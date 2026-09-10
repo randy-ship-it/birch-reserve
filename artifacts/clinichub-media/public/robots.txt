@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /buycalc
+Allow: /v1/
+Allow: /llms.txt
+Allow: /openapi.yaml
+Disallow: /api/editorial/admin
+Disallow: /sales/
+Disallow: /sign-in/
+Disallow: /sign-up/
+Sitemap: https://birchreserve.net/api/editorial/sitemap.xml

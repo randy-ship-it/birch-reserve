@@ -1,0 +1,132 @@
+ENHANCE IN PLACE — birchreserve.net / current Replit app.
+Do not redesign. Do not touch Stripe, checkout, or payment code. Randy is wiring Stripe separately.
+Do not change SKUs or prices: reserve-990 $990 · pilot-4900 $4,900 · network-9900 $9,900 USD.
+Do not add Spark. Do not invent impression totals. Kill any remaining “100M impressions” copy if it is still on the homepage.
+
+WHY THIS TICKET
+A buyer needs to feel the ad sits next to real recovery products and inside real brand hubs — not next to random junk. We already have signed hubs and a public Scale Health supplier list. Show that. Make inquire and reserve both obvious. Leave checkout alone.
+
+==================================================
+1) HONEST LANGUAGE (use this exact idea, not inflated reach)
+==================================================
+The ad does not run on the open web.
+It sits inside a Scale Health brand hub — after someone already bought, booked, or started a plan — and it sits BESIDE products those customers already buy (recovery devices, topicals, nutrition, sleep, meal prep).
+That is the quality control: your brand appears next to recognized supply brands, not random inventory.
+
+Caption under any mock:
+“Illustrative unit. Your creative is placed beside live catalog products on a signed hub. Nothing runs until an insertion order names the surface.”
+
+==================================================
+2) IMAGE RULES — NON-NEGOTIABLE
+==================================================
+You may screenshot and perfectly crop ONLY these properties.
+Signed = opted into display space even if the hub is not public-launched yet. That is enough.
+
+LIVE (link it):
+- DR-HO’S — https://physio.drhonow.com/
+
+SIGNED / launching (crop allowed; label “Signed hub · launching” unless the URL is the live DR-HO site):
+- Kalaya — https://kalaya-review-96e8a6.vercel.app/
+- Jill Health — https://jill-health.replit.app/my-brand-landing/
+- Jack Health — https://jack-health-review-152989.vercel.app/
+- Integrity Fitness — https://www.scalehealth.ca/integrity
+- Bird & Be — https://bb-review-6bfc59.vercel.app/
+- NutriProCan — https://nutriprocan-review-89aed9.vercel.app/
+- Roll Recovery marketplace — https://roll-recovery-review-fb85f8.vercel.app/portal?tab=marketplace
+
+If a URL 404s, is blank, or is behind auth: skip it. Do not invent a fake hub screenshot. Do not generate an AI stand-in of a hub.
+
+DO NOT screenshot or name as inventory:
+AirWaav, Genuine Health, Effortless Admin, Vivobarefoot, Inbody, Trainers Choice, Urban Poling, Medi-Dyne, Aetrex, CastleFlexx, Native Shoes, Built with Science, Urestra, or any late-discussion brand.
+
+CROP SPEC
+- Dismiss cookie banners before capture (DR-HO has a privacy modal — close it).
+- 16:9 or 4:3, tight. No browser chrome, no URL bar, no scrollbars, no cookie sheet, no “review / staging” watermarks if you can crop them out.
+- Prefer: hub home (Brand × ScaleHealth lockup + booking card), member-offer / marketplace product grid, booking / first-service card.
+- Save crops in /public/hub-proof/ with names like drho-hub-home.jpg, kalaya-booking-card.jpg, roll-marketplace-grid.jpg.
+- Max 6 hub images on the homepage. Quality over quantity. DR-HO first. Then Kalaya. Then whichever signed hubs actually render.
+
+==================================================
+3) NEW / REWRITE SECTIONS ON THE EXISTING HOMEPAGE
+==================================================
+Keep current structure. Insert or rewrite these three blocks. Do not add manifesto essays.
+
+A. “Where the ad sits”
+Four format cards. Reuse existing mocks (Aura / Pulse / Somnus / Nordic) only if you also put ONE real cropped hub frame next to them so it is obvious this is a real page type, not a concept deck.
+1. Post-checkout — after a product purchase on the hub
+2. Recovery plan — inside the plan the customer is already on
+3. Booking confirmation — after they book physio / a session
+4. Member hub module — native unit on the hub home, beside member offers
+Each card: one sentence + “This unit lives on hubs like DR-HO’S.” Link https://physio.drhonow.com/ once.
+
+B. “You sit beside these products”  ← this is the new believability block
+Headline: “Your ad runs next to products people already buy — not random inventory.”
+Body (short): “Scale Health hubs sell and recommend a private supplier catalog. Birch placements sit in that same shelf: recovery equipment, topicals, nutrition, sleep, meal prep. You are not dropped next to unknown brands.”
+
+Logo / name strip. Use ONLY names already public on scalehealth.ca Supplier Network plus signed hub brands:
+
+Signed hub brands (context, not “your ad is live here today” except DR-HO):
+DR-HO’S · Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery
+
+Supplier / product adjacency (the shelf the ad sits beside):
+DR-HO recovery equipment · Kalaya topical pain relief · Magnum Supps · Fresh Prep · LyfeFuel · RenPho · Manduka · Flora Health · Resolve Sleep · 360 Athletics · AirWaav · Medistick · Viome
+
+Caption: “These are the products and hubs on the Scale Health layer. Birch buys the display unit beside them. It is not a sold impression count.”
+Link https://scalehealth.ca as “See the brand network.”
+Do not imply Garmin or any unsigned consumer brand is a Birch slot.
+
+C. “Signed hubs” proof strip
+Three chips only:
+- LIVE — DR-HO’S · physio.drhonow.com
+- SIGNED — Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery
+- PHYSICAL — participating locations TBA Fall 2026
+
+Under the chips: the cropped hub images from section 2. Each image caption:
+“Signed Scale Health hub. Display inventory is contracted. Launch timing varies.”
+DR-HO caption: “Live customer hub.”
+
+==================================================
+4) WHAT YOU GET (keep prices, no Stripe work)
+==================================================
+Leave /buycalc and Stripe code untouched.
+On the homepage, one tight table + two buttons:
+
+$990 Access Reserve — holds first-right on one category in the 8-seat pool. 100% credit. No media runs until an IO names the surface.
+$4,900 Placement Pilot — credit toward one named format on a scoped hub.
+$9,900 Network Pilot — credit toward a coordinated multi-surface test across live digital hubs.
+
+Buttons (do not wire new payment):
+- Primary: “Reserve first access — $990” → existing /buycalc?sku=reserve-990
+- Secondary: “Inquire first” → same page inquire mode OR a short form (brand, work email, website, category, note) that writes interest_captured to the existing Google Sheet “Birch Reserve — Splash Ad Pipeline.” No charge.
+
+==================================================
+5) VIDEO — SLOT ONLY, NO SHITTY AI
+==================================================
+Add a reserved block on the homepage: “See a hub walk-through” with a 16:9 placeholder and a comment in code:
+  VIDEO_SRC = ""  // Randy drops a real MP4 / Loom / YouTube later
+Do NOT generate an AI video. Do NOT loop stock “clinic smiling” footage. Do NOT autoplay garbage.
+If a real, clean, non-AI clip already exists in the repo, embed it muted with a play button. Otherwise leave the slot empty and visually quiet so it does not look broken.
+
+==================================================
+6) COPY FIXES WHILE YOU ARE IN THERE
+==================================================
+- Remove 100M / unverified reach / fake CTR.
+- Relabel every current mock “Illustrative — not your receipt.”
+- Physical inventory: “Fall 2026 · participating locations TBA.”
+- Footer already planned: Scale Health Network Inc. · RDG Digital Holdings Inc. · scalehealth.ca · rdgdh.com. Add if missing. Do not build a legal novel.
+
+==================================================
+7) BIRCH GUIDE / llms.txt (one paragraph each)
+==================================================
+Guide and /llms.txt must say:
+Ads sit inside signed Scale Health hubs, beside the supplier catalog (DR-HO, Kalaya, Magnum, Fresh Prep, LyfeFuel, RenPho, Flora, Resolve Sleep, etc.). Live example: physio.drhonow.com. Other named hubs are signed / launching. $990 is a category hold, not a live flight. No impression guarantee. Inquire or reserve. Do not invent reach.
+
+==================================================
+ACCEPTANCE
+- Homepage shows real cropped frames from DR-HO and at least one other signed hub that actually loaded.
+- A “sit beside these products” strip uses the Scale supplier names above.
+- No late-discussion brands. No AI hub fakes. No AI video.
+- Stripe files were not edited.
+- 100M is gone.
+- Reserve + Inquire are both visible above the fold.
+- A stranger can tell: the ad sits on a recovery hub, next to real products, not next to weird inventory.

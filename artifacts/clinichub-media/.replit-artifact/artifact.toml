@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Birch Reserve"
+description = "A premium private distribution marketplace accepting qualified pilot, supply, and category-insight requests for approved participants."
+version = "1.0.0"
+id = "artifacts/clinichub-media"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24610
+
+[services.development]
+run = "pnpm --filter @workspace/clinichub-media run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/clinichub-media", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/clinichub-media/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24610"
+BASE_PATH = "/"

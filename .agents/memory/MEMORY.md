@@ -1,0 +1,22 @@
+- [Orval Zod compatibility](orval-zod-compatibility.md) — keep OpenAPI validation primitives compatible with this workspace’s generated Zod version.
+- [Public waitlist privacy](public-waitlist-privacy.md) — keep duplicate membership and exact queue rank private until email ownership is verified.
+- [Public performance claims](public-performance-claims.md) — keep planning-model metrics and named partner queues private until they are substantiated and approved for publication.
+- [Contributor access verification](contributor-access-verification.md) — public requests may choose a route, but only private review can grant contributor priority.
+- [Splash checkout state transitions](splash-checkout-state-transitions.md) — claim payment attempts atomically and bind webhooks to the claimed Stripe session.
+- [Reserve offer ladder](reserve-offer-ladder.md) — use three canonical USD media-credit tiers with shared inventory and lookup-only legacy compatibility.
+- [Institutional brand direction](institutional-brand-direction.md) — optimize Birch Reserve for major-brand and procurement credibility, not boutique editorial styling.
+- [Concierge privacy boundary](concierge-privacy-boundary.md) — keep raw buyer questions browser-only; APIs and AI receive anonymous intent signals, never message text.
+- [Advertiser intake session deduplication](advertiser-intake-session-deduplication.md) — keep completed follow-up state across a tab session without retaining email or chat text.
+- [Private sales queue access](private-sales-queue-access.md) — private intake data must leave browser caches when staff access clears, including after late mutations.
+- [Revocation regression isolation](revocation-regression-isolation.md) — test watchdog revocation and mutation denial separately so accelerated polling cannot mask the mutation path.
+- [Reservation alert delivery boundary](reservation-alert-delivery-boundary.md) — start alerts after durable save; never let delivery or downstream sync gate buyer checkout.
+- [Paid creative recycle boundary](paid-creative-recycle-boundary.md) — only recycle paid seats when creative receipt has a durable, race-safe staff transition.
+- [Inventory hold clocks](inventory-hold-clocks.md) — expiry starts when capacity is acquired, and every still-payable offer generation shares one inventory boundary.
+- [Public machine-buying boundary](public-machine-buying-boundary.md) — delegated UCP payment is opt-in, signed-profile authenticated, exact-version, and independent of human Checkout.
+- [Shared UCP merge validation](shared-ucp-merge-validation.md) — concurrent UCP route work can merge cleanly yet interleave semantics; validate the rebased contract and flow.
+- [Agent replay-proof maintenance](agent-replay-proof-maintenance.md) — keep nonce claims atomic and foreground; run expiry pruning as bounded, lock-skipping background maintenance.
+- [Replay-proof performance guard](replay-proof-performance-guard.md) — benchmark mixed live/expired cardinality with broad CI latency ceilings, not machine-specific microbenchmarks.
+- [API project-reference declarations](api-project-reference-declarations.md) — rebuild shared-library declarations before trusting API typecheck errors after schema changes.
+- [Shared admission test isolation](shared-admission-test-isolation.md) — isolate durable rate-limit buckets and avoid accidental timeout fallback in cross-worker tests.
+- [UCP identity continuity](ucp-identity-continuity.md) — profile changes require proof from the recorded continuity key, current-owner checks, and durable audit history.
+- [GitHub connector boundary](github-connector-boundary.md) — connector API access does not authenticate shell pushes; finish repository linking through Replit’s Git tool.

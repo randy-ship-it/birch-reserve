@@ -1,0 +1,102 @@
+Here’s a paste-ready brief for Replit, plus what **you** need to drop in (so the bot doesn’t have to sign into Stripe).
+
+---
+
+### What you need to do (Randy)
+
+In the BirchReserve Replit Secrets / env:
+
+1. **`STRIPE_SECRET_KEY`** — from Stripe Dashboard → Developers → API keys → **Secret key** for **SBG APIs** (live `sk_live_…`). Don’t paste it into chat; only into Replit Secrets.
+2. **`STRIPE_WEBHOOK_SECRET`** — after Replit exposes a webhook URL, create a webhook in Stripe for that URL (events below) and paste the signing secret (`whsec_…`).
+3. Confirm secrets are on the **production / deployment** env, not just the Replit shell.
+
+Optional but useful:
+- **`STRIPE_PRICE_ID=price_1UDk7WDxmCwsLJNDN33kvt1x`**
+- **`STRIPE_PRODUCT_ID=prod_VECW1NASrdM4I3`**
+
+Fallback if code isn’t ready yet: Payment Link  
+https://buy.stripe.com/9B614n6tnbK2cHcbpk8AE01
+
+---
+
+### Paste this to Replit bot
+
+```text
+Wire live Stripe Checkout for Birch Reserve Ad on BirchReserve.net.
+
+CONTEXT
+- Site: https://birchreserve.net
+- Merchant: Silver Birch Growth Inc (Stripe account display name: SBG APIs)
+- Product already exists in LIVE Stripe — do NOT create a new product/price.
+- Product ID: prod_VECW1NASrdM4I3
+- Price ID: price_1UDk7WDxmCwsLJNDN33kvt1x
+- Amount: USD $1,900 one-time (unit_amount 190000, currency usd)
+- Offer key used by the UI: "splash-1900"
+- Frontend already posts to /api/launch/splash/checkout and expects { checkoutUrl } then redirects.
+- Card payments are NOT live yet — that endpoint must create a real Stripe Checkout Session.
+- Do NOT use Payment Element. Use Stripe-hosted Checkout Sessions.
+- Never put sk_live keys in client code. Secret key only on the server via env.
+
+ENV (already / will be set in Replit Secrets by the human — do not ask them to paste keys into chat)
+- STRIPE_SECRET_KEY=sk_live_… (required)
+- STRIPE_PRICE_ID=price_1UDk7WDxmCwsLJNDN33kvt1x
+- STRIPE_PRODUCT_ID=prod_VECW1NASrdM4I3
+- STRIPE_WEBHOOK_SECRET=whsec_… (after webhook is created)
+- PUBLIC_APP_URL=https://birchreserve.net
+
+IMPLEMENT
+
+1) Install stripe Node SDK if missing. Use StripeClient / modern SDK pattern (not global stripe.api_key if avoidable).
+
+2) Fix POST /api/launch/splash/checkout
+- Accept body like: { offer, brandName, workEmail, website? }
+- Validate offer === "splash-1900" (or map offer → STRIPE_PRICE_ID)
+- Require workEmail
+- Create Checkout Session:
+  - mode: "payment"
+  - line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }]
+  - success_url: `${PUBLIC_APP_URL}/splash/activation?session_id={CHECKOUT_SESSION_ID}` (or existing success route if one already exists — keep activation-token flow if present)
+  - cancel_url: `${PUBLIC_APP_URL}/?checkout=cancelled`
+  - customer_email: workEmail
+  - metadata: { offer: "splash-1900", brandName, workEmail, website, site: "birchreserve.net" }
+  - payment_intent_data.metadata: same
+  - Do NOT set payment_method_types (let Stripe dynamic payment methods work)
+- Return JSON: { checkoutUrl: session.url }
+- On missing STRIPE_SECRET_KEY or Stripe errors, return clear 500 JSON — never claim payment succeeded.
+
+3) Webhook POST /api/stripe/webhook (raw body)
+- Verify with STRIPE_WEBHOOK_SECRET
+- Handle: checkout.session.completed, checkout.session.async_payment_succeeded, checkout.session.expired, payment_intent.payment_failed
+- On successful payment: mark reservation paid, generate/store activation token, email receipt/ops if that flow exists
+- Idempotent by session.id / payment_intent id
+
+4) Remove/disable the placeholder copy: “Card payments are not live yet, so no charge was attempted.”
+
+5) Keep Payment Link as emergency fallback only:
+   https://buy.stripe.com/9B614n6tnbK2cHcbpk8AE01
+   Do not replace the modal flow with this unless Checkout Session creation fails and you need a temporary bypass.
+
+VERIFY
+- From the reserve modal, submit test brand + real email → redirect to checkout.stripe.com
+- Session shows $1,900 USD and product “Birch Reserve Ad”
+- Cancel returns to site
+- After a real/test charge path you support, activation/paid state updates via webhook
+
+OUT OF SCOPE
+- Do not create new Stripe products/prices
+- Do not switch accounts
+- Do not put publishable key requirements in the client for this flow (hosted Checkout doesn’t need pk_ on the client)
+```
+
+---
+
+### Stripe webhook events to enable (you, in Dashboard)
+
+Endpoint: `https://birchreserve.net/api/stripe/webhook` (or whatever path Replit ships)
+
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
+- `checkout.session.expired`
+- `payment_intent.payment_failed`
+
+Want me to also draft the exact Secrets checklist as a short Slack/email you can send yourself, or jump into Replit on my computer and verify the endpoint once the key is in?

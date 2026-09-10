@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ucp.stripe.com/payments/2026-06-25/response_config.json",
+  "title": "Stripe Payments Response Config",
+  "type": "object",
+  "properties": {
+    "environment": {
+      "type": "string",
+      "enum": [
+        "sandbox",
+        "production"
+      ]
+    },
+    "merchant_id": {
+      "type": "string",
+      "description": "Business's Stripe account identifier."
+    },
+    "tokenization_specification": {
+      "type": "object",
+      "description": "Runtime tokenization configuration for this checkout.",
+      "required": [
+        "type",
+        "parameters"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "TOKENIZE_API",
+          "description": "Tokenization method type."
+        },
+        "parameters": {
+          "type": "object",
+          "required": [
+            "url",
+            "authentication"
+          ],
+          "properties": {
+            "url": {
+              "type": "string",
+              "format": "uri",
+              "description": "The tokenize endpoint URL."
+            },
+            "authentication": {
+              "type": "object",
+              "required": [
+                "method",
+                "credential"
+              ],
+              "properties": {
+                "method": {
+                  "type": "string",
+                  "const": "bearer"
+                },
+                "credential": {
+                  "type": "string",
+                  "description": "Field name from business_config to use as Bearer token value."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ucp.stripe.com/payments/2026-06-25/business_config.json",
+  "title": "Stripe Payments Business Config",
+  "type": "object",
+  "required": [
+    "environment",
+    "merchant_id",
+    "publishable_key"
+  ],
+  "properties": {
+    "environment": {
+      "type": "string",
+      "enum": [
+        "sandbox",
+        "production"
+      ]
+    },
+    "merchant_id": {
+      "type": "string",
+      "description": "Stripe account identifier (e.g. acct_xxx)."
+    },
+    "publishable_key": {
+      "type": "string",
+      "description": "Stripe publishable key for authenticating tokenization calls."
+    }
+  },
+  "additionalProperties": false
+}

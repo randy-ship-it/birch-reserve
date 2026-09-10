@@ -1,0 +1,230 @@
+# PASTE THIS ENTIRE FILE INTO REPLIT AGENT
+# Repl: https://replit.com/@randy121/clinichub-media ONLY
+# Randy Gilling authorized publish of THIS project only.
+# You own the design. We own the commercial truth. Do not ship a SaaS template.
+
+You are building the public site for HubAds — Silver Birch Growth Inc’s exclusive agency for advertising and activation space on the Scale Health private network.
+
+This is not a thank-you-page widget. This is not a Meta ads clone. This is not a mature omnichannel network. It is a private post-checkout activation layer: the buyer just finished a brand order and has not left.
+
+============================================================
+HARD RULES
+============================================================
+- Work ONLY in @randy121/clinichub-media
+- NEVER open, fork, search, or edit ScaleHealth Connect, any scalehealth repl, or Scale source
+- Do not write Scale frontend/backend. Scale is a fulfillment vendor we ticket. Later they may POST events TO US. We never call them.
+- Do not scrape Scale cookies. Do not inject trackers into Scale pages from this repo.
+- Our cookies live on THIS HubAds origin only (first party).
+- Never commit Stripe secret keys. Use Replit Secrets.
+- If video/png upload crashes the tab, stop retrying binaries. Hotlink public media below.
+- CAD only at launch. No USD.
+- Do not invent CTR, 5MM audience, $10MM, testimonials, or unsigned live hosts.
+- 10 million = signed annual ORDERS, not dollars. Never write $10MM or “$10 million.”
+- Never pitch a thank-you-page ad buy. Never claim a mature network.
+- Industry conversion ranges below are ANCHORS, not our live results. Label them “industry” or “expected floors.”
+- When it runs, Publish this Repl. Target https://clinichub-media.replit.app
+- Reply with the live URL when Publish succeeds.
+
+============================================================
+WHAT THIS COMPANY IS
+============================================================
+Silver Birch Growth Inc sells the seat.
+Scale Health is the exclusive distribution partner and the private network.
+Buyer pays SBG on Stripe. Cash hits the SBG account.
+SBG tickets Scale / Barb to place. Host brand can veto a conflict.
+Category exclusive by default.
+Brand partners already signed with Scale get first look / first inventory.
+Buyer keeps the customer. Not affiliate. Not Meta.
+
+Two offer types after a brand checkout (hybrid, in this order):
+
+1) PRODUCT A → B CROSS-SELL
+   Near-zero friction (same payment, one-click).
+   Industry one-click: 8–15%. H&W upsell avg 22.3%, top quartile 35.6%. Post-purchase 14.6%. Shopify/Forrester one-click 6–12%. Aftersell cart ~8.5%.
+   Immediate: AOV lift, partner revenue share, pure profit per txn in the $0.29–$0.80 band on small attach.
+   Our floors: ≥10% target, 15%+ stretch.
+   Best when complementary stacks, recovery protocols, subscription attach.
+
+2) PHYSIO / CLINICAL SERVICE as “protocol activation”
+   Medium friction (scheduling / consult intent) — kill that friction (one-tap consult, pre-qualified booking).
+   Industry: 3–8% lead-to-book baseline; 8–15% with low friction + high relevance. Wellness landings 5.1–8.2%; PT sites ~4.6%. Telehealth base 2–5% → optimized 8–15%.
+   Our floors: ≥5% lead-to-book, stretch 8–12%.
+   LTV is the point: Align ARPA $3.4–3.9k band, 30%+ gross margin, multi-session. Exclusive high-value leads into the Align network + brand elevation.
+   Best trigger: fertility / hormonal → pelvic floor / MSK physio (clinical adjacency).
+
+Prediction flow on the page (keep it one diagram, not a spreadsheet):
+Brand checkout complete
+  → Product offer (8–15%+) → immediate cash + partner share
+  → Service activation (5–10% optimized) → Align billings + network flywheel + brand lift
+
+Copy the idea, not the table: “Products fund the short cycle and keep brand partners happy. Services compound the clinical asset and feed the Align network.”
+
+Three levers (one short section, not a white paper):
+1. Clinical adjacency scoring
+2. Friction kill on the service side
+3. Track contribution margin + downstream Align sessions, not just click-to-accept
+
+Who buys: any complementary brand, physio/fulfillment, retail, or health & wellness company that wants post-checkout space. Clinics are one row, not the whole book. Do not sell the 80-door clinic list.
+
+Live surfaces you may name (do not invent more):
+- https://physio.drhonow.com  — live consumer hub (countable today)
+- https://www.scalehealth.ca/integrity — partner gym hub (name it; do not claim proven post-checkout volume)
+Do NOT treat scalehealth.ca homepage as inventory.
+Do NOT list InBody, Aetrex, Manduka, Kalaya, Jill, Jack as live hosts.
+Press: Newsfile 303020, 26 Jun 2026. Quote OK: “This is the clinical layer brands have been missing.” — Randy Gilling
+Team: https://www.silverbirchgrowth.com/team
+
+============================================================
+PACKAGES (this is the cash register — old tile SKUs are retired)
+============================================================
+Sell packages, not pixel sizes. Pixel sizes are fulfillment notes for Scale, not the product.
+
+LIVE TODAY
+$5,000 CAD — Founding Sponsor
+90 days. One complementary seat on one live hub (start: DR-HO). Host veto. Category exclusive. End-of-term note. We ticket Scale to place.
+Use this when inventory is thin. It is the live offer.
+Do not promise 200–400k impressions. Do not promise a second surface.
+
+HELD — do not auto-checkout until Randy flips a flag
+$10,000 CAD — Test Pilot
+2+ live premium surfaces AND a path to 200–400k premium-led (post-booking / post-checkout) impressions. One mid-pilot optimization. Basic reporting.
+Show the card. Badge it “Opens when a second surface is live.” Button = “Request the pilot” (reserve, no Stripe charge) until env LIVE_TEST_PILOT=1.
+
+LATER — show as coming, no buy button
+$20,000–$30,000 CAD — Founding Advertiser
+Once fulfillment is real across the network.
+
+$15,000+ CAD — Sponsored Placement
+Visibility buyers. Quote on request.
+
+Default checkout = Founding Sponsor $5,000 CAD, one-time, 90 days.
+No subscriptions.
+No SKU over the live $5k unless LIVE_TEST_PILOT=1.
+
+Old à-la-carte tiles (Partner Logo / Product Card / Journey Band / Locator / Hub Network $9,900) are fulfillment shapes, not public products. Do not sell them on the homepage. Admin may still map a paid package to a seat type when writing the Scale ticket.
+
+============================================================
+STACK
+============================================================
+Node (or Replit-friendly) is fine. You design the UI.
+
+- GET /              sales page
+- POST /reserve      create an order (brand, email, url, kind: brand|physio|retail|other, package, hub) status=reserved
+- POST /api/checkout Stripe Checkout Session (CAD, one-time) for Founding Sponsor (and Test Pilot only if LIVE_TEST_PILOT=1)
+- GET /success       “We will send Scale the placement order.”
+- POST /api/stripe/webhook   mark paid (STRIPE_WEBHOOK_SECRET)
+- POST /api/scale/report     Scale later sends view/click/book. Shared secret. We receive only.
+- GET /admin         password gate. Orders, paid, events, Scale ticket copy. No fake CTR theater.
+- GET /brief         plain-text living commercial brief (see LIVING BRIEF). Replit and humans can refetch this.
+
+First-party cookie `ha_sid` on this origin only. Record our-site views, package clicks, reserve starts, checkout starts. Rank already-allowed packages. Never claim Scale-page CTR until Scale POSTs real events.
+
+Secrets (do not invent values; if missing, mock Stripe and yellow-banner “Stripe secrets missing — reserve only”):
+- STRIPE_SECRET_KEY
+- STRIPE_WEBHOOK_SECRET
+- STRIPE_PRICE_SPONSOR          → $5,000 Founding Sponsor
+- STRIPE_PRICE_PILOT            → $10,000 Test Pilot (unused until LIVE_TEST_PILOT=1)
+- ADMIN_PASSWORD
+- SCALE_REPORT_SECRET
+- LIVE_TEST_PILOT               → "0" or "1"
+- BRIEF_EDITORS                 → comma emails allowed to POST /brief (randy@silverbirchgrowth.com, jon — Randy will paste)
+
+If Stripe secrets are absent, Reserve still saves and says “we will invoice.” Do not crash.
+
+============================================================
+STRIPE
+============================================================
+CAD. One-time. Collect billing email. No subscriptions. No keys in client JS.
+success_url = {origin}/success?session_id={CHECKOUT_SESSION_ID}
+
+Randy creates Price IDs in the SBG Stripe account and pastes them into Secrets.
+Do not invent Price IDs.
+
+After paid: write a Scale ticket object (brand, url, package, seat type, hub, dates, stripe id). Admin: “copy to Scale.” Optional mailto randy@silverbirchgrowth.com. Do not auto-email Scale.
+
+============================================================
+SCALE REPORTING (interface, not their repo)
+============================================================
+Build OUR collector. Document it at GET /docs/scale-report.
+
+Scale will later POST JSON to /api/scale/report
+Header: x-scale-secret: SCALE_REPORT_SECRET
+{
+  "hub": "physio.drhonow.com",
+  "package": "sponsor" | "pilot",
+  "brand": "Example",
+  "event": "view" | "click" | "book" | "product_accept" | "service_book",
+  "ts": "ISO-8601"
+}
+
+Store events. Admin shows counts.
+Sales page: “view and click note at end of term.” No invented live CTR.
+Tiny first-party pixel: /p.gif?e=view&sku=
+
+Allowed improvement loop:
+- Rank already-allowed packages using OUR site engagement
+- Partner-priority badge if email domain is a known Scale partner
+- Do NOT build a Meta-style auction
+- Do NOT edit Scale
+
+============================================================
+LIVING BRIEF (Randy + Jon only)
+============================================================
+GET /brief.md  — public, cache 60s, the commercial source of truth this page (and future Replit runs) should reread.
+POST /brief    — only if Authorization: Bearer BRIEF_EDITORS token or a simple emailed-link you invent; start with ADMIN_PASSWORD on POST. Body is markdown. Save to brief.md. Never accept from the public form.
+
+Default /brief.md content = a short version of this file’s “WHAT THIS COMPANY IS” + packages + live hubs. When Jon or Randy updates it, the homepage proof line and package badges should prefer /brief.md over hardcoded copy on next load (or a daily rebuild is fine).
+
+Do not let the living brief become a CMS. One markdown file.
+
+============================================================
+PAGE — YOU DESIGN THIS
+============================================================
+Previous build was ugly. Do not recreate a dark crypto hero, a SaaS pricing grid, or a media-kit PDF in HTML.
+
+Must feel like an exclusive agency that already has the room: paper, type, one inevitable idea.
+Warm off-white. Black ink. One accent (copper or ember). Readable in sunlight.
+Type that looks expensive. You pick the fonts. No Inter / no generic Tailwind landing.
+
+H1 idea (you may sharpen the words, keep the meaning):
+They just ordered. They have not left.
+
+Proof line (exact):
+Ten million signed annual orders — that is the floor.
+
+Sub: Scale Health is a private post-checkout network. HubAds is the exclusive agency for that space. Product first. Then the protocol.
+
+One hybrid diagram (product then service). Industry floors labeled as industry.
+
+Two buyer doors, same form:
+- Brand / retail / H&W — product seat
+- Physio / clinical — protocol activation seat
+
+Live offer card: $5,000 Founding Sponsor. Primary CTA.
+Held card: $10,000 Test Pilot. Request only.
+Later: Founding Advertiser / Sponsored Placement as quiet text.
+
+Hero video HOTLINK only:
+- https://physio.drhonow.com/videos/dr-ho/randy-dr-ho-portal-video.mp4
+- poster https://physio.drhonow.com/images/dr-ho/video-gradient-thumb.png
+Badge: Live hub · physio.drhonow.com
+
+How it works (4 beats, not 12):
+1. Brand checkout completes on a Scale hub
+2. Product offer, then protocol activation
+3. Buyer pays SBG (CAD prepaid)
+4. We ticket Scale. Host can veto. Tile / booking path goes live. Reporting comes back to us.
+
+Form = insertion order. POST /reserve then checkout (or request if Test Pilot is held).
+Footer: HubAds by Silver Birch Growth Inc. Exclusive agency for Scale Health private-network space. 777-2255B Queen St E, Toronto ON M4E 1G3 · randy@silverbirchgrowth.com · 647-966-7918
+
+Vibe: exclusive, inevitable, a little crazy. Draper precision, not a help-desk site.
+
+============================================================
+SHIP
+============================================================
+1. / loads. /reserve and /api/checkout exist. /brief.md exists.
+2. Mock Stripe if secrets missing.
+3. Default live SKU is Founding Sponsor $5,000.
+4. Publish THIS repl to https://clinichub-media.replit.app
+5. Return the live URL.

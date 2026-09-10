@@ -1,0 +1,206 @@
+You are the Replit Agent for this existing app (https://birch-list-ad-agency.replit.app), the working copy of Birch Reserve (https://birchreserve.net) — Silver Birch Growth / Scale Health private clinic-hub media.
+
+DO NOT rebuild the site. DO NOT restyle it. Audit the repo first, then extend it so a media-buying bot AND a human can discover the unit, price the unit, pay the unit, and get a machine receipt. Same job rdgdh.com/navcalc does for a stock.
+
+# Locked offer (do not change)
+- SKU: seat-1900  (existing offer id: splash-1900)
+- Due today: $1,900 CAD one-time (190000 cents)
+- Credits: $5,000–$50,000 exclusive high-value display
+- Discount: 25% below published
+- Formats (fulfillment, NOT separate SKUs this pass): Confirmation / Post-Checkout, Recovery Plan, Scheduled Service / Booking, Member Hub, Motion 15s
+- Model: curated reserved inventory. NOT RTB. NOT an open auction.
+- Payment is autopilot. Flight is coordinated (creative + slot in 72h).
+- Reporting: aggregate only. Never patient data. No PHI. No clinical pixels.
+
+# Palette if you touch UI
+#0A1D56 navy  #00FF88 green  #9D4EDD purple  #F0F4F8 / #FFFFFF contrast
+Existing dark hero (#071A39) stays.
+
+# Hard do-not
+- Do not publish CPM, fill rate, Order Unit yield, monthly dollars, clinic-count economics, or patient LTV.
+- Do not require Clerk/login to buy seat-1900.
+- Do not invent new prices or extra paid SKUs.
+- Do not route /llms.txt, /openapi.yaml, /robots.txt, /v1/*, or /buycalc through the Vite SPA catch-all. Those must be Express text/json or SSR.
+- Do not treat Replit as long-term production. Keep routes portable Express so they copy onto birchreserve.net.
+- Do not delete working homepage copy, reserve modal, or marketplace UI.
+- Do not add tracking pixels on clinical/hub pages.
+
+# Current truth — do not regress
+- POST /api/launch/splash/reserve already works.
+  Body: { brandName, email, websiteUrl?, offer:"splash-1900" }
+  Returns 202: { reservationId, status:"held_pending_payments", checkoutUrl:null, amountCents:190000, currency:"cad", offer:"splash-1900" }
+- POST /api/launch/splash/checkout is 404. That is the money leak. Wire it; do not invent a parallel cart.
+- UI copy currently says “Card payments are not live yet.” DELETE that sentence.
+- GET /api/marketplace/placements returns 400 with no query schema.
+- GET /api/editorial/articles returns [].
+- Formats and categories already exist in the UI. Keep them.
+- Clerk is for admin/editorial only.
+
+############################################################
+PHASE 0 — Audit (30 min). Report, then build.
+############################################################
+1. List routes, env vars, Stripe keys, reserve schema, robots.txt, SPA fallback order.
+2. Document why placements GET is 400 and what query it wants.
+3. Do not delete working reserve or marketplace code.
+
+############################################################
+PHASE 1 — Take money on the EXISTING reserve hold
+############################################################
+1. Use Stripe price from env STRIPE_PRICE_ID_SEAT_1900 if set. Else create/test product seat_reserve_1900 one-time CAD $1,900.
+2. Implement POST /api/launch/splash/checkout
+   Body: { reservationId }  OR  { brandName, email, websiteUrl, offer:"splash-1900", idempotencyKey }
+   If no reservationId, call reserve internally first.
+   Create Stripe Checkout Session (CAD, mode=payment, success_url=/success?order={id}, cancel_url=/).
+   Return JSON { checkoutUrl, reservationId, amountCents:190000, currency:"cad", offer:"splash-1900" }.
+3. If request Accept: application/json → JSON only. Browser form may 303 to checkoutUrl.
+4. After a successful reserve, if checkoutUrl is present, AUTO-REDIRECT. If not, show button “Pay $1,900 CAD”.
+5. Webhook POST /api/stripe/webhook
+   checkout.session.completed → status paid, persist order, decrement seats, write receipt.
+6. Idempotent. Same idempotencyKey never double-charges.
+7. DELETE all “payments are not live / we’ll send checkout later” copy. Replace success page with paid confirmation + “upload creative within 72 hours” + IO link.
+8. If STRIPE_SECRET_KEY is missing: return JSON { error:"STRIPE_SECRET_KEY missing", checkoutUrl:null } — never HTML, never a fake success.
+
+############################################################
+PHASE 2 — Machine surfaces (NAVCalc twin). Serve BEFORE SPA fallback.
+############################################################
+GET /llms.txt          text/plain
+  Who we sell to (health/wellness brands + their media agents).
+  One SKU seat-1900. $1,900 CAD. Credits $5k–$50k. 25% off published.
+  Formats list. Exclusions: PHI, clinical pixels, open auction.
+  How to pay: POST /v1/checkout. How to poll: GET /v1/orders/{id}.
+  Contact: randy@silverbirchgrowth.com
+
+GET /v1/catalog.json
+{
+  "sku":"seat-1900",
+  "name":"Display reserve seat",
+  "currency":"CAD",
+  "due_today":1900,
+  "credit_min":5000,
+  "credit_max":50000,
+  "discount_vs_published":0.25,
+  "formats":["post_checkout","recovery_plan","scheduled_service","member_hub","motion_15s"],
+  "exclusivity":"category_lock",
+  "fulfillment":"coordinated_72h",
+  "reporting":"aggregate_only",
+  "checkout":"/v1/checkout",
+  "human":"/buycalc"
+}
+
+GET /v1/availability.json
+{ "sku":"seat-1900", "seats_open": <int>, "seats_held": <int>, "next_window":"rolling_30_90_180", "formats_live":[...], "last_updated": ISO, "checkout":"/v1/checkout" }
+Seed seats_open from SEATS_TOTAL (default 8). Decrement on paid webhook. If 0, homepage CTA = waitlist, not checkout.
+
+GET /v1/quote?format=post_checkout&days=30
+Always: dueTodayCad 1900, creditBand "$5,000–$50,000", discount "25%", exclusions, checkout path.
+
+GET /openapi.yaml covering /v1/catalog /v1/availability /v1/quote /v1/checkout /v1/orders/{id}
+
+JSON-LD Offer + Product on / and /buycalc (price 1900 CAD).
+
+Sitemap must include /buycalc, /marketplace, /v1/catalog.json, /llms.txt.
+robots.txt: Allow /, /buycalc, /v1/, /llms.txt, /openapi.yaml. Disallow /api/editorial/admin, /sales, Clerk callbacks.
+
+############################################################
+PHASE 3 — /buycalc + bot checkout
+############################################################
+GET /buycalc  (SSR or static numbers that work with JS disabled)
+Inputs: format, windowDays 30|90|180, exclusivity category|ron (default category), creative static|native|motion
+Outputs on the page:
+- Due today $1,900 CAD
+- Credit $5,000–$50,000
+- 25% below published
+- Seats remaining (from availability)
+- What is NOT included (PHI, clinical pixels, open auction)
+- Primary button: Reserve seat — $1,900 CAD → same Stripe checkout as Phase 1
+- Secondary: copy quote JSON
+
+POST /v1/checkout
+Body: { sku:"seat-1900", email, brand, format_pref?, idempotency_key }
+- Reject any other sku
+- Reuse splash reserve + checkout internally so there is ONE order table
+- Return { checkout_url, order_id, reservationId, amountCents:190000, currency:"cad" }
+No Clerk.
+
+GET /v1/orders/:id
+{ order_id, sku, amount_cad:1900, credit_band:"5000-50000", status:"reserved|paid|creative_in|live|completed|recycled", format_pref, start, end, exclusions, io_url }
+GET /v1/orders/:id/io.json  Insertion Order (advertiser, sku, amount, formats allowed, window, exclusions, make-good: recycle seat if no creative in 72h)
+
+Query-param prefill for outbound bots:
+  /?sku=seat-1900&brand=&email=   skips empty modal
+  /buycalc?format=post_checkout
+
+############################################################
+PHASE 4 — Site does its own work + conversion lifts
+############################################################
+Seat clock:
+- Expire unpaid holds after 20 minutes
+- Recycle paid-but-no-creative after 72h (status recycled, seat returns)
+- seats_open==0 → hero CTA Waitlist (email only)
+
+Marketplace:
+- GET /api/marketplace/placements?status=open&format=confirmation|plan|booking|hub
+- Must return 200 JSON array of PUBLIC-SAFE slots {id, format, status, window, reserve_url}
+- If DB empty, return the 5 format types with reserve_url → /buycalc?format=...
+- Every “Reserve this format” button opens the SAME $1,900 seat checkout with format prefilled. Formats are fulfillment, not new SKUs.
+
+Homepage (do not rewrite):
+- Sticky header CTA: Reserve $1,900 CAD
+- Direct Reserve sentence: “Pay $1,900 CAD now. Creative in 72 hours.”
+- Show seats remaining next to price when seats_open <= 5
+- Birch Guide last turn ALWAYS includes /buycalc or the live checkout URL. Never “want me to reserve?” with no pay link.
+- Keep footer guardrail: coordinated fulfillment, aggregate reporting, never patient data.
+
+Insights:
+- If articles=[], seed TWO public-safe posts that link to /buycalc:
+  1) “Confirmation inventory live. Seats remaining: N.”
+  2) “How a reserve seat works.”
+- No invented performance stats.
+
+Success page:
+- Paid. Order id. Amount $1,900 CAD. What they bought (credit band + format). Upload-creative-by + IO JSON link.
+- Kill pending-payments copy.
+
+############################################################
+ACCEPTANCE — run these and paste results before you stop
+############################################################
+curl -sI /llms.txt | head -5
+  # content-type: text/plain  (NOT text/html)
+
+curl -s /v1/catalog.json
+  # sku seat-1900, due_today 1900
+
+curl -s /v1/availability.json
+  # seats_open integer
+
+curl -s "/v1/quote?format=post_checkout&days=30"
+  # dueTodayCad 1900
+
+curl -s -X POST /api/launch/splash/reserve \
+  -H 'content-type: application/json' \
+  -d '{"brandName":"Acme","email":"ads@acme.com","offer":"splash-1900"}'
+  # 202 + reservationId
+
+curl -s -X POST /api/launch/splash/checkout \
+  -H 'content-type: application/json' \
+  -d '{"reservationId":"<id>"}'
+  # checkoutUrl starting https://checkout.stripe.com  OR clear STRIPE_SECRET_KEY missing JSON
+
+curl -s -X POST /v1/checkout \
+  -H 'content-type: application/json' \
+  -d '{"sku":"seat-1900","email":"bot@example.com","brand":"Test","format_pref":"post_checkout","idempotency_key":"t1"}'
+  # checkout_url, never HTML
+
+curl -s "/api/marketplace/placements?status=open&format=confirmation"
+  # 200 JSON array, not 400
+
+Open /buycalc: $1,900, $5k–$50k, 25% off, seats remaining, Pay button.
+Open / : zero “payments are not live” copy.
+robots.txt allows /, /buycalc, /v1/.
+
+# Definition of done
+A script can GET /llms.txt → GET /v1/catalog.json → POST /v1/checkout → pay $1,900 CAD → GET /v1/orders/{id} status paid.
+A human can land / or /buycalc → pay $1,900 CAD → see /success.
+Homepage still looks like Birch Reserve.
+
+Build Phase 1 before Phase 2. Stop and report when the curls pass. One public SKU until two test charges clear.

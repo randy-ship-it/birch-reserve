@@ -1,0 +1,299 @@
+BIRCH RESERVE — CURRENT STRIPE SETUP BRIEF
+Updated for the three-tier institutional offer ladder
+
+IMPORTANT
+
+- This replaces every earlier Birch Reserve Stripe instruction that referenced a single USD $1,900 public offer.
+- Do not use the old Product ID, Price ID, or Payment Link from the earlier brief.
+- Do not expose splash-1900 or seat-1900 for new purchases.
+- Do not rewrite the application checkout routes or weaken their existing reservation, amount, currency, offer, and checkout-attempt validation.
+- Do not configure UCP or Stripe Agentic Commerce as part of this setup.
+
+
+WHAT RANDY NEEDS TO DO
+
+1. In Replit, disconnect the incomplete Stripe connection and reconnect the Stripe account owned by Silver Birch Growth Inc. Confirm the account identity before enabling live charges.
+
+2. Do not paste API keys, webhook signing secrets, or other credentials into chat. Complete authentication through the Replit Stripe connection or Replit Secrets interface only if the existing server configuration explicitly requires it.
+
+3. In the connected LIVE Stripe account, create or verify the three Products and one-time USD Prices described below.
+
+4. Verify that the production webhook destination is:
+
+   https://birchreserve.net/api/stripe/webhook
+
+   If the deployed route differs, use the deployed route shown by Replit. Do not guess a replacement URL.
+
+
+PASTE THIS TO STRIPE GROK
+
+Configure the connected LIVE Stripe account for Silver Birch Growth Inc. for Birch Reserve.
+
+Do not create subscriptions, trials, coupons, discounts, shipping rates, automatic tax rules, Payment Links, UCP configuration, or Stripe Agentic Commerce configuration.
+
+Do not modify or archive historical Stripe records associated with the retired USD $1,900 or CAD offers. They may be needed to reconcile existing reservations, but they must not be offered for new purchases.
+
+Create or verify exactly these three active Products, each with one active, non-recurring USD Price:
+
+1. Product name: Birch Reserve — Access Reserve
+   Price: $990.00 USD
+   unit_amount: 99000
+   recurring: none
+   metadata:
+     offerKey: reserve-990
+     sku: reserve-990
+     mediaCreditCents: 99000
+   description:
+     One-time Access Reserve payment applied as 100% media credit. Provides first-right planning access before a final insertion order. Does not guarantee impressions.
+
+2. Product name: Birch Reserve — Placement Pilot
+   Price: $4,900.00 USD
+   unit_amount: 490000
+   recurring: none
+   metadata:
+     offerKey: pilot-4900
+     sku: pilot-4900
+     mediaCreditCents: 490000
+   description:
+     One-time Placement Pilot payment applied as 100% media credit toward one scoped digital or physical placement-format pilot. Final insertion order required. Does not guarantee impressions.
+
+3. Product name: Birch Reserve — Network Pilot
+   Price: $9,900.00 USD
+   unit_amount: 990000
+   recurring: none
+   metadata:
+     offerKey: network-9900
+     sku: network-9900
+     mediaCreditCents: 990000
+   description:
+     One-time Network Pilot payment applied as 100% media credit toward a coordinated multi-surface pilot. Final insertion order required. Does not guarantee impressions.
+
+Before creating anything, search the account for exact matching active Products and Prices. Reuse an exact match rather than creating a duplicate. Never reuse the retired $1,900 Price for one of the new offers.
+
+Checkout expectations:
+
+- Stripe-hosted Checkout Sessions.
+- mode: payment
+- Exactly one line item with quantity 1.
+- Do not force payment_method_types; retain Stripe's eligible dynamic payment methods.
+- Amount and currency must exactly match the selected stored reservation.
+- Checkout Session metadata must include:
+    reservationId
+    offerKey
+    sku
+    checkoutAttemptId
+- The same identifiers should be available on the PaymentIntent metadata when the application supplies them.
+- Never reuse a Checkout Session if its reservationId, offerKey, amount, or currency differs.
+- The Birch Reserve application's immutable stored reservation values remain authoritative.
+- Do not convert currencies or create CAD versions of these offers.
+- A success-page redirect must never mark a reservation paid by itself.
+
+Webhook destination:
+
+https://birchreserve.net/api/stripe/webhook
+
+Subscribe it to:
+
+- checkout.session.completed
+- checkout.session.async_payment_succeeded
+- checkout.session.async_payment_failed
+- checkout.session.expired
+
+Webhook delivery must be signed. The application must verify the signature, process retries idempotently, and recognize payment only after the event matches the stored reservation, session, offer, amount, and currency.
+
+When finished, return a table containing:
+
+- Product name
+- Product ID
+- Price ID
+- USD amount
+- offerKey
+- sku
+- Active status
+
+Also return the webhook destination ID and subscribed event list.
+
+Do not display API keys, webhook signing secrets, credentials, or full customer information.
+
+
+NOTES FOR REPLIT
+
+The current application already has separate purchase surfaces:
+
+- Human reservation checkout uses the private activation token flow.
+- Machine checkout uses the public buying API and requires a canonical SKU.
+
+Do not replace either flow with the old request body:
+
+  { offer, brandName, workEmail, website }
+
+Do not change the human checkout endpoint to accept public buyer details directly. It must continue resolving the stored reservation from its activation token.
+
+Do not restore any single STRIPE_PRICE_ID or STRIPE_PRODUCT_ID assumption. The application has three canonical offers and preserves older USD reservations only for lookup and payment of already-created records.
+
+Do not use the retired $1,900 Payment Link as a fallback. A fallback link could bypass reservation ownership, shared inventory, selected-tier validation, and checkout-attempt binding.
+
+If live Stripe is unavailable, return an explicit configuration or payment error. Never claim payment succeeded and never silently redirect to a mismatched Price or Payment Link.
+
+
+FINAL VERIFICATION
+
+- Access Reserve Checkout shows exactly $990 USD.
+- Placement Pilot Checkout shows exactly $4,900 USD.
+- Network Pilot Checkout shows exactly $9,900 USD.
+- Each Checkout Session is bound to the correct reservation, offerKey, SKU, amount, currency, and checkout attempt.
+- Cancelling returns to the application without marking payment complete.
+- Verified webhook success changes the reservation to paid.
+- Async payment failure and session expiry leave or restore the correct unpaid state.
+- Existing supported USD $1,900 reservations remain payable only at their stored value.
+- Historical CAD records cannot start a new USD checkout.
+- No new public page, catalog, quote, or modal offers the retired $1,900 tier.BIRCH RESERVE — CURRENT STRIPE SETUP BRIEF
+Updated for the three-tier institutional offer ladder
+
+IMPORTANT
+
+- This replaces every earlier Birch Reserve Stripe instruction that referenced a single USD $1,900 public offer.
+- Do not use the old Product ID, Price ID, or Payment Link from the earlier brief.
+- Do not expose splash-1900 or seat-1900 for new purchases.
+- Do not rewrite the application checkout routes or weaken their existing reservation, amount, currency, offer, and checkout-attempt validation.
+- Do not configure UCP or Stripe Agentic Commerce as part of this setup.
+
+
+WHAT RANDY NEEDS TO DO
+
+1. In Replit, disconnect the incomplete Stripe connection and reconnect the Stripe account owned by Silver Birch Growth Inc. Confirm the account identity before enabling live charges.
+
+2. Do not paste API keys, webhook signing secrets, or other credentials into chat. Complete authentication through the Replit Stripe connection or Replit Secrets interface only if the existing server configuration explicitly requires it.
+
+3. In the connected LIVE Stripe account, create or verify the three Products and one-time USD Prices described below.
+
+4. Verify that the production webhook destination is:
+
+   https://birchreserve.net/api/stripe/webhook
+
+   If the deployed route differs, use the deployed route shown by Replit. Do not guess a replacement URL.
+
+
+PASTE THIS TO STRIPE GROK
+
+Configure the connected LIVE Stripe account for Silver Birch Growth Inc. for Birch Reserve.
+
+Do not create subscriptions, trials, coupons, discounts, shipping rates, automatic tax rules, Payment Links, UCP configuration, or Stripe Agentic Commerce configuration.
+
+Do not modify or archive historical Stripe records associated with the retired USD $1,900 or CAD offers. They may be needed to reconcile existing reservations, but they must not be offered for new purchases.
+
+Create or verify exactly these three active Products, each with one active, non-recurring USD Price:
+
+1. Product name: Birch Reserve — Access Reserve
+   Price: $990.00 USD
+   unit_amount: 99000
+   recurring: none
+   metadata:
+     offerKey: reserve-990
+     sku: reserve-990
+     mediaCreditCents: 99000
+   description:
+     One-time Access Reserve payment applied as 100% media credit. Provides first-right planning access before a final insertion order. Does not guarantee impressions.
+
+2. Product name: Birch Reserve — Placement Pilot
+   Price: $4,900.00 USD
+   unit_amount: 490000
+   recurring: none
+   metadata:
+     offerKey: pilot-4900
+     sku: pilot-4900
+     mediaCreditCents: 490000
+   description:
+     One-time Placement Pilot payment applied as 100% media credit toward one scoped digital or physical placement-format pilot. Final insertion order required. Does not guarantee impressions.
+
+3. Product name: Birch Reserve — Network Pilot
+   Price: $9,900.00 USD
+   unit_amount: 990000
+   recurring: none
+   metadata:
+     offerKey: network-9900
+     sku: network-9900
+     mediaCreditCents: 990000
+   description:
+     One-time Network Pilot payment applied as 100% media credit toward a coordinated multi-surface pilot. Final insertion order required. Does not guarantee impressions.
+
+Before creating anything, search the account for exact matching active Products and Prices. Reuse an exact match rather than creating a duplicate. Never reuse the retired $1,900 Price for one of the new offers.
+
+Checkout expectations:
+
+- Stripe-hosted Checkout Sessions.
+- mode: payment
+- Exactly one line item with quantity 1.
+- Do not force payment_method_types; retain Stripe's eligible dynamic payment methods.
+- Amount and currency must exactly match the selected stored reservation.
+- Checkout Session metadata must include:
+    reservationId
+    offerKey
+    sku
+    checkoutAttemptId
+- The same identifiers should be available on the PaymentIntent metadata when the application supplies them.
+- Never reuse a Checkout Session if its reservationId, offerKey, amount, or currency differs.
+- The Birch Reserve application's immutable stored reservation values remain authoritative.
+- Do not convert currencies or create CAD versions of these offers.
+- A success-page redirect must never mark a reservation paid by itself.
+
+Webhook destination:
+
+https://birchreserve.net/api/stripe/webhook
+
+Subscribe it to:
+
+- checkout.session.completed
+- checkout.session.async_payment_succeeded
+- checkout.session.async_payment_failed
+- checkout.session.expired
+
+Webhook delivery must be signed. The application must verify the signature, process retries idempotently, and recognize payment only after the event matches the stored reservation, session, offer, amount, and currency.
+
+When finished, return a table containing:
+
+- Product name
+- Product ID
+- Price ID
+- USD amount
+- offerKey
+- sku
+- Active status
+
+Also return the webhook destination ID and subscribed event list.
+
+Do not display API keys, webhook signing secrets, credentials, or full customer information.
+
+
+NOTES FOR REPLIT
+
+The current application already has separate purchase surfaces:
+
+- Human reservation checkout uses the private activation token flow.
+- Machine checkout uses the public buying API and requires a canonical SKU.
+
+Do not replace either flow with the old request body:
+
+  { offer, brandName, workEmail, website }
+
+Do not change the human checkout endpoint to accept public buyer details directly. It must continue resolving the stored reservation from its activation token.
+
+Do not restore any single STRIPE_PRICE_ID or STRIPE_PRODUCT_ID assumption. The application has three canonical offers and preserves older USD reservations only for lookup and payment of already-created records.
+
+Do not use the retired $1,900 Payment Link as a fallback. A fallback link could bypass reservation ownership, shared inventory, selected-tier validation, and checkout-attempt binding.
+
+If live Stripe is unavailable, return an explicit configuration or payment error. Never claim payment succeeded and never silently redirect to a mismatched Price or Payment Link.
+
+
+FINAL VERIFICATION
+
+- Access Reserve Checkout shows exactly $990 USD.
+- Placement Pilot Checkout shows exactly $4,900 USD.
+- Network Pilot Checkout shows exactly $9,900 USD.
+- Each Checkout Session is bound to the correct reservation, offerKey, SKU, amount, currency, and checkout attempt.
+- Cancelling returns to the application without marking payment complete.
+- Verified webhook success changes the reservation to paid.
+- Async payment failure and session expiry leave or restore the correct unpaid state.
+- Existing supported USD $1,900 reservations remain payable only at their stored value.
+- Historical CAD records cannot start a new USD checkout.
+- No new public page, catalog, quote, or modal offers the retired $1,900 tier.

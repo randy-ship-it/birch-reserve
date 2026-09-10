@@ -1,0 +1,158 @@
+# PASTE THIS ENTIRE FILE INTO REPLIT AGENT
+# Repl: https://replit.com/@randy121/clinichub-media ONLY
+# Randy Gilling authorized publish of THIS project only.
+
+You are building HubAds — SBG Inc’s exclusive ad agency for Scale Health hubs.
+Not a brochure. A live agency system that sells space, takes CAD prepaid on Stripe, tickets Scale to place, then gets smarter from first-party traffic.
+
+This is Don Draper precision + a real cash register. Priority goes to Scale brand partners so their flywheel compounds (they already send hub traffic from sites and newsletters; we sell the seat on the order-adjacent page).
+
+============================================================
+HARD RULES
+============================================================
+- Work ONLY in @randy121/clinichub-media
+- NEVER open, fork, search, or edit ScaleHealth Connect, any scalehealth repl, or Scale source
+- Do not write Scale frontend/backend. Scale is a vendor we ticket + a reporting partner that will POST events TO US later
+- Do not scrape Scale cookies. Do not inject trackers into Scale pages from this repo
+- Our cookies live on THIS HubAds origin only (first party)
+- Never commit Stripe secret keys. Use Replit Secrets
+- If video/png upload crashes the tab, stop retrying binaries. Hotlink public media below
+- CAD only. No USD at launch
+- Do not invent CTR, 5MM audience, $10MM, testimonials, or unsigned live hosts
+- 10 million = signed annual ORDERS, not dollars. Never write $10MM
+- When it runs, Publish this Repl. Target https://clinichub-media.replit.app
+- Reply with the live URL when Publish succeeds
+
+============================================================
+WHAT THIS COMPANY IS
+============================================================
+Silver Birch Growth Inc sells HubAds.
+Scale Health is the exclusive distribution partner for the hubs.
+Buyer pays SBG on Stripe. Money hits the SBG account (capital pool / unearned until days served).
+SBG emails/tickets Scale a placement order. Scale puts the tile up. Host brand can veto a conflict.
+Category exclusive by default. Brand partners (already signed with Scale) get first look / first inventory.
+Buyer keeps the customer. Not affiliate. Not Meta.
+
+Live hubs you may name:
+- https://physio.drhonow.com
+- https://www.scalehealth.ca/integrity
+Press: Newsfile 303020, 26 Jun 2026. Quote OK: "This is the clinical layer brands have been missing." — Randy Gilling
+Team: https://www.silverbirchgrowth.com/team
+Do NOT list InBody, Aetrex, Manduka, Kalaya, Jill, Jack as live hosts.
+
+============================================================
+STACK
+============================================================
+Node (or Replit-friendly) is fine.
+- GET /  → the HubAds sales page (light paper, see PAGE)
+- POST /reserve → create an order (brand, email, unit, hub, package) status=reserved
+- POST /api/checkout → create a Stripe Checkout Session (CAD, one-time) for that unit; redirect buyer
+- GET /success → thank you. "We will send Scale the placement order."
+- POST /api/stripe/webhook → mark order paid (use STRIPE_WEBHOOK_SECRET)
+- POST /api/scale/report → Scale (later) sends view/click events. Shared secret SCALE_REPORT_SECRET. Do not call Scale. Just receive.
+- GET /admin → simple password gate (ADMIN_PASSWORD secret). Lists orders, paid, events. No public analytics theater with fake numbers
+- First-party cookie `ha_sid` on this origin. Record page views, unit clicks, reserve starts, checkout starts on OUR site only. Use that to rank which units to feature (already-allowed units only). Never claim Scale-page CTR until Scale POSTs real events
+
+Secrets Randy will paste in Replit (do not invent values; if missing, run in mock mode and show a yellow "Stripe secrets missing — reserve only"):
+- STRIPE_SECRET_KEY
+- STRIPE_WEBHOOK_SECRET
+- STRIPE_PRICE_LOGO
+- STRIPE_PRICE_CARD
+- STRIPE_PRICE_JOURNEY
+- STRIPE_PRICE_LOCATOR
+- STRIPE_PRICE_NETWORK
+- ADMIN_PASSWORD
+- SCALE_REPORT_SECRET
+
+If Stripe secrets are absent, Reserve still saves the order and says "we will invoice." Do not crash.
+
+============================================================
+STRIPE (CAD, one-time)
+============================================================
+Products / Price IDs Randy creates in SBG Stripe (he may paste IDs later). Map:
+
+| sku | name | amount CAD | term |
+|---|---|---|---|
+| logo | HubAds — Partner Logo | 1500 | 30d one hub, 160×160 |
+| product | HubAds — Product Card | 2500 | 30d one hub, 280×360 |
+| journey | HubAds — Journey Band | 2800 | 30d one hub, 720×180 |
+| locator | HubAds — Locator Tile | 3200 | 30d one hub, 360×140 |
+| network | HubAds — Hub Network | 9900 | 90d all four, every live hub |
+
+No SKU over 9900. À la carte all four one hub 30d = 10000; Network 9900 is the discount.
+Checkout success_url = {origin}/success?session_id={CHECKOUT_SESSION_ID}
+Collect billing email.
+Do not enable subscriptions.
+Do not put keys in client JS.
+
+============================================================
+SCALE REPORTING (interface, not their repo)
+============================================================
+Build OUR collector. Document it at GET /docs/scale-report (plain page).
+
+Scale will later POST JSON to /api/scale/report
+Header: x-scale-secret: SCALE_REPORT_SECRET
+Body example:
+{
+  "hub": "physio.drhonow.com",
+  "sku": "product",
+  "brand": "Example",
+  "event": "view" | "click" | "book",
+  "ts": "ISO-8601"
+}
+
+Store events. Admin shows counts. The sales page may say "view and click note at end of term" — do not display invented live CTR.
+Also ship a tiny first-party pixel URL /p.gif?e=view&sku= for our own site.
+
+Improvement loop (allowed):
+- Rank already-allowed units on the picker using OUR site engagement (clicks on seats, reserve rate)
+- Partner-priority flag: if order.kind or email domain is a known Scale partner, badge "Partner priority" and sort them first in admin
+- Do NOT build a Meta-style auction on the clinical pages
+- Do NOT ask this Repl to edit Scale
+
+After paid: write a Scale ticket object (brand, url, unit, size, hub, dates, stripe id). Show it in admin as "copy to Scale." Optional mailto: randy@silverbirchgrowth.com with that ticket. Do not auto-email Scale.
+
+============================================================
+PAGE (must look expensive and readable)
+============================================================
+Light paper. Warm off-white. Black ink. Copper/ember CTAs only. Readable in sunlight.
+NO dark full-bleed video hero. Type sits on paper.
+Fonts: Fraunces + IBM Plex Sans.
+Sticky header: HubAds · Exclusive seats on Scale hubs · Reserve
+
+H1 exactly: They just ordered. They have not left.
+Proof line exactly: Ten million signed annual orders — that is the floor.
+
+Lede: Order pages convert hardest. Brand partners already send this hub from their sites and newsletters, so views exceed the order page. HubAds is the exclusive agency for that space. Partners first. The flywheel is theirs. The seat is ours to sell. SBG charges. Scale places. You keep the customer.
+
+Buttons: Reserve a seat · See the live hubs
+Fine: CAD prepaid to Silver Birch Growth Inc. No invented traffic. No affiliate cut.
+
+Hero video HOTLINK:
+- https://physio.drhonow.com/videos/dr-ho/randy-dr-ho-portal-video.mp4
+- poster https://physio.drhonow.com/images/dr-ho/video-gradient-thumb.png
+Badge: Live hub · physio.drhonow.com
+
+Inventory: DR-HO + Integrity frames. Pins: Locator / Journey / Card. Never a TENS rival on DR-HO.
+
+Seats: selectable cards that fill the insertion form. Network is THE BUY at $9,900/90.
+
+How it works (4):
+1. Partner or brand picks a seat
+2. Pays SBG on Stripe (CAD)
+3. We ticket Scale. Host can veto
+4. Tile goes live. Views/clicks come back to us when Scale reports. The book gets smarter
+
+Form = insertion order. POST /reserve then checkout.
+Button: Reserve this seat — prepaid
+Footer: HubAds by Silver Birch Growth Inc. Exclusive agency for Scale Health hub space. 777-2255B Queen St E, Toronto ON M4E 1G3 · randy@silverbirchgrowth.com · 647-966-7918
+
+Vibe: exclusive, inevitable, a little crazy — not a SaaS template, not a dark crypto landing, not a Meta ads clone.
+
+============================================================
+SHIP
+============================================================
+1. Build it so / loads the page and /reserve + /api/checkout exist
+2. Mock Stripe if secrets missing
+3. Publish THIS repl to https://clinichub-media.replit.app
+4. Return the live URL

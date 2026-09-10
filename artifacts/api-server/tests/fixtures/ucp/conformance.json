@@ -1,0 +1,76 @@
+{
+  "version": "2026-04-08",
+  "urls": {
+    "overviewSpec": "https://ucp.dev/2026-04-08/specification/overview",
+    "checkoutSpec": "https://ucp.dev/2026-04-08/specification/checkout",
+    "shoppingRestSchema": "https://ucp.dev/2026-04-08/services/shopping/rest.openapi.json",
+    "checkoutSchema": "https://ucp.dev/2026-04-08/schemas/shopping/checkout.json",
+    "ucpSchema": "https://ucp.dev/2026-04-08/schemas/ucp.json"
+  },
+  "negotiationErrors": [
+    {
+      "name": "missing UCP-Agent",
+      "expectedStatus": 400,
+      "expectedCode": "invalid_profile_url"
+    },
+    {
+      "name": "malformed UCP-Agent",
+      "header": "profile=https://agent.example/.well-known/ucp",
+      "expectedStatus": 400,
+      "expectedCode": "invalid_profile_url"
+    },
+    {
+      "name": "profile URL outside the discovery path",
+      "header": "profile=\"https://agent.example/profile\"",
+      "expectedStatus": 400,
+      "expectedCode": "invalid_profile_url"
+    },
+    {
+      "name": "unsupported protocol version",
+      "header": "profile=\"https://agent.example/.well-known/ucp\"",
+      "profileMode": "unsupported_version",
+      "expectedStatus": 422,
+      "expectedCode": "version_unsupported"
+    },
+    {
+      "name": "missing checkout capability",
+      "header": "profile=\"https://agent.example/.well-known/ucp\"",
+      "profileMode": "missing_capability",
+      "expectedStatus": 200,
+      "expectedCode": "capabilities_incompatible"
+    },
+    {
+      "name": "checkout capability points at another schema",
+      "header": "profile=\"https://agent.example/.well-known/ucp\"",
+      "profileMode": "wrong_schema",
+      "expectedStatus": 200,
+      "expectedCode": "capabilities_incompatible"
+    }
+  ],
+  "requiredHeaders": [
+    {
+      "name": "missing Request-Id",
+      "omit": "request-id",
+      "expectedStatus": 400,
+      "expectedCode": "invalid_header"
+    },
+    {
+      "name": "missing UCP-Agent-Timestamp",
+      "omit": "ucp-agent-timestamp",
+      "expectedStatus": 404,
+      "expectedCode": "not_found"
+    },
+    {
+      "name": "missing UCP-Agent-Nonce",
+      "omit": "ucp-agent-nonce",
+      "expectedStatus": 404,
+      "expectedCode": "not_found"
+    },
+    {
+      "name": "missing UCP-Agent-Signature",
+      "omit": "ucp-agent-signature",
+      "expectedStatus": 404,
+      "expectedCode": "not_found"
+    }
+  ]
+}

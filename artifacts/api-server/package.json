@@ -1,0 +1,53 @@
+{
+  "name": "@workspace/api-server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "export NODE_ENV=development && pnpm run build && pnpm run start",
+    "build": "node ./build.mjs",
+    "prestart": "pnpm --filter @workspace/db run push",
+    "start": "node --enable-source-maps ./dist/index.mjs",
+    "test": "pnpm run test:typecheck-refresh && pnpm run test:launch && pnpm run test:marketplace-safety && pnpm run test:sponsor-reservations && pnpm run test:splash-reservations && pnpm run test:public-buying && pnpm run test:ucp-proof-performance && pnpm run test:concierge && pnpm run test:editorial && pnpm run test:editorial-api",
+    "test:typecheck-refresh": "pnpm --dir ../.. run test:api-typecheck-refresh",
+    "test:launch": "esbuild ./tests/launch.test.ts --bundle --platform=node --format=esm --outfile=/tmp/launch.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test node /tmp/launch.test.mjs",
+    "test:marketplace-safety": "esbuild ./tests/marketplace-safety.test.ts --bundle --platform=node --format=esm --outfile=/tmp/marketplace-safety.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && node /tmp/marketplace-safety.test.mjs",
+    "test:sponsor-reservations": "esbuild ./tests/sponsorReservations.test.ts --bundle --platform=node --format=esm --outfile=./dist/sponsor-reservations.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=production node ./dist/sponsor-reservations.test.mjs",
+    "test:splash-reservations": "esbuild ./tests/splashAdReservations.test.ts --bundle --platform=node --format=esm --outfile=./dist/splash-ad-reservations.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test SPLASH_PIPELINE_SYNC_DISABLED=true SPLASH_RESERVE_ALERTS_DISABLED=true STRIPE_CHECKOUT_DISABLED=true node ./dist/splash-ad-reservations.test.mjs",
+    "test:public-buying": "esbuild ./tests/helpers/ucpAdmissionWorker.ts --bundle --platform=node --format=esm --outfile=/tmp/ucp-admission-worker.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && esbuild ./tests/publicBuying.test.ts --bundle --platform=node --format=esm --outfile=/tmp/public-buying.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test node /tmp/public-buying.test.mjs",
+    "test:ucp-proof-performance": "esbuild ./tests/ucpRequestProofs.performance.test.ts --bundle --platform=node --format=esm --outfile=/tmp/ucp-request-proofs.performance.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test node /tmp/ucp-request-proofs.performance.test.mjs",
+    "test:concierge": "esbuild ./tests/concierge.test.ts --bundle --platform=node --format=esm --outfile=./dist/concierge.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=production CONCIERGE_AI_DISABLED=true node ./dist/concierge.test.mjs",
+    "test:editorial": "esbuild ./tests/editorial.test.ts --bundle --platform=node --format=esm --outfile=/tmp/editorial.test.mjs && node /tmp/editorial.test.mjs",
+    "test:editorial-api": "esbuild ./tests/editorial-api.test.ts --bundle --platform=node --format=esm --outfile=/tmp/editorial-api.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test node /tmp/editorial-api.test.mjs",
+    "pretypecheck": "tsc --build ../../lib/db/tsconfig.json --force && tsc --build ../../tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@clerk/express": "^2.1.61",
+    "@clerk/shared": "^4.29.3",
+    "@replit/connectors-sdk": "^0.4.2",
+    "@workspace/api-zod": "workspace:*",
+    "@workspace/db": "workspace:*",
+    "@workspace/integrations-openai-ai-server": "workspace:*",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "drizzle-orm": "catalog:",
+    "express": "^5.2.1",
+    "http-proxy-middleware": "^4.2.0",
+    "pino": "^9.14.0",
+    "pino-http": "^10.5.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "catalog:",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "esbuild": "0.27.3",
+    "esbuild-plugin-pino": "^2.3.3",
+    "pino-pretty": "^13.1.3",
+    "thread-stream": "3.1.0"
+  }
+}

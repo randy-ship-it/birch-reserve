@@ -1,0 +1,18 @@
+---
+name: Public machine-buying boundary
+description: Security and state rules for bot-accessible Birch Reserve purchasing surfaces.
+---
+
+Public machine-buying routes exist so automated media-buying agents can discover Birch Reserve, evaluate canonical offers, initiate checkout, and send qualified business without human navigation or Clerk. They must reuse the same durable reservation and Stripe state machine as the human reserve flow. Agent-owned resources require proof of control of a profile-published signing key; a self-declared profile URL is never identity by itself. Keep the authenticated partner marketplace private; expose a separate, deliberately minimal public placement projection instead of relaxing its credentials.
+
+UCP and Stripe Agentic Commerce are separate concerns. Hosted buyer review remains the default UCP path. Delegated payment is an independent opt-in capability for approved, authenticated profiles and may be advertised only when its exact handler version, Stripe credentials, webhook verification, merchant identity, and instrument configuration are all available. Stripe's Link Agent Wallet still arrives as the `link` instrument with a `stripe_payment_token`, but an `spt_` credential must be charged through Stripe's shared-payment-granted-token field rather than the card-token field. The Stripe handler's discovery and checkout-response configurations also have distinct schemas; do not reuse one object across both surfaces.
+
+**Why:** Media-buying agents need direct text, JSON, OpenAPI, quote, checkout, and receipt surfaces without Clerk, but delegated charging adds a stronger trust boundary. Partial configuration, capability drift, a guessed profile URL, or an unsigned request must never grant payment or checkout ownership.
+
+**How to apply:** Serve only canonical stored-value offers, save before Stripe, bind UCP ownership and idempotency to verified key identity, reject replayed signed requests for their full validity window, and fail closed when a protected profile's delegated credential configuration is missing or malformed. Negotiate exact versions, select Stripe's confirmation field from the scoped token kind, validate discovery and runtime handler configs against their separate exact schemas, confirm payment only from verified Stripe state, and keep hosted Checkout behavior unchanged when delegation is absent or disabled.
+
+Key rotation is forward-only: each profile-advertised succession edge must bind the profile URL, both key IDs, both Ed25519 fingerprints, and its validity window under the predecessor key’s signature. Verify a bounded chain ending at the authenticated current key. Keep resource authorization time-bounded, but persist checkout-create idempotency mappings independently so expiry or removal of a succession edge cannot duplicate a checkout owned by the current key. When lazily adopting a pre-mapping checkout with no stored owner, preserve the identity encoded by the matched legacy idempotency namespace; never bind it to the current successor merely because succession is active.
+
+**Why:** Mutable profile URLs and current-key fingerprints are not durable enough on their own. Directional signatures prevent unrelated or retired keys from claiming successor-owned resources, while durable creator mappings keep ordinary rotation-window expiry from creating a second reservation or payment session.
+
+**How to apply:** Successors may read, cancel, and idempotently recover predecessor-owned checkouts only through a currently valid verified chain. Never infer succession from a shared URL, key ID, or hostname, and never let a predecessor reverse-access successor-owned resources.

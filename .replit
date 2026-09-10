@@ -1,0 +1,53 @@
+modules = ["nodejs-24", "python-base-3.13", "postgresql-16"]
+
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
+
+[deployment.postBuild]
+args = ["pnpm", "store", "prune"]
+env = { "CI" = "true" }
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "marketplace-safety"
+
+[[workflows.workflow]]
+name = "marketplace-safety"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pnpm --filter @workspace/api-server test && pnpm --filter @workspace/clinichub-media test"
+
+[workflows.workflow.metadata]
+isValidation = true
+
+[agent]
+stack = "PNPM_WORKSPACE"
+expertMode = true
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 20000
+
+[nix]
+channel = "stable-25_05"
+packages = ["freetype", "gumbo", "harfbuzz", "jbig2dec", "libjpeg_turbo", "mupdf", "openjpeg", "swig", "xcbuild", "glib", "nss", "nspr", "atk", "at-spi2-atk", "dbus", "xorg.libX11", "xorg.libXcomposite", "xorg.libXdamage", "xorg.libXext", "xorg.libXfixes", "xorg.libXrandr", "mesa", "xorg.libxcb", "libxkbcommon", "alsa-lib", "libgbm"]
+
+[userenv]
+
+[userenv.shared]
+SPLASH_PIPELINE_SPREADSHEET_ID = "1Pf3c-elnevc0VRVHbC3-0F3odEVK652Oqgfv_PYZ0_Y"
+STRIPE_PRICE_RESERVE_1900 = "price_1UDTmiBC1LcvLegtoBb3fkCL"
+SPLASH_PIPELINE_SYNC_DISABLED = "true"
+PUBLIC_BASE_URL = "https://birch-list-ad-agency.replit.app"
+SEATS_TOTAL = "8"

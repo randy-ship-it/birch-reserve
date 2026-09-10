@@ -1,0 +1,32 @@
+kind = "api"
+previewPath = "/api" # TODO - should be excluded from preview in the first place
+title = "API Server"
+version = "1.0.0"
+id = "3B4_FFSkEVBkAeYMFRJ2e"
+
+[[services]]
+localPort = 8080
+name = "API Server"
+paths = ["/api", "/v1", "/ucp", "/.well-known/ucp", "/llms.txt", "/openapi.yaml", "/buycalc"]
+
+[services.development]
+run = "pnpm --filter @workspace/api-server run dev"
+
+[services.production]
+
+[services.production.build]
+args = ["pnpm", "--filter", "@workspace/api-server", "run", "build"]
+
+[services.production.build.env]
+NODE_ENV = "production"
+
+[services.production.run]
+# Run through the package script so prestart applies database schema changes before serving requests
+args = ["pnpm", "--filter", "@workspace/api-server", "run", "start"]
+
+[services.production.run.env]
+PORT = "8080"
+NODE_ENV = "production"
+
+[services.production.health.startup]
+path = "/api/healthz"

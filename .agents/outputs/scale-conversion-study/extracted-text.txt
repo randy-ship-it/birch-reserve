@@ -1,0 +1,196 @@
+--- PAGE 1 ---
+ScaleHealth Private Network | Internal Study
+CONFIDENTIAL
+CHI / ScaleHealth | August 2026
+Page 1
+ScaleHealth Private Network
+Post-Checkout Activation Study
+Product Cross-Sells vs Clinical Service Referrals
+Internal Research | August 2026
+EXECUTIVE SUMMARY
+This internal study quantifies expected post-checkout conversion performance for two offer types inside the ScaleHealth
+private network: product-to-product cross-sells versus clinical service referrals (primarily Physiotherapy activation into
+the Align network).
+Core Finding: Product cross-sells deliver higher immediate conversion (8–15% typical one-click range; H&W industry
+upsell average 22.3%). Clinical service referrals convert lower on first click (3–8% baseline lead-to-book) but generate
+materially higher lifetime value, exclusive patient flow into the 70+ location Align network, and brand elevation for partner
+properties.
+Recommendation: Run a hybrid model. Sequence a high-relevance product offer first for velocity and partner economics,
+then present the clinical service as “protocol activation” or “expert next step.” Kill friction on the service side (one-tap
+consult / pre-qualified booking) to close the conversion gap. Measure full contribution margin plus downstream Align
+billings—not click rate alone.
+Align Network Context (Current)
+• 70+ active locations | Monthly gross billings tracking >$220k (March 2026) → modeled >$3.0MM calendar 2026
+• ARPA stable $3.4k–$3.9k band | Median billed climbing | Core ($3k+/mo) churn <4% annualized
+• 100% of locations self-fund physio costs → locked positive gross margin (30%+) on every dollar billed
+• ScaleHealth demand treated as pure upside in internal models; already visible in pipeline quality
+
+
+--- PAGE 2 ---
+ScaleHealth Private Network | Internal Study
+CONFIDENTIAL
+CHI / ScaleHealth | August 2026
+Page 2
+1. CORE BENCHMARKS COMPARISON
+Aggregated from 2025–2026 industry reports across 1,800+ digital businesses, Health & Wellness vertical data, and
+clinical service conversion studies.
+Metric
+Product Cross-Sell
+Physio / Service Referral
+Edge
+Expected Conversion
+(post-checkout)
+8–15% one-click
+15–25% well-matched
+H&W avg 22.3% (top 35.6%)
+3–8% lead-to-book baseline
+8–15% optimized low-friction
+Landing pages 5.1–8.2%
+Products
+for volume
+Friction Level
+Near-zero
+(same payment, one-click)
+Medium
+(scheduling / consult intent)
+Products
+Immediate Economics
+Strong AOV lift (+$3+)
+Pure profit $0.29–$0.80 / txn
+(Aftersell H&W data)
+Lower first-session cash
+Products
+LTV & Strategic Value
+Moderate
+High
+Align ARPA $3.4–3.9k
+30%+ gross margin
+Multi-session episodes
+Services
+Network / Moat Impact
+Partner revenue share
+Exclusive high-value leads into Align
+network + brand elevation for partners
+Services
+Best Trigger Context
+Complementary stacks
+Recovery protocols
+Subscription attach
+Fertility / hormonal → pelvic floor / MSK
+Physio
+(strong clinical adjacency)
+Relevance multiplies
+both
+2. KEY DATA ANCHORS
+Product / Post-Purchase Side
+• Focus Digital 2025 (1,847 businesses): Health & Wellness upsell average 22.3%, top quartile 35.6%. Best performers:
+supplement bundles, meal plans, coaching calls. Overall post-purchase upsells 14.6%.
+• Shopify / Forrester 2025–26: Post-purchase one-click acceptance 6–12%; thank-you page 3–6%. Health & Supplements
+cross-sell ~4.8%, upsell 5.5% in stricter definitions.
+• Aftersell H&W case data: Cart upsells ~8.5%; post-purchase AOV lifts of +$3.49; pure profit per transaction $0.29–$0.80.
+Service / Clinical Activation Side
+• Unbounce / industry landing page data: Health & wellness median 5.1%; wellness-specific pages 8.2%.
+• Physiotherapy website conversion benchmarks: average ~4.6%; optimized landing pages ~8%; Google Ads Health & Fitness
+conversion ~7%.
+• Telehealth / app trial-to-paid: baseline 2–5%; optimized sequences reach 8–15%. Trusted referral multiplies booking
+likelihood significantly (friend referral ~4×).
+
+
+--- PAGE 3 ---
+ScaleHealth Private Network | Internal Study
+CONFIDENTIAL
+CHI / ScaleHealth | August 2026
+Page 3
+3. PREDICTIVE MODEL FOR THE PRIVATE NETWORK
+Inside a branded, high-trust post-checkout surface the conversion dynamics shift favorably versus open-web cold traffic.
+The private network already owns the customer relationship and payment method; the only remaining variables are offer
+relevance and remaining friction.
+Brand Checkout Complete
+→ Product Offer Path Expected 8–15%+ acceptance → Immediate cash + partner revenue share
+→ Service Activation Path Expected 5–10% optimized → Align network utilization + brand elevation + multi-session LTV
+Why Hybrid Wins
+Pure product focus leaves the clinical asset under-monetized and fails to strengthen the Align network moat. Pure service
+focus leaves easy, high-conversion post-checkout dollars on the table and weakens short-cycle partner economics.
+Sequencing product first (velocity) then service as the natural clinical continuation (depth) captures both.
+Clinical Adjacency Advantage
+Fertility and hormonal health properties present unusually strong clinical adjacency to Physiotherapy (pelvic floor,
+pregnancy-related musculoskeletal issues, hormone-driven pain and inflammation). When the service offer is framed as
+the logical next step in the patient’s protocol rather than a generic referral, conversion rates compress toward the upper
+end of the service range and patient quality rises.
+4. STRATEGIC IMPLICATIONS FOR SCALEHEALTH + ALIGN
+• Partner Retention: Brands see immediate incremental revenue from product offers and elevated brand perception from
+clinician activation. Both improve retention of the private network inventory.
+• Align Same-Store Lift: Exclusive, high-intent patients arriving via ScaleHealth improve utilization, median billed, and
+same-store growth without additional CAC.
+• Network Moat: Every successful service activation strengthens the exclusive lead-flow story that differentiates ScaleHealth
+from pure retail media networks.
+• Operating Leverage: The model requires no material fixed-cost step-up; the existing clinical infrastructure absorbs the
+incremental volume.
+
+
+--- PAGE 4 ---
+ScaleHealth Private Network | Internal Study
+CONFIDENTIAL
+CHI / ScaleHealth | August 2026
+Page 4
+5. EXECUTION PLAYBOOK
+Target Floors (Start Here)
+Offer Type
+Target Floor
+Stretch Target
+Product cross-sell / post-purchase upsell
+≥ 10% acceptance
+15%+
+Service activation (low-friction)
+≥ 5% lead-to-book
+8–12%
+Three High-Leverage Levers
+1. Relevance Engine (Clinical Adjacency Scoring)
+Score offers by purchase + condition data. Fertility / hormonal / recovery protocols should surface Physio offers at higher
+priority than generic product cross-sells. Relevance is the single largest controllable variable for service conversion.
+2. Friction Kill on the Service Side
+One-tap virtual consult or pre-qualified booking. Pre-fill benefit/insurance signals where possible. Brand the clinician as the
+partner’s recovery specialist rather than a cold third-party referral. This is the highest-ROI conversion lever for closing the
+product–service gap.
+3. Full-Value Measurement
+Track contribution margin per accepted offer and downstream Align billings / sessions generated / 30-60-90 day LTV of the
+activated cohort. Click-to-accept alone understates the true value of the service path.
+Recommended Test Design
+Instrument both offer types in parallel on 2–3 live brand partners with the highest clinical adjacency (fertility, hormonal
+health, recovery). Sequence product offer first, then service framed as protocol activation. Force a true A/B on service
+friction (full booking flow vs one-tap consult request). Review full-value metrics at 30 days.
+
+
+--- PAGE 5 ---
+ScaleHealth Private Network | Internal Study
+CONFIDENTIAL
+CHI / ScaleHealth | August 2026
+Page 5
+6. DATA SOURCES
+1. Focus Digital — Average Upsell Conversion Rate: 2025 Report (1,847 digital businesses).
+https://focus-digital.co/average-upsell-conversion-rate-2025-report/
+2. Aftersell — Health & Wellness Industry Benchmarks. https://www.aftersell.com/industries/health-and-wellness
+3. Shopify Plus / Forrester 2025–2026 post-purchase and one-click upsell aggregates (via industry compilations).
+4. Unbounce Conversion Benchmark Report — Health & Wellness landing page medians (5.1% overall, 8.2% wellness-specific).
+5. Physiotherapy / clinical marketing benchmarks (cufinder, HMDG Private Practice Barometer, WordStream Health & Fitness Google Ads data).
+6. Telehealth and health-app trial-to-paid ranges (Lifecycle Architect and related 2026 operator studies).
+7. Internal Align Account Analysis v3.0 and CHI trajectory data (March–April 2026 run-rate).
+7. IMMEDIATE NEXT ACTIONS
+1
+Select 2–3 brand partners with strongest clinical adjacency (fertility, hormonal, recovery).
+2
+Build hybrid offer surface: product first, then service framed as protocol activation.
+3
+Implement friction-reduced service path (one-tap consult / pre-qualified booking).
+4
+Instrument tracking of acceptance rate, contribution margin, and downstream Align sessions.
+5
+Run 30-day pilot; review full-value results against the floors in this study.
+6
+Feed winners into broader ScaleHealth automation and outbound systems.
+Bottom Line
+Product offers win the session. High-relevance clinical services win the relationship and the network. The private network’s
+advantage is the ability to sequence both on a single high-trust surface. Execute the hybrid, kill friction on the service leg,
+and measure the full value chain.
+Internal Use Only — Clairvoyant Holdings Inc / ScaleHealth / Align Wellness
+August 2026 | Not for external distribution

@@ -1,0 +1,57 @@
+/* ─── Clinichub Media group stylesheet ───────────────────────────────────────
+   Scoped to this mockup group only. Loads app-specific fonts and CSS tokens
+   so that Tailwind semantic classes (bg-background, text-primary, etc.) match
+   the live Clinichub Media app exactly.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* App-specific Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Plus+Jakarta+Sans:ital,wght@0,400..700;1,400..700&display=swap');
+
+/* Override sandbox token defaults with Clinichub Media's design system */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 10%;
+  --border: 240 6% 85%;
+  --input: 240 6% 85%;
+  --ring: 235 90% 45%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 10%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 10%;
+
+  --primary: 235 90% 45%; /* International Klein Blue */
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 240 5% 96%;
+  --secondary-foreground: 240 10% 15%;
+
+  --muted: 240 5% 96%;
+  --muted-foreground: 240 4% 45%;
+
+  --accent: 240 5% 96%;
+  --accent-foreground: 240 10% 15%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --radius: 0.25rem;
+
+  /* Font stack */
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Bricolage Grotesque', sans-serif;
+}
+
+/* App-specific Tailwind theme extensions (font families) */
+@theme inline {
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Bricolage Grotesque', sans-serif;
+  --font-mono: ui-monospace, monospace;
+}
+
+/* Base typography matching the main app */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}

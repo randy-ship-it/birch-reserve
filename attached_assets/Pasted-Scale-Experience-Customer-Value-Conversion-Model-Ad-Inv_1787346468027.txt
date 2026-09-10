@@ -1,0 +1,91 @@
+Scale Experience Customer Value & Conversion Model Ad Inventory Premium Build-Out | Aug 2026
+High-intent recovery traffic inside branded Clinic Hubs (physio.drhonow.com and the Aug–Oct queue) is structurally superior to cold digital. Early private network tests already show 5–9% CTR. That single metric, paired with free assessment gateway + clinical context, drives 3–8× expected value vs regular display.
+1. Funnel Conversion Rates (Scale Hub vs Regular Digital)
+Stage
+Regular / Cold Digital
+Scale Hub Target
+Premium Multiple
+CTR (private / display)
+0.5–1.5%
+5–9%
+5–12×
+Hub / Landing → Assessment Book
+2–5%
+8–15%
+3–4×
+Book → Completed Episode (show + care)
+50–65%
+70–85%
+1.3–1.5×
+Engaged Patient → Product Reorder / Partner Cross-Sell
+5–12%
+15–30%
+2–3×
+Overall Expected Value per Visitor
+<$3–8
+$15–45
+4–8×
+Sources: internal early tests + 2026 physio/health digital benchmarks (Google Health/Wellness CVR 6–9%, PT episode data, private network premiums).
+2. Customer Value Build (CAD, conservative–ambitious)
+Clinical Episode [ \text{Gross Episode} = 6\text{–}8 \times $110 = $660\text{–}$880 ] Scale net take (~30% post-costs, 70/30 model): $200–$260
+Product + Partner Layer
+	•	Origin brand reorder lift +15–30% frequency/AOV
+	•	Partner cross-sell attach 15–25% of engaged patients
+	•	Commission 15–20% on $50–90 baskets → +$40–$200 incremental
+Blended Value per Converted Patient [ $250\text{–}$650 ]
+Expected Value per Hub Visitor (at 12% book × 55% complete episode) [ \approx $15\text{–}$40 ]
+vs regular cold digital health visitor: typically <$5–8.
+Free assessment as membership gateway preserves trust and elevates downstream CVR while creating the long-term reactivation asset.
+3. Ad Display Space Valuation (Why Premium Pricing Holds)
+Metric
+Regular Wellness Display
+Scale Private Network
+Justification
+CTR
+0.5–1.5%
+5–9%
+High-intent recovery context
+CVR to high-value action
+Low
+2–4× lift
+Clinical journey + free assessment
+eCPM
+$4–12
+$25–65
+Quality × action value
+Audience LTV
+Low–medium
+High ($250–650 converted)
+Episode + product + membership
+Inventory Map for Ad Bot / Replit Sales Page
+	1	Hub homepage / hero
+	2	Assessment wait / pre-book
+	3	Education modules & recovery content
+	4	Post-session / care plan
+	5	Marketplace / product carousel
+	6	Reactivation / membership surfaces
+Pricing Levers to Embed in Sales Page
+	•	Impression packages (eCPM $25–65)
+	•	CTR-guaranteed or high-intent click packages
+	•	Performance: CPA $15–40 per booked assessment or % of downstream value
+	•	Priority access for supply brands already in queue (Magnum, Fresh Prep, Manduka, RenPho, Apollo, etc.)
+4. Launch Queue Impact Snapshot
+	•	DR-HO’s: LIVE
+	•	Aug: Kalaya, Jill Health, Jack Health, Bird & Be, Integrity (+others)
+	•	Sep–Oct: NutriProCan, Trainers Choice, Roll Recovery, Aetrex, InBody, etc.
+Even modest ramp (tens of thousands of monthly high-intent sessions across first 8–10 hubs) creates meaningful premium inventory while the >10MM aggregate brand eyeballs and 5MM+ reachable consumers scale the network.
+5. 10× Optimizations for Ad Bot Build
+	•	Dynamic slot allocation by intent stage (pre-assessment vs post-care)
+	•	AI ranking of creatives inside hubs
+	•	Performance guarantees + transparent reporting from day-1 analytics
+	•	Supply brands first (already aligned, zero cold CAC) → expand to external advertisers
+	•	Negative working capital flywheel: collect ad + clinical revenue now, settle partners later
+This positions Scale as the pure demand-gen / Expedia layer for health & wellness SMBs: own the high-intent surface, monetize it at premium, keep clinical fulfillment distributed.
+
+Ad Bot Handoff (Replit Slot Sales Page) Build the sales page off these exact assumptions:
+	•	Inventory map above
+	•	Pricing tiers (impression / guaranteed CTR / CPA)
+	•	Expected conversion math (5–9% CTR, 8–15% book, $250–650 LTV)
+	•	Priority booking for current supply queue + live hubs
+	•	Clear “vs regular display” value props for advertisers
+I will email the full model + this brief to randy@silverbirchgrowth.com now so you have it clean for the Ad Bot build.

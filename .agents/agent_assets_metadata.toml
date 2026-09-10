@@ -1,0 +1,16 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "M7ziKY2PfJnq6a1R-sO4d"
+uri = "file://deliverables/birch-reserve-stripe-setup-current.txt"
+type = "text"
+title = "Current Birch Reserve Stripe setup brief"
+description = "Rewritten for the $990, $4,900, and $9,900 offers; removes the retired $1,900 Price, Payment Link, public offer, and obsolete checkout instructions."
+logical_id = "4c97ccf5-dcc1-4051-849a-d71f873e8759"
+content_hash = "sha256:0ad9afb49f51594f45643781c101ae77669bcc16f49334ed17a38c6fc26fa341"
+size = 6735
+mtime_ms = 1788957044536
+storage_uri = "gcs://replit-rams-assets-kirk/rams/assets/repl:eb075753-0571-4707-948a-00ca7f8da6bb/4c97ccf5-dcc1-4051-849a-d71f873e8759/8137ff80-3f93-4ef7-9403-2a0435d186c6"
+storage_version_token = "1788957052049261"
+content_type = "text/plain"
