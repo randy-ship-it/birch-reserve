@@ -1239,11 +1239,13 @@ test("UCP proxy forwarding drift alerts only after repeated privacy-safe mismatc
 
 test("UCP discovery creates a hosted-checkout escalation without delegated payment", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.PUBLIC_BASE_URL;
   const previousTotal = process.env.SEATS_TOTAL;
   process.env.STRIPE_CHECKOUT_DISABLED = "false";
   process.env.PUBLIC_BASE_URL = "https://reserve.example.com";
   process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   setUcpProfileResolverForTests(resolveTestUcpProfile);
   let stripeCreates = 0;
   setStripeCheckoutFunctionsForTests({
@@ -1603,6 +1605,8 @@ test("UCP discovery creates a hosted-checkout escalation without delegated payme
     setUcpProfileResolverForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
     if (previousPublicUrl === undefined) delete process.env.PUBLIC_BASE_URL;
     else process.env.PUBLIC_BASE_URL = previousPublicUrl;
     if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
@@ -1612,11 +1616,13 @@ test("UCP discovery creates a hosted-checkout escalation without delegated payme
 
 test("verified key succession preserves forward checkout access without enabling rollback", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.PUBLIC_BASE_URL;
   const previousTotal = process.env.SEATS_TOTAL;
   process.env.STRIPE_CHECKOUT_DISABLED = "false";
   process.env.PUBLIC_BASE_URL = "https://reserve.example.com";
   process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   const rotationCheckoutIds: string[] = [];
   const stripeSessions = new Map<string, Record<string, unknown>>();
   let currentProfile = ucpProfile();
@@ -1944,6 +1950,8 @@ test("verified key succession preserves forward checkout access without enabling
     setUcpProfileResolverForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
     if (previousPublicUrl === undefined) delete process.env.PUBLIC_BASE_URL;
     else process.env.PUBLIC_BASE_URL = previousPublicUrl;
     if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
@@ -1953,11 +1961,13 @@ test("verified key succession preserves forward checkout access without enabling
 
 test("UCP rotates active checkout ownership only with the recorded identity key and audits it", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.PUBLIC_BASE_URL;
   const previousTotal = process.env.SEATS_TOTAL;
   process.env.STRIPE_CHECKOUT_DISABLED = "false";
   process.env.PUBLIC_BASE_URL = "https://reserve.example.com";
   process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   const previousProfileUrl = "https://old-agent.example/.well-known/ucp";
   const replacementProfileUrl =
     "https://new-agent.example/.well-known/ucp";
@@ -3123,6 +3133,8 @@ test("UCP rotates active checkout ownership only with the recorded identity key 
     setUcpProfileResolverForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
     if (previousPublicUrl === undefined) delete process.env.PUBLIC_BASE_URL;
     else process.env.PUBLIC_BASE_URL = previousPublicUrl;
     if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
@@ -3132,11 +3144,13 @@ test("UCP rotates active checkout ownership only with the recorded identity key 
 
 test("UCP cancellation expires Stripe before atomically releasing only unpaid holds", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.PUBLIC_BASE_URL;
   const previousTotal = process.env.SEATS_TOTAL;
   process.env.STRIPE_CHECKOUT_DISABLED = "false";
   process.env.PUBLIC_BASE_URL = "https://reserve.example.com";
   process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   setUcpProfileResolverForTests(resolveTestUcpProfile);
   const sessions = new Map<string, Record<string, any>>();
   const expired: string[] = [];
@@ -3588,6 +3602,8 @@ test("UCP cancellation expires Stripe before atomically releasing only unpaid ho
     setUcpProfileResolverForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
     if (previousPublicUrl === undefined) delete process.env.PUBLIC_BASE_URL;
     else process.env.PUBLIC_BASE_URL = previousPublicUrl;
     if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
@@ -3776,11 +3792,13 @@ test("catalog and quotes expose every exact canonical tier", async () => {
 
 test("each exact canonical tier is stored and charged with exact Stripe data", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.PUBLIC_BASE_URL;
   const previousTotal = process.env.SEATS_TOTAL;
   process.env.STRIPE_CHECKOUT_DISABLED = "false";
   process.env.PUBLIC_BASE_URL = "https://reserve.example.com";
   process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   const expected = [
     ["reserve-990", 99000],
     ["pilot-4900", 490000],
@@ -3838,6 +3856,8 @@ test("each exact canonical tier is stored and charged with exact Stripe data", a
     setStripeCheckoutFunctionsForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
     if (previousPublicUrl === undefined) delete process.env.PUBLIC_BASE_URL;
     else process.env.PUBLIC_BASE_URL = previousPublicUrl;
     if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
@@ -3969,6 +3989,7 @@ test("Stripe-disabled checkout durably reuses one public reservation", async () 
 
 test("a successful public checkout confirms payment without a webhook", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.PUBLIC_BASE_URL;
   const previousWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const previousTotal = process.env.SEATS_TOTAL;
@@ -3976,6 +3997,7 @@ test("a successful public checkout confirms payment without a webhook", async ()
   process.env.STRIPE_CHECKOUT_DISABLED = "false";
   process.env.PUBLIC_BASE_URL = "https://reserve.example.com";
   process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   delete process.env.STRIPE_WEBHOOK_SECRET;
   setStripeCheckoutFunctionsForTests({
     create: async (params) =>
@@ -4054,6 +4076,8 @@ test("a successful public checkout confirms payment without a webhook", async ()
     setStripeCheckoutFunctionsForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
     if (previousPublicUrl === undefined) delete process.env.PUBLIC_BASE_URL;
     else process.env.PUBLIC_BASE_URL = previousPublicUrl;
     if (previousWebhookSecret === undefined) delete process.env.STRIPE_WEBHOOK_SECRET;
@@ -4065,12 +4089,14 @@ test("a successful public checkout confirms payment without a webhook", async ()
 
 test("machine checkout confirmation rejects incomplete Stripe metadata", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.PUBLIC_BASE_URL;
   const previousTotal = process.env.SEATS_TOTAL;
   const sessionId = `cs_test_metadata_${randomUUID().replaceAll("-", "")}`;
   process.env.STRIPE_CHECKOUT_DISABLED = "false";
   process.env.PUBLIC_BASE_URL = "https://reserve.example.com";
   process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   let orderId = "";
   setStripeCheckoutFunctionsForTests({
     create: async (params) =>
@@ -4133,6 +4159,8 @@ test("machine checkout confirmation rejects incomplete Stripe metadata", async (
     setStripeCheckoutFunctionsForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
     if (previousPublicUrl === undefined) delete process.env.PUBLIC_BASE_URL;
     else process.env.PUBLIC_BASE_URL = previousPublicUrl;
     if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
@@ -4261,11 +4289,13 @@ test("concurrent buyers cannot both claim the final open seat", async () => {
 
 test("same-key retry safely replaces an invalid Stripe session", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.PUBLIC_BASE_URL;
   const previousTotal = process.env.SEATS_TOTAL;
   process.env.STRIPE_CHECKOUT_DISABLED = "false";
   process.env.PUBLIC_BASE_URL = "https://reserve.example.com";
   process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   const idempotencyKey = randomUUID();
   let createCalls = 0;
   let expiredSessionId = "";
@@ -4320,6 +4350,8 @@ test("same-key retry safely replaces an invalid Stripe session", async () => {
     setStripeCheckoutFunctionsForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
     if (previousPublicUrl === undefined) delete process.env.PUBLIC_BASE_URL;
     else process.env.PUBLIC_BASE_URL = previousPublicUrl;
     if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
@@ -4329,11 +4361,13 @@ test("same-key retry safely replaces an invalid Stripe session", async () => {
 
 test("ambiguous Stripe creation failure stays held for reconciliation", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.PUBLIC_BASE_URL;
   const previousTotal = process.env.SEATS_TOTAL;
   process.env.STRIPE_CHECKOUT_DISABLED = "false";
   process.env.PUBLIC_BASE_URL = "https://reserve.example.com";
   process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   setStripeCheckoutFunctionsForTests({
     create: async () => {
       throw new Error("Stripe response was lost");
@@ -4371,6 +4405,8 @@ test("ambiguous Stripe creation failure stays held for reconciliation", async ()
     setStripeCheckoutFunctionsForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
     if (previousPublicUrl === undefined) delete process.env.PUBLIC_BASE_URL;
     else process.env.PUBLIC_BASE_URL = previousPublicUrl;
     if (previousTotal === undefined) delete process.env.SEATS_TOTAL;

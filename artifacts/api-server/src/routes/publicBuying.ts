@@ -27,6 +27,7 @@ import {
 import {
   createStripeCheckoutSession,
   expireStripeCheckoutSession,
+  isStripeSecretConfigured,
   retrieveStripeCheckoutSession,
 } from "../lib/stripeClient";
 import {
@@ -104,7 +105,11 @@ function publicUrl(): string | null {
 }
 
 function checkoutConfigured(): boolean {
-  return process.env.STRIPE_CHECKOUT_DISABLED !== "true" && publicUrl() !== null;
+  return (
+    process.env.STRIPE_CHECKOUT_DISABLED !== "true" &&
+    publicUrl() !== null &&
+    isStripeSecretConfigured()
+  );
 }
 
 function isFormat(value: unknown): value is (typeof FORMATS)[number] {
