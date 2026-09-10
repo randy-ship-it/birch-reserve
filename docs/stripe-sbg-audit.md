@@ -125,3 +125,111 @@ Secondary gates (different messages):
 3. `splashAdReservations.ts` — honor `PUBLIC_BASE_URL` the same way as `/v1/checkout` when building success/cancel URLs.
 
 No live Stripe objects were modified. No secret values are committed.
+
+## Live Stripe account checklist (authorized connector — read-only)
+
+Retrieved via Randy’s authorized Stripe MCP connection (`SBG APIs` / livemode). No browser automation. No live Stripe mutations. No secrets, bank/payout, tax, or identity-verification data included.
+
+### ACCOUNT
+
+1. **Completed SBG / Silver Birch Growth account?** **Yes.** Legal company name on the account is **Silver Birch Growth Inc.**; dashboard display name **SBG APIs**. Country CA; charges and details submitted.
+2. **Stripe account ID (final six characters only):** `…wsLJND`
+3. **Country / default currency:** `CA` / `cad`
+4. **details_submitted:** `true`
+5. **charges_enabled:** `true`
+6. **payouts_enabled:** `true`
+7. **Public business-profile name:** `SBG APIs`
+8. **Public website URL:** `SilverBirchGrowth.com` (as stored on `business_profile.url`)
+9. **Public support URL:** *not set* (`null`)
+10. **Support email / telephone configured?** Email: **no**. Telephone: **yes** (number omitted).
+11. **Customer-facing statement descriptor:** `SBG SWEEPSTAKES TICKET` (payments statement descriptor). Card statement prefix: `SILVERGUAR`.
+12. **Live or test data?** **Live** (`livemode: true`). Only this live account is connected in the session (no testmode account listed).
+
+### BIRCH RESERVE PRODUCTS
+
+Searched active products, inactive/archived products (`active: false` → empty), and product search by name (`Access Reserve`, `Placement Pilot`, `Network Pilot`, `reserve-990`, `Birch Reserve`).
+
+App checkout uses **inline `price_data`** (see above); Catalog Products/Prices are optional hygiene and are **not required** for `/v1/checkout` to work once `STRIPE_SECRET_KEY` is set. Still documenting Catalog state for SBG ops.
+
+#### reserve-990 — Access Reserve — $990 USD one-time (99000¢)
+
+| Field | Result |
+| --- | --- |
+| Product name | **NOT FOUND** |
+| Product ID | — |
+| Active Price ID | — |
+| Currency | — |
+| Unit amount (cents) | expected `99000` — **no matching Catalog price** |
+| Active / archived | — |
+| Live / test | Live search only |
+| Product metadata | — |
+| Duplicates | none |
+
+#### pilot-4900 — Placement Pilot — $4,900 USD one-time (490000¢)
+
+| Field | Result |
+| --- | --- |
+| Product name | **NOT FOUND** |
+| Product ID | — |
+| Active Price ID | — |
+| Currency | — |
+| Unit amount (cents) | expected `490000` — **no matching Catalog price** |
+| Active / archived | — |
+| Live / test | Live search only |
+| Product metadata | — |
+| Duplicates | none |
+
+#### network-9900 — Network Pilot — $9,900 USD one-time (990000¢)
+
+| Field | Result |
+| --- | --- |
+| Product name | **NOT FOUND** |
+| Product ID | — |
+| Active Price ID | — |
+| Currency | — |
+| Unit amount (cents) | expected `990000` — **no matching Catalog price** |
+| Active / archived | — |
+| Live / test | Live search only |
+| Product metadata | — |
+| Duplicates | none |
+
+#### Legacy (do not reuse for the three packages; do not delete/archive)
+
+| Field | Value |
+| --- | --- |
+| Product name | Birch Reserve Ad |
+| Product ID | `prod_VECW1NASrdM4I3` |
+| Active Price ID | `price_1UDk7WDxmCwsLJNDN33kvt1x` |
+| Currency | `usd` |
+| Unit amount (cents) | `190000` ($1,900) |
+| Status | active |
+| Mode | live |
+| Metadata | `offer=splash-1900`, `site=birchreserve.net` |
+| Duplicates | single price on this product |
+
+**Instruction honored:** do not reuse the $1,900 Product/Price for reserve-990 / pilot-4900 / network-9900. Do not delete or archive this legacy product in this pass.
+
+### WEBHOOKS
+
+App expects (from code): `POST https://birchreserve.net/api/stripe/webhook` (`app.ts` → `handleStripeWebhook`). Signing secret must live only in `STRIPE_WEBHOOK_SECRET` (never in git).
+
+Live webhook endpoints on this account (hostname + path only; **no `whsec` returned**):
+
+| Destination | Status | Mode | Notes / events (relevant subset) |
+| --- | --- | --- | --- |
+| `sales-bridge.replit.app` `/api/stripe/webhook` | enabled | live | Broad set incl. `checkout.session.completed`, `checkout.session.expired`, `payment_intent.succeeded`, `payment_intent.payment_failed`, `payment_intent.canceled` (+ many others). Metadata `managed_by=stripe-sync`. **Not birchreserve.net.** |
+| `getsilverguard.com` `/api/silverguard/stripe/webhook` | enabled | live | Includes `checkout.session.completed`; subscription/invoice events. **Not Birch.** |
+| `getsilverguard.com` `/api/silverguard/webhook` | enabled | live | `checkout.session.completed` + subscription events. **Not Birch.** |
+
+**Birch gap:** No enabled live webhook endpoint was found whose destination is `birchreserve.net` (or `/api/stripe/webhook` on that host). Until one is created (Randy approval) and `STRIPE_WEBHOOK_SECRET` is set, Checkout Sessions may create successfully after the SDK wiring fix, but paid-seat settlement via webhook will not fire on Birch.
+
+Checked-for event types present on at least one account endpoint: `checkout.session.completed` ✓, `checkout.session.expired` ✓ (sales-bridge), `payment_intent.succeeded` ✓, `payment_intent.payment_failed` ✓, `payment_intent.canceled` ✓ — but **not wired to Birch’s hostname**.
+
+### Checklist conclusions (no mutations performed)
+
+1. Account is completed live **Silver Birch Growth Inc. / SBG APIs** (`…wsLJND`).
+2. Catalog Products/Prices for the three current packages **do not exist** yet (optional for app `price_data` path).
+3. Legacy $1,900 Birch product remains; leave it alone; do not map new SKUs to it.
+4. Birch webhook endpoint on `birchreserve.net` is **missing** — separate ops step after Randy approval.
+5. Still no secret keys or `whsec` values in this document.
+
