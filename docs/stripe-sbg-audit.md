@@ -241,3 +241,13 @@ Checked-for event types present on at least one account endpoint: `checkout.sess
 4. Birch webhook endpoint on `birchreserve.net` is **missing** — separate ops step after Randy approval.
 5. Still no secret keys or `whsec` values in this document.
 
+
+## Autoscale HARD 500 recovery note (2026-09-11)
+
+Live apex + `birch-list-ad-agency.replit.app` returned Google Frontend 500 on all paths (including static) after failed publishes the afternoon of Sep 10. Operator Replit UI jammed on Cloudflare Verify.
+
+**Boot risk:** `@workspace/api-server` `prestart` ran `pnpm --filter @workspace/db run push` (integrity check + drizzle-kit push + security guards). Any failure there prevents `start` → process never listens → GF 500 everywhere.
+
+**Code harden (this branch):** `prestart` is best-effort — db push failure logs a warning and continues so HTTP can bind. Explicit `pnpm --filter @workspace/api-server run db:push` remains for intentional migrations.
+
+**Still required for live recovery:** republish/restart Autoscale from a desktop that can open Replit (or clear CF on the bot box). GitHub PR alone does not restart a hung Autoscale until Replit pulls/redeploys.
