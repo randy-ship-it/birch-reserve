@@ -12,6 +12,14 @@ Scope: read-only analysis of how `checkout_url` is produced for POST `/v1/checko
 - Historical env names like `STRIPE_PRICE_ID` / `STRIPE_PRICE_RESERVE_1900` / Payment Link fallbacks are **stale relative to current code** and must not be restored.
 - Primary wiring gap verified in code: Checkout Session create/retrieve/expire went only through **Replit Connectors** `proxy("stripe", ...)`, while `STRIPE_SECRET_KEY` was only used by `getStripeClient()` (webhooks). If the connector is incomplete/broken but a public HTTPS base URL is set, reservations save and checkout returns 503 with null `checkout_url`.
 
+## Canonical public origin (2026-09-10)
+
+Randy lock via Emma: product door is **https://www.birchreserve.net** (not bare apex).
+
+- `PUBLIC_BASE_URL` / `SPLASH_AD_PUBLIC_URL` / editorial `PUBLIC_SITE_ORIGIN` should use the www origin once DNS + Replit Domains attach land.
+- Webhook endpoint prefer `https://www.birchreserve.net/api/stripe/webhook` (keep apex working until cutover).
+- Hands off live SKU/pricing while Randy edits Replit; this branch only documents + sets editorial origin constant.
+
 ## POST `/v1/checkout` → `checkout_url` path
 
 | Step | File | Function / notes |
@@ -100,8 +108,8 @@ Secondary gates (different messages):
 **Required for live paid checkout + webhook settle**
 
 1. `STRIPE_SECRET_KEY` — live SBG secret (`sk_live_…`); Replit Secrets / host secrets only  
-2. `STRIPE_WEBHOOK_SECRET` — endpoint signing secret (`whsec_…`) for `https://birchreserve.net/api/stripe/webhook` (or deployed equivalent)  
-3. `PUBLIC_BASE_URL` or `SPLASH_AD_PUBLIC_URL` — HTTPS canonical site origin (e.g. `https://birchreserve.net`)  
+2. `STRIPE_WEBHOOK_SECRET` — endpoint signing secret (`whsec_…`) for `https://www.birchreserve.net/api/stripe/webhook` (apex also OK until www is sole door)  
+3. `PUBLIC_BASE_URL` or `SPLASH_AD_PUBLIC_URL` — HTTPS canonical site origin — **https://www.birchreserve.net** (Randy lock 2026-09-10; apex secondary)  
 4. `DATABASE_URL` — reservations durability  
 
 **Optional / operational**

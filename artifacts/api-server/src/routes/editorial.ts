@@ -19,7 +19,7 @@ import {
 import { requestEditorialDraft } from "../lib/editorialDrafting";
 
 const router: IRouter = Router();
-const PUBLIC_SITE_ORIGIN = "https://birchreserve.net";
+const PUBLIC_SITE_ORIGIN = "https://www.birchreserve.net";
 const uuid = z.string().uuid();
 const draftInput = z.object({
   title: z.string().trim().min(12).max(180),
