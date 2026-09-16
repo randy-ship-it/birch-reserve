@@ -17,6 +17,20 @@ export class StripeProxyError extends Error {
   }
 }
 
+export function isStripeSecretConfigured(): boolean {
+  return Boolean(process.env.STRIPE_SECRET_KEY?.trim());
+}
+
+/**
+ * Prefer the official Stripe SDK whenever STRIPE_SECRET_KEY is present so
+ * Checkout Session create/retrieve/expire share the same credential path as
+ * webhook verification. Fall back to the Replit Stripe connector only when no
+ * secret is configured.
+ */
+function preferStripeSdk(): boolean {
+  return isStripeSecretConfigured();
+}
+
 async function stripeProxy<T>(path: string, options?: ProxyOptions): Promise<T> {
   const response = await new ReplitConnectors().proxy("stripe", path, options);
   const payload = (await response.json()) as T & {
@@ -44,10 +58,14 @@ export function retrieveStripeCheckoutSession(
 
 let stripeCheckoutSessionRetriever = (
   sessionId: string,
-): Promise<Stripe.Checkout.Session> =>
-  stripeProxy<Stripe.Checkout.Session>(
+): Promise<Stripe.Checkout.Session> => {
+  if (preferStripeSdk()) {
+    return getStripeClient().checkout.sessions.retrieve(sessionId);
+  }
+  return stripeProxy<Stripe.Checkout.Session>(
     `/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
   );
+};
 
 export function expireStripeCheckoutSession(
   sessionId: string,
@@ -57,11 +75,15 @@ export function expireStripeCheckoutSession(
 
 let stripeCheckoutSessionExpirer = (
   sessionId: string,
-): Promise<Stripe.Checkout.Session> =>
-  stripeProxy<Stripe.Checkout.Session>(
+): Promise<Stripe.Checkout.Session> => {
+  if (preferStripeSdk()) {
+    return getStripeClient().checkout.sessions.expire(sessionId);
+  }
+  return stripeProxy<Stripe.Checkout.Session>(
     `/v1/checkout/sessions/${encodeURIComponent(sessionId)}/expire`,
     { method: "POST" },
   );
+};
 
 export function createStripeCheckoutSession(
   params: Stripe.Checkout.SessionCreateParams,
@@ -195,10 +217,9 @@ let stripePaymentIntentCreator = (
     });
 };
 
-let stripeCheckoutSessionCreator = (
+function appendCheckoutSessionFormBody(
   params: Stripe.Checkout.SessionCreateParams,
-  idempotencyKey: string,
-): Promise<Stripe.Checkout.Session> => {
+): URLSearchParams {
   const body = new URLSearchParams();
   body.set("mode", params.mode ?? "payment");
   if (params.client_reference_id) {
@@ -223,6 +244,23 @@ let stripeCheckoutSessionCreator = (
           item.price_data.product_data.name,
         );
       }
+      if (item.price_data.product_data?.description) {
+        body.set(
+          `line_items[${index}][price_data][product_data][description]`,
+          item.price_data.product_data.description,
+        );
+      }
+      const productMetadata = item.price_data.product_data?.metadata;
+      if (productMetadata) {
+        Object.entries(productMetadata).forEach(([key, value]) => {
+          if (value != null) {
+            body.set(
+              `line_items[${index}][price_data][product_data][metadata][${key}]`,
+              String(value),
+            );
+          }
+        });
+      }
     }
     body.set(`line_items[${index}][quantity]`, String(item.quantity ?? 1));
   });
@@ -242,16 +280,36 @@ let stripeCheckoutSessionCreator = (
     "allow_promotion_codes",
     params.allow_promotion_codes === true ? "true" : "false",
   );
+  return body;
+}
 
+function createCheckoutSessionViaConnector(
+  params: Stripe.Checkout.SessionCreateParams,
+  idempotencyKey: string,
+): Promise<Stripe.Checkout.Session> {
   return stripeProxy<Stripe.Checkout.Session>("/v1/checkout/sessions", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
       "Idempotency-Key": idempotencyKey,
     },
-    body: body.toString(),
+    body: appendCheckoutSessionFormBody(params).toString(),
   });
-};
+}
+
+function defaultCreateStripeCheckoutSession(
+  params: Stripe.Checkout.SessionCreateParams,
+  idempotencyKey: string,
+): Promise<Stripe.Checkout.Session> {
+  if (preferStripeSdk()) {
+    return getStripeClient().checkout.sessions.create(params, {
+      idempotencyKey,
+    });
+  }
+  return createCheckoutSessionViaConnector(params, idempotencyKey);
+}
+
+let stripeCheckoutSessionCreator = defaultCreateStripeCheckoutSession;
 
 export function setStripeCheckoutFunctionsForTests(overrides?: {
   create?: typeof stripeCheckoutSessionCreator;
@@ -262,70 +320,28 @@ export function setStripeCheckoutFunctionsForTests(overrides?: {
     throw new Error("Stripe checkout overrides are test-only.");
   }
   stripeCheckoutSessionCreator =
-    overrides?.create ??
-    ((params, idempotencyKey) => {
-      const body = new URLSearchParams();
-      body.set("mode", params.mode ?? "payment");
-      if (params.client_reference_id) {
-        body.set("client_reference_id", params.client_reference_id);
-      }
-      if (params.customer_email) body.set("customer_email", params.customer_email);
-      params.line_items?.forEach((item, index) => {
-        if (typeof item.price === "string") {
-          body.set(`line_items[${index}][price]`, item.price);
-        } else if (item.price_data) {
-          body.set(`line_items[${index}][price_data][currency]`, item.price_data.currency);
-          body.set(
-            `line_items[${index}][price_data][unit_amount]`,
-            String(item.price_data.unit_amount),
-          );
-          if (item.price_data.product_data?.name) {
-            body.set(
-              `line_items[${index}][price_data][product_data][name]`,
-              item.price_data.product_data.name,
-            );
-          }
-        }
-        body.set(`line_items[${index}][quantity]`, String(item.quantity ?? 1));
-      });
-      Object.entries(params.metadata ?? {}).forEach(([key, value]) => {
-        if (value != null) body.set(`metadata[${key}]`, String(value));
-      });
-      Object.entries(params.payment_intent_data?.metadata ?? {}).forEach(
-        ([key, value]) => {
-          if (value != null) {
-            body.set(`payment_intent_data[metadata][${key}]`, String(value));
-          }
-        },
-      );
-      if (params.success_url) body.set("success_url", params.success_url);
-      if (params.cancel_url) body.set("cancel_url", params.cancel_url);
-      body.set(
-        "allow_promotion_codes",
-        params.allow_promotion_codes === true ? "true" : "false",
-      );
-      return stripeProxy<Stripe.Checkout.Session>("/v1/checkout/sessions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Idempotency-Key": idempotencyKey,
-        },
-        body: body.toString(),
-      });
-    });
+    overrides?.create ?? defaultCreateStripeCheckoutSession;
   stripeCheckoutSessionExpirer =
     overrides?.expire ??
-    ((sessionId) =>
-      stripeProxy<Stripe.Checkout.Session>(
+    ((sessionId) => {
+      if (preferStripeSdk()) {
+        return getStripeClient().checkout.sessions.expire(sessionId);
+      }
+      return stripeProxy<Stripe.Checkout.Session>(
         `/v1/checkout/sessions/${encodeURIComponent(sessionId)}/expire`,
         { method: "POST" },
-      ));
+      );
+    });
   stripeCheckoutSessionRetriever =
     overrides?.retrieve ??
-    ((sessionId) =>
-      stripeProxy<Stripe.Checkout.Session>(
+    ((sessionId) => {
+      if (preferStripeSdk()) {
+        return getStripeClient().checkout.sessions.retrieve(sessionId);
+      }
+      return stripeProxy<Stripe.Checkout.Session>(
         `/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
-      ));
+      );
+    });
 }
 
 export function setStripePaymentIntentFunctionForTests(
@@ -376,11 +392,13 @@ export function setStripePaymentIntentCancelerForTests(
 }
 
 /**
- * Stripe credentials are supplied by the Replit Stripe connection at runtime.
+ * Server-side Stripe SDK client using STRIPE_SECRET_KEY from host secrets.
+ * Prefer this path for Checkout Sessions and webhooks so create/retrieve/expire
+ * and signature verification use the same SBG account credentials.
  * Never move this lookup to the browser or cache a client across requests.
  */
 export function getStripeClient(): Stripe {
-  const secretKey = process.env.STRIPE_SECRET_KEY;
+  const secretKey = process.env.STRIPE_SECRET_KEY?.trim();
   if (!secretKey) {
     throw new Error("Stripe is not connected.");
   }

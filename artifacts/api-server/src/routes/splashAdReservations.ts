@@ -28,6 +28,7 @@ import {
   createStripeCheckoutSession,
   expireStripeCheckoutSession,
   getStripeClient,
+  isStripeSecretConfigured,
   retrieveStripeCheckoutSession,
 } from "../lib/stripeClient";
 import {
@@ -94,7 +95,9 @@ function createActivationToken(): string {
 }
 
 function configuredPublicAppUrl(): string | null {
-  const configured = process.env.SPLASH_AD_PUBLIC_URL?.trim();
+  const configured =
+    process.env.PUBLIC_BASE_URL?.trim() ??
+    process.env.SPLASH_AD_PUBLIC_URL?.trim();
   if (configured) {
     try {
       const url = new URL(configured);
@@ -111,14 +114,16 @@ function configuredPublicAppUrl(): string | null {
 function isStripePaymentConfigured(): boolean {
   return Boolean(
     process.env.STRIPE_CHECKOUT_DISABLED !== "true" &&
-      configuredPublicAppUrl(),
+      configuredPublicAppUrl() &&
+      isStripeSecretConfigured(),
   );
 }
 
 function isReserveCheckoutConfigured(): boolean {
   return Boolean(
     process.env.STRIPE_CHECKOUT_DISABLED !== "true" &&
-      configuredPublicAppUrl(),
+      configuredPublicAppUrl() &&
+      isStripeSecretConfigured(),
   );
 }
 

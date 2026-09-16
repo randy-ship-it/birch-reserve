@@ -163,9 +163,11 @@ test("public reserve stores the canonical $990 offer and holds the seat without 
 
 test("legacy USD reservations remain readable and payable, without being public offers", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.SPLASH_AD_PUBLIC_URL;
   process.env.STRIPE_CHECKOUT_DISABLED = "false";
   process.env.SPLASH_AD_PUBLIC_URL = "https://reserve.example.com";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   const activationToken = randomUUID();
   const [legacy] = await db
     .insert(splashAdReservationsTable)
@@ -226,6 +228,8 @@ test("legacy USD reservations remain readable and payable, without being public 
     setStripeCheckoutFunctionsForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
     if (previousPublicUrl === undefined) delete process.env.SPLASH_AD_PUBLIC_URL;
     else process.env.SPLASH_AD_PUBLIC_URL = previousPublicUrl;
   }
@@ -233,11 +237,13 @@ test("legacy USD reservations remain readable and payable, without being public 
 
 test("human reserve checkout uses the exact selected tier and Stripe line item", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.SPLASH_AD_PUBLIC_URL;
   const previousTotal = process.env.SEATS_TOTAL;
   process.env.STRIPE_CHECKOUT_DISABLED = "false";
   process.env.SPLASH_AD_PUBLIC_URL = "https://reserve.example.com";
   process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   const expected = [
     ["reserve-990", 99000],
     ["pilot-4900", 490000],
@@ -281,6 +287,8 @@ test("human reserve checkout uses the exact selected tier and Stripe line item",
     setStripeCheckoutFunctionsForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
     if (previousPublicUrl === undefined) delete process.env.SPLASH_AD_PUBLIC_URL;
     else process.env.SPLASH_AD_PUBLIC_URL = previousPublicUrl;
     if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
@@ -721,6 +729,7 @@ test("staff approval and a public buyer cannot both claim the final seat", async
   const previousTotal = process.env.SEATS_TOTAL;
   const previousAdminSecret = process.env.SPLASH_AD_ADMIN_SECRET;
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const [candidate] = await db
     .insert(splashAdReservationsTable)
     .values({
@@ -778,12 +787,15 @@ test("staff approval and a public buyer cannot both claim the final seat", async
     else process.env.SPLASH_AD_ADMIN_SECRET = previousAdminSecret;
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
   }
 });
 
 test("a supported legacy reservation consumes the final seat", async () => {
   const previousTotal = process.env.SEATS_TOTAL;
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const before = await getSplashSeatCounts();
   process.env.SEATS_TOTAL = String(before.seats_paid + before.seats_held + 1);
   process.env.STRIPE_CHECKOUT_DISABLED = "true";
@@ -837,6 +849,8 @@ test("a supported legacy reservation consumes the final seat", async () => {
     else process.env.SEATS_TOTAL = previousTotal;
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
   }
 });
 
@@ -1868,6 +1882,7 @@ test("a fresh checkout claim made after candidate selection defeats stale cleanu
 
 test("cleanup and a replacement buyer defeat an in-flight checkout renewal", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.SPLASH_AD_PUBLIC_URL;
   const previousTotal = process.env.SEATS_TOTAL;
   const old = new Date(Date.now() - 21 * 60 * 1000);
@@ -1896,6 +1911,7 @@ test("cleanup and a replacement buyer defeat an in-flight checkout renewal", asy
   process.env.SEATS_TOTAL = String(counts.seats_paid + counts.seats_held);
   process.env.STRIPE_CHECKOUT_DISABLED = "false";
   process.env.SPLASH_AD_PUBLIC_URL = "https://reserve.example.com";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
 
   let signalRetrieval!: () => void;
   let releaseRetrieval!: () => void;
@@ -1965,6 +1981,8 @@ test("cleanup and a replacement buyer defeat an in-flight checkout renewal", asy
     setStripeCheckoutFunctionsForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
     else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
     if (previousPublicUrl === undefined) delete process.env.SPLASH_AD_PUBLIC_URL;
     else process.env.SPLASH_AD_PUBLIC_URL = previousPublicUrl;
     if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
