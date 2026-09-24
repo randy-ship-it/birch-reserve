@@ -1,15 +1,20 @@
 /**
- * Chat Randy model client — prefers live Grok via api-server; stub fallback.
+ * Chat Randy model client: live Grok via api-server.
  *
  * Browser calls POST /api/launch/randy-chat (XAI_API_KEY stays server-side).
- * On 503 / disabled / network failure → stub replies (graceful).
+ * Contract (must match artifacts/api-server/src/routes/randyChat.ts parseBody):
+ *   { messages: [{ role: "user" | "assistant", content }], mode?, chipId?, sessionId?, pagePath? }
+ *
+ * Failures are NEVER silent: network errors, timeouts (25s), 4xx and provider
+ * 5xx return { ok: false } so the widget shows a friendly error with Retry +
+ * the tel fallback. The canned stub is only used when the server says AI is
+ * switched off / not configured (reason "disabled" | "missing_key"), e.g. local dev.
  *
  * Knowledge SoT: birch-live-ops/voice-closer/knowledge (vendored snapshot on api-server).
  */
 
 import {
   CHECKOUT_LIVE,
-  LIVE_HUB_PROOF_DISPLAY,
   LIVE_HUB_PROOF_URL,
   PUBLIC_SKU_KEYS,
   VOICE_CLOSER_KNOWLEDGE_SOT,
@@ -18,7 +23,7 @@ import {
 } from "@/lib/randy-chat-knowledge";
 
 export type RandyModelMessage = {
-  role: "user" | "assistant" | "system";
+  role: "user" | "assistant";
   content: string;
 };
 
@@ -26,6 +31,14 @@ export type RandyModelRequest = {
   messages: RandyModelMessage[];
   mode: "chat" | "hear";
   chipId?: DiscoveryChipId;
+  sessionId?: string;
+};
+
+export type RandyReplyFailure = {
+  ok: false;
+  kind: "timeout" | "network" | "rate_limited" | "rejected" | "unavailable";
+  status?: number;
+  detail?: string;
 };
 
 export type RandyModelResponse = {
@@ -46,7 +59,32 @@ export type RandyVoiceSession =
     };
 
 const RANDY_CHAT_API = "/api/launch/randy-chat";
-const FETCH_TIMEOUT_MS = 14_000;
+const RANDY_EVENT_API = "/api/launch/randy-chat/event";
+/** Server gives Grok 22s; allow for network on top. */
+export const FETCH_TIMEOUT_MS = 25_000;
+/** Same clip the server applies, so long replies never poison later requests. */
+const MAX_CONTENT_CHARS = 1_500;
+const MAX_MESSAGES = 80;
+
+function currentPagePath(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  const p = window.location.pathname || "/";
+  return /^\/[A-Za-z0-9._~/?=&%-]{0,199}$/.test(p) ? p : "/";
+}
+
+/** Shape the thread exactly as the server accepts it (no extra fields). */
+export function toWireMessages(messages: RandyModelMessage[]): RandyModelMessage[] {
+  return messages
+    .filter((m) => (m.role === "user" || m.role === "assistant") && m.content.trim())
+    .slice(-MAX_MESSAGES)
+    .map((m) => {
+      const content = m.content.trim();
+      return {
+        role: m.role,
+        content: content.length > MAX_CONTENT_CHARS ? `${content.slice(0, MAX_CONTENT_CHARS - 1)}…` : content,
+      };
+    });
+}
 
 void VOICE_CLOSER_KNOWLEDGE_SOT;
 void CHECKOUT_LIVE;
@@ -110,7 +148,7 @@ async function stubRandyReply(
 
   if (chip === "live_hub") {
     return {
-      text: `Here’s a live hub: ${LIVE_HUB_PROOF_URL} (${LIVE_HUB_PROOF_DISPLAY}). That’s the kind of surface a seat shows up on. What category would you want in front of those patients?`,
+      text: `Here’s a live hub: ${LIVE_HUB_PROOF_URL} That’s the kind of surface a seat shows up on. What category would you want in front of those patients?`,
       source: "stub",
     };
   }
@@ -124,75 +162,151 @@ async function stubRandyReply(
   }
 
   return {
-    text: "Got it. Which category are you thinking about for the recovery hubs? Call is there whenever you want it.",
+    text: "Got it. Which category are you thinking about for the recovery hubs? Call is there whenever you want it; and I can line up a callback once I know a bit more.",
     source: "stub",
     offerHandoff: stubOfferHandoff(req),
   };
 }
 
-async function fetchGrokReply(
-  req: RandyModelRequest,
-): Promise<RandyModelResponse | null> {
+type LiveResult =
+  | { ok: true; reply: RandyModelResponse }
+  | RandyReplyFailure
+  | { ok: "stub" };
+
+async function fetchGrokReply(req: RandyModelRequest): Promise<LiveResult> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const pagePath = currentPagePath();
 
   try {
     const response = await fetch(RANDY_CHAT_API, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        messages: req.messages.map((m) => ({
-          role: m.role,
-          content: m.content,
-        })),
+        messages: toWireMessages(req.messages),
         mode: req.mode,
         ...(req.chipId ? { chipId: req.chipId } : {}),
+        ...(req.sessionId ? { sessionId: req.sessionId } : {}),
+        ...(pagePath ? { pagePath } : {}),
       }),
       signal: controller.signal,
     });
 
-    if (response.status === 503 || response.status === 429) {
-      return null;
-    }
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = (await response.json()) as {
+    let data: {
       text?: string;
       source?: string;
       offerHandoff?: boolean;
       disabled?: boolean;
-    };
+      reason?: string;
+      error?: string;
+    } = {};
+    try {
+      data = await response.json();
+    } catch {
+      /* non-JSON (proxy error page) */
+    }
 
-    if (data.disabled || data.source !== "grok" || typeof data.text !== "string" || !data.text.trim()) {
-      return null;
+    if (response.status === 429) return { ok: false, kind: "rate_limited", status: 429 };
+    if (response.status === 503 && (data.reason === "disabled" || data.reason === "missing_key")) {
+      return { ok: "stub" };
+    }
+    if (response.status >= 400 && response.status < 500) {
+      console.warn("[randy-chat] request rejected", response.status, data.error);
+      return { ok: false, kind: "rejected", status: response.status, detail: data.error };
+    }
+    if (!response.ok) {
+      console.warn("[randy-chat] unavailable", response.status, data.reason ?? data.error);
+      return { ok: false, kind: "unavailable", status: response.status, detail: data.reason };
+    }
+    if (data.source !== "grok" || typeof data.text !== "string" || !data.text.trim()) {
+      return { ok: false, kind: "unavailable", status: response.status, detail: "empty_reply" };
     }
 
     return {
-      text: data.text.trim(),
-      source: "grok",
-      ...(data.offerHandoff || stubOfferHandoff(req)
-        ? { offerHandoff: true }
-        : {}),
+      ok: true,
+      reply: {
+        text: data.text.trim(),
+        source: "grok",
+        ...(data.offerHandoff || stubOfferHandoff(req) ? { offerHandoff: true } : {}),
+      },
     };
-  } catch {
-    return null;
+  } catch (error) {
+    const aborted = error instanceof DOMException && error.name === "AbortError";
+    console.warn("[randy-chat] fetch failed", aborted ? "timeout" : error);
+    return { ok: false, kind: aborted ? "timeout" : "network" };
   } finally {
     window.clearTimeout(timeout);
   }
 }
 
 /**
- * Prefer live Grok via api-server; fall back to stub on failure/disabled.
+ * Live Grok via api-server. Returns a failure (never a silent canned reply)
+ * unless the server explicitly reports AI switched off / not configured.
  * Never reads XAI_API_KEY in the browser.
  */
 export async function requestRandyReply(
   req: RandyModelRequest,
-): Promise<RandyModelResponse> {
+): Promise<({ ok: true } & RandyModelResponse) | RandyReplyFailure> {
   const live = await fetchGrokReply(req);
-  if (live) return live;
-  return stubRandyReply(req);
+  if (live.ok === true) return { ok: true, ...live.reply };
+  if (live.ok === "stub") return { ok: true, ...(await stubRandyReply(req)) };
+  return live;
+}
+
+export type RandyChatEventType =
+  | "tel_click"
+  | "callback_request"
+  | "cal_shown"
+  | "qualified"
+  | "close"
+  | "activity";
+
+export type RandyChatEvent = {
+  sessionId: string;
+  type: RandyChatEventType;
+  messages?: RandyModelMessage[];
+  qualify?: { company?: string; category?: string; reach?: string; timing?: string };
+  contact?: { phone?: string; email?: string; name?: string };
+};
+
+function eventPayload(evt: RandyChatEvent): string {
+  const pagePath = currentPagePath();
+  return JSON.stringify({
+    sessionId: evt.sessionId,
+    type: evt.type,
+    ...(evt.messages ? { messages: toWireMessages(evt.messages) } : {}),
+    ...(evt.qualify ? { qualify: evt.qualify } : {}),
+    ...(evt.contact ? { contact: evt.contact } : {}),
+    ...(pagePath ? { pagePath } : {}),
+  });
+}
+
+/** Transcript / handoff event. Resolves true when the server stored it. */
+export async function sendRandyEvent(evt: RandyChatEvent): Promise<boolean> {
+  try {
+    const response = await fetch(RANDY_EVENT_API, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: eventPayload(evt),
+      keepalive: true,
+    });
+    if (!response.ok) console.warn("[randy-chat] event rejected", evt.type, response.status);
+    return response.ok;
+  } catch (error) {
+    console.warn("[randy-chat] event failed", evt.type, error);
+    return false;
+  }
+}
+
+/** Close / pagehide: best-effort beacon (the server sweep still emails idle sessions). */
+export function beaconRandyEvent(evt: RandyChatEvent): void {
+  try {
+    const blob = new Blob([eventPayload(evt)], { type: "application/json" });
+    if (navigator.sendBeacon?.(RANDY_EVENT_API, blob)) return;
+  } catch {
+    /* fall through */
+  }
+  void sendRandyEvent(evt);
 }
 
 /**
@@ -207,6 +321,6 @@ export async function startRandyVoiceSession(): Promise<RandyVoiceSession> {
     status: "eve_pending",
     reason: "Eve / Grok realtime voice not wired yet — text Grok still serves Hear mode.",
     uiNote:
-      "Voice coming soon. Chat here, or tap Call for the live line.",
+      "Voice coming soon. Chat here, or tap Call for the live phone line.",
   };
 }

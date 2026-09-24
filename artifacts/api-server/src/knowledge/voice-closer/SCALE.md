@@ -1,9 +1,11 @@
-# SCALE.md — Scale Health (consumer #1 of this pack)
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:10 EDT. Edit sales-brain, not this file. -->
+# Scale Health (brand training)
 
 **Legal:** Scale Health Network Inc. · Randy calls the org **Scale**.  
-**Door:** https://scalehealth.ca  
-**CRM workspace:** `scalehealth` (Friday)  
-**SoT talk-tracks:** HARD-Scale-Provider-TalkTrack-24Sep2026 · ICA_TALKTRACK_LOCK · HARD-TALKTRACK-REFRESH (US)
+**Door:** https://scalehealth.ca
+
+Note: the live /providers page headline currently says "We send the patient." On calls, still use the rails framing below; do not repeat that headline.  
+**Talk-track sources:** HARD Scale provider talk-track 2026-09-24 · no-session-fee HARD 2026-09-24 3:55pm
 
 ## What Scale is (public)
 
@@ -25,20 +27,38 @@ Scale sells **booking / practice rails**, not patients.
 
 **Scope warning for Birch closer:** “50MM+ contracted brand eyeballs” is a **Scale provider** frame. It is **not** a Birch sold-impression guarantee. Do not tell brand ad buyers “your Birch seat equals 50MM views.”
 
-## Economics when asked (ICA)
+## Economics when asked — HARD (Randy 2026-09-24 ~3:55pm ET)
 
-- Partner sets Professional Fee; patient pays them; they keep **100%** of that fee.
-- Scale invoices **$49 only when a paid visit completes on Scale**.
-- Listing included. Rank not for sale. Nobody assigned.
-- $0 until care happens.
+- Scale does **not** charge providers (physio and other registered fulfillment services) for sessions. No per-session fee, no per-booking fee, no cut of their fee.
+- The provider sets their own fee, the patient pays them, and they keep it.
+- What providers get: bookable presence in brand hubs, an admin portal, data, and insights (the rails).
+- Transaction-based fees apply only to Scale marketplace and services partners, never to providers.
+- Rank is not for sale. Nobody is assigned; people choose eligible clinicians.
+- Anything beyond this (subscription or setup pricing): not in these instructions. Say the team will confirm.
 
-Do **not** spew internal shareback % / Align royalty math to prospects (see INTERNAL monetization memo — internal only).
+Phone line if asked "what does it cost me per session?": "Nothing per session. We don't take a cut of your visits. You get the booking presence, the admin portal, and the data. Want me to send you the provider page?"
 
-## Link order (naked URLs)
+Do **not** share internal shareback %, Align royalty math, or company-to-company fees.
 
-1. **Providers (rails):** https://scalehealth.ca/providers  
-2. **Clinic hubs (free store):** https://scalehealth.ca/clinichubs — built more for people with audiences who want to monetize and tap supply deals; small shops can stand it up free too.  
-3. **Birch waitlist / exposure:** https://birchreserve.net (waitlist / category seats — separate product)
+## Diagnose then route (HARD 2026-09-24 ~3:47pm ET)
+
+Every Scale conversation ends with ONE URL that fits what they told you. Full table + phone phrasing: ROUTING-URLS.md and SYSTEM-PROMPT.md.
+
+| Who | Scale URL |
+|---|---|
+| Canadian physio / clinic / independent provider wanting to be bookable on rails | https://scalehealth.ca/providers |
+| Brand wanting its own hub / storefront ($0 build) | https://scalehealth.ca/clinichubs |
+| Gym, pilates, yoga, recovery studio wanting a free physio door for members | https://scalehealth.ca/clinichubs |
+| Brand wanting display exposure in hubs | https://birchreserve.net (Birch, separate product) |
+| Anything else Scale | https://scalehealth.ca |
+| US clinic | No push (US clinic outbound STOP). Capture email; team follows up. |
+
+Quick diagnosis cues:
+- Says "patients", "bookings", "my clinic", "I'm a physio" = provider, /providers. Answer "do you send patients?" with rails: brands need a booking place; you get tools, data, insights; people choose.
+- Says "members", "my audience", "my studio", "storefront" = /clinichubs.
+- Says "advertise", "sponsor", "get my product in front of" = birchreserve.net.
+
+Phone: "scale health, all one word, dot C-A, slash providers" (or "slash clinic hubs, one word"). Then offer to text or email the link.
 
 ## Birch why (after fit, soft)
 
@@ -69,13 +89,9 @@ Features-first: free store, monetize more, supply deals already on. Brand-hub fl
 
 If a US clinic asks to join rails: do not promise commercial launch timing. Capture interest → Book a call / Randy.
 
-## Lanes (Friday CRM tags — internal)
-
-Clinic Hubs · Local Biz · Fulfillment CA · Fulfillment US · Brand supply. Do not dump lane taxonomy on cold calls unless useful for triage.
-
 ## Handoff from Birch voice
 
-If caller is a clinician / studio wanting bookings or a free store → stop Birch pitch → Scale link order. Franchise / multi-loc complexity → Jon (jon@silverbirchgrowth.com).
+If caller is a clinician wanting bookings: stop the Birch pitch, give https://scalehealth.ca/providers. Studio / audience wanting a free store: https://scalehealth.ca/clinichubs. One URL, then offer to text or email it. Franchise / multi-loc complexity → Jon (jon@silverbirchgrowth.com).
 
 ## UNKNOWN
 

@@ -1,6 +1,12 @@
 /**
  * Loads the vendored voice-closer knowledge pack for Chat Randy (Grok).
- * SoT remains /workspace/birch-live-ops/voice-closer/knowledge/ — this is a snapshot.
+ *
+ * Source of truth: /workspace/sales-brain/ (edit there, then run ./build.sh).
+ * build.sh generates the mirror at /workspace/birch-live-ops/voice-closer/knowledge/,
+ * and src/knowledge/voice-closer/ is a byte-identical copy of that mirror
+ * (Autoscale cannot read /workspace paths). Never hand-edit either copy.
+ * Mirror SYSTEM-PROMPT.md = sales-brain core 00-30 (identity, qualify flow,
+ * routing URLs, phone phrasing); NEVER-SAY loads last so it wins.
  */
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
@@ -8,8 +14,9 @@ import { fileURLToPath } from "node:url";
 
 /** Practical concat order (README paste order, size-aware). */
 export const VOICE_CLOSER_LOAD_ORDER = [
+  // Routing (core/20) is already inside SYSTEM-PROMPT.md; ROUTING-URLS.md in the
+  // mirror is the same table plus the ops verification log, so it is not loaded.
   "SYSTEM-PROMPT.md",
-  "NEVER-SAY.md",
   "BIRCH-OFFER.md",
   "CROSS-PORTFOLIO.md",
   "HANDOFF-CHECKLIST.md",
@@ -17,9 +24,20 @@ export const VOICE_CLOSER_LOAD_ORDER = [
   "ALIGN.md",
   "RDGDH-PORTFOLIO.md",
   "TEAM-ACCESS.md",
+  "NEVER-SAY.md",
 ] as const;
 
-const MAX_PACK_CHARS = 48_000;
+const MAX_PACK_CHARS = 56_000;
+
+/** Ops-only audit log at the end of ROUTING-URLS.md; never sent to the model. */
+export const ROUTING_LOG_MARKER = "<!-- ROUTING-VERIFICATION-LOG";
+
+/** Drop ops-only tails (routing verification log) and HTML comments (GENERATED headers). */
+function stripOpsOnlySections(_file: string, body: string): string {
+  const idx = body.indexOf(ROUTING_LOG_MARKER);
+  const kept = idx >= 0 ? body.slice(0, idx) : body;
+  return kept.replace(/<!--[\s\S]*?-->/g, "").trim();
+}
 
 function candidateDirs(): string[] {
   const here = path.dirname(fileURLToPath(import.meta.url));
@@ -61,7 +79,7 @@ export function loadVoiceCloserSystemPrompt(force = false): string {
   for (const file of VOICE_CLOSER_LOAD_ORDER) {
     const full = path.join(dir, file);
     if (!existsSync(full)) continue;
-    const body = readFileSync(full, "utf8").trim();
+    const body = stripOpsOnlySections(file, readFileSync(full, "utf8").trim());
     if (!body) continue;
     parts.push(`## FILE: ${file}\n\n${body}`);
   }
@@ -82,9 +100,10 @@ export function loadVoiceCloserSystemPrompt(force = false): string {
 ## RUNTIME HARD LOCKS (api-server)
 - Public SKUs only: hold-190 ($190), reserve-490 ($490). Never hero $899 / reserve-899.
 - Checkout is OFF until Gordon — do not invent pay links or claim live checkout.
-- Cal https://cal.com/randy-gilling/30min only after qualify (2–3 discovery / clear fit).
+- Routing: only URLs in the ROUTING-URLS.md table above; one per reply.
+- Next step after qualifying is an AI call first (tel or callback in chat). Cal https://cal.com/randy-gilling/30min only after qualifying questions AND the call/callback step.
 - Tel: +1 (504) 504-6526 / tel:+15045046526.
-- Mode hear: reply in text; realtime Eve/Grok voice is pending — do not claim live in-widget voice.
+- In-widget voice is not live yet ("Voice coming soon"); reply in text and never claim live in-widget voice.
 `;
 
   cachedPrompt = prompt;

@@ -8,13 +8,9 @@
  * (2–3 smart discovery turns OR clear fit) OR after Hear Randy / Call
  * paths that already screened.
  */
+/** Post-qualify only: rendered solely inside Randy chat after the AI call / callback step. */
 export const BOOK_CALL_CAL_URL = "https://cal.com/randy-gilling/30min" as const;
 
-/**
- * Post-qualify Cal URL only. Prefer openRandyChat() for primary CTAs.
- * Kept as BOOK_CALL_HREF for secondary / already-qualified in-chat links.
- */
-export const BOOK_CALL_HREF = BOOK_CALL_CAL_URL;
 
 /** Mailto kept as secondary / fallback only. */
 export const BOOK_CALL_MAILTO_HREF =

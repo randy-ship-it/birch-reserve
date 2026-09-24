@@ -11,18 +11,36 @@
  */
 import { Router, type IRouter, type Request } from "express";
 import { loadVoiceCloserSystemPrompt } from "../lib/voiceCloserKnowledge";
+import {
+  ensureTranscriptSweepTimer,
+  maybeSweepTranscripts,
+  recordTranscript,
+  sweepTranscripts,
+  type ContactInfo,
+  type QualifyAnswers,
+} from "../lib/randyChatTranscripts";
 
-type ChatRole = "user" | "assistant" | "system";
+type ChatRole = "user" | "assistant";
 
 type IncomingMessage = {
   role: ChatRole;
   content: string;
 };
 
+/**
+ * Client ↔ server contract (keep in sync with clinichub-media randy-model-client.ts):
+ *   POST /api/launch/randy-chat
+ *     { messages: [{role:"user"|"assistant", content}], mode?: "chat"|"hear",
+ *       chipId?: string, sessionId?: string, pagePath?: string }
+ *   POST /api/launch/randy-chat/event
+ *     { sessionId, type, messages?, qualify?, contact?, pagePath? }
+ */
 type RandyChatBody = {
   messages: IncomingMessage[];
   mode?: "chat" | "hear";
   chipId?: string;
+  sessionId?: string;
+  pagePath?: string;
 };
 
 type RandyChatSuccess = {
@@ -31,25 +49,33 @@ type RandyChatSuccess = {
   offerHandoff?: boolean;
 };
 
+type DisabledReason = "disabled" | "missing_key" | "knowledge" | "provider_error";
+
 type RandyChatDisabled = {
   error: string;
   disabled: true;
   source: "disabled";
+  reason: DisabledReason;
 };
 
 const router: IRouter = Router();
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 20;
-const PROVIDER_TIMEOUT_MS = 12_000;
-const MAX_MESSAGES = 24;
-const MAX_CONTENT_CHARS = 1_200;
-const MAX_TOTAL_CHARS = 8_000;
+const EVENT_RATE_LIMIT_MAX = 60;
+/** Grok can take 5–15s on long threads; client waits 25s. */
+const PROVIDER_TIMEOUT_MS = 22_000;
+/** Accept the whole thread (for transcripts); only the recent window goes to Grok. */
+const MAX_INCOMING_MESSAGES = 80;
+const MAX_CONTENT_CHARS = 1_500;
+const MAX_RAW_CONTENT_CHARS = 8_000;
+const MODEL_WINDOW_MESSAGES = 20;
+const MODEL_WINDOW_CHARS = 9_000;
 const XAI_BASE = "https://api.x.ai/v1";
 /** Default grok-3-mini for widget latency; set GROK_MODEL=grok-4 for stronger replies. */
 const DEFAULT_GROK_MODEL = "grok-3-mini";
 
-const VALID_ROLES = new Set<ChatRole>(["user", "assistant", "system"]);
+const VALID_ROLES = new Set<string>(["user", "assistant", "system"]);
 /** Birch Reserve site chips (HARD 2026-09-24 3:31pm ET: BR only, no portfolio menu). */
 const VALID_CHIPS = new Set([
   "how_seats",
@@ -57,6 +83,18 @@ const VALID_CHIPS = new Set([
   "live_hub",
   "talk_human",
 ]);
+/**
+ * Pre-#11 chip ids. Accepted (and ignored) so a browser tab still running the
+ * old bundle during a publish does not 400 and fall into a dead chat.
+ */
+const LEGACY_CHIPS = new Set([
+  "birch_seat",
+  "scale_providers",
+  "align_care",
+  "not_sure",
+]);
+const SESSION_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
+const PAGE_PATH_PATTERN = /^\/[A-Za-z0-9._~/?=&%-]{0,199}$/;
 
 const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal";
 
@@ -66,13 +104,16 @@ const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal";
  * untouched; this only scopes how Randy leads on this site.
  */
 export const BIRCH_SITE_SCOPE_PROMPT = [
-  "SITE SCOPE (overrides any portfolio-routing or multi-brand opener in the pack): You are Randy on birchreserve.net and you represent Birch Reserve only.",
+  "SITE SCOPE (overrides any portfolio-routing or multi-brand opener in the pack): You are Randy from Birch Reserve, on birchreserve.net, and you represent Birch Reserve only.",
+  "IDENTITY (overrides any voice-assistant wording in the pack for this chat): if asked \"who are you?\" or similar, answer as Randy from Birch Reserve: \"I'm Randy from Birch Reserve. I help brands get a category seat inside recovery hubs. What are you working on?\" Do not call yourself Randy's voice assistant, Randy's assistant, or Randy Gilling. If asked directly whether you are an AI or a bot, say yes, you're an AI version of Randy from Birch Reserve, and offer a call with the team; never claim to be human. Never describe yourself or the process with internal team labels, role nicknames, or process jargon.",
   "Lead with Birch Reserve category seats inside the recovery hubs. Do not open with or offer a menu of brands (no \"Birch, Scale, Align, or something else\").",
   "Use Scale Health, Align Wellness, or RDGDH knowledge only if the visitor raises it themselves (for example \"what are the hubs?\"); answer briefly and bring it back to the Birch seat. Never pitch the portfolio or other companies.",
+  "ROUTING (ROUTING-URLS.md): diagnose who the visitor is and what they want in 1-2 short questions. Once the need is clear, give exactly ONE fitting URL from the verified ROUTING-URLS.md table, written as a full https:// URL on its own (the widget turns it into a link). Never give any URL or sub-path that is not in that table, never make up paths, and never list several URLs at once. If nothing fits, offer the live line or a callback.",
   "Public prices are Hold $190 (7-day look) and Reserve $490 (the seat) only. Never mention any other price or SKU. Online checkout is off: never invent checkout or payment links.",
-  "Never claim reach, impression, CTR, unique-visitor, or audience-size numbers, and never guarantee patient outcomes.",
-  `Live proof of a hub surface: ${LIVE_HUB_PROOF_URL} (physio.drhonow.com). Share it when the visitor asks to see a live hub.`,
-  "Human path: the live line is +1 (504) 504-6526. Only suggest booking a calendar call after a short pre-screen (category, what they want in the hubs, timing).",
+  "Never claim reach, impression, CTR, unique-visitor, or audience-size numbers to a brand buyer, and never guarantee patient outcomes.",
+  `Live proof of a hub surface: ${LIVE_HUB_PROOF_URL}. Share it when the visitor asks to see a live hub.`,
+  "Human path: the next step is an AI call first. The visitor can tap \"Get a call from Randy's AI now\" (+1 (504) 504-6526) or leave a number for a callback in this chat. Only point to the calendar https://cal.com/randy-gilling/30min after a few qualifying questions (company, category, who they want to reach, timing or budget) AND after they have taken the call or callback step.",
+  "If the visitor gives a phone number or email, thank them and confirm Randy's team will follow up. Do not repeat it back in full.",
 ].join(" ");
 
 const CHIP_INTENT_NOTES: Record<string, string> = {
@@ -82,7 +123,7 @@ const CHIP_INTENT_NOTES: Record<string, string> = {
     "Visitor tapped \"Hold a category $190\": explain the $190 7-day hold vs $490 Reserve, note checkout is off, and ask which category to hold.",
   live_hub: `Visitor tapped \"See a live hub\": share ${LIVE_HUB_PROOF_URL} as the live proof, then ask what category they would want there.`,
   talk_human:
-    "Visitor tapped \"Talk to a human\": give the live line +1 (504) 504-6526 and ask one quick pre-screen question.",
+    "Visitor tapped \"Talk to a human\": offer the AI call now (+1 (504) 504-6526) or a callback in this chat, and ask one quick qualifying question.",
 };
 
 const requestBuckets = new Map<
@@ -125,7 +166,7 @@ function requestIsAllowed(req: Request): boolean {
   }
 }
 
-function isRateLimited(key: string): boolean {
+function isRateLimited(key: string, max = RATE_LIMIT_MAX): boolean {
   const now = Date.now();
   const current = requestBuckets.get(key);
 
@@ -135,54 +176,94 @@ function isRateLimited(key: string): boolean {
   }
 
   current.count += 1;
-  return current.count > RATE_LIMIT_MAX;
+  return current.count > max;
 }
 
-function parseBody(raw: unknown): { ok: true; body: RandyChatBody } | { ok: false; error: string } {
+type ParseOk<T> = { ok: true; body: T };
+type ParseErr = { ok: false; error: string };
+
+function clip(text: string): string {
+  return text.length > MAX_CONTENT_CHARS ? `${text.slice(0, MAX_CONTENT_CHARS - 1)}…` : text;
+}
+
+/**
+ * Parse a thread. Long assistant replies and long threads are clipped/trimmed,
+ * never rejected: before this, one >1200-char Grok reply or a 13th turn made
+ * every later request 400 and the widget silently fell back to canned replies.
+ * Client-sent "system" messages are dropped (no prompt injection via role).
+ */
+export function parseMessages(raw: unknown, required: boolean): ParseOk<IncomingMessage[]> | ParseErr {
+  if (raw === undefined && !required) return { ok: true, body: [] };
+  if (!Array.isArray(raw) || (required && raw.length === 0)) {
+    return { ok: false, error: "messages required." };
+  }
+  const items = raw.length > MAX_INCOMING_MESSAGES ? raw.slice(-MAX_INCOMING_MESSAGES) : raw;
+  const messages: IncomingMessage[] = [];
+  for (const item of items) {
+    if (!item || typeof item !== "object" || Array.isArray(item)) {
+      return { ok: false, error: "Invalid message." };
+    }
+    const m = item as Record<string, unknown>;
+    if (typeof m.role !== "string" || !VALID_ROLES.has(m.role)) {
+      return { ok: false, error: "Invalid role." };
+    }
+    if (typeof m.content !== "string") {
+      return { ok: false, error: "Invalid content." };
+    }
+    const trimmed = m.content.trim();
+    if (trimmed.length > MAX_RAW_CONTENT_CHARS) {
+      return { ok: false, error: "Message length out of bounds." };
+    }
+    if (!trimmed || m.role === "system") continue;
+    messages.push({ role: m.role as ChatRole, content: clip(trimmed) });
+  }
+  if (required && !messages.some((m) => m.role === "user")) {
+    return { ok: false, error: "messages required." };
+  }
+  return { ok: true, body: messages };
+}
+
+/** Most recent turns that fit the model window (always ends with the latest turn). */
+export function modelWindow(messages: IncomingMessage[]): IncomingMessage[] {
+  const out: IncomingMessage[] = [];
+  let total = 0;
+  for (let i = messages.length - 1; i >= 0 && out.length < MODEL_WINDOW_MESSAGES; i -= 1) {
+    const m = messages[i]!;
+    if (total + m.content.length > MODEL_WINDOW_CHARS && out.length > 0) break;
+    total += m.content.length;
+    out.unshift(m);
+  }
+  // Chat APIs expect the first non-system turn to be a user turn or the opener; fine either way.
+  return out;
+}
+
+function parseOptionalSessionId(v: unknown): ParseOk<string | undefined> | ParseErr {
+  if (v === undefined) return { ok: true, body: undefined };
+  if (typeof v !== "string" || !SESSION_ID_PATTERN.test(v)) return { ok: false, error: "Invalid sessionId." };
+  return { ok: true, body: v };
+}
+
+function parseOptionalPagePath(v: unknown): ParseOk<string | undefined> | ParseErr {
+  if (v === undefined) return { ok: true, body: undefined };
+  if (typeof v !== "string" || !PAGE_PATH_PATTERN.test(v)) return { ok: false, error: "Invalid pagePath." };
+  return { ok: true, body: v };
+}
+
+export function parseBody(raw: unknown): ParseOk<RandyChatBody> | ParseErr {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
     return { ok: false, error: "Invalid body." };
   }
 
   const obj = raw as Record<string, unknown>;
-  const allowedKeys = new Set(["messages", "mode", "chipId"]);
+  const allowedKeys = new Set(["messages", "mode", "chipId", "sessionId", "pagePath"]);
   for (const key of Object.keys(obj)) {
     if (!allowedKeys.has(key)) {
       return { ok: false, error: "Unknown field." };
     }
   }
 
-  if (!Array.isArray(obj.messages) || obj.messages.length === 0) {
-    return { ok: false, error: "messages required." };
-  }
-  if (obj.messages.length > MAX_MESSAGES) {
-    return { ok: false, error: "Too many messages." };
-  }
-
-  let total = 0;
-  const messages: IncomingMessage[] = [];
-  for (const item of obj.messages) {
-    if (!item || typeof item !== "object" || Array.isArray(item)) {
-      return { ok: false, error: "Invalid message." };
-    }
-    const m = item as Record<string, unknown>;
-    const role = m.role;
-    const content = m.content;
-    if (typeof role !== "string" || !VALID_ROLES.has(role as ChatRole)) {
-      return { ok: false, error: "Invalid role." };
-    }
-    if (typeof content !== "string") {
-      return { ok: false, error: "Invalid content." };
-    }
-    const trimmed = content.trim();
-    if (!trimmed || trimmed.length > MAX_CONTENT_CHARS) {
-      return { ok: false, error: "Message length out of bounds." };
-    }
-    total += trimmed.length;
-    if (total > MAX_TOTAL_CHARS) {
-      return { ok: false, error: "Thread too long." };
-    }
-    messages.push({ role: role as ChatRole, content: trimmed });
-  }
+  const parsedMessages = parseMessages(obj.messages, true);
+  if (!parsedMessages.ok) return parsedMessages;
 
   let mode: "chat" | "hear" | undefined;
   if (obj.mode !== undefined) {
@@ -194,13 +275,113 @@ function parseBody(raw: unknown): { ok: true; body: RandyChatBody } | { ok: fals
 
   let chipId: string | undefined;
   if (obj.chipId !== undefined) {
-    if (typeof obj.chipId !== "string" || !VALID_CHIPS.has(obj.chipId)) {
+    if (typeof obj.chipId !== "string" || !(VALID_CHIPS.has(obj.chipId) || LEGACY_CHIPS.has(obj.chipId))) {
       return { ok: false, error: "Invalid chipId." };
     }
-    chipId = obj.chipId;
+    // Legacy chips are accepted but carry no intent note.
+    chipId = VALID_CHIPS.has(obj.chipId) ? obj.chipId : undefined;
   }
 
-  return { ok: true, body: { messages, ...(mode ? { mode } : {}), ...(chipId ? { chipId } : {}) } };
+  const sessionId = parseOptionalSessionId(obj.sessionId);
+  if (!sessionId.ok) return sessionId;
+  const pagePath = parseOptionalPagePath(obj.pagePath);
+  if (!pagePath.ok) return pagePath;
+
+  return {
+    ok: true,
+    body: {
+      messages: parsedMessages.body,
+      ...(mode ? { mode } : {}),
+      ...(chipId ? { chipId } : {}),
+      ...(sessionId.body ? { sessionId: sessionId.body } : {}),
+      ...(pagePath.body ? { pagePath: pagePath.body } : {}),
+    },
+  };
+}
+
+const EVENT_TYPES = new Set(["tel_click", "callback_request", "cal_shown", "qualified", "close", "activity"]);
+const QUALIFY_KEYS = ["company", "category", "reach", "timing"] as const;
+const EMAIL_PATTERN = /^[^\s@]{1,64}@[^\s@]{1,190}\.[A-Za-z]{2,24}$/;
+
+export type RandyChatEventBody = {
+  sessionId: string;
+  type: string;
+  messages: IncomingMessage[];
+  qualify?: QualifyAnswers;
+  contact?: ContactInfo;
+  pagePath?: string;
+};
+
+export function parseEventBody(raw: unknown): ParseOk<RandyChatEventBody> | ParseErr {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { ok: false, error: "Invalid body." };
+  const obj = raw as Record<string, unknown>;
+  const allowed = new Set(["sessionId", "type", "messages", "qualify", "contact", "pagePath"]);
+  for (const key of Object.keys(obj)) {
+    if (!allowed.has(key)) return { ok: false, error: "Unknown field." };
+  }
+  if (typeof obj.sessionId !== "string" || !SESSION_ID_PATTERN.test(obj.sessionId)) {
+    return { ok: false, error: "Invalid sessionId." };
+  }
+  if (typeof obj.type !== "string" || !EVENT_TYPES.has(obj.type)) return { ok: false, error: "Invalid type." };
+  const messages = parseMessages(obj.messages, false);
+  if (!messages.ok) return messages;
+
+  let qualify: QualifyAnswers | undefined;
+  if (obj.qualify !== undefined) {
+    if (!obj.qualify || typeof obj.qualify !== "object" || Array.isArray(obj.qualify)) {
+      return { ok: false, error: "Invalid qualify." };
+    }
+    qualify = {};
+    for (const [k, v] of Object.entries(obj.qualify as Record<string, unknown>)) {
+      if (!(QUALIFY_KEYS as readonly string[]).includes(k)) return { ok: false, error: "Invalid qualify." };
+      if (typeof v !== "string" || v.length > 300) return { ok: false, error: "Invalid qualify." };
+      qualify[k as (typeof QUALIFY_KEYS)[number]] = v.trim();
+    }
+  }
+
+  let contact: ContactInfo | undefined;
+  if (obj.contact !== undefined) {
+    if (!obj.contact || typeof obj.contact !== "object" || Array.isArray(obj.contact)) {
+      return { ok: false, error: "Invalid contact." };
+    }
+    const c = obj.contact as Record<string, unknown>;
+    for (const k of Object.keys(c)) {
+      if (!["phone", "email", "name"].includes(k)) return { ok: false, error: "Invalid contact." };
+    }
+    contact = {};
+    if (c.phone !== undefined) {
+      const digits = typeof c.phone === "string" ? c.phone.replace(/\D/g, "") : "";
+      if (typeof c.phone !== "string" || c.phone.length > 32 || digits.length < 10 || digits.length > 15) {
+        return { ok: false, error: "Invalid phone." };
+      }
+      contact.phone = c.phone.trim();
+    }
+    if (c.email !== undefined) {
+      if (typeof c.email !== "string" || !EMAIL_PATTERN.test(c.email.trim())) return { ok: false, error: "Invalid email." };
+      contact.email = c.email.trim();
+    }
+    if (c.name !== undefined) {
+      if (typeof c.name !== "string" || c.name.length > 80) return { ok: false, error: "Invalid name." };
+      contact.name = c.name.trim();
+    }
+  }
+  if (obj.type === "callback_request" && !contact?.phone) {
+    return { ok: false, error: "Phone required for a callback." };
+  }
+  const pagePath = parseOptionalPagePath(obj.pagePath);
+  if (!pagePath.ok) return pagePath;
+
+  return {
+    ok: true,
+    body: {
+      sessionId: obj.sessionId,
+      type: obj.type,
+      messages: messages.body,
+      ...(qualify ? { qualify } : {}),
+      ...(contact ? { contact } : {}),
+      ...(pagePath.body ? { pagePath: pagePath.body } : {}),
+    },
+  };
 }
 
 const BUY_OR_HUMAN =
@@ -240,17 +421,20 @@ async function callGrok(
       },
       body: JSON.stringify({
         model,
-        max_tokens: 420,
+        // grok-3-mini reasons before answering; reasoning tokens share this budget,
+        // so 420 could yield empty content (→ 503). Keep replies short via the prompt.
+        max_tokens: 1_200,
         temperature: 0.6,
+        ...(model.startsWith("grok-3-mini") ? { reasoning_effort: "low" } : {}),
         messages: [
           { role: "system", content: systemPrompt },
           { role: "system", content: BIRCH_SITE_SCOPE_PROMPT },
           {
             role: "system",
-            content: `${modeNote} ${chipNote} Keep replies short (2–5 sentences). Never invent checkout URLs. Birch Reserve only unless the visitor raises another company.`.trim(),
+            content: `${modeNote} ${chipNote} Keep replies short (2–5 sentences). Never invent checkout URLs. Birch Reserve only unless the visitor raises another company. At most one URL per reply, from the verified routing table only.`.trim(),
           },
-          ...body.messages.map((m) => ({
-            role: m.role === "assistant" ? "assistant" : m.role === "system" ? "system" : "user",
+          ...modelWindow(body.messages).map((m) => ({
+            role: m.role === "assistant" ? "assistant" : "user",
             content: m.content,
           })),
         ],
@@ -276,6 +460,10 @@ async function callGrok(
   }
 }
 
+function disabledPayload(reason: DisabledReason, error: string): RandyChatDisabled {
+  return { error, disabled: true, source: "disabled", reason };
+}
+
 router.post("/launch/randy-chat", async (req, res): Promise<void> => {
   if (!requestIsAllowed(req)) {
     res.status(403).json({ error: "Origin not allowed." });
@@ -284,28 +472,29 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
 
   const parsed = parseBody(req.body);
   if (!parsed.ok) {
+    req.log?.warn({ error: parsed.error }, "Randy chat request rejected");
     res.status(400).json({ error: parsed.error });
     return;
   }
+  const body = parsed.body;
+
+  ensureTranscriptSweepTimer();
+  maybeSweepTranscripts();
 
   if (isAiDisabled()) {
-    const disabled: RandyChatDisabled = {
-      error: "Randy chat AI disabled (RANDY_CHAT_AI_DISABLED).",
-      disabled: true,
-      source: "disabled",
-    };
-    res.status(503).json(disabled);
+    if (body.sessionId) {
+      void recordTranscript({ id: body.sessionId, messages: body.messages, ...(body.pagePath ? { pagePath: body.pagePath } : {}) });
+    }
+    res.status(503).json(disabledPayload("disabled", "Randy chat AI disabled (RANDY_CHAT_AI_DISABLED)."));
     return;
   }
 
   const apiKey = getXaiApiKey();
   if (!apiKey) {
-    const disabled: RandyChatDisabled = {
-      error: "Randy chat AI unavailable (missing XAI_API_KEY).",
-      disabled: true,
-      source: "disabled",
-    };
-    res.status(503).json(disabled);
+    if (body.sessionId) {
+      void recordTranscript({ id: body.sessionId, messages: body.messages, ...(body.pagePath ? { pagePath: body.pagePath } : {}) });
+    }
+    res.status(503).json(disabledPayload("missing_key", "Randy chat AI unavailable (missing XAI_API_KEY)."));
     return;
   }
 
@@ -318,55 +507,98 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
   try {
     systemPrompt = loadVoiceCloserSystemPrompt();
   } catch (error) {
-    req.log.error(
+    req.log?.error(
       { err: error instanceof Error ? error.message : "knowledge_load_failed" },
       "Randy chat knowledge load failed",
     );
-    res.status(503).json({
-      error: "Randy chat knowledge pack unavailable.",
-      disabled: true,
-      source: "disabled",
-    } satisfies RandyChatDisabled);
+    res.status(503).json(disabledPayload("knowledge", "Randy chat knowledge pack unavailable."));
     return;
   }
 
+  const startedAt = Date.now();
   try {
-    const text = await callGrok(systemPrompt, parsed.body, apiKey);
-    const offerHandoff = inferOfferHandoff(parsed.body);
+    const text = await callGrok(systemPrompt, body, apiKey);
+    const offerHandoff = inferOfferHandoff(body);
     const success: RandyChatSuccess = {
       text,
       source: "grok",
       ...(offerHandoff ? { offerHandoff: true } : {}),
     };
 
-    req.log.info(
+    if (body.sessionId) {
+      await recordTranscript({
+        id: body.sessionId,
+        messages: [...body.messages, { role: "assistant", content: text }],
+        ...(body.pagePath ? { pagePath: body.pagePath } : {}),
+      });
+    }
+
+    req.log?.info(
       {
         source: "grok",
         model: getGrokModel(),
-        mode: parsed.body.mode ?? "chat",
-        chipId: parsed.body.chipId ?? null,
+        mode: body.mode ?? "chat",
+        chipId: body.chipId ?? null,
         offerHandoff,
+        ms: Date.now() - startedAt,
         // Never log API key or full message bodies.
-        messageCount: parsed.body.messages.length,
+        messageCount: body.messages.length,
       },
       "Randy chat Grok reply",
     );
 
     res.status(200).json(success);
   } catch (error) {
-    req.log.warn(
+    req.log?.warn(
       {
         err: error instanceof Error ? error.message : "grok_failed",
         model: getGrokModel(),
+        ms: Date.now() - startedAt,
       },
       "Randy chat Grok call failed",
     );
-    res.status(503).json({
-      error: "Randy chat AI temporarily unavailable.",
-      disabled: true,
-      source: "disabled",
-    } satisfies RandyChatDisabled);
+    if (body.sessionId) {
+      void recordTranscript({ id: body.sessionId, messages: body.messages });
+    }
+    res.status(503).json(disabledPayload("provider_error", "Randy chat AI temporarily unavailable."));
   }
+});
+
+/**
+ * Widget events: handoffs (tel click, callback request, Cal shown), qualifying
+ * answers, close beacon, and local-only turns. Handoffs email the transcript now.
+ */
+router.post("/launch/randy-chat/event", async (req, res): Promise<void> => {
+  if (!requestIsAllowed(req)) {
+    res.status(403).json({ error: "Origin not allowed." });
+    return;
+  }
+  const parsed = parseEventBody(req.body);
+  if (!parsed.ok) {
+    res.status(400).json({ error: parsed.error });
+    return;
+  }
+  if (isRateLimited(`event:${req.ip || "unknown"}`, EVENT_RATE_LIMIT_MAX)) {
+    res.status(429).json({ error: "Rate limit exceeded. Try again shortly." });
+    return;
+  }
+  const b = parsed.body;
+  ensureTranscriptSweepTimer();
+  await recordTranscript({
+    id: b.sessionId,
+    event: b.type,
+    ...(b.messages.length ? { messages: b.messages } : {}),
+    ...(b.qualify ? { qualify: b.qualify } : {}),
+    ...(b.contact ? { contact: b.contact } : {}),
+    ...(b.pagePath ? { pagePath: b.pagePath } : {}),
+  });
+  if (b.type === "tel_click" || b.type === "callback_request" || b.type === "cal_shown") {
+    void sweepTranscripts({ onlyId: b.sessionId }).catch(() => undefined);
+  } else {
+    maybeSweepTranscripts();
+  }
+  req.log?.info({ type: b.type, messageCount: b.messages.length }, "Randy chat event");
+  res.status(200).json({ ok: true });
 });
 
 export default router;
