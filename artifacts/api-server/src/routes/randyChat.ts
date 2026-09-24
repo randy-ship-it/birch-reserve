@@ -10,7 +10,7 @@
  * Auth: XAI_API_KEY (alias GROK_API_KEY). Never log or echo the key.
  */
 import { createHash, timingSafeEqual } from "node:crypto";
-import { Router, type IRouter, type Request } from "express";
+import express, { Router, type IRouter, type Request, type RequestHandler } from "express";
 import { loadVoiceCloserSystemPrompt } from "../lib/voiceCloserKnowledge";
 import {
   ensureTranscriptSweepTimer,
@@ -77,6 +77,36 @@ const MODEL_WINDOW_CHARS = 9_000;
 const XAI_BASE = "https://api.x.ai/v1";
 /** Default grok-3-mini for widget latency; set GROK_MODEL=grok-4 for stronger replies. */
 const DEFAULT_GROK_MODEL = "grok-3-mini";
+/**
+ * Body limit for the chat routes. The widget may send the whole thread (up to 80
+ * turns x 1,500 chars, ~125kb of JSON); the app-wide 32kb parser would 413 long
+ * chats. Mounted in app.ts ahead of the global parser.
+ */
+export const RANDY_CHAT_BODY_LIMIT = "256kb";
+/** Never hold a finished reply hostage to the transcript DB write. */
+export const TRANSCRIPT_AWAIT_MS = 2_500;
+
+/**
+ * JSON parser for /api/launch/randy-chat*: bigger limit, and parse / size errors
+ * come back as small JSON (never Express's HTML error page).
+ */
+export function randyChatJsonParser(): RequestHandler {
+  const parse = express.json({ limit: RANDY_CHAT_BODY_LIMIT });
+  return (req, res, next) => {
+    parse(req, res, (err?: unknown) => {
+      if (!err) return next();
+      const status = (err as { status?: number }).status === 413 ? 413 : 400;
+      res.status(status).json({ error: status === 413 ? "Thread too long." : "Invalid JSON." });
+    });
+  };
+}
+
+/** Resolve after `p` or `ms`, whichever is first (p keeps running; it never throws). */
+async function settleWithin(p: Promise<unknown>, ms: number): Promise<void> {
+  let t: ReturnType<typeof setTimeout> | undefined;
+  await Promise.race([p, new Promise<void>((resolve) => { t = setTimeout(resolve, ms); })]);
+  if (t) clearTimeout(t);
+}
 
 const VALID_ROLES = new Set<string>(["user", "assistant", "system"]);
 /** Birch Reserve site chips (HARD 2026-09-24 3:31pm ET: BR only, no portfolio menu). */
@@ -561,11 +591,16 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
     };
 
     if (body.sessionId) {
-      await recordTranscript({
-        id: body.sessionId,
-        messages: [...body.messages, { role: "assistant", content: text }],
-        ...(body.pagePath ? { pagePath: body.pagePath } : {}),
-      });
+      // recordTranscript never throws; bound it so a slow DB can't push the reply
+      // past the widget's 25s timeout.
+      await settleWithin(
+        recordTranscript({
+          id: body.sessionId,
+          messages: [...body.messages, { role: "assistant", content: text }],
+          ...(body.pagePath ? { pagePath: body.pagePath } : {}),
+        }),
+        TRANSCRIPT_AWAIT_MS,
+      );
     }
 
     req.log?.info(

@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 17:28 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 17:56 EDT. Edit sales-brain, not this file. -->
 # ROUTING-URLS, where Randy sends people (chat + phone)
 Randy HARD 2026-09-24 ~3:47pm ET: Randy is fully trained on Scale Health. He diagnoses intent (chat or call), then hands the right inquiry URL. On birchreserve.net he OPENS Birch-only; he routes elsewhere only once the visitor's need shows up in dialogue.
 
@@ -10,7 +10,7 @@ Only the URLs in this table are routable. Every row was verified in headless Chr
 | Brand / advertiser | Display seat in recovery hubs | Birch: Hold $190 / Reserve $490 on https://birchreserve.net (media kit https://birchreserve.net/kit) | verified |
 | Brand wanting its own hub / storefront | Branded Clinic Hub (turnkey, $0 build) | https://scalehealth.ca/clinichubs | verified ("For Studios & Gyms") |
 | Physio / clinic / independent provider (Canada) | Join the network, get bookable on rails | https://scalehealth.ca/providers | verified ("For Clinics & Physiotherapists") |
-| Local business (gym, pilates, yoga, recovery) | Free physio door / hub for members | https://scalehealth.ca/clinichubs | verified |
+| Local business (gym, pilates, yoga, recovery) | FIRST: Birch local ads (geo-targeted, location-based placements inside co-branded physio and clinical hubs in busy brands). SECOND, only if they raise it or say no to ads: free physio door / hub for members | https://birchreserve.net first, then https://scalehealth.ca/clinichubs | verified |
 | Employer / gym / clinic wanting virtual rehab (MSP) | Align Wellness care | https://alignwellness.ca | verified homepage |
 | Patient wanting care | Virtual physio | https://alignwellness.ca (homepage only; there is no live booking sub-page) | verified homepage |
 | PT job seeker (remote) | Careers | No careers URL is live. Capture email for Randy's team. | no routable URL |

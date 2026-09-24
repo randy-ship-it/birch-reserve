@@ -3,6 +3,7 @@ import { clerkMiddleware } from "@clerk/express";
 import { publishableKeyFromHost } from "@clerk/shared/keys";
 import pinoHttp from "pino-http";
 import router from "./routes/index";
+import { randyChatJsonParser } from "./routes/randyChat";
 import publicBuyingRouter from "./routes/publicBuying";
 import { logger } from "./lib/logger";
 import { uiEventsJsonParser } from "./lib/uiEvents";
@@ -96,6 +97,9 @@ app.post(
   },
 );
 
+// Chat Randy sends the whole thread; give it a bigger limit than the 32kb default
+// (a long chat used to 413 into the widget's error card).
+app.use("/api/launch/randy-chat", randyChatJsonParser());
 app.use(express.json({ limit: "32kb" }));
 app.use(express.urlencoded({ extended: true, limit: "32kb" }));
 

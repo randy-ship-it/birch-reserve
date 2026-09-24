@@ -22,6 +22,7 @@ import {
   OPEN_RANDY_CHAT_EVENT,
   type OpenRandyChatDetail,
 } from "@/lib/book-call";
+import { reserveIntakeNeed } from "@/lib/checkout-status";
 import {
   AI_CALL_LABEL,
   QUALIFY_QUESTIONS,
@@ -267,6 +268,24 @@ export function RandyChat() {
       setTeaserVisible(false);
       setTeaserDone(true);
       setMode("chat");
+      if (detail?.reason === "reserve-intake") {
+        // Checkout paused: straight into the callback intake, seat + category preselected.
+        const sku = detail.sku === "hold-190" ? "hold-190" : "reserve-490";
+        const need = reserveIntakeNeed(sku, detail.category);
+        ensureThread();
+        const nextQualify = { ...qualifyRef.current, ...(detail.category ? { category: detail.category } : {}) };
+        qualifyRef.current = nextQualify;
+        setQualify(nextQualify);
+        setIntake((cur) => ({ ...cur, need }));
+        pushMessages({
+          id: newId(),
+          role: "randy",
+          text: `Online checkout is paused, so I'll lock this with you directly. Leave your details and the team will send the insertion order and invoice for the ${sku === "hold-190" ? "$190 hold" : "$490 seat"}.`,
+        });
+        setHandoffReady(true);
+        setCallbackOpen(true);
+        return;
+      }
       const isBookCall =
         detail?.reason === "book-a-call" || detail?.reason === "voice-demo" || detail?.reason === "concierge";
       if (isBookCall && !qualified && qualifyStep === null) {
@@ -277,7 +296,7 @@ export function RandyChat() {
         ensureThread();
       }
     },
-    [ensureThread, qualified, qualifyStep, setThread, startQualify],
+    [ensureThread, pushMessages, qualified, qualifyStep, setThread, startQualify],
   );
 
   useEffect(() => {

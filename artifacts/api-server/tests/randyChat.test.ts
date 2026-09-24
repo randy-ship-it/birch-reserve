@@ -5,6 +5,8 @@ import { after, before, test } from "node:test";
 import express from "express";
 import randyChatRouter, {
   BIRCH_SITE_SCOPE_PROMPT,
+  randyChatJsonParser,
+  TRANSCRIPT_AWAIT_MS,
   parseEventBody,
   polishReply,
   modelWindow,
@@ -59,7 +61,9 @@ before(async () => {
   delete process.env["GROK_API_KEY"];
 
   // Mount only the Randy router — avoid full app Clerk middleware in this box.
+  // Same parser order as app.ts: chat routes get their own limit ahead of the global 32kb.
   const app = express();
+  app.use("/api/launch/randy-chat", randyChatJsonParser());
   app.use(express.json({ limit: "32kb" }));
   app.use("/api", randyChatRouter);
 
@@ -648,4 +652,145 @@ test("5:32pm: callback response never echoes contact info (intake goes to logs o
   const row = await memoryStore.get("rc_intake_resp_01");
   assert.equal(row?.contact.role, "CMO");
   assert.equal(row?.qualify.size, "5 locations");
+});
+
+/** Run `fn` with AI enabled and xAI answered by a local fake (no network, no real key). */
+async function withFakeGrok<T>(
+  reply: (body: { messages: Array<{ role: string; content: string }> }) => string,
+  fn: (xaiCalls: Array<{ messages: Array<{ role: string; content: string }> }>) => Promise<T>,
+): Promise<T> {
+  const realFetch = globalThis.fetch;
+  const calls: Array<{ messages: Array<{ role: string; content: string }> }> = [];
+  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+    if (url.startsWith("https://api.x.ai/")) {
+      const body = JSON.parse(String(init?.body ?? "{}")) as { messages: Array<{ role: string; content: string }> };
+      calls.push(body);
+      return new Response(JSON.stringify({ choices: [{ message: { content: reply(body) } }] }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    }
+    return realFetch(input as RequestInfo, init);
+  }) as typeof fetch;
+  delete process.env["RANDY_CHAT_AI_DISABLED"];
+  process.env["XAI_API_KEY"] = "test-key-not-real";
+  try {
+    return await fn(calls);
+  } finally {
+    globalThis.fetch = realFetch;
+    process.env["RANDY_CHAT_AI_DISABLED"] = "true";
+    delete process.env["XAI_API_KEY"];
+  }
+}
+
+test("5:43pm: a message with an email or phone number gets a normal 200 reply (never 4xx/5xx)", async () => {
+  await withFakeGrok(
+    () => "Thanks, I'll have the team follow up. What category are you in?",
+    async (calls) => {
+      const opener = { role: "assistant", content: "Hey, what brings you to Birch Reserve?" };
+      const cases = [
+        "I just had a call with you and it hung up. Email me on qa+test@silverbirchgrowth.com",
+        "call me at (416) 555-0199 or +1 416.555.0199",
+        "Email: First.Last+tag@sub.example.co.uk, phone 4165550199, ext 22",
+        "my emails are a@b.co, c@d.io and 647 555 0100",
+      ];
+      for (const [i, content] of cases.entries()) {
+        const res = await postChat({
+          messages: [opener, { role: "user", content: "hi" }, { role: "assistant", content: "Hey!" }, { role: "user", content }],
+          mode: "chat",
+          sessionId: `qa-replitbot-email-${i}`,
+          pagePath: "/",
+        });
+        assert.equal(res.status, 200, content);
+        const body = (await res.json()) as { text?: string; source?: string };
+        assert.equal(body.source, "grok");
+        assert.ok(body.text);
+      }
+      assert.equal(calls.length, cases.length);
+      // The model still sees what the visitor typed (the server does not strip or reject it).
+      assert.match(calls[0]!.messages.at(-1)!.content, /qa\+test@silverbirchgrowth\.com/);
+    },
+  );
+});
+
+test("5:43pm: a long thread (80 turns x 1,500 chars) is accepted, not 413'd by the 32kb app parser", async () => {
+  const thread: Array<{ role: string; content: string }> = [];
+  for (let i = 0; i < 40; i += 1) {
+    thread.push({ role: "user", content: `q${i} ` + "u".repeat(1_490) }, { role: "assistant", content: `a${i} ` + "a".repeat(1_490) });
+  }
+  thread.push({ role: "user", content: "email me on qa+test@silverbirchgrowth.com" });
+  assert.ok(JSON.stringify({ messages: thread }).length > 100_000);
+  const res = await postChat({ messages: thread, mode: "chat" });
+  assert.equal(res.status, 503); // AI disabled in this suite: reached the route, not a 413
+  const bad = await fetch(`${baseUrl}/launch/randy-chat`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: "{not json",
+  });
+  assert.equal(bad.status, 400);
+  assert.match(bad.headers.get("content-type") ?? "", /json/);
+});
+
+test("5:43pm: a slow transcript DB never holds the reply past the widget timeout", async () => {
+  const slowStore = new MemoryTranscriptStore();
+  const realUpsert = slowStore.upsert.bind(slowStore);
+  slowStore.upsert = async (u) => {
+    await new Promise((r) => setTimeout(r, 30_000).unref());
+    return realUpsert(u);
+  };
+  setTranscriptDepsForTests({ store: slowStore });
+  try {
+    await withFakeGrok(
+      () => "Got it.",
+      async () => {
+        const started = Date.now();
+        const res = await postChat({ messages: [{ role: "user", content: "hello" }], sessionId: "qa-replitbot-slowdb" });
+        assert.equal(res.status, 200);
+        assert.ok(Date.now() - started < TRANSCRIPT_AWAIT_MS + 1_500, "reply not blocked by the DB");
+      },
+    );
+  } finally {
+    setTranscriptDepsForTests({ store: memoryStore });
+  }
+});
+
+test("5:47pm brain: studios get the ad pitch first; never hang up right after taking an email; locks intact", () => {
+  const prompt = loadVoiceCloserSystemPrompt(true);
+  assert.match(prompt, /Gyms, studios and local businesses/);
+  assert.match(prompt, /lead with ADVERTISING/);
+  assert.match(prompt, /Never end the call right after taking an email/);
+  assert.match(prompt, /Never hero \$899/);
+  assert.match(prompt, /Checkout is OFF/);
+  assert.match(prompt, /Never promote the calendar/);
+});
+
+test("vendored prompts are byte-for-byte copies of sales-brain dist (when the source is on this box)", async () => {
+  const { createHash } = await import("node:crypto");
+  const sha = (p: string) => createHash("sha256").update(readFileSync(p)).digest("hex");
+  const here = path.resolve(process.cwd(), "src/knowledge");
+  for (const file of ["birch-chat.prompt.txt", "birch-phone.prompt.txt"]) {
+    const vendored = path.join(here, file);
+    assert.ok(existsSync(vendored), `${file} vendored`);
+    const source = `/workspace/sales-brain/dist/${file}`;
+    if (existsSync(source)) assert.equal(sha(vendored), sha(source), `${file} matches sales-brain`);
+  }
+  const phone = readFileSync(path.join(here, "birch-phone.prompt.txt"), "utf8");
+  assert.match(phone, /^SURFACE: phone call on the Birch Reserve line/);
+  assert.match(phone, /Never end the call right after taking an email/);
+  assert.match(phone, /lead with ADVERTISING/);
+});
+
+test("5:53pm: the site has no in-browser voice session; every voice CTA is a tel: link to the phone agent", () => {
+  const root = path.resolve(process.cwd(), "../clinichub-media/src");
+  const files = [
+    "components/randy-chat.tsx",
+    "lib/randy-model-client.ts",
+    "lib/randy-chat-knowledge.ts",
+    "pages/sales/voice-demo.tsx",
+  ].map((f) => readFileSync(path.join(root, f), "utf8"));
+  for (const src of files) {
+    assert.doesNotMatch(src, /new WebSocket|RTCPeerConnection|getUserMedia|client_secret|end_call/);
+  }
+  assert.match(files[2]!, /RANDY_TEL_HREF = `tel:\$\{RANDY_TEL_E164\}`/);
 });

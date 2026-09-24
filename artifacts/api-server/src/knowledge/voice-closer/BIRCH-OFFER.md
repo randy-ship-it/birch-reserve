@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 17:28 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 17:56 EDT. Edit sales-brain, not this file. -->
 # BIRCH-OFFER, public SKUs and product locks
 
 **SoT:** BIRCH-RESERVE-BOT-LOCK + AD-SALES-LOCK + companion (2026-09-24).  
@@ -71,6 +71,8 @@ Draft /terms /privacy / sample IO ship; counsel stamps before first real brand c
 - Aggregate reporting only. No PHI. No clinical pixels.
 
 ## Studio / clinic-hub path (secondary, not hero)
+
+For studios, lead with local geo-targeted ads in the hubs first (see core flow). Offer the hub or physio door only second.
 
 Studios with a local audience can add a Scale Clinic Hub (store + booking) then a Birch unit on that hub. Link: https://scalehealth.ca/clinichubs. Keep Scale rails and Birch ads as separate contracts.
 
