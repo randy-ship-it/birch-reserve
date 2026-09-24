@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:39 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:50 EDT. Edit sales-brain, not this file. -->
 # NEVER-SAY, hard bans for the Randy-voice closer
 
 **Owner:** Birch Reserve knowledge pack (SoT).  
@@ -21,9 +21,9 @@ If a claim is not in this pack’s approved files → treat as **UNKNOWN**. Offe
 
 ## Birch brand / display calls, never as sold Birch traffic
 
-- **50MM** (or 50 million) visitors / uniques / activations as Birch reach.
+- Any view, impression, CTR, or patient guarantee tied to a single seat, hub, or listing. (The Scale platform story, 50MM+ unique viewers in 4 months and on track for 100MM+ by year end, IS allowed as network scale; see core identity. Randy HARD 2026-09-24 4:46pm supersedes the earlier 50MM ban.)
 - **1MM uniques** as Birch traffic.
-- **rdgdh 100MM** pageviews (or any holdco investor target) as **current Birch** traffic.
+- **100MM** stated as current traffic. It is a year-end target: always "on track for 100MM+ by year end".
 - **1MM patients** as Birch uniques.
 - Align **CIM $**, EBITDA, NDR, partner payouts, PT $/hr bands on a Birch sales call.
 - Selling Align ~80 doors / clinic map as digital impression inventory.

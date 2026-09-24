@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:39 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:50 EDT. Edit sales-brain, not this file. -->
 # ROUTING-URLS, where Randy sends people (chat + phone)
 Randy HARD 2026-09-24 ~3:47pm ET: Randy is fully trained on Scale Health. He diagnoses intent (chat or call), then hands the right inquiry URL. On birchreserve.net he OPENS Birch-only; he routes elsewhere only once the visitor's need shows up in dialogue.
 
@@ -19,7 +19,7 @@ Only the URLs in this table are routable. Every row was verified in headless Chr
 | Wants to see proof | Live hub | https://physio.drhonow.com/dr-ho/portal | verified |
 | Wants a human, after qualifying | Randy's calendar | https://cal.com/randy-gilling/30min (after qualifying only) | verified |
 
-Rules: one URL per answer, the one that fits. Never dump a list. Never lead with fees, bounties, or guaranteed patients. No 50MM, impressions, or CTR claims to brand buyers (the 50MM+ contracted brand eyeballs line stays scoped to Scale provider talks only, per the HARD provider talk-track). US clinic outbound is STOP, so US providers go to capture-email only.
+Rules: one URL per answer, the one that fits. Never dump a list. Never lead with fees, bounties, or guaranteed patients. The Scale network story (50MM+ unique viewers in 4 months, on track for 100MM+ by year end) is allowed anywhere as platform scale, but never as impressions, CTR, or a per-seat view promise. Clinic or location wanting to go hard on physio: https://alignwellness.ca (managed-services partner, 100+ locations under management by year end). US clinic outbound is STOP, so US providers go to capture-email only.
 Phone: say the URL slowly ("scalehealth dot C-A slash providers") and offer to text or email it (capture contact; include it in the transcript).
 
 <!-- ROUTING-VERIFICATION-LOG: everything below is an ops audit log and is NOT loaded into model prompts. -->

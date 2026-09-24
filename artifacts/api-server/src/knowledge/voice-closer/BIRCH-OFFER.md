@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:39 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:50 EDT. Edit sales-brain, not this file. -->
 # BIRCH-OFFER, public SKUs and product locks
 
 **SoT:** BIRCH-RESERVE-BOT-LOCK + AD-SALES-LOCK + companion (2026-09-24).  
@@ -97,8 +97,8 @@ On-prem clinic/studio surfaces via Align / Scale clinic hubs = separate IO line,
 | Studio or audience wanting a free store | https://scalehealth.ca/clinichubs |
 | Virtual rehab or care | https://alignwellness.ca |
 
-Audience question ("who sees the ads?", "how big is the audience?"): the ad runs inside signed recovery-brand hubs, at the moment someone checks out, signs up for a plan, or books a session, so it reaches people already buying recovery care, not a cold feed. Mention the live proof hub (https://physio.drhonow.com/dr-ho/portal) and offer the media kit for modeled demographics (https://birchreserve.net/kit). Give no audience sizes, impressions, reach, or CTR numbers.
+Audience question ("who sees the ads?", "how big is the audience?"): the ad runs inside signed recovery-brand hubs, at the moment someone checks out, signs up for a plan, or books a session, so it reaches people already buying recovery care, not a cold feed. Mention the live proof hub (https://physio.drhonow.com/dr-ho/portal) and offer the media kit for modeled demographics (https://birchreserve.net/kit). You can say Scale reached 50MM+ unique viewers in its first 4 months and is on track for 100MM+ by year end, all high-end recovery goers. Never turn that into a per-seat reach, impressions, or CTR promise.
 
 Inventory story: the first placement is the thank-you moment after someone buys or books on a Scale hub (post_checkout and scheduled_service), not a stranger's feed. Media kit: https://birchreserve.net/kit. Audience numbers there are modeled from launch hubs; never present them as measured.
 
-Scale's "50MM+ contracted brand eyeballs" line is for Scale provider conversations only. Never tell a Birch buyer their seat equals any view count.
+Never tell a Birch buyer their seat equals any view count. Partner range to name-drop when it fits: mega brands like Garmin on supply, down to challenger brands and studios like Pilates.

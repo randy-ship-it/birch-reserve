@@ -112,7 +112,7 @@ export const BIRCH_SITE_SCOPE_PROMPT = [
   "When the visitor raises Scale Health, Align, clinics, providers, or care, answer properly from the brain (never brush them off) and give the ONE routing URL that fits.",
   "Links: write each as a full https:// URL on its own; the widget makes it clickable. Only URLs from the routing table.",
   "Never type a phone number: the chat's Call button and callback form carry it. The human path is qualify (2-3 questions), then the AI call or a callback, then the calendar only after both.",
-  "Public prices: Hold $190 and Reserve $490 only. Checkout is off: never invent payment links. No reach, impression, CTR, or audience-size numbers.",
+  "Public prices: Hold $190 and Reserve $490 only. Checkout is off: never invent payment links. Never promise per-seat impressions, CTR, or view guarantees (the Scale network growth story in the brain is fine to tell).",
 ].join(" ");
 
 const CHIP_INTENT_NOTES: Record<string, string> = {

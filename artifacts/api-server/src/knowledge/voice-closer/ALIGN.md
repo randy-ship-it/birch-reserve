@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:39 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:50 EDT. Edit sales-brain, not this file. -->
 # Align Wellness (brand training)
 
 **Public brand:** Align Wellness · https://alignwellness.ca  
@@ -18,11 +18,11 @@ From sourced frames:
 - **MSP:** Location can put the whole book on Align (in-person + SMB’s own volume), not only Scale-sourced $.
 - **Distributor of Scale:** Align team can sell hubs; reciprocal royalty math is **internal**, never quote % on calls.
 
-Public Align talk-track (from memo): “Free hub that pays you. Physio already in it. Put the rest of the book on us when you’re ready.” Don’t open with MSP, open with free monetizing hub; digital physio already on via Align; upsell the door later.
+Public Align talk-track (from memo): “Free hub that pays you. Physio already in it. Put the rest of the book on us when you’re ready.” Don’t open with MSP, open with free monetizing hub; digital physio already on via Align; upsell the door later. EXCEPTION (Randy HARD 2026-09-24): when a location wants to go hard on physio, go straight to partnering with them through Align, our successful MSP, which will have 100+ locations under management by year end.
 
 ## Network context (use carefully)
 
-~**80** partner retail doors (tracking 90+ by YE 2026 appears on RDGDH public portfolio meta).  
+~**80** partner retail doors today; Randy HARD 2026-09-24: 100+ locations under management by year end (say "by year end").  
 
 For **Birch** brand buyers: Align’s ~80 doors and on-prem display = **second surface, on request**, never the homepage hero, never sold as digital impression count.
 

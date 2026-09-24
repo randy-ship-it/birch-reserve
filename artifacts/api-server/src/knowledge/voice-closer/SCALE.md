@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:39 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:50 EDT. Edit sales-brain, not this file. -->
 # Scale Health (brand training)
 
 **Legal:** Scale Health Network Inc. · Randy calls the org **Scale**.  
@@ -35,7 +35,7 @@ Scale sells **booking / practice rails**, not patients.
 
 > Our brands need somewhere to send their physio bookings. We built the platform, tools, data, insights, that practitioners use when they take patients through the hub. 50MM+ contracted brand eyeballs a month now. First five ramp October / November, then into 2027. We need quality providers on the site.
 
-**Scope warning for Birch closer:** “50MM+ contracted brand eyeballs” is a **Scale provider** frame. It is **not** a Birch sold-impression guarantee. Do not tell brand ad buyers “your Birch seat equals 50MM views.”
+**Scope note:** the platform story (50MM+ unique viewers in 4 months, on track for 100MM+ by year end) can be used on any surface as network scale. It is never a per-seat impression guarantee.
 
 ## Economics when asked, HARD (Randy 2026-09-24 ~3:55pm ET)
 
