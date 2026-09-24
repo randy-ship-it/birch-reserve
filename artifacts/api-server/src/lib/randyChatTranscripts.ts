@@ -6,7 +6,7 @@
  * - Email: Resend HTTP API. Env RESEND_API_KEY (required to send),
  *   RANDY_CHAT_FROM (default "Birch Reserve <care@scalehealth.ca>", a sender verified in
  *   the Scale Resend account that owns the Autoscale RESEND_API_KEY),
- *   RANDY_TRANSCRIPT_TO (default randy@silverbirchgrowth.com).
+ *   RANDY_CHAT_TO (comma-separated; default randy@ and jon@silverbirchgrowth.com).
  *   Without RESEND_API_KEY, sessions are still logged and nothing is sent;
  *   once the key is set, the backlog from the last 7 days goes out.
  * - When: a session is due once it has new messages since the last send AND
@@ -25,8 +25,10 @@ export type QualifyAnswers = {
   category?: string;
   reach?: string;
   timing?: string;
+  need?: string;
+  size?: string;
 };
-export type ContactInfo = { phone?: string; email?: string; name?: string };
+export type ContactInfo = { phone?: string; email?: string; name?: string; role?: string };
 export type TranscriptEvent = { type: string; at: string };
 
 export type TranscriptSession = {
@@ -75,7 +77,7 @@ export interface TranscriptStore {
   claimDue(opts: ClaimOptions): Promise<TranscriptSession[]>;
   markSent(id: string, sentMessageCount: number, now: Date): Promise<void>;
   markFailed(id: string, error: string, now?: Date): Promise<void>;
-  get?(id: string): Promise<TranscriptSession | undefined>;
+  get(id: string): Promise<TranscriptSession | undefined>;
 }
 
 export const TRANSCRIPT_IDLE_MS = 10 * 60_000;
@@ -268,7 +270,7 @@ function htmlWithNakedLinks(s: string): string {
 const EVENT_LABELS: Record<string, string> = {
   tel_click: "Tapped \"Get a call from Randy's AI now\" (tel)",
   callback_request: "Requested a callback",
-  cal_shown: "Calendar link shown (qualified)",
+  cal_shown: "Calendar link shown (legacy)",
   qualified: "Answered the qualifying questions",
   close: "Closed the chat",
   activity: "Chat activity",
@@ -280,14 +282,18 @@ export function renderTranscriptEmail(s: TranscriptSession): RenderedEmail {
   const outcome = s.lastHandoff
     ? EVENT_LABELS[s.lastHandoff] ?? s.lastHandoff
     : "Went idle (10 min)";
+  // Callback intake first (HARD 5:28pm): the team calls back from this block.
   const fields: Array<[string, string | undefined]> = [
-    ["Company / brand", s.qualify.company],
-    ["Category / who to reach", s.qualify.category],
-    ...(s.qualify.reach ? ([["Wants to reach", s.qualify.reach]] as Array<[string, string]>) : []),
-    ["Timing / budget", s.qualify.timing],
     ["Name", s.contact.name],
+    ["Company", s.qualify.company],
+    ["Role", s.contact.role],
     ["Phone", s.contact.phone],
     ["Email", s.contact.email],
+    ["Need", s.qualify.need ?? s.qualify.category],
+    ["Size", s.qualify.size],
+    ["Timing", s.qualify.timing],
+    ...(s.qualify.need && s.qualify.category ? ([["Category", s.qualify.category]] as Array<[string, string]>) : []),
+    ...(s.qualify.reach ? ([["Wants to reach", s.qualify.reach]] as Array<[string, string]>) : []),
   ];
   const meta: Array<[string, string]> = [
     ["Session", s.id],
@@ -302,10 +308,10 @@ export function renderTranscriptEmail(s: TranscriptSession): RenderedEmail {
   const text = [
     "Birch chat transcript",
     "",
-    ...meta.map(([k, v]) => `${k}: ${v}`),
-    "",
-    "Qualifying answers and contact",
+    "Callback intake",
     ...fields.map(([k, v]) => `${k}: ${v?.trim() || "(not given)"}`),
+    "",
+    ...meta.map(([k, v]) => `${k}: ${v}`),
     "",
     "Events",
     ...(events.length ? events : ["(none)"]),
@@ -320,9 +326,9 @@ export function renderTranscriptEmail(s: TranscriptSession): RenderedEmail {
   const html = [
     `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#111;line-height:1.45">`,
     `<h2 style="margin:0 0 8px">Birch chat transcript</h2>`,
-    `<table style="border-collapse:collapse;margin-bottom:12px">${meta.map(([k, v]) => row(k, v)).join("")}</table>`,
-    `<h3 style="margin:12px 0 4px">Qualifying answers and contact</h3>`,
+    `<h3 style="margin:12px 0 4px">Callback intake</h3>`,
     `<table style="border-collapse:collapse;margin-bottom:12px">${fields.map(([k, v]) => row(k, v?.trim() || "(not given)")).join("")}</table>`,
+    `<table style="border-collapse:collapse;margin-bottom:12px">${meta.map(([k, v]) => row(k, v)).join("")}</table>`,
     `<h3 style="margin:12px 0 4px">Events</h3>`,
     `<ul style="margin:0 0 12px;padding-left:18px">${(events.length ? events : ["(none)"]).map((e) => `<li>${escapeHtml(e)}</li>`).join("")}</ul>`,
     `<h3 style="margin:12px 0 4px">Transcript</h3>`,
@@ -548,6 +554,12 @@ export class DrizzleTranscriptStore implements TranscriptStore {
     );
   }
 
+  async get(id: string): Promise<TranscriptSession | undefined> {
+    const m = await this.mod();
+    const res = await m.pool.query("SELECT * FROM randy_chat_sessions WHERE id = $1", [id]);
+    return res.rows[0] ? rowToSession(res.rows[0] as RawRow) : undefined;
+  }
+
   async markFailed(id: string, error: string, now: Date = new Date()): Promise<void> {
     const m = await this.mod();
     await m.pool.query(
@@ -566,7 +578,13 @@ export type TranscriptMailer = (email: RenderedEmail) => Promise<void>;
 export const RESEND_API_KEY_ENV = "RESEND_API_KEY" as const;
 /** Must be a sender verified in the Resend account behind RESEND_API_KEY (Scale's). */
 export const DEFAULT_TRANSCRIPT_FROM = "Birch Reserve <care@scalehealth.ca>";
-export const TRANSCRIPT_TO = "randy@silverbirchgrowth.com";
+/** Default recipients (HARD 5:28pm): Randy and Jon. Override with env RANDY_CHAT_TO (comma-separated). */
+export const TRANSCRIPT_TO = ["randy@silverbirchgrowth.com", "jon@silverbirchgrowth.com"] as const;
+export function transcriptRecipients(): string[] {
+  const raw = process.env["RANDY_CHAT_TO"]?.trim();
+  const list = raw ? raw.split(",").map((x) => x.trim()).filter(Boolean) : [];
+  return list.length ? list : [...TRANSCRIPT_TO];
+}
 export function transcriptFrom(): string {
   return process.env["RANDY_CHAT_FROM"]?.trim() || DEFAULT_TRANSCRIPT_FROM;
 }
@@ -586,7 +604,7 @@ export const resendMailer: TranscriptMailer = async (email) => {
       headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
       body: JSON.stringify({
         from: transcriptFrom(),
-        to: [process.env["RANDY_TRANSCRIPT_TO"]?.trim() || TRANSCRIPT_TO],
+        to: transcriptRecipients(),
         subject: email.subject,
         text: email.text,
         html: email.html,
@@ -665,6 +683,47 @@ export async function sendTestTranscript(now: Date = new Date()): Promise<{ sent
   return { sent: true };
 }
 
+/**
+ * Lead safety net (Emma 5:32pm): one structured server-log line with the full intake
+ * and transcript, so no lead is lost while email is failing. Logs only; never returned
+ * in any HTTP response.
+ */
+export function logIntake(s: TranscriptSession, reason: string, error?: string): void {
+  logger.info(
+    {
+      kind: "randy_chat_intake",
+      reason,
+      session: s.id,
+      intake: {
+        name: s.contact.name ?? null,
+        company: s.qualify.company ?? null,
+        role: s.contact.role ?? null,
+        phone: s.contact.phone ?? null,
+        email: s.contact.email ?? null,
+        need: s.qualify.need ?? s.qualify.category ?? null,
+        size: s.qualify.size ?? null,
+        timing: s.qualify.timing ?? null,
+        category: s.qualify.category ?? null,
+      },
+      lastHandoff: s.lastHandoff,
+      pagePath: s.pagePath,
+      transcript: s.messages.map((m) => `${m.role === "user" ? "Visitor" : "Randy"}: ${m.content}`),
+      ...(error ? { error } : {}),
+    },
+    "Randy chat intake",
+  );
+}
+
+/** Log the stored session for `id` (used on callback requests, even with no mailer). */
+export async function logIntakeForSession(id: string, reason: string): Promise<void> {
+  try {
+    const s = await store.get(id);
+    if (s) logIntake(s, reason);
+  } catch (error) {
+    logger.warn({ err: error instanceof Error ? error.message : "intake_log_failed" }, "Randy chat intake log failed");
+  }
+}
+
 /** Send every due transcript (or just `onlyId`). Idempotent; safe to call often. */
 export async function sweepTranscripts(opts: { now?: Date; onlyId?: string } = {}): Promise<SweepResult> {
   if (transcriptsDisabled()) return { sent: 0, failed: 0, skipped: "disabled" };
@@ -691,6 +750,7 @@ export async function sweepTranscripts(opts: { now?: Date; onlyId?: string } = {
     ...(opts.onlyId ? { onlyId: opts.onlyId } : {}),
   });
   for (const session of due) {
+    logIntake(session, "before_send");
     try {
       await mailer(renderTranscriptEmail(session));
       await store.markSent(session.id, session.messages.length, new Date());
@@ -699,6 +759,7 @@ export async function sweepTranscripts(opts: { now?: Date; onlyId?: string } = {
       failed += 1;
       const message = error instanceof Error ? error.message : "send_failed";
       await store.markFailed(session.id, message, now).catch(() => undefined);
+      logIntake(session, "send_failed", message);
       logger.warn({ err: message, session: session.id }, "Randy chat transcript email failed");
     }
   }

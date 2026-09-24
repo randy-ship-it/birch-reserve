@@ -14,6 +14,7 @@ import { Router, type IRouter, type Request } from "express";
 import { loadVoiceCloserSystemPrompt } from "../lib/voiceCloserKnowledge";
 import {
   ensureTranscriptSweepTimer,
+  logIntakeForSession,
   maybeSweepTranscripts,
   sendTestTranscript,
   recordTranscript,
@@ -111,7 +112,7 @@ export const BIRCH_SITE_SCOPE_PROMPT = [
   `Live proof hub: ${LIVE_HUB_PROOF_URL} (share when they ask to see a live hub or who sees the ads).`,
   "When the visitor raises Scale Health, Align, clinics, providers, or care, answer properly from the brain (never brush them off) and give the ONE routing URL that fits.",
   "Links: write each as a full https:// URL on its own; the widget makes it clickable. Only URLs from the routing table.",
-  "Never type a phone number: the chat's Call button and callback form carry it. The human path is qualify (2-3 questions), then the AI call or a callback, then the calendar only after both.",
+  "Never type a phone number: the chat's Call button and callback form carry it. You handle buyers yourself: close the $190 hold / $490 reserve, and for partnerships or bigger deals take intake in chat (name, company, role, phone, email, need, size, timing) and say the team will call back. Do not promote Randy's calendar; only if the visitor insists on a set time may you give https://cal.com/randy-gilling/30min.",
   "Public prices: Hold $190 and Reserve $490 only. Checkout is off: never invent payment links. Never promise per-seat impressions, CTR, or view guarantees (the Scale network growth story in the brain is fine to tell).",
 ].join(" ");
 
@@ -330,7 +331,7 @@ export function parseBody(raw: unknown): ParseOk<RandyChatBody> | ParseErr {
 }
 
 const EVENT_TYPES = new Set(["tel_click", "callback_request", "cal_shown", "qualified", "close", "activity"]);
-const QUALIFY_KEYS = ["company", "category", "reach", "timing"] as const;
+const QUALIFY_KEYS = ["company", "category", "reach", "timing", "need", "size"] as const;
 const EMAIL_PATTERN = /^[^\s@]{1,64}@[^\s@]{1,190}\.[A-Za-z]{2,24}$/;
 
 export type RandyChatEventBody = {
@@ -376,7 +377,7 @@ export function parseEventBody(raw: unknown): ParseOk<RandyChatEventBody> | Pars
     }
     const c = obj.contact as Record<string, unknown>;
     for (const k of Object.keys(c)) {
-      if (!["phone", "email", "name"].includes(k)) return { ok: false, error: "Invalid contact." };
+      if (!["phone", "email", "name", "role"].includes(k)) return { ok: false, error: "Invalid contact." };
     }
     contact = {};
     if (c.phone !== undefined) {
@@ -393,6 +394,10 @@ export function parseEventBody(raw: unknown): ParseOk<RandyChatEventBody> | Pars
     if (c.name !== undefined) {
       if (typeof c.name !== "string" || c.name.length > 80) return { ok: false, error: "Invalid name." };
       contact.name = c.name.trim();
+    }
+    if (c.role !== undefined) {
+      if (typeof c.role !== "string" || c.role.length > 80) return { ok: false, error: "Invalid role." };
+      contact.role = c.role.trim();
     }
   }
   if (obj.type === "callback_request" && !contact?.phone) {
@@ -622,6 +627,10 @@ router.post("/launch/randy-chat/event", async (req, res): Promise<void> => {
     ...(b.contact ? { contact: b.contact } : {}),
     ...(b.pagePath ? { pagePath: b.pagePath } : {}),
   });
+  if (b.type === "callback_request") {
+    // Logged even if email is not configured; response below never echoes contact info.
+    await logIntakeForSession(b.sessionId, "callback_request");
+  }
   if (b.type === "tel_click" || b.type === "callback_request" || b.type === "cal_shown") {
     // Await (bounded by the mailer's 10s timeout) so Autoscale can't freeze the
     // instance before the handoff email goes out.

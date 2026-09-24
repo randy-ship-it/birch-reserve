@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 17:17 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 17:28 EDT. Edit sales-brain, not this file. -->
 # Scale Health (brand training)
 
 **Legal:** Scale Health Network Inc. · Randy calls the org **Scale**.  

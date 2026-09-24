@@ -3,7 +3,8 @@
  * Only http(s) URLs become links (target=_blank rel=noopener noreferrer).
  * No HTML is ever parsed or injected (no dangerouslySetInnerHTML).
  * Calendar links stay non-clickable until the visitor has qualified and taken
- * the AI call / callback step (HARD 3:42pm ET: no bare calendar link).
+ * the AI call / callback step. Since 5:28pm the widget always passes allowCal
+ * (the model only gives the calendar when a visitor insists on a set time; no UI surfaces it).
  */
 import React from "react";
 

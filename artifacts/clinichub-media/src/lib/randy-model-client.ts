@@ -127,7 +127,7 @@ async function stubRandyReply(
 
   if (chip === "talk_human" || /\b(call|human|phone)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: `Happy to connect you live. Tap Call for ${RANDY_TEL_DISPLAY}. After a couple of quick questions here I can also open the calendar.`,
+      text: `Happy to connect you live. Tap Call for ${RANDY_TEL_DISPLAY}. Or leave your details here and the team will call you back.`,
       source: "stub",
       offerHandoff: true,
     };
@@ -266,8 +266,8 @@ export type RandyChatEvent = {
   sessionId: string;
   type: RandyChatEventType;
   messages?: RandyModelMessage[];
-  qualify?: { company?: string; category?: string; reach?: string; timing?: string };
-  contact?: { phone?: string; email?: string; name?: string };
+  qualify?: { company?: string; category?: string; reach?: string; timing?: string; need?: string; size?: string };
+  contact?: { phone?: string; email?: string; name?: string; role?: string };
 };
 
 function eventPayload(evt: RandyChatEvent): string {
