@@ -8,6 +8,10 @@
  *                      voice session started from a chat, so one visitor = one lead)
  *   intake:<uuid>      advertiser follow-up form (advertiser_intakes row)
  *   email:<sha256>     linger email capture (source email_capture), keyed by email hash
+ *   checkout:<resId>   paid Stripe checkout (source checkout); re-posts to Friday under the
+ *                      matching prior lead's externalId when one exists (meta.friday_external_id)
+ *
+ * meta (jsonb, 7:21pm): Friday deal metadata (category, hubs, sku, value, paid, ...), merged key-wise.
  *
  * is_test (6:50pm): QA / probe rows are stored but never emailed or pushed to Friday.
  * Attribution (utm_*, referrer, landing_page) is first-touch: set once, never overwritten.
@@ -22,7 +26,37 @@
 import { logger } from "./logger";
 import { applyAdditiveColumns } from "./schemaEnsure";
 
-export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture";
+export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture" | "checkout";
+
+/** Friday deal metadata carried on the lead (unknown keys are simply absent). */
+export type LeadMeta = {
+  category?: string;
+  hubs?: string;
+  sku?: string;
+  value?: number;
+  paid?: boolean;
+  stripe_session_id?: string;
+  /** Re-post under this Friday externalId (a paid checkout joins the visitor's prior lead). */
+  friday_external_id?: string;
+  /** QA only (X-Birch-QA + /api/launch/qa/friday-test-lead): push this is_test lead to Friday once. */
+  friday_qa_ok?: boolean;
+};
+const META_STRING_KEYS = ["category", "hubs", "sku", "stripe_session_id", "friday_external_id"] as const;
+
+/** Keep only well-typed, non-empty keys (never empty strings). */
+export function cleanLeadMeta(raw: unknown): LeadMeta {
+  if (!raw || typeof raw !== "object") return {};
+  const src = raw as Record<string, unknown>;
+  const out: LeadMeta = {};
+  for (const k of META_STRING_KEYS) {
+    const v = src[k];
+    if (typeof v === "string" && v.trim()) out[k] = v.trim().slice(0, 200);
+  }
+  if (typeof src["value"] === "number" && Number.isFinite(src["value"]) && src["value"] >= 0) out.value = src["value"];
+  if (src["paid"] === true) out.paid = true;
+  if (src["friday_qa_ok"] === true) out.friday_qa_ok = true;
+  return out;
+}
 export type FridayStatus = "pending" | "sending" | "sent" | "failed" | "skipped";
 
 export const LEAD_FIELDS = ["name", "company", "role", "phone", "email", "need", "size", "timing", "pagePath"] as const;
@@ -49,6 +83,8 @@ export type LeadInput = {
   now?: Date;
   /** Sticky: once a lead is test traffic it stays test traffic. */
   isTest?: boolean;
+  /** Merged key-wise into the stored meta (never erases a known key). */
+  meta?: LeadMeta;
 } & Partial<Record<LeadField, string | null | undefined>> &
   Partial<Record<AttributionField, string | null | undefined>>;
 
@@ -64,6 +100,7 @@ export type Lead = {
   fridayPushedAt: Date | null;
   fridayAttemptedAt: Date | null;
   isTest: boolean;
+  meta: LeadMeta;
   createdAt: Date;
   updatedAt: Date;
 } & Record<LeadField, string | null> &
@@ -82,6 +119,8 @@ export interface LeadStore {
   /** afterClaim (default true): a lead edited mid-send stays pending so it is re-pushed. */
   markFriday(id: string, result: FridayResult, now: Date, afterClaim?: boolean): Promise<void>;
   listFridayRetryable(opts: { now: Date; retryAfterMs: number; maxAttempts: number; includeSkipped: boolean; limit: number }): Promise<string[]>;
+  /** Oldest real (non-test, non-checkout) lead with this email: a paid checkout joins it in Friday. */
+  findPriorByEmail(email: string): Promise<Lead | undefined>;
 }
 
 /* ------------------------------------------------------------------ */
@@ -109,6 +148,7 @@ const SOURCE_RANK: Record<LeadSource, number> = {
   voice: 2,
   web_voice: 2,
   email_capture: 0,
+  checkout: 3,
 };
 
 function clean(field: LeadField, v: unknown): string | null {
@@ -130,6 +170,7 @@ export function emptyLead(input: LeadInput, now: Date): Lead {
     fridayPushedAt: null,
     fridayAttemptedAt: null,
     isTest: false,
+    meta: {} as LeadMeta,
     createdAt: now,
     updatedAt: now,
   };
@@ -157,6 +198,9 @@ export function mergeLead(existing: Lead | undefined, input: LeadInput, now: Dat
     if (v !== null && base[f] === null) next[f] = v;
   }
   if (input.isTest && !base.isTest) next.isTest = true;
+  // Friday meta: merge known keys (side data, like attribution; not a "change" that re-emails).
+  const incomingMeta = cleanLeadMeta(input.meta);
+  if (Object.keys(incomingMeta).length) next.meta = { ...base.meta, ...incomingMeta };
   if (SOURCE_RANK[input.source] > SOURCE_RANK[base.source]) {
     next.source = input.source;
     changed = true;
@@ -171,6 +215,10 @@ export function mergeLead(existing: Lead | undefined, input: LeadInput, now: Dat
     }
   }
   return { lead: next, changed };
+}
+
+export function leadMetaEqual(a: LeadMeta, b: LeadMeta): boolean {
+  return JSON.stringify(Object.entries(a).sort()) === JSON.stringify(Object.entries(b).sort());
 }
 
 /** True when a lead has something a human can follow up on. */
@@ -226,6 +274,16 @@ export class MemoryLeadStore implements LeadStore {
       if (out.length >= opts.limit) break;
     }
     return out;
+  }
+
+  async findPriorByEmail(email: string) {
+    const e = email.trim().toLowerCase();
+    let best: Lead | undefined;
+    for (const l of this.rows.values()) {
+      if (l.isTest || l.source === "checkout" || l.email?.toLowerCase() !== e) continue;
+      if (!best || l.createdAt < best.createdAt) best = l;
+    }
+    return best ? { ...best } : undefined;
   }
 }
 
@@ -298,6 +356,7 @@ export const LEADS_HYGIENE_DDL = [
   `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS utm_content text`,
   `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS referrer text`,
   `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS landing_page text`,
+  `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS meta jsonb`,
 ] as const;
 
 type DbModule = typeof import("@workspace/db");
@@ -311,6 +370,14 @@ function toDate(v: unknown): Date | null {
 
 function str(v: unknown): string | null {
   return v == null ? null : String(v);
+}
+
+function safeJson(v: string): unknown {
+  try {
+    return JSON.parse(v);
+  } catch {
+    return null;
+  }
 }
 
 function rowToLead(r: RawRow): Lead {
@@ -335,6 +402,7 @@ function rowToLead(r: RawRow): Lead {
     fridayPushedAt: toDate(r["friday_pushed_at"]),
     fridayAttemptedAt: toDate(r["friday_attempted_at"]),
     isTest: r["is_test"] === true,
+    meta: cleanLeadMeta(typeof r["meta"] === "string" ? safeJson(r["meta"]) : r["meta"]),
     utmSource: str(r["utm_source"]),
     utmMedium: str(r["utm_medium"]),
     utmCampaign: str(r["utm_campaign"]),
@@ -374,14 +442,16 @@ export class PgLeadStore implements LeadStore {
       const { lead, changed } = mergeLead(existing, input, now);
       const sideChanged =
         existing !== undefined &&
-        (lead.isTest !== existing.isTest || ATTRIBUTION_FIELDS.some((f) => lead[f] !== existing[f]));
+        (lead.isTest !== existing.isTest ||
+          !leadMetaEqual(lead.meta, existing.meta) ||
+          ATTRIBUTION_FIELDS.some((f) => lead[f] !== existing[f]));
       if (changed || !existing) {
         await client.query(
           `INSERT INTO leads (id, source, source_ref, name, company, role, phone, email, need, size, timing,
                               page_path, friday_status, friday_attempts, created_at, updated_at,
                               is_test, utm_source, utm_medium, utm_campaign, utm_term, utm_content,
-                              referrer, landing_page)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24)
+                              referrer, landing_page, meta)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25::jsonb)
            ON CONFLICT (id) DO UPDATE SET
              source = EXCLUDED.source, name = EXCLUDED.name, company = EXCLUDED.company,
              role = EXCLUDED.role, phone = EXCLUDED.phone, email = EXCLUDED.email,
@@ -395,20 +465,29 @@ export class PgLeadStore implements LeadStore {
              utm_term = COALESCE(leads.utm_term, EXCLUDED.utm_term),
              utm_content = COALESCE(leads.utm_content, EXCLUDED.utm_content),
              referrer = COALESCE(leads.referrer, EXCLUDED.referrer),
-             landing_page = COALESCE(leads.landing_page, EXCLUDED.landing_page)`,
+             landing_page = COALESCE(leads.landing_page, EXCLUDED.landing_page),
+             meta = COALESCE(leads.meta, '{}'::jsonb) || COALESCE(EXCLUDED.meta, '{}'::jsonb)`,
           [
             lead.id, lead.source, lead.sourceRef, lead.name, lead.company, lead.role, lead.phone,
             lead.email, lead.need, lead.size, lead.timing, lead.pagePath, lead.fridayStatus,
             lead.fridayAttempts, lead.createdAt, lead.updatedAt, lead.isTest,
             ...ATTRIBUTION_FIELDS.map((f) => lead[f]),
+            Object.keys(lead.meta).length ? JSON.stringify(lead.meta) : null,
           ],
         );
       } else if (lead.pagePath !== existing.pagePath || sideChanged) {
         await client.query(
           `UPDATE leads SET page_path = $2, is_test = is_test OR $3,
-                  ${ATTRIBUTION_FIELDS.map((f, i) => `${ATTRIBUTION_COLUMN[f]} = COALESCE(${ATTRIBUTION_COLUMN[f]}, $${i + 4})`).join(", ")}
+                  ${ATTRIBUTION_FIELDS.map((f, i) => `${ATTRIBUTION_COLUMN[f]} = COALESCE(${ATTRIBUTION_COLUMN[f]}, $${i + 4})`).join(", ")},
+                  meta = COALESCE(meta, '{}'::jsonb) || COALESCE($${ATTRIBUTION_FIELDS.length + 4}::jsonb, '{}'::jsonb)
             WHERE id = $1`,
-          [lead.id, lead.pagePath, lead.isTest, ...ATTRIBUTION_FIELDS.map((f) => lead[f])],
+          [
+            lead.id,
+            lead.pagePath,
+            lead.isTest,
+            ...ATTRIBUTION_FIELDS.map((f) => lead[f]),
+            Object.keys(lead.meta).length ? JSON.stringify(lead.meta) : null,
+          ],
         );
       }
       await client.query("COMMIT");
@@ -419,6 +498,16 @@ export class PgLeadStore implements LeadStore {
     } finally {
       client.release();
     }
+  }
+
+  async findPriorByEmail(email: string) {
+    const m = await leadsDb();
+    const res = await m.pool.query(
+      `SELECT * FROM leads WHERE lower(email) = lower($1) AND source <> 'checkout' AND NOT is_test
+        ORDER BY created_at LIMIT 1`,
+      [email.trim()],
+    );
+    return res.rows[0] ? rowToLead(res.rows[0] as RawRow) : undefined;
   }
 
   async get(id: string) {

@@ -509,7 +509,7 @@ test("runtime column ensure only ALTERs when a column is missing (no lock on war
       return { rows: [] };
     },
   });
-  assert.equal(await applyAdditiveColumns(fake(["id", "is_test", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "referrer", "landing_page"]), LEADS_HYGIENE_DDL), 0);
+  assert.equal(await applyAdditiveColumns(fake(["id", "is_test", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "referrer", "landing_page", "meta"]), LEADS_HYGIENE_DDL), 0);
   assert.equal(await applyAdditiveColumns(fake(["id"]), LEADS_HYGIENE_DDL), LEADS_HYGIENE_DDL.length);
   assert.equal(await applyAdditiveColumns(fake([]), SPLASH_HYGIENE_DDL), 0);
   assert.equal(ran.length, LEADS_HYGIENE_DDL.length);

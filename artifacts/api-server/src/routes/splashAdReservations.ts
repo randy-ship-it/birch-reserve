@@ -54,6 +54,7 @@ import {
 } from "../lib/salesStaffAccess";
 import { hasValidQaHeader } from "../lib/testTraffic";
 import { attributionFrom } from "../lib/publicGuards";
+import { recordPaidCheckoutSafe } from "../lib/checkoutLead";
 import { markSplashReservationTestIfQa } from "../lib/splashTestTraffic";
 
 const router: IRouter = Router();
@@ -562,7 +563,9 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
   ) {
     const session = event.data.object as Stripe.Checkout.Session;
     if (session.payment_status === "paid") {
-      await markSplashReservationPaidFromSession(session);
+      const paid = await markSplashReservationPaidFromSession(session);
+      // 7:21pm: paid checkout → Friday (never throws; Stripe still gets its 2xx).
+      if (paid === "paid") await recordPaidCheckoutSafe(session);
     }
     return;
   }

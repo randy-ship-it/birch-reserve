@@ -9,6 +9,7 @@ import randyChatRouter from "./randyChat";
 import editorialRouter from "./editorial";
 import voiceCallEndedRouter from "./voiceCallEnded";
 import humanGateRouter from "./humanGate";
+import qaFridayRouter from "./qaFriday";
 
 const router: IRouter = Router();
 
@@ -22,5 +23,6 @@ router.use(randyChatRouter);
 router.use(editorialRouter);
 router.use(voiceCallEndedRouter);
 router.use(humanGateRouter);
+router.use(qaFridayRouter);
 
 export default router;

@@ -1,4 +1,4 @@
--- Birch Reserve 6:50pm: test-traffic hygiene (is_test) + first-touch attribution.
+-- Birch Reserve 6:50pm: test-traffic hygiene (is_test) + first-touch attribution + Friday meta.
 -- ADDITIVE ONLY and idempotent: ADD COLUMN IF NOT EXISTS. No DROP, no RENAME,
 -- no type / default changes to existing columns. Safe to run repeatedly.
 --
@@ -22,6 +22,8 @@ ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS utm_term text;
 ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS utm_content text;
 ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS referrer text;
 ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS landing_page text;
+-- leads: Friday deal metadata (category, hubs, sku, value, paid, stripe_session_id, ...)
+ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS meta jsonb;
 
 -- voice_calls: QA flag
 ALTER TABLE IF EXISTS voice_calls ADD COLUMN IF NOT EXISTS is_test boolean NOT NULL DEFAULT false;

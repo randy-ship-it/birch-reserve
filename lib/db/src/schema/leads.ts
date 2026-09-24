@@ -59,6 +59,8 @@ export const leadsTable = pgTable(
     utmContent: text("utm_content"),
     referrer: text("referrer"),
     landingPage: text("landing_page"),
+    // 7:21pm: Friday deal metadata (category, hubs, sku, value, paid, stripe_session_id, ...).
+    meta: jsonb("meta"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },

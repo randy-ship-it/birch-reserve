@@ -31,6 +31,7 @@ export function chatLeadInput(s: TranscriptSession, event: string, attribution: 
     timing: s.qualify.timing,
     pagePath: s.pagePath ?? undefined,
     isTest: s.isTest,
+    meta: { category: s.qualify.category, hubs: s.qualify.reach },
     ...attribution,
   };
 }
