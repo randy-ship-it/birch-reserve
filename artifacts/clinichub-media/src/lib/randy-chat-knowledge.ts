@@ -42,8 +42,21 @@ export const PUBLIC_SKU_KEYS = ["hold-190", "reserve-490"] as const;
 /** Checkout OFF until Gordon — chat must not invent pay links or claim live checkout. */
 export const CHECKOUT_LIVE = false;
 
-export const RANDY_TEL_HREF = "tel:+15045046526" as const;
-export const RANDY_TEL_DISPLAY = "+1 (504) 504-6526" as const;
+/**
+ * The ONE place the live/AI call number lives on the client. Set VITE_RANDY_TEL
+ * (E.164, e.g. +14165550123) at build time to swap numbers; fallback is the current line.
+ */
+const RANDY_TEL_E164 = (() => {
+  const raw = String(import.meta.env.VITE_RANDY_TEL ?? "").trim();
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  if (digits.length === 10) return `+1${digits}`;
+  return "+15045046526";
+})();
+export const RANDY_TEL_HREF = `tel:${RANDY_TEL_E164}`;
+/** HARD 3:42pm ET: after qualifying, the next step is an AI call first. */
+export const AI_CALL_LABEL = "Get a call from Randy's AI now" as const;
+export const RANDY_TEL_DISPLAY = `+1 (${RANDY_TEL_E164.slice(2, 5)}) ${RANDY_TEL_E164.slice(5, 8)}-${RANDY_TEL_E164.slice(8)}`;
 
 export type RandyChatMode = "chat" | "hear" | "call";
 
@@ -87,7 +100,7 @@ export const SUGGESTION_CHIPS: ReadonlyArray<{
   {
     id: "live_hub",
     label: "See a live hub",
-    message: `Can I see a live hub? (live proof: ${LIVE_HUB_PROOF_DISPLAY})`,
+    message: "Can I see a live hub?",
   },
   {
     id: "talk_human",
@@ -121,3 +134,35 @@ export function shouldOfferLiveHandoff(opts: {
   }
   return opts.discoveryTurns >= 2;
 }
+
+/**
+ * Book a call qualifying questions (HARD 2026-09-24 3:42pm ET). Book a call opens the chat
+ * and asks these first; next step is the AI call (tel) or a callback request,
+ * and only then, if qualified, Randy's calendar.
+ */
+export type QualifyKey = "company" | "category" | "timing";
+
+export const QUALIFY_QUESTIONS: ReadonlyArray<{ key: QualifyKey; prompt: string }> = [
+  {
+    key: "company",
+    prompt:
+      "Happy to set up a call. Three quick questions so it's useful. First, what's your brand or company?",
+  },
+  {
+    key: "category",
+    prompt: "Thanks. What category are you in, and who do you want to reach?",
+  },
+  {
+    key: "timing",
+    prompt:
+      "Last one: what's your timing, and a rough budget range? (For reference, a hold is $190 and a seat is $490.)",
+  },
+] as const;
+
+export function qualifyDoneMessage(company?: string): string {
+  const who = company?.trim() ? `Perfect, ${company.trim()}.` : "Perfect.";
+  return `${who} Fastest next step: ${AI_CALL_LABEL.replace("Get", "get")} (it picks up right away), or leave your number and we'll call you back. Once that's done I can open Randy's calendar.`;
+}
+
+export const TALK_HUMAN_REPLY =
+  "Sure. The fastest way is a call from Randy's AI right now, or leave your number and we'll call you back." as const;

@@ -1,11 +1,12 @@
+import { RANDY_TEL_DISPLAY, RANDY_TEL_HREF } from "@/lib/randy-chat-knowledge";
 import { useEffect } from "react";
 import { Phone } from "lucide-react";
 import { trackCta } from "@/lib/track-cta";
 import { openRandyChat } from "@/lib/book-call";
 
 const PAGE_TITLE = "Birch Reserve · Randy voice closer (team demo)";
-const TEL_HREF = "tel:+15045046526";
-const TEL_DISPLAY = "+1 (504) 504-6526";
+const TEL_HREF = RANDY_TEL_HREF;
+const TEL_DISPLAY = RANDY_TEL_DISPLAY;
 const KNOWLEDGE_SOT =
   "/workspace/birch-live-ops/voice-closer/knowledge/";
 

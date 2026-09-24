@@ -1,3 +1,4 @@
+import { RANDY_TEL_HREF } from "@/lib/randy-chat-knowledge";
 import { useEffect } from "react";
 
 const CATEGORIES = [
@@ -13,7 +14,7 @@ const CATEGORIES = [
 
 const BOOK_CALL_MAILTO =
   "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve";
-const CALL_BACK_TEL = "tel:+15045046526";
+const CALL_BACK_TEL = RANDY_TEL_HREF;
 
 const PAGE_TITLE = "DRAFT — Birch Reserve Kit | Thank-you first inventory";
 

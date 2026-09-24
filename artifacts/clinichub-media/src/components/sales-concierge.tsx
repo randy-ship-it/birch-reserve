@@ -1,3 +1,4 @@
+import { RANDY_TEL_DISPLAY, RANDY_TEL_HREF } from "@/lib/randy-chat-knowledge";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShieldCheck } from "lucide-react";
@@ -347,16 +348,16 @@ export function SalesConcierge({
         return {
           text: "On-prem clinic and studio surfaces are a separate insertion-order line, available on request. The public product is digital hubs.",
           options: [
-            { label: "Get a call back", href: "tel:+15045046526", primary: true },
+            { label: "Get a call back", href: RANDY_TEL_HREF, primary: true },
             { label: "Book a call", action: () => { trackCta("cta_book_call"); openRandyChat({ reason: "concierge", mode: "chat" }); } },
             { label: "Lock the seat — $490 USD", action: onHandoff },
           ],
         };
       case "book_a_call":
         return {
-          text: "Multi-hub, exclusive, and on-prem Align are a call, not a public checkout SKU. Dial +1 (504) 504-6526 or email.",
+          text: `Multi-hub, exclusive, and on-prem Align are a call, not a public checkout SKU. Dial ${RANDY_TEL_DISPLAY} or email.`,
           options: [
-            { label: "Get a call back", href: "tel:+15045046526", primary: true },
+            { label: "Get a call back", href: RANDY_TEL_HREF, primary: true },
             { label: "Book a call", action: () => { trackCta("cta_book_call"); openRandyChat({ reason: "concierge", mode: "chat" }); } },
           ],
         };

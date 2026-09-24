@@ -1,3 +1,4 @@
+import { RANDY_TEL_DISPLAY, RANDY_TEL_HREF } from "@/lib/randy-chat-knowledge";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -152,8 +153,8 @@ export default function Home() {
     setSplashDialogOpen(true);
   };
 
-  const VOICE_TEL_HREF = "tel:+15045046526";
-  const VOICE_TEL_DISPLAY = "+1 (504) 504-6526";
+  const VOICE_TEL_HREF = RANDY_TEL_HREF;
+  const VOICE_TEL_DISPLAY = RANDY_TEL_DISPLAY;
 
   const callBack = () => {
     trackCta("cta_book_call");

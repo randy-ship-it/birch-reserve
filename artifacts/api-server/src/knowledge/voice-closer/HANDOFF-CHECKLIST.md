@@ -1,3 +1,4 @@
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:24 EDT. Edit sales-brain, not this file. -->
 # HANDOFF-CHECKLIST — route before you sell
 
 Capture every call: **name · email · brand/clinic legal name · what they want · category (if Birch) · callback number**.
@@ -6,7 +7,7 @@ Capture every call: **name · email · brand/clinic legal name · what they want
 |---------------|---------|--------|
 | Brand / CPG exploring category seat | **Hold $190** or explain look | Invent impressions |
 | Brand clear on category, ready to lock | **Reserve $490** | Hero $899 |
-| Multi-hub / exclusive / on-prem Align screens / custom | **Book a call** → only **after** Chat Randy / voice pre-screen; then Cal https://cal.com/randy-gilling/30min (Mon–Fri 1–3pm ET) — **no bare/cold Cal** | Fake a checkout charge |
+| Multi-hub / exclusive / on-prem Align screens / custom | **Book a call** → only **after** a short qualifying chat or call with Randy; then Cal https://cal.com/randy-gilling/30min (Mon–Fri 1–3pm ET) — **no bare/cold Cal** | Fake a checkout charge |
 | Checkout / legal pending | Capture lead; promise IO / payment follow-up | Say card was charged |
 | Clinician wants bookings / “send patients” | Scale https://scalehealth.ca/providers — rails-not-leads | Lead fee / bounty language |
 | Studio / audience / free store | Scale https://scalehealth.ca/clinichubs | Promise per-door brand deals |
@@ -28,7 +29,7 @@ Capture every call: **name · email · brand/clinic legal name · what they want
 ## Book a call / Cal — HARD (2026-09-24 ~3:00pm ET)
 
 **No bare Cal link to Randy’s calendar.**  
-Chat Randy (site chat / voice) **pre-screens first** as a clinichubs-aware ad explainer / portfolio point-guard (Birch → Scale → Align → RDGDH). Engaging smart questions; same knowledge pack SoT.
+Chat Randy (site chat / voice) **qualifies first** as Randy from Birch Reserve, a clinichubs-aware ad explainer who routes to Scale / Align / RDGDH only when asked. Engaging smart questions; same knowledge pack SoT.
 
 - **Cal SoT (post-qualify only):** https://cal.com/randy-gilling/30min (Mon–Fri 1–3pm ET → SBG Growth)
 - Offer Cal **only after** screen: fit confirmed (brand/display vs provider rails vs Align MSP vs other), category/intent captured, and they still want a human.

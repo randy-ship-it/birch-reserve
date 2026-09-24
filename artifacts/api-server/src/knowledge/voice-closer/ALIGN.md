@@ -1,4 +1,5 @@
-# ALIGN.md — Align Wellness / CHI (consumer #2)
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:24 EDT. Edit sales-brain, not this file. -->
+# Align Wellness (brand training)
 
 **Public brand:** Align Wellness · https://alignwellness.ca  
 **Legal opco:** Clairvoyant Holdings Inc. (**CHI**) — Align Billing is a BMO nickname, not a second company.  
@@ -12,7 +13,7 @@ Align is the **care / MSP / fulfillment** layer next to Scale’s demand engine 
 
 From sourced frames:
 
-- **Ontario:** Align fulfills Scale digital bookings; pays Scale $49 (co→co) + PT rate band in internal memo; Align keeps margin. (**Do not recite internal $ bands to prospects** — see NEVER-SAY / internal monetization.)
+- **Ontario:** Align fulfills Scale digital bookings. Company-to-company economics are internal only; never recite them.
 - **Rest of Canada:** Curated partners fulfill first; network fee now; partners = future MSP / distribution leads.
 - **MSP:** Location can put the whole book on Align (in-person + SMB’s own volume), not only Scale-sourced $.
 - **Distributor of Scale:** Align team can sell hubs; reciprocal royalty math is **internal** — never quote % on calls.
@@ -52,3 +53,12 @@ Hub-owner shareback is Scale’s deal with the hub. Align’s booking take is Al
 - Live CIM dollar figures, partner payout schedules, exact PT $/hr on a sales call → **FORBIDDEN** (internal only).
 - Cap-table / s.85 / Alset deal status on a voice closer → out of scope; escalate to Randy.
 - Exact door list for a city → UNKNOWN unless in a current approved roster.
+
+
+## Booking (patients)
+
+Route patients to https://alignwellness.ca (homepage). There is no verified booking sub-page yet; do not say /book.
+
+## Careers (stub)
+
+No careers page is live (/careers shows "Page Not Found"). For remote physiotherapist job seekers: capture name, email, province, and license status, and say Randy's team will follow up. Do not promise roles, pay, or timing.

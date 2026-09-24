@@ -1,29 +1,31 @@
 # Vendored voice-closer knowledge (runtime snapshot)
 
-**Source of truth (SoT):** `/workspace/birch-live-ops/voice-closer/knowledge/`  
-Birch-live-ops remains the only talk-track SoT. This folder is a **synced snapshot** so Autoscale / api-server can load instructions at runtime (Repl cannot read birch-live-ops paths).
+**Source of truth:** `/workspace/sales-brain/` (edit there, then run `./build.sh`).
+`build.sh` generates the mirror at `/workspace/birch-live-ops/voice-closer/knowledge/`.
+This folder is a byte-identical copy of that mirror so the Autoscale api-server can load it at runtime.
+Never hand-edit this folder or the mirror.
 
 ## Sync rule (before ship)
 
 ```bash
+(cd /workspace/sales-brain && ./build.sh)
 cp -a /workspace/birch-live-ops/voice-closer/knowledge/*.md \
   artifacts/api-server/src/knowledge/voice-closer/
+diff -r /workspace/birch-live-ops/voice-closer/knowledge artifacts/api-server/src/knowledge/voice-closer
 ```
 
-Do **not** invent alternate talk-track here. Edit SoT first, then re-sync. Last sync should match SoT mtimes / content.
+## Load order (`src/lib/voiceCloserKnowledge.ts`)
 
-## Load order (system concat)
+1. `SYSTEM-PROMPT.md` (sales-brain core 00-30: identity, qualify then AI call then Cal, routing URLs, phone phrasing)
+2. `BIRCH-OFFER.md`
+3. `CROSS-PORTFOLIO.md`
+4. `HANDOFF-CHECKLIST.md`
+5. `SCALE.md`
+6. `ALIGN.md`
+7. `RDGDH-PORTFOLIO.md`
+8. `TEAM-ACCESS.md`
+9. `NEVER-SAY.md` (last, so it wins)
 
-Prefer README paste order; practical concat used by `randyChat` route:
-
-1. `SYSTEM-PROMPT.md`
-2. `NEVER-SAY.md`
-3. `BIRCH-OFFER.md`
-4. `CROSS-PORTFOLIO.md`
-5. `HANDOFF-CHECKLIST.md`
-6. `SCALE.md`
-7. `ALIGN.md`
-8. `RDGDH-PORTFOLIO.md`
-9. `TEAM-ACCESS.md` (optional / size-permitting)
-
-Public locks still apply: hold-190 / reserve-490 only; checkout OFF until Gordon; no $899 hero; Cal only after qualify.
+`ROUTING-URLS.md` is vendored but not loaded: its table is already in SYSTEM-PROMPT.md, and its tail is the ops verification log.
+HTML comments (GENERATED headers) and anything after `<!-- ROUTING-VERIFICATION-LOG` are stripped before the prompt is sent.
+The birchreserve.net site scope (Birch-only opener, identity, routing rule) is layered on in `src/routes/randyChat.ts`.

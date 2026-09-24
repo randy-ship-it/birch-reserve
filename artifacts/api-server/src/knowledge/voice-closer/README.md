@@ -72,4 +72,4 @@ Anything not in those files → mark **UNKNOWN** and offer Book a call / email r
 
 ## Cal / Book a call
 
-HARD: no bare Cal. Pre-screen in chat/voice first; Cal https://cal.com/randy-gilling/30min only post-qualify. See CROSS-PORTFOLIO.md.
+HARD: no bare Cal. Qualify in chat/voice first; Cal https://cal.com/randy-gilling/30min only post-qualify. See CROSS-PORTFOLIO.md.

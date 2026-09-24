@@ -1,19 +1,21 @@
 /**
- * Chat Randy widget (Emma UX + Randy HARD). Grok text via /api/launch/randy-chat.
+ * Chat Randy widget. Grok text via /api/launch/randy-chat.
  *
  * Header: Randy · Birch Reserve, online dot, Call pill (tel). Voice tab hidden until voice ships.
  * HARD 2026-09-24 3:31–3:33pm ET: birchreserve.net = Birch Reserve only (opener + chips).
  * Full-body Randy (/avatars/randy-fullbody.png, transparent cutout) stands bottom-right
- * on a floating WHITE card (never navy behind him), object-fit: contain, bottom center —
- * head through shoes always visible. Small circles use /avatars/randy-head.png only
- * (pre-cropped head + shoulders); never cover-crop the full-body art into a circle.
- * Brain SoT: /workspace/birch-live-ops/voice-closer/knowledge/ (no chat-only fork)
- * Book a call: Cal ONLY after in-thread qualification — never cold-dump.
- * Checkout OFF until Gordon. Public SKUs hold-190 / reserve-490 only.
+ * on a floating WHITE card (never navy behind him), object-fit: contain, bottom center:
+ * head through shoes always visible. Small circles use /avatars/randy-head.png only.
+ * HARD 3:42pm ET: never silent on failure (error + Retry + tel). Book a call asks
+ * 2–3 qualifying questions; next step is an AI call (tel) or a callback request;
+ * Randy's calendar only after that AND once qualified. Every session is logged
+ * server-side and emailed to Randy.
+ * HARD 3:52pm ET: visitor-facing identity is "Randy from Birch Reserve"; no internal labels.
+ * Checkout OFF. Public SKUs hold-190 / reserve-490 only.
  */
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Phone, X, Calendar, ArrowUp } from "lucide-react";
+import { Phone, X, Calendar, PhoneIncoming, RotateCw, ArrowUp } from "lucide-react";
 import { trackCta } from "@/lib/track-cta";
 import {
   BOOK_CALL_CAL_URL,
@@ -22,19 +24,28 @@ import {
   type OpenRandyChatDetail,
 } from "@/lib/book-call";
 import {
+  AI_CALL_LABEL,
+  QUALIFY_QUESTIONS,
   RANDY_TEL_DISPLAY,
   RANDY_TEL_HREF,
   SMART_OPENER,
   SUGGESTION_CHIPS,
+  TALK_HUMAN_REPLY,
   TEASER_TEXT,
+  qualifyDoneMessage,
   shouldOfferLiveHandoff,
   type DiscoveryChipId,
-  type RandyChatMode,
+  type QualifyKey,
 } from "@/lib/randy-chat-knowledge";
 import {
+  beaconRandyEvent,
   requestRandyReply,
+  sendRandyEvent,
+  type RandyChatEventType,
   type RandyModelMessage,
+  type RandyReplyFailure,
 } from "@/lib/randy-model-client";
+import { RichText } from "@/components/randy-rich-text";
 
 /** Head + shoulders (on white) for small circles only. */
 const HEAD_SRC = "/avatars/randy-head.png";
@@ -113,24 +124,73 @@ type ChatMessage = {
   id: string;
   role: "randy" | "user";
   text: string;
+  /** error = friendly failure bubble (not sent to the model). */
+  kind?: "error";
   showHandoff?: boolean;
   showCal?: boolean;
+  failure?: RandyReplyFailure["kind"];
 };
+
+type Mode = "chat" | "call";
+
+const SESSION_KEY = "birch:randy-session";
+const PHONE_DIGITS_MIN = 10;
 
 function newId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function getSessionId(): string {
+  try {
+    const existing = window.sessionStorage.getItem(SESSION_KEY);
+    if (existing && /^[A-Za-z0-9_-]{8,64}$/.test(existing)) return existing;
+    const id =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `s-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+    window.sessionStorage.setItem(SESSION_KEY, id);
+    return id;
+  } catch {
+    return `s-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+  }
+}
+
+function failureCopy(kind: RandyReplyFailure["kind"]): string {
+  switch (kind) {
+    case "timeout":
+      return "Sorry, that took too long on my side. Tap Retry, or call the live line and you'll get an answer right away.";
+    case "rate_limited":
+      return "You're quicker than me. Give it a few seconds, then tap Retry. The live line is always open too.";
+    case "network":
+      return "Looks like the connection dropped. Check your signal and tap Retry, or call the live line.";
+    default:
+      return "Sorry, I couldn't get a reply just now. Tap Retry, or call the live line and you'll get an answer right away.";
+  }
+}
+
+function toHistory(messages: ChatMessage[]): RandyModelMessage[] {
+  return messages
+    .filter((m) => !m.kind)
+    .map((m) => ({ role: m.role === "randy" ? "assistant" : "user", content: m.text }));
+}
+
 export function RandyChat() {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<RandyChatMode>("chat");
-  void mode;
+  const [mode, setMode] = useState<Mode>("chat");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
-  const [discoveryTurns, setDiscoveryTurns] = useState(0);
+  const [slow, setSlow] = useState(false);
   const [handoffReady, setHandoffReady] = useState(false);
-  const [calUnlocked, setCalUnlocked] = useState(false);
+  const [callStepDone, setCallStepDone] = useState(false);
+  const [qualifyStep, setQualifyStep] = useState<number | null>(null);
+  const [qualify, setQualify] = useState<Partial<Record<QualifyKey, string>>>({});
+  const [qualified, setQualified] = useState(false);
+  const [calShown, setCalShown] = useState(false);
+  const [callbackOpen, setCallbackOpen] = useState(false);
+  const [callbackPhone, setCallbackPhone] = useState("");
+  const [callbackName, setCallbackName] = useState("");
+  const [callbackState, setCallbackState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [dismissed, setDismissed] = useState<boolean>(() => {
     try {
       return typeof window !== "undefined" && window.sessionStorage.getItem(DISMISS_KEY) === "1";
@@ -142,38 +202,72 @@ export function RandyChat() {
   const [teaserDone, setTeaserDone] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const historyRef = useRef<RandyModelMessage[]>([]);
+  const messagesRef = useRef<ChatMessage[]>([]);
+  const sessionRef = useRef<string>("");
+  const qualifyRef = useRef<Partial<Record<QualifyKey, string>>>({});
 
-  const resetThread = useCallback(() => {
-    setMessages([
-      {
-        id: "opener",
-        role: "randy",
-        text: SMART_OPENER,
-      },
-    ]);
-    setDiscoveryTurns(0);
-    setHandoffReady(false);
-    setCalUnlocked(false);
-    setInput("");
-    setTyping(false);
-    setMode("chat");
-    historyRef.current = [{ role: "assistant", content: SMART_OPENER }];
+  messagesRef.current = messages;
+  qualifyRef.current = qualify;
+
+  const sessionId = useCallback(() => {
+    if (!sessionRef.current) sessionRef.current = getSessionId();
+    return sessionRef.current;
   }, []);
+
+  const calUnlocked = qualified && callStepDone;
+
+  const setThread = useCallback((next: ChatMessage[]) => {
+    messagesRef.current = next;
+    setMessages(next);
+  }, []);
+
+  const pushMessages = useCallback(
+    (...items: ChatMessage[]) => {
+      setThread([...messagesRef.current, ...items]);
+    },
+    [setThread],
+  );
+
+  const logEvent = useCallback(
+    (type: RandyChatEventType, extra?: { contact?: { phone?: string; name?: string } }) =>
+      sendRandyEvent({
+        sessionId: sessionId(),
+        type,
+        messages: toHistory(messagesRef.current),
+        qualify: qualifyRef.current,
+        ...(extra?.contact ? { contact: extra.contact } : {}),
+      }),
+    [sessionId],
+  );
+
+  const startQualify = useCallback(() => {
+    setQualifyStep(0);
+    pushMessages({ id: newId(), role: "randy", text: QUALIFY_QUESTIONS[0]!.prompt });
+  }, [pushMessages]);
+
+  const ensureThread = useCallback(() => {
+    if (messagesRef.current.length === 0) {
+      setThread([{ id: "opener", role: "randy", text: SMART_OPENER }]);
+    }
+  }, [setThread]);
 
   const openWidget = useCallback(
     (detail?: OpenRandyChatDetail) => {
       setOpen(true);
       setTeaserVisible(false);
       setTeaserDone(true);
-      if (messages.length === 0) resetThread();
       setMode("chat");
-      if (detail?.reason === "book-a-call") {
-        // Book a call: keep Cal locked until discovery qualifies.
-        setCalUnlocked(false);
+      const isBookCall =
+        detail?.reason === "book-a-call" || detail?.reason === "voice-demo" || detail?.reason === "concierge";
+      if (isBookCall && !qualified && qualifyStep === null) {
+        // Book a call: qualifying questions first, never a cold calendar link.
+        if (messagesRef.current.length === 0) setThread([]);
+        startQualify();
+      } else {
+        ensureThread();
       }
     },
-    [messages.length, resetThread],
+    [ensureThread, qualified, qualifyStep, setThread, startQualify],
   );
 
   useEffect(() => {
@@ -184,6 +278,18 @@ export function RandyChat() {
     window.addEventListener(OPEN_RANDY_CHAT_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_RANDY_CHAT_EVENT, onOpen);
   }, [openWidget]);
+
+  // Deep link (?chat=book) used by server-rendered pages instead of a bare calendar link.
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("chat") === "book") openWidget({ reason: "book-a-call", mode: "chat" });
+      else if (params.get("chat") === "open") openWidget({ reason: "launcher", mode: "chat" });
+    } catch {
+      /* ignore */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Teaser bubble after ~4s (closed state only; once per page view).
   useEffect(() => {
@@ -206,7 +312,7 @@ export function RandyChat() {
     if (!open) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     endRef.current?.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
-  }, [messages, typing, open, mode]);
+  }, [messages, typing, open, mode, callbackOpen, callbackState]);
 
   useEffect(() => {
     if (open && mode === "chat") {
@@ -214,79 +320,147 @@ export function RandyChat() {
     }
   }, [open, mode]);
 
-  const unlockHandoff = useCallback((alsoCal: boolean) => {
-    setHandoffReady(true);
-    if (alsoCal) setCalUnlocked(true);
-  }, []);
+  // "Still thinking…" after 8s of typing.
+  useEffect(() => {
+    if (!typing) {
+      setSlow(false);
+      return;
+    }
+    const t = window.setTimeout(() => setSlow(true), 8000);
+    return () => window.clearTimeout(t);
+  }, [typing]);
 
-  const appendRandy = useCallback(
-    (text: string, opts?: { showHandoff?: boolean; showCal?: boolean }) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: newId(),
-          role: "randy",
-          text,
-          showHandoff: opts?.showHandoff,
-          showCal: opts?.showCal,
-        },
-      ]);
-      historyRef.current = [
-        ...historyRef.current,
-        { role: "assistant", content: text },
-      ];
-    },
-    [],
-  );
+  // Calendar appears only once qualified AND after the AI call / callback step.
+  useEffect(() => {
+    if (!calUnlocked || calShown) return;
+    setCalShown(true);
+    pushMessages({
+      id: newId(),
+      role: "randy",
+      text: "You're all set. If you'd also like a time with Randy himself, pick one on his calendar.",
+      showCal: true,
+    });
+    trackCta("cta_book_call");
+    void logEvent("cal_shown");
+  }, [calUnlocked, calShown, logEvent, pushMessages]);
 
-  const runReply = useCallback(
-    async (userText: string, chipId?: DiscoveryChipId) => {
-      const nextTurns = discoveryTurns + 1;
-      setDiscoveryTurns(nextTurns);
+  // Transcript: close beacon when the tab is hidden/closed mid-conversation.
+  useEffect(() => {
+    const onHide = () => {
+      if (messagesRef.current.some((m) => m.role === "user")) {
+        beaconRandyEvent({
+          sessionId: sessionId(),
+          type: "close",
+          messages: toHistory(messagesRef.current),
+          qualify: qualifyRef.current,
+        });
+      }
+    };
+    window.addEventListener("pagehide", onHide);
+    return () => window.removeEventListener("pagehide", onHide);
+  }, [sessionId]);
+
+  const closeWidget = () => {
+    setOpen(false);
+    if (messagesRef.current.some((m) => m.role === "user")) {
+      beaconRandyEvent({
+        sessionId: sessionId(),
+        type: "close",
+        messages: toHistory(messagesRef.current),
+        qualify: qualifyRef.current,
+      });
+    }
+  };
+
+  /** Ask Grok for the next reply using the current thread (already ends with the user turn). */
+  const fetchReply = useCallback(
+    async (chipId?: DiscoveryChipId) => {
+      const history = toHistory(messagesRef.current);
+      const lastUser = [...history].reverse().find((m) => m.role === "user")?.content ?? "";
+      const turns = history.filter((m) => m.role === "user").length;
       setTyping(true);
-
-      historyRef.current = [
-        ...historyRef.current,
-        { role: "user", content: userText },
-      ];
-
       try {
         const reply = await requestRandyReply({
-          messages: historyRef.current,
+          messages: history,
           mode: "chat",
-          chipId,
+          ...(chipId ? { chipId } : {}),
+          sessionId: sessionId(),
         });
-
-        const offer = shouldOfferLiveHandoff({
-          discoveryTurns: nextTurns,
-          lastUserText: userText,
-          chipId,
-        });
-        const showHandoff = Boolean(reply.offerHandoff || offer);
-        // Cal only after qualification (2–3 turns or clear fit / handoff from model).
-        // HARD: Cal only after ≥2 visitor turns, never on the first tap.
-        const showCal = showHandoff && nextTurns >= 2;
-
-        if (showHandoff) unlockHandoff(showCal);
-
-        appendRandy(reply.text, { showHandoff, showCal });
-      } catch {
-        appendRandy(
-          "Sorry, I couldn't get a reply just now. Tap Call for the live line, or send your message again.",
-          { showHandoff: true, showCal: false },
+        if (!reply.ok) {
+          pushMessages({
+            id: newId(),
+            role: "randy",
+            kind: "error",
+            text: failureCopy(reply.kind),
+            failure: reply.kind,
+          });
+          setHandoffReady(true);
+          return;
+        }
+        const showHandoff = Boolean(
+          reply.offerHandoff || shouldOfferLiveHandoff({ discoveryTurns: turns, lastUserText: lastUser, chipId }),
         );
-        unlockHandoff(false);
+        if (showHandoff) setHandoffReady(true);
+        if (turns >= 3) setQualified(true);
+        pushMessages({ id: newId(), role: "randy", text: reply.text, showHandoff });
       } finally {
         setTyping(false);
       }
     },
-    [appendRandy, discoveryTurns, mode, unlockHandoff],
+    [pushMessages, sessionId],
   );
 
+  const retry = async (errorId: string) => {
+    if (typing) return;
+    setThread(messagesRef.current.filter((m) => m.id !== errorId));
+    await fetchReply();
+  };
+
+  /** Local (non-model) Randy turn; synced to the transcript. */
+  const localReply = useCallback(
+    (text: string, opts?: { showHandoff?: boolean }) => {
+      pushMessages({ id: newId(), role: "randy", text, showHandoff: opts?.showHandoff });
+      if (opts?.showHandoff) setHandoffReady(true);
+      void logEvent("activity");
+    },
+    [logEvent, pushMessages],
+  );
+
+  const answerQualify = (text: string) => {
+    const step = qualifyStep ?? 0;
+    const key = QUALIFY_QUESTIONS[step]!.key;
+    const nextQualify = { ...qualifyRef.current, [key]: text };
+    qualifyRef.current = nextQualify;
+    setQualify(nextQualify);
+    pushMessages({ id: newId(), role: "user", text });
+    const next = step + 1;
+    if (next < QUALIFY_QUESTIONS.length) {
+      setQualifyStep(next);
+      localReply(QUALIFY_QUESTIONS[next]!.prompt);
+      return;
+    }
+    setQualifyStep(null);
+    setQualified(true);
+    if (callStepDone) {
+      localReply("Thanks, that's everything I need.");
+    } else {
+      pushMessages({ id: newId(), role: "randy", text: qualifyDoneMessage(nextQualify.company), showHandoff: true });
+      setHandoffReady(true);
+    }
+    void logEvent("qualified");
+  };
+
   const handleChip = async (chipId: DiscoveryChipId, label: string, message: string) => {
-    if (chipId === "talk_human") trackCta("cta_book_call");
-    setMessages((prev) => [...prev, { id: newId(), role: "user", text: label }]);
-    await runReply(message, chipId);
+    if (typing) return;
+    if (chipId === "talk_human") {
+      trackCta("cta_book_call");
+      pushMessages({ id: newId(), role: "user", text: label });
+      localReply(TALK_HUMAN_REPLY, { showHandoff: true });
+      return;
+    }
+    // Bubble shows the chip label; the model gets the fuller message.
+    pushMessages({ id: newId(), role: "user", text: message });
+    await fetchReply(chipId);
   };
 
   const submit = async (e?: React.FormEvent) => {
@@ -294,19 +468,83 @@ export function RandyChat() {
     const text = input.trim();
     if (!text || typing) return;
     setInput("");
-    setMessages((prev) => [...prev, { id: newId(), role: "user", text }]);
-    await runReply(text);
+    if (qualifyStep !== null) {
+      answerQualify(text);
+      return;
+    }
+    pushMessages({ id: newId(), role: "user", text });
+    await fetchReply();
+  };
+
+  const markCallStep = (type: "tel_click" | "callback_request", contact?: { phone?: string; name?: string }) => {
+    setCallStepDone(true);
+    setHandoffReady(true);
+    return logEvent(type, contact ? { contact } : undefined);
   };
 
   const onTelClick = () => {
     trackCta("cta_book_call");
-    unlockHandoff(false);
+    void markCallStep("tel_click");
+    if (!qualified && qualifyStep === null) {
+      window.setTimeout(() => {
+        pushMessages({
+          id: newId(),
+          role: "randy",
+          text: "Calling now. If you'd rather book time with Randy too, answer three quick questions here after the call.",
+        });
+      }, 400);
+    }
   };
 
-  const onCalClick = () => {
-    if (!calUnlocked) return;
+  const submitCallback = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const digits = callbackPhone.replace(/\D/g, "");
+    if (digits.length < PHONE_DIGITS_MIN || digits.length > 15) {
+      setCallbackState("error");
+      return;
+    }
+    setCallbackState("sending");
+    pushMessages({
+      id: newId(),
+      role: "user",
+      text: `Please call me back at ${callbackPhone.trim()}${callbackName.trim() ? ` (${callbackName.trim()})` : ""}.`,
+    });
+    if (qualified) {
+      // Ack first so it lands before the calendar message the call step unlocks.
+      pushMessages({ id: newId(), role: "randy", text: "Got it, thanks. Randy's team will call you back shortly." });
+    }
+    const ok = await markCallStep("callback_request", {
+      phone: callbackPhone.trim(),
+      ...(callbackName.trim() ? { name: callbackName.trim() } : {}),
+    });
+    if (!ok) {
+      setCallbackState("error");
+      pushMessages({
+        id: newId(),
+        role: "randy",
+        kind: "error",
+        text: "Sorry, I couldn't save your number just now. Try again, or call the live line.",
+      });
+      return;
+    }
+    setCallbackState("done");
+    setCallbackOpen(false);
     trackCta("cta_book_call");
+    if (!qualified) {
+      pushMessages({
+        id: newId(),
+        role: "randy",
+        text: "Got it, thanks. Randy's team will call you back shortly. While you wait, three quick questions so the call is useful.",
+      });
+      setQualifyStep(0);
+      pushMessages({ id: newId(), role: "randy", text: QUALIFY_QUESTIONS[0]!.prompt });
+    }
   };
+
+  const lastHandoffIndex = (() => {
+    for (let i = messages.length - 1; i >= 0; i -= 1) if (messages[i]!.showHandoff) return i;
+    return -1;
+  })();
 
   const headAvatar = (size: "lg" | "sm") => (
     <span
@@ -342,6 +580,84 @@ export function RandyChat() {
       <Phone className="size-3.5" aria-hidden />
       {label}
     </a>
+  );
+
+  const pillBase =
+    "inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2";
+
+  const handoffCard = (
+    <div className="mt-2 flex w-full flex-col gap-2" data-testid="randy-handoff">
+      <a
+        href={RANDY_TEL_HREF}
+        onClick={onTelClick}
+        className={`${pillBase} h-10 justify-center bg-accent text-accent-foreground shadow-sm`}
+        data-testid="randy-handoff-ai-call"
+      >
+        <Phone className="size-4" aria-hidden />
+        {AI_CALL_LABEL}
+      </a>
+      {callbackState === "done" ? (
+        <p className="text-[12px] text-slate-500">Callback requested. Randy&apos;s team will call you shortly.</p>
+      ) : callbackOpen ? (
+        <form
+          onSubmit={submitCallback}
+          className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-3"
+          data-testid="randy-callback-form"
+        >
+          <label className="text-[12px] font-medium text-slate-600" htmlFor="randy-callback-phone">
+            Your phone number
+          </label>
+          <input
+            id="randy-callback-phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            value={callbackPhone}
+            onChange={(e) => {
+              setCallbackPhone(e.target.value);
+              if (callbackState === "error") setCallbackState("idle");
+            }}
+            placeholder="(416) 555-0123"
+            maxLength={32}
+            className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[14px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
+            data-testid="randy-callback-phone"
+          />
+          <input
+            type="text"
+            autoComplete="name"
+            value={callbackName}
+            onChange={(e) => setCallbackName(e.target.value)}
+            placeholder="Your name (optional)"
+            maxLength={80}
+            aria-label="Your name (optional)"
+            className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[14px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
+          />
+          {callbackState === "error" && (
+            <p className="text-[12px] text-red-600" role="alert">
+              Please enter a full phone number, including area code.
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={callbackState === "sending"}
+            className={`${pillBase} h-10 justify-center bg-foreground text-background disabled:opacity-60`}
+            data-testid="randy-callback-submit"
+          >
+            {callbackState === "sending" ? "Sending…" : "Call me back"}
+          </button>
+        </form>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setCallbackOpen(true)}
+          className={`${pillBase} h-10 justify-center border border-slate-300 bg-white text-slate-800`}
+          data-testid="randy-handoff-callback"
+        >
+          <PhoneIncoming className="size-4" aria-hidden />
+          Request a callback
+        </button>
+      )}
+    </div>
   );
 
   return (
@@ -473,7 +789,7 @@ export function RandyChat() {
                   {callPill("Call", "randy-chip-call")}
                   <button
                     type="button"
-                    onClick={() => setOpen(false)}
+                    onClick={closeWidget}
                     className="flex size-9 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     aria-label="Close chat"
                     data-testid="button-close-randy-chat"
@@ -495,32 +811,52 @@ export function RandyChat() {
                             {(index === messages.length - 1 || messages[index + 1]?.role !== "randy") && headAvatar("sm")}
                           </span>
                           <div className="flex min-w-0 max-w-[85%] flex-col items-start">
-                            <p className="rounded-2xl rounded-bl-md bg-slate-100 px-4 py-2.5 text-[14px] leading-relaxed text-slate-800 break-words">
-                              {msg.text}
-                            </p>
-                            {msg.showHandoff && (
-                              <div className="mt-2 flex flex-wrap gap-2">
-                                {callPill(`Call ${RANDY_TEL_DISPLAY}`, "randy-handoff-call")}
-                                {msg.showCal || calUnlocked ? (
-                                  <a
-                                    href={BOOK_CALL_CAL_URL}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    onClick={onCalClick}
-                                    className="inline-flex h-9 items-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 text-[13px] font-semibold text-slate-800 hover:border-slate-400"
-                                    data-testid="randy-handoff-cal"
-                                  >
-                                    <Calendar className="size-3.5" aria-hidden />
-                                    Book a time
-                                  </a>
-                                ) : null}
+                            {msg.kind === "error" ? (
+                              <div
+                                className="w-full rounded-2xl rounded-bl-md border border-red-200 bg-red-50 px-4 py-3 text-[14px] leading-relaxed text-slate-800"
+                                role="alert"
+                                data-testid="randy-error"
+                              >
+                                <p>{msg.text}</p>
+                                <div className="mt-2.5 flex flex-wrap gap-2">
+                                  {msg.failure && (
+                                    <button
+                                      type="button"
+                                      onClick={() => void retry(msg.id)}
+                                      className={`${pillBase} border border-slate-300 bg-white text-slate-800`}
+                                      data-testid="randy-retry"
+                                    >
+                                      <RotateCw className="size-3.5" aria-hidden />
+                                      Retry
+                                    </button>
+                                  )}
+                                  {callPill("Call", "randy-error-call")}
+                                </div>
                               </div>
+                            ) : (
+                              <p className="whitespace-pre-line break-words rounded-2xl rounded-bl-md bg-slate-100 px-4 py-2.5 text-[14px] leading-relaxed text-slate-800">
+                                <RichText text={msg.text} allowCal={calUnlocked} />
+                              </p>
                             )}
+                            {msg.showCal && calUnlocked && (
+                              <a
+                                href={BOOK_CALL_CAL_URL}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={() => trackCta("cta_book_call")}
+                                className={`${pillBase} mt-2 border border-slate-300 bg-white text-slate-800`}
+                                data-testid="randy-handoff-cal"
+                              >
+                                <Calendar className="size-3.5" aria-hidden />
+                                Book a time with Randy
+                              </a>
+                            )}
+                            {msg.showHandoff && index === lastHandoffIndex && handoffCard}
                           </div>
                         </div>
                       ) : (
                         <div className="flex justify-end">
-                          <div className="max-w-[80%] rounded-2xl rounded-br-md bg-foreground px-4 py-2.5 text-[14px] leading-relaxed text-background break-words">
+                          <div className="max-w-[80%] break-words rounded-2xl rounded-br-md bg-foreground px-4 py-2.5 text-[14px] leading-relaxed text-background">
                             {msg.text}
                           </div>
                         </div>
@@ -529,7 +865,7 @@ export function RandyChat() {
                   ))}
 
                   {/* Suggestion chips on fresh opener (staggered) */}
-                  {messages.length === 1 && !typing && (
+                  {messages.length === 1 && messages[0]?.id === "opener" && !typing && (
                     <div className="flex flex-wrap gap-2 pl-8" data-testid="randy-suggestion-chips">
                       {SUGGESTION_CHIPS.map((chip, i) => (
                         <button
@@ -557,12 +893,51 @@ export function RandyChat() {
                             style={{ animationDelay: `${i * 150}ms` }}
                           />
                         ))}
+                        {slow && <span className="ml-2 text-[12px] text-slate-500">Still thinking…</span>}
                       </div>
                     </div>
                   )}
                   <div ref={endRef} className="h-1" />
                 </div>
               </div>
+
+              {/* Persistent next steps once handoff intent shows */}
+              {handoffReady && (
+                <div className="flex gap-2 px-4 pt-2 shrink-0" data-testid="randy-persistent-cta">
+                  <a href={RANDY_TEL_HREF} onClick={onTelClick} className={`${pillBase} flex-1 justify-center bg-accent text-accent-foreground`}>
+                    <Phone className="size-3.5" aria-hidden />
+                    AI call now
+                  </a>
+                  {calUnlocked ? (
+                    <a
+                      href={BOOK_CALL_CAL_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => trackCta("cta_book_call")}
+                      className={`${pillBase} flex-1 justify-center border border-slate-300 bg-white text-slate-800`}
+                    >
+                      <Calendar className="size-3.5" aria-hidden />
+                      Calendar
+                    </a>
+                  ) : callbackState === "done" ? (
+                    <span className="inline-flex flex-1 items-center justify-center text-[12px] text-slate-500">Callback requested</span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCallbackOpen(true);
+                        if (lastHandoffIndex < 0) {
+                          pushMessages({ id: newId(), role: "randy", text: "Leave your number and Randy's team will call you back.", showHandoff: true });
+                        }
+                      }}
+                      className={`${pillBase} flex-1 justify-center border border-slate-300 bg-white text-slate-800`}
+                    >
+                      <PhoneIncoming className="size-3.5" aria-hidden />
+                      Callback
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Composer */}
               <div className="px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-2 shrink-0">
@@ -573,7 +948,7 @@ export function RandyChat() {
                     value={input}
                     maxLength={1000}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Message Randy…"
+                    placeholder={qualifyStep !== null ? "Type your answer…" : "Message Randy…"}
                     aria-label="Message Randy"
                     className="h-9 min-w-0 flex-1 bg-transparent text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none"
                     data-testid="randy-chat-input"
@@ -589,7 +964,7 @@ export function RandyChat() {
                   </button>
                 </form>
                 <p className="mt-2 text-center text-[11px] text-slate-400">
-                  Prefer email?{" "}
+                  Chats are saved so Randy&apos;s team can follow up. Prefer email?{" "}
                   <a href={BOOK_CALL_MAILTO_HREF} className="underline hover:text-slate-600">
                     Email Randy
                   </a>

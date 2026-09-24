@@ -1,3 +1,4 @@
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:24 EDT. Edit sales-brain, not this file. -->
 # CROSS-PORTFOLIO — one Randy brain, one pack
 
 **HARD (Randy via Emma, 2026-09-24 ~2:26pm ET):**  
@@ -7,7 +8,7 @@ Birch Reserve voice genius is the **SOURCE** for Align, Scale, and other portfol
 
 | Role | Who |
 |------|-----|
-| Pack SoT + file ownership | **Birch Reserve** agent (`/workspace/birch-live-ops/voice-closer/knowledge/`) |
+| Pack SoT + file ownership | **Birch Reserve** agent (`/workspace/sales-brain/ (mirror: /workspace/birch-live-ops/voice-closer/knowledge/)`) |
 | Voice agent standup / phone provision | Emma (with Birch help once number + agent exist) |
 | Site CTA / private team demo URL on birchreserve.net | Birch Reserve (checkout stays **false** until Gordon) |
 | Scale then Align product consumers | Pull this pack after Birch callback is stable |
@@ -38,7 +39,7 @@ Listen first. Birch Hold/Reserve only for brand/display buyers. Providers → Sc
 
 ## Site chat “Randy” (HARD 2026-09-24 ~2:41pm ET)
 
-Randy GO: cartoon avatar chat AI on birchreserve.net (site chat + voice) as **portfolio point-guard** (Birch / Scale / Align / RDGDH). Engaging, smart questions.
+Randy GO: cartoon avatar chat AI on birchreserve.net (site chat + voice). To visitors he is **Randy from Birch Reserve**: he knows ads, and routes to Scale / Align / RDGDH only when the visitor raises it. Engaging, smart questions.
 
 - **Same knowledge pack** as the phone closer — chat **consumes** this folder; do **not** fork a chat-only talk-track.
 - Birch owns pack SoT; Replit scaffolds UI after PR #5 Publish; avatar image → Emma then onto site.
@@ -47,7 +48,7 @@ Randy GO: cartoon avatar chat AI on birchreserve.net (site chat + voice) as **po
 ## Book a call / Cal — HARD (2026-09-24 ~3:00pm ET)
 
 **No bare Cal link to Randy’s calendar.**  
-Chat Randy (site chat / voice) **pre-screens first** as a clinichubs-aware ad explainer / portfolio point-guard (Birch → Scale → Align → RDGDH). Engaging smart questions; same knowledge pack SoT.
+Chat Randy (site chat / voice) **qualifies first** as Randy from Birch Reserve, a clinichubs-aware ad explainer who routes to Scale / Align / RDGDH only when asked. Engaging smart questions; same knowledge pack SoT.
 
 - **Cal SoT (post-qualify only):** https://cal.com/randy-gilling/30min (Mon–Fri 1–3pm ET → SBG Growth)
 - Offer Cal **only after** screen: fit confirmed (brand/display vs provider rails vs Align MSP vs other), category/intent captured, and they still want a human.
