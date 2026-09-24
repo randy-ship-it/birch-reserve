@@ -7,7 +7,8 @@
  *
  * Failures are NEVER silent: network errors, timeouts (25s), 4xx and provider
  * 5xx return { ok: false } so the widget shows a friendly error with Retry +
- * the tel fallback. The canned stub is only used when the server says AI is
+ * the tel fallback. A fast transient failure (dropped connection, 5xx) is first
+ * retried once, quietly, with the same request (see randy-wire.ts). The canned stub is only used when the server says AI is
  * switched off / not configured (reason "disabled" | "missing_key"), e.g. local dev.
  *
  * Knowledge SoT: birch-live-ops/voice-closer/knowledge (vendored snapshot on api-server).
@@ -22,6 +23,7 @@ import {
   shouldOfferLiveHandoff,
   type DiscoveryChipId,
 } from "@/lib/randy-chat-knowledge";
+import { fitWireBudget, withQuietRetry } from "@/lib/randy-wire";
 
 export type RandyModelMessage = {
   role: "user" | "assistant";
@@ -75,16 +77,18 @@ function currentPagePath(): string | undefined {
 
 /** Shape the thread exactly as the server accepts it (no extra fields). */
 export function toWireMessages(messages: RandyModelMessage[]): RandyModelMessage[] {
-  return messages
-    .filter((m) => (m.role === "user" || m.role === "assistant") && m.content.trim())
-    .slice(-MAX_MESSAGES)
-    .map((m) => {
-      const content = m.content.trim();
-      return {
-        role: m.role,
-        content: content.length > MAX_CONTENT_CHARS ? `${content.slice(0, MAX_CONTENT_CHARS - 1)}…` : content,
-      };
-    });
+  return fitWireBudget(
+    messages
+      .filter((m) => (m.role === "user" || m.role === "assistant") && m.content.trim())
+      .slice(-MAX_MESSAGES)
+      .map((m) => {
+        const content = m.content.trim();
+        return {
+          role: m.role,
+          content: content.length > MAX_CONTENT_CHARS ? `${content.slice(0, MAX_CONTENT_CHARS - 1)}…` : content,
+        };
+      }),
+  );
 }
 
 void VOICE_CLOSER_KNOWLEDGE_SOT;
@@ -170,26 +174,20 @@ async function stubRandyReply(
 }
 
 type LiveResult =
-  | { ok: true; reply: RandyModelResponse }
+  | { ok: true; value: RandyModelResponse }
   | RandyReplyFailure
   | { ok: "stub" };
 
-async function fetchGrokReply(req: RandyModelRequest): Promise<LiveResult> {
+/** One POST. `payload` is built once so the quiet retry sends the exact same request. */
+async function fetchGrokReply(req: RandyModelRequest, payload: string): Promise<LiveResult> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  const pagePath = currentPagePath();
 
   try {
     const response = await fetch(RANDY_CHAT_API, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        messages: toWireMessages(req.messages),
-        mode: req.mode,
-        ...(req.chipId ? { chipId: req.chipId } : {}),
-        ...(req.sessionId ? { sessionId: req.sessionId } : {}),
-        ...(pagePath ? { pagePath } : {}),
-      }),
+      body: payload,
       signal: controller.signal,
     });
 
@@ -225,7 +223,7 @@ async function fetchGrokReply(req: RandyModelRequest): Promise<LiveResult> {
 
     return {
       ok: true,
-      reply: {
+      value: {
         text: data.text.trim(),
         source: "grok",
         ...(data.offerHandoff || stubOfferHandoff(req) ? { offerHandoff: true } : {}),
@@ -248,8 +246,20 @@ async function fetchGrokReply(req: RandyModelRequest): Promise<LiveResult> {
 export async function requestRandyReply(
   req: RandyModelRequest,
 ): Promise<({ ok: true } & RandyModelResponse) | RandyReplyFailure> {
-  const live = await fetchGrokReply(req);
-  if (live.ok === true) return { ok: true, ...live.reply };
+  const pagePath = currentPagePath();
+  const payload = JSON.stringify({
+    messages: toWireMessages(req.messages),
+    mode: req.mode,
+    ...(req.chipId ? { chipId: req.chipId } : {}),
+    ...(req.sessionId ? { sessionId: req.sessionId } : {}),
+    ...(pagePath ? { pagePath } : {}),
+  });
+  // Quiet retry lives here, below the UI: the widget pushes no bubble for it, so
+  // the visitor never sees a duplicate message or a flash of the error card.
+  const live = (await withQuietRetry(() => fetchGrokReply(req, payload), {
+    onRetry: (kind) => console.warn("[randy-chat] quiet retry after", kind),
+  })) as LiveResult;
+  if (live.ok === true) return { ok: true, ...live.value };
   if (live.ok === "stub") return { ok: true, ...(await stubRandyReply(req)) };
   return live;
 }

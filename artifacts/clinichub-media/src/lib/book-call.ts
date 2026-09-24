@@ -16,8 +16,11 @@ export const BOOK_CALL_LABEL = "Book a call" as const;
 export const OPEN_RANDY_CHAT_EVENT = "birch:open-randy-chat" as const;
 
 export type OpenRandyChatDetail = {
-  reason?: "book-a-call" | "launcher" | "concierge" | "voice-demo";
+  reason?: "book-a-call" | "launcher" | "concierge" | "voice-demo" | "reserve-intake";
   mode?: "chat" | "hear" | "call";
+  /** reserve-intake only: the seat the visitor tapped (checkout paused). */
+  sku?: "hold-190" | "reserve-490";
+  category?: string;
 };
 
 /** Primary Book a call / open-chat helper — never assigns location to Cal. */

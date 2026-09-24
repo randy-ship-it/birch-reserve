@@ -23,6 +23,7 @@ import {
 } from "@/lib/reserve-offers";
 import { trackCta, trackReserveDialogOpen, type CtaEvent } from "@/lib/track-cta";
 import { openRandyChat } from "@/lib/book-call";
+import { fetchCheckoutEnabled } from "@/lib/checkout-status";
 import { ShowcaseCarousel } from "@/components/showcase-carousel";
 import {
   PostCheckoutMockup,
@@ -148,10 +149,22 @@ export default function Home() {
     event?: CtaEvent,
   ) => {
     trackReserveDialogOpen(format, offer, event);
-    setSelectedFormat(format);
-    setSelectedOffer(offer);
-    setSplashDialogOpen(true);
+    // Checkout paused (runtime server flag): open Randy's callback intake with the
+    // seat + category preselected instead of a dead checkout. Re-enabled: normal dialog.
+    void fetchCheckoutEnabled().then((enabled) => {
+      if (!enabled) {
+        openRandyChat({ reason: "reserve-intake", sku: offer === "hold-190" ? "hold-190" : "reserve-490", category: format });
+        return;
+      }
+      setSelectedFormat(format);
+      setSelectedOffer(offer);
+      setSplashDialogOpen(true);
+    });
   };
+
+  useEffect(() => {
+    void fetchCheckoutEnabled();
+  }, []);
 
   const VOICE_TEL_HREF = RANDY_TEL_HREF;
   const VOICE_TEL_DISPLAY = RANDY_TEL_DISPLAY;
@@ -449,8 +462,14 @@ export default function Home() {
             <Button
               type="button"
               onClick={() => {
-                trackCta("buycalc_open", { offer: "reserve-490" });
-                window.location.href = "/buycalc?sku=reserve-490";
+                void fetchCheckoutEnabled().then((enabled) => {
+                  if (!enabled) {
+                    openReserveDialog(undefined, "reserve-490");
+                    return;
+                  }
+                  trackCta("buycalc_open", { offer: "reserve-490" });
+                  window.location.href = "/buycalc?sku=reserve-490";
+                });
               }}
               className="h-12 rounded-none bg-accent px-6 text-accent-foreground hover:bg-foreground hover:text-background"
             >

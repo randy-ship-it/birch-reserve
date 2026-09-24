@@ -903,6 +903,16 @@ router.get(
   },
 );
 
+/**
+ * Runtime checkout switch for the homepage CTAs (reads STRIPE_CHECKOUT_DISABLED and
+ * Stripe config; never changes them). While false, Lock the seat / Hold open the
+ * Randy chat callback intake instead of a dead checkout.
+ */
+router.get("/launch/checkout-status", (_req, res): void => {
+  res.set("cache-control", "no-store");
+  res.json({ checkoutEnabled: isReserveCheckoutConfigured() });
+});
+
 router.get("/launch/splash/status", async (req, res): Promise<void> => {
   const parsed = GetSplashAdReservationStatusQueryParams.safeParse(req.query);
   if (!parsed.success) {
