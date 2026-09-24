@@ -50,13 +50,40 @@ const XAI_BASE = "https://api.x.ai/v1";
 const DEFAULT_GROK_MODEL = "grok-3-mini";
 
 const VALID_ROLES = new Set<ChatRole>(["user", "assistant", "system"]);
+/** Birch Reserve site chips (HARD 2026-09-24 3:31pm ET: BR only, no portfolio menu). */
 const VALID_CHIPS = new Set([
-  "birch_seat",
-  "scale_providers",
-  "align_care",
-  "not_sure",
+  "how_seats",
+  "hold_190",
+  "live_hub",
   "talk_human",
 ]);
+
+const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal";
+
+/**
+ * Site scope for birchreserve.net. Layered on top of the shared voice-closer
+ * pack (same brain, different front door). The vendored knowledge files are
+ * untouched; this only scopes how Randy leads on this site.
+ */
+export const BIRCH_SITE_SCOPE_PROMPT = [
+  "SITE SCOPE (overrides any portfolio-routing or multi-brand opener in the pack): You are Randy on birchreserve.net and you represent Birch Reserve only.",
+  "Lead with Birch Reserve category seats inside the recovery hubs. Do not open with or offer a menu of brands (no \"Birch, Scale, Align, or something else\").",
+  "Use Scale Health, Align Wellness, or RDGDH knowledge only if the visitor raises it themselves (for example \"what are the hubs?\"); answer briefly and bring it back to the Birch seat. Never pitch the portfolio or other companies.",
+  "Public prices are Hold $190 (7-day look) and Reserve $490 (the seat) only. Never mention any other price or SKU. Online checkout is off: never invent checkout or payment links.",
+  "Never claim reach, impression, CTR, unique-visitor, or audience-size numbers, and never guarantee patient outcomes.",
+  `Live proof of a hub surface: ${LIVE_HUB_PROOF_URL} (physio.drhonow.com). Share it when the visitor asks to see a live hub.`,
+  "Human path: the live line is +1 (504) 504-6526. Only suggest booking a calendar call after a short pre-screen (category, what they want in the hubs, timing).",
+].join(" ");
+
+const CHIP_INTENT_NOTES: Record<string, string> = {
+  how_seats:
+    "Visitor tapped \"How seats work\": explain a Birch Reserve category seat inside the recovery hubs in plain words, then ask their category.",
+  hold_190:
+    "Visitor tapped \"Hold a category $190\": explain the $190 7-day hold vs $490 Reserve, note checkout is off, and ask which category to hold.",
+  live_hub: `Visitor tapped \"See a live hub\": share ${LIVE_HUB_PROOF_URL} as the live proof, then ask what category they would want there.`,
+  talk_human:
+    "Visitor tapped \"Talk to a human\": give the live line +1 (504) 504-6526 and ask one quick pre-screen question.",
+};
 
 const requestBuckets = new Map<
   string,
@@ -198,7 +225,7 @@ async function callGrok(
       ? "Caller selected Hear Randy: reply in concise spoken-friendly text. Do not claim live in-widget voice; Eve/Grok realtime voice is pending."
       : "Caller is in Chat Randy text mode.";
   const chipNote = body.chipId
-    ? `UI chip selected: ${body.chipId}.`
+    ? CHIP_INTENT_NOTES[body.chipId] ?? `UI chip selected: ${body.chipId}.`
     : "";
 
   const controller = new AbortController();
@@ -217,9 +244,10 @@ async function callGrok(
         temperature: 0.6,
         messages: [
           { role: "system", content: systemPrompt },
+          { role: "system", content: BIRCH_SITE_SCOPE_PROMPT },
           {
             role: "system",
-            content: `${modeNote} ${chipNote} Keep replies short (2–5 sentences). Never invent checkout URLs. Never hero $899.`.trim(),
+            content: `${modeNote} ${chipNote} Keep replies short (2–5 sentences). Never invent checkout URLs. Birch Reserve only unless the visitor raises another company.`.trim(),
           },
           ...body.messages.map((m) => ({
             role: m.role === "assistant" ? "assistant" : m.role === "system" ? "system" : "user",

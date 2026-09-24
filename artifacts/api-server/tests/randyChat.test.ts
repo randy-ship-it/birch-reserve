@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
 import express from "express";
-import randyChatRouter from "../src/routes/randyChat";
+import randyChatRouter, { BIRCH_SITE_SCOPE_PROMPT } from "../src/routes/randyChat";
 import {
   loadVoiceCloserSystemPrompt,
   resolveVoiceCloserKnowledgeDir,
@@ -101,4 +101,32 @@ test("randy-chat rejects unknown fields", async () => {
     }),
   });
   assert.equal(response.status, 400);
+});
+
+test("randy-chat site scope is Birch Reserve only", () => {
+  assert.match(BIRCH_SITE_SCOPE_PROMPT, /Birch Reserve only/);
+  assert.match(BIRCH_SITE_SCOPE_PROMPT, /Never pitch the portfolio/);
+  assert.match(BIRCH_SITE_SCOPE_PROMPT, /physio\.drhonow\.com/);
+  assert.doesNotMatch(BIRCH_SITE_SCOPE_PROMPT, /899|50\s*MM/i);
+});
+
+test("randy-chat accepts Birch chips and rejects old portfolio chips", async () => {
+  const ok = await fetch(`${baseUrl}/launch/randy-chat`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      messages: [{ role: "user", content: "How seats work" }],
+      chipId: "how_seats",
+    }),
+  });
+  assert.equal(ok.status, 503); // valid body; AI disabled in test
+  const bad = await fetch(`${baseUrl}/launch/randy-chat`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      messages: [{ role: "user", content: "Scale" }],
+      chipId: "scale_providers",
+    }),
+  });
+  assert.equal(bad.status, 400);
 });

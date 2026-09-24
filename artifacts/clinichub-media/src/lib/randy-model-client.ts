@@ -9,6 +9,8 @@
 
 import {
   CHECKOUT_LIVE,
+  LIVE_HUB_PROOF_DISPLAY,
+  LIVE_HUB_PROOF_URL,
   PUBLIC_SKU_KEYS,
   VOICE_CLOSER_KNOWLEDGE_SOT,
   shouldOfferLiveHandoff,
@@ -86,50 +88,43 @@ async function stubRandyReply(
 
   if (chip === "talk_human" || /\b(call|human|phone)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "Happy to connect you live. Tap Call for +1 (504) 504-6526. Calendar unlocks after this pre-screen.",
+      text: "Happy to connect you live. Tap Call for +1 (504) 504-6526. After a couple of quick questions here I can also open the calendar.",
       source: "stub",
       offerHandoff: true,
     };
   }
 
-  if (chip === "birch_seat") {
+  if (chip === "how_seats") {
     return {
-      text: "Birch Reserve is a category seat on signed Scale hubs — Hold $190 for a 7-day look, Reserve $490 for the seat + media credit. Checkout is off until Gordon stamps; I can take interest or get you on a call. What category are you thinking?",
+      text: "A Birch Reserve seat is one category spot on the screens inside partner recovery hubs, so your brand is the only one in that category there. Nothing runs until an insertion order names the surface. What category are you in?",
       source: "stub",
     };
   }
 
-  if (chip === "scale_providers") {
+  if (chip === "hold_190") {
     return {
-      text: "That’s a Scale Health door — rails, not leads. Providers list a surface; hubs are the free store. Want the providers path, clinichubs, or a quick call?",
+      text: "Hold $190 gives you a 7-day look at a category before you commit; Reserve $490 locks the seat. Online checkout is off right now, so I’ll take it from here with you. Which category do you want to hold?",
       source: "stub",
     };
   }
 
-  if (chip === "align_care") {
+  if (chip === "live_hub") {
     return {
-      text: "Align is the care / MSP fulfillment lane — separate from Birch display. I can route you, or we hop on a call if it’s custom.",
-      source: "stub",
-    };
-  }
-
-  if (chip === "not_sure") {
-    return {
-      text: "No problem. Are you a brand looking for hub placement, a clinic/provider, or exploring the portfolio?",
+      text: `Here’s a live hub: ${LIVE_HUB_PROOF_URL} (${LIVE_HUB_PROOF_DISPLAY}). That’s the kind of surface a seat shows up on. What category would you want in front of those patients?`,
       source: "stub",
     };
   }
 
   if (/\b(190|490|hold|reserve|seat|price|pricing|buy|checkout)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "Public SKUs are Hold $190 and Reserve $490 only — no $899 hero. Checkout stays off until Gordon. Prefer Call now, or keep chatting so I can unlock the calendar?",
+      text: "Two options: Hold $190 for a 7-day look, or Reserve $490 for the seat. Online checkout is off for now. Want to call, or keep going here so I can open the calendar?",
       source: "stub",
       offerHandoff: true,
     };
   }
 
   return {
-    text: "Got it. One more beat — brand/display seat, Scale providers/hubs, or Align care? Call is there when you’re ready; calendar after we qualify.",
+    text: "Got it. Which category are you thinking about for the recovery hubs? Call is there whenever you want it; the calendar opens after a quick pre-screen.",
     source: "stub",
     offerHandoff: stubOfferHandoff(req),
   };

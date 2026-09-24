@@ -47,25 +47,53 @@ export const RANDY_TEL_DISPLAY = "+1 (504) 504-6526" as const;
 
 export type RandyChatMode = "chat" | "hear" | "call";
 
+/**
+ * HARD Randy 2026-09-24 3:31pm ET: birchreserve.net = BIRCH RESERVE ONLY.
+ * Greeting + chips are Birch only. Scale / Align / RDGDH knowledge is used
+ * only when the visitor raises it mid-dialogue — never a portfolio menu here.
+ */
 export type DiscoveryChipId =
-  | "birch_seat"
-  | "scale_providers"
-  | "align_care"
-  | "not_sure"
+  | "how_seats"
+  | "hold_190"
+  | "live_hub"
   | "talk_human";
 
+/** Live proof of a recovery hub surface (public). */
+export const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal" as const;
+export const LIVE_HUB_PROOF_DISPLAY = "physio.drhonow.com" as const;
+
 export const SMART_OPENER =
-  "Hey — Randy here. Birch, Scale, Align, or something else in the portfolio? Tell me what you were looking at and I’ll point you." as const;
+  "Hey, I’m Randy. Want to see how a seat inside the recovery hubs works?" as const;
+
+/** Teaser bubble shown beside the full-body figure (closed state). */
+export const TEASER_TEXT = "Got a category in mind? Ask me." as const;
 
 export const SUGGESTION_CHIPS: ReadonlyArray<{
   id: DiscoveryChipId;
   label: string;
+  /** What is sent to the model as the visitor turn (label stays in the bubble). */
+  message: string;
 }> = [
-  { id: "birch_seat", label: "Birch Reserve seat" },
-  { id: "scale_providers", label: "Scale providers / hubs" },
-  { id: "align_care", label: "Align care network" },
-  { id: "not_sure", label: "Not sure yet" },
-  { id: "talk_human", label: "Talk to a human" },
+  {
+    id: "how_seats",
+    label: "How seats work",
+    message: "How does a Birch Reserve category seat inside the recovery hubs work?",
+  },
+  {
+    id: "hold_190",
+    label: "Hold a category $190",
+    message: "I want to hold a category for $190. How does the hold work?",
+  },
+  {
+    id: "live_hub",
+    label: "See a live hub",
+    message: `Can I see a live hub? (live proof: ${LIVE_HUB_PROOF_DISPLAY})`,
+  },
+  {
+    id: "talk_human",
+    label: "Talk to a human",
+    message: "I’d like to talk to a human.",
+  },
 ] as const;
 
 const BUY_INTENT =
