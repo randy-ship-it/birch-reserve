@@ -1,3 +1,4 @@
+import { seedPublicInsights } from "@workspace/db";
 import app from "./app";
 import { logger } from "./lib/logger";
 import { startSplashReservationCleanup } from "./lib/splashReservationLifecycle";
@@ -23,6 +24,13 @@ app.listen(port, (err?: Error) => {
   }
 
   logger.info({ port }, "Server listening");
+  void seedPublicInsights()
+    .then((result) => {
+      logger.info(result, "Public insights seed finished");
+    })
+    .catch((error) => {
+      logger.error({ err: error }, "Public insights seed failed");
+    });
   startSplashReservationCleanup((error) => {
     logger.error({ err: error }, "Splash reservation cleanup failed");
   });

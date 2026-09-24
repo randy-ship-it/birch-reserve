@@ -7,6 +7,7 @@
     "hello": "tsx ./src/hello.ts",
     "sales-access": "tsx ./src/manage-sales-access.ts",
     "editorial-runner": "tsx ./src/editorial-runner.ts",
+    "seed-public-insights": "tsx ./src/seed-public-insights.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
