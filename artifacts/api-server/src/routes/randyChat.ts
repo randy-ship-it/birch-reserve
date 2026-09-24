@@ -181,22 +181,23 @@ function isRateLimited(key: string, max = RATE_LIMIT_MAX): boolean {
 type ParseOk<T> = { ok: true; body: T };
 type ParseErr = { ok: false; error: string };
 
-const WHO_ASK = /\b(who (are|r) (you|u)|who is this|who am i (talking|speaking)|your name|are you (a |an )?(ai|bot|human|real))\b/i;
+const WHO_ASK =
+  /\b(who (are|r) (you|u)|who('s| is) this|who am i (talking|speaking|chatting)( to| with)?|what('s| is) your name|your name|introduce yourself|are (you|u) (a |an )?(ai|bot|robot|human|real|person)|is this (a |an )?(bot|ai|robot|real person|human))\b/i;
 const LINK_ASK = /\b(link|url|website|site|page|send( me)?|where can i|show me|see (it|a|the|an)|kit|portal|calendar|book)\b/i;
 const REINTRO = /^\s*(hi|hey|hello)?[,!.\s]*i'?\s*a?m randy(?: gilling)?(?: from birch reserve)?[.!,:;]?\s*/i;
 
 /**
- * Safety net on every Grok reply: no em/en dashes, and no re-introduction once
- * Randy (or the widget opener) has already spoken, unless the visitor asked who he is.
+ * Safety net on every Grok reply: no em/en dashes, and never a leading
+ * "I'm Randy from Birch Reserve." intro unless the visitor's last message asks
+ * who he is or whether he's a bot (5:18pm rule; the widget opener already says hi).
  */
 export function polishReply(text: string, history: ReadonlyArray<{ role: string; content: string }>): string {
   let out = text
     .replace(/\s+[\u2014\u2013]\s+/g, ", ")
     .replace(/[\u2014\u2013](?=\s*$)/gm, ".")
     .replace(/[\u2014\u2013]/g, ", ");
-  const hasSpoken = history.some((m) => m.role === "assistant");
   const lastUser = [...history].reverse().find((m) => m.role === "user")?.content ?? "";
-  if (hasSpoken && !WHO_ASK.test(lastUser)) {
+  if (!WHO_ASK.test(lastUser)) {
     const stripped = out.replace(REINTRO, "");
     if (stripped.trim()) out = stripped.charAt(0).toUpperCase() + stripped.slice(1);
   }
