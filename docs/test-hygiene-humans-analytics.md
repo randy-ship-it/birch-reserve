@@ -35,3 +35,16 @@ Without a valid header the route is a 404.
 ## Phone
 tel: links can't be gated. If spam calls show up, filter at the Twilio number (spam/robocall
 screening or a Studio "press 1" pre-screen).
+
+## Reply-To and mail test (Randy 7:27pm)
+- `BIRCH_REPLY_TO` (default `sales@silverbirchgrowth.com`): Reply-To on every buyer-facing email the
+  site sends (`sendBuyerEmail` in lib/siteMail.ts). Today the site sends no buyer email itself:
+  Stripe sends checkout receipts (set the Stripe account's support email / customer-email reply
+  address to sales@ in the Stripe dashboard), the media kit is delivered in-page, and intake
+  confirmations are on-screen. Internal notifications still go TO randy@ + jon@ (Reply-To = visitor).
+- `POST /api/ops/mail-test` with header `X-Birch-QA: $BIRCH_QA_SECRET` sends one fixed email to
+  sales@silverbirchgrowth.com (subject "Birch site test — sales@ routing", Reply-To sales@) and
+  returns `{accepted, id, sentAt}`. 3 per hour. 401 without the header, 503 if RESEND_API_KEY is unset.
+```
+curl -sS -X POST https://birchreserve.net/api/ops/mail-test -H "X-Birch-QA: $BIRCH_QA_SECRET"
+```

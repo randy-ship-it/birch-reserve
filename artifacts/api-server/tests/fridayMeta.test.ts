@@ -18,6 +18,9 @@ import {
 import { recordPaidCheckoutSafe, setCheckoutLeadDepsForTests, type CheckoutReservation } from "../src/lib/checkoutLead";
 import { chatLeadInput } from "../src/lib/leadCapture";
 import qaFridayRouter from "../src/routes/qaFriday";
+import opsMailTestRouter, { MAIL_TEST_SUBJECT, MAIL_TEST_TO } from "../src/routes/opsMailTest";
+import { DEFAULT_BIRCH_REPLY_TO, birchReplyTo, sendBuyerEmail, setSiteMailFetchForTests, type ResendFetch } from "../src/lib/siteMail";
+import { resendMailer } from "../src/lib/randyChatTranscripts";
 import { resetRateLimitsForTests } from "../src/lib/rateLimit";
 
 const QA_SECRET = "qa-secret-for-friday-tests-5e2f";
@@ -50,6 +53,7 @@ before(async () => {
   const app = express();
   app.use(express.json());
   app.use("/api", qaFridayRouter);
+  app.use("/api", opsMailTestRouter);
   const server = app.listen(0);
   await new Promise<void>((r) => server.once("listening", r));
   const a = server.address();
@@ -60,6 +64,7 @@ before(async () => {
 
 after(async () => {
   setCheckoutLeadDepsForTests(null);
+  setSiteMailFetchForTests(null);
   await closeServer?.();
 });
 
@@ -226,4 +231,72 @@ test("QA Friday test lead: 404 without the X-Birch-QA secret; with it, one is_te
   assert.ok((sent["tags"] as string[]).includes("birch:qa-test"));
   assert.ok((sent["tags"] as string[]).includes("birch:reserve-490"));
   assert.doesNotMatch(JSON.stringify(body), /friday-key-test/);
+});
+
+/* ---------------- Reply-To + ops mail test (Randy 7:27pm) ---------------- */
+
+const resendCalls: Array<Record<string, unknown>> = [];
+const mockResend: ResendFetch = async (_url, init) => {
+  resendCalls.push(JSON.parse(init.body) as Record<string, unknown>);
+  return { ok: true, status: 200, text: async () => JSON.stringify({ id: `re_${resendCalls.length}` }) };
+};
+
+function mailSetup() {
+  resendCalls.length = 0;
+  setSiteMailFetchForTests(mockResend);
+  process.env["RESEND_API_KEY"] = "re_test_key_not_real";
+  delete process.env["BIRCH_REPLY_TO"];
+  delete process.env["RANDY_CHAT_TO"];
+}
+
+test("BIRCH_REPLY_TO: defaults to sales@, env-overridable, invalid values fall back", () => {
+  assert.equal(DEFAULT_BIRCH_REPLY_TO, "sales@silverbirchgrowth.com");
+  assert.equal(birchReplyTo({}), "sales@silverbirchgrowth.com");
+  assert.equal(birchReplyTo({ BIRCH_REPLY_TO: "team@silverbirchgrowth.com" }), "team@silverbirchgrowth.com");
+  assert.equal(birchReplyTo({ BIRCH_REPLY_TO: "not an email" }), "sales@silverbirchgrowth.com");
+});
+
+test("buyer email always carries Reply-To sales@; internal notifications still go TO randy@ + jon@ with visitor Reply-To", async () => {
+  mailSetup();
+  await sendBuyerEmail({ from: "Birch Reserve <care@scalehealth.ca>", to: ["buyer@brand.example"], subject: "s", text: "t" });
+  assert.equal(resendCalls[0]!["reply_to"], "sales@silverbirchgrowth.com");
+  await resendMailer({ subject: "lead", text: "x", html: "<p>x</p>", replyTo: "visitor@brand.example" });
+  assert.deepEqual(resendCalls[1]!["to"], ["randy@silverbirchgrowth.com", "jon@silverbirchgrowth.com"]);
+  assert.equal(resendCalls[1]!["reply_to"], "visitor@brand.example");
+});
+
+test("POST /api/ops/mail-test: secret required, fixed sales@ recipient + subject, Reply-To sales@, 3 per hour", async () => {
+  mailSetup();
+  const call = (headers: Record<string, string>, body: unknown = {}) =>
+    fetch(`${baseUrl}/ops/mail-test`, { method: "POST", headers: { "content-type": "application/json", ...headers }, body: JSON.stringify(body) });
+  assert.equal((await call({})).status, 401);
+  assert.equal((await call({ "x-birch-qa": "wrong" })).status, 401);
+  assert.equal(resendCalls.length, 0);
+
+  const ok = await call({ "x-birch-qa": QA_SECRET }, { to: "attacker@evil.example", subject: "hijack" });
+  assert.equal(ok.status, 200);
+  const body = (await ok.json()) as { accepted: boolean; id: string; sentAt: string };
+  assert.equal(body.accepted, true);
+  assert.equal(body.id, "re_1");
+  assert.ok(!Number.isNaN(Date.parse(body.sentAt)));
+  assert.deepEqual(resendCalls[0]!["to"], [MAIL_TEST_TO]);
+  assert.equal(MAIL_TEST_TO, "sales@silverbirchgrowth.com");
+  assert.equal(resendCalls[0]!["subject"], MAIL_TEST_SUBJECT);
+  assert.equal(MAIL_TEST_SUBJECT, "Birch site test — sales@ routing");
+  assert.equal(resendCalls[0]!["reply_to"], "sales@silverbirchgrowth.com");
+  assert.doesNotMatch(JSON.stringify(resendCalls[0]), /attacker|hijack/);
+
+  assert.equal((await call({ "x-birch-qa": QA_SECRET })).status, 200);
+  assert.equal((await call({ "x-birch-qa": QA_SECRET })).status, 200);
+  const limited = await call({ "x-birch-qa": QA_SECRET });
+  assert.equal(limited.status, 429);
+  assert.equal(resendCalls.length, 3);
+});
+
+test("POST /api/ops/mail-test without a mail key → 503, nothing sent", async () => {
+  mailSetup();
+  delete process.env["RESEND_API_KEY"];
+  const res = await fetch(`${baseUrl}/ops/mail-test`, { method: "POST", headers: { "x-birch-qa": QA_SECRET } });
+  assert.equal(res.status, 503);
+  assert.equal(resendCalls.length, 0);
 });

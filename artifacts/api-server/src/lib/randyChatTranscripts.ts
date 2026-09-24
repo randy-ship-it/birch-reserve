@@ -16,6 +16,7 @@
  *   a 60s unref'd interval. Claims are atomic (sending_at + SKIP LOCKED), and
  *   sent_message_count makes sends idempotent across instances and restarts.
  */
+import { resendSend } from "./siteMail";
 import { logger } from "./logger";
 import { isTestIdentity } from "./testTraffic";
 import { applyAdditiveColumns } from "./schemaEnsure";
@@ -623,31 +624,15 @@ export function resendConfigured(): boolean {
 }
 
 export const resendMailer: TranscriptMailer = async (email) => {
-  const key = process.env[RESEND_API_KEY_ENV]?.trim();
-  if (!key) throw new Error("resend_not_configured");
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
-  try {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
-      body: JSON.stringify({
-        from: transcriptFrom(),
-        to: transcriptRecipients(),
-        subject: email.subject,
-        text: email.text,
-        html: email.html,
-        ...(email.replyTo ? { reply_to: email.replyTo } : {}),
-      }),
-      signal: controller.signal,
-    });
-    if (!response.ok) {
-      const detail = (await response.text().catch(() => "")).replace(/\s+/g, " ").slice(0, 160);
-      throw new Error(`Resend HTTP ${response.status}${detail ? `: ${detail}` : ""}`);
-    }
-  } finally {
-    clearTimeout(timeout);
-  }
+  // Internal notification: TO randy@ + jon@, Reply-To = the visitor (unchanged).
+  await resendSend({
+    from: transcriptFrom(),
+    to: transcriptRecipients(),
+    subject: email.subject,
+    text: email.text,
+    html: email.html,
+    ...(email.replyTo ? { replyTo: email.replyTo } : {}),
+  });
 };
 
 /* ------------------------------------------------------------------ */

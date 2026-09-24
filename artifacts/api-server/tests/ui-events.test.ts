@@ -261,7 +261,7 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.match(home, /cta_hero_reserve/);
   assert.match(home, /buycalc_open/);
   assert.match(home, /cta_book_call/);
-  assert.match(home, /cta_custom_onprem/);
+  // cta_custom_onprem CTA was removed from home in #25 (Book a call CTAs dropped).
   assert.match(concierge, /cta_book_call/);
   assert.match(layout, /nav_insights/);
   assert.match(editorial, /const PUBLIC_SITE_ORIGIN = "https:\/\/birchreserve\.net"/);

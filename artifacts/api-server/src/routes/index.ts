@@ -10,6 +10,7 @@ import editorialRouter from "./editorial";
 import voiceCallEndedRouter from "./voiceCallEnded";
 import humanGateRouter from "./humanGate";
 import qaFridayRouter from "./qaFriday";
+import opsMailTestRouter from "./opsMailTest";
 
 const router: IRouter = Router();
 
@@ -24,5 +25,6 @@ router.use(editorialRouter);
 router.use(voiceCallEndedRouter);
 router.use(humanGateRouter);
 router.use(qaFridayRouter);
+router.use(opsMailTestRouter);
 
 export default router;
