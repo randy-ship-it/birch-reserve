@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Phone } from "lucide-react";
 import { trackCta } from "@/lib/track-cta";
-import { BOOK_CALL_HREF } from "@/lib/book-call";
+import { openRandyChat } from "@/lib/book-call";
 
 const PAGE_TITLE = "Birch Reserve · Randy voice closer (team demo)";
 const TEL_HREF = "tel:+15045046526";
@@ -107,16 +107,20 @@ export default function VoiceDemo() {
 
       <div className="mt-12 border-t border-border pt-8">
         <p className="text-muted-foreground">
-          Prefer email instead of the voice line?
+          Prefer a chat pre-screen (Cal unlocks after qualify) instead of the voice line?
         </p>
-        <a
-          href={BOOK_CALL_HREF}
-          onClick={() => trackCta("cta_book_call")}
+        <button
+          type="button"
+          onClick={() => {
+            trackCta("cta_book_call");
+            // Pre-screen in Randy chat — Cal only after qualification in-thread.
+            openRandyChat({ reason: "voice-demo", mode: "chat" });
+          }}
           className="mt-3 inline-block border border-border px-4 py-2 text-xs font-medium uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent"
           data-testid="voice-demo-book-call"
         >
           Book a call
-        </a>
+        </button>
       </div>
     </article>
   );
