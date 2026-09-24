@@ -167,7 +167,7 @@ export default function Kit() {
       </p>
       <p className="mt-4">
         Seller: Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 ·{" "}
-        <a className="underline" href="mailto:sales@silverbirchgrowth.com">Email sales</a>
+        <a className="underline" href="mailto:randy@silverbirchgrowth.com">Email Randy</a>
       </p>
       <p className="mt-4 text-xs uppercase tracking-widest text-muted-foreground">
         Terms are draft until counsel stamps

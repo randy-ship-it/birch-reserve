@@ -1080,7 +1080,7 @@ export function RandyChat() {
                 <p className="mt-2 text-center text-[11px] text-slate-400">
                   Chats are saved so Randy&apos;s team can follow up. Prefer email?{" "}
                   <a href={BOOK_CALL_MAILTO_HREF} className="underline hover:text-slate-600">
-                    Email sales
+                    Email Randy
                   </a>
                 </p>
               </div>
