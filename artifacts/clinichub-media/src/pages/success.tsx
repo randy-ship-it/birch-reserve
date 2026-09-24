@@ -127,6 +127,13 @@ export default function Success() {
             >
               View insertion order JSON
             </a>
+            <a
+              className="mt-4 block text-sm font-medium text-foreground underline underline-offset-4 hover:text-accent"
+              href="/kit"
+              data-testid="link-success-media-kit"
+            >
+              See the media kit
+            </a>
           </div>
         </div>
       </div>
@@ -192,7 +199,14 @@ export default function Success() {
           </div>
         </div>
 
-        <div className="mt-12 text-center">
+        <div className="mt-12 flex flex-col items-center gap-4 text-center">
+          <a
+            href="/kit"
+            className="text-sm font-medium text-foreground underline underline-offset-4 hover:text-accent"
+            data-testid="link-success-media-kit"
+          >
+            See the media kit
+          </a>
           <Link href="/">
             <Button variant="outline" className="rounded-none border-border text-foreground hover:bg-secondary px-8 h-12">
               Return to Hub

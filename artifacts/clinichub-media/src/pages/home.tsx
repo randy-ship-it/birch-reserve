@@ -24,7 +24,7 @@ import {
 import { trackCta, trackReserveDialogOpen, type CtaEvent } from "@/lib/track-cta";
 import { openRandyChat } from "@/lib/book-call";
 import { fetchCheckoutEnabled } from "@/lib/checkout-status";
-import { ShowcaseCarousel } from "@/components/showcase-carousel";
+import { ExampleHubsGallery } from "@/components/example-hubs-gallery";
 import {
   PostCheckoutMockup,
   ProtocolMockup,
@@ -297,15 +297,25 @@ export default function Home() {
                 Call {VOICE_TEL_DISPLAY}
               </a>
               <span className="text-background/50"> · </span>
-              Live hub: <a className="underline" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">physio.drhonow.com/dr-ho/portal</a>
+              <a className="underline underline-offset-4" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" data-testid="link-hero-live-hub">See a live hub</a>
             </p>
-            <button
-              type="button"
-              className="mt-3 w-max text-left text-sm text-background/80 underline underline-offset-4"
-              onClick={() => openReserveDialog(undefined, "hold-190")}
-            >
-              Hold a category for 7 days — $190
-            </button>
+            <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+              <button
+                type="button"
+                className="w-max text-left text-sm text-background/80 underline underline-offset-4"
+                onClick={() => openReserveDialog(undefined, "hold-190")}
+              >
+                Hold a category for 7 days — $190
+              </button>
+              <a
+                href="/kit"
+                className="group inline-flex items-center gap-1.5 rounded-full border border-background/25 px-3.5 py-1.5 text-sm text-background/85 transition-colors hover:border-accent hover:text-accent"
+                data-testid="link-hero-media-kit"
+              >
+                See the media kit
+                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
+              </a>
+            </div>
             <p className="mt-4 max-w-xl text-sm text-background/70">
               Eight seats = eight advertiser categories across hubs, not eight websites.
             </p>
@@ -708,7 +718,7 @@ export default function Home() {
           <div className="mb-8 grid border border-border bg-secondary/10 md:grid-cols-3">
             <div className="p-5 md:border-r md:border-border">
               <p className="text-[10px] font-bold uppercase tracking-widest text-accent">Live</p>
-              <p className="mt-2 text-sm font-medium">DR-HO'S · physio.drhonow.com/dr-ho/portal</p>
+              <p className="mt-2 text-sm font-medium">DR-HO'S ·{" "}<a className="underline underline-offset-4 hover:text-accent" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">Tour the DR-HO hub</a></p>
             </div>
             <div className="border-t border-border p-5 md:border-r md:border-t-0">
               <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/60">Signed</p>
@@ -772,6 +782,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Example hubs gallery — live co-branded hubs (examples, not advertisers) */}
+      <ExampleHubsGallery />
 
       {/* Inventory Previews */}
       <section id="placements" className="py-20 md:py-28 border-b border-border bg-background relative">

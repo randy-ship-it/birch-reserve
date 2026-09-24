@@ -34,7 +34,7 @@ export default function Privacy() {
           The Stripe descriptor should read SCALE HEALTH*BIRCH or BIRCH RESERVE.
           Contact{" "}
           <a className="text-foreground underline" href="mailto:randy@silverbirchgrowth.com">
-            randy@silverbirchgrowth.com
+            Email Randy
           </a>{" "}
           to ask for a copy of reservation details or to correct a brand name
           or email on an unpaid hold.

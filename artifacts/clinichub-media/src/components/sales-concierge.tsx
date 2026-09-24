@@ -308,7 +308,7 @@ export function SalesConcierge({
           text: "That is a Scale Health Clinic Hubs conversation, rather than an ad purchase.",
           options: [
             {
-              label: "Open https://scalehealth.ca/clinichubs",
+              label: "Open Scale Health clinic hubs",
               href: SCALE_HEALTH_URLS.clinicHubs,
               primary: true,
             },
@@ -320,7 +320,7 @@ export function SalesConcierge({
           text: "Providers listing a surface can opt in free. That is not a charge, and it is not the Scale Health $49 ICA.",
           options: [
             {
-              label: "Open https://scalehealth.ca/providers",
+              label: "Open Scale Health for providers",
               href: SCALE_HEALTH_URLS.providers,
               primary: true,
             },
@@ -332,7 +332,7 @@ export function SalesConcierge({
           text: "If you are already in Clinic Hubs and can receive bookings, Performance is the advertising path here.",
           options: [
             { label: "Explore Performance", action: () => handlePathSelection("performance"), primary: true },
-            { label: "Open https://scalehealth.ca/providers", href: SCALE_HEALTH_URLS.providers },
+            { label: "Open Scale Health for providers", href: SCALE_HEALTH_URLS.providers },
           ],
         };
       case "pricing_or_availability":
