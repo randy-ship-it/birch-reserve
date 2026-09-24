@@ -5,7 +5,7 @@ export default function Terms() {
   return (
     <article className="container mx-auto max-w-3xl px-6 py-16 md:py-24">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-        DRAFT — Gordon stamps before the first real card
+        DRAFT — counsel stamps before the first real card
       </p>
       <h1 className="mt-4 font-display text-4xl tracking-tight md:text-6xl">
         Terms of sale
@@ -14,25 +14,31 @@ export default function Terms() {
       <div className="mt-10 space-y-6 text-base leading-relaxed text-muted-foreground">
         <p>
           Birch Reserve is operated by Silver Birch Growth Inc. These terms are
-          a draft for the $899 USD Access Reserve (<span className="text-foreground">reserve-899</span>).
-          They are not in force for a live card until Gordon stamps this draft.
+          a draft. They are not in force for a live card until counsel stamps
+          this page. Public prices are $190 USD (
+          <span className="text-foreground">hold-190</span>, a 7-day category
+          look that does not consume an 8-seat) and $490 USD (
+          <span className="text-foreground">reserve-490</span>, a named category
+          seat). $899 (<span className="text-foreground">reserve-899</span>) is
+          a legacy SKU only, kept so existing Stripe Checkout sessions still
+          match. It is not a public offer.
         </p>
         <p>
-          The $899 payment is a media credit and a category hold in the shared
-          reserve pool. It is not a live flight, not an impression guarantee,
-          and not delivery of media. Nothing runs until a final insertion order
-          names the surface.
+          hold-190 is a 100% credit if the buyer takes a seat within 7 days.
+          Otherwise it is a cash refund. It does not consume an 8-seat.
+          reserve-490 is 100% media credit. Credit expires 12 months after
+          payment. A cash refund is available if no approved surface is named
+          within 60 days of payment.
         </p>
         <p>
-          A cash refund is available only if no approved surface is named
-          within 60 days of payment. Otherwise the amount stays as media
-          credit. Unused credit expires 12 months after payment.
+          Payment is a reservation credit, not a live flight and not an
+          impression guarantee. Nothing runs until an insertion order names the
+          surface. After that order, cancellation and makegood follow IAB. The
+          public sample is <Link href="/sample-io" className="text-foreground underline">/sample-io</Link>.
         </p>
         <p>
-          After an insertion order is in place, cancellation and makegood
-          follow IAB. The sample insertion order in the repository
-          (<span className="text-foreground">docs/legal/DRAFT-access-reserve-899-insertion-order.md</span>)
-          is the working draft of that document.
+          Eight seats means eight advertiser categories across hubs, not eight
+          websites. Reporting is aggregate only. No PHI. No clinical pixels.
         </p>
         <p>
           Checkout is Stripe-hosted. Silver Birch Growth Inc. does not store
@@ -47,6 +53,9 @@ export default function Terms() {
         <Link href="/privacy" className="underline">
           Privacy
         </Link>
+      </p>
+      <p className="mt-8 text-xs uppercase tracking-widest text-muted-foreground">
+        Draft until counsel stamps.
       </p>
     </article>
   );

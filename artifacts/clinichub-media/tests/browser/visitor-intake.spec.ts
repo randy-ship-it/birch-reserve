@@ -95,9 +95,9 @@ async function capturePublicRequests(page: Page): Promise<NetworkCapture> {
           reservationId: "7e67ef03-0c6a-4a66-a01c-8ebf89f7bfc7",
           status: "held_pending_payments",
           checkoutUrl: null,
-          amountCents: reserveBody.expectedAmountCents ?? 89900,
+          amountCents: reserveBody.expectedAmountCents ?? 49000,
           currency: "usd",
-          offer: reserveBody.offer ?? "reserve-899",
+          offer: reserveBody.offer ?? "reserve-490",
         }),
       });
       return;
@@ -173,26 +173,23 @@ test("public offer leads with the three-tier USD ladder", async ({ page }) => {
   await expect(
     page
       .getByRole("button", {
-        name: "Reserve first access - $899 USD",
+        name: "Lock the seat — $490 USD",
         exact: true,
       })
       .first(),
   ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "See the customer", exact: true }),
-  ).toBeVisible();
   await expect(page.locator("body")).toContainText(
-    "Reserve first rights to book inventory.",
+    "Eight category seats. One brand per aisle.",
   );
   await expect(page.locator("body")).toContainText("Digital inventory");
-  await expect(page.locator("body")).toContainText("Physical inventory");
-  await expect(page.locator("body")).toContainText("Direct reserve");
-  await expect(page.locator("body")).toContainText("Managed distribution");
-  await expect(page.locator("body")).toContainText("Access Reserve");
-  await expect(page.locator("body")).toContainText("Placement Pilot");
-  await expect(page.locator("body")).toContainText("Network Pilot");
-  await expect(page.locator("body")).toContainText("$4,900");
-  await expect(page.locator("body")).toContainText("$9,900");
+  await expect(page.locator("body")).toContainText("On-prem, on request");
+  await expect(page.locator("body")).toContainText("7-day category look");
+  await expect(page.locator("body")).toContainText("Category seat");
+  await expect(page.locator("body")).toContainText("$190");
+  await expect(page.locator("body")).toContainText("$490");
+  await expect(page.locator("body")).not.toContainText("$4,900");
+  await expect(page.locator("body")).not.toContainText("$9,900");
+  await expect(page.locator("body")).not.toContainText("$899");
   await expect(
     page.getByRole("heading", { name: "Who you actually reach." }),
   ).toBeVisible();
@@ -357,11 +354,12 @@ test("reserve form stores the selected tier and shows its held-seat fallback", a
     .locator('input[name="websiteUrl"]')
     .fill("https://northstar.example");
   await dialog
-    .getByRole("button", { name: /Network Pilot.*\$9,900/ })
+    .getByRole("button", { name: /Category seat.*\$490/ })
     .click();
+  await dialog.getByTestId("checkbox-reserve-terms").check();
   await dialog
     .getByRole("button", {
-      name: "Reserve Network Pilot",
+      name: "Lock the seat — $490 USD",
       exact: true,
     })
     .click();
@@ -373,17 +371,17 @@ test("reserve form stores the selected tier and shows its held-seat fallback", a
       email: "buyer@northstar.example",
       websiteUrl: "https://northstar.example",
       buyerPath: "private_distribution",
-      expectedAmountCents: 990000,
+      expectedAmountCents: 49000,
       expectedCurrency: "usd",
-      offer: "network-9900",
+      offer: "reserve-490",
     },
   ]);
   await expect(
     dialog.getByRole("heading", { name: "Seat reserved", exact: true }),
   ).toBeVisible();
   await expect(dialog).toContainText(
-    "Payment is still required; contact Birch Reserve to complete the secure $9,900 USD checkout",
+    "Payment is still required; contact Birch Reserve to complete the secure $490 USD checkout",
   );
-  await expect(dialog).toContainText("applied toward future campaign spend");
+  await expect(dialog).toContainText("applied 100% toward future media");
   expect(capture.unexpectedApiRequests).toEqual([]);
 });

@@ -42,8 +42,9 @@ import {
 import {
   getPayableReserveOffer,
   getPublicReserveOfferByKey,
-  isInventoryOfferKey,
+  isPayableOfferKey,
   RESERVE_CURRENCY,
+  reserveCheckoutLineItem,
   type ReserveOffer,
 } from "../lib/reserveOffers";
 import {
@@ -128,7 +129,7 @@ function isReserveCheckoutConfigured(): boolean {
 }
 
 function isPaidOfferKey(value: string): boolean {
-  return isInventoryOfferKey(value);
+  return isPayableOfferKey(value);
 }
 
 function isCheckoutAvailable(reservation: SplashAdReservation): boolean {
@@ -495,22 +496,7 @@ async function findByActivationToken(token: string) {
 function offerLineItem(
   offer: ReserveOffer,
 ): Stripe.Checkout.SessionCreateParams.LineItem {
-  return {
-    price_data: {
-      currency: RESERVE_CURRENCY,
-      unit_amount: offer.amountCents,
-      product_data: {
-        name: `Birch Reserve — ${offer.name}`,
-        description: offer.scope,
-        metadata: {
-          sku: offer.sku,
-          offerKey: offer.offerKey,
-          offerType: offer.offerType,
-        },
-      },
-    },
-    quantity: 1,
-  };
+  return reserveCheckoutLineItem(offer);
 }
 
 async function markPaymentFailedFromSession(

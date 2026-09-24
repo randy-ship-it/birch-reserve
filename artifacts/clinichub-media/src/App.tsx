@@ -20,9 +20,11 @@ import {
 import { MotionConfig } from 'framer-motion';
 import { Layout } from '@/components/layout';
 import Home from '@/pages/home';
-import About from '@/pages/about';
+import Kit from '@/pages/kit';
 import Terms from '@/pages/terms';
 import Privacy from '@/pages/privacy';
+import SampleIo from '@/pages/sample-io';
+import About from '@/pages/about';
 import Marketplace from '@/pages/marketplace';
 import Success from '@/pages/success';
 import SplashActivation from '@/pages/splash-activation';
@@ -211,11 +213,17 @@ function Router() {
         <Route path="/about">
           <Layout><About /></Layout>
         </Route>
+        <Route path="/kit">
+          <Layout><Kit /></Layout>
+        </Route>
         <Route path="/terms">
           <Layout><Terms /></Layout>
         </Route>
         <Route path="/privacy">
           <Layout><Privacy /></Layout>
+        </Route>
+        <Route path="/sample-io">
+          <Layout><SampleIo /></Layout>
         </Route>
         <Route path="/marketplace">
           <Layout><Marketplace /></Layout>

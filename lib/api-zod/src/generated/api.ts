@@ -68,7 +68,7 @@ export const createBirchReserveUcpCheckoutBodyContextWebsiteUrlMax = 2048;
 export const CreateBirchReserveUcpCheckoutBody = zod.object({
   "line_items": zod.array(zod.object({
   "item": zod.object({
-  "id": zod.enum(['reserve-899', 'pilot-4900', 'network-9900'])
+  "id": zod.enum(['hold-190', 'reserve-490'])
 }),
   "quantity": zod.literal(1)
 })).min(1).max(createBirchReserveUcpCheckoutBodyLineItemsMax),
@@ -363,29 +363,38 @@ export const RotateBirchReserveUcpCheckoutIdentityResponse = zod.object({
 export const GetBirchReserveLlmsTextResponse = zod.string()
 
 
-export const getBirchReserveCatalogResponseOffersMin = 3;
-export const getBirchReserveCatalogResponseOffersMax = 3;
+export const getBirchReserveCatalogResponseOffersMin = 2;
+export const getBirchReserveCatalogResponseOffersMax = 2;
 
 
 
 export const GetBirchReserveCatalogResponse = zod.object({
   "catalog_version": zod.string(),
   "currency": zod.enum(['USD']),
-  "default_sku": zod.enum(['reserve-899', 'pilot-4900', 'network-9900']),
+  "default_sku": zod.enum(['hold-190', 'reserve-490']),
   "inventory_model": zod.enum(['shared_reserve_pool']),
   "offers": zod.array(zod.object({
-  "offer_key": zod.enum(['reserve-899', 'pilot-4900', 'network-9900']),
-  "sku": zod.enum(['reserve-899', 'pilot-4900', 'network-9900']),
+  "offer_key": zod.enum(['hold-190', 'reserve-490']),
+  "sku": zod.enum(['hold-190', 'reserve-490']),
   "name": zod.string(),
-  "offer_type": zod.enum(['reservation_credit', 'single_format_pilot', 'multi_surface_pilot']),
-  "amount_cents": zod.union([zod.literal(89900),zod.literal(490000),zod.literal(990000)]),
-  "due_today": zod.union([zod.literal(899),zod.literal(4900),zod.literal(9900)]),
-  "media_credit_cents": zod.union([zod.literal(89900),zod.literal(490000),zod.literal(990000)]),
+  "offer_type": zod.enum(['category_look', 'category_seat']),
+  "amount_cents": zod.union([zod.literal(19000),zod.literal(49000)]),
+  "due_today": zod.union([zod.literal(190),zod.literal(490)]),
+  "media_credit_cents": zod.union([zod.literal(19000),zod.literal(49000)]),
   "scope": zod.string(),
   "best_for": zod.string(),
   "requires_insertion_order": zod.literal(true),
   "guarantees_impressions": zod.literal(false)
 })).min(getBirchReserveCatalogResponseOffersMin).max(getBirchReserveCatalogResponseOffersMax),
+  "legacy_offers": zod.array(zod.object({
+  "offer_key": zod.literal('reserve-899'),
+  "sku": zod.literal('reserve-899'),
+  "name": zod.string(),
+  "published": zod.literal(false),
+  "amount_cents": zod.literal(89900),
+  "due_today": zod.literal(899),
+  "note": zod.string()
+})).min(1).max(1),
   "discount_vs_published": zod.literal(0.25),
   "formats": zod.array(zod.enum(['post_checkout', 'recovery_plan', 'scheduled_service', 'member_hub', 'motion_15s'])),
   "exclusivity": zod.string(),
@@ -396,8 +405,8 @@ export const GetBirchReserveCatalogResponse = zod.object({
 })
 
 
-export const getBirchReserveAvailabilityResponseSkusMin = 3;
-export const getBirchReserveAvailabilityResponseSkusMax = 3;
+export const getBirchReserveAvailabilityResponseSkusMin = 2;
+export const getBirchReserveAvailabilityResponseSkusMax = 2;
 
 export const getBirchReserveAvailabilityResponseSeatsTotalMultipleOf = 1;
 
@@ -411,8 +420,8 @@ export const getBirchReserveAvailabilityResponseSeatsOpenMultipleOf = 1;
 
 export const GetBirchReserveAvailabilityResponse = zod.object({
   "currency": zod.enum(['USD']),
-  "default_sku": zod.enum(['reserve-899', 'pilot-4900', 'network-9900']),
-  "skus": zod.array(zod.enum(['reserve-899', 'pilot-4900', 'network-9900'])).min(getBirchReserveAvailabilityResponseSkusMin).max(getBirchReserveAvailabilityResponseSkusMax),
+  "default_sku": zod.enum(['hold-190', 'reserve-490']),
+  "skus": zod.array(zod.enum(['hold-190', 'reserve-490'])).min(getBirchReserveAvailabilityResponseSkusMin).max(getBirchReserveAvailabilityResponseSkusMax),
   "inventory_model": zod.enum(['shared_reserve_pool']),
   "seats_total": zod.number().multipleOf(getBirchReserveAvailabilityResponseSeatsTotalMultipleOf),
   "seats_paid": zod.number().multipleOf(getBirchReserveAvailabilityResponseSeatsPaidMultipleOf),
@@ -426,22 +435,22 @@ export const GetBirchReserveAvailabilityResponse = zod.object({
 
 
 export const GetBirchReserveQuoteQueryParams = zod.object({
-  "sku": zod.enum(['reserve-899', 'pilot-4900', 'network-9900']),
+  "sku": zod.enum(['hold-190', 'reserve-490']),
   "format": zod.enum(['post_checkout', 'recovery_plan', 'scheduled_service', 'member_hub', 'motion_15s']),
   "days": zod.union([zod.literal(30),zod.literal(90),zod.literal(180)])
 })
 
 export const GetBirchReserveQuoteResponse = zod.object({
-  "sku": zod.enum(['reserve-899', 'pilot-4900', 'network-9900']),
-  "offerKey": zod.enum(['reserve-899', 'pilot-4900', 'network-9900']),
+  "sku": zod.enum(['hold-190', 'reserve-490']),
+  "offerKey": zod.enum(['hold-190', 'reserve-490']),
   "offerName": zod.string(),
-  "offerType": zod.enum(['reservation_credit', 'single_format_pilot', 'multi_surface_pilot']),
+  "offerType": zod.enum(['category_look', 'category_seat']),
   "format": zod.enum(['post_checkout', 'recovery_plan', 'scheduled_service', 'member_hub', 'motion_15s']),
   "days": zod.union([zod.literal(30),zod.literal(90),zod.literal(180)]),
   "currency": zod.enum(['USD']),
-  "amountCents": zod.union([zod.literal(89900),zod.literal(490000),zod.literal(990000)]),
-  "dueTodayUsd": zod.union([zod.literal(899),zod.literal(4900),zod.literal(9900)]),
-  "mediaCreditCents": zod.union([zod.literal(89900),zod.literal(490000),zod.literal(990000)]),
+  "amountCents": zod.union([zod.literal(19000),zod.literal(49000)]),
+  "dueTodayUsd": zod.union([zod.literal(190),zod.literal(490)]),
+  "mediaCreditCents": zod.union([zod.literal(19000),zod.literal(49000)]),
   "scope": zod.string(),
   "discount": zod.literal(0.25),
   "requiresInsertionOrder": zod.literal(true),
@@ -464,7 +473,7 @@ export const createBirchReserveCheckoutBodyIdempotencyKeyMax = 200;
 
 
 export const CreateBirchReserveCheckoutBody = zod.object({
-  "sku": zod.enum(['reserve-899', 'pilot-4900', 'network-9900']),
+  "sku": zod.enum(['hold-190', 'reserve-490']),
   "email": zod.string().min(createBirchReserveCheckoutBodyEmailMin).max(createBirchReserveCheckoutBodyEmailMax),
   "brand": zod.string().min(1).max(createBirchReserveCheckoutBodyBrandMax),
   "website_url": zod.string().max(createBirchReserveCheckoutBodyWebsiteUrlMax).optional(),
@@ -725,7 +734,7 @@ export const CreateSplashAdReservationBody = zod.object({
   "buyerPath": zod.enum(['auto_buy', 'private_distribution']).optional().describe('Optional self-selected buying path used to route the inquiry.'),
   "expectedAmountCents": zod.number().min(1).describe('Exact amount displayed to the buyer before submission.'),
   "expectedCurrency": zod.enum(['usd']).describe('Exact currency displayed to the buyer before submission.'),
-  "offer": zod.enum(['reserve-899', 'pilot-4900', 'network-9900']).describe('Stable identifier for the selected canonical USD offer.')
+  "offer": zod.enum(['hold-190', 'reserve-490']).describe('Stable identifier for the selected canonical USD offer.')
 })
 
 export const CreateSplashAdReservationResponse = zod.object({
@@ -734,7 +743,7 @@ export const CreateSplashAdReservationResponse = zod.object({
   "checkoutUrl": zod.string().nullable().describe('Real Stripe Checkout URL when payments are configured; otherwise null.'),
   "amountCents": zod.number(),
   "currency": zod.enum(['usd']),
-  "offer": zod.enum(['reserve-899', 'pilot-4900', 'network-9900'])
+  "offer": zod.enum(['hold-190', 'reserve-490'])
 })
 
 

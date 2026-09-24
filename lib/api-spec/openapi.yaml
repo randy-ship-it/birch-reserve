@@ -1284,7 +1284,7 @@ components:
   schemas:
     BirchReserveSku:
       type: string
-      enum: [reserve-899, pilot-4900, network-9900]
+      enum: [hold-190, reserve-490]
     BirchReserveUcpProfile:
       type: object
       additionalProperties: true
@@ -1395,21 +1395,22 @@ components:
       additionalProperties: false
       required: [offer_key, sku, name, offer_type, amount_cents, due_today, media_credit_cents, scope, best_for, requires_insertion_order, guarantees_impressions]
       properties:
-        offer_key: { type: string, enum: [reserve-899, pilot-4900, network-9900] }
+        offer_key: { type: string, enum: [hold-190, reserve-490] }
         sku: { $ref: "#/components/schemas/BirchReserveSku" }
         name: { type: string }
-        offer_type: { type: string, enum: [reservation_credit, single_format_pilot, multi_surface_pilot] }
-        amount_cents: { type: integer, enum: [89900, 490000, 990000] }
-        due_today: { type: integer, enum: [899, 4900, 9900] }
-        media_credit_cents: { type: integer, enum: [89900, 490000, 990000] }
+        offer_type: { type: string, enum: [category_look, category_seat] }
+        amount_cents: { type: integer, enum: [19000, 49000] }
+        due_today: { type: integer, enum: [190, 490] }
+        media_credit_cents: { type: integer, enum: [19000, 49000] }
         scope: { type: string }
         best_for: { type: string }
         requires_insertion_order: { type: boolean, enum: [true] }
         guarantees_impressions: { type: boolean, enum: [false] }
+        consumes_seat: { type: boolean }
     BirchReserveCatalog:
       type: object
       additionalProperties: false
-      required: [catalog_version, currency, default_sku, inventory_model, offers, discount_vs_published, formats, exclusivity, fulfillment, reporting, checkout, human]
+      required: [catalog_version, currency, default_sku, inventory_model, offers, legacy_offers, discount_vs_published, formats, exclusivity, fulfillment, reporting, checkout, human]
       properties:
         catalog_version: { type: string }
         currency: { type: string, enum: [USD] }
@@ -1417,9 +1418,26 @@ components:
         inventory_model: { type: string, enum: [shared_reserve_pool] }
         offers:
           type: array
-          minItems: 3
-          maxItems: 3
+          minItems: 2
+          maxItems: 2
           items: { $ref: "#/components/schemas/BirchReserveOffer" }
+        legacy_offers:
+          type: array
+          minItems: 1
+          maxItems: 1
+          description: Unpublished legacy SKUs kept so existing Stripe Checkout sessions still match. Not offered for new public checkout.
+          items:
+            type: object
+            additionalProperties: false
+            required: [offer_key, sku, name, published, amount_cents, due_today, note]
+            properties:
+              offer_key: { type: string, enum: [reserve-899] }
+              sku: { type: string, enum: [reserve-899] }
+              name: { type: string }
+              published: { type: boolean, enum: [false] }
+              amount_cents: { type: integer, enum: [89900] }
+              due_today: { type: integer, enum: [899] }
+              note: { type: string }
         discount_vs_published: { type: number, enum: [0.25] }
         formats: { type: array, items: { type: string, enum: [post_checkout, recovery_plan, scheduled_service, member_hub, motion_15s] } }
         exclusivity: { type: string }
@@ -1436,8 +1454,8 @@ components:
         default_sku: { $ref: "#/components/schemas/BirchReserveSku" }
         skus:
           type: array
-          minItems: 3
-          maxItems: 3
+          minItems: 2
+          maxItems: 2
           items: { $ref: "#/components/schemas/BirchReserveSku" }
         inventory_model: { type: string, enum: [shared_reserve_pool] }
         seats_total: { type: number, multipleOf: 1 }
@@ -1454,15 +1472,15 @@ components:
       required: [sku, offerKey, offerName, offerType, format, days, currency, amountCents, dueTodayUsd, mediaCreditCents, scope, discount, requiresInsertionOrder, guaranteesImpressions, exclusions, checkoutPath]
       properties:
         sku: { $ref: "#/components/schemas/BirchReserveSku" }
-        offerKey: { type: string, enum: [reserve-899, pilot-4900, network-9900] }
+        offerKey: { type: string, enum: [hold-190, reserve-490] }
         offerName: { type: string }
-        offerType: { type: string, enum: [reservation_credit, single_format_pilot, multi_surface_pilot] }
+        offerType: { type: string, enum: [category_look, category_seat] }
         format: { type: string, enum: [post_checkout, recovery_plan, scheduled_service, member_hub, motion_15s] }
         days: { type: integer, enum: [30, 90, 180] }
         currency: { type: string, enum: [USD] }
-        amountCents: { type: integer, enum: [89900, 490000, 990000] }
-        dueTodayUsd: { type: integer, enum: [899, 4900, 9900] }
-        mediaCreditCents: { type: integer, enum: [89900, 490000, 990000] }
+        amountCents: { type: integer, enum: [19000, 49000] }
+        dueTodayUsd: { type: integer, enum: [190, 490] }
+        mediaCreditCents: { type: integer, enum: [19000, 49000] }
         scope: { type: string }
         discount: { type: number, enum: [0.25] }
         requiresInsertionOrder: { type: boolean, enum: [true] }
@@ -1983,7 +2001,7 @@ components:
           description: Exact currency displayed to the buyer before submission.
         offer:
           type: string
-          enum: [reserve-899, pilot-4900, network-9900]
+          enum: [hold-190, reserve-490]
           description: Stable identifier for the selected canonical USD offer.
     SplashAdReservationReceipt:
       type: object
@@ -2006,7 +2024,7 @@ components:
           enum: [usd]
         offer:
           type: string
-          enum: [reserve-899, pilot-4900, network-9900]
+          enum: [hold-190, reserve-490]
     SplashAdReservationStatus:
       type: object
       required: [reservationId, status, paymentStatus, creativeStatus, amountCents, currency, offer, offerName, checkoutAvailable, createdAt]

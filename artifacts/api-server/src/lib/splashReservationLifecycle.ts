@@ -17,8 +17,10 @@ import {
 } from "./stripeClient";
 import {
   INVENTORY_OFFER_KEYS,
+  LIFECYCLE_OFFER_KEYS,
+  consumesInventorySeat,
   getPayableReserveOffer,
-  isInventoryOfferKey,
+  isPayableOfferKey,
 } from "./reserveOffers";
 import {
   deliverCreativeDeadlineWarning,
@@ -369,15 +371,17 @@ export async function claimSplashReserveSeat(
       if (existing) return { reservation: existing, created: false };
     }
 
-    const rows = await tx
-      .select({
-        status: splashAdReservationsTable.status,
-        paymentStatus: splashAdReservationsTable.paymentStatus,
-      })
-      .from(splashAdReservationsTable)
-      .where(inArray(splashAdReservationsTable.offerKey, INVENTORY_OFFER_KEYS));
-    if (seatCounts(rows).seats_open < 1) {
-      return { reservation: null, created: false };
+    if (consumesInventorySeat(values.offerKey ?? "")) {
+      const rows = await tx
+        .select({
+          status: splashAdReservationsTable.status,
+          paymentStatus: splashAdReservationsTable.paymentStatus,
+        })
+        .from(splashAdReservationsTable)
+        .where(inArray(splashAdReservationsTable.offerKey, INVENTORY_OFFER_KEYS));
+      if (seatCounts(rows).seats_open < 1) {
+        return { reservation: null, created: false };
+      }
     }
 
     const [reservation] = await tx
@@ -417,14 +421,14 @@ export async function approveSplashReservationWithCapacity(
       .where(eq(splashAdReservationsTable.id, reservationId));
     if (!existing) return { kind: "not_found" as const };
     if (
-      !isInventoryOfferKey(existing.offerKey) ||
+      !isPayableOfferKey(existing.offerKey) ||
       existing.paymentStatus === "paid" ||
       !["pending_review", "approved", "rejected"].includes(existing.status)
     ) {
       return { kind: "not_eligible" as const };
     }
 
-    if (existing.status !== "approved") {
+    if (existing.status !== "approved" && consumesInventorySeat(existing.offerKey)) {
       const rows = await tx
         .select({
           status: splashAdReservationsTable.status,
@@ -603,7 +607,7 @@ export async function cancelSplashReservation(
   if (!existing) return { kind: "not_found" };
   if (
     existing.source !== "birch_reserve_v1_checkout" ||
-    !isInventoryOfferKey(existing.offerKey)
+    !isPayableOfferKey(existing.offerKey)
   ) {
     return { kind: "not_eligible" };
   }
@@ -789,7 +793,7 @@ async function expireUnpaidRow(
     .where(
       and(
         eq(splashAdReservationsTable.id, reservation.id),
-        inArray(splashAdReservationsTable.offerKey, INVENTORY_OFFER_KEYS),
+        inArray(splashAdReservationsTable.offerKey, LIFECYCLE_OFFER_KEYS),
         lt(inventoryHeldSince, cutoff),
         inArray(splashAdReservationsTable.status, [
           "seat_held",
@@ -852,7 +856,7 @@ export async function cleanupSplashReservations(
     .from(splashAdReservationsTable)
     .where(
       and(
-        inArray(splashAdReservationsTable.offerKey, INVENTORY_OFFER_KEYS),
+        inArray(splashAdReservationsTable.offerKey, LIFECYCLE_OFFER_KEYS),
         eq(splashAdReservationsTable.status, "payment_pending"),
         eq(splashAdReservationsTable.paymentStatus, "checkout_creating"),
         lt(splashAdReservationsTable.updatedAt, holdCutoff),
@@ -875,7 +879,7 @@ export async function cleanupSplashReservations(
     .from(splashAdReservationsTable)
     .where(
       and(
-        inArray(splashAdReservationsTable.offerKey, INVENTORY_OFFER_KEYS),
+        inArray(splashAdReservationsTable.offerKey, LIFECYCLE_OFFER_KEYS),
         lt(inventoryHeldSince, holdCutoff),
         inArray(splashAdReservationsTable.status, [
           "seat_held",
@@ -926,7 +930,7 @@ export async function cleanupSplashReservations(
       .from(splashAdReservationsTable)
       .where(
         and(
-          inArray(splashAdReservationsTable.offerKey, INVENTORY_OFFER_KEYS),
+          inArray(splashAdReservationsTable.offerKey, LIFECYCLE_OFFER_KEYS),
           eq(splashAdReservationsTable.status, "paid"),
           eq(splashAdReservationsTable.paymentStatus, "paid"),
           eq(splashAdReservationsTable.creativeStatus, "awaiting_upload"),
@@ -967,7 +971,7 @@ export async function cleanupSplashReservations(
     })
     .where(
       and(
-        inArray(splashAdReservationsTable.offerKey, INVENTORY_OFFER_KEYS),
+        inArray(splashAdReservationsTable.offerKey, LIFECYCLE_OFFER_KEYS),
         eq(splashAdReservationsTable.status, "paid"),
         eq(splashAdReservationsTable.paymentStatus, "paid"),
         eq(splashAdReservationsTable.creativeStatus, "awaiting_upload"),

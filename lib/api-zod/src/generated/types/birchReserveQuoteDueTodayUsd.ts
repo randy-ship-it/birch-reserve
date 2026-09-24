@@ -10,7 +10,6 @@ export type BirchReserveQuoteDueTodayUsd = typeof BirchReserveQuoteDueTodayUsd[k
 
 
 export const BirchReserveQuoteDueTodayUsd = {
-  NUMBER_899: 899,
-  NUMBER_4900: 4900,
-  NUMBER_9900: 9900,
+  NUMBER_190: 190,
+  NUMBER_490: 490,
 } as const;
