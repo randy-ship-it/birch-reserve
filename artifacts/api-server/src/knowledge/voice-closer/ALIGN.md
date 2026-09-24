@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:50 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 17:17 EDT. Edit sales-brain, not this file. -->
 # Align Wellness (brand training)
 
 **Public brand:** Align Wellness · https://alignwellness.ca  

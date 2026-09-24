@@ -413,14 +413,27 @@ test("sales-brain prompt: QA answers present, no phone digits, identity fixed", 
   assert.doesNotMatch(prompt.replace(/Do not call yourself[^.]*\./g, "").replace(/Never “Randy’s assistant”[^\n]*/g, ""), /voice assistant/i);
 });
 
-test("polishReply: no em dashes, no re-intro after the first turn unless asked", () => {
+test("polishReply: no em dashes, no intro on any reply unless asked who / bot", () => {
   const first = [{ role: "user", content: "hi" }];
   const later = [
     { role: "assistant", content: "Hey, I'm Randy. Want to see how a seat inside the recovery hubs works?" },
     { role: "user", content: "we sell recovery drinks" },
   ];
   assert.equal(polishReply("Got it \u2014 checkout isn't live\u2014yet.", first), "Got it, checkout isn't live, yet.");
-  assert.equal(polishReply("I'm Randy from Birch Reserve. Hi there.", first), "I'm Randy from Birch Reserve. Hi there.");
+  // 5:18pm: no intro on ANY reply (first included) unless they ask who he is / if he's a bot.
+  assert.equal(polishReply("I'm Randy from Birch Reserve. Hi there.", first), "Hi there.");
+  assert.equal(
+    polishReply("I'm Randy from Birch Reserve. Hold is $190.", [{ role: "user", content: "how much does it cost?" }]),
+    "Hold is $190.",
+  );
+  assert.equal(
+    polishReply("I'm Randy from Birch Reserve, an AI version of Randy.", [{ role: "user", content: "are you a bot?" }]),
+    "I'm Randy from Birch Reserve, an AI version of Randy.",
+  );
+  assert.equal(
+    polishReply("I'm Randy from Birch Reserve. I help brands.", [{ role: "user", content: "who is this?" }]),
+    "I'm Randy from Birch Reserve. I help brands.",
+  );
   assert.equal(polishReply("I'm Randy from Birch Reserve. Sounds like a fit.", later), "Sounds like a fit.");
   assert.equal(
     polishReply("I'm Randy from Birch Reserve. I help brands.", [...later, { role: "user", content: "wait, who are you?" }]),
@@ -514,4 +527,10 @@ test("transcript send_error is never permanently stuck: backoff retry, retry aft
   const r2 = await sweepTranscripts({ onlyId: id2, now: at(30 * 60_000) });
   assert.equal(r2.sent, 1);
   mailerFailures = 0;
+});
+
+test("server wrapper never tells Randy to introduce himself or volunteer credit expiry", () => {
+  const wrapper = `${BIRCH_SITE_SCOPE_PROMPT}\n${loadVoiceCloserSystemPrompt(true).split("## RUNTIME HARD LOCKS")[1] ?? ""}`;
+  assert.doesNotMatch(wrapper, /introduce/i);
+  assert.doesNotMatch(wrapper, /expir|12 months/i);
 });
