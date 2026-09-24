@@ -665,7 +665,7 @@ test("machine surfaces expose text, JSON, YAML, and fixed USD contracts", async 
   assert.equal(quote.offerKey, "reserve-899");
   assert.equal(quote.amountCents, 89900);
   assert.equal(quote.currency, "USD");
-  assert.equal(quote.dueTodayUsd, 990);
+  assert.equal(quote.dueTodayUsd, 899);
 
   const openapi = await fetch(`${origin}/openapi.yaml`);
   assert.match(openapi.headers.get("content-type") ?? "", /yaml/);
