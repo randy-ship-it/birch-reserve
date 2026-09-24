@@ -93,7 +93,7 @@ type CheckoutReceipt = {
 
 function publicUrl(): string | null {
   const configured =
-    process.env.PUBLIC_BASE_URL?.trim() ??
+    process.env.PUBLIC_BASE_URL?.trim() ||
     process.env.SPLASH_AD_PUBLIC_URL?.trim();
   if (configured) {
     try {

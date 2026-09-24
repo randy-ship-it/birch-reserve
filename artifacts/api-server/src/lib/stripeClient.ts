@@ -152,6 +152,40 @@ export function isDefinitelyUncreatedStripePaymentIntentError(
   );
 }
 
+/**
+ * True only when Stripe definitively rejected a Checkout Session create, so no
+ * session exists and the reservation can be released. Rate limits, conflicts,
+ * idempotency errors, network failures and 5xx stay unresolved because a
+ * session may still have been created.
+ */
+export function isDefinitelyUncreatedStripeCheckoutError(error: unknown): boolean {
+  if (error instanceof StripeProxyError) {
+    return (
+      error.status >= 400 &&
+      error.status < 500 &&
+      error.status !== 409 &&
+      error.status !== 429
+    );
+  }
+  if (!error || typeof error !== "object") return false;
+  const candidate = error as { type?: unknown; statusCode?: unknown };
+  if (
+    candidate.type !== "StripeInvalidRequestError" &&
+    candidate.type !== "StripeAuthenticationError" &&
+    candidate.type !== "StripePermissionError"
+  ) {
+    return false;
+  }
+  const status = candidate.statusCode;
+  return (
+    typeof status === "number" &&
+    status >= 400 &&
+    status < 500 &&
+    status !== 409 &&
+    status !== 429
+  );
+}
+
 export function createAndConfirmStripePaymentIntent(
   params: StripeTokenPaymentIntentParams,
   idempotencyKey: string,
