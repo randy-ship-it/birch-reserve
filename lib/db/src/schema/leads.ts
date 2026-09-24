@@ -1,4 +1,5 @@
 import {
+  boolean,
   index,
   integer,
   jsonb,
@@ -48,6 +49,16 @@ export const leadsTable = pgTable(
     fridayDealId: text("friday_deal_id"),
     fridayPushedAt: timestamp("friday_pushed_at", { withTimezone: true }),
     fridayAttemptedAt: timestamp("friday_attempted_at", { withTimezone: true }),
+    // 6:50pm additive columns (scripts/sql/2026-09-24-test-hygiene-attribution.sql):
+    // QA / probe traffic flag + first-touch attribution.
+    isTest: boolean("is_test").notNull().default(false),
+    utmSource: text("utm_source"),
+    utmMedium: text("utm_medium"),
+    utmCampaign: text("utm_campaign"),
+    utmTerm: text("utm_term"),
+    utmContent: text("utm_content"),
+    referrer: text("referrer"),
+    landingPage: text("landing_page"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -84,6 +95,8 @@ export const voiceCallsTable = pgTable(
     receivedCount: integer("received_count").notNull().default(1),
     notifiedAt: timestamp("notified_at", { withTimezone: true }),
     notifyError: text("notify_error"),
+    // 6:50pm additive column: QA / probe call (stored, never emailed or pushed).
+    isTest: boolean("is_test").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },

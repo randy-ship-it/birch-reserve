@@ -8,6 +8,7 @@ import conciergeRouter from "./concierge";
 import randyChatRouter from "./randyChat";
 import editorialRouter from "./editorial";
 import voiceCallEndedRouter from "./voiceCallEnded";
+import humanGateRouter from "./humanGate";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(conciergeRouter);
 router.use(randyChatRouter);
 router.use(editorialRouter);
 router.use(voiceCallEndedRouter);
+router.use(humanGateRouter);
 
 export default router;

@@ -18,6 +18,8 @@
 import { logger } from "./logger";
 import { leadsDb, upsertLeadSafe } from "./leads";
 import { queueFridayPush } from "./fridayPush";
+import { isTestIdentity } from "./testTraffic";
+import { applyAdditiveColumns } from "./schemaEnsure";
 import {
   resendConfigured,
   resendMailer,
@@ -366,6 +368,8 @@ export function normalizeVoicePayload(raw: unknown): { ok: true; call: Normalize
 
 export type VoiceCallRecord = NormalizedVoiceCall & {
   leadId: string | null;
+  /** Test traffic (6:50pm): stored, never emailed or pushed. Sticky once true. */
+  isTest: boolean;
   rawPayload: unknown;
   receivedCount: number;
   notifiedAt: Date | null;
@@ -375,7 +379,7 @@ export type VoiceCallRecord = NormalizedVoiceCall & {
 };
 
 export interface VoiceCallStore {
-  upsert(call: NormalizedVoiceCall, raw: unknown, leadId: string, now: Date): Promise<{ created: boolean; row: VoiceCallRecord }>;
+  upsert(call: NormalizedVoiceCall, raw: unknown, leadId: string, now: Date, isTest?: boolean): Promise<{ created: boolean; row: VoiceCallRecord }>;
   /** Atomically claim the one notification email for this call. */
   claimNotify(callId: string, now: Date): Promise<boolean>;
   markNotifyFailed(callId: string, error: string): Promise<void>;
@@ -383,12 +387,20 @@ export interface VoiceCallStore {
 }
 
 /** Later deliveries fill gaps; they never blank out what an earlier one had. */
-export function mergeVoiceCall(existing: VoiceCallRecord | undefined, call: NormalizedVoiceCall, raw: unknown, leadId: string, now: Date): VoiceCallRecord {
+export function mergeVoiceCall(
+  existing: VoiceCallRecord | undefined,
+  call: NormalizedVoiceCall,
+  raw: unknown,
+  leadId: string,
+  now: Date,
+  isTest = false,
+): VoiceCallRecord {
   if (!existing) {
-    return { ...call, leadId, rawPayload: raw, receivedCount: 1, notifiedAt: null, notifyError: null, createdAt: now, updatedAt: now };
+    return { ...call, leadId, isTest, rawPayload: raw, receivedCount: 1, notifiedAt: null, notifyError: null, createdAt: now, updatedAt: now };
   }
   return {
     ...existing,
+    isTest: existing.isTest || isTest,
     source: existing.source,
     callerNumber: call.callerNumber ?? existing.callerNumber,
     calledNumber: call.calledNumber ?? existing.calledNumber,
@@ -408,9 +420,9 @@ export function mergeVoiceCall(existing: VoiceCallRecord | undefined, call: Norm
 
 export class MemoryVoiceCallStore implements VoiceCallStore {
   rows = new Map<string, VoiceCallRecord>();
-  async upsert(call: NormalizedVoiceCall, raw: unknown, leadId: string, now: Date) {
+  async upsert(call: NormalizedVoiceCall, raw: unknown, leadId: string, now: Date, isTest = false) {
     const existing = this.rows.get(call.callId);
-    const row = mergeVoiceCall(existing, call, raw, leadId, now);
+    const row = mergeVoiceCall(existing, call, raw, leadId, now, isTest);
     this.rows.set(call.callId, row);
     return { created: !existing, row: { ...row } };
   }
@@ -457,6 +469,11 @@ export const VOICE_CALLS_DDL = [
   `CREATE INDEX IF NOT EXISTS voice_calls_created_at_idx ON voice_calls (created_at)`,
 ] as const;
 
+/** 6:50pm hygiene column (ADD COLUMN IF NOT EXISTS only); mirrors scripts/sql/2026-09-24-test-hygiene-attribution.sql. */
+export const VOICE_CALLS_HYGIENE_DDL = [
+  `ALTER TABLE IF EXISTS voice_calls ADD COLUMN IF NOT EXISTS is_test boolean NOT NULL DEFAULT false`,
+] as const;
+
 type RawRow = Record<string, unknown>;
 const d = (v: unknown): Date | null => {
   if (v == null) return null;
@@ -470,6 +487,7 @@ function rowToVoice(r: RawRow): VoiceCallRecord {
     callId: String(r["call_id"]),
     source: (s(r["source"]) ?? "phone") as VoiceCallSource,
     leadId: s(r["lead_id"]),
+    isTest: r["is_test"] === true,
     callerNumber: s(r["caller_number"]),
     calledNumber: s(r["called_number"]),
     startedAt: d(r["started_at"]),
@@ -493,20 +511,22 @@ async function voiceDb() {
   const m = await leadsDb();
   if (!voiceEnsured) {
     for (const stmt of VOICE_CALLS_DDL) await m.pool.query(stmt);
+    await applyAdditiveColumns(m.pool, VOICE_CALLS_HYGIENE_DDL);
     voiceEnsured = true;
   }
   return m;
 }
 
 export class PgVoiceCallStore implements VoiceCallStore {
-  async upsert(call: NormalizedVoiceCall, raw: unknown, leadId: string, now: Date) {
+  async upsert(call: NormalizedVoiceCall, raw: unknown, leadId: string, now: Date, isTest = false) {
     const m = await voiceDb();
     const res = await m.pool.query(
       `INSERT INTO voice_calls (call_id, source, lead_id, caller_number, called_number, started_at, ended_at,
                                 duration_seconds, end_reason, transcript, transcript_turns, extracted,
-                                raw_payload, created_at, updated_at)
-       VALUES ($1,$14,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11::jsonb,$12::jsonb,$13,$13)
+                                raw_payload, created_at, updated_at, is_test)
+       VALUES ($1,$14,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11::jsonb,$12::jsonb,$13,$13,$15)
        ON CONFLICT (call_id) DO UPDATE SET
+         is_test = voice_calls.is_test OR EXCLUDED.is_test,
          lead_id = COALESCE(voice_calls.lead_id, EXCLUDED.lead_id),
          caller_number = COALESCE(EXCLUDED.caller_number, voice_calls.caller_number),
          called_number = COALESCE(EXCLUDED.called_number, voice_calls.called_number),
@@ -537,6 +557,7 @@ export class PgVoiceCallStore implements VoiceCallStore {
         JSON.stringify(raw ?? {}),
         now,
         call.source,
+        isTest,
       ],
     );
     const r = res.rows[0] as RawRow;
@@ -693,7 +714,14 @@ export type VoiceIngestOptions = {
   leadId?: string;
   /** Only email when the call has caller speech or contact fields (web sessions). */
   notifyOnlyWithContent?: boolean;
+  /** Request carried a valid X-Birch-QA header (test traffic). */
+  isTest?: boolean;
 };
+
+/** QA identity rules for a call: call_id prefix, extracted email / name. */
+export function voiceCallLooksLikeTest(call: Pick<NormalizedVoiceCall, "callId" | "extracted">): boolean {
+  return isTestIdentity({ callId: call.callId, email: call.extracted.email ?? null, name: call.extracted.name ?? null });
+}
 
 function hasContent(r: VoiceCallRecord): boolean {
   const e = r.extracted;
@@ -703,13 +731,14 @@ function hasContent(r: VoiceCallRecord): boolean {
 export async function ingestVoiceCall(call: NormalizedVoiceCall, raw: unknown, opts: VoiceIngestOptions = {}): Promise<VoiceIngestResult> {
   const now = opts.now ?? new Date();
   const leadId = opts.leadId ?? (call.source === "web" ? `webvoice:${call.callId.replace(/^web:/, "")}` : `voice:${call.callId}`);
+  const flaggedTest = Boolean(opts.isTest) || voiceCallLooksLikeTest(call);
   let stored: { created: boolean; row: VoiceCallRecord };
   try {
-    stored = await voiceStore.upsert(call, raw, leadId, now);
+    stored = await voiceStore.upsert(call, raw, leadId, now, flaggedTest);
   } catch (error) {
     // DB down: the log line is the safety net (the webhook returns 500 so xAI retries).
     const message = error instanceof Error ? error.message : "store_failed";
-    logVoiceIntake(mergeVoiceCall(undefined, call, raw, leadId, now), "store_failed", message);
+    logVoiceIntake(mergeVoiceCall(undefined, call, raw, leadId, now, flaggedTest), "store_failed", message);
     throw error;
   }
   const { created, row } = stored;
@@ -729,13 +758,17 @@ export async function ingestVoiceCall(call: NormalizedVoiceCall, raw: unknown, o
     need: row.extracted.need ?? row.extracted.summary,
     size: row.extracted.size,
     timing: row.extracted.timing,
+    isTest: row.isTest,
     now,
   });
 
   logVoiceIntake(row, created ? "call_ended" : "call_ended_repeat");
 
   let emailed = false;
-  if (opts.notifyOnlyWithContent && !hasContent(row)) {
+  if (row.isTest) {
+    // Test traffic (6:50pm): stored, never emailed to randy@ / jon@.
+    logVoiceIntake(row, "is_test");
+  } else if (opts.notifyOnlyWithContent && !hasContent(row)) {
     // Empty web session (opened and closed with nothing said): stored, not emailed.
   } else if (!mailerReady()) {
     logVoiceIntake(row, "resend_not_configured");
@@ -751,6 +784,7 @@ export async function ingestVoiceCall(call: NormalizedVoiceCall, raw: unknown, o
     }
   }
 
+  // Test leads are recorded as friday_status=skipped ("is_test") inside pushLeadToFriday.
   if (lead) queueFridayPush(lead.id);
   return { duplicate: !created, emailed };
 }

@@ -74,6 +74,7 @@ const SOURCE_LABEL: Record<Lead["source"], string> = {
   voice: "Birch voice call",
   web_voice: "Birch web voice call",
   advertiser_intake: "Birch advertiser form",
+  email_capture: "Birch email capture",
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -94,6 +95,11 @@ export function buildFridayPayload(lead: Lead, cfg: Pick<FridayConfig, "workspac
     lead.size ? `Size: ${lead.size}` : "",
     lead.timing ? `Timing: ${lead.timing}` : "",
     lead.role ? `Role: ${lead.role}` : "",
+    lead.utmSource || lead.utmMedium || lead.utmCampaign
+      ? `UTM: ${[lead.utmSource, lead.utmMedium, lead.utmCampaign].map((x) => x ?? "-").join(" / ")}`
+      : "",
+    lead.referrer ? `Referrer: ${lead.referrer}` : "",
+    lead.landingPage ? `Landing page: ${lead.landingPage}` : "",
     `Birch lead id: ${lead.id}`,
   ].filter(Boolean);
   const payload: Record<string, unknown> = {
@@ -212,6 +218,12 @@ export async function pushLeadToFriday(leadId: string, now: Date = new Date()): 
   try {
     const current = await store.get(leadId);
     if (!current || !leadIsActionable(current)) return undefined;
+    if (current.isTest) {
+      // Test traffic (6:50pm): stored, never pushed to Friday.
+      const result: FridayResult = { status: "skipped", error: "is_test" };
+      if (current.fridayStatus !== "sent") await store.markFriday(leadId, result, now, false);
+      return result;
+    }
     const cfg = fridayConfig();
     if (!cfg) {
       const result: FridayResult = { status: "skipped", error: "friday_not_configured" };

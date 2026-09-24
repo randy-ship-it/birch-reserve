@@ -8,7 +8,7 @@
     "build": "node ./build.mjs",
     "prestart": "sh -c 'pnpm --filter @workspace/db run push || { echo \"[warn] db push failed \u2014 continuing start so Autoscale can serve HTTP\" >&2; exit 0; }'",
     "start": "node --enable-source-maps ./dist/index.mjs",
-    "test": "pnpm run test:typecheck-refresh && pnpm run test:launch && pnpm run test:marketplace-safety && pnpm run test:sponsor-reservations && pnpm run test:splash-reservations && pnpm run test:public-buying && pnpm run test:ucp-proof-performance && pnpm run test:concierge && pnpm run test:randy-chat && pnpm run test:voice-leads && pnpm run test:editorial && pnpm run test:editorial-api && pnpm run test:ui-events",
+    "test": "pnpm run test:typecheck-refresh && pnpm run test:launch && pnpm run test:marketplace-safety && pnpm run test:sponsor-reservations && pnpm run test:splash-reservations && pnpm run test:public-buying && pnpm run test:ucp-proof-performance && pnpm run test:concierge && pnpm run test:randy-chat && pnpm run test:voice-leads && pnpm run test:hygiene && pnpm run test:editorial && pnpm run test:editorial-api && pnpm run test:ui-events",
     "test:typecheck-refresh": "pnpm --dir ../.. run test:api-typecheck-refresh",
     "test:launch": "esbuild ./tests/launch.test.ts --bundle --platform=node --format=esm --outfile=/tmp/launch.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test node /tmp/launch.test.mjs",
     "test:marketplace-safety": "esbuild ./tests/marketplace-safety.test.ts --bundle --platform=node --format=esm --outfile=/tmp/marketplace-safety.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && node /tmp/marketplace-safety.test.mjs",
@@ -24,7 +24,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "db:push": "pnpm --filter @workspace/db run push",
     "test:randy-chat": "esbuild ./tests/randyChat.test.ts --bundle --platform=node --format=esm --outfile=./dist/randy-chat.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=production RANDY_CHAT_AI_DISABLED=true node ./dist/randy-chat.test.mjs",
-    "test:voice-leads": "esbuild ./tests/voiceLeads.test.ts --bundle --platform=node --format=esm --outfile=./dist/voice-leads.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test RANDY_CHAT_AI_DISABLED=true node ./dist/voice-leads.test.mjs"
+    "test:voice-leads": "esbuild ./tests/voiceLeads.test.ts --bundle --platform=node --format=esm --outfile=./dist/voice-leads.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test RANDY_CHAT_AI_DISABLED=true node ./dist/voice-leads.test.mjs",
+    "test:hygiene": "esbuild ./tests/hygiene.test.ts --bundle --platform=node --format=esm --outfile=./dist/hygiene.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test RANDY_CHAT_AI_DISABLED=true node --test-concurrency=1 ./dist/hygiene.test.mjs"
   },
   "dependencies": {
     "@clerk/express": "^2.1.61",

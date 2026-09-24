@@ -1,4 +1,5 @@
 import {
+  boolean,
   index,
   integer,
   jsonb,
@@ -77,6 +78,12 @@ export const splashAdReservationsTable = pgTable(
       "creative_deadline_warning_delivered_at",
       { withTimezone: true },
     ),
+    /**
+     * QA / probe traffic (6:50pm hygiene): X-Birch-QA, qa+ email, "QA Test" /
+     * "Pulse Probe" brand. Marking only; seat logic is unchanged. Additive column
+     * (scripts/sql/2026-09-24-test-hygiene-attribution.sql).
+     */
+    isTest: boolean("is_test").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

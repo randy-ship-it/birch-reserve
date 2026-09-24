@@ -52,6 +52,9 @@ import {
   getAuthorizedSalesStaff,
   requireSalesStaff,
 } from "../lib/salesStaffAccess";
+import { hasValidQaHeader } from "../lib/testTraffic";
+import { attributionFrom } from "../lib/publicGuards";
+import { markSplashReservationTestIfQa } from "../lib/splashTestTraffic";
 
 const router: IRouter = Router();
 
@@ -646,6 +649,15 @@ router.post(
       res.status(409).json({ error: "Birch Reserve is sold out." });
       return;
     }
+
+    // 6:50pm test-traffic hygiene: mark only (seat logic untouched).
+    await markSplashReservationTestIfQa(reservation.id, {
+      qaHeader: hasValidQaHeader(req),
+      email: normalizedEmail,
+      name: parsed.data.brandName,
+      attribution: attributionFrom(res),
+      log: req.log,
+    });
 
     await db.insert(advertiserIntakesTable).values({
       normalizedEmail,

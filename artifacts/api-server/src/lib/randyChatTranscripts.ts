@@ -17,6 +17,8 @@
  *   sent_message_count makes sends idempotent across instances and restarts.
  */
 import { logger } from "./logger";
+import { isTestIdentity } from "./testTraffic";
+import { applyAdditiveColumns } from "./schemaEnsure";
 
 export type TranscriptRole = "user" | "assistant";
 export type TranscriptMessage = { role: TranscriptRole; content: string };
@@ -47,6 +49,8 @@ export type TranscriptSession = {
   sendingAt: Date | null;
   sendAttempts: number;
   sendError: string | null;
+  /** Test traffic (6:50pm): stored, never emailed. Sticky once true. */
+  isTest: boolean;
 };
 
 export type TranscriptUpdate = {
@@ -58,6 +62,8 @@ export type TranscriptUpdate = {
   event?: string;
   handoff?: boolean;
   pagePath?: string;
+  /** Request carried a valid X-Birch-QA header. */
+  isTest?: boolean;
 };
 
 export type ClaimOptions = {
@@ -182,7 +188,18 @@ export function emptySession(id: string, now: Date): TranscriptSession {
     sendingAt: null,
     sendAttempts: 0,
     sendError: null,
+    isTest: false,
   };
+}
+
+/** QA identity rules for a chat session (session id / label, contact name / email). */
+export function sessionLooksLikeTest(s: Pick<TranscriptSession, "id" | "contact" | "qualify">): boolean {
+  return isTestIdentity({
+    sessionId: s.id,
+    label: s.qualify.company ?? null,
+    email: s.contact.email ?? null,
+    name: s.contact.name ?? null,
+  });
 }
 
 export function applyUpdate(
@@ -198,7 +215,7 @@ export function applyUpdate(
   const isHandoff = Boolean(update.handoff || (update.event && HANDOFF_EVENTS.has(update.event)));
   // A new handoff on a session whose last send failed retries right away.
   const retryNow = isHandoff && Boolean(base.sendError);
-  return {
+  const next: TranscriptSession = {
     ...base,
     ...(retryNow ? { sendAttempts: 0, sendingAt: null } : {}),
     messages,
@@ -211,9 +228,12 @@ export function applyUpdate(
     pagePath: update.pagePath ?? base.pagePath,
     lastActivityAt: update.now,
   };
+  next.isTest = Boolean(base.isTest || update.isTest || sessionLooksLikeTest(next));
+  return next;
 }
 
 export function isDue(s: TranscriptSession, opts: ClaimOptions): boolean {
+  if (s.isTest) return false;
   const now = opts.now.getTime();
   const userCount = s.messages.filter((m) => m.role === "user").length;
   if (userCount === 0) return false;
@@ -417,8 +437,13 @@ function rowToSession(r: RawRow): TranscriptSession {
     sendingAt: toDate(pick("sendingAt", "sending_at")),
     sendAttempts: Number(pick("sendAttempts", "send_attempts") ?? 0),
     sendError: (pick("sendError", "send_error") as string | null) ?? null,
+    isTest: pick("isTest", "is_test") === true,
   };
 }
+
+/** 6:50pm hygiene column; mirrors scripts/sql/2026-09-24-test-hygiene-attribution.sql. */
+export const RANDY_CHAT_SESSIONS_HYGIENE_DDL =
+  "ALTER TABLE IF EXISTS randy_chat_sessions ADD COLUMN IF NOT EXISTS is_test boolean NOT NULL DEFAULT false";
 
 /** Postgres store via @workspace/db (lazy import so tests without a DB never load it). */
 export class DrizzleTranscriptStore implements TranscriptStore {
@@ -449,6 +474,7 @@ export class DrizzleTranscriptStore implements TranscriptStore {
         send_attempts integer NOT NULL DEFAULT 0,
         send_error text
       )`);
+      await applyAdditiveColumns(m.pool, [RANDY_CHAT_SESSIONS_HYGIENE_DDL]);
       this.ensured = true;
     }
     return m;
@@ -466,9 +492,10 @@ export class DrizzleTranscriptStore implements TranscriptStore {
       await client.query(
         `INSERT INTO randy_chat_sessions
            (id, messages, message_count, user_message_count, qualify, contact, events,
-            last_handoff, handoff_pending, page_path, created_at, last_activity_at)
-         VALUES ($1, $2::jsonb, $3, $4, $5::jsonb, $6::jsonb, $7::jsonb, $8, $9, $10, $11, $12)
+            last_handoff, handoff_pending, page_path, created_at, last_activity_at, is_test)
+         VALUES ($1, $2::jsonb, $3, $4, $5::jsonb, $6::jsonb, $7::jsonb, $8, $9, $10, $11, $12, $14)
          ON CONFLICT (id) DO UPDATE SET
+           is_test = randy_chat_sessions.is_test OR EXCLUDED.is_test,
            messages = EXCLUDED.messages,
            message_count = EXCLUDED.message_count,
            user_message_count = EXCLUDED.user_message_count,
@@ -497,6 +524,7 @@ export class DrizzleTranscriptStore implements TranscriptStore {
           s.createdAt,
           s.lastActivityAt,
           Boolean(update.handoff || (update.event && HANDOFF_EVENTS.has(update.event))),
+          s.isTest,
         ],
       );
       await client.query("COMMIT");
@@ -520,6 +548,7 @@ export class DrizzleTranscriptStore implements TranscriptStore {
           SELECT id FROM randy_chat_sessions
            WHERE message_count > sent_message_count
              AND user_message_count > 0
+             AND NOT is_test
              AND (send_attempts < $2 OR (send_error IS NOT NULL AND (sending_at IS NULL OR sending_at <= $8)))
              AND last_activity_at >= $3
              AND (sending_at IS NULL OR sending_at <= $4)

@@ -35,6 +35,8 @@ export const randyChatSessionsTable = pgTable("randy_chat_sessions", {
   sendingAt: timestamp("sending_at", { withTimezone: true }),
   sendAttempts: integer("send_attempts").notNull().default(0),
   sendError: text("send_error"),
+  /** QA / probe traffic (6:50pm): stored, never emailed. Additive column. */
+  isTest: boolean("is_test").notNull().default(false),
 });
 
 export type RandyChatSessionRow = typeof randyChatSessionsTable.$inferSelect;

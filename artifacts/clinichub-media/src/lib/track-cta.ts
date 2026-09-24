@@ -1,3 +1,5 @@
+import { track } from "@/lib/analytics";
+
 export const CTA_EVENTS = [
   "cta_hero_reserve",
   "cta_hold_190",
@@ -24,6 +26,12 @@ function currentPath(): string {
 
 export function trackCta(event: CtaEvent, options?: { offer?: CtaOffer | null }): void {
   if (!CTA_EVENT_SET.has(event)) return;
+  // Env-gated analytics (see lib/analytics.ts; no-op without config): every Hold / Reserve CTA is a checkout_click.
+  if (options?.offer === "hold-190" || options?.offer === "reserve-490") {
+    track("checkout_click", { offer: options.offer === "hold-190" ? "hold" : "reserve", cta: event });
+  } else if (event === "cta_book_call") {
+    // tel / call CTAs are counted via call_click where the tel link lives.
+  }
   try {
     const payload: { event: CtaEvent; path: string; offer?: CtaOffer } = {
       event,

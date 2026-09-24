@@ -1,4 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { HoneypotField, withFormGuards } from "@/lib/form-guards";
+import { track } from "@/lib/analytics";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -43,6 +45,7 @@ interface WaitlistDialogProps {
 
 export function WaitlistDialog({ open, onOpenChange }: WaitlistDialogProps) {
   const { mutate: joinWaitlist, isPending, isError, isSuccess, data, reset: resetMutation } = useJoinPilotWaitlist();
+  const honeypotRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<UpdateFormValues>({
     resolver: zodResolver(updateSchema),
@@ -70,8 +73,9 @@ export function WaitlistDialog({ open, onOpenChange }: WaitlistDialogProps) {
     };
 
     joinWaitlist(
-      { data: payload },
+      { data: withFormGuards(payload, honeypotRef) },
       {
+        onSuccess: () => track("intake_submit", { source: "waitlist" }),
         onError: (err) => {
           console.error("Updates error:", err);
         }
@@ -113,7 +117,8 @@ export function WaitlistDialog({ open, onOpenChange }: WaitlistDialogProps) {
               )}
 
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="relative space-y-6">
+                  <HoneypotField inputRef={honeypotRef} idSuffix="waitlist" />
                   <FormField
                     control={form.control}
                     name="email"
