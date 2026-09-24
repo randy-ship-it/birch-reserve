@@ -1,8 +1,8 @@
 /**
  * Voice call intake: phone calls (POST /api/voice/call-ended, a secured generic
  * ingest; xAI phone agents have no post-call webhook today, they email randy@,
- * so Emma may post parsed call emails here) and in-browser live web voice
- * sessions (POST /api/voice/web-session-ended, source "web").
+ * so Emma may post parsed call emails here). source "web" is reserved for a
+ * future in-browser voice client (none on birchreserve.net today).
  *
  * xAI does not publish a post-call webhook schema (the documented SIP
  * webhook is `realtime.call.incoming` in a Standard Webhooks envelope:

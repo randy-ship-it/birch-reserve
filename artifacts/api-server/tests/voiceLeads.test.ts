@@ -6,13 +6,6 @@ import express from "express";
 import { getTableConfig } from "drizzle-orm/pg-core";
 import { leadsTable, voiceCallsTable } from "@workspace/db/schema";
 import voiceRouter, { secretMatches } from "../src/routes/voiceCallEnded";
-import voiceWebRouter, { resetWebVoiceRateLimitForTests } from "../src/routes/voiceWebSession";
-import {
-  buildWebVoicePayload,
-  MAX_WEB_VOICE_PAYLOAD_BYTES,
-  WebVoiceSessionReporter,
-  WEB_VOICE_SESSION_API,
-} from "../../clinichub-media/src/lib/web-voice-session";
 import randyChatRouter from "../src/routes/randyChat";
 import {
   MemoryVoiceCallStore,
@@ -71,10 +64,8 @@ before(async () => {
 
   const app = express();
   app.use("/api/voice/call-ended", express.json({ limit: "1mb" }));
-  app.use("/api/voice/web-session-ended", express.json({ limit: "256kb", type: ["application/json", "text/plain"] }));
   app.use(express.json({ limit: "32kb" }));
   app.use("/api", voiceRouter);
-  app.use("/api", voiceWebRouter);
   app.use("/api", randyChatRouter);
   const server = app.listen(0);
   await new Promise<void>((resolve, reject) => {
@@ -100,7 +91,6 @@ beforeEach(() => {
   fetchResponses = [];
   logLines.length = 0;
   mailerFailures = 0;
-  resetWebVoiceRateLimitForTests();
   process.env["VOICE_WEBHOOK_SECRET"] = SECRET;
   delete process.env["FRIDAY_API_URL"];
   delete process.env["FRIDAY_API_KEY"];
@@ -473,144 +463,6 @@ test("Friday: URL normalization and payload limits", () => {
   assert.equal(p["email"], undefined);
   assert.equal((p["phone"] as string).length, 40);
   assert.equal(p["kind"], "bot");
-});
-
-/* ---------------- web voice sessions (in-browser) ---------------- */
-
-function postWeb(body: unknown, headers: Record<string, string> = {}, contentType = "application/json") {
-  return fetch(`${baseUrl}/voice/web-session-ended`, {
-    method: "POST",
-    headers: { "content-type": contentType, ...headers },
-    body: typeof body === "string" ? body : JSON.stringify(body),
-  });
-}
-
-const WEB = {
-  sessionId: "wv_test_session_01",
-  surface: "call_chip",
-  pagePath: "/",
-  startedAt: "2026-09-24T21:10:00Z",
-  endedAt: "2026-09-24T21:12:05Z",
-  endReason: "visitor_hangup",
-  transcript: [
-    { role: "assistant", content: "Randy's AI here. What brand are you with?" },
-    { role: "user", content: "Mo at Peak Bars, we want the hubs." },
-  ],
-  fields: { name: "Mo Diaz", company: "Peak Bars", phone: "647 555 0133", email: "mo@peak.example", need: "Hub sampling" },
-};
-
-test("web voice: saved to voice_calls (source web) + leads + email + Friday; response never echoes contact", async () => {
-  setFriday();
-  const res = await postWeb(WEB, { origin: "https://birchreserve.net" });
-  assert.equal(res.status, 200);
-  const text = await res.text();
-  assert.equal(text, JSON.stringify({ ok: true }));
-  const row = voiceStore.rows.get("web:wv_test_session_01")!;
-  assert.equal(row.source, "web");
-  assert.equal(row.durationSeconds, 125);
-  assert.equal(row.endReason, "visitor_hangup");
-  assert.equal(row.turns.length, 2);
-  assert.equal(row.extracted.company, "Peak Bars");
-  assert.equal((row.rawPayload as Record<string, unknown>)["surface"], "call_chip");
-  const lead = leadStore.rows.get("webvoice:wv_test_session_01")!;
-  assert.equal(lead.source, "web_voice");
-  assert.equal(lead.phone, "647 555 0133");
-  assert.equal(sentEmails.length, 1);
-  assert.match(sentEmails[0]!.subject, /Birch web voice session: Peak Bars/);
-  assert.match(sentEmails[0]!.text, /Caller: Mo at Peak Bars/);
-  await flush();
-  assert.equal(fetchCalls.length, 1);
-  assert.equal(fetchCalls[0]!.body["kind"], "bot");
-  assert.equal(fetchCalls[0]!.body["source"], "Birch web voice call");
-});
-
-test("web voice: idempotent on sessionId (pagehide beacon + explicit end merge, one email)", async () => {
-  await postWeb({ ...WEB, endReason: "pagehide", transcript: WEB.transcript.slice(0, 1), fields: { name: "Mo Diaz" } });
-  await postWeb(WEB);
-  assert.equal(voiceStore.rows.size, 1);
-  const row = voiceStore.rows.get("web:wv_test_session_01")!;
-  assert.equal(row.receivedCount, 2);
-  assert.equal(row.turns.length, 2);
-  assert.equal(leadStore.rows.size, 1);
-  assert.equal(leadStore.rows.get("webvoice:wv_test_session_01")!.company, "Peak Bars");
-});
-
-test("web voice: started from a chat → merges into the chat lead (one visitor, one lead)", async () => {
-  await leadStore.upsert({ id: "chat:rc_chat_0042", source: "chat_intake", sourceRef: "rc_chat_0042", company: "Peak Bars" });
-  await postWeb({ ...WEB, chatSessionId: "rc_chat_0042" });
-  assert.equal(leadStore.rows.size, 1);
-  const lead = leadStore.rows.get("chat:rc_chat_0042")!;
-  assert.equal(lead.source, "web_voice");
-  assert.equal(lead.email, "mo@peak.example");
-  assert.equal(voiceStore.rows.get("web:wv_test_session_01")!.leadId, "chat:rc_chat_0042");
-});
-
-test("web voice: sendBeacon text/plain body accepted; empty sessions stored but not emailed", async () => {
-  const res = await postWeb(JSON.stringify({ sessionId: "wv_empty_000001", endReason: "pagehide" }), {}, "text/plain;charset=UTF-8");
-  assert.equal(res.status, 200);
-  assert.ok(voiceStore.rows.get("web:wv_empty_000001"));
-  assert.equal(sentEmails.length, 0);
-  assert.equal(leadStore.rows.size, 0, "no lead without contact info");
-});
-
-test("web voice: Origin check, strict validation, rate limit", async () => {
-  assert.equal((await postWeb(WEB, { origin: "https://evil.example" })).status, 403);
-  assert.equal((await postWeb({ ...WEB, extra: 1 })).status, 400);
-  assert.equal((await postWeb({ ...WEB, sessionId: "short" })).status, 400);
-  assert.equal((await postWeb({ ...WEB, fields: { ssn: "1" } })).status, 400);
-  assert.equal((await postWeb({ ...WEB, transcript: [{ role: "system", content: "x" }] })).status, 400);
-  const bad = await postWeb({ ...WEB, fields: { ...WEB.fields, name: "x".repeat(301) } });
-  assert.equal(bad.status, 400);
-  assert.doesNotMatch(await bad.text(), /Mo Diaz|peak\.example|0133/);
-  assert.equal(voiceStore.rows.size, 0);
-  resetWebVoiceRateLimitForTests();
-  let last = 0;
-  for (let i = 0; i < 31; i += 1) last = (await postWeb({ sessionId: `wv_rate_${String(i).padStart(4, "0")}` })).status;
-  assert.equal(last, 429);
-});
-
-test("web voice client: reporter flushes on pagehide via beacon, ends via keepalive fetch, dedupes", async () => {
-  const beacons: string[] = [];
-  const fetches: Array<{ body: string; keepalive: boolean }> = [];
-  const r = new WebVoiceSessionReporter({
-    beacon: (url, body) => {
-      assert.equal(url, WEB_VOICE_SESSION_API);
-      beacons.push(body);
-      return true;
-    },
-    fetch: async (_url, init) => {
-      fetches.push({ body: init.body, keepalive: init.keepalive });
-    },
-  });
-  assert.equal(r.flush(), false, "no session → nothing sent");
-  const id = r.start({ surface: "ai_call_now", chatSessionId: "rc_chat_0042", pagePath: "/" });
-  assert.match(id, /^[A-Za-z0-9_-]{8,80}$/);
-  r.addTurn("assistant", "Hi");
-  r.addTurn("user", "Hello");
-  r.setFields({ name: "Mo Diaz", email: "mo@peak.example" });
-  assert.equal(r.flush("pagehide"), true);
-  assert.equal(r.flush("pagehide"), false, "unchanged → not re-sent");
-  r.addTurn("user", "Bye");
-  assert.equal(r.end("visitor_hangup"), true);
-  assert.equal(beacons.length, 1);
-  assert.equal(fetches.length, 1);
-  assert.equal(fetches[0]!.keepalive, true);
-  const final = JSON.parse(fetches[0]!.body) as Record<string, unknown>;
-  assert.equal(final["chatSessionId"], "rc_chat_0042");
-  assert.equal((final["transcript"] as unknown[]).length, 3);
-  assert.equal(r.active, false);
-  // And the server accepts exactly what the client sends.
-  const res = await postWeb(fetches[0]!.body);
-  assert.equal(res.status, 200);
-});
-
-test("web voice client: payload always fits a beacon (drops oldest turns)", () => {
-  const turns = Array.from({ length: 300 }, (_, i) => ({ role: (i % 2 ? "user" : "assistant") as "user" | "assistant", content: `${i} ${"y".repeat(1500)}` }));
-  const body = buildWebVoicePayload({ sessionId: "wv_big_0000001", surface: "voice_demo", startedAt: new Date().toISOString(), turns, fields: {} }, "ended");
-  assert.ok(new TextEncoder().encode(body).length <= MAX_WEB_VOICE_PAYLOAD_BYTES);
-  const parsed = JSON.parse(body) as { transcript: Array<{ content: string }> };
-  assert.ok(parsed.transcript.length > 0);
-  assert.match(parsed.transcript.at(-1)!.content, /^299 /, "newest turns are kept");
 });
 
 /* ---------------- additive schema ---------------- */

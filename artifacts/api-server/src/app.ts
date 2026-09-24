@@ -100,11 +100,9 @@ app.post(
 // Chat Randy sends the whole thread; give it a bigger limit than the 32kb default
 // (a long chat used to 413 into the widget's error card).
 app.use("/api/launch/randy-chat", randyChatJsonParser());
-// xAI post-call webhook: transcripts can exceed the 32kb default, so parse this
+// Voice call-ended ingest: transcripts can exceed the 32kb default, so parse this
 // one route first with a larger cap (the global parser skips parsed bodies).
 app.use("/api/voice/call-ended", express.json({ limit: "1mb" }));
-// Web voice session end: sendBeacon posts may be text/plain; beacons cap at ~64kb.
-app.use("/api/voice/web-session-ended", express.json({ limit: "256kb", type: ["application/json", "text/plain"] }));
 app.use(express.json({ limit: "32kb" }));
 app.use(express.urlencoded({ extended: true, limit: "32kb" }));
 

@@ -63,8 +63,7 @@ export type LeadRow = typeof leadsTable.$inferSelect;
  * Voice call records, one row per call_id (idempotent; repeats bump received_count):
  *   source "phone"  POST /api/voice/call-ended (secured generic ingest, e.g. parsed
  *                   xAI phone-agent emails); raw_payload keeps the exact JSON posted
- *   source "web"    POST /api/voice/web-session-ended (in-browser live voice on
- *                   birchreserve.net), call_id = "web:<sessionId>"
+ *   source "web"    reserved for a future in-browser voice client
  */
 export const voiceCallsTable = pgTable(
   "voice_calls",
