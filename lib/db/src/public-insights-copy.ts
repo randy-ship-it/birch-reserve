@@ -47,23 +47,26 @@ Seller: Silver Birch Growth Inc., Toronto · randy@silverbirchgrowth.com · http
 `,
 } as const;
 
-const LEGACY_DISPLAY_RESERVE_SENTENCE =
-  "The first Display Reserve is deliberately concrete: a fixed $899 USD reservation for eight seats, with a media credit and a final insertion order.";
-
 const PUBLIC_OFFER_SENTENCE =
   "Public offers are Hold $190 for a seven-day category look that does not consume one of the eight seats, or Reserve $490 for a named category seat in the eight-pool. Both amounts are media credit, and the insertion order names the surface before anything runs.";
+
+const LEGACY_DISPLAY_RESERVE_SENTENCE =
+  /The first Display Reserve is deliberately concrete:\s*a fixed \$899(?:\.00)?\s*USD reservation for eight seats, with a media credit and a final insertion order\./g;
 
 const LEGACY_HERO_PRICE = /\$899|reserve-899|hero\s*899|\b899(?:\.00)?\s*USD\b/i;
 
 export function mentionsLegacyHeroPrice(text: string): boolean {
-  return LEGACY_HERO_PRICE.test(text);
+  return LEGACY_HERO_PRICE.test(text.replaceAll("\u00a0", " ").replaceAll("\u202f", " "));
 }
 
 export function rewriteLegacyReserveCopy(text: string): string {
-  const replaced = text.replaceAll(LEGACY_DISPLAY_RESERVE_SENTENCE, PUBLIC_OFFER_SENTENCE);
+  if (!mentionsLegacyHeroPrice(text)) return text;
+  const normalized = text.replaceAll("\u00a0", " ").replaceAll("\u202f", " ");
+  const replaced = normalized.replaceAll(LEGACY_DISPLAY_RESERVE_SENTENCE, PUBLIC_OFFER_SENTENCE);
   if (!mentionsLegacyHeroPrice(replaced)) return replaced;
   return replaced
     .replaceAll(/reserve-899/gi, "reserve-490")
+    .replaceAll(/\$899(?:\.00)?\s*USD reservation/gi, "Hold $190 or Reserve $490")
     .replaceAll(/\$899(?:\.00)?(?:\s*USD)?/g, "Hold $190 or Reserve $490")
     .replaceAll(/hero\s*899/gi, "Hold $190 or Reserve $490")
     .replaceAll(/\b899(?:\.00)?\s*USD\b/gi, "Hold $190 or Reserve $490");

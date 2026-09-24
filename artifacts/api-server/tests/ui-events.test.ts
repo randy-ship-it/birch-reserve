@@ -49,7 +49,14 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
   assert.match(patch.body, /Hold \$190/);
   assert.match(patch.body, /Reserve \$490/);
   assert.match(patch.body, /Payments are currently paused/);
+  assert.doesNotMatch(patch.body, /\$899 USD reservation/);
+  assert.doesNotMatch(patch.body, /\$899/);
   assert.equal(legacyReserveCopyPatch(patch.summary, patch.body), null);
+
+  const phraseOnly = legacyReserveCopyPatch("summary", "Still selling a fixed $899\u00a0USD reservation.");
+  assert.ok(phraseOnly);
+  assert.doesNotMatch(phraseOnly.body, /\$899/);
+  assert.match(phraseOnly.body, /Hold \$190 or Reserve \$490/);
 
   const fallback = legacyReserveCopyPatch("fine", "Do not hero 899 or sell reserve-899 at 899 USD.");
   assert.ok(fallback);
@@ -195,7 +202,7 @@ test("POST /v1/ui-events allowlists CTA events and rejects unknown or oversized 
     const failedWrite = await fetch(`${origin}/v1/ui-events`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ event: "cta_insights_article", path: "/insights" }),
+      body: JSON.stringify({ event: "nav_insights", path: "/insights" }),
     });
     assert.equal(failedWrite.status, 204);
 
@@ -236,29 +243,30 @@ test("POST /v1/ui-events allowlists CTA events and rejects unknown or oversized 
 
 test("marketing CTAs call the first-party helper and no third-party pixel", async () => {
   const root = resolve(process.cwd(), "..");
-  const [home, concierge, insights, article, helper] = await Promise.all([
+  const [home, concierge, layout, helper, editorial] = await Promise.all([
     readFile(resolve(root, "clinichub-media/src/pages/home.tsx"), "utf8"),
     readFile(resolve(root, "clinichub-media/src/components/sales-concierge.tsx"), "utf8"),
-    readFile(resolve(root, "clinichub-media/src/pages/insights.tsx"), "utf8"),
-    readFile(resolve(root, "clinichub-media/src/pages/insight-article.tsx"), "utf8"),
+    readFile(resolve(root, "clinichub-media/src/components/layout.tsx"), "utf8"),
     readFile(resolve(root, "clinichub-media/src/lib/track-cta.ts"), "utf8"),
+    readFile(resolve(process.cwd(), "src/routes/editorial.ts"), "utf8"),
   ]);
-  const clientEvents = [...helper.matchAll(/"(cta_[a-z0-9_]+)"/g)].map((match) => match[1]);
-  assert.ok(clientEvents.length >= 8);
-  for (const event of new Set(clientEvents)) {
+  const clientEvents = [...helper.matchAll(/"(cta_[a-z0-9_]+|nav_[a-z0-9_]+|buycalc_[a-z0-9_]+)"/g)].map((match) => match[1]);
+  for (const event of ["cta_hero_reserve", "cta_hold_190", "cta_reserve_490", "cta_book_call", "nav_insights", "buycalc_open"]) {
+    assert.equal(clientEvents.includes(event), true);
     assert.equal(parseUiEvent({ event, path: "/" })?.event, event);
   }
   assert.match(helper, /\/v1\/ui-events/);
   assert.match(helper, /sendBeacon/);
   assert.match(helper, /keepalive:\s*true/);
-  assert.match(home, /trackReserveDialogOpen/);
+  assert.match(home, /cta_hero_reserve/);
+  assert.match(home, /buycalc_open/);
   assert.match(home, /cta_book_call/);
   assert.match(home, /cta_custom_onprem/);
-  assert.match(home, /cta_reserve_490/);
   assert.match(concierge, /cta_book_call/);
-  assert.match(insights, /cta_insights_article/);
-  assert.match(article, /cta_insights_related/);
-  const surfaces = `${home}\n${concierge}\n${insights}\n${article}\n${helper}`;
+  assert.match(layout, /nav_insights/);
+  assert.match(editorial, /const PUBLIC_SITE_ORIGIN = "https:\/\/birchreserve\.net"/);
+  assert.doesNotMatch(editorial, /www\.birchreserve\.net/);
+  const surfaces = `${home}\n${concierge}\n${layout}\n${helper}`;
   assert.doesNotMatch(surfaces, /googletagmanager|google-analytics|plausible|posthog|vercel\.com\/analytics|gtag\(/i);
 });
 

@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useParams, Link } from 'wouter';
 import { useGetEditorialArticle, useListEditorialArticles, getGetEditorialArticleQueryKey } from '@workspace/api-client-react';
 import { ChevronLeft, FileText, Calendar, User, BookOpen, Quote } from 'lucide-react';
-import { trackCta } from '@/lib/track-cta';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function InsightArticle() {
@@ -190,7 +189,6 @@ export default function InsightArticle() {
                 <Link 
                   key={related.slug}
                   href={`/insights/${related.slug}`}
-                  onClick={() => trackCta("cta_insights_related")}
                   className="bg-background p-8 transition-colors hover:bg-secondary/10 flex flex-col"
                 >
                   <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">

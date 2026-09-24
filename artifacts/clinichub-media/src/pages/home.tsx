@@ -20,7 +20,7 @@ import {
   RESERVE_OFFERS,
   type ReserveOfferKey,
 } from "@/lib/reserve-offers";
-import { trackCta, trackReserveDialogOpen } from "@/lib/track-cta";
+import { trackCta, trackReserveDialogOpen, type CtaEvent } from "@/lib/track-cta";
 import {
   SalesConcierge,
   type ConciergeQuestionSignals,
@@ -153,8 +153,9 @@ export default function Home() {
   const openReserveDialog = (
     format?: string,
     offer: ReserveOfferKey = DEFAULT_RESERVE_OFFER_KEY,
+    event?: CtaEvent,
   ) => {
-    trackReserveDialogOpen(format, offer);
+    trackReserveDialogOpen(format, offer, event);
     setSelectedFormat(format);
     setSelectedOffer(offer);
     setSplashDialogOpen(true);
@@ -296,7 +297,7 @@ export default function Home() {
               <Button
                 size="lg"
                 className="w-full sm:w-auto rounded-none bg-accent text-accent-foreground h-14 px-8 font-medium hover:bg-background hover:text-foreground transition-colors text-base"
-                onClick={() => openReserveDialog()}
+                onClick={() => openReserveDialog(undefined, "reserve-490", "cta_hero_reserve")}
                 data-testid="button-hero-reserve"
               >
                 Lock the seat — {reservePriceLabel}
@@ -464,7 +465,7 @@ export default function Home() {
             <Button
               type="button"
               onClick={() => {
-                trackCta("cta_reserve_490", { offer: "reserve-490" });
+                trackCta("buycalc_open", { offer: "reserve-490" });
                 window.location.href = "/buycalc?sku=reserve-490";
               }}
               className="h-12 rounded-none bg-accent px-6 text-accent-foreground hover:bg-foreground hover:text-background"

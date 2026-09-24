@@ -3,6 +3,7 @@ import { ReactNode, useState } from 'react';
 import { Menu, X, ArrowRight } from 'lucide-react';
 import birchReserveMark from '@assets/brand/birch-reserve-mark-v2.svg';
 import { SELLER_IDENTITY } from '@/lib/seller-identity';
+import { trackCta } from '@/lib/track-cta';
 
 export function Layout({ children }: { children: ReactNode }) {
   const basePath = import.meta.env.BASE_URL;
@@ -32,7 +33,16 @@ export function Layout({ children }: { children: ReactNode }) {
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8 text-sm text-foreground">
             {navLinks.map((link) => (
-              <a key={link.label} href={link.href} className="hover:text-accent transition-colors">{link.label}</a>
+              <a
+                key={link.label}
+                href={link.href}
+                className="hover:text-accent transition-colors"
+                onClick={() => {
+                  if (link.label === "Insights") trackCta("nav_insights");
+                }}
+              >
+                {link.label}
+              </a>
             ))}
             <Link href="/about" className="hover:text-accent transition-colors">About</Link>
             <div className="w-px h-4 bg-border" />
@@ -59,7 +69,10 @@ export function Layout({ children }: { children: ReactNode }) {
                   key={link.label}
                   href={link.href}
                   className="text-foreground hover:text-accent transition-colors py-2 border-b border-border/50"
-                  onClick={() => setMobileMenuOpen(false)}
+                  onClick={() => {
+                    if (link.label === "Insights") trackCta("nav_insights");
+                    setMobileMenuOpen(false);
+                  }}
                 >
                   {link.label}
                 </a>

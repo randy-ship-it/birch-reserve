@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useListEditorialArticles } from '@workspace/api-client-react';
 import { Link } from 'wouter';
-import { trackCta } from '@/lib/track-cta';
 import { ChevronRight, ExternalLink } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -60,7 +59,6 @@ export default function Insights() {
               <Link 
                 key={article.slug} 
                 href={`/insights/${article.slug}`}
-                onClick={() => trackCta("cta_insights_article")}
                 className="group flex flex-col bg-background p-8 md:p-10 transition-colors hover:bg-secondary/10"
               >
                 <div className="mb-6 flex items-center justify-between text-xs font-semibold uppercase tracking-widest text-muted-foreground">

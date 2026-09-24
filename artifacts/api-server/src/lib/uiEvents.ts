@@ -7,16 +7,17 @@ import express from "express";
 import { logger } from "./logger";
 
 export const UI_EVENTS = [
+  "cta_hero_reserve",
   "cta_hold_190",
   "cta_reserve_490",
   "cta_book_call",
+  "nav_insights",
+  "buycalc_open",
   "cta_open_reserve",
   "cta_custom_onprem",
   "cta_confirmation_placement",
   "cta_auto_buy",
   "cta_private_distribution",
-  "cta_insights_article",
-  "cta_insights_related",
 ] as const;
 
 export type UiEventName = (typeof UI_EVENTS)[number];
