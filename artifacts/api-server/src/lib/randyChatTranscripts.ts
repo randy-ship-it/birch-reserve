@@ -4,7 +4,8 @@
  *
  * - Storage: Postgres table `randy_chat_sessions` (Drizzle, @workspace/db).
  * - Email: Resend HTTP API. Env RESEND_API_KEY (required to send),
- *   RANDY_TRANSCRIPT_FROM (default "Birch Reserve Chat <alerts@rdgdh.com>"),
+ *   RANDY_CHAT_FROM (default "Birch Reserve <care@scalehealth.ca>", a sender verified in
+ *   the Scale Resend account that owns the Autoscale RESEND_API_KEY),
  *   RANDY_TRANSCRIPT_TO (default randy@silverbirchgrowth.com).
  *   Without RESEND_API_KEY, sessions are still logged and nothing is sent;
  *   once the key is set, the backlog from the last 7 days goes out.
@@ -61,6 +62,8 @@ export type ClaimOptions = {
   now: Date;
   idleMs: number;
   staleClaimMs: number;
+  /** After maxAttempts, a failed row is still retried once per this interval (never stuck). */
+  failedRetryMs?: number;
   maxAttempts: number;
   maxAgeMs: number;
   limit: number;
@@ -71,12 +74,13 @@ export interface TranscriptStore {
   upsert(update: TranscriptUpdate): Promise<void>;
   claimDue(opts: ClaimOptions): Promise<TranscriptSession[]>;
   markSent(id: string, sentMessageCount: number, now: Date): Promise<void>;
-  markFailed(id: string, error: string): Promise<void>;
+  markFailed(id: string, error: string, now?: Date): Promise<void>;
   get?(id: string): Promise<TranscriptSession | undefined>;
 }
 
 export const TRANSCRIPT_IDLE_MS = 10 * 60_000;
 const STALE_CLAIM_MS = 5 * 60_000;
+const FAILED_RETRY_MS = 30 * 60_000;
 const MAX_SEND_ATTEMPTS = 5;
 const MAX_BACKLOG_AGE_MS = 7 * 24 * 60 * 60_000;
 const SWEEP_THROTTLE_MS = 60_000;
@@ -190,8 +194,11 @@ export function applyUpdate(
     ? [...base.events, { type: update.event, at: update.now.toISOString() }].slice(-MAX_EVENTS)
     : base.events;
   const isHandoff = Boolean(update.handoff || (update.event && HANDOFF_EVENTS.has(update.event)));
+  // A new handoff on a session whose last send failed retries right away.
+  const retryNow = isHandoff && Boolean(base.sendError);
   return {
     ...base,
+    ...(retryNow ? { sendAttempts: 0, sendingAt: null } : {}),
     messages,
     qualify: { ...base.qualify, ...cleanFields(update.qualify) },
     // Explicit fields win over values scraped from chat text.
@@ -209,9 +216,13 @@ export function isDue(s: TranscriptSession, opts: ClaimOptions): boolean {
   const userCount = s.messages.filter((m) => m.role === "user").length;
   if (userCount === 0) return false;
   if (s.messages.length <= s.sentMessageCount) return false;
-  if (s.sendAttempts >= opts.maxAttempts) return false;
   if (now - s.lastActivityAt.getTime() > opts.maxAgeMs) return false;
   if (s.sendingAt && now - s.sendingAt.getTime() < opts.staleClaimMs) return false;
+  if (s.sendAttempts >= opts.maxAttempts) {
+    const retryMs = opts.failedRetryMs ?? FAILED_RETRY_MS;
+    const lastTry = s.sendingAt?.getTime() ?? 0;
+    if (!s.sendError || now - lastTry < retryMs) return false;
+  }
   return s.handoffPending || now - s.lastActivityAt.getTime() >= opts.idleMs;
 }
 
@@ -360,10 +371,11 @@ export class MemoryTranscriptStore implements TranscriptStore {
     s.sendError = null;
   }
 
-  async markFailed(id: string, error: string): Promise<void> {
+  async markFailed(id: string, error: string, now: Date = new Date()): Promise<void> {
     const s = this.rows.get(id);
     if (!s) return;
-    s.sendingAt = null;
+    // sendingAt doubles as "last attempt at" so retries back off (stale-claim window).
+    s.sendingAt = now;
     s.sendError = error.slice(0, 300);
   }
 
@@ -460,7 +472,11 @@ export class DrizzleTranscriptStore implements TranscriptStore {
            last_handoff = EXCLUDED.last_handoff,
            handoff_pending = randy_chat_sessions.handoff_pending OR EXCLUDED.handoff_pending,
            page_path = EXCLUDED.page_path,
-           last_activity_at = EXCLUDED.last_activity_at`,
+           last_activity_at = EXCLUDED.last_activity_at,
+           send_attempts = CASE WHEN $13 AND randy_chat_sessions.send_error IS NOT NULL
+                                THEN 0 ELSE randy_chat_sessions.send_attempts END,
+           sending_at = CASE WHEN $13 AND randy_chat_sessions.send_error IS NOT NULL
+                             THEN NULL ELSE randy_chat_sessions.sending_at END`,
         [
           s.id,
           JSON.stringify(s.messages),
@@ -474,6 +490,7 @@ export class DrizzleTranscriptStore implements TranscriptStore {
           s.pagePath,
           s.createdAt,
           s.lastActivityAt,
+          Boolean(update.handoff || (update.event && HANDOFF_EVENTS.has(update.event))),
         ],
       );
       await client.query("COMMIT");
@@ -497,7 +514,7 @@ export class DrizzleTranscriptStore implements TranscriptStore {
           SELECT id FROM randy_chat_sessions
            WHERE message_count > sent_message_count
              AND user_message_count > 0
-             AND send_attempts < $2
+             AND (send_attempts < $2 OR (send_error IS NOT NULL AND (sending_at IS NULL OR sending_at <= $8)))
              AND last_activity_at >= $3
              AND (sending_at IS NULL OR sending_at <= $4)
              AND (handoff_pending OR last_activity_at <= $5)
@@ -506,7 +523,16 @@ export class DrizzleTranscriptStore implements TranscriptStore {
            LIMIT $7
            FOR UPDATE SKIP LOCKED)
         RETURNING *`,
-      [now, opts.maxAttempts, notOlderThan, staleBefore, idleBefore, opts.onlyId ?? null, opts.limit],
+      [
+        now,
+        opts.maxAttempts,
+        notOlderThan,
+        staleBefore,
+        idleBefore,
+        opts.onlyId ?? null,
+        opts.limit,
+        new Date(now.getTime() - (opts.failedRetryMs ?? FAILED_RETRY_MS)),
+      ],
     );
     return (res.rows as RawRow[]).map(rowToSession);
   }
@@ -522,11 +548,11 @@ export class DrizzleTranscriptStore implements TranscriptStore {
     );
   }
 
-  async markFailed(id: string, error: string): Promise<void> {
+  async markFailed(id: string, error: string, now: Date = new Date()): Promise<void> {
     const m = await this.mod();
     await m.pool.query(
-      "UPDATE randy_chat_sessions SET sending_at = NULL, send_error = $2 WHERE id = $1",
-      [id, error.slice(0, 300)],
+      "UPDATE randy_chat_sessions SET sending_at = $3, send_error = $2 WHERE id = $1",
+      [id, error.slice(0, 300), now],
     );
   }
 }
@@ -538,8 +564,12 @@ export class DrizzleTranscriptStore implements TranscriptStore {
 export type TranscriptMailer = (email: RenderedEmail) => Promise<void>;
 
 export const RESEND_API_KEY_ENV = "RESEND_API_KEY" as const;
-const DEFAULT_FROM = "Birch Reserve Chat <alerts@rdgdh.com>";
-const DEFAULT_TO = "randy@silverbirchgrowth.com";
+/** Must be a sender verified in the Resend account behind RESEND_API_KEY (Scale's). */
+export const DEFAULT_TRANSCRIPT_FROM = "Birch Reserve <care@scalehealth.ca>";
+export const TRANSCRIPT_TO = "randy@silverbirchgrowth.com";
+export function transcriptFrom(): string {
+  return process.env["RANDY_CHAT_FROM"]?.trim() || DEFAULT_TRANSCRIPT_FROM;
+}
 
 export function resendConfigured(): boolean {
   return Boolean(process.env[RESEND_API_KEY_ENV]?.trim());
@@ -555,8 +585,8 @@ export const resendMailer: TranscriptMailer = async (email) => {
       method: "POST",
       headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
       body: JSON.stringify({
-        from: process.env["RANDY_TRANSCRIPT_FROM"]?.trim() || DEFAULT_FROM,
-        to: [process.env["RANDY_TRANSCRIPT_TO"]?.trim() || DEFAULT_TO],
+        from: transcriptFrom(),
+        to: [process.env["RANDY_TRANSCRIPT_TO"]?.trim() || TRANSCRIPT_TO],
         subject: email.subject,
         text: email.text,
         html: email.html,
@@ -564,7 +594,10 @@ export const resendMailer: TranscriptMailer = async (email) => {
       }),
       signal: controller.signal,
     });
-    if (!response.ok) throw new Error(`Resend HTTP ${response.status}`);
+    if (!response.ok) {
+      const detail = (await response.text().catch(() => "")).replace(/\s+/g, " ").slice(0, 160);
+      throw new Error(`Resend HTTP ${response.status}${detail ? `: ${detail}` : ""}`);
+    }
   } finally {
     clearTimeout(timeout);
   }
@@ -665,7 +698,7 @@ export async function sweepTranscripts(opts: { now?: Date; onlyId?: string } = {
     } catch (error) {
       failed += 1;
       const message = error instanceof Error ? error.message : "send_failed";
-      await store.markFailed(session.id, message).catch(() => undefined);
+      await store.markFailed(session.id, message, now).catch(() => undefined);
       logger.warn({ err: message, session: session.id }, "Randy chat transcript email failed");
     }
   }

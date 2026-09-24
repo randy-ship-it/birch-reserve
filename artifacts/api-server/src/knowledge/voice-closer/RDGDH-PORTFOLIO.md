@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:39 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:50 EDT. Edit sales-brain, not this file. -->
 # RDGDH-PORTFOLIO.md, factual overview only
 
 **Holdco:** RDG Digital Holdings Inc. (RDGDH) · https://rdgdh.com  

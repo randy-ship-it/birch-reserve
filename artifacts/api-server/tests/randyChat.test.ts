@@ -15,6 +15,9 @@ import {
   setTranscriptDepsForTests,
   stopTranscriptSweepTimerForTests,
   sweepTranscripts,
+  transcriptFrom,
+  DEFAULT_TRANSCRIPT_FROM,
+  TRANSCRIPT_TO,
   type RenderedEmail,
 } from "../src/lib/randyChatTranscripts";
 import {
@@ -31,11 +34,16 @@ const prevGrok = process.env["GROK_API_KEY"];
 const memoryStore = new MemoryTranscriptStore();
 const sentEmails: RenderedEmail[] = [];
 let mailerReady = true;
+let mailerFailures = 0;
 
 before(async () => {
   setTranscriptDepsForTests({
     store: memoryStore,
     mailer: async (email) => {
+      if (mailerFailures > 0) {
+        mailerFailures -= 1;
+        throw new Error("Resend HTTP 403: sender not verified");
+      }
       sentEmails.push(email);
     },
     mailerReady: () => mailerReady,
@@ -136,7 +144,9 @@ test("randy-chat site scope is Birch Reserve only", () => {
   assert.match(BIRCH_SITE_SCOPE_PROMPT, /You are Randy from Birch Reserve\. Lead with Birch Reserve/);
   assert.match(BIRCH_SITE_SCOPE_PROMPT, /Never pitch the portfolio/);
   assert.match(BIRCH_SITE_SCOPE_PROMPT, /physio\.drhonow\.com/);
-  assert.doesNotMatch(BIRCH_SITE_SCOPE_PROMPT, /899|50\s*MM/i);
+  assert.doesNotMatch(BIRCH_SITE_SCOPE_PROMPT, /899/);
+  // 4:46pm HARD: Scale growth story (50MM+ unique viewers) is allowed; guarantees stay banned.
+  assert.match(BIRCH_SITE_SCOPE_PROMPT, /Never promise per-seat impressions, CTR, or view guarantees/);
 });
 
 async function postChat(body: unknown): Promise<Response> {
@@ -431,4 +441,77 @@ test("polishReply: trailing bare URL dropped if Randy linked in his last two rep
     /physio\.drhonow\.com/,
   );
   assert.match(polishReply("Here you go.\nhttps://birchreserve.net/kit", [{ role: "user", content: "hi" }]), /kit/);
+});
+
+test("4:46pm brain: full prompt loads untruncated, growth story allowed, guarantees still banned", () => {
+  const prompt = loadVoiceCloserSystemPrompt(true);
+  assert.doesNotMatch(prompt, /\[TRUNCATED/);
+  assert.ok(prompt.length > 28_000, `prompt should be the full ~28.8k brain, got ${prompt.length}`);
+  assert.match(prompt, /50MM\+? unique viewers/);
+  assert.match(prompt, /100MM\+/);
+  assert.match(`${prompt}\n${BIRCH_SITE_SCOPE_PROMPT}`, /guarantee/i);
+});
+
+test("transcript sender defaults to care@scalehealth.ca (Scale Resend), RANDY_CHAT_FROM overrides", () => {
+  const prev = process.env["RANDY_CHAT_FROM"];
+  try {
+    delete process.env["RANDY_CHAT_FROM"];
+    assert.equal(transcriptFrom(), "Birch Reserve <care@scalehealth.ca>");
+    assert.equal(DEFAULT_TRANSCRIPT_FROM, "Birch Reserve <care@scalehealth.ca>");
+    assert.equal(TRANSCRIPT_TO, "randy@silverbirchgrowth.com");
+    process.env["RANDY_CHAT_FROM"] = "Birch <alerts@example.com>";
+    assert.equal(transcriptFrom(), "Birch <alerts@example.com>");
+  } finally {
+    if (prev === undefined) delete process.env["RANDY_CHAT_FROM"];
+    else process.env["RANDY_CHAT_FROM"] = prev;
+  }
+});
+
+test("transcript send_error is never permanently stuck: backoff retry, retry after max attempts, new handoff retries now", async () => {
+  const id = "rc_retry_" + Date.now().toString(36);
+  const t0 = new Date();
+  const at = (ms: number) => new Date(t0.getTime() + ms);
+  await memoryStore.upsert({
+    id,
+    now: t0,
+    messages: [{ role: "user", content: "call me" }],
+    event: "callback_request",
+  });
+  const before = sentEmails.length;
+
+  // 403 five times in a row (backoff: each retry waits out the 5 min claim window).
+  mailerFailures = 5;
+  assert.equal((await sweepTranscripts({ onlyId: id, now: at(0) })).failed, 1);
+  assert.equal((await sweepTranscripts({ onlyId: id, now: at(60_000) })).failed, 0, "backs off inside 5 min");
+  for (let i = 1; i < 5; i += 1) {
+    assert.equal((await sweepTranscripts({ onlyId: id, now: at(i * 6 * 60_000) })).failed, 1);
+  }
+  let row = await memoryStore.get(id);
+  assert.equal(row?.sendAttempts, 5);
+  assert.match(row?.sendError ?? "", /403/);
+
+  // Max attempts reached: still retried after the 30 min failed-retry interval.
+  const lastTry = 4 * 6 * 60_000;
+  assert.equal((await sweepTranscripts({ onlyId: id, now: at(lastTry + 10 * 60_000) })).sent, 0);
+  const retried = await sweepTranscripts({ onlyId: id, now: at(lastTry + 31 * 60_000) });
+  assert.equal(retried.sent, 1);
+  assert.equal(sentEmails.length, before + 1);
+  row = await memoryStore.get(id);
+  assert.equal(row?.sendError, null);
+
+  // A new handoff after a failure retries immediately (attempts reset).
+  const id2 = id + "b";
+  await memoryStore.upsert({ id: id2, now: t0, messages: [{ role: "user", content: "hi" }], event: "tel_click" });
+  mailerFailures = 5;
+  for (let i = 0; i < 5; i += 1) await sweepTranscripts({ onlyId: id2, now: at(i * 6 * 60_000) });
+  assert.equal((await memoryStore.get(id2))?.sendAttempts, 5);
+  await memoryStore.upsert({
+    id: id2,
+    now: at(30 * 60_000),
+    messages: [{ role: "user", content: "hi" }, { role: "user", content: "please call 416 555 0123" }],
+    event: "callback_request",
+  });
+  const r2 = await sweepTranscripts({ onlyId: id2, now: at(30 * 60_000) });
+  assert.equal(r2.sent, 1);
+  mailerFailures = 0;
 });
