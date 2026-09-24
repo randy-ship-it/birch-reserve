@@ -1,5 +1,5 @@
 /**
- * Chat Randy widget — DRAFT (Emma UX + Randy ~3:00pm HARD).
+ * Chat Randy widget (Emma UX + Randy HARD). Grok text via /api/launch/randy-chat.
  *
  * Chips: Chat | Hear Randy | Call
  * Avatar: /avatars/randy.jpg (from birch-live-ops/chat-randy/assets/randy-avatar.jpg)
@@ -211,11 +211,15 @@ export function RandyChat() {
       return;
     }
     if (next === "hear") {
-      setVoiceNote("Hear Randy — DRAFT stub. Eve / Grok voice until clone.");
       const session = await startRandyVoiceSession();
+      const note =
+        !session.ok && "uiNote" in session
+          ? session.uiNote
+          : "Hear Randy — text via Grok when AI is on; Eve/Grok realtime voice next.";
+      setVoiceNote(note);
       if (!session.ok) {
         appendRandy(
-          "Hear Randy is wired for UI only in this draft. Stay in Chat for discovery, or tap Call for the live phone closer. Cal stays locked until we qualify.",
+          "Hear Randy: ask in text (Grok when live). In-widget Eve/Grok voice is next — tap Call for the phone closer now. Cal stays locked until we qualify.",
           { showHandoff: true, showCal: false },
         );
         unlockHandoff(false);
@@ -474,7 +478,7 @@ export function RandyChat() {
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder={mode === "hear" ? "Ask — audio stub, text still works…" : "Ask Randy…"}
+                    placeholder={mode === "hear" ? "Ask — text live; Eve voice next…" : "Ask Randy…"}
                     className="h-12 w-full border border-background/20 bg-background/5 px-4 pr-20 text-sm text-background placeholder:text-background/40 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                     data-testid="randy-chat-input"
                   />
