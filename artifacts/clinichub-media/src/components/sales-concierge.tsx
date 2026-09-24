@@ -346,15 +346,17 @@ export function SalesConcierge({
         return {
           text: "On-prem clinic and studio surfaces are a separate insertion-order line, available on request. The public product is digital hubs.",
           options: [
-            { label: "Book a call", href: "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve", primary: true },
+            { label: "Get a call back", href: "tel:+15045046526", primary: true },
+            { label: "Book a call", href: "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve" },
             { label: "Lock the seat — $490 USD", action: onHandoff },
           ],
         };
       case "book_a_call":
         return {
-          text: "Multi-hub, exclusive, and on-prem Align are a call, not a public checkout SKU.",
+          text: "Multi-hub, exclusive, and on-prem Align are a call, not a public checkout SKU. Dial +1 (504) 504-6526 or email.",
           options: [
-            { label: "Book a call", href: "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve", primary: true },
+            { label: "Get a call back", href: "tel:+15045046526", primary: true },
+            { label: "Book a call", href: "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve" },
           ],
         };
       case "audience_or_metrics":
@@ -550,7 +552,7 @@ export function SalesConcierge({
                                 target="_blank"
                                 rel="noreferrer"
                                 onClick={() => {
-                                  if (opt.label === "Book a call") trackCta("cta_book_call");
+                                  if (opt.label === "Book a call" || opt.label === "Get a call back") trackCta("cta_book_call");
                                 }}
                                 className={`flex items-center justify-between px-4 py-3 text-left text-sm font-medium transition-colors w-full border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent ${
                                   opt.primary

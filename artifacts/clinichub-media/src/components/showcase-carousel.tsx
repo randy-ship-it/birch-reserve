@@ -15,10 +15,10 @@ const HUBS = [
     id: "dr-ho",
     name: "DR-HO'S",
     surface: "Care & product landing",
-    displayUrl: "physio.drhonow.com",
+    displayUrl: "physio.drhonow.com/dr-ho/portal",
     description: "Integrating virtual physiotherapy alongside established pain therapy product paths.",
     image: drHoHub,
-    url: "https://physio.drhonow.com/"
+    url: "https://physio.drhonow.com/dr-ho/portal"
   },
   {
     id: "jill-health",

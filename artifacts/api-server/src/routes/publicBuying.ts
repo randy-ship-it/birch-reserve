@@ -468,7 +468,7 @@ router.get("/llms.txt", (_req, res) => {
       "# Birch Reserve",
       "",
       "Eight category seats inside signed Scale Health hubs. Not an open auction. Not a guaranteed impression buy.",
-      "Live proof: https://physio.drhonow.com",
+      "Live proof: https://physio.drhonow.com/dr-ho/portal",
       "Public SKUs:",
       "- hold-190 · $190 USD · 7-day category look · 100% credit if converted to a seat within 7 days, else cash refund · does not consume an 8-seat",
       "- reserve-490 · $490 USD · named category seat in the 8-pool · 100% media credit · insertion order before flight · credit expires 12 months",
@@ -479,7 +479,7 @@ router.get("/llms.txt", (_req, res) => {
       "Launching cohort (logos, not reach): DR-HO’S · Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery.",
       `Formats: ${FORMATS.join(", ")}.`,
       "Every published dollar is a 100% media credit. Delivery starts when the insertion order names the hub.",
-      "$490 holds a category seat inside signed Scale Health hubs. Live example: physio.drhonow.com. Credit, not a flight.",
+      "$490 holds a category seat inside signed Scale Health hubs. Live example: physio.drhonow.com/dr-ho/portal. Credit, not a flight.",
       "Quoted public prices are exact, one-time, and USD. Only reserve-490 consumes the eight-seat pool. hold-190 does not.",
       "Exclusions: no PHI, no clinical pixels, no open auction, no impression guarantee.",
       "Seller: Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · randy@silverbirchgrowth.com",
@@ -2031,7 +2031,7 @@ router.get("/buycalc", async (req, res): Promise<void> => {
   const availability = await reserveCounts();
   res.type("html").send(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Buy calculator — Birch Reserve</title><meta name="description" content="$490 holds a category seat inside signed Scale Health hubs. Live example: physio.drhonow.com. Credit, not a flight."><meta property="og:description" content="$490 holds a category seat inside signed Scale Health hubs. Live example: physio.drhonow.com. Credit, not a flight.">
+<title>Buy calculator — Birch Reserve</title><meta name="description" content="$490 holds a category seat inside signed Scale Health hubs. Live example: physio.drhonow.com/dr-ho/portal. Credit, not a flight."><meta property="og:description" content="$490 holds a category seat inside signed Scale Health hubs. Live example: physio.drhonow.com/dr-ho/portal. Credit, not a flight.">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <script type="application/ld+json">${JSON.stringify({
   "@context": "https://schema.org",
@@ -2062,7 +2062,7 @@ router.get("/buycalc", async (req, res): Promise<void> => {
 </style></head><body><header><strong>BIRCH RESERVE</strong><a href="/v1/catalog.json">Machine catalog</a></header><main>
 <p>Reservations are open. Campaigns start when the insertion order names the hub.</p><h1>Eight category seats inside closed recovery hubs.</h1>
 <p>Your offer sits after checkout, on a plan, or at a booking — not in a stranger’s feed.</p>
-<p>Live hub: <a href="https://physio.drhonow.com">physio.drhonow.com</a></p>
+<p>Live hub: <a href="https://physio.drhonow.com/dr-ho/portal">physio.drhonow.com/dr-ho/portal</a></p>
 <div class="figures"><div class="figure">Category seat<strong>$490 USD</strong></div><div class="figure">7-day look<strong>$190 USD</strong></div><div class="figure">Media credit<strong>100%</strong></div></div>
 <div class="grid"><section><h2>What the seat includes</h2><p><strong>${availability.seats_open} seats remaining</strong> of ${availability.seats_total}. Availability is rolling and subtracts paid and currently held seats.</p>
 <div class="offer-grid">${PUBLIC_RESERVE_OFFERS.map((offer) => `<article class="offer"><small>${offer.offerType.replaceAll("_", " ").toUpperCase()}</small><strong>$${offer.dueTodayUsd.toLocaleString("en-US")} · ${offer.name}</strong><small>${offer.scope}</small></article>`).join("")}</div>

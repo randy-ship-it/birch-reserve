@@ -46,6 +46,7 @@ import {
 import { publishableKeyFromHost } from '@clerk/react/internal';
 import { dark } from '@clerk/themes';
 import TeamAccess from '@/pages/sales/team';
+import VoiceDemo from '@/pages/sales/voice-demo';
 import { notifyEditorialAccessDenied } from '@/lib/access-utils';
 
 const clerkPubKey = publishableKeyFromHost(
@@ -239,6 +240,9 @@ function Router() {
         </Route>
         <Route path="/sales/team">
           <Layout><TeamAccess /></Layout>
+        </Route>
+        <Route path="/sales/voice-demo">
+          <Layout><VoiceDemo /></Layout>
         </Route>
         <Route path="/insights">
           <Layout><Insights /></Layout>

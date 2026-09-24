@@ -8,6 +8,7 @@ import {
   MessageSquareText,
   MonitorUp,
   MapPin,
+  Phone,
   ReceiptText,
   ShieldCheck,
   Zap,
@@ -161,6 +162,14 @@ export default function Home() {
     setSplashDialogOpen(true);
   };
 
+  const VOICE_TEL_HREF = "tel:+15045046526";
+  const VOICE_TEL_DISPLAY = "+1 (504) 504-6526";
+
+  const callBack = () => {
+    trackCta("cta_book_call");
+    window.location.href = VOICE_TEL_HREF;
+  };
+
   const bookCall = () => {
     trackCta("cta_book_call");
     window.location.href = "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve";
@@ -306,13 +315,28 @@ export default function Home() {
                 size="lg"
                 variant="outline"
                 className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background h-14 px-8 font-medium hover:bg-background/10 transition-colors"
+                onClick={callBack}
+                data-testid="button-hero-call-back"
+              >
+                <Phone className="mr-2 size-4" aria-hidden />
+                Get a call back
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background/80 h-14 px-8 font-medium hover:bg-background/10 transition-colors"
                 onClick={bookCall}
+                data-testid="button-hero-book-call"
               >
                 Book a call
               </Button>
             </motion.div>
-            <p className="mt-4 text-sm text-background/80">
-              Live hub: <a className="underline" href="https://physio.drhonow.com" target="_blank" rel="noopener noreferrer">physio.drhonow.com</a>
+            <p className="mt-3 text-sm text-background/80">
+              <a href={VOICE_TEL_HREF} className="underline underline-offset-4" onClick={() => trackCta("cta_book_call")}>
+                Call {VOICE_TEL_DISPLAY}
+              </a>
+              <span className="text-background/50"> · </span>
+              Live hub: <a className="underline" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">physio.drhonow.com/dr-ho/portal</a>
             </p>
             <button
               type="button"
@@ -435,14 +459,26 @@ export default function Home() {
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               Multi-hub, exclusive, or on-prem Align. Credit, not a flight.
             </p>
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-6 h-11 rounded-none"
-              onClick={bookCall}
-            >
-              Book a call
-            </Button>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Button
+                type="button"
+                className="h-11 rounded-none bg-accent text-accent-foreground hover:bg-foreground hover:text-background"
+                onClick={callBack}
+                data-testid="button-custom-call-back"
+              >
+                <Phone className="mr-2 size-4" aria-hidden />
+                Call {VOICE_TEL_DISPLAY}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 rounded-none"
+                onClick={bookCall}
+                data-testid="button-custom-book-call"
+              >
+                Book a call
+              </Button>
+            </div>
           </article>
           <div className="mt-10">
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/60">
@@ -509,9 +545,20 @@ export default function Home() {
               <p className="text-sm leading-relaxed text-background/70 mb-4">
                 On-prem clinic and studio surfaces via Align and Scale clinic hubs are a separate insertion-order line. They are not sold as digital reach.
               </p>
-              <a href="mailto:randy@silverbirchgrowth.com?subject=On-prem%20Birch%20Reserve" onClick={() => trackCta("cta_custom_onprem")} className="inline-block border border-background/20 px-3 py-1 text-[10px] uppercase tracking-widest text-accent bg-background/5">
-                Book a call
-              </a>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href={VOICE_TEL_HREF}
+                  onClick={() => trackCta("cta_book_call")}
+                  className="inline-flex items-center gap-1.5 border border-accent/40 px-3 py-1 text-[10px] uppercase tracking-widest text-accent bg-background/5"
+                  data-testid="link-onprem-call"
+                >
+                  <Phone className="size-3" aria-hidden />
+                  Call {VOICE_TEL_DISPLAY}
+                </a>
+                <a href="mailto:randy@silverbirchgrowth.com?subject=On-prem%20Birch%20Reserve" onClick={() => trackCta("cta_custom_onprem")} className="inline-block border border-background/20 px-3 py-1 text-[10px] uppercase tracking-widest text-accent bg-background/5">
+                  Book a call
+                </a>
+              </div>
             </article>
           </div>
         </div>
@@ -687,7 +734,7 @@ export default function Home() {
           <div className="mb-8 grid border border-border bg-secondary/10 md:grid-cols-3">
             <div className="p-5 md:border-r md:border-border">
               <p className="text-[10px] font-bold uppercase tracking-widest text-accent">Live</p>
-              <p className="mt-2 text-sm font-medium">DR-HO'S · physio.drhonow.com</p>
+              <p className="mt-2 text-sm font-medium">DR-HO'S · physio.drhonow.com/dr-ho/portal</p>
             </div>
             <div className="border-t border-border p-5 md:border-r md:border-t-0">
               <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/60">Signed</p>
@@ -712,7 +759,7 @@ export default function Home() {
                   <img src="/hub-proof/drho-hub-home.png" alt="DR-HO'S Insider Hub screenshot" className="w-full h-full object-cover object-top" loading="lazy" />
                 </div>
                 <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Illustrative — not your receipt.</p>
-                <a href="https://physio.drhonow.com" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold">
+                <a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold">
                   Open the live hub <ArrowUpRight className="size-4" />
                 </a>
               </div>
@@ -760,7 +807,7 @@ export default function Home() {
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
               Not on the open web. Birch units appear after a customer has already bought, booked, or started a plan inside a signed Scale Health hub.
             </p>
-            <a href="https://physio.drhonow.com/" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-accent">
+            <a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-accent">
               See the live DR-HO'S hub <ArrowUpRight className="size-4" />
             </a>
           </div>
@@ -916,14 +963,35 @@ export default function Home() {
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
               {reservePriceLabel} is a named category seat and a 100% media credit. Nothing runs until the insertion order names the hub.
             </p>
-            <Button
-              size="lg"
-              className="w-full sm:w-auto rounded-none bg-accent text-accent-foreground h-14 px-12 hover:bg-background hover:text-foreground transition-colors font-medium text-base"
-              onClick={() => openReserveDialog()}
-              data-testid="button-final-splash-access"
-            >
-              Lock the seat — {reservePriceLabel}
-            </Button>
+            <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:justify-center">
+              <Button
+                size="lg"
+                className="w-full sm:w-auto rounded-none bg-accent text-accent-foreground h-14 px-12 hover:bg-background hover:text-foreground transition-colors font-medium text-base"
+                onClick={() => openReserveDialog()}
+                data-testid="button-final-splash-access"
+              >
+                Lock the seat — {reservePriceLabel}
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background h-14 px-8 font-medium hover:bg-background/10 transition-colors"
+                onClick={callBack}
+                data-testid="button-final-call-back"
+              >
+                <Phone className="mr-2 size-4" aria-hidden />
+                Get a call back
+              </Button>
+            </div>
+            <p className="mt-4 text-sm text-background/70">
+              <a href={VOICE_TEL_HREF} className="underline underline-offset-4" onClick={() => trackCta("cta_book_call")}>
+                {VOICE_TEL_DISPLAY}
+              </a>
+              <span className="text-background/40"> · </span>
+              <button type="button" onClick={bookCall} className="underline underline-offset-4">
+                Book a call
+              </button>
+            </p>
           </div>
         </div>
       </section>

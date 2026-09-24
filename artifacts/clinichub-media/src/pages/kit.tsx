@@ -18,7 +18,7 @@ export default function Kit() {
         Eight category seats inside signed Scale Health hubs. Not an open auction. Not a guaranteed impression buy.
       </p>
       <p className="mt-6">
-        Live proof: <a className="underline" href="https://physio.drhonow.com">https://physio.drhonow.com</a>
+        Live proof: <a className="underline" href="https://physio.drhonow.com/dr-ho/portal">https://physio.drhonow.com/dr-ho/portal</a>
       </p>
       <p className="mt-2 text-muted-foreground">Caption on every mock: Illustrative — not your receipt.</p>
       <h2 className="mt-10 font-display text-3xl">Eight seats</h2>
