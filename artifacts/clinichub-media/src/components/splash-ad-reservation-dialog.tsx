@@ -38,7 +38,10 @@ const reserveSchema = z.object({
   email: z.string().trim().email("Valid email required").min(3).max(320),
   websiteUrl: z.string().trim().url("Must be a valid URL").optional().or(z.literal('')),
   buyerPath: z.enum(["auto_buy", "private_distribution"]),
-  offer: z.enum(["reserve-899", "pilot-4900", "network-9900"]),
+  offer: z.enum(["hold-190", "reserve-490"]),
+  termsAccepted: z.boolean().refine((value) => value === true, {
+    message: "Accept the draft terms before any charge.",
+  }),
 });
 
 type ReserveFormValues = z.infer<typeof reserveSchema>;
@@ -68,6 +71,7 @@ export function SplashAdReservationDialog({
       buyerPath:
         selectedFormat === "Auto-buy" ? "auto_buy" : "private_distribution",
       offer: defaultOffer,
+      termsAccepted: false,
     },
   });
 
@@ -84,6 +88,7 @@ export function SplashAdReservationDialog({
         buyerPath:
           selectedFormat === "Auto-buy" ? "auto_buy" : "private_distribution",
         offer: defaultOffer,
+        termsAccepted: false,
       });
       setIsError(false);
       setSuccessReceipt(null);
@@ -305,16 +310,38 @@ export function SplashAdReservationDialog({
                     />
 
                     <div className="border-y border-border py-4 text-xs leading-relaxed text-muted-foreground">
-                      <p><strong className="text-foreground">Final insertion order required</strong> before delivery</p>
-                      <p className="mt-1"><strong className="text-foreground">No guaranteed impressions</strong></p>
+                      <p><strong className="text-foreground">Credit, not a flight.</strong> Nothing runs until an insertion order names the surface.</p>
+                      <p className="mt-1">Draft terms apply until counsel stamps them.</p>
                     </div>
+
+                    <FormField
+                      control={form.control}
+                      name="termsAccepted"
+                      render={({ field }) => (
+                        <FormItem>
+                          <label className="flex items-start gap-3 text-xs leading-relaxed text-muted-foreground">
+                            <input
+                              type="checkbox"
+                              className="mt-1"
+                              checked={field.value === true}
+                              onChange={(event) => field.onChange(event.target.checked)}
+                              data-testid="checkbox-reserve-terms"
+                            />
+                            <span>
+                              I agree to the draft <a className="underline" href="/terms">terms</a> before any charge.
+                            </span>
+                          </label>
+                          <FormMessage className="text-xs" />
+                        </FormItem>
+                      )}
+                    />
 
                     <div className="pt-2 flex flex-col gap-3">
                       <Button type="submit" disabled={isPending} className="w-full rounded-none bg-accent text-accent-foreground hover:bg-foreground hover:text-background h-14 text-base font-medium transition-colors">
                         {isPending ? (
                           <><Loader2 className="mr-2 size-5 animate-spin" /> Processing</>
                         ) : (
-                          <>Reserve {selectedOffer.name} <CreditCard className="ml-2 size-5" /></>
+                          <>{selectedOffer.key === "hold-190" ? "Hold a category for 7 days — $190" : "Lock the seat — $490 USD"} <CreditCard className="ml-2 size-5" /></>
                         )}
                       </Button>
                       <div className="text-center text-[11px] text-muted-foreground mt-2">

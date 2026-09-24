@@ -10,7 +10,6 @@ export type BirchReserveOfferOfferType = typeof BirchReserveOfferOfferType[keyof
 
 
 export const BirchReserveOfferOfferType = {
-  reservation_credit: 'reservation_credit',
-  single_format_pilot: 'single_format_pilot',
-  multi_surface_pilot: 'multi_surface_pilot',
+  category_look: 'category_look',
+  category_seat: 'category_seat',
 } as const;

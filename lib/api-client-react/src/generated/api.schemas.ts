@@ -9,9 +9,8 @@ export type BirchReserveSku = typeof BirchReserveSku[keyof typeof BirchReserveSk
 
 
 export const BirchReserveSku = {
-  'reserve-899': 'reserve-899',
-  'pilot-4900': 'pilot-4900',
-  'network-9900': 'network-9900',
+  'hold-190': 'hold-190',
+  'reserve-490': 'reserve-490',
 } as const;
 
 export type BirchReserveUcpProfileUcpVersion = typeof BirchReserveUcpProfileUcpVersion[keyof typeof BirchReserveUcpProfileUcpVersion];
@@ -243,45 +242,40 @@ export type BirchReserveOfferOfferKey = typeof BirchReserveOfferOfferKey[keyof t
 
 
 export const BirchReserveOfferOfferKey = {
-  'reserve-899': 'reserve-899',
-  'pilot-4900': 'pilot-4900',
-  'network-9900': 'network-9900',
+  'hold-190': 'hold-190',
+  'reserve-490': 'reserve-490',
 } as const;
 
 export type BirchReserveOfferOfferType = typeof BirchReserveOfferOfferType[keyof typeof BirchReserveOfferOfferType];
 
 
 export const BirchReserveOfferOfferType = {
-  reservation_credit: 'reservation_credit',
-  single_format_pilot: 'single_format_pilot',
-  multi_surface_pilot: 'multi_surface_pilot',
+  category_look: 'category_look',
+  category_seat: 'category_seat',
 } as const;
 
 export type BirchReserveOfferAmountCents = typeof BirchReserveOfferAmountCents[keyof typeof BirchReserveOfferAmountCents];
 
 
 export const BirchReserveOfferAmountCents = {
-  NUMBER_89900: 89900,
-  NUMBER_490000: 490000,
-  NUMBER_990000: 990000,
+  NUMBER_19000: 19000,
+  NUMBER_49000: 49000,
 } as const;
 
 export type BirchReserveOfferDueToday = typeof BirchReserveOfferDueToday[keyof typeof BirchReserveOfferDueToday];
 
 
 export const BirchReserveOfferDueToday = {
-  NUMBER_899: 899,
-  NUMBER_4900: 4900,
-  NUMBER_9900: 9900,
+  NUMBER_190: 190,
+  NUMBER_490: 490,
 } as const;
 
 export type BirchReserveOfferMediaCreditCents = typeof BirchReserveOfferMediaCreditCents[keyof typeof BirchReserveOfferMediaCreditCents];
 
 
 export const BirchReserveOfferMediaCreditCents = {
-  NUMBER_89900: 89900,
-  NUMBER_490000: 490000,
-  NUMBER_990000: 990000,
+  NUMBER_19000: 19000,
+  NUMBER_49000: 49000,
 } as const;
 
 export interface BirchReserveOffer {
@@ -387,18 +381,16 @@ export type BirchReserveQuoteOfferKey = typeof BirchReserveQuoteOfferKey[keyof t
 
 
 export const BirchReserveQuoteOfferKey = {
-  'reserve-899': 'reserve-899',
-  'pilot-4900': 'pilot-4900',
-  'network-9900': 'network-9900',
+  'hold-190': 'hold-190',
+  'reserve-490': 'reserve-490',
 } as const;
 
 export type BirchReserveQuoteOfferType = typeof BirchReserveQuoteOfferType[keyof typeof BirchReserveQuoteOfferType];
 
 
 export const BirchReserveQuoteOfferType = {
-  reservation_credit: 'reservation_credit',
-  single_format_pilot: 'single_format_pilot',
-  multi_surface_pilot: 'multi_surface_pilot',
+  category_look: 'category_look',
+  category_seat: 'category_seat',
 } as const;
 
 export type BirchReserveQuoteFormat = typeof BirchReserveQuoteFormat[keyof typeof BirchReserveQuoteFormat];
@@ -432,27 +424,24 @@ export type BirchReserveQuoteAmountCents = typeof BirchReserveQuoteAmountCents[k
 
 
 export const BirchReserveQuoteAmountCents = {
-  NUMBER_89900: 89900,
-  NUMBER_490000: 490000,
-  NUMBER_990000: 990000,
+  NUMBER_19000: 19000,
+  NUMBER_49000: 49000,
 } as const;
 
 export type BirchReserveQuoteDueTodayUsd = typeof BirchReserveQuoteDueTodayUsd[keyof typeof BirchReserveQuoteDueTodayUsd];
 
 
 export const BirchReserveQuoteDueTodayUsd = {
-  NUMBER_899: 899,
-  NUMBER_4900: 4900,
-  NUMBER_9900: 9900,
+  NUMBER_190: 190,
+  NUMBER_490: 490,
 } as const;
 
 export type BirchReserveQuoteMediaCreditCents = typeof BirchReserveQuoteMediaCreditCents[keyof typeof BirchReserveQuoteMediaCreditCents];
 
 
 export const BirchReserveQuoteMediaCreditCents = {
-  NUMBER_89900: 89900,
-  NUMBER_490000: 490000,
-  NUMBER_990000: 990000,
+  NUMBER_19000: 19000,
+  NUMBER_49000: 49000,
 } as const;
 
 export type BirchReserveQuoteDiscount = typeof BirchReserveQuoteDiscount[keyof typeof BirchReserveQuoteDiscount];
@@ -1286,9 +1275,8 @@ export type SplashAdReservationInputOffer = typeof SplashAdReservationInputOffer
 
 
 export const SplashAdReservationInputOffer = {
-  'reserve-899': 'reserve-899',
-  'pilot-4900': 'pilot-4900',
-  'network-9900': 'network-9900',
+  'hold-190': 'hold-190',
+  'reserve-490': 'reserve-490',
 } as const;
 
 export interface SplashAdReservationInput {
@@ -1341,9 +1329,8 @@ export type SplashAdReservationReceiptOffer = typeof SplashAdReservationReceiptO
 
 
 export const SplashAdReservationReceiptOffer = {
-  'reserve-899': 'reserve-899',
-  'pilot-4900': 'pilot-4900',
-  'network-9900': 'network-9900',
+  'hold-190': 'hold-190',
+  'reserve-490': 'reserve-490',
 } as const;
 
 export interface SplashAdReservationReceipt {

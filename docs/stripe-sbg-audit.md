@@ -8,7 +8,7 @@ Scope: read-only analysis of how `checkout_url` is produced for POST `/v1/checko
 
 ## Executive summary
 
-- Human/machine public checkout is **Stripe Checkout Sessions** created with **inline `price_data`** (not Catalog Price IDs, not Payment Links).
+- Human/machine public checkout is **Stripe Checkout Sessions**. When `STRIPE_PRICE_HOLD_190`, `STRIPE_PRICE_RESERVE_490`, or `STRIPE_PRICE_RESERVE_899` is set, that SKU uses the Price ID from the env var. Otherwise checkout uses inline `price_data`. Price ID values stay in host secrets and are not committed. Payment Links are not used.
 - Canonical SKUs: `reserve-990` ($990), `pilot-4900` ($4,900), `network-9900` ($9,900) USD.
 - Live symptom `checkout_url: null` + `"Reservation saved, but secure checkout is unavailable."` means the seat was claimed, `checkoutConfigured()` passed, then **session create / match / attach failed** in the try/catch of `handleMachineCheckout`.
 - Historical env names like `STRIPE_PRICE_ID` / `STRIPE_PRICE_RESERVE_1900` / Payment Link fallbacks are **stale relative to current code** and must not be restored.
@@ -37,15 +37,15 @@ Randy lock via Emma: product door is **https://www.birchreserve.net** (not bare 
 
 OpenAPI contract: `lib/api-spec/openapi.yaml` — 200 requires string `checkout_url`; 503 allows `checkout_url: null` with `error`.
 
-Related (activation-token) path: `artifacts/api-server/src/routes/splashAdReservations.ts` `POST /launch/splash/checkout` — same `createStripeCheckoutSession` + `price_data`, different success/cancel URLs.
+Related (activation-token) path: `artifacts/api-server/src/routes/splashAdReservations.ts` `POST /launch/splash/checkout` — same `createStripeCheckoutSession`, different success/cancel URLs. A set `STRIPE_PRICE_*` env wins over inline `price_data`.
 
 ## Price IDs vs `price_data` vs Payment Links vs Checkout Session
 
 | Mechanism | Used for new public checkout? | Evidence |
 | --- | --- | --- |
 | Checkout Session `mode: "payment"` | **Yes** | `handleMachineCheckout` / splash checkout builders |
-| Inline `line_items[].price_data` | **Yes** | `lineItem()` / `offerLineItem()` — amount from `reserveOffers` |
-| Catalog `price` ID / `STRIPE_PRICE_*` | **No** (stale) | No runtime read of `STRIPE_PRICE_ID` / `STRIPE_PRICE_RESERVE_1900` in api-server src |
+| Inline `line_items[].price_data` | **Yes, when no Price env is set** | `reserveCheckoutLineItem()` — amount from `reserveOffers` |
+| Catalog `price` ID via env | **Yes, when set** | `STRIPE_PRICE_HOLD_190`, `STRIPE_PRICE_RESERVE_490`, `STRIPE_PRICE_RESERVE_899`. Values are host secrets, not committed. |
 | Payment Links | **No** (forbidden fallback) | `deliverables/birch-reserve-stripe-setup-current.txt` |
 
 Dashboard Products/Prices in the setup brief are optional catalog hygiene for SBG; the app does **not** require Price IDs in env to create sessions.
@@ -159,7 +159,7 @@ Retrieved via Randy’s authorized Stripe MCP connection (`SBG APIs` / livemode)
 
 Searched active products, inactive/archived products (`active: false` → empty), and product search by name (`Access Reserve`, `Placement Pilot`, `Network Pilot`, `reserve-990`, `Birch Reserve`).
 
-App checkout uses **inline `price_data`** (see above); Catalog Products/Prices are optional hygiene and are **not required** for `/v1/checkout` to work once `STRIPE_SECRET_KEY` is set. Still documenting Catalog state for SBG ops.
+App checkout uses a matching `STRIPE_PRICE_*` env when set, and otherwise **inline `price_data`**. Catalog Products/Prices are not required for `/v1/checkout` once `STRIPE_SECRET_KEY` is set. Still documenting Catalog state for SBG ops.
 
 #### reserve-990 — Access Reserve — $990 USD one-time (99000¢)
 

@@ -100,12 +100,9 @@ export function Layout({ children }: { children: ReactNode }) {
               <span className="font-display text-2xl tracking-tight italic">Birch Reserve</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              Performance and display advertising across the Clinic Hubs experience.
+              Eight category seats inside signed Scale Health hubs. Credit, not a flight.
             </p>
-            <p className="text-xs text-muted-foreground uppercase tracking-widest">
-              Operated by
-            </p>
-            <p className="mt-2 text-xs leading-relaxed text-foreground">
+            <p className="text-xs leading-relaxed text-foreground">
               {SELLER_IDENTITY}
             </p>
             <p className="text-xs text-muted-foreground uppercase tracking-widest mt-6">
@@ -121,12 +118,13 @@ export function Layout({ children }: { children: ReactNode }) {
                   <a href={`${basePath}#placements`} className="hover:text-accent transition-colors">Ad Examples</a>
                  <a href={`${basePath}#splash-ad`} className="hover:text-accent transition-colors">Advertise</a>
                  <Link href="/about" className="hover:text-accent transition-colors">About</Link>
+                <Link href="/kit" className="hover:text-accent transition-colors">Kit</Link>
+                <Link href="/terms" className="hover:text-accent transition-colors">Terms</Link>
+                <Link href="/privacy" className="hover:text-accent transition-colors">Privacy</Link>
              </div>
              <div className="flex flex-col gap-4 text-sm">
                 <span className="text-xs font-medium uppercase tracking-widest text-foreground/50 mb-2">Access</span>
                 <Link href="/marketplace" className="hover:text-accent transition-colors">Partner Workspace</Link>
-                <Link href="/terms" className="hover:text-accent transition-colors">Terms</Link>
-                <Link href="/privacy" className="hover:text-accent transition-colors">Privacy</Link>
              </div>
           </div>
         </div>

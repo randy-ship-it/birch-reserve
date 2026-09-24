@@ -172,7 +172,7 @@ export function SalesConcierge({
       setIsTyping(true);
       window.setTimeout(() => {
         setIsTyping(false);
-        appendAdvisorMessage("Reservations start at $899 USD. The Access Reserve holds first right on one category in the shared eight-seat pool and is applied as 100% media credit. It is not a live flight; nothing runs until a final insertion order names the surface.", [
+        appendAdvisorMessage("Prices: $190 = 7-day look, does not eat a seat. $490 = category seat + 100% media credit. $899 is a legacy SKU still in checkout — do not hero it. Nothing runs until an insertion order names the surface.", [
           { label: "Open Reservation Form", action: () => onHandoff(), primary: true },
           { label: "Compare advertising paths", action: () => handleChoosePath(true) }
         ]);
@@ -314,7 +314,7 @@ export function SalesConcierge({
         };
       case "join_provider_network":
         return {
-          text: "If you want to join the provider network, start with Scale Health providers. If you are already in Clinic Hubs and can receive bookings, Performance is the advertising conversation here.",
+          text: "Providers listing a surface can opt in free. That is not a charge, and it is not the Scale Health $49 ICA.",
           options: [
             {
               label: "Open https://scalehealth.ca/providers",
@@ -335,15 +335,30 @@ export function SalesConcierge({
       case "pricing_or_availability":
       case "self_serve_purchase":
         return {
-          text: "Reservations start at $899 USD. The Access Reserve holds first right on one category in the shared eight-seat pool and is applied as 100% media credit. It is not a live flight; nothing runs until a final insertion order names the surface.",
+          text: "Prices: $190 = 7-day look, does not eat a seat. $490 = category seat + 100% media credit. $899 is a legacy SKU still in checkout — do not hero it. Nothing runs until an insertion order names the surface.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "Compare advertising paths", action: () => handleChoosePath(true) },
           ],
         };
+      case "align_on_request":
+        return {
+          text: "On-prem clinic and studio surfaces are a separate insertion-order line, available on request. The public product is digital hubs.",
+          options: [
+            { label: "Book a call", href: "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve", primary: true },
+            { label: "Lock the seat — $490 USD", action: onHandoff },
+          ],
+        };
+      case "book_a_call":
+        return {
+          text: "Multi-hub, exclusive, and on-prem Align are a call, not a public checkout SKU.",
+          options: [
+            { label: "Book a call", href: "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve", primary: true },
+          ],
+        };
       case "audience_or_metrics":
         return {
-          text: "Birch placements sit inside signed Scale Health brand hubs beside the private supplier catalog. DR-HO'S is live at physio.drhonow.com; other named hubs are signed and launching. We do not guarantee impressions or invent reach.",
+          text: "We do not sell a guaranteed impression count. You buy first-right on a category inside signed hubs. We name the surface on the insertion order.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },
@@ -351,7 +366,7 @@ export function SalesConcierge({
         };
       case "media_kit":
         return {
-          text: "The $899 Access Reserve holds first right on one category before broader release. It is 100% media credit, not a live flight, and no media runs until a final insertion order names the surface.",
+          text: "Eight category seats inside signed Scale Health hubs. Not an open auction. Not a guaranteed impression buy. $490 is the category seat. Credit, not a flight.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },

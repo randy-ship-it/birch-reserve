@@ -5,7 +5,7 @@ export default function Privacy() {
   return (
     <article className="container mx-auto max-w-3xl px-6 py-16 md:py-24">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-        DRAFT — Gordon stamps before the first real card
+        DRAFT — counsel stamps before the first real card
       </p>
       <h1 className="mt-4 font-display text-4xl tracking-tight md:text-6xl">
         Privacy
@@ -13,8 +13,9 @@ export default function Privacy() {
       <p className="mt-6 text-sm text-muted-foreground">{SELLER_IDENTITY}</p>
       <div className="mt-10 space-y-6 text-base leading-relaxed text-muted-foreground">
         <p>
-          This draft describes what Birch Reserve collects to sell the $899
-          Access Reserve. It is not in force until Gordon stamps it.
+          This draft describes what Birch Reserve collects to sell the public
+          $190 and $490 reservations. reserve-899 at $899 is legacy-only and is
+          not a public offer. This page is not in force until counsel stamps it.
         </p>
         <p>
           Reservation checkout collects the brand legal name, work email,
@@ -25,10 +26,12 @@ export default function Privacy() {
         </p>
         <p>
           Birch Reserve does not collect protected health information, clinical
-          pixels, or patient-level reporting. Placement reporting, when an
-          insertion order later authorizes a flight, is aggregate only.
+          pixels, or patient-level reporting. Birch Guide does not collect
+          patient or PHI data. Placement reporting, when an insertion order
+          later authorizes a flight, is aggregate only.
         </p>
         <p>
+          The Stripe descriptor should read SCALE HEALTH*BIRCH or BIRCH RESERVE.
           Contact{" "}
           <a className="text-foreground underline" href="mailto:randy@silverbirchgrowth.com">
             randy@silverbirchgrowth.com
@@ -41,6 +44,9 @@ export default function Privacy() {
         <Link href="/terms" className="underline">
           Terms of sale
         </Link>
+      </p>
+      <p className="mt-8 text-xs uppercase tracking-widest text-muted-foreground">
+        Draft until counsel stamps.
       </p>
     </article>
   );

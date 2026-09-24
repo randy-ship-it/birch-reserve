@@ -6,20 +6,20 @@ test("a paid recycled order preserves payment without showing a spinner", () => 
   const presentation = birchOrderPresentation({
     status: "recycled",
     payment_status: "paid",
-    amountCents: 490000,
+    amountCents: 49000,
     currency: "usd",
   });
   assert.equal(presentation.kind, "paid_recycled");
   assert.match(presentation.title, /Payment Preserved/);
   assert.match(presentation.description, /payment remains recorded/i);
-  assert.match(presentation.description, /\$4,900 USD/);
+  assert.match(presentation.description, /\$490 USD/);
 });
 
 test("an expired unpaid hold is terminal and does not imply a charge", () => {
   const presentation = birchOrderPresentation({
     status: "recycled",
     payment_status: "not_paid",
-    amountCents: 89900,
+    amountCents: 19000,
     currency: "usd",
   });
   assert.equal(presentation.kind, "expired");

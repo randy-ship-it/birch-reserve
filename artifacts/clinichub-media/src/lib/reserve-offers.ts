@@ -1,27 +1,27 @@
 export const RESERVE_OFFERS = [
   {
-    key: "reserve-899",
-    name: "Access Reserve",
-    amountCents: 89_900,
-    description: "First-right planning access. $899 is media credit plus a category hold, before a final insertion order.",
+    key: "hold-190",
+    name: "7-day category look",
+    amountCents: 19_000,
+    consumesSeat: false,
+    description:
+      "7-day category look. 100% credit if converted to a seat within 7 days, else cash refund. Does not consume an 8-seat.",
+    creditLine: "Credit, not a flight.",
   },
   {
-    key: "pilot-4900",
-    name: "Placement Pilot",
-    amountCents: 490_000,
-    description: "Credit toward one scoped digital or physical placement-format pilot.",
-  },
-  {
-    key: "network-9900",
-    name: "Network Pilot",
-    amountCents: 990_000,
-    description: "Credit toward a coordinated multi-surface network pilot.",
+    key: "reserve-490",
+    name: "Category seat",
+    amountCents: 49_000,
+    consumesSeat: true,
+    description:
+      "Named category seat in the 8-pool. 100% media credit. IO before flight. Credit expires 12 months.",
+    creditLine: "Credit, not a flight.",
   },
 ] as const;
 
 export type ReserveOfferKey = (typeof RESERVE_OFFERS)[number]["key"];
 
-export const DEFAULT_RESERVE_OFFER_KEY: ReserveOfferKey = "reserve-899";
+export const DEFAULT_RESERVE_OFFER_KEY: ReserveOfferKey = "reserve-490";
 
 export function getReserveOffer(key: ReserveOfferKey) {
   return RESERVE_OFFERS.find((offer) => offer.key === key) ?? RESERVE_OFFERS[0];

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -80,6 +80,17 @@ const INVENTORY_FORMATS = [
   }
 ];
 
+const CATEGORY_SEATS = [
+  "Pain relief / topicals",
+  "Recovery hardware",
+  "Nutrition",
+  "Sleep",
+  "Meal prep",
+  "Women’s health",
+  "Men’s health",
+  "Diagnostics / services",
+];
+
 const SIGNED_HUB_BRANDS = [
   "DR-HO'S",
   "Kalaya",
@@ -113,7 +124,28 @@ export default function Home() {
     DEFAULT_RESERVE_OFFER_KEY,
   );
   const [conciergeOpen, setConciergeOpen] = useState(false);
-  const reservePriceLabel = "$899 USD";
+  const [availability, setAvailability] = useState<{
+    seats_open: number;
+    seats_held: number;
+    seats_paid: number;
+    seats_total: number;
+  } | null>(null);
+  const reservePriceLabel = "$490 USD";
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/v1/availability.json")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!cancelled && data && typeof data.seats_open === "number") {
+          setAvailability(data);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const { mutateAsync: requestConciergeAdvice } = useCreateConciergeAdvice();
 
@@ -205,7 +237,7 @@ export default function Home() {
               onClick={() => openReserveDialog()}
               className="flex h-12 w-full items-center justify-center bg-accent font-medium text-accent-foreground transition-colors hover:bg-foreground hover:text-background"
             >
-              Reserve first access - {reservePriceLabel} <ArrowRight className="ml-2 size-4" />
+              Lock the seat — {reservePriceLabel} <ArrowRight className="ml-2 size-4" />
             </button>
           </div>
         </>
@@ -213,7 +245,7 @@ export default function Home() {
 
       {/* Open-Seats Banner */}
       <div className="bg-accent text-accent-foreground py-3 px-6 text-center text-[11px] md:text-xs font-bold uppercase tracking-widest flex justify-center items-center gap-3 border-b border-foreground/10" data-testid="text-launch-status">
-          <span>Reservations are open now. Campaign inventory rolls out next.</span>
+          <span>Reservations are open. Campaigns start when the insertion order names the hub.</span>
       </div>
 
       {/* Hero Section */}
@@ -236,7 +268,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="text-5xl md:text-6xl lg:text-[5.5rem] font-display text-background leading-[0.95] tracking-tight mb-6"
             >
-              Exclusive digital + physical media inventory inside the health & wellness customer journey.
+              Eight category seats inside closed recovery hubs.
             </motion.h1>
 
             <motion.p
@@ -245,7 +277,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="text-base md:text-lg text-background/70 max-w-xl mb-10 leading-relaxed"
             >
-              Reach high-intent customers after they buy, book, or begin a plan—inside trusted digital experiences operated by leading recovery and wellness brands.
+              Your offer sits after checkout, on a plan, or at a booking — not in a stranger’s feed.
             </motion.p>
 
             <motion.div
@@ -260,17 +292,32 @@ export default function Home() {
                 onClick={() => openReserveDialog()}
                 data-testid="button-hero-reserve"
               >
-                Reserve first access - {reservePriceLabel}
+                Lock the seat — {reservePriceLabel}
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background h-14 px-8 font-medium hover:bg-background/10 transition-colors"
-                onClick={() => setConciergeOpen(true)}
+                onClick={() => {
+                  window.location.href = "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve";
+                }}
               >
-                Inquire
+                Book a call
               </Button>
             </motion.div>
+            <p className="mt-4 text-sm text-background/80">
+              Live hub: <a className="underline" href="https://physio.drhonow.com" target="_blank" rel="noopener noreferrer">physio.drhonow.com</a>
+            </p>
+            <button
+              type="button"
+              className="mt-3 w-max text-left text-sm text-background/80 underline underline-offset-4"
+              onClick={() => openReserveDialog(undefined, "hold-190")}
+            >
+              Hold a category for 7 days — $190
+            </button>
+            <p className="mt-4 max-w-xl text-sm text-background/70">
+              Eight seats = eight advertiser categories across hubs, not eight websites.
+            </p>
           </div>
 
           <motion.div
@@ -315,10 +362,10 @@ export default function Home() {
                 Reserve before campaigns open
               </p>
               <h2 className="font-display text-3xl text-foreground">
-                Reserve first rights to book inventory.
+                Eight category seats. One brand per aisle.
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Your payment is applied toward future campaign spend as 100% media credit. No media runs until a final insertion order names the surface.
+                Every dollar is a 100% media credit. Delivery starts when the insertion order names the hub. Hubs are the rooms. The seat is the exclusive shelf in those rooms.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[620px]">
@@ -363,7 +410,7 @@ export default function Home() {
                   {offer.description}
                 </p>
                 <p className="mt-5 border-t border-border pt-4 text-xs text-muted-foreground">
-                  100% media credit · Final insertion order required
+                  {offer.creditLine}
                 </p>
                 <Button
                   type="button"
@@ -376,51 +423,57 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="mt-16 overflow-x-auto border border-border">
-            <table className="w-full text-sm text-left">
-              <thead>
-                <tr className="bg-secondary/10 border-b border-border text-[10px] uppercase tracking-widest text-muted-foreground font-bold">
-                  <th className="p-5 font-bold border-r border-border">Package</th>
-                  <th className="p-5 font-bold border-r border-border">Media credit</th>
-                  <th className="p-5 font-bold">What it reserves</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                <tr>
-                  <td className="p-5 font-medium text-foreground border-r border-border">$899 Access Reserve</td>
-                  <td className="p-5 border-r border-border">100% credit</td>
-                  <td className="p-5 text-muted-foreground">First right on one category in the shared eight-seat pool.</td>
-                </tr>
-                <tr>
-                  <td className="p-5 font-medium text-foreground border-r border-border">$4,900 Placement Pilot</td>
-                  <td className="p-5 border-r border-border">100% credit</td>
-                  <td className="p-5 text-muted-foreground">Credit toward one named format on a scoped hub.</td>
-                </tr>
-                <tr>
-                  <td className="p-5 font-medium text-foreground border-r border-border">$9,900 Network Pilot</td>
-                  <td className="p-5 border-r border-border">100% credit</td>
-                  <td className="p-5 text-muted-foreground">Credit toward a coordinated multi-surface test across live digital hubs.</td>
-                </tr>
-              </tbody>
-            </table>
+          <article className="mt-6 border border-border p-6 md:p-8">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/60">Custom</p>
+            <p className="mt-4 font-display text-4xl text-foreground">Book a call</p>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              Multi-hub, exclusive, or on-prem Align. Credit, not a flight.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-6 h-11 rounded-none"
+              onClick={() => {
+                window.location.href = "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve";
+              }}
+            >
+              Book a call
+            </Button>
+          </article>
+          <div className="mt-10">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/60">
+              Eight advertiser categories
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {availability
+                ? `${availability.seats_open} open · ${availability.seats_held} held · ${availability.seats_paid} paid · ${availability.seats_total} seats`
+                : "Live open, held, and paid counts load from availability."}
+            </p>
+            <div className="mt-4 grid border border-border sm:grid-cols-2 lg:grid-cols-4">
+              {CATEGORY_SEATS.map((category) => (
+                <div key={category} className="border-b border-r border-border px-4 py-4 text-sm">
+                  {category}
+                </div>
+              ))}
+            </div>
           </div>
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
             <Button
               type="button"
               onClick={() => {
-                window.location.href = "/buycalc?sku=reserve-899";
+                window.location.href = "/buycalc?sku=reserve-490";
               }}
               className="h-12 rounded-none bg-accent px-6 text-accent-foreground hover:bg-foreground hover:text-background"
             >
-              Reserve first access — $899
+              Lock the seat — $490 USD
             </Button>
             <Button
               type="button"
               variant="outline"
-              onClick={() => setConciergeOpen(true)}
+              onClick={() => openReserveDialog(undefined, "hold-190")}
               className="h-12 rounded-none px-6"
             >
-              Inquire first
+              Hold a category for 7 days — $190
             </Button>
           </div>
         </div>
@@ -434,7 +487,7 @@ export default function Home() {
               Inventory made concrete
             </p>
             <h2 className="font-display text-4xl tracking-tight text-foreground md:text-5xl">
-              One closed network. Digital and physical access.
+              Where it also runs — on request.
             </h2>
           </div>
           <div className="grid gap-5 md:grid-cols-2">
@@ -447,13 +500,13 @@ export default function Home() {
             </article>
             <article className="border border-border bg-foreground p-7 text-background md:p-9">
               <MapPin className="mb-7 size-6 text-accent" />
-              <h3 className="mb-3 font-display text-3xl">Physical inventory</h3>
+              <h3 className="mb-3 font-display text-3xl">On-prem, on request</h3>
               <p className="text-sm leading-relaxed text-background/70 mb-4">
-                Product sampling, demo-unit placement, brand-staffed pop-ups and other in-location activations across participating health, fitness and wellness locations.
+                On-prem clinic and studio surfaces via Align and Scale clinic hubs are a separate insertion-order line. They are not sold as digital reach.
               </p>
-              <p className="inline-block border border-background/20 px-3 py-1 text-[10px] uppercase tracking-widest text-accent bg-background/5">
-                Fall 2026 &middot; participating locations TBA
-              </p>
+              <a href="mailto:randy@silverbirchgrowth.com?subject=On-prem%20Birch%20Reserve" className="inline-block border border-background/20 px-3 py-1 text-[10px] uppercase tracking-widest text-accent bg-background/5">
+                Book a call
+              </a>
             </article>
           </div>
         </div>
@@ -476,7 +529,7 @@ export default function Home() {
                   <li className="border-l border-accent pl-4">Already paid once.</li>
                   <li className="border-l border-accent pl-4">Already in-protocol, so the next buy is the recovery stack: sleep, mobility, nutrition, recovery.</li>
                   <li className="border-l border-accent pl-4">Exclusive category—you are not auctioning against 40 supplement brands.</li>
-                  <li className="border-l border-accent pl-4">25% below regular, locked at reserve.</li>
+                  <li className="border-l border-accent pl-4">One brand per aisle. You are not auctioned against a competitor in the same category.</li>
                 </ul>
               </div>
 
@@ -636,8 +689,8 @@ export default function Home() {
               <p className="mt-2 text-sm leading-relaxed">{SIGNED_HUB_BRANDS.slice(1).join(" · ")}</p>
             </div>
             <div className="border-t border-border p-5 md:border-t-0">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/60">Physical</p>
-              <p className="mt-2 text-sm">Participating locations TBA Fall 2026</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/60">On request</p>
+              <p className="mt-2 text-sm">On-prem clinic and studio surfaces are a separate insertion order.</p>
             </div>
           </div>
           <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
@@ -653,7 +706,10 @@ export default function Home() {
                 <div className="border border-border/50 shadow-sm overflow-hidden aspect-[4/3] bg-muted relative">
                   <img src="/hub-proof/drho-hub-home.png" alt="DR-HO'S Insider Hub screenshot" className="w-full h-full object-cover object-top" loading="lazy" />
                 </div>
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Live customer hub.</p>
+                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Illustrative — not your receipt.</p>
+                <a href="https://physio.drhonow.com" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold">
+                  Open the live hub <ArrowUpRight className="size-4" />
+                </a>
               </div>
             </div>
 
@@ -790,9 +846,9 @@ export default function Home() {
             </div>
             <div className="grid gap-8 border-l border-background/20 pl-6 sm:grid-cols-2 md:pl-10">
               <div>
-                <p className="font-display text-3xl text-accent">From $899</p>
+                <p className="font-display text-3xl text-accent">$490 USD</p>
                 <p className="mt-2 text-sm leading-relaxed text-background/80">
-                  Fixed one-time USD payment holds the seat.
+                  Locks a named category seat. A 7-day look is $190 and does not consume a seat.
                 </p>
               </div>
               <div>
@@ -816,9 +872,9 @@ export default function Home() {
       <section className="py-20 md:py-24 border-b border-border bg-secondary/10">
         <div className="container mx-auto px-6 max-w-5xl">
           <div className="mb-10">
-            <h3 className="text-2xl md:text-3xl font-display tracking-tight mb-3">Looking for another Scale Health path?</h3>
+            <h3 className="text-2xl md:text-3xl font-display tracking-tight mb-3">Studios that already own a local audience</h3>
             <p className="text-muted-foreground text-sm max-w-xl leading-relaxed">
-               Birch Reserve coordinates performance and display advertising. If you are looking to build a storefront, launch a Clinic Hub, or join the provider network, use the Scale Health paths below.
+               Studios that already own a local audience can add a Scale Clinic Hub (store + booking) and then a Birch unit on that hub. Care, commerce, and display stay three separate contracts.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-4 md:gap-6">
@@ -851,9 +907,9 @@ export default function Home() {
       <section className="py-20 md:py-28 bg-foreground text-background text-center border-b border-foreground">
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto flex flex-col items-center">
-            <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">Reserve first rights before campaigns open.</h2>
+            <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">Lock the seat before the aisle is gone.</h2>
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
-              Your {reservePriceLabel} reservation is applied toward future campaign spend and gives you first rights to book available inventory before broader release.
+              {reservePriceLabel} is a named category seat and a 100% media credit. Nothing runs until the insertion order names the hub.
             </p>
             <Button
               size="lg"
@@ -861,7 +917,7 @@ export default function Home() {
               onClick={() => openReserveDialog()}
               data-testid="button-final-splash-access"
             >
-              Reserve first access - {reservePriceLabel}
+              Lock the seat — {reservePriceLabel}
             </Button>
           </div>
         </div>

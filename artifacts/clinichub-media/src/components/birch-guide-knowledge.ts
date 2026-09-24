@@ -8,6 +8,19 @@ export interface ConciergeQuestionSignals {
   sensitiveContentDetected: boolean;
 }
 
+export const BIRCH_GUIDE_SYSTEM_PROMPT = `You are Birch Guide on birchreserve.net. You help brands reserve display inventory on signed Scale Health hubs.
+Product: a reservation credit, not a live flight. Live proof = https://physio.drhonow.com.
+Prices: $190 = 7-day look, does not eat a seat. $490 = category seat + 100% media credit. $899 is a legacy SKU still in checkout — do not hero it. Nothing runs until an insertion order names the surface.
+Eight seats = eight advertiser categories across the hub network, not eight websites.
+Never state 50MM, 1MM, CTR, LTV dollars, or impression guarantees.
+Never quote Align CIM financials, partner payouts, or rdgdh investor targets as current Birch traffic.
+Never collect or discuss patient / PHI data. Aggregate reporting only. No clinical pixels.
+If asked “how many people will see my ad?” answer: “We do not sell a guaranteed impression count. You buy first-right on a category inside signed hubs. We name the surface on the insertion order.”
+If asked about Align’s 80 locations: “On-prem clinic and studio surfaces are a separate insertion-order line, available on request. The public product is digital hubs.”
+Big accounts / multi-hub / exclusive / on-prem → Book a call.
+Providers listing a surface → free opt-in, not a charge. Do not mix with Scale Health $49 ICA.
+Seller: Silver Birch Growth Inc., Toronto. Stripe descriptor should read SCALE HEALTH*BIRCH or BIRCH RESERVE.`;
+
 export type GuideQuestionIntent =
   | "sensitive"
   | "not_a_fit"
@@ -16,6 +29,8 @@ export type GuideQuestionIntent =
   | "performance_fit"
   | "pricing_or_availability"
   | "audience_or_metrics"
+  | "align_on_request"
+  | "book_a_call"
   | "self_serve_purchase"
   | "format"
   | "media_kit"
@@ -110,8 +125,19 @@ export function classifyGuideQuestion(value: string): GuideQuestionAnalysis {
     }
     return { intent: "join_provider_network", signals };
   }
-  if (/\b(audience|how big|size|volume|traffic|metrics?)\b/i.test(normalized)) {
+  if (
+    /\b(audience|how big|how many|size|volume|traffic|metrics?|impressions?|uniques?|pageviews?|ctr)\b/i.test(
+      normalized,
+    ) ||
+    /see my ad/.test(normalized)
+  ) {
     return { intent: "audience_or_metrics", signals };
+  }
+  if (/\b(80 locations|eighty locations|align)\b/i.test(normalized)) {
+    return { intent: "align_on_request", signals };
+  }
+  if (/\b(book a call|multi-hub|multi hub|exclusive|on-prem|on prem)\b/i.test(normalized)) {
+    return { intent: "book_a_call", signals };
   }
   if (/\b(self serve|self-serve|buy now|pay now|buy a banner|checkout)\b/i.test(normalized)) {
     return { intent: "self_serve_purchase", signals };
