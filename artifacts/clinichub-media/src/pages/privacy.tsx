@@ -14,8 +14,8 @@ export default function Privacy() {
       <div className="mt-10 space-y-6 text-base leading-relaxed text-muted-foreground">
         <p>
           This draft describes what Birch Reserve collects to sell the public
-          $190 and $490 reservations. reserve-899 at $899 is legacy-only and is
-          not a public offer. This page is not in force until counsel stamps it.
+          $190 and $490 reservations. This page is not in force until counsel
+          stamps it.
         </p>
         <p>
           Reservation checkout collects the brand legal name, work email,

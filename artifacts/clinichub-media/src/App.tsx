@@ -241,8 +241,14 @@ function Router() {
         <Route path="/sales/team">
           <Layout><TeamAccess /></Layout>
         </Route>
+        {/* Internal team page (Emma 7:21pm): signed-in team only; the public gets the 404. */}
         <Route path="/sales/voice-demo">
-          <Layout><VoiceDemo /></Layout>
+          <Show when="signed-in">
+            <Layout><VoiceDemo /></Layout>
+          </Show>
+          <Show when="signed-out">
+            <Layout><NotFound /></Layout>
+          </Show>
         </Route>
         <Route path="/insights">
           <Layout><Insights /></Layout>

@@ -19,9 +19,7 @@ export default function Terms() {
           <span className="text-foreground">hold-190</span>, a 7-day category
           look that does not consume an 8-seat) and $490 USD (
           <span className="text-foreground">reserve-490</span>, a named category
-          seat). $899 (<span className="text-foreground">reserve-899</span>) is
-          a legacy SKU only, kept so existing Stripe Checkout sessions still
-          match. It is not a public offer.
+          seat).
         </p>
         <p>
           hold-190 is a 100% credit if the buyer takes a seat within 7 days.

@@ -174,11 +174,6 @@ export default function Home() {
     window.location.href = VOICE_TEL_HREF;
   };
 
-  const bookCall = () => {
-    trackCta("cta_book_call");
-    // HARD Randy ~3:00pm: Book a call opens Randy chat qualifying questions — never cold-dump Cal.
-    openRandyChat({ reason: "book-a-call", mode: "chat" });
-  };
 
   const handleDialogChange = (open: boolean) => {
     setSplashDialogOpen(open);
@@ -281,15 +276,6 @@ export default function Home() {
               >
                 <Phone className="mr-2 size-4" aria-hidden />
                 Get a call back
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background/80 h-14 px-8 font-medium hover:bg-background/10 transition-colors"
-                onClick={bookCall}
-                data-testid="button-hero-book-call"
-              >
-                Book a call
               </Button>
             </motion.div>
             <p className="mt-3 text-sm text-background/80">
@@ -426,7 +412,7 @@ export default function Home() {
 
           <article className="mt-6 border border-border p-6 md:p-8">
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/60">Custom</p>
-            <p className="mt-4 font-display text-4xl text-foreground">Book a call</p>
+            <p className="mt-4 font-display text-4xl text-foreground">Talk to the team</p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               Multi-hub, exclusive, or on-prem Align. Credit, not a flight.
             </p>
@@ -439,15 +425,6 @@ export default function Home() {
               >
                 <Phone className="mr-2 size-4" aria-hidden />
                 Call {VOICE_TEL_DISPLAY}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-11 rounded-none"
-                onClick={bookCall}
-                data-testid="button-custom-book-call"
-              >
-                Book a call
               </Button>
             </div>
           </article>
@@ -532,16 +509,6 @@ export default function Home() {
                   <Phone className="size-3" aria-hidden />
                   Call {VOICE_TEL_DISPLAY}
                 </a>
-                <button
-                  type="button"
-                  onClick={() => {
-                    trackCta("cta_custom_onprem");
-                    openRandyChat({ reason: "book-a-call", mode: "chat" });
-                  }}
-                  className="inline-block border border-background/20 px-3 py-1 text-[10px] uppercase tracking-widest text-accent bg-background/5"
-                >
-                  Book a call
-                </button>
               </div>
             </article>
           </div>
@@ -974,10 +941,6 @@ export default function Home() {
               <a href={VOICE_TEL_HREF} className="underline underline-offset-4" onClick={() => trackCta("cta_book_call")}>
                 {VOICE_TEL_DISPLAY}
               </a>
-              <span className="text-background/40"> · </span>
-              <button type="button" onClick={bookCall} className="underline underline-offset-4">
-                Book a call
-              </button>
             </p>
           </div>
         </div>
