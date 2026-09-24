@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 17:56 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 18:00 EDT. Edit sales-brain, not this file. -->
 # NEVER-SAY, hard bans for the Randy-voice closer
 
 **Owner:** Birch Reserve knowledge pack (SoT).  

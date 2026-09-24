@@ -31,6 +31,7 @@ import {
   UpdateAdvertiserIntakeReviewStatusResponse,
 } from "@workspace/api-zod";
 import { getPublicLaunchMode } from "../lib/launchMode";
+import { captureAdvertiserIntakeLead } from "../lib/leadCapture";
 import {
   getAuthorizedSalesStaff,
   requireSalesManager,
@@ -354,6 +355,16 @@ router.post("/launch/advertiser-intake", async (req, res): Promise<void> => {
   if (!intake) {
     throw new Error("Advertiser intake was not persisted.");
   }
+
+  // Single system of record (HARD 5:46pm): mirror into leads + Friday push. Never throws.
+  await captureAdvertiserIntakeLead({
+    id: intake.id,
+    email: normalizedEmail,
+    advertisingIntent: parsed.data.advertisingIntent,
+    advertiserSize: parsed.data.advertiserSize ?? null,
+    adInterest: parsed.data.adInterest ?? null,
+    source: parsed.data.source,
+  });
 
   req.log.info(
     {

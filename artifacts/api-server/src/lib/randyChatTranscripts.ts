@@ -714,6 +714,16 @@ export function logIntake(s: TranscriptSession, reason: string, error?: string):
   );
 }
 
+/** Read a stored session (lead capture). Never throws; undefined on error. */
+export async function getTranscriptSession(id: string): Promise<TranscriptSession | undefined> {
+  try {
+    return await store.get(id);
+  } catch (error) {
+    logger.warn({ err: error instanceof Error ? error.message : "transcript_get_failed" }, "Randy chat session read failed");
+    return undefined;
+  }
+}
+
 /** Log the stored session for `id` (used on callback requests, even with no mailer). */
 export async function logIntakeForSession(id: string, reason: string): Promise<void> {
   try {

@@ -7,6 +7,7 @@ import splashAdReservationsRouter from "./splashAdReservations";
 import conciergeRouter from "./concierge";
 import randyChatRouter from "./randyChat";
 import editorialRouter from "./editorial";
+import voiceCallEndedRouter from "./voiceCallEnded";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(splashAdReservationsRouter);
 router.use(conciergeRouter);
 router.use(randyChatRouter);
 router.use(editorialRouter);
+router.use(voiceCallEndedRouter);
 
 export default router;
