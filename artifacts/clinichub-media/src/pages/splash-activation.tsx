@@ -198,6 +198,13 @@ function ActivationShell({
         <h1 className="font-display text-4xl italic tracking-tight">{title}</h1>
         <p className="mt-5 text-sm leading-relaxed text-muted-foreground">{description}</p>
         {children}
+        <a
+          href="/kit"
+          className="mt-7 text-sm font-medium text-foreground underline underline-offset-4 hover:text-accent"
+          data-testid="link-activation-media-kit"
+        >
+          See the media kit
+        </a>
         <Link href="/">
           <Button variant="outline" className="mt-9 h-11 rounded-none border-border px-6">Return to Birch Reserve</Button>
         </Link>

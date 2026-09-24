@@ -73,7 +73,7 @@ export type DiscoveryChipId =
 
 /** Live proof of a recovery hub surface (public). */
 export const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal" as const;
-export const LIVE_HUB_PROOF_DISPLAY = "physio.drhonow.com" as const;
+export const LIVE_HUB_PROOF_DISPLAY = "the live DR-HO hub" as const;
 
 export const SMART_OPENER =
   "Hey, I’m Randy. Want to see how a seat inside the recovery hubs works?" as const;

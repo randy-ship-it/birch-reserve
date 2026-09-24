@@ -1,5 +1,9 @@
 import { RANDY_TEL_HREF } from "@/lib/randy-chat-knowledge";
 import { useEffect } from "react";
+import { Download } from "lucide-react";
+
+/** Static print of this page (headless Chromium print-to-PDF of the /kit build). */
+const MEDIA_KIT_PDF_HREF = "/birch-reserve-media-kit.pdf" as const;
 
 const CATEGORIES = [
   "Pain relief / topicals",
@@ -16,7 +20,7 @@ const BOOK_CALL_MAILTO =
   "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve";
 const CALL_BACK_TEL = RANDY_TEL_HREF;
 
-const PAGE_TITLE = "DRAFT — Birch Reserve Kit | Thank-you first inventory";
+const PAGE_TITLE = "Media kit — Birch Reserve | Thank-you first inventory";
 
 export default function Kit() {
   useEffect(() => {
@@ -26,7 +30,7 @@ export default function Kit() {
     const previousDescription = description?.content;
     if (description) {
       description.content =
-        "DRAFT kit. Thank-you after Scale buy or book first. MODELED demos. $190 / $490. Not published until Emma GO.";
+        "Birch Reserve media kit. Thank-you after Scale buy or book first. MODELED demos. $190 hold / $490 seat.";
     }
     return () => {
       document.title = previousTitle;
@@ -39,17 +43,26 @@ export default function Kit() {
   return (
     <article className="container mx-auto max-w-3xl px-6 py-16 text-sm leading-relaxed">
       <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/60">
-        Kit · DRAFT — do not Publish until Emma GO
+        Birch Reserve · Media kit
       </p>
       <h1 className="mt-4 font-display text-5xl">Display beside the product they already trust.</h1>
+      <a
+        href={MEDIA_KIT_PDF_HREF}
+        download
+        className="kit-download mt-6 inline-flex h-11 items-center gap-2 rounded-full bg-foreground px-5 text-sm font-medium text-background shadow-sm transition-all hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent print:hidden"
+        data-testid="button-download-media-kit"
+      >
+        <Download className="size-4" aria-hidden />
+        Download media kit (PDF)
+      </a>
       <p className="mt-6 text-lg">
         Eight category seats inside signed Scale Health hubs. Not an open auction. Not a guaranteed impression buy.
         First story: thank-you after Scale buy or book — then in-experience display.
       </p>
       <p className="mt-6">
         Live proof:{" "}
-        <a className="underline" href="https://physio.drhonow.com/dr-ho/portal">
-          https://physio.drhonow.com/dr-ho/portal
+        <a className="underline" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">
+          Tour the DR-HO hub
         </a>
       </p>
       <p className="mt-2 text-muted-foreground">Caption on every mock: Illustrative — not your receipt.</p>
@@ -76,10 +89,7 @@ export default function Kit() {
         </li>
         <li>Context: thank-you after buy or book, on a plan, or in-hub. Not a cold feed impression.</li>
         <li>Brand buyer: founder or brand manager already adjacent to those names.</li>
-        <li>
-          Analog only: open-web wellness CPM often $8–25; owned / retail-media $20–80. Birch is priced as a credit, not
-          a CPM guarantee.
-        </li>
+        <li>Birch is priced as a credit, not a CPM guarantee.</li>
       </ul>
 
       <h2 className="mt-10 font-display text-3xl">Formats (thank-you first)</h2>
@@ -122,8 +132,8 @@ export default function Kit() {
         Shopify-agnostic embed / snippet so Scale Clinic Hub / partner hubs can enable thank-you + in-experience display
         without custom one-offs. Scale Activation owns Shopify coordination. Care · commerce · display stay three
         contracts.{" "}
-        <a className="underline" href="https://scalehealth.ca/clinichubs">
-          scalehealth.ca/clinichubs
+        <a className="underline" href="https://scalehealth.ca/clinichubs" target="_blank" rel="noopener noreferrer">
+          See Scale Health clinic hubs
         </a>
       </p>
 
@@ -135,7 +145,6 @@ export default function Kit() {
           a flight.
         </li>
         <li>custom · Book a call · multi-hub / exclusive / on-prem. Credit, not a flight.</li>
-        <li>reserve-899 remains unpublished/legacy so live Stripe sessions still match.</li>
       </ul>
       <p className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
         <a className="underline" href={BOOK_CALL_MAILTO}>
@@ -153,8 +162,8 @@ export default function Kit() {
       <p className="mt-3">
         Studios that already own a local audience can add a Scale Clinic Hub (store + booking) and then a Birch unit on
         that hub. Care, commerce, and display stay three separate contracts.{" "}
-        <a className="underline" href="https://scalehealth.ca/clinichubs">
-          scalehealth.ca/clinichubs
+        <a className="underline" href="https://scalehealth.ca/clinichubs" target="_blank" rel="noopener noreferrer">
+          See Scale Health clinic hubs
         </a>
       </p>
 
@@ -165,10 +174,11 @@ export default function Kit() {
         only. No PHI. No clinical pixels.
       </p>
       <p className="mt-4">
-        Seller: Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · randy@silverbirchgrowth.com
+        Seller: Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 ·{" "}
+        <a className="underline" href="mailto:randy@silverbirchgrowth.com">Email Randy</a>
       </p>
       <p className="mt-4 text-xs uppercase tracking-widest text-muted-foreground">
-        DRAFT /terms until counsel stamps · do not Publish until Emma GO
+        Terms are draft until counsel stamps
       </p>
     </article>
   );

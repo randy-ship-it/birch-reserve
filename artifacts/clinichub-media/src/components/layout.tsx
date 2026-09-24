@@ -2,7 +2,7 @@ import { Link, useLocation } from 'wouter';
 import { ReactNode, useState } from 'react';
 import { Menu, X, ArrowRight } from 'lucide-react';
 import birchReserveMark from '@assets/brand/birch-reserve-mark-v2.svg';
-import { SELLER_IDENTITY } from '@/lib/seller-identity';
+import { SELLER_EMAIL_HREF, SELLER_IDENTITY } from '@/lib/seller-identity';
 import { trackCta } from '@/lib/track-cta';
 import { RandyChat } from '@/components/randy-chat';
 
@@ -15,6 +15,7 @@ export function Layout({ children }: { children: ReactNode }) {
     { href: `${basePath}#placements`, label: 'Ad Examples' },
     { href: `${basePath}#splash-ad`, label: 'Advertise' },
     { href: `/insights`, label: 'Insights' },
+    { href: `/kit`, label: 'Media kit' },
   ];
 
   return (
@@ -117,12 +118,12 @@ export function Layout({ children }: { children: ReactNode }) {
               Eight category seats inside signed Scale Health hubs. Credit, not a flight.
             </p>
             <p className="text-xs leading-relaxed text-foreground">
-              {SELLER_IDENTITY}
+              {SELLER_IDENTITY} · <a href={SELLER_EMAIL_HREF} className="underline underline-offset-2 hover:text-accent">Email Randy</a>
             </p>
             <p className="text-xs text-muted-foreground uppercase tracking-widest mt-6">
               In Partnership With<br/>
-              <span className="text-foreground mt-1 block mb-1">Scale Health Network Inc. (<a href="https://scalehealth.ca" className="hover:text-accent" target="_blank" rel="noreferrer">scalehealth.ca</a>)</span>
-              <span className="text-foreground block">RDG Digital Holdings Inc. (<a href="https://rdgdh.com" className="hover:text-accent" target="_blank" rel="noreferrer">rdgdh.com</a>)</span>
+              <span className="text-foreground mt-1 block mb-1"><a href="https://scalehealth.ca" className="hover:text-accent" target="_blank" rel="noopener noreferrer">Scale Health Network Inc.</a></span>
+              <span className="text-foreground block"><a href="https://rdgdh.com" className="hover:text-accent" target="_blank" rel="noopener noreferrer">RDG Digital Holdings Inc.</a></span>
             </p>
           </div>
 

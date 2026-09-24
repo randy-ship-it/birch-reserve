@@ -15,7 +15,7 @@ const HUBS = [
     id: "dr-ho",
     name: "DR-HO'S",
     surface: "Care & product landing",
-    displayUrl: "physio.drhonow.com/dr-ho/portal",
+    displayUrl: "DR-HO'S hub",
     description: "Integrating virtual physiotherapy alongside established pain therapy product paths.",
     image: drHoHub,
     url: "https://physio.drhonow.com/dr-ho/portal"
@@ -33,7 +33,7 @@ const HUBS = [
     id: "integrity",
     name: "Integrity Fitness",
     surface: "Member offers",
-    displayUrl: "scalehealth.ca / integrity",
+    displayUrl: "Integrity hub",
     description: "A local fitness partner augmenting memberships with exclusive recovery offers and physio access.",
     image: integrityHub,
     url: "https://www.scalehealth.ca/integrity"
