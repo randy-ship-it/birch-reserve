@@ -3,6 +3,7 @@ import { after, before, test } from "node:test";
 import express from "express";
 import randyChatRouter, {
   BIRCH_SITE_SCOPE_PROMPT,
+  polishReply,
   modelWindow,
   parseBody,
 } from "../src/routes/randyChat";
@@ -400,4 +401,34 @@ test("sales-brain prompt: QA answers present, no phone digits, identity fixed", 
   assert.match(prompt, /https:\/\/birchreserve\.net\/kit/);
   assert.match(prompt, /I'm Randy from Birch Reserve/);
   assert.doesNotMatch(prompt.replace(/Do not call yourself[^.]*\./g, "").replace(/Never “Randy’s assistant”[^\n]*/g, ""), /voice assistant/i);
+});
+
+test("polishReply: no em dashes, no re-intro after the first turn unless asked", () => {
+  const first = [{ role: "user", content: "hi" }];
+  const later = [
+    { role: "assistant", content: "Hey, I'm Randy. Want to see how a seat inside the recovery hubs works?" },
+    { role: "user", content: "we sell recovery drinks" },
+  ];
+  assert.equal(polishReply("Got it \u2014 checkout isn't live\u2014yet.", first), "Got it, checkout isn't live, yet.");
+  assert.equal(polishReply("I'm Randy from Birch Reserve. Hi there.", first), "I'm Randy from Birch Reserve. Hi there.");
+  assert.equal(polishReply("I'm Randy from Birch Reserve. Sounds like a fit.", later), "Sounds like a fit.");
+  assert.equal(
+    polishReply("I'm Randy from Birch Reserve. I help brands.", [...later, { role: "user", content: "wait, who are you?" }]),
+    "I'm Randy from Birch Reserve. I help brands.",
+  );
+  assert.doesNotMatch(loadVoiceCloserSystemPrompt(true).replace(/\(no "\u2014" or "\u2013"\)/, ""), /\u2014/);
+  assert.match(loadVoiceCloserSystemPrompt(true), /Want me to text or email that to you\?/);
+});
+
+test("polishReply: trailing bare URL dropped if Randy linked in his last two replies", () => {
+  const h = [
+    { role: "assistant", content: "Here's the kit: https://birchreserve.net/kit" },
+    { role: "user", content: "we target athletes 25-45" },
+  ];
+  assert.equal(polishReply("Great fit. Want Randy's AI to call you?\n\nhttps://birchreserve.net", h), "Great fit. Want Randy's AI to call you?");
+  assert.match(
+    polishReply("Sure.\n\nhttps://physio.drhonow.com/dr-ho/portal", [...h.slice(0, 1), { role: "user", content: "can you send me the link to a live hub?" }]),
+    /physio\.drhonow\.com/,
+  );
+  assert.match(polishReply("Here you go.\nhttps://birchreserve.net/kit", [{ role: "user", content: "hi" }]), /kit/);
 });

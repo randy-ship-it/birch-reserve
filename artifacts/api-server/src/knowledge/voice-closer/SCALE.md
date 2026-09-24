@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:24 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:39 EDT. Edit sales-brain, not this file. -->
 # Scale Health (brand training)
 
 **Legal:** Scale Health Network Inc. · Randy calls the org **Scale**.  
@@ -9,19 +9,21 @@ Note: the live /providers page headline currently says "We send the patient." On
 
 ## What Scale is (public)
 
-Digitally-native customer activation / brand-hub platform. Brands need somewhere to send physio bookings. Scale built the platform — tools, data, insights — practitioners use when they take patients through the hub.
+Digitally-native customer activation / brand-hub platform. Brands need somewhere to send physio bookings. Scale built the platform, tools, data, insights, practitioners use when they take patients through the hub.
 
-Scale **opens as a buyer** (supply, capacity, audience, or placement), then triages — not as a cold vendor pitch.
+Scale **opens as a buyer** (supply, capacity, audience, or placement), then triages, not as a cold vendor pitch.
 
 ## Chat answers (HARD 2026-09-24 4:23pm ET)
 
 "What's Scale Health?" Answer in two sentences, then ask what they need: "Scale Health is a Canadian platform that puts physio and recovery care inside brand hubs, so members can book a clinician right where they already shop, train, or recover. Clinics get bookable in those hubs with an admin portal, data, and insights; brands and studios get a turnkey clinic hub." Then give the ONE URL that fits their need (providers: https://scalehealth.ca/providers, studios/gyms/brands wanting a hub: https://scalehealth.ca/clinichubs, general: https://scalehealth.ca).
 
-Clinic or physio asks "can you send me patients?": never promise patients and never brush them off (never "this isn't for clinics"). Say: "I can't promise patients, but Scale lets clinics get bookable inside brand hubs with no per-session fees, plus an admin portal, data, and insights. Here's the provider page: https://scalehealth.ca/providers" Then offer to text or email the link.
+Clinic or physio asks "can you send me patients?": never promise patients and never brush them off (never "this isn't for clinics"). Say: "I can't promise patients, but Scale lets clinics get bookable inside brand hubs with no per-session fees, plus an admin portal, data, and insights. Here's the provider page: https://scalehealth.ca/providers Want me to text or email that to you?"
 
-Provider asks "do you take a cut of each session?": "No per-session fees. We don't take a cut of your visits; you set your fee and keep it. You get the booking presence, admin portal, and data: https://scalehealth.ca/providers"
+Provider asks "do you take a cut of each session?": "No per-session fees. We don't take a cut of your visits; you set your fee and keep it. You get the booking presence, admin portal, and data: https://scalehealth.ca/providers Want me to text or email that to you?"
 
-## Rails, not leads — HARD
+RULE: any reply that gives a clinic, physio, or provider the https://scalehealth.ca/providers link ends with: "Want me to text or email that to you?" (in chat the URL goes on its own line, then that question).
+
+## Rails, not leads, HARD
 
 Scale sells **booking / practice rails**, not patients.
 
@@ -31,11 +33,11 @@ Scale sells **booking / practice rails**, not patients.
 
 ## No-flinch provider talk-track (say this)
 
-> Our brands need somewhere to send their physio bookings. We built the platform — tools, data, insights — that practitioners use when they take patients through the hub. 50MM+ contracted brand eyeballs a month now. First five ramp October / November, then into 2027. We need quality providers on the site.
+> Our brands need somewhere to send their physio bookings. We built the platform, tools, data, insights, that practitioners use when they take patients through the hub. 50MM+ contracted brand eyeballs a month now. First five ramp October / November, then into 2027. We need quality providers on the site.
 
 **Scope warning for Birch closer:** “50MM+ contracted brand eyeballs” is a **Scale provider** frame. It is **not** a Birch sold-impression guarantee. Do not tell brand ad buyers “your Birch seat equals 50MM views.”
 
-## Economics when asked — HARD (Randy 2026-09-24 ~3:55pm ET)
+## Economics when asked, HARD (Randy 2026-09-24 ~3:55pm ET)
 
 - Scale does **not** charge providers (physio and other registered fulfillment services) for sessions. No per-session fee, no per-booking fee, no cut of their fee.
 - The provider sets their own fee, the patient pays them, and they keep it.
@@ -70,9 +72,9 @@ Phone: "scale health, all one word, dot C-A, slash providers" (or "slash clinic 
 
 ## Birch why (after fit, soft)
 
-Plan **3× or higher** average customer value versus Google — visitor arrives as a brand’s customer buying high-value recovery products/services, not a cold public-site click. Soft after bullish / signup — not a cold lead product.
+Plan **3× or higher** average customer value versus Google, visitor arrives as a brand’s customer buying high-value recovery products/services, not a cold public-site click. Soft after bullish / signup, not a cold lead product.
 
-## Brand hubs / launch queue (INTERNAL — logos OK publicly; stages not for prospect dumps)
+## Brand hubs / launch queue (INTERNAL, logos OK publicly; stages not for prospect dumps)
 
 Live proof hub: **DR-HO’s** → https://physio.drhonow.com/dr-ho/portal  
 
@@ -84,7 +86,7 @@ Clinic Hub DIY self-onboarding exists but is **not marketed yet** (Randy note).
 
 ## SMB / creators close
 
-Features-first: free store, monetize more, supply deals already on. Brand-hub flow exists because brands need a place for bookings — **not a per-door promise**.
+Features-first: free store, monetize more, supply deals already on. Brand-hub flow exists because brands need a place for bookings, **not a per-door promise**.
 
 ## CA vs US outbound posture
 
