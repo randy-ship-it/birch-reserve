@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShieldCheck } from "lucide-react";
+import { trackCta } from "@/lib/track-cta";
 import {
   DISPLAY_FORMATS,
   SCALE_HEALTH_URLS,
@@ -548,6 +549,9 @@ export function SalesConcierge({
                                 href={opt.href}
                                 target="_blank"
                                 rel="noreferrer"
+                                onClick={() => {
+                                  if (opt.label === "Book a call") trackCta("cta_book_call");
+                                }}
                                 className={`flex items-center justify-between px-4 py-3 text-left text-sm font-medium transition-colors w-full border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent ${
                                   opt.primary
                                     ? 'bg-accent border-accent text-accent-foreground hover:bg-accent/90'

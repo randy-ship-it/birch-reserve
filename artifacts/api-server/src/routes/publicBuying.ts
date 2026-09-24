@@ -68,6 +68,7 @@ import {
   syncReservationToPipeline,
 } from "./splashAdReservations";
 import { recordUcpProxyForwardingShape } from "../lib/logger";
+import { handleUiEvent } from "../lib/uiEvents";
 
 const router: IRouter = Router();
 
@@ -456,6 +457,10 @@ async function sendCheckoutReceipt(
 async function reserveCounts() {
   return getSplashSeatCounts();
 }
+
+router.post("/v1/ui-events", (req, res) => {
+  void handleUiEvent(req, res);
+});
 
 router.get("/llms.txt", (_req, res) => {
   res.type("text/plain").send(

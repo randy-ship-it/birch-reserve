@@ -20,6 +20,7 @@
 export * from "./marketplace";
 export * from "./launch";
 export * from "./editorial";
+export * from "./site-cta-events";
 export * from "./reservations";
 export * from "./splash-ad-reservations";
 export * from "./ucp-agent-request-proofs";

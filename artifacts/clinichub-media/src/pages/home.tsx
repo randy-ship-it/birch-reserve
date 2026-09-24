@@ -20,6 +20,7 @@ import {
   RESERVE_OFFERS,
   type ReserveOfferKey,
 } from "@/lib/reserve-offers";
+import { trackCta, trackReserveDialogOpen, type CtaEvent } from "@/lib/track-cta";
 import {
   SalesConcierge,
   type ConciergeQuestionSignals,
@@ -152,10 +153,17 @@ export default function Home() {
   const openReserveDialog = (
     format?: string,
     offer: ReserveOfferKey = DEFAULT_RESERVE_OFFER_KEY,
+    event?: CtaEvent,
   ) => {
+    trackReserveDialogOpen(format, offer, event);
     setSelectedFormat(format);
     setSelectedOffer(offer);
     setSplashDialogOpen(true);
+  };
+
+  const bookCall = () => {
+    trackCta("cta_book_call");
+    window.location.href = "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve";
   };
 
   const handleDialogChange = (open: boolean) => {
@@ -289,7 +297,7 @@ export default function Home() {
               <Button
                 size="lg"
                 className="w-full sm:w-auto rounded-none bg-accent text-accent-foreground h-14 px-8 font-medium hover:bg-background hover:text-foreground transition-colors text-base"
-                onClick={() => openReserveDialog()}
+                onClick={() => openReserveDialog(undefined, "reserve-490", "cta_hero_reserve")}
                 data-testid="button-hero-reserve"
               >
                 Lock the seat — {reservePriceLabel}
@@ -298,9 +306,7 @@ export default function Home() {
                 size="lg"
                 variant="outline"
                 className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background h-14 px-8 font-medium hover:bg-background/10 transition-colors"
-                onClick={() => {
-                  window.location.href = "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve";
-                }}
+                onClick={bookCall}
               >
                 Book a call
               </Button>
@@ -433,9 +439,7 @@ export default function Home() {
               type="button"
               variant="outline"
               className="mt-6 h-11 rounded-none"
-              onClick={() => {
-                window.location.href = "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve";
-              }}
+              onClick={bookCall}
             >
               Book a call
             </Button>
@@ -461,6 +465,7 @@ export default function Home() {
             <Button
               type="button"
               onClick={() => {
+                trackCta("buycalc_open", { offer: "reserve-490" });
                 window.location.href = "/buycalc?sku=reserve-490";
               }}
               className="h-12 rounded-none bg-accent px-6 text-accent-foreground hover:bg-foreground hover:text-background"
@@ -504,7 +509,7 @@ export default function Home() {
               <p className="text-sm leading-relaxed text-background/70 mb-4">
                 On-prem clinic and studio surfaces via Align and Scale clinic hubs are a separate insertion-order line. They are not sold as digital reach.
               </p>
-              <a href="mailto:randy@silverbirchgrowth.com?subject=On-prem%20Birch%20Reserve" className="inline-block border border-background/20 px-3 py-1 text-[10px] uppercase tracking-widest text-accent bg-background/5">
+              <a href="mailto:randy@silverbirchgrowth.com?subject=On-prem%20Birch%20Reserve" onClick={() => trackCta("cta_custom_onprem")} className="inline-block border border-background/20 px-3 py-1 text-[10px] uppercase tracking-widest text-accent bg-background/5">
                 Book a call
               </a>
             </article>

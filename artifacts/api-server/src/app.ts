@@ -5,6 +5,7 @@ import pinoHttp from "pino-http";
 import router from "./routes/index";
 import publicBuyingRouter from "./routes/publicBuying";
 import { logger } from "./lib/logger";
+import { uiEventsJsonParser } from "./lib/uiEvents";
 import { handleStripeWebhook } from "./routes/splashAdReservations";
 import {
   CLERK_PROXY_PATH,
@@ -43,6 +44,7 @@ app.use(
 // Public machine-buying and human-buying surfaces never require Clerk.
 // Parse only their JSON checkout body here so Stripe's later raw webhook
 // middleware remains untouched.
+app.use("/v1/ui-events", uiEventsJsonParser());
 app.use("/v1/checkout", express.json({ limit: "32kb" }));
 app.use("/v1/orders", express.json({ limit: "32kb" }));
 app.use(
