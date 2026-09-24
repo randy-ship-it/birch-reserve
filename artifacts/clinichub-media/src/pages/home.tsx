@@ -5,7 +5,6 @@ import {
   ArrowUpRight,
   CalendarCheck2,
   ClipboardCheck,
-  MessageSquareText,
   MonitorUp,
   MapPin,
   Phone,
@@ -22,15 +21,7 @@ import {
   type ReserveOfferKey,
 } from "@/lib/reserve-offers";
 import { trackCta, trackReserveDialogOpen, type CtaEvent } from "@/lib/track-cta";
-import { BOOK_CALL_HREF } from "@/lib/book-call";
-import {
-  SalesConcierge,
-  type ConciergeQuestionSignals,
-  type SalesConciergeResponse,
-} from "@/components/sales-concierge";
-import {
-  useCreateConciergeAdvice,
-} from "@workspace/api-client-react";
+import { openRandyChat } from "@/lib/book-call";
 import { ShowcaseCarousel } from "@/components/showcase-carousel";
 import {
   PostCheckoutMockup,
@@ -126,7 +117,6 @@ export default function Home() {
   const [selectedOffer, setSelectedOffer] = useState<ReserveOfferKey>(
     DEFAULT_RESERVE_OFFER_KEY,
   );
-  const [conciergeOpen, setConciergeOpen] = useState(false);
   const [availability, setAvailability] = useState<{
     seats_open: number;
     seats_held: number;
@@ -150,7 +140,6 @@ export default function Home() {
     };
   }, []);
 
-  const { mutateAsync: requestConciergeAdvice } = useCreateConciergeAdvice();
 
   const openReserveDialog = (
     format?: string,
@@ -173,7 +162,8 @@ export default function Home() {
 
   const bookCall = () => {
     trackCta("cta_book_call");
-    window.location.href = BOOK_CALL_HREF;
+    // HARD Randy ~3:00pm: Book a call opens Randy chat pre-screen — never cold-dump Cal.
+    openRandyChat({ reason: "book-a-call", mode: "chat" });
   };
 
   const handleDialogChange = (open: boolean) => {
@@ -183,23 +173,7 @@ export default function Home() {
     }
   };
 
-  const askConcierge = async (
-    signals: ConciergeQuestionSignals,
-  ): Promise<SalesConciergeResponse> => {
-    const advice = await requestConciergeAdvice({
-      data: signals,
-    });
-    return {
-      message: advice.message,
-      recommendedInterest: advice.recommendedInterest,
-      handoffAllowed: advice.handoffAllowed,
-    };
-  };
 
-  const handoffConcierge = () => {
-    setConciergeOpen(false);
-    window.setTimeout(() => openReserveDialog(), 260);
-  };
 
   const scrollToPlacements = () => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -217,48 +191,20 @@ export default function Home() {
         defaultOffer={selectedOffer}
       />
 
-      <SalesConcierge
-        isOpen={conciergeOpen}
-        onClose={() => setConciergeOpen(false)}
-        onAskQuestion={askConcierge}
-        onHandoff={handoffConcierge}
-        onRequestReview={handoffConcierge}
-      />
 
       {!splashDialogOpen && (
-        <>
+        <div
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-foreground/10 bg-background/95 p-4 backdrop-blur-md md:hidden"
+          data-testid="mobile-sticky-reserve-cta"
+        >
           <button
             type="button"
-            onClick={() => setConciergeOpen(true)}
-            aria-hidden={conciergeOpen}
-            tabIndex={conciergeOpen ? -1 : 0}
-            className={`fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 z-[45] inline-flex h-11 items-center gap-2 rounded-full border border-foreground/15 bg-background/95 px-3 text-xs font-semibold text-foreground shadow-xl backdrop-blur-md transition-all hover:border-accent hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 md:bottom-6 md:right-6 md:h-12 md:gap-2 md:rounded-none md:border-foreground md:bg-foreground md:px-4 md:text-background md:backdrop-blur-none md:hover:bg-accent md:hover:text-accent-foreground ${
-              conciergeOpen
-                ? "pointer-events-none opacity-0"
-                : "opacity-100"
-            }`}
-            aria-label="Ask Birch Guide about advertising paths"
-            data-testid="button-open-sales-concierge"
+            onClick={() => openReserveDialog()}
+            className="flex h-12 w-full items-center justify-center bg-accent font-medium text-accent-foreground transition-colors hover:bg-foreground hover:text-background"
           >
-            <span className="flex size-7 items-center justify-center bg-accent text-accent-foreground" aria-hidden="true">
-              <MessageSquareText className="size-4" />
-            </span>
-            <span className="md:hidden">Ask a question</span>
-            <span className="hidden md:inline">Ask Birch Guide</span>
+            Lock the seat — {reservePriceLabel} <ArrowRight className="ml-2 size-4" />
           </button>
-          <div
-            className="fixed inset-x-0 bottom-0 z-40 border-t border-foreground/10 bg-background/95 p-4 backdrop-blur-md md:hidden"
-            data-testid="mobile-sticky-reserve-cta"
-          >
-            <button
-              type="button"
-              onClick={() => openReserveDialog()}
-              className="flex h-12 w-full items-center justify-center bg-accent font-medium text-accent-foreground transition-colors hover:bg-foreground hover:text-background"
-            >
-              Lock the seat — {reservePriceLabel} <ArrowRight className="ml-2 size-4" />
-            </button>
-          </div>
-        </>
+        </div>
       )}
 
       {/* Open-Seats Banner */}
@@ -556,9 +502,16 @@ export default function Home() {
                   <Phone className="size-3" aria-hidden />
                   Call {VOICE_TEL_DISPLAY}
                 </a>
-                <a href="mailto:randy@silverbirchgrowth.com?subject=On-prem%20Birch%20Reserve" onClick={() => trackCta("cta_custom_onprem")} className="inline-block border border-background/20 px-3 py-1 text-[10px] uppercase tracking-widest text-accent bg-background/5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    trackCta("cta_custom_onprem");
+                    openRandyChat({ reason: "book-a-call", mode: "chat" });
+                  }}
+                  className="inline-block border border-background/20 px-3 py-1 text-[10px] uppercase tracking-widest text-accent bg-background/5"
+                >
                   Book a call
-                </a>
+                </button>
               </div>
             </article>
           </div>
