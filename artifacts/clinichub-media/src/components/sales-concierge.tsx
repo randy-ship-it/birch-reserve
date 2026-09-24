@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShieldCheck } from "lucide-react";
 import { trackCta } from "@/lib/track-cta";
+import { BOOK_CALL_HREF } from "@/lib/book-call";
 import {
   DISPLAY_FORMATS,
   SCALE_HEALTH_URLS,
@@ -347,7 +348,7 @@ export function SalesConcierge({
           text: "On-prem clinic and studio surfaces are a separate insertion-order line, available on request. The public product is digital hubs.",
           options: [
             { label: "Get a call back", href: "tel:+15045046526", primary: true },
-            { label: "Book a call", href: "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve" },
+            { label: "Book a call", href: BOOK_CALL_HREF },
             { label: "Lock the seat — $490 USD", action: onHandoff },
           ],
         };
@@ -356,7 +357,7 @@ export function SalesConcierge({
           text: "Multi-hub, exclusive, and on-prem Align are a call, not a public checkout SKU. Dial +1 (504) 504-6526 or email.",
           options: [
             { label: "Get a call back", href: "tel:+15045046526", primary: true },
-            { label: "Book a call", href: "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve" },
+            { label: "Book a call", href: BOOK_CALL_HREF },
           ],
         };
       case "audience_or_metrics":

@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import { Phone } from "lucide-react";
 import { trackCta } from "@/lib/track-cta";
+import { BOOK_CALL_HREF } from "@/lib/book-call";
 
 const PAGE_TITLE = "Birch Reserve · Randy voice closer (team demo)";
-const BOOK_CALL_HREF =
-  "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve";
 const TEL_HREF = "tel:+15045046526";
 const TEL_DISPLAY = "+1 (504) 504-6526";
 const KNOWLEDGE_SOT =
