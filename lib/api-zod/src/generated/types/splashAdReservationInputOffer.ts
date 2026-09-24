@@ -13,7 +13,7 @@ export type SplashAdReservationInputOffer = typeof SplashAdReservationInputOffer
 
 
 export const SplashAdReservationInputOffer = {
-  'reserve-990': 'reserve-990',
+  'reserve-899': 'reserve-899',
   'pilot-4900': 'pilot-4900',
   'network-9900': 'network-9900',
 } as const;

@@ -2,13 +2,13 @@ export const RESERVE_CURRENCY = "usd" as const;
 
 export const PUBLIC_RESERVE_OFFERS = [
   {
-    sku: "reserve-990",
-    offerKey: "reserve-990",
+    sku: "reserve-899",
+    offerKey: "reserve-899",
     name: "Access Reserve",
-    amountCents: 99_000,
-    dueTodayUsd: 990,
+    amountCents: 89_900,
+    dueTodayUsd: 899,
     offerType: "reservation_credit",
-    scope: "First-right planning access; no media delivery until a final insertion order is approved.",
+    scope: "First-right planning access and a category hold. The $899 payment is 100% media credit; no media delivery until a final insertion order is approved.",
     bestFor: "Brands that want to hold access without committing to a full pilot.",
   },
   {
@@ -46,14 +46,29 @@ const LEGACY_USD_OFFER = {
   bestFor: "Existing reservations only.",
 } as const;
 
+const LEGACY_RESERVE_990_OFFER = {
+  sku: "reserve-990",
+  offerKey: "reserve-990",
+  name: "Access Reserve",
+  amountCents: 99_000,
+  dueTodayUsd: 990,
+  offerType: "legacy_reservation_credit",
+  scope: "Legacy $990 access reserve. Existing holds only; new checkout uses reserve-899.",
+  bestFor: "Existing reservations only.",
+} as const;
+
 export const LEGACY_CAD_OFFER_KEY = "splash_ad_1900_cad";
 
 export type PublicReserveOffer = (typeof PUBLIC_RESERVE_OFFERS)[number];
-export type ReserveOffer = PublicReserveOffer | typeof LEGACY_USD_OFFER;
+export type ReserveOffer =
+  | PublicReserveOffer
+  | typeof LEGACY_USD_OFFER
+  | typeof LEGACY_RESERVE_990_OFFER;
 
 export const INVENTORY_OFFER_KEYS = [
   ...PUBLIC_RESERVE_OFFERS.map((offer) => offer.offerKey),
   LEGACY_USD_OFFER.offerKey,
+  LEGACY_RESERVE_990_OFFER.offerKey,
   LEGACY_CAD_OFFER_KEY,
 ] as const;
 
@@ -77,7 +92,10 @@ export function getPayableReserveOffer(
   if (currency !== RESERVE_CURRENCY) return null;
   const offer =
     getPublicReserveOfferByKey(offerKey) ??
-    (offerKey === LEGACY_USD_OFFER.offerKey ? LEGACY_USD_OFFER : null);
+    (offerKey === LEGACY_USD_OFFER.offerKey ? LEGACY_USD_OFFER : null) ??
+    (offerKey === LEGACY_RESERVE_990_OFFER.offerKey
+      ? LEGACY_RESERVE_990_OFFER
+      : null);
   return offer?.amountCents === amountCents ? offer : null;
 }
 

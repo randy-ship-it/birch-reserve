@@ -113,7 +113,7 @@ export default function Home() {
     DEFAULT_RESERVE_OFFER_KEY,
   );
   const [conciergeOpen, setConciergeOpen] = useState(false);
-  const reservePriceLabel = "$990 USD";
+  const reservePriceLabel = "$899 USD";
 
   const { mutateAsync: requestConciergeAdvice } = useCreateConciergeAdvice();
 
@@ -387,7 +387,7 @@ export default function Home() {
               </thead>
               <tbody className="divide-y divide-border">
                 <tr>
-                  <td className="p-5 font-medium text-foreground border-r border-border">$990 Access Reserve</td>
+                  <td className="p-5 font-medium text-foreground border-r border-border">$899 Access Reserve</td>
                   <td className="p-5 border-r border-border">100% credit</td>
                   <td className="p-5 text-muted-foreground">First right on one category in the shared eight-seat pool.</td>
                 </tr>
@@ -408,11 +408,11 @@ export default function Home() {
             <Button
               type="button"
               onClick={() => {
-                window.location.href = "/buycalc?sku=reserve-990";
+                window.location.href = "/buycalc?sku=reserve-899";
               }}
               className="h-12 rounded-none bg-accent px-6 text-accent-foreground hover:bg-foreground hover:text-background"
             >
-              Reserve first access — $990
+              Reserve first access — $899
             </Button>
             <Button
               type="button"
@@ -790,7 +790,7 @@ export default function Home() {
             </div>
             <div className="grid gap-8 border-l border-background/20 pl-6 sm:grid-cols-2 md:pl-10">
               <div>
-                <p className="font-display text-3xl text-accent">From $990</p>
+                <p className="font-display text-3xl text-accent">From $899</p>
                 <p className="mt-2 text-sm leading-relaxed text-background/80">
                   Fixed one-time USD payment holds the seat.
                 </p>

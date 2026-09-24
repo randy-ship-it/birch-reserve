@@ -10,7 +10,7 @@ export type BirchReserveQuoteOfferKey = typeof BirchReserveQuoteOfferKey[keyof t
 
 
 export const BirchReserveQuoteOfferKey = {
-  'reserve-990': 'reserve-990',
+  'reserve-899': 'reserve-899',
   'pilot-4900': 'pilot-4900',
   'network-9900': 'network-9900',
 } as const;

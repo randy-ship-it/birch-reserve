@@ -10,7 +10,7 @@ export type BirchReserveOfferDueToday = typeof BirchReserveOfferDueToday[keyof t
 
 
 export const BirchReserveOfferDueToday = {
-  NUMBER_990: 990,
+  NUMBER_899: 899,
   NUMBER_4900: 4900,
   NUMBER_9900: 9900,
 } as const;

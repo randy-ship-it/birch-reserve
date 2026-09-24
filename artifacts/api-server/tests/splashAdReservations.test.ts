@@ -89,7 +89,7 @@ async function waitForAlertStatus(
   throw new Error(`Reservation alert did not become ${status}.`);
 }
 
-test("public reserve stores the canonical $990 offer and holds the seat without Stripe", async () => {
+test("public reserve stores the canonical $899 offer and holds the seat without Stripe", async () => {
   const email = `splash-${randomUUID()}@example.com`;
   const brandName = "Northstar Recovery";
   const websiteUrl = "https://northstar.example.com";
@@ -108,9 +108,9 @@ test("public reserve stores the canonical $990 offer and holds the seat without 
         brandName,
         email: ` ${email.toUpperCase()} `,
         websiteUrl,
-        expectedAmountCents: 99000,
+        expectedAmountCents: 89900,
         expectedCurrency: "usd",
-        offer: "reserve-990",
+        offer: "reserve-899",
       }),
     });
   } finally {
@@ -135,9 +135,9 @@ test("public reserve stores the canonical $990 offer and holds the seat without 
 
   assert.equal(receipt.status, "held_pending_payments");
   assert.equal(receipt.checkoutUrl, null);
-  assert.equal(receipt.amountCents, 99000);
+  assert.equal(receipt.amountCents, 89900);
   assert.equal(receipt.currency, "usd");
-  assert.equal(receipt.offer, "reserve-990");
+  assert.equal(receipt.offer, "reserve-899");
 
   const row = await waitForAlertStatus(receipt.reservationId, "sent");
   assert.ok(row);
@@ -151,8 +151,8 @@ test("public reserve stores the canonical $990 offer and holds the seat without 
   );
   assert.equal(row.launchWindow, null);
   assert.equal(row.status, "seat_held");
-  assert.equal(row.offerKey, "reserve-990");
-  assert.equal(row.amountCents, 99000);
+  assert.equal(row.offerKey, "reserve-899");
+  assert.equal(row.amountCents, 89900);
   assert.equal(row.currency, "usd");
   assert.equal(row.source, "birch_reserve_public_checkout");
   assert.equal(row.sheetSyncStatus, "disabled");
@@ -245,7 +245,7 @@ test("human reserve checkout uses the exact selected tier and Stripe line item",
   process.env.SEATS_TOTAL = "100";
   process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   const expected = [
-    ["reserve-990", 99000],
+    ["reserve-899", 89900],
     ["pilot-4900", 490000],
     ["network-9900", 990000],
   ] as const;
@@ -371,8 +371,8 @@ test("pipeline updates the existing staff row with the cancellation reason", asy
       email: `pipeline-canceled-${randomUUID()}@buyer.invalid`,
       adInterest: "post_checkout",
       status: "expired",
-      offerKey: "reserve-990",
-      amountCents: 99000,
+      offerKey: "reserve-899",
+      amountCents: 89900,
       currency: "usd",
       source: "birch_reserve_v1_checkout",
       followUpBy: new Date(),
@@ -480,9 +480,9 @@ test("Slack failures do not block the reservation receipt and record a private r
       body: JSON.stringify({
         brandName: "Saved Brand",
         email,
-        expectedAmountCents: 99000,
+        expectedAmountCents: 89900,
         expectedCurrency: "usd",
-        offer: "reserve-990",
+        offer: "reserve-899",
       }),
     });
   } finally {
@@ -528,9 +528,9 @@ test("a stalled Slack request never delays the saved reservation receipt", async
       body: JSON.stringify({
         brandName: "Slow Alert Brand",
         email,
-        expectedAmountCents: 99000,
+        expectedAmountCents: 89900,
         expectedCurrency: "usd",
-        offer: "reserve-990",
+        offer: "reserve-899",
       }),
     });
   } finally {
@@ -574,7 +574,7 @@ test("public reserve rejects a price that differs from the fixed offer", async (
       email,
       expectedAmountCents: 98900,
       expectedCurrency: "usd",
-      offer: "reserve-990",
+      offer: "reserve-899",
     }),
   });
   assert.equal(response.status, 409);
@@ -590,28 +590,28 @@ test("public reserve rejects missing and invalid checkout details", async () => 
     {
       brandName: "Northstar Recovery",
       email: "not-an-email",
-        expectedAmountCents: 99000,
+        expectedAmountCents: 89900,
       expectedCurrency: "usd",
-        offer: "reserve-990",
+        offer: "reserve-899",
     },
     {
       email: "buyer@example.com",
-        expectedAmountCents: 99000,
+        expectedAmountCents: 89900,
       expectedCurrency: "usd",
-        offer: "reserve-990",
+        offer: "reserve-899",
     },
     {
       brandName: "Northstar Recovery",
       email: "buyer@example.com",
       websiteUrl: "not-a-url",
-        expectedAmountCents: 99000,
+        expectedAmountCents: 89900,
       expectedCurrency: "usd",
-        offer: "reserve-990",
+        offer: "reserve-899",
     },
     {
       brandName: "Northstar Recovery",
       email: "buyer@example.com",
-      expectedAmountCents: 99000,
+      expectedAmountCents: 89900,
       expectedCurrency: "usd",
       offer: "invented-offer",
       expectedStatus: 400,
@@ -619,9 +619,9 @@ test("public reserve rejects missing and invalid checkout details", async () => 
     {
       brandName: "Northstar Recovery",
       email: "buyer@example.com",
-      expectedAmountCents: 99000,
+      expectedAmountCents: 89900,
       expectedCurrency: "eur",
-      offer: "reserve-990",
+      offer: "reserve-899",
       expectedStatus: 400,
     },
     {
@@ -629,7 +629,7 @@ test("public reserve rejects missing and invalid checkout details", async () => 
       email: "buyer@example.com",
       expectedAmountCents: 490000,
       expectedCurrency: "usd",
-      offer: "reserve-990",
+      offer: "reserve-899",
       expectedStatus: 409,
     },
   ]) {
@@ -761,7 +761,7 @@ test("staff approval and a public buyer cannot both claim the final seat", async
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          sku: "reserve-990",
+          sku: "reserve-899",
           email: `approval-race-buyer-${randomUUID()}@example.com`,
           brand: "Final Seat Buyer",
           idempotency_key: randomUUID(),
@@ -837,7 +837,7 @@ test("a supported legacy reservation consumes the final seat", async () => {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        sku: "reserve-990",
+        sku: "reserve-899",
         email: `legacy-competitor-${randomUUID()}@example.com`,
         brand: "Competing Buyer",
         idempotency_key: randomUUID(),
@@ -1895,8 +1895,8 @@ test("cleanup and a replacement buyer defeat an in-flight checkout renewal", asy
       status: "payment_pending",
       paymentStatus: "checkout_created",
       creativeStatus: "locked",
-      offerKey: "reserve-990",
-      amountCents: 99000,
+      offerKey: "reserve-899",
+      amountCents: 89900,
       currency: "usd",
       activationToken,
       stripeCheckoutSessionId: sessionId,
@@ -1957,7 +1957,7 @@ test("cleanup and a replacement buyer defeat an in-flight checkout renewal", asy
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          sku: "reserve-990",
+          sku: "reserve-899",
           email: `replacement-${randomUUID()}@example.com`,
           brand: "Replacement Buyer",
           idempotency_key: randomUUID(),

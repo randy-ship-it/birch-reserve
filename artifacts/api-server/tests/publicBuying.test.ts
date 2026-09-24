@@ -545,7 +545,7 @@ test("UCP negotiation and required-header fixtures return conforming errors", as
   setUcpProfileResolverForTests(resolveTestUcpProfile);
   try {
     const body = JSON.stringify({
-      line_items: [{ item: { id: "reserve-990" }, quantity: 1 }],
+      line_items: [{ item: { id: "reserve-899" }, quantity: 1 }],
     });
     for (const headerFixture of fixture.requiredHeaders) {
       const idempotencyKey = randomUUID();
@@ -630,7 +630,7 @@ test("business discovery and checkout builders conform to official pinned schema
 test("machine surfaces expose text, JSON, YAML, and fixed USD contracts", async () => {
   const llms = await fetch(`${origin}/llms.txt`);
   assert.match(llms.headers.get("content-type") ?? "", /^text\/plain/);
-  assert.match(await llms.text(), /reserve-990.*pilot-4900.*network-9900/);
+  assert.match(await llms.text(), /reserve-899.*pilot-4900.*network-9900/);
 
   const catalogResponse = await fetch(`${origin}/v1/catalog.json`);
   assert.match(catalogResponse.headers.get("content-type") ?? "", /^application\/json/);
@@ -642,12 +642,12 @@ test("machine surfaces expose text, JSON, YAML, and fixed USD contracts", async 
       offer.amount_cents,
     ]),
     [
-      ["reserve-990", "reserve-990", 99000],
+      ["reserve-899", "reserve-899", 89900],
       ["pilot-4900", "pilot-4900", 490000],
       ["network-9900", "network-9900", 990000],
     ],
   );
-  assert.equal(catalog.default_sku, "reserve-990");
+  assert.equal(catalog.default_sku, "reserve-899");
   assert.equal(catalog.currency, "USD");
   assert.deepEqual(catalog.formats, [
     "post_checkout",
@@ -658,12 +658,12 @@ test("machine surfaces expose text, JSON, YAML, and fixed USD contracts", async 
   ]);
 
   const quoteResponse = await fetch(
-    `${origin}/v1/quote?sku=reserve-990&format=post_checkout&days=30`,
+    `${origin}/v1/quote?sku=reserve-899&format=post_checkout&days=30`,
   );
   const quote = (await quoteResponse.json()) as Record<string, unknown>;
-  assert.equal(quote.sku, "reserve-990");
-  assert.equal(quote.offerKey, "reserve-990");
-  assert.equal(quote.amountCents, 99000);
+  assert.equal(quote.sku, "reserve-899");
+  assert.equal(quote.offerKey, "reserve-899");
+  assert.equal(quote.amountCents, 89900);
   assert.equal(quote.currency, "USD");
   assert.equal(quote.dueTodayUsd, 990);
 
@@ -675,7 +675,7 @@ test("machine surfaces expose text, JSON, YAML, and fixed USD contracts", async 
 test("UCP request proofs fail uniformly before checkout lookup or creation", async () => {
   setUcpProfileResolverForTests(resolveTestUcpProfile);
   const body = JSON.stringify({
-    line_items: [{ item: { id: "reserve-990" }, quantity: 1 }],
+    line_items: [{ item: { id: "reserve-899" }, quantity: 1 }],
   });
   const idempotencyKey = randomUUID();
   const expected = {
@@ -1638,7 +1638,7 @@ test("verified key succession preserves forward checkout access without enabling
         payment_status: "unpaid",
         client_reference_id: params.client_reference_id,
         currency: "usd",
-        amount_total: 99000,
+        amount_total: 89900,
         metadata: params.metadata,
       };
       stripeSessions.set(session.id, session);
@@ -1660,7 +1660,7 @@ test("verified key succession preserves forward checkout access without enabling
   }) => {
     const idempotencyKey = input?.idempotencyKey ?? randomUUID();
     const body = JSON.stringify({
-      line_items: [{ item: { id: "reserve-990" }, quantity: 1 }],
+      line_items: [{ item: { id: "reserve-899" }, quantity: 1 }],
     });
     const response = await fetch(`${origin}/ucp/v1/checkout-sessions`, {
       method: "POST",
@@ -2062,7 +2062,7 @@ test("UCP rotates active checkout ownership only with the recorded identity key 
         payment_status: "unpaid",
         client_reference_id: params.client_reference_id,
         currency: "usd",
-        amount_total: 99000,
+        amount_total: 89900,
         metadata: params.metadata,
       };
       sessions.set(session.id, session);
@@ -2088,7 +2088,7 @@ test("UCP rotates active checkout ownership only with the recorded identity key 
   });
   try {
     const checkoutBody = JSON.stringify({
-      line_items: [{ item: { id: "reserve-990" }, quantity: 1 }],
+      line_items: [{ item: { id: "reserve-899" }, quantity: 1 }],
     });
     const legacyIdempotencyKey = randomUUID();
     const legacyPublicIdempotencyKey = `ucp:${createHash("sha256")
@@ -2105,8 +2105,8 @@ test("UCP rotates active checkout ownership only with the recorded identity key 
         adInterest: "post_checkout",
         promotedOffer: "Birch Reserve Starter",
         status: "payment_pending",
-        offerKey: "reserve-990",
-        amountCents: 99000,
+        offerKey: "reserve-899",
+        amountCents: 89900,
         currency: "usd",
         source: "birch_reserve_v1_checkout",
         followUpBy: new Date(),
@@ -2133,11 +2133,11 @@ test("UCP rotates active checkout ownership only with the recorded identity key 
       payment_status: "unpaid",
       client_reference_id: legacyReservation.id,
       currency: "usd",
-      amount_total: 99000,
+      amount_total: 89900,
       metadata: {
         reservationId: legacyReservation.id,
-        offerKey: "reserve-990",
-        sku: "reserve-990",
+        offerKey: "reserve-899",
+        sku: "reserve-899",
         checkoutAttempt: "1",
       },
     });
@@ -2271,7 +2271,7 @@ test("UCP rotates active checkout ownership only with the recorded identity key 
       .where(eq(splashAdReservationsTable.id, checkoutId));
     assert.match(createdReservation?.publicIdempotencyKey ?? "", /^ucp:/);
     const unsignedPublicRetryBody = JSON.stringify({
-      sku: "reserve-990",
+      sku: "reserve-899",
       email: `ucp-${createHash("sha256")
         .update(idempotencyKey)
         .digest("hex")
@@ -2295,7 +2295,7 @@ test("UCP rotates active checkout ownership only with the recorded identity key 
         checkout_url: null,
         order_id: null,
         reservationId: null,
-        amountCents: 99000,
+        amountCents: 89900,
         currency: "usd",
       },
     );
@@ -2427,7 +2427,7 @@ test("UCP rotates active checkout ownership only with the recorded identity key 
         checkout_url: null,
         order_id: null,
         reservationId: null,
-        amountCents: 99000,
+        amountCents: 89900,
         currency: "usd",
       },
     );
@@ -2507,7 +2507,7 @@ test("UCP rotates active checkout ownership only with the recorded identity key 
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        sku: "reserve-990",
+        sku: "reserve-899",
         email: "public-buyer@example.com",
         brand: "Public buyer",
         idempotency_key: randomUUID(),
@@ -3177,7 +3177,7 @@ test("UCP cancellation expires Stripe before atomically releasing only unpaid ho
         payment_status: "unpaid",
         client_reference_id: params.client_reference_id,
         currency: "usd",
-        amount_total: 99000,
+        amount_total: 89900,
         metadata: params.metadata,
       };
       sessions.set(id, session);
@@ -3198,7 +3198,7 @@ test("UCP cancellation expires Stripe before atomically releasing only unpaid ho
   const createCheckout = () => {
     const idempotencyKey = randomUUID();
     const body = JSON.stringify({
-      line_items: [{ item: { id: "reserve-990" }, quantity: 1 }],
+      line_items: [{ item: { id: "reserve-899" }, quantity: 1 }],
     });
     return fetch(`${origin}/ucp/v1/checkout-sessions`, {
       method: "POST",
@@ -3369,8 +3369,8 @@ test("UCP cancellation expires Stripe before atomically releasing only unpaid ho
       .values({
         email: `ucp-cancel-concurrent-${randomUUID()}@buyer.invalid`,
         status: "seat_held",
-        offerKey: "reserve-990",
-        amountCents: 99000,
+        offerKey: "reserve-899",
+        amountCents: 89900,
         currency: "usd",
         source: "birch_reserve_v1_checkout",
         followUpBy: new Date(),
@@ -3508,8 +3508,8 @@ test("UCP cancellation expires Stripe before atomically releasing only unpaid ho
       .values({
         email: `ucp-cancel-sync-failure-${randomUUID()}@buyer.invalid`,
         status: "seat_held",
-        offerKey: "reserve-990",
-        amountCents: 99000,
+        offerKey: "reserve-899",
+        amountCents: 89900,
         currency: "usd",
         source: "birch_reserve_v1_checkout",
         followUpBy: new Date(),
@@ -3702,7 +3702,7 @@ test("UCP requires compatible agent negotiation before creating a resource", asy
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      line_items: [{ item: { id: "reserve-990" }, quantity: 1 }],
+      line_items: [{ item: { id: "reserve-899" }, quantity: 1 }],
     }),
   });
   assert.equal(missingAgent.status, 400);
@@ -3720,7 +3720,7 @@ test("UCP requires compatible agent negotiation before creating a resource", asy
   }));
   try {
     const body = JSON.stringify({
-      line_items: [{ item: { id: "reserve-990" }, quantity: 1 }],
+      line_items: [{ item: { id: "reserve-899" }, quantity: 1 }],
     });
     const incompatible = await fetch(`${origin}/ucp/v1/checkout-sessions`, {
       method: "POST",
@@ -3762,6 +3762,85 @@ test("quote and checkout reject unsupported contract values", async () => {
     }),
   });
   assert.equal(response.status, 400);
+
+  const amountOnly = await fetch(`${origin}/v1/checkout`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ amountCents: 89900 }),
+  });
+  assert.equal(amountOnly.status, 400);
+  assert.equal(
+    ((await amountOnly.json()) as { error?: string }).error,
+    "Invalid checkout request.",
+  );
+});
+
+test("reserve-899 checkout accepts the full body and returns a Stripe Checkout URL for $899", async () => {
+  const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
+  const previousPublicUrl = process.env.PUBLIC_BASE_URL;
+  const previousTotal = process.env.SEATS_TOTAL;
+  process.env.STRIPE_CHECKOUT_DISABLED = "false";
+  process.env.PUBLIC_BASE_URL = "https://www.birchreserve.net";
+  process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
+  let unitAmount: number | undefined;
+  let currency: string | undefined;
+  setStripeCheckoutFunctionsForTests({
+    create: async (params) => {
+      const priceData = params.line_items?.[0]?.price_data;
+      unitAmount = priceData?.unit_amount ?? undefined;
+      currency = priceData?.currency;
+      return {
+        id: `cs_test_${randomUUID().replaceAll("-", "")}`,
+        url: "https://checkout.stripe.com/c/pay/cs_test_reserve_899",
+        client_reference_id: params.client_reference_id,
+        currency: priceData?.currency,
+        amount_total: priceData?.unit_amount,
+        metadata: params.metadata,
+      } as never;
+    },
+  });
+  try {
+    const response = await fetch(`${origin}/v1/checkout`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        sku: "reserve-899",
+        email: "buyer@brand.com",
+        brand: "Brand Legal Name",
+        idempotency_key: `br-reserve-899-${randomUUID()}`,
+        format_pref: "post_checkout",
+        website_url: "https://brand.com",
+      }),
+    });
+    assert.equal(response.status, 200);
+    const receipt = (await response.json()) as {
+      checkout_url?: string;
+      order_id?: string;
+      amountCents?: number;
+      currency?: string;
+    };
+    if (receipt.order_id) createdIds.push(receipt.order_id);
+    assert.equal(receipt.amountCents, 89900);
+    assert.equal(receipt.currency, "usd");
+    assert.equal(
+      receipt.checkout_url,
+      "https://checkout.stripe.com/c/pay/cs_test_reserve_899",
+    );
+    assert.equal(unitAmount, 89900);
+    assert.equal(currency, "usd");
+  } finally {
+    setStripeCheckoutFunctionsForTests();
+    if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
+    else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
+    if (previousPublicUrl === undefined) delete process.env.PUBLIC_BASE_URL;
+    else process.env.PUBLIC_BASE_URL = previousPublicUrl;
+    if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
+    else process.env.SEATS_TOTAL = previousTotal;
+  }
 });
 
 test("catalog and quotes expose every exact canonical tier", async () => {
@@ -3769,7 +3848,7 @@ test("catalog and quotes expose every exact canonical tier", async () => {
     offers: Array<Record<string, unknown>>;
   };
   const expected = [
-    ["reserve-990", 99000],
+    ["reserve-899", 89900],
     ["pilot-4900", 490000],
     ["network-9900", 990000],
   ] as const;
@@ -3800,7 +3879,7 @@ test("each exact canonical tier is stored and charged with exact Stripe data", a
   process.env.SEATS_TOTAL = "100";
   process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   const expected = [
-    ["reserve-990", 99000],
+    ["reserve-899", 89900],
     ["pilot-4900", 490000],
     ["network-9900", 990000],
   ] as const;
@@ -3874,7 +3953,7 @@ test("public idempotency keys cannot be reused across canonical tiers", async ()
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        sku: "reserve-990",
+        sku: "reserve-899",
         email: `idempotency-${randomUUID()}@example.com`,
         brand: "Idempotency Buyer",
         idempotency_key: key,
@@ -3907,7 +3986,7 @@ test("canonical tiers draw from one shared eight-seat inventory pool", async () 
     seats_held: number;
   };
   process.env.SEATS_TOTAL = String(current.seats_paid + current.seats_held + 2);
-  const requests = ["reserve-990", "pilot-4900", "network-9900"].map((sku) =>
+  const requests = ["reserve-899", "pilot-4900", "network-9900"].map((sku) =>
     fetch(`${origin}/v1/checkout`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -3940,7 +4019,7 @@ test("Stripe-disabled checkout durably reuses one public reservation", async () 
   process.env.SEATS_TOTAL = "100";
   const idempotencyKey = randomUUID();
   const payload = {
-    sku: "reserve-990",
+    sku: "reserve-899",
     email: `public-${randomUUID()}@example.com`,
     brand: "Public-safe Buyer",
     format_pref: "recovery_plan",
@@ -3954,7 +4033,7 @@ test("Stripe-disabled checkout durably reuses one public reservation", async () 
   assert.equal(first.status, 503);
   const firstReceipt = (await first.json()) as Record<string, unknown>;
   assert.equal(firstReceipt.checkout_url, null);
-  assert.equal(firstReceipt.amountCents, 99000);
+  assert.equal(firstReceipt.amountCents, 89900);
   assert.equal(firstReceipt.currency, "usd");
   createdIds.push(String(firstReceipt.order_id));
 
@@ -3972,8 +4051,8 @@ test("Stripe-disabled checkout durably reuses one public reservation", async () 
     .from(splashAdReservationsTable)
     .where(eq(splashAdReservationsTable.publicIdempotencyKey, idempotencyKey));
   assert.equal(rows.length, 1);
-  assert.equal(rows[0]?.offerKey, "reserve-990");
-  assert.equal(rows[0]?.amountCents, 99000);
+  assert.equal(rows[0]?.offerKey, "reserve-899");
+  assert.equal(rows[0]?.amountCents, 89900);
   assert.equal(rows[0]?.currency, "usd");
 
   const orderResponse = await fetch(`${origin}/v1/orders/${firstReceipt.order_id}`);
@@ -4006,14 +4085,14 @@ test("a successful public checkout confirms payment without a webhook", async ()
         url: "https://checkout.stripe.test/public-return",
         client_reference_id: params.client_reference_id,
         currency: "usd",
-        amount_total: 99000,
+        amount_total: 89900,
         metadata: params.metadata,
       }) as never,
     retrieve: async () =>
       ({
         id: sessionId,
         currency: "usd",
-        amount_total: 99000,
+        amount_total: 89900,
         payment_status: "paid",
         payment_intent: "pi_public_return",
       }) as never,
@@ -4024,7 +4103,7 @@ test("a successful public checkout confirms payment without a webhook", async ()
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        sku: "reserve-990",
+        sku: "reserve-899",
         email: `paid-return-${randomUUID()}@example.com`,
         brand: "No Webhook Buyer",
         idempotency_key: randomUUID(),
@@ -4041,13 +4120,13 @@ test("a successful public checkout confirms payment without a webhook", async ()
           id: sessionId,
           client_reference_id: orderId,
           currency: "usd",
-          amount_total: 99000,
+          amount_total: 89900,
           payment_status: "paid",
           payment_intent: "pi_public_return",
           metadata: {
             reservationId: orderId,
-            offerKey: "reserve-990",
-            sku: "reserve-990",
+            offerKey: "reserve-899",
+            sku: "reserve-899",
             checkoutAttempt: "1",
           },
         }) as never,
@@ -4105,7 +4184,7 @@ test("machine checkout confirmation rejects incomplete Stripe metadata", async (
         url: "https://checkout.stripe.test/metadata",
         client_reference_id: params.client_reference_id,
         currency: "usd",
-        amount_total: 99000,
+        amount_total: 89900,
         metadata: params.metadata,
       }) as never,
   });
@@ -4115,7 +4194,7 @@ test("machine checkout confirmation rejects incomplete Stripe metadata", async (
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        sku: "reserve-990",
+        sku: "reserve-899",
         email: `metadata-${randomUUID()}@example.com`,
         brand: "Strict Metadata Buyer",
         idempotency_key: randomUUID(),
@@ -4132,13 +4211,13 @@ test("machine checkout confirmation rejects incomplete Stripe metadata", async (
           id: sessionId,
           client_reference_id: orderId,
           currency: "usd",
-          amount_total: 99000,
+          amount_total: 89900,
           payment_status: "paid",
           payment_intent: "pi_incomplete_metadata",
           metadata: {
             reservationId: orderId,
-            offerKey: "reserve-990",
-            sku: "reserve-990",
+            offerKey: "reserve-899",
+            sku: "reserve-899",
           },
         }) as never,
     });
@@ -4177,7 +4256,7 @@ test("sold-out inventory does not insert a new v1 reservation", async () => {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        sku: "reserve-990",
+        sku: "reserve-899",
         email: `sold-out-${randomUUID()}@example.com`,
         brand: "No Remaining Seat",
         idempotency_key: idempotencyKey,
@@ -4205,8 +4284,14 @@ test("availability is integer-valued and buycalc remains useful without JavaScri
   const response = await fetch(`${origin}/buycalc`);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html/);
   const html = await response.text();
-  assert.match(html, /\$990 USD/);
-  assert.match(html, /\$990 USD/);
+  assert.match(html, /\$899 USD/);
+  assert.match(html, /\$899 USD/);
+  assert.match(
+    html,
+    /Silver Birch Growth Inc\. · 777-2255B Queen St E, Toronto ON M4E 1G3 · randy@silverbirchgrowth.com/,
+  );
+  assert.match(html, /href="\/terms"/);
+  assert.match(html, /href="\/privacy"/);
   assert.match(html, /100%/);
   assert.match(html, /No PHI/);
   assert.match(html, /<noscript>/);
@@ -4220,8 +4305,8 @@ test("an expired public hold returns its seat and receipt reports it as recycled
     .values({
       email: `availability-${randomUUID()}@example.com`,
       status: "seat_held",
-      offerKey: "reserve-990",
-      amountCents: 99000,
+      offerKey: "reserve-899",
+      amountCents: 89900,
       currency: "usd",
       paymentStatus: "unpaid",
       creativeStatus: "locked",
@@ -4253,7 +4338,7 @@ test("concurrent buyers cannot both claim the final open seat", async () => {
   const previousTotal = process.env.SEATS_TOTAL;
   process.env.SEATS_TOTAL = String(initial.seats_paid + initial.seats_held + 1);
   const payload = () => ({
-    sku: "reserve-990",
+    sku: "reserve-899",
     email: `last-seat-${randomUUID()}@example.com`,
     brand: "Concurrent Buyer",
     idempotency_key: randomUUID(),
@@ -4307,7 +4392,7 @@ test("same-key retry safely replaces an invalid Stripe session", async () => {
         url: `https://checkout.stripe.test/retry-${createCalls}`,
         client_reference_id: params.client_reference_id,
         currency: "usd",
-        amount_total: createCalls === 1 ? 1 : 99000,
+        amount_total: createCalls === 1 ? 1 : 89900,
         metadata: params.metadata,
       } as never;
     },
@@ -4317,7 +4402,7 @@ test("same-key retry safely replaces an invalid Stripe session", async () => {
     },
   });
   const payload = {
-    sku: "reserve-990",
+    sku: "reserve-899",
     email: `retry-${randomUUID()}@example.com`,
     brand: "Retry Buyer",
     idempotency_key: idempotencyKey,
@@ -4374,7 +4459,7 @@ test("ambiguous Stripe creation failure stays held for reconciliation", async ()
     },
   });
   const payload = {
-    sku: "reserve-990",
+    sku: "reserve-899",
     email: `ambiguous-${randomUUID()}@example.com`,
     brand: "Ambiguous Buyer",
     idempotency_key: randomUUID(),

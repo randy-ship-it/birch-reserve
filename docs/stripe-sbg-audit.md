@@ -1,5 +1,7 @@
 # Stripe / SBG checkout audit (Birch Reserve)
 
+**Catalog update 2026-09-24:** new Access Reserve checkout is `reserve-899` at $899 USD (89900 cents). `reserve-990` remains payable only for existing holds. The 2026-09-09 notes below describe the catalog as it was on that date.
+
 Date: 2026-09-09 (America/Toronto)  
 Branch: `grok/stripe-sbg-audit`  
 Scope: read-only analysis of how `checkout_url` is produced for POST `/v1/checkout`, then verified env/wiring fixes only.

@@ -9,7 +9,7 @@ export type BirchReserveSku = typeof BirchReserveSku[keyof typeof BirchReserveSk
 
 
 export const BirchReserveSku = {
-  'reserve-990': 'reserve-990',
+  'reserve-899': 'reserve-899',
   'pilot-4900': 'pilot-4900',
   'network-9900': 'network-9900',
 } as const;
@@ -243,7 +243,7 @@ export type BirchReserveOfferOfferKey = typeof BirchReserveOfferOfferKey[keyof t
 
 
 export const BirchReserveOfferOfferKey = {
-  'reserve-990': 'reserve-990',
+  'reserve-899': 'reserve-899',
   'pilot-4900': 'pilot-4900',
   'network-9900': 'network-9900',
 } as const;
@@ -261,7 +261,7 @@ export type BirchReserveOfferAmountCents = typeof BirchReserveOfferAmountCents[k
 
 
 export const BirchReserveOfferAmountCents = {
-  NUMBER_99000: 99000,
+  NUMBER_89900: 89900,
   NUMBER_490000: 490000,
   NUMBER_990000: 990000,
 } as const;
@@ -270,7 +270,7 @@ export type BirchReserveOfferDueToday = typeof BirchReserveOfferDueToday[keyof t
 
 
 export const BirchReserveOfferDueToday = {
-  NUMBER_990: 990,
+  NUMBER_899: 899,
   NUMBER_4900: 4900,
   NUMBER_9900: 9900,
 } as const;
@@ -279,7 +279,7 @@ export type BirchReserveOfferMediaCreditCents = typeof BirchReserveOfferMediaCre
 
 
 export const BirchReserveOfferMediaCreditCents = {
-  NUMBER_99000: 99000,
+  NUMBER_89900: 89900,
   NUMBER_490000: 490000,
   NUMBER_990000: 990000,
 } as const;
@@ -387,7 +387,7 @@ export type BirchReserveQuoteOfferKey = typeof BirchReserveQuoteOfferKey[keyof t
 
 
 export const BirchReserveQuoteOfferKey = {
-  'reserve-990': 'reserve-990',
+  'reserve-899': 'reserve-899',
   'pilot-4900': 'pilot-4900',
   'network-9900': 'network-9900',
 } as const;
@@ -432,7 +432,7 @@ export type BirchReserveQuoteAmountCents = typeof BirchReserveQuoteAmountCents[k
 
 
 export const BirchReserveQuoteAmountCents = {
-  NUMBER_99000: 99000,
+  NUMBER_89900: 89900,
   NUMBER_490000: 490000,
   NUMBER_990000: 990000,
 } as const;
@@ -441,7 +441,7 @@ export type BirchReserveQuoteDueTodayUsd = typeof BirchReserveQuoteDueTodayUsd[k
 
 
 export const BirchReserveQuoteDueTodayUsd = {
-  NUMBER_990: 990,
+  NUMBER_899: 899,
   NUMBER_4900: 4900,
   NUMBER_9900: 9900,
 } as const;
@@ -450,7 +450,7 @@ export type BirchReserveQuoteMediaCreditCents = typeof BirchReserveQuoteMediaCre
 
 
 export const BirchReserveQuoteMediaCreditCents = {
-  NUMBER_99000: 99000,
+  NUMBER_89900: 89900,
   NUMBER_490000: 490000,
   NUMBER_990000: 990000,
 } as const;
@@ -1286,7 +1286,7 @@ export type SplashAdReservationInputOffer = typeof SplashAdReservationInputOffer
 
 
 export const SplashAdReservationInputOffer = {
-  'reserve-990': 'reserve-990',
+  'reserve-899': 'reserve-899',
   'pilot-4900': 'pilot-4900',
   'network-9900': 'network-9900',
 } as const;
@@ -1341,7 +1341,7 @@ export type SplashAdReservationReceiptOffer = typeof SplashAdReservationReceiptO
 
 
 export const SplashAdReservationReceiptOffer = {
-  'reserve-990': 'reserve-990',
+  'reserve-899': 'reserve-899',
   'pilot-4900': 'pilot-4900',
   'network-9900': 'network-9900',
 } as const;

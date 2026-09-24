@@ -36,13 +36,13 @@ Do not modify or archive historical Stripe records associated with the retired U
 Create or verify exactly these three active Products, each with one active, non-recurring USD Price:
 
 1. Product name: Birch Reserve — Access Reserve
-   Price: $990.00 USD
-   unit_amount: 99000
+   Price: $899.00 USD
+   unit_amount: 89900
    recurring: none
    metadata:
-     offerKey: reserve-990
-     sku: reserve-990
-     mediaCreditCents: 99000
+     offerKey: reserve-899
+     sku: reserve-899
+     mediaCreditCents: 89900
    description:
      One-time Access Reserve payment applied as 100% media credit. Provides first-right planning access before a final insertion order. Does not guarantee impressions.
 
@@ -138,7 +138,7 @@ If live Stripe is unavailable, return an explicit configuration or payment error
 
 FINAL VERIFICATION
 
-- Access Reserve Checkout shows exactly $990 USD.
+- Access Reserve Checkout shows exactly $899 USD.
 - Placement Pilot Checkout shows exactly $4,900 USD.
 - Network Pilot Checkout shows exactly $9,900 USD.
 - Each Checkout Session is bound to the correct reservation, offerKey, SKU, amount, currency, and checkout attempt.
@@ -185,13 +185,13 @@ Do not modify or archive historical Stripe records associated with the retired U
 Create or verify exactly these three active Products, each with one active, non-recurring USD Price:
 
 1. Product name: Birch Reserve — Access Reserve
-   Price: $990.00 USD
-   unit_amount: 99000
+   Price: $899.00 USD
+   unit_amount: 89900
    recurring: none
    metadata:
-     offerKey: reserve-990
-     sku: reserve-990
-     mediaCreditCents: 99000
+     offerKey: reserve-899
+     sku: reserve-899
+     mediaCreditCents: 89900
    description:
      One-time Access Reserve payment applied as 100% media credit. Provides first-right planning access before a final insertion order. Does not guarantee impressions.
 
@@ -287,7 +287,7 @@ If live Stripe is unavailable, return an explicit configuration or payment error
 
 FINAL VERIFICATION
 
-- Access Reserve Checkout shows exactly $990 USD.
+- Access Reserve Checkout shows exactly $899 USD.
 - Placement Pilot Checkout shows exactly $4,900 USD.
 - Network Pilot Checkout shows exactly $9,900 USD.
 - Each Checkout Session is bound to the correct reservation, offerKey, SKU, amount, currency, and checkout attempt.

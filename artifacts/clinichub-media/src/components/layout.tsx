@@ -2,6 +2,7 @@ import { Link, useLocation } from 'wouter';
 import { ReactNode, useState } from 'react';
 import { Menu, X, ArrowRight } from 'lucide-react';
 import birchReserveMark from '@assets/brand/birch-reserve-mark-v2.svg';
+import { SELLER_IDENTITY } from '@/lib/seller-identity';
 
 export function Layout({ children }: { children: ReactNode }) {
   const basePath = import.meta.env.BASE_URL;
@@ -102,8 +103,10 @@ export function Layout({ children }: { children: ReactNode }) {
               Performance and display advertising across the Clinic Hubs experience.
             </p>
             <p className="text-xs text-muted-foreground uppercase tracking-widest">
-              Operated by<br/>
-              <span className="text-foreground mt-1 block">Silver Birch Growth Inc.</span>
+              Operated by
+            </p>
+            <p className="mt-2 text-xs leading-relaxed text-foreground">
+              {SELLER_IDENTITY}
             </p>
             <p className="text-xs text-muted-foreground uppercase tracking-widest mt-6">
               In Partnership With<br/>
@@ -122,6 +125,8 @@ export function Layout({ children }: { children: ReactNode }) {
              <div className="flex flex-col gap-4 text-sm">
                 <span className="text-xs font-medium uppercase tracking-widest text-foreground/50 mb-2">Access</span>
                 <Link href="/marketplace" className="hover:text-accent transition-colors">Partner Workspace</Link>
+                <Link href="/terms" className="hover:text-accent transition-colors">Terms</Link>
+                <Link href="/privacy" className="hover:text-accent transition-colors">Privacy</Link>
              </div>
           </div>
         </div>

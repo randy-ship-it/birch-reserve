@@ -1284,7 +1284,7 @@ components:
   schemas:
     BirchReserveSku:
       type: string
-      enum: [reserve-990, pilot-4900, network-9900]
+      enum: [reserve-899, pilot-4900, network-9900]
     BirchReserveUcpProfile:
       type: object
       additionalProperties: true
@@ -1395,13 +1395,13 @@ components:
       additionalProperties: false
       required: [offer_key, sku, name, offer_type, amount_cents, due_today, media_credit_cents, scope, best_for, requires_insertion_order, guarantees_impressions]
       properties:
-        offer_key: { type: string, enum: [reserve-990, pilot-4900, network-9900] }
+        offer_key: { type: string, enum: [reserve-899, pilot-4900, network-9900] }
         sku: { $ref: "#/components/schemas/BirchReserveSku" }
         name: { type: string }
         offer_type: { type: string, enum: [reservation_credit, single_format_pilot, multi_surface_pilot] }
-        amount_cents: { type: integer, enum: [99000, 490000, 990000] }
-        due_today: { type: integer, enum: [990, 4900, 9900] }
-        media_credit_cents: { type: integer, enum: [99000, 490000, 990000] }
+        amount_cents: { type: integer, enum: [89900, 490000, 990000] }
+        due_today: { type: integer, enum: [899, 4900, 9900] }
+        media_credit_cents: { type: integer, enum: [89900, 490000, 990000] }
         scope: { type: string }
         best_for: { type: string }
         requires_insertion_order: { type: boolean, enum: [true] }
@@ -1454,15 +1454,15 @@ components:
       required: [sku, offerKey, offerName, offerType, format, days, currency, amountCents, dueTodayUsd, mediaCreditCents, scope, discount, requiresInsertionOrder, guaranteesImpressions, exclusions, checkoutPath]
       properties:
         sku: { $ref: "#/components/schemas/BirchReserveSku" }
-        offerKey: { type: string, enum: [reserve-990, pilot-4900, network-9900] }
+        offerKey: { type: string, enum: [reserve-899, pilot-4900, network-9900] }
         offerName: { type: string }
         offerType: { type: string, enum: [reservation_credit, single_format_pilot, multi_surface_pilot] }
         format: { type: string, enum: [post_checkout, recovery_plan, scheduled_service, member_hub, motion_15s] }
         days: { type: integer, enum: [30, 90, 180] }
         currency: { type: string, enum: [USD] }
-        amountCents: { type: integer, enum: [99000, 490000, 990000] }
-        dueTodayUsd: { type: integer, enum: [990, 4900, 9900] }
-        mediaCreditCents: { type: integer, enum: [99000, 490000, 990000] }
+        amountCents: { type: integer, enum: [89900, 490000, 990000] }
+        dueTodayUsd: { type: integer, enum: [899, 4900, 9900] }
+        mediaCreditCents: { type: integer, enum: [89900, 490000, 990000] }
         scope: { type: string }
         discount: { type: number, enum: [0.25] }
         requiresInsertionOrder: { type: boolean, enum: [true] }
@@ -1983,7 +1983,7 @@ components:
           description: Exact currency displayed to the buyer before submission.
         offer:
           type: string
-          enum: [reserve-990, pilot-4900, network-9900]
+          enum: [reserve-899, pilot-4900, network-9900]
           description: Stable identifier for the selected canonical USD offer.
     SplashAdReservationReceipt:
       type: object
@@ -2006,7 +2006,7 @@ components:
           enum: [usd]
         offer:
           type: string
-          enum: [reserve-990, pilot-4900, network-9900]
+          enum: [reserve-899, pilot-4900, network-9900]
     SplashAdReservationStatus:
       type: object
       required: [reservationId, status, paymentStatus, creativeStatus, amountCents, currency, offer, offerName, checkoutAvailable, createdAt]
