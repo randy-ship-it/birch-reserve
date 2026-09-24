@@ -118,6 +118,12 @@ globalThis.__dirname = __bannerPath.dirname(globalThis.__filename);
     `,
     },
   });
+
+  // Vendored voice-closer knowledge snapshot for Chat Randy (Grok) at runtime.
+  const { cp } = await import("node:fs/promises");
+  const knowledgeSrc = path.resolve(artifactDir, "src/knowledge");
+  const knowledgeDest = path.resolve(distDir, "knowledge");
+  await cp(knowledgeSrc, knowledgeDest, { recursive: true });
 }
 
 buildAll().catch((err) => {

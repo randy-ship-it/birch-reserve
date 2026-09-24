@@ -5,6 +5,7 @@ import launchRouter from "./launch";
 import sponsorReservationsRouter from "./sponsorReservations";
 import splashAdReservationsRouter from "./splashAdReservations";
 import conciergeRouter from "./concierge";
+import randyChatRouter from "./randyChat";
 import editorialRouter from "./editorial";
 
 const router: IRouter = Router();
@@ -15,6 +16,7 @@ router.use(launchRouter);
 router.use(sponsorReservationsRouter);
 router.use(splashAdReservationsRouter);
 router.use(conciergeRouter);
+router.use(randyChatRouter);
 router.use(editorialRouter);
 
 export default router;

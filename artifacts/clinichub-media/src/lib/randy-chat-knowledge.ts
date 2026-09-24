@@ -1,11 +1,12 @@
 /**
- * Chat Randy knowledge pointer — DRAFT.
+ * Chat Randy knowledge pointer.
  *
  * HARD: Same SoT as the phone voice closer. Do NOT fork a chat-only knowledge pack.
- * SoT path (ops / phone / chat share this):
- *   /workspace/birch-live-ops/voice-closer/knowledge/
+ * SoT (ops): /workspace/birch-live-ops/voice-closer/knowledge/
+ * Runtime snapshot (api-server Autoscale): artifacts/api-server/src/knowledge/voice-closer/
+ * Re-sync from SoT before ship — do not invent alternate talk-track in the snapshot.
  *
- * Files to load when Grok/xAI is wired (paste / RAG order per README.md):
+ * Files (paste / RAG order per SoT README.md):
  *   SYSTEM-PROMPT.md · BIRCH-OFFER.md · NEVER-SAY.md · HANDOFF-CHECKLIST.md
  *   CROSS-PORTFOLIO.md · SCALE.md · ALIGN.md · RDGDH-PORTFOLIO.md · TEAM-ACCESS.md
  *
@@ -17,7 +18,11 @@
 export const VOICE_CLOSER_KNOWLEDGE_SOT =
   "/workspace/birch-live-ops/voice-closer/knowledge/" as const;
 
-/** Relative map for future agent/RAG wiring (same pack, no fork). */
+/** Vendored runtime snapshot inside birch-reserve (Autoscale-readable). */
+export const VOICE_CLOSER_KNOWLEDGE_VENDORED =
+  "artifacts/api-server/src/knowledge/voice-closer/" as const;
+
+/** Relative map for agent/RAG wiring (same pack, no fork). */
 export const VOICE_CLOSER_KNOWLEDGE_FILES = [
   "SYSTEM-PROMPT.md",
   "BIRCH-OFFER.md",
