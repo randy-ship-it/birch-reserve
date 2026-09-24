@@ -118,7 +118,7 @@ export function Layout({ children }: { children: ReactNode }) {
               Eight category seats inside signed Scale Health hubs. Credit, not a flight.
             </p>
             <p className="text-xs leading-relaxed text-foreground">
-              {SELLER_IDENTITY} · <a href={SELLER_EMAIL_HREF} className="underline underline-offset-2 hover:text-accent">Email Randy</a>
+              {SELLER_IDENTITY} · <a href={SELLER_EMAIL_HREF} className="underline underline-offset-2 hover:text-accent">Email sales</a>
             </p>
             <p className="text-xs text-muted-foreground uppercase tracking-widest mt-6">
               In Partnership With<br/>
