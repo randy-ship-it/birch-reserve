@@ -336,7 +336,7 @@ export default function Home() {
                 Call {VOICE_TEL_DISPLAY}
               </a>
               <span className="text-background/50"> · </span>
-              Live hub: <a className="underline" href="https://physio.drhonow.com" target="_blank" rel="noopener noreferrer">physio.drhonow.com</a>
+              Live hub: <a className="underline" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">physio.drhonow.com/dr-ho/portal</a>
             </p>
             <button
               type="button"
@@ -734,7 +734,7 @@ export default function Home() {
           <div className="mb-8 grid border border-border bg-secondary/10 md:grid-cols-3">
             <div className="p-5 md:border-r md:border-border">
               <p className="text-[10px] font-bold uppercase tracking-widest text-accent">Live</p>
-              <p className="mt-2 text-sm font-medium">DR-HO'S · physio.drhonow.com</p>
+              <p className="mt-2 text-sm font-medium">DR-HO'S · physio.drhonow.com/dr-ho/portal</p>
             </div>
             <div className="border-t border-border p-5 md:border-r md:border-t-0">
               <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/60">Signed</p>
@@ -759,7 +759,7 @@ export default function Home() {
                   <img src="/hub-proof/drho-hub-home.png" alt="DR-HO'S Insider Hub screenshot" className="w-full h-full object-cover object-top" loading="lazy" />
                 </div>
                 <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Illustrative — not your receipt.</p>
-                <a href="https://physio.drhonow.com" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold">
+                <a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold">
                   Open the live hub <ArrowUpRight className="size-4" />
                 </a>
               </div>
@@ -807,7 +807,7 @@ export default function Home() {
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
               Not on the open web. Birch units appear after a customer has already bought, booked, or started a plan inside a signed Scale Health hub.
             </p>
-            <a href="https://physio.drhonow.com/" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-accent">
+            <a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-accent">
               See the live DR-HO'S hub <ArrowUpRight className="size-4" />
             </a>
           </div>

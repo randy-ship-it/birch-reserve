@@ -17,7 +17,7 @@ Most performance channels buy attention before someone has decided anything. Sca
 
 ## What a Birch Reserve seat actually is
 
-Birch Reserve is the paid-display layer for signed Scale Health recovery hubs. Inventory is eight advertiser categories across those hubs, not eight websites. One brand per aisle. Live proof of a participating hub: https://physio.drhonow.com.
+Birch Reserve is the paid-display layer for signed Scale Health recovery hubs. Inventory is eight advertiser categories across those hubs, not eight websites. One brand per aisle. Live proof of a participating hub: https://physio.drhonow.com/dr-ho/portal.
 
 Public offers (USD):
 
