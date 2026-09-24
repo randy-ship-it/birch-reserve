@@ -22,6 +22,7 @@ import {
   type ReserveOfferKey,
 } from "@/lib/reserve-offers";
 import { trackCta, trackReserveDialogOpen, type CtaEvent } from "@/lib/track-cta";
+import { BOOK_CALL_HREF } from "@/lib/book-call";
 import {
   SalesConcierge,
   type ConciergeQuestionSignals,
@@ -172,7 +173,7 @@ export default function Home() {
 
   const bookCall = () => {
     trackCta("cta_book_call");
-    window.location.href = "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve";
+    window.location.href = BOOK_CALL_HREF;
   };
 
   const handleDialogChange = (open: boolean) => {
