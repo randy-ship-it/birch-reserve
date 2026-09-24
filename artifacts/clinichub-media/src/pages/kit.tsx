@@ -16,8 +16,6 @@ const CATEGORIES = [
   "Diagnostics / services",
 ];
 
-const BOOK_CALL_MAILTO =
-  "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve";
 const CALL_BACK_TEL = RANDY_TEL_HREF;
 
 const PAGE_TITLE = "Media kit — Birch Reserve | Thank-you first inventory";
@@ -144,15 +142,9 @@ export default function Kit() {
           reserve-490 · $490 · named category seat · 100% media credit · IO before flight · 12-month credit. Credit, not
           a flight.
         </li>
-        <li>custom · Book a call · multi-hub / exclusive / on-prem. Credit, not a flight.</li>
+        <li>custom · Get a call back · multi-hub / exclusive / on-prem. Credit, not a flight.</li>
       </ul>
       <p className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
-        <a className="underline" href={BOOK_CALL_MAILTO}>
-          Book a call
-        </a>
-        <span className="text-muted-foreground" aria-hidden>
-          ·
-        </span>
         <a className="underline" href={CALL_BACK_TEL}>
           Get a call back
         </a>
