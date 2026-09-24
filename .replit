@@ -49,5 +49,5 @@ packages = ["freetype", "gumbo", "harfbuzz", "jbig2dec", "libjpeg_turbo", "mupdf
 SPLASH_PIPELINE_SPREADSHEET_ID = "1Pf3c-elnevc0VRVHbC3-0F3odEVK652Oqgfv_PYZ0_Y"
 STRIPE_PRICE_RESERVE_1900 = "price_1UDTmiBC1LcvLegtoBb3fkCL"
 SPLASH_PIPELINE_SYNC_DISABLED = "true"
-PUBLIC_BASE_URL = "https://birch-list-ad-agency.replit.app"
+PUBLIC_BASE_URL = "https://birchreserve.net"
 SEATS_TOTAL = "8"
