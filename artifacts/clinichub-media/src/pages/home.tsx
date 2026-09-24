@@ -162,7 +162,7 @@ export default function Home() {
 
   const bookCall = () => {
     trackCta("cta_book_call");
-    // HARD Randy ~3:00pm: Book a call opens Randy chat pre-screen — never cold-dump Cal.
+    // HARD Randy ~3:00pm: Book a call opens Randy chat qualifying questions — never cold-dump Cal.
     openRandyChat({ reason: "book-a-call", mode: "chat" });
   };
 
