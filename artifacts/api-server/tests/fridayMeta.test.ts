@@ -249,23 +249,27 @@ function mailSetup() {
   delete process.env["RANDY_CHAT_TO"];
 }
 
-test("BIRCH_REPLY_TO: defaults to sales@, env-overridable, invalid values fall back", () => {
-  assert.equal(DEFAULT_BIRCH_REPLY_TO, "sales@silverbirchgrowth.com");
-  assert.equal(birchReplyTo({}), "sales@silverbirchgrowth.com");
+test("BIRCH_REPLY_TO: default off (unset = no Reply-To), env-overridable, invalid values fall back to off", () => {
+  assert.equal(DEFAULT_BIRCH_REPLY_TO, "");
+  assert.equal(birchReplyTo({}), "");
   assert.equal(birchReplyTo({ BIRCH_REPLY_TO: "team@silverbirchgrowth.com" }), "team@silverbirchgrowth.com");
-  assert.equal(birchReplyTo({ BIRCH_REPLY_TO: "not an email" }), "sales@silverbirchgrowth.com");
+  assert.equal(birchReplyTo({ BIRCH_REPLY_TO: "not an email" }), "");
 });
 
-test("buyer email always carries Reply-To sales@; internal notifications still go TO randy@ + jon@ with visitor Reply-To", async () => {
+test("buyer email has no Reply-To while BIRCH_REPLY_TO is unset (set = that address); internal notifications still go TO randy@ + jon@ with visitor Reply-To", async () => {
   mailSetup();
   await sendBuyerEmail({ from: "Birch Reserve <care@scalehealth.ca>", to: ["buyer@brand.example"], subject: "s", text: "t" });
-  assert.equal(resendCalls[0]!["reply_to"], "sales@silverbirchgrowth.com");
+  assert.equal("reply_to" in resendCalls[0]!, false);
   await resendMailer({ subject: "lead", text: "x", html: "<p>x</p>", replyTo: "visitor@brand.example" });
   assert.deepEqual(resendCalls[1]!["to"], ["randy@silverbirchgrowth.com", "jon@silverbirchgrowth.com"]);
   assert.equal(resendCalls[1]!["reply_to"], "visitor@brand.example");
+  process.env["BIRCH_REPLY_TO"] = "team@silverbirchgrowth.com";
+  await sendBuyerEmail({ from: "Birch Reserve <care@scalehealth.ca>", to: ["buyer@brand.example"], subject: "s", text: "t" });
+  assert.equal(resendCalls[2]!["reply_to"], "team@silverbirchgrowth.com");
+  delete process.env["BIRCH_REPLY_TO"];
 });
 
-test("POST /api/ops/mail-test: secret required, fixed sales@ recipient + subject, Reply-To sales@, 3 per hour", async () => {
+test("POST /api/ops/mail-test: secret required, fixed sales@ recipient + subject, no Reply-To by default, 3 per hour", async () => {
   mailSetup();
   const call = (headers: Record<string, string>, body: unknown = {}) =>
     fetch(`${baseUrl}/ops/mail-test`, { method: "POST", headers: { "content-type": "application/json", ...headers }, body: JSON.stringify(body) });
@@ -283,7 +287,7 @@ test("POST /api/ops/mail-test: secret required, fixed sales@ recipient + subject
   assert.equal(MAIL_TEST_TO, "sales@silverbirchgrowth.com");
   assert.equal(resendCalls[0]!["subject"], MAIL_TEST_SUBJECT);
   assert.equal(MAIL_TEST_SUBJECT, "Birch site test — sales@ routing");
-  assert.equal(resendCalls[0]!["reply_to"], "sales@silverbirchgrowth.com");
+  assert.equal("reply_to" in resendCalls[0]!, false); // BIRCH_REPLY_TO unset → no Reply-To
   assert.doesNotMatch(JSON.stringify(resendCalls[0]), /attacker|hijack/);
 
   assert.equal((await call({ "x-birch-qa": QA_SECRET })).status, 200);
