@@ -1,8 +1,11 @@
+import { readFileSync, existsSync } from "node:fs";
+import path from "node:path";
 import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
 import express from "express";
 import randyChatRouter, {
   BIRCH_SITE_SCOPE_PROMPT,
+  parseEventBody,
   polishReply,
   modelWindow,
   parseBody,
@@ -18,6 +21,9 @@ import {
   transcriptFrom,
   DEFAULT_TRANSCRIPT_FROM,
   TRANSCRIPT_TO,
+  transcriptRecipients,
+  renderTranscriptEmail,
+  applyUpdate,
   type RenderedEmail,
 } from "../src/lib/randyChatTranscripts";
 import {
@@ -471,7 +477,7 @@ test("transcript sender defaults to care@scalehealth.ca (Scale Resend), RANDY_CH
     delete process.env["RANDY_CHAT_FROM"];
     assert.equal(transcriptFrom(), "Birch Reserve <care@scalehealth.ca>");
     assert.equal(DEFAULT_TRANSCRIPT_FROM, "Birch Reserve <care@scalehealth.ca>");
-    assert.equal(TRANSCRIPT_TO, "randy@silverbirchgrowth.com");
+    assert.deepEqual([...TRANSCRIPT_TO], ["randy@silverbirchgrowth.com", "jon@silverbirchgrowth.com"]);
     process.env["RANDY_CHAT_FROM"] = "Birch <alerts@example.com>";
     assert.equal(transcriptFrom(), "Birch <alerts@example.com>");
   } finally {
@@ -533,4 +539,113 @@ test("server wrapper never tells Randy to introduce himself or volunteer credit 
   const wrapper = `${BIRCH_SITE_SCOPE_PROMPT}\n${loadVoiceCloserSystemPrompt(true).split("## RUNTIME HARD LOCKS")[1] ?? ""}`;
   assert.doesNotMatch(wrapper, /introduce/i);
   assert.doesNotMatch(wrapper, /expir|12 months/i);
+});
+
+test("5:28pm: recipients default to Randy + Jon, RANDY_CHAT_TO overrides", () => {
+  const prev = process.env["RANDY_CHAT_TO"];
+  try {
+    delete process.env["RANDY_CHAT_TO"];
+    assert.deepEqual(transcriptRecipients(), ["randy@silverbirchgrowth.com", "jon@silverbirchgrowth.com"]);
+    process.env["RANDY_CHAT_TO"] = " a@example.com, b@example.com ,";
+    assert.deepEqual(transcriptRecipients(), ["a@example.com", "b@example.com"]);
+  } finally {
+    if (prev === undefined) delete process.env["RANDY_CHAT_TO"];
+    else process.env["RANDY_CHAT_TO"] = prev;
+  }
+});
+
+test("5:28pm: callback intake is strictly validated (name, company, role, phone, email, need, size, timing)", () => {
+  const base = { sessionId: "rc_intake_test_01", type: "callback_request", messages: [] };
+  const good = parseEventBody({
+    ...base,
+    contact: { phone: "416 555 0123", name: "Jane Doe", email: "jane@acme.example", role: "VP Marketing" },
+    qualify: { company: "Acme", need: "Brand partnership across hubs", size: "12 locations, $20k", timing: "Q4" },
+  });
+  assert.ok(good.ok);
+  if (good.ok) {
+    assert.equal(good.body.contact?.role, "VP Marketing");
+    assert.equal(good.body.qualify?.size, "12 locations, $20k");
+  }
+  const bad = (patch: Record<string, unknown>) => parseEventBody({ ...base, ...patch });
+  assert.equal(bad({ contact: { name: "x" } }).ok, false, "phone required for callback");
+  assert.equal(bad({ contact: { phone: "416 555 0123", role: "x".repeat(81) } }).ok, false);
+  assert.equal(bad({ contact: { phone: "416 555 0123", email: "nope" } }).ok, false);
+  assert.equal(bad({ contact: { phone: "416 555 0123", title: "CEO" } }).ok, false, "unknown contact key");
+  assert.equal(bad({ contact: { phone: "416 555 0123" }, qualify: { budget: "10k" } }).ok, false, "unknown qualify key");
+  assert.equal(bad({ contact: { phone: "416 555 0123" }, qualify: { need: "y".repeat(301) } }).ok, false);
+  assert.equal(bad({ contact: { phone: "416 555 0123" }, qualify: { size: 12 } }).ok, false);
+});
+
+test("5:28pm: callback email puts the intake fields at the top, then the transcript", () => {
+  const now = new Date("2026-09-24T21:30:00Z");
+  const s = applyUpdate(undefined, {
+    id: "rc_intake_email_1",
+    now,
+    messages: [{ role: "user", content: "we want a partnership" }],
+    contact: { name: "Jane Doe", phone: "416 555 0123", email: "jane@acme.example", role: "VP Marketing" },
+    qualify: { company: "Acme", need: "Partnership", size: "12 locations", timing: "Q4" },
+    event: "callback_request",
+  });
+  const e = renderTranscriptEmail(s);
+  assert.equal(e.subject, "Birch chat transcript: Acme");
+  const head = e.text.split("\n").slice(0, 11).join("\n");
+  assert.equal(
+    head,
+    [
+      "Birch chat transcript",
+      "",
+      "Callback intake",
+      "Name: Jane Doe",
+      "Company: Acme",
+      "Role: VP Marketing",
+      "Phone: 416 555 0123",
+      "Email: jane@acme.example",
+      "Need: Partnership",
+      "Size: 12 locations",
+      "Timing: Q4",
+    ].join("\n"),
+  );
+  assert.ok(e.text.indexOf("Callback intake") < e.text.indexOf("Transcript\n"));
+  assert.ok(e.html.indexOf("Callback intake") < e.html.indexOf("Session"));
+});
+
+test("5:28pm: no calendar button, chip, CTA or auto-injected Cal link in the widget UI or wrapper", () => {
+  const roots = [path.resolve(process.cwd(), "../clinichub-media/src"), path.resolve(process.cwd(), "artifacts/clinichub-media/src")];
+  const root = roots.find((r) => existsSync(r));
+  assert.ok(root, "frontend src should be reachable from the test");
+  const files = [
+    "components/randy-chat.tsx",
+    "lib/book-call.ts",
+    "lib/randy-chat-knowledge.ts",
+    "lib/randy-model-client.ts",
+    "pages/home.tsx",
+    "pages/kit.tsx",
+    "pages/sales/voice-demo.tsx",
+    "components/sales-concierge.tsx",
+  ];
+  for (const f of files) {
+    const src = readFileSync(path.join(root!, f), "utf8");
+    assert.doesNotMatch(src, /cal\.com/i, `${f} must not surface the Cal URL`);
+    assert.doesNotMatch(src, /Book (a time|30 ?min)|grab 30 ?min|BOOK_CALL_CAL_URL|showCal|logEvent\("cal_shown"\)/i, `${f} has a Cal CTA`);
+  }
+  assert.doesNotMatch(BIRCH_SITE_SCOPE_PROMPT, /then the calendar/i);
+  assert.match(BIRCH_SITE_SCOPE_PROMPT, /only if the visitor insists on a set time/);
+  const locks = loadVoiceCloserSystemPrompt(true).split("## RUNTIME HARD LOCKS")[1] ?? "";
+  assert.match(locks, /only if the visitor insists on a set time/);
+});
+
+test("5:32pm: callback response never echoes contact info (intake goes to logs only)", async () => {
+  const res = await postEvent({
+    sessionId: "rc_intake_resp_01",
+    type: "callback_request",
+    messages: [{ role: "user", content: "call me" }],
+    contact: { phone: "416 555 0199", email: "lead@acme.example", name: "Lead Person", role: "CMO" },
+    qualify: { company: "Acme", need: "Partnership", size: "5 locations", timing: "Now" },
+  });
+  assert.equal(res.status, 200);
+  const text = await res.text();
+  assert.doesNotMatch(text, /0199|lead@acme|Lead Person|CMO/);
+  const row = await memoryStore.get("rc_intake_resp_01");
+  assert.equal(row?.contact.role, "CMO");
+  assert.equal(row?.qualify.size, "5 locations");
 });

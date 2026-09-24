@@ -137,8 +137,8 @@ export function shouldOfferLiveHandoff(opts: {
 
 /**
  * Book a call qualifying questions (HARD 2026-09-24 3:42pm ET). Book a call opens the chat
- * and asks these first; next step is the AI call (tel) or a callback request,
- * and only then, if qualified, Randy's calendar.
+ * and asks these first; next step is the AI call (tel) or a callback intake.
+ * HARD 5:28pm: no calendar CTA in the UI; the team calls back from the intake.
  */
 export type QualifyKey = "company" | "category" | "timing";
 
@@ -161,7 +161,7 @@ export const QUALIFY_QUESTIONS: ReadonlyArray<{ key: QualifyKey; prompt: string 
 
 export function qualifyDoneMessage(company?: string): string {
   const who = company?.trim() ? `Perfect, ${company.trim()}.` : "Perfect.";
-  return `${who} Fastest next step: ${AI_CALL_LABEL.replace("Get", "get")} (it picks up right away), or leave your number and we'll call you back. Once that's done I can open Randy's calendar.`;
+  return `${who} Fastest next step: ${AI_CALL_LABEL.replace("Get", "get")} (it picks up right away), or leave your details and the team will call you back.`;
 }
 
 export const TALK_HUMAN_REPLY =

@@ -8,17 +8,16 @@
  * head through shoes always visible. Small circles use /avatars/randy-head.png only.
  * HARD 3:42pm ET: never silent on failure (error + Retry + tel). Book a call asks
  * 2–3 qualifying questions; next step is an AI call (tel) or a callback request;
- * Randy's calendar only after that AND once qualified. Every session is logged
+ * No calendar CTA anywhere (HARD 5:28pm): partnerships get a callback intake. Every session is logged
  * server-side and emailed to Randy.
  * HARD 3:52pm ET: visitor-facing identity is "Randy from Birch Reserve"; no internal labels.
  * Checkout OFF. Public SKUs hold-190 / reserve-490 only.
  */
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Phone, X, Calendar, PhoneIncoming, RotateCw, ArrowUp } from "lucide-react";
+import { Phone, X, PhoneIncoming, RotateCw, ArrowUp } from "lucide-react";
 import { trackCta } from "@/lib/track-cta";
 import {
-  BOOK_CALL_CAL_URL,
   BOOK_CALL_MAILTO_HREF,
   OPEN_RANDY_CHAT_EVENT,
   type OpenRandyChatDetail,
@@ -127,7 +126,6 @@ type ChatMessage = {
   /** error = friendly failure bubble (not sent to the model). */
   kind?: "error";
   showHandoff?: boolean;
-  showCal?: boolean;
   failure?: RandyReplyFailure["kind"];
 };
 
@@ -135,6 +133,7 @@ type Mode = "chat" | "call";
 
 const SESSION_KEY = "birch:randy-session";
 const PHONE_DIGITS_MIN = 10;
+const INTAKE_EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[A-Za-z]{2,24}$/;
 
 function newId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -186,10 +185,17 @@ export function RandyChat() {
   const [qualifyStep, setQualifyStep] = useState<number | null>(null);
   const [qualify, setQualify] = useState<Partial<Record<QualifyKey, string>>>({});
   const [qualified, setQualified] = useState(false);
-  const [calShown, setCalShown] = useState(false);
   const [callbackOpen, setCallbackOpen] = useState(false);
   const [callbackPhone, setCallbackPhone] = useState("");
   const [callbackName, setCallbackName] = useState("");
+  const [intake, setIntake] = useState<{ company: string; role: string; email: string; need: string; size: string; timing: string }>({
+    company: "",
+    role: "",
+    email: "",
+    need: "",
+    size: "",
+    timing: "",
+  });
   const [callbackState, setCallbackState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [dismissed, setDismissed] = useState<boolean>(() => {
     try {
@@ -214,8 +220,6 @@ export function RandyChat() {
     return sessionRef.current;
   }, []);
 
-  const calUnlocked = qualified && callStepDone;
-
   const setThread = useCallback((next: ChatMessage[]) => {
     messagesRef.current = next;
     setMessages(next);
@@ -229,12 +233,18 @@ export function RandyChat() {
   );
 
   const logEvent = useCallback(
-    (type: RandyChatEventType, extra?: { contact?: { phone?: string; name?: string } }) =>
+    (
+      type: RandyChatEventType,
+      extra?: {
+        contact?: { phone?: string; name?: string; email?: string; role?: string };
+        qualify?: { company?: string; need?: string; size?: string; timing?: string };
+      },
+    ) =>
       sendRandyEvent({
         sessionId: sessionId(),
         type,
         messages: toHistory(messagesRef.current),
-        qualify: qualifyRef.current,
+        qualify: { ...qualifyRef.current, ...(extra?.qualify ?? {}) },
         ...(extra?.contact ? { contact: extra.contact } : {}),
       }),
     [sessionId],
@@ -330,19 +340,6 @@ export function RandyChat() {
     return () => window.clearTimeout(t);
   }, [typing]);
 
-  // Calendar appears only once qualified AND after the AI call / callback step.
-  useEffect(() => {
-    if (!calUnlocked || calShown) return;
-    setCalShown(true);
-    pushMessages({
-      id: newId(),
-      role: "randy",
-      text: "You're all set. If you'd also like a time with Randy himself, pick one on his calendar.",
-      showCal: true,
-    });
-    trackCta("cta_book_call");
-    void logEvent("cal_shown");
-  }, [calUnlocked, calShown, logEvent, pushMessages]);
 
   // Transcript: close beacon when the tab is hidden/closed mid-conversation.
   useEffect(() => {
@@ -476,10 +473,28 @@ export function RandyChat() {
     await fetchReply();
   };
 
-  const markCallStep = (type: "tel_click" | "callback_request", contact?: { phone?: string; name?: string }) => {
+  const markCallStep = (
+    type: "tel_click" | "callback_request",
+    extra?: {
+      contact?: { phone?: string; name?: string; email?: string; role?: string };
+      qualify?: { company?: string; need?: string; size?: string; timing?: string };
+    },
+  ) => {
     setCallStepDone(true);
     setHandoffReady(true);
-    return logEvent(type, contact ? { contact } : undefined);
+    return logEvent(type, extra);
+  };
+
+  const openCallbackIntake = () => {
+    // Prefill from the qualifying answers so the visitor doesn't retype them.
+    const q = qualifyRef.current;
+    setIntake((cur) => ({
+      ...cur,
+      company: cur.company || q.company || "",
+      need: cur.need || q.category || "",
+      timing: cur.timing || q.timing || "",
+    }));
+    setCallbackOpen(true);
   };
 
   const onTelClick = () => {
@@ -490,7 +505,7 @@ export function RandyChat() {
         pushMessages({
           id: newId(),
           role: "randy",
-          text: "Calling now. If you'd rather book time with Randy too, answer three quick questions here after the call.",
+          text: "Calling now. If you'd rather, leave your details here and the team will call you back.",
         });
       }, 400);
     }
@@ -499,46 +514,51 @@ export function RandyChat() {
   const submitCallback = async (e: React.FormEvent) => {
     e.preventDefault();
     const digits = callbackPhone.replace(/\D/g, "");
-    if (digits.length < PHONE_DIGITS_MIN || digits.length > 15) {
+    const email = intake.email.trim();
+    if (digits.length < PHONE_DIGITS_MIN || digits.length > 15 || (email && !INTAKE_EMAIL.test(email))) {
       setCallbackState("error");
       return;
     }
     setCallbackState("sending");
+    const name = callbackName.trim();
     pushMessages({
       id: newId(),
       role: "user",
-      text: `Please call me back at ${callbackPhone.trim()}${callbackName.trim() ? ` (${callbackName.trim()})` : ""}.`,
+      text: `Please call me back at ${callbackPhone.trim()}${name ? ` (${name})` : ""}.`,
     });
-    if (qualified) {
-      // Ack first so it lands before the calendar message the call step unlocks.
-      pushMessages({ id: newId(), role: "randy", text: "Got it, thanks. Randy's team will call you back shortly." });
-    }
-    const ok = await markCallStep("callback_request", {
+    const clip = (v: string, n: number) => v.trim().slice(0, n);
+    const contact = {
       phone: callbackPhone.trim(),
-      ...(callbackName.trim() ? { name: callbackName.trim() } : {}),
-    });
+      ...(name ? { name: clip(name, 80) } : {}),
+      ...(email ? { email } : {}),
+      ...(intake.role.trim() ? { role: clip(intake.role, 80) } : {}),
+    };
+    const qualifyExtra = {
+      ...(intake.company.trim() ? { company: clip(intake.company, 300) } : {}),
+      ...(intake.need.trim() ? { need: clip(intake.need, 300) } : {}),
+      ...(intake.size.trim() ? { size: clip(intake.size, 300) } : {}),
+      ...(intake.timing.trim() ? { timing: clip(intake.timing, 300) } : {}),
+    };
+    const ok = await markCallStep("callback_request", { contact, qualify: qualifyExtra });
     if (!ok) {
       setCallbackState("error");
       pushMessages({
         id: newId(),
         role: "randy",
         kind: "error",
-        text: "Sorry, I couldn't save your number just now. Try again, or call the live line.",
+        text: "Sorry, I couldn't save your details just now. Try again, or call the live line.",
       });
       return;
     }
     setCallbackState("done");
     setCallbackOpen(false);
     trackCta("cta_book_call");
-    if (!qualified) {
-      pushMessages({
-        id: newId(),
-        role: "randy",
-        text: "Got it, thanks. Randy's team will call you back shortly. While you wait, three quick questions so the call is useful.",
-      });
-      setQualifyStep(0);
-      pushMessages({ id: newId(), role: "randy", text: QUALIFY_QUESTIONS[0]!.prompt });
-    }
+    setQualifyStep(null);
+    pushMessages({
+      id: newId(),
+      role: "randy",
+      text: "Got it, thanks. Randy's team will call you back shortly. Anything else I can answer in the meantime?",
+    });
   };
 
   const lastHandoffIndex = (() => {
@@ -604,9 +624,7 @@ export function RandyChat() {
           className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-3"
           data-testid="randy-callback-form"
         >
-          <label className="text-[12px] font-medium text-slate-600" htmlFor="randy-callback-phone">
-            Your phone number
-          </label>
+          <p className="text-[12px] font-medium text-slate-600">Leave your details and the team will call you back.</p>
           <input
             id="randy-callback-phone"
             type="tel"
@@ -617,24 +635,97 @@ export function RandyChat() {
               setCallbackPhone(e.target.value);
               if (callbackState === "error") setCallbackState("idle");
             }}
-            placeholder="(416) 555-0123"
+            placeholder="Phone (required)"
+            aria-label="Phone number (required)"
             maxLength={32}
-            className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[14px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
+            required
+            className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
             data-testid="randy-callback-phone"
           />
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="text"
+              autoComplete="name"
+              value={callbackName}
+              onChange={(e) => setCallbackName(e.target.value)}
+              placeholder="Name"
+              aria-label="Your name"
+              maxLength={80}
+              className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
+              data-testid="randy-callback-name"
+            />
+            <input
+              type="email"
+              autoComplete="email"
+              value={intake.email}
+              onChange={(e) => {
+                setIntake((c) => ({ ...c, email: e.target.value }));
+                if (callbackState === "error") setCallbackState("idle");
+              }}
+              placeholder="Email"
+              aria-label="Email"
+              maxLength={254}
+              className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
+              data-testid="randy-callback-email"
+            />
+            <input
+              type="text"
+              autoComplete="organization"
+              value={intake.company}
+              onChange={(e) => setIntake((c) => ({ ...c, company: e.target.value }))}
+              placeholder="Company"
+              aria-label="Company"
+              maxLength={300}
+              className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
+              data-testid="randy-callback-company"
+            />
+            <input
+              type="text"
+              autoComplete="organization-title"
+              value={intake.role}
+              onChange={(e) => setIntake((c) => ({ ...c, role: e.target.value }))}
+              placeholder="Role"
+              aria-label="Role"
+              maxLength={80}
+              className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
+              data-testid="randy-callback-role"
+            />
+          </div>
           <input
             type="text"
-            autoComplete="name"
-            value={callbackName}
-            onChange={(e) => setCallbackName(e.target.value)}
-            placeholder="Your name (optional)"
-            maxLength={80}
-            aria-label="Your name (optional)"
-            className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[14px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
+            value={intake.need}
+            onChange={(e) => setIntake((c) => ({ ...c, need: e.target.value }))}
+            placeholder="What do you need?"
+            aria-label="What do you need?"
+            maxLength={300}
+            className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
+            data-testid="randy-callback-need"
           />
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="text"
+              value={intake.size}
+              onChange={(e) => setIntake((c) => ({ ...c, size: e.target.value }))}
+              placeholder="Size (locations, budget)"
+              aria-label="Size (locations, budget)"
+              maxLength={300}
+              className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
+              data-testid="randy-callback-size"
+            />
+            <input
+              type="text"
+              value={intake.timing}
+              onChange={(e) => setIntake((c) => ({ ...c, timing: e.target.value }))}
+              placeholder="Timing"
+              aria-label="Timing"
+              maxLength={300}
+              className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
+              data-testid="randy-callback-timing"
+            />
+          </div>
           {callbackState === "error" && (
             <p className="text-[12px] text-red-600" role="alert">
-              Please enter a full phone number, including area code.
+              Please enter a full phone number with area code{intake.email.trim() ? ", and a valid email" : ""}.
             </p>
           )}
           <button
@@ -649,7 +740,7 @@ export function RandyChat() {
       ) : (
         <button
           type="button"
-          onClick={() => setCallbackOpen(true)}
+          onClick={openCallbackIntake}
           className={`${pillBase} h-10 justify-center border border-slate-300 bg-white text-slate-800`}
           data-testid="randy-handoff-callback"
         >
@@ -835,21 +926,8 @@ export function RandyChat() {
                               </div>
                             ) : (
                               <p className="whitespace-pre-line break-words rounded-2xl rounded-bl-md bg-slate-100 px-4 py-2.5 text-[14px] leading-relaxed text-slate-800">
-                                <RichText text={msg.text} allowCal={calUnlocked} />
+                                <RichText text={msg.text} allowCal />
                               </p>
-                            )}
-                            {msg.showCal && calUnlocked && (
-                              <a
-                                href={BOOK_CALL_CAL_URL}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={() => trackCta("cta_book_call")}
-                                className={`${pillBase} mt-2 border border-slate-300 bg-white text-slate-800`}
-                                data-testid="randy-handoff-cal"
-                              >
-                                <Calendar className="size-3.5" aria-hidden />
-                                Book a time with Randy
-                              </a>
                             )}
                             {msg.showHandoff && index === lastHandoffIndex && handoffCard}
                           </div>
@@ -908,26 +986,15 @@ export function RandyChat() {
                     <Phone className="size-3.5" aria-hidden />
                     AI call now
                   </a>
-                  {calUnlocked ? (
-                    <a
-                      href={BOOK_CALL_CAL_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackCta("cta_book_call")}
-                      className={`${pillBase} flex-1 justify-center border border-slate-300 bg-white text-slate-800`}
-                    >
-                      <Calendar className="size-3.5" aria-hidden />
-                      Calendar
-                    </a>
-                  ) : callbackState === "done" ? (
+                  {callbackState === "done" ? (
                     <span className="inline-flex flex-1 items-center justify-center text-[12px] text-slate-500">Callback requested</span>
                   ) : (
                     <button
                       type="button"
                       onClick={() => {
-                        setCallbackOpen(true);
+                        openCallbackIntake();
                         if (lastHandoffIndex < 0) {
-                          pushMessages({ id: newId(), role: "randy", text: "Leave your number and Randy's team will call you back.", showHandoff: true });
+                          pushMessages({ id: newId(), role: "randy", text: "Leave your details and Randy's team will call you back.", showHandoff: true });
                         }
                       }}
                       className={`${pillBase} flex-1 justify-center border border-slate-300 bg-white text-slate-800`}

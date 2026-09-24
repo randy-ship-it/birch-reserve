@@ -1,17 +1,11 @@
 /**
- * Book a call URL locks — HARD Randy 2026-09-24 ~3:00pm ET.
+ * Book a call locks (HARD Randy 2026-09-24 5:28pm ET).
  *
- * Primary "Book a call" CTAs must OPEN/FOCUS the Randy chat widget for
- * qualifying dialogue. Do NOT navigate straight to Cal (never cold-dump).
- *
- * Cal is ONLY offered in-thread after qualification
- * (2–3 smart discovery turns OR clear fit) OR after Hear Randy / Call
- * paths that already screened.
+ * "Book a call" CTAs OPEN the Randy chat: a few qualifying questions, then the
+ * AI call or a callback intake (name, company, role, phone, email, need, size,
+ * timing). No calendar button, chip or link anywhere in the UI; the model may
+ * give Randy's calendar only if a visitor insists on a set time.
  */
-/** Post-qualify only: rendered solely inside Randy chat after the AI call / callback step. */
-export const BOOK_CALL_CAL_URL = "https://cal.com/randy-gilling/30min" as const;
-
-
 /** Mailto kept as secondary / fallback only. */
 export const BOOK_CALL_MAILTO_HREF =
   "mailto:randy@silverbirchgrowth.com?subject=Book%20a%20call%20%E2%80%94%20Birch%20Reserve" as const;

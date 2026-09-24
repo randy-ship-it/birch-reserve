@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 17:17 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 17:28 EDT. Edit sales-brain, not this file. -->
 # ROUTING-URLS, where Randy sends people (chat + phone)
 Randy HARD 2026-09-24 ~3:47pm ET: Randy is fully trained on Scale Health. He diagnoses intent (chat or call), then hands the right inquiry URL. On birchreserve.net he OPENS Birch-only; he routes elsewhere only once the visitor's need shows up in dialogue.
 
@@ -17,7 +17,8 @@ Only the URLs in this table are routable. Every row was verified in headless Chr
 | Brand partnership / other Scale | General Scale | https://scalehealth.ca (homepage only) | verified homepage |
 | Investor / buyer | RDGDH portfolio | https://rdgdh.com/portfolio | verified |
 | Wants to see proof | Live hub | https://physio.drhonow.com/dr-ho/portal | verified |
-| Wants a human, after qualifying | Randy's calendar | https://cal.com/randy-gilling/30min (after qualifying only) | verified |
+| Wants a human | Team callback: take name, company, role, phone, email, need, size, timing | (no link; intake is captured and emailed to the team) | verified |
+| Explicitly insists on a set booking time | Randy's calendar | https://cal.com/randy-gilling/30min (last resort only, never offered proactively) | verified |
 
 Rules: one URL per answer, the one that fits. Never dump a list. Never lead with fees, bounties, or guaranteed patients. The Scale network story (50MM+ unique viewers in 4 months, on track for 100MM+ by year end) is allowed anywhere as platform scale, but never as impressions, CTR, or a per-seat view promise. Clinic or location wanting to go hard on physio: https://alignwellness.ca (managed-services partner, 100+ locations under management by year end). US clinic outbound is STOP, so US providers go to capture-email only.
 Phone: say the URL slowly ("scalehealth dot C-A slash providers") and offer to text or email it (capture contact; include it in the transcript).
