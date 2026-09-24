@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { HoneypotField, withFormGuards } from "@/lib/form-guards";
+import { track } from "@/lib/analytics";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -60,6 +62,7 @@ interface CommercialInquiryDialogProps {
 
 export function CommercialInquiryDialog({ open, onOpenChange, defaultInquiryType = "branded_hub" }: CommercialInquiryDialogProps) {
   const { mutate: createInquiry, isPending, isError, reset: resetMutation } = useCreateCommercialInquiry();
+  const honeypotRef = useRef<HTMLInputElement>(null);
   const [successReceipt, setSuccessReceipt] = useState<CommercialInquiryReceipt | null>(null);
 
   const form = useForm<InquiryFormValues>({
@@ -102,9 +105,10 @@ export function CommercialInquiryDialog({ open, onOpenChange, defaultInquiryType
 
   function onSubmit(values: InquiryFormValues) {
     createInquiry(
-      { data: values },
+      { data: withFormGuards(values, honeypotRef) },
       {
         onSuccess: (receipt) => {
+          track("intake_submit", { source: "commercial_inquiry" });
           setSuccessReceipt(receipt);
         },
         onError: (err) => {
@@ -150,7 +154,8 @@ export function CommercialInquiryDialog({ open, onOpenChange, defaultInquiryType
               )}
 
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="relative space-y-5">
+                  <HoneypotField inputRef={honeypotRef} idSuffix="commercial" />
                   <FormField
                     control={form.control}
                     name="inquiryType"

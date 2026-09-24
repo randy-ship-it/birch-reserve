@@ -17,6 +17,10 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Phone, X, PhoneIncoming, RotateCw, ArrowUp } from "lucide-react";
 import { trackCta } from "@/lib/track-cta";
+import { track } from "@/lib/analytics";
+import { ensureHuman } from "@/lib/human-gate";
+import { HoneypotField } from "@/lib/form-guards";
+import { isLingerOpen, LINGER_STATE_EVENT, setChatOpen } from "@/lib/overlay-bus";
 import {
   BOOK_CALL_MAILTO_HREF,
   OPEN_RANDY_CHAT_EVENT,
@@ -207,6 +211,9 @@ export function RandyChat() {
   });
   const [teaserVisible, setTeaserVisible] = useState(false);
   const [teaserDone, setTeaserDone] = useState(false);
+  // Linger email card showing → hide the launcher (never both on screen).
+  const [lingerOpen, setLingerOpenState] = useState<boolean>(() => isLingerOpen());
+  const honeypotRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesRef = useRef<ChatMessage[]>([]);
@@ -239,6 +246,7 @@ export function RandyChat() {
       extra?: {
         contact?: { phone?: string; name?: string; email?: string; role?: string };
         qualify?: { company?: string; need?: string; size?: string; timing?: string };
+        fax?: string;
       },
     ) =>
       sendRandyEvent({
@@ -247,6 +255,7 @@ export function RandyChat() {
         messages: toHistory(messagesRef.current),
         qualify: { ...qualifyRef.current, ...(extra?.qualify ?? {}) },
         ...(extra?.contact ? { contact: extra.contact } : {}),
+        ...(extra?.fax ? { fax: extra.fax } : {}),
       }),
     [sessionId],
   );
@@ -265,6 +274,9 @@ export function RandyChat() {
   const openWidget = useCallback(
     (detail?: OpenRandyChatDetail) => {
       setOpen(true);
+      track("chat_open", { reason: detail?.reason ?? "launcher" });
+      // Humans only: verify in the background while the opener shows (no-op when off).
+      void ensureHuman();
       setTeaserVisible(false);
       setTeaserDone(true);
       setMode("chat");
@@ -318,6 +330,16 @@ export function RandyChat() {
       /* ignore */
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setChatOpen(open);
+  }, [open]);
+
+  useEffect(() => {
+    const onLinger = (event: Event) => setLingerOpenState(Boolean((event as CustomEvent<{ open: boolean }>).detail?.open));
+    window.addEventListener(LINGER_STATE_EVENT, onLinger);
+    return () => window.removeEventListener(LINGER_STATE_EVENT, onLinger);
   }, []);
 
   // Teaser bubble after ~4s (closed state only; once per page view).
@@ -476,6 +498,7 @@ export function RandyChat() {
     }
     // Bubble shows the chip label; the model gets the fuller message.
     pushMessages({ id: newId(), role: "user", text: message });
+    track("chat_message", { chip: chipId });
     await fetchReply(chipId);
   };
 
@@ -489,6 +512,7 @@ export function RandyChat() {
       return;
     }
     pushMessages({ id: newId(), role: "user", text });
+    track("chat_message");
     await fetchReply();
   };
 
@@ -497,6 +521,7 @@ export function RandyChat() {
     extra?: {
       contact?: { phone?: string; name?: string; email?: string; role?: string };
       qualify?: { company?: string; need?: string; size?: string; timing?: string };
+      fax?: string;
     },
   ) => {
     setCallStepDone(true);
@@ -558,7 +583,8 @@ export function RandyChat() {
       ...(intake.size.trim() ? { size: clip(intake.size, 300) } : {}),
       ...(intake.timing.trim() ? { timing: clip(intake.timing, 300) } : {}),
     };
-    const ok = await markCallStep("callback_request", { contact, qualify: qualifyExtra });
+    const fax = honeypotRef.current?.value ?? "";
+    const ok = await markCallStep("callback_request", { contact, qualify: qualifyExtra, ...(fax ? { fax } : {}) });
     if (!ok) {
       setCallbackState("error");
       pushMessages({
@@ -572,6 +598,7 @@ export function RandyChat() {
     setCallbackState("done");
     setCallbackOpen(false);
     trackCta("cta_book_call");
+    track("intake_submit", { source: "chat_callback" });
     setQualifyStep(null);
     pushMessages({
       id: newId(),
@@ -644,6 +671,7 @@ export function RandyChat() {
           data-testid="randy-callback-form"
         >
           <p className="text-[12px] font-medium text-slate-600">Leave your details and the team will call you back.</p>
+          <HoneypotField inputRef={honeypotRef} idSuffix="randy-callback" />
           <input
             id="randy-callback-phone"
             type="tel"
@@ -775,7 +803,7 @@ export function RandyChat() {
       <style>{FIGURE_STYLES}</style>
 
       {/* Closed state: full-body Randy on a floating white card, bottom-right */}
-      {!open && !dismissed && (
+      {!open && !dismissed && !lingerOpen && (
         <div
           className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-3 z-[45] flex items-end gap-2 md:bottom-6 md:right-6"
           data-testid="randy-figure-launcher"

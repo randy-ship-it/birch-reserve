@@ -3,16 +3,20 @@
  *   - Chat Randy: qualify answers / callback intake (randy_chat_sessions qualify +
  *     contact jsonb, #18) → leads row `chat:<sessionId>`
  *   - Advertiser follow-up form (advertiser_intakes) → leads row `intake:<id>`
- * Each upsert queues a non-blocking Friday CRM push. Never throws.
+ *   - Linger email capture → leads row `email:<sha256(email)>` (source email_capture)
+ * Each upsert queues a non-blocking Friday CRM push (skipped for is_test rows).
+ * Attribution (utm_*, referrer, landing page) rides along, first-touch. Never throws.
  */
-import { leadIsActionable, upsertLeadSafe, type Lead } from "./leads";
+import { createHash } from "node:crypto";
+import { leadIsActionable, upsertLeadSafe, upsertLeadSafeDetailed, type Attribution, type Lead } from "./leads";
 import { queueFridayPush } from "./fridayPush";
 import { getTranscriptSession, type TranscriptSession } from "./randyChatTranscripts";
+import { isTestIdentity } from "./testTraffic";
 
 /** Widget events that carry intake worth a lead row. */
 export const CHAT_LEAD_EVENTS = new Set(["callback_request", "qualified", "tel_click"]);
 
-export function chatLeadInput(s: TranscriptSession, event: string) {
+export function chatLeadInput(s: TranscriptSession, event: string, attribution: Attribution = {}) {
   return {
     id: `chat:${s.id}`,
     source: event === "callback_request" || s.lastHandoff === "callback_request" ? ("chat_callback" as const) : ("chat_intake" as const),
@@ -26,14 +30,17 @@ export function chatLeadInput(s: TranscriptSession, event: string) {
     size: s.qualify.size,
     timing: s.qualify.timing,
     pagePath: s.pagePath ?? undefined,
+    isTest: s.isTest,
+    meta: { category: s.qualify.category, hubs: s.qualify.reach },
+    ...attribution,
   };
 }
 
-export async function captureChatLead(sessionId: string, event: string): Promise<Lead | undefined> {
+export async function captureChatLead(sessionId: string, event: string, attribution: Attribution = {}): Promise<Lead | undefined> {
   if (!CHAT_LEAD_EVENTS.has(event)) return undefined;
   const s = await getTranscriptSession(sessionId);
   if (!s) return undefined;
-  const input = chatLeadInput(s, event);
+  const input = chatLeadInput(s, event, attribution);
   if (!leadIsActionable({ phone: input.phone ?? null, email: input.email ?? null, name: input.name ?? null, company: input.company ?? null })) {
     return undefined;
   }
@@ -49,6 +56,8 @@ export async function captureAdvertiserIntakeLead(intake: {
   advertiserSize?: string | null;
   adInterest?: string | null;
   source?: string | null;
+  isTest?: boolean;
+  attribution?: Attribution;
 }): Promise<Lead | undefined> {
   const lead = await upsertLeadSafe({
     id: `intake:${intake.id}`,
@@ -57,7 +66,40 @@ export async function captureAdvertiserIntakeLead(intake: {
     email: intake.email,
     need: [intake.advertisingIntent, intake.adInterest].filter(Boolean).join(" / ") || undefined,
     size: intake.advertiserSize ?? undefined,
+    isTest: Boolean(intake.isTest) || isTestIdentity({ email: intake.email }),
+    ...(intake.attribution ?? {}),
   });
   if (lead) queueFridayPush(lead.id);
   return lead;
+}
+
+export function emailCaptureLeadId(normalizedEmail: string): string {
+  return `email:${createHash("sha256").update(normalizedEmail).digest("hex").slice(0, 32)}`;
+}
+
+/** Linger pop-up email capture → leads row (source email_capture) + Friday push. */
+export async function captureEmailLead(input: {
+  email: string;
+  company?: string | null;
+  pagePath?: string | null;
+  isTest?: boolean;
+  attribution?: Attribution;
+  now?: Date;
+}): Promise<{ lead: Lead | undefined; created: boolean }> {
+  const email = input.email.trim().toLowerCase();
+  const id = emailCaptureLeadId(email);
+  const res = await upsertLeadSafeDetailed({
+    id,
+    source: "email_capture",
+    sourceRef: id.slice("email:".length),
+    email,
+    company: input.company ?? undefined,
+    need: "Birch Reserve media kit + seat updates",
+    pagePath: input.pagePath ?? undefined,
+    isTest: Boolean(input.isTest) || isTestIdentity({ email, name: input.company ?? null }),
+    ...(input.attribution ?? {}),
+    ...(input.now ? { now: input.now } : {}),
+  });
+  if (res) queueFridayPush(res.lead.id);
+  return { lead: res?.lead, created: Boolean(res?.created) };
 }

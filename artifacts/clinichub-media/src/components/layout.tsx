@@ -5,6 +5,7 @@ import birchReserveMark from '@assets/brand/birch-reserve-mark-v2.svg';
 import { SELLER_EMAIL_HREF, SELLER_IDENTITY } from '@/lib/seller-identity';
 import { trackCta } from '@/lib/track-cta';
 import { RandyChat } from '@/components/randy-chat';
+import { LingerCapture } from '@/components/linger-capture';
 
 export function Layout({ children }: { children: ReactNode }) {
   const basePath = import.meta.env.BASE_URL;
@@ -152,6 +153,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
       {/* DRAFT: Chat Randy — site-wide; Book a call opens this, not Cal */}
       <RandyChat />
+      <LingerCapture />
     </div>
   )
 }

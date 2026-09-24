@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { HoneypotField, withFormGuards } from "@/lib/form-guards";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -120,6 +121,7 @@ export function SponsorReservationDialog({
   defaultAccessRoute = "open_market",
 }: SponsorReservationDialogProps) {
   const { mutate: createReservation, isPending, isError, reset: resetMutation } = useCreateSponsorReservation();
+  const honeypotRef = useRef<HTMLInputElement>(null);
   const [successReceipt, setSuccessReceipt] = useState<SponsorReservationReceipt | null>(null);
   const [step, setStep] = useState(1);
   const totalSteps = 4;
@@ -190,11 +192,14 @@ export function SponsorReservationDialog({
 
     createReservation(
       {
-        data: {
-          ...requiredValues,
-          ...(requestedHubName ? { requestedHubName } : {}),
-          ...(additionalNotes ? { additionalNotes } : {}),
-        },
+        data: withFormGuards(
+          {
+            ...requiredValues,
+            ...(requestedHubName ? { requestedHubName } : {}),
+            ...(additionalNotes ? { additionalNotes } : {}),
+          },
+          honeypotRef,
+        ),
       },
       {
         onSuccess: (receipt) => {
@@ -266,7 +271,8 @@ export function SponsorReservationDialog({
               {/* Form Content */}
               <div className="flex-1 overflow-y-auto hide-scrollbar p-8 bg-background">
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="relative space-y-6">
+                    <HoneypotField inputRef={honeypotRef} idSuffix="sponsor" />
 
                     <AnimatePresence mode="wait">
                       {step === 1 && (

@@ -24,6 +24,8 @@ import {
   type DiscoveryChipId,
 } from "@/lib/randy-chat-knowledge";
 import { fitWireBudget, withQuietRetry } from "@/lib/randy-wire";
+import { clearHumanToken, ensureHuman, humanHeaders } from "@/lib/human-gate";
+import { getAttribution } from "@/lib/attribution";
 
 export type RandyModelMessage = {
   role: "user" | "assistant";
@@ -176,7 +178,8 @@ async function stubRandyReply(
 type LiveResult =
   | { ok: true; value: RandyModelResponse }
   | RandyReplyFailure
-  | { ok: "stub" };
+  | { ok: "stub" }
+  | { ok: "human" };
 
 /** One POST. `payload` is built once so the quiet retry sends the exact same request. */
 async function fetchGrokReply(req: RandyModelRequest, payload: string): Promise<LiveResult> {
@@ -186,7 +189,7 @@ async function fetchGrokReply(req: RandyModelRequest, payload: string): Promise<
   try {
     const response = await fetch(RANDY_CHAT_API, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", ...humanHeaders() },
       body: payload,
       signal: controller.signal,
     });
@@ -206,6 +209,8 @@ async function fetchGrokReply(req: RandyModelRequest, payload: string): Promise<
     }
 
     if (response.status === 429) return { ok: false, kind: "rate_limited", status: 429 };
+    // Turnstile gate (server has TURNSTILE_* keys): verify once, then retry.
+    if (response.status === 401 && (data as { humanRequired?: boolean }).humanRequired) return { ok: "human" };
     if (response.status === 503 && (data.reason === "disabled" || data.reason === "missing_key")) {
       return { ok: "stub" };
     }
@@ -254,11 +259,20 @@ export async function requestRandyReply(
     ...(req.sessionId ? { sessionId: req.sessionId } : {}),
     ...(pagePath ? { pagePath } : {}),
   });
+  // Humans only: no-op when the gate is off or this tab already verified.
+  await ensureHuman();
   // Quiet retry lives here, below the UI: the widget pushes no bubble for it, so
   // the visitor never sees a duplicate message or a flash of the error card.
-  const live = (await withQuietRetry(() => fetchGrokReply(req, payload), {
-    onRetry: (kind) => console.warn("[randy-chat] quiet retry after", kind),
-  })) as LiveResult;
+  const attempt = () =>
+    withQuietRetry(() => fetchGrokReply(req, payload), {
+      onRetry: (kind) => console.warn("[randy-chat] quiet retry after", kind),
+    }) as Promise<LiveResult>;
+  let live = await attempt();
+  if (live.ok === "human") {
+    clearHumanToken();
+    live = (await ensureHuman()) ? await attempt() : live;
+    if (live.ok === "human") return { ok: false, kind: "rejected", status: 401, detail: "human_required" };
+  }
   if (live.ok === true) return { ok: true, ...live.value };
   if (live.ok === "stub") return { ok: true, ...(await stubRandyReply(req)) };
   return live;
@@ -278,6 +292,8 @@ export type RandyChatEvent = {
   messages?: RandyModelMessage[];
   qualify?: { company?: string; category?: string; reach?: string; timing?: string; need?: string; size?: string };
   contact?: { phone?: string; email?: string; name?: string; role?: string };
+  /** Honeypot (callback form). Filled only by bots; the server drops those. */
+  fax?: string;
 };
 
 function eventPayload(evt: RandyChatEvent): string {
@@ -288,9 +304,14 @@ function eventPayload(evt: RandyChatEvent): string {
     ...(evt.messages ? { messages: toWireMessages(evt.messages) } : {}),
     ...(evt.qualify ? { qualify: evt.qualify } : {}),
     ...(evt.contact ? { contact: evt.contact } : {}),
+    ...(evt.fax ? { fax: evt.fax } : {}),
     ...(pagePath ? { pagePath } : {}),
+    // Lead-bearing events carry first-touch attribution (server stores it on the lead).
+    ...(LEAD_EVENTS.has(evt.type) && Object.keys(getAttribution()).length ? { attribution: getAttribution() } : {}),
   });
 }
+
+const LEAD_EVENTS = new Set<RandyChatEventType>(["callback_request", "qualified", "tel_click"]);
 
 /** Transcript / handoff event. Resolves true when the server stored it. */
 export async function sendRandyEvent(evt: RandyChatEvent): Promise<boolean> {

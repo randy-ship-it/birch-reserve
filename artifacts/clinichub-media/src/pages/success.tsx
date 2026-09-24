@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { birchOrderPresentation } from "@/lib/birch-order-status";
 import { formatReserveAmount } from "@/lib/reserve-offers";
+import { useEffect, useRef } from "react";
+import { track } from "@/lib/analytics";
 
 type BirchReserveOrder = {
   order_id: string;
@@ -51,6 +53,14 @@ export default function Success() {
       return response.json() as Promise<BirchReserveOrder>;
     },
   });
+  // Analytics: one checkout_success per paid order (no-op without analytics config).
+  const successTracked = useRef(false);
+  const paidOrder = orderQuery.data?.payment_status === "paid" ? orderQuery.data : null;
+  useEffect(() => {
+    if (!paidOrder || successTracked.current) return;
+    successTracked.current = true;
+    track("checkout_success", { offer: paidOrder.sku === "hold-190" ? "hold" : "reserve" });
+  }, [paidOrder]);
   const { data, isLoading, isError } = useGetSponsorReservationStatus(
     { token: token || "" },
     {

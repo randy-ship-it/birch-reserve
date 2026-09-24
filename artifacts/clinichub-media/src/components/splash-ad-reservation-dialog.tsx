@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { HoneypotField, withFormGuards } from "@/lib/form-guards";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -61,6 +62,7 @@ export function SplashAdReservationDialog({
   const [successReceipt, setSuccessReceipt] = useState<(SplashAdReservationReceipt & { lockedAmountCents?: number }) | null>(null);
 
   const { mutateAsync: reserveSeat, isPending } = useCreateSplashAdReservation();
+  const honeypotRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<ReserveFormValues>({
     resolver: zodResolver(reserveSchema),
@@ -100,15 +102,18 @@ export function SplashAdReservationDialog({
     const offerDetails = getReserveOffer(values.offer as ReserveOfferKey);
     try {
       const receipt = await reserveSeat({
-        data: {
-          brandName: values.brandName,
-          email: values.email,
-          websiteUrl: values.websiteUrl || undefined,
-          buyerPath: values.buyerPath,
-          expectedAmountCents: offerDetails.amountCents,
-          expectedCurrency: "usd",
-          offer: values.offer
-        }
+        data: withFormGuards(
+          {
+            brandName: values.brandName,
+            email: values.email,
+            websiteUrl: values.websiteUrl || undefined,
+            buyerPath: values.buyerPath,
+            expectedAmountCents: offerDetails.amountCents,
+            expectedCurrency: "usd",
+            offer: values.offer,
+          },
+          honeypotRef,
+        ),
       });
 
       if (receipt.checkoutUrl) {
@@ -199,7 +204,8 @@ export function SplashAdReservationDialog({
 
               <div className="flex-1 bg-background p-6 sm:p-8">
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="relative space-y-6">
+                    <HoneypotField inputRef={honeypotRef} idSuffix="splash-reserve" />
                     <FormField
                       control={form.control}
                       name="offer"

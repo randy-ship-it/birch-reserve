@@ -9,6 +9,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { Router, type IRouter, type Request } from "express";
 import { ingestVoiceCall, normalizeVoicePayload } from "../lib/voiceCalls";
+import { hasValidQaHeader } from "../lib/testTraffic";
 
 export const VOICE_WEBHOOK_SECRET_ENV = "VOICE_WEBHOOK_SECRET" as const;
 export const VOICE_WEBHOOK_HEADER = "x-voice-webhook-secret" as const;
@@ -46,7 +47,8 @@ router.post("/voice/call-ended", async (req, res): Promise<void> => {
     return;
   }
   try {
-    const result = await ingestVoiceCall(parsed.call, req.body);
+    // X-Birch-QA (or a qa-/emma-qa call id, qa+ email, QA Test name) → stored as is_test, no email/Friday.
+    const result = await ingestVoiceCall(parsed.call, req.body, { isTest: hasValidQaHeader(req) });
     req.log?.info({ duplicate: result.duplicate, emailed: result.emailed }, "Voice call-ended webhook");
     res.status(200).json({ ok: true, duplicate: result.duplicate });
   } catch (error) {

@@ -13,8 +13,10 @@ import {
   renderVoiceEmail,
   setVoiceDepsForTests,
   VOICE_CALLS_DDL,
+  VOICE_CALLS_HYGIENE_DDL,
 } from "../src/lib/voiceCalls";
-import { LEADS_DDL, MemoryLeadStore, mergeLead, setLeadStoreForTests } from "../src/lib/leads";
+import { LEADS_DDL, LEADS_HYGIENE_DDL, MemoryLeadStore, mergeLead, setLeadStoreForTests } from "../src/lib/leads";
+import { parseAdditiveColumn } from "../src/lib/schemaEnsure";
 import {
   buildFridayPayload,
   fridayConfig,
@@ -490,9 +492,9 @@ test("schema: dev-DB SQL file is additive-only and identical to the runtime DDL"
 });
 
 test("schema: drizzle tables match the SQL columns and indexes (publish never proposes drops)", () => {
-  for (const [table, ddl] of [
-    [leadsTable, LEADS_DDL],
-    [voiceCallsTable, VOICE_CALLS_DDL],
+  for (const [table, ddl, added] of [
+    [leadsTable, LEADS_DDL, LEADS_HYGIENE_DDL],
+    [voiceCallsTable, VOICE_CALLS_DDL, VOICE_CALLS_HYGIENE_DDL],
   ] as const) {
     const cfg = getTableConfig(table);
     const create = squash(ddl[0]);
@@ -500,7 +502,9 @@ test("schema: drizzle tables match the SQL columns and indexes (publish never pr
       .slice(create.indexOf("(") + 1, create.lastIndexOf(")"))
       .split(",")
       .map((c) => c.trim().split(" ")[0]);
-    assert.deepEqual(cfg.columns.map((c) => c.name).sort(), [...cols].sort());
+    // 6:50pm additive columns (ADD COLUMN IF NOT EXISTS) are part of the Drizzle table too.
+    const addedCols = added.map((st) => parseAdditiveColumn(st)!.column);
+    assert.deepEqual(cfg.columns.map((c) => c.name).sort(), [...cols, ...addedCols].sort());
     const idx = ddl.slice(1).map((d) => squash(d).split(" ")[5]);
     assert.deepEqual(cfg.indexes.map((i) => i.config.name).sort(), [...idx].sort());
   }

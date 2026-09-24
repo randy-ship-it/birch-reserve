@@ -14,7 +14,7 @@ export type WireMessage = { role: "user" | "assistant"; content: string };
 
 export type WireFailureKind = "timeout" | "network" | "rate_limited" | "rejected" | "unavailable";
 
-export type WireAttempt<T> = { ok: true; value: T } | { ok: "stub" } | { ok: false; kind: WireFailureKind; status?: number };
+export type WireAttempt<T> = { ok: true; value: T } | { ok: "stub" } | { ok: "human" } | { ok: false; kind: WireFailureKind; status?: number };
 
 /** Short backoff before the single quiet retry. */
 export const QUIET_RETRY_BACKOFF_MS = 700;

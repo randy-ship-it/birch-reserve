@@ -32,6 +32,8 @@ import {
 } from "@workspace/api-zod";
 import { getPublicLaunchMode } from "../lib/launchMode";
 import { captureAdvertiserIntakeLead } from "../lib/leadCapture";
+import { attributionFrom } from "../lib/publicGuards";
+import { hasValidQaHeader } from "../lib/testTraffic";
 import {
   getAuthorizedSalesStaff,
   requireSalesManager,
@@ -235,6 +237,7 @@ router.post("/launch/waitlist", async (req, res): Promise<void> => {
       interestType: parsed.data.interestType,
       created: inserted,
       requestId: receipt.requestId,
+      attribution: attributionFrom(res),
     },
     "Pilot waitlist request accepted",
   );
@@ -314,6 +317,7 @@ router.post("/launch/commercial-inquiries", async (req, res): Promise<void> => {
     {
       inquiryType: parsed.data.inquiryType,
       requestId: receipt.requestId,
+      attribution: attributionFrom(res),
     },
     "Commercial inquiry accepted",
   );
@@ -364,6 +368,8 @@ router.post("/launch/advertiser-intake", async (req, res): Promise<void> => {
     advertiserSize: parsed.data.advertiserSize ?? null,
     adInterest: parsed.data.adInterest ?? null,
     source: parsed.data.source,
+    isTest: hasValidQaHeader(req),
+    attribution: attributionFrom(res),
   });
 
   req.log.info(

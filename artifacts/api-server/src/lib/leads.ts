@@ -7,6 +7,14 @@
  *   webvoice:<id>      in-browser live voice session (or chat:<sessionId> when the
  *                      voice session started from a chat, so one visitor = one lead)
  *   intake:<uuid>      advertiser follow-up form (advertiser_intakes row)
+ *   email:<sha256>     linger email capture (source email_capture), keyed by email hash
+ *   checkout:<resId>   paid Stripe checkout (source checkout); re-posts to Friday under the
+ *                      matching prior lead's externalId when one exists (meta.friday_external_id)
+ *
+ * meta (jsonb, 7:21pm): Friday deal metadata (category, hubs, sku, value, paid, ...), merged key-wise.
+ *
+ * is_test (6:50pm): QA / probe rows are stored but never emailed or pushed to Friday.
+ * Attribution (utm_*, referrer, landing_page) is first-touch: set once, never overwritten.
  *
  * The source tables keep the detail (transcripts, raw payloads). This row holds
  * the normalized contact/qualify fields plus the Friday CRM push status.
@@ -16,19 +24,69 @@
  * scripts/sql/2026-09-24-leads-voice-calls.sql. Additive only.
  */
 import { logger } from "./logger";
+import { applyAdditiveColumns } from "./schemaEnsure";
 
-export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake";
+export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture" | "checkout";
+
+/** Friday deal metadata carried on the lead (unknown keys are simply absent). */
+export type LeadMeta = {
+  category?: string;
+  hubs?: string;
+  sku?: string;
+  value?: number;
+  paid?: boolean;
+  stripe_session_id?: string;
+  /** Re-post under this Friday externalId (a paid checkout joins the visitor's prior lead). */
+  friday_external_id?: string;
+  /** QA only (X-Birch-QA + /api/launch/qa/friday-test-lead): push this is_test lead to Friday once. */
+  friday_qa_ok?: boolean;
+};
+const META_STRING_KEYS = ["category", "hubs", "sku", "stripe_session_id", "friday_external_id"] as const;
+
+/** Keep only well-typed, non-empty keys (never empty strings). */
+export function cleanLeadMeta(raw: unknown): LeadMeta {
+  if (!raw || typeof raw !== "object") return {};
+  const src = raw as Record<string, unknown>;
+  const out: LeadMeta = {};
+  for (const k of META_STRING_KEYS) {
+    const v = src[k];
+    if (typeof v === "string" && v.trim()) out[k] = v.trim().slice(0, 200);
+  }
+  if (typeof src["value"] === "number" && Number.isFinite(src["value"]) && src["value"] >= 0) out.value = src["value"];
+  if (src["paid"] === true) out.paid = true;
+  if (src["friday_qa_ok"] === true) out.friday_qa_ok = true;
+  return out;
+}
 export type FridayStatus = "pending" | "sending" | "sent" | "failed" | "skipped";
 
 export const LEAD_FIELDS = ["name", "company", "role", "phone", "email", "need", "size", "timing", "pagePath"] as const;
 export type LeadField = (typeof LEAD_FIELDS)[number];
+
+/** First-touch attribution captured by the browser (utm_*, document.referrer, landing page). */
+export const ATTRIBUTION_FIELDS = ["utmSource", "utmMedium", "utmCampaign", "utmTerm", "utmContent", "referrer", "landingPage"] as const;
+export type AttributionField = (typeof ATTRIBUTION_FIELDS)[number];
+export type Attribution = Partial<Record<AttributionField, string>>;
+const ATTRIBUTION_COLUMN: Record<AttributionField, string> = {
+  utmSource: "utm_source",
+  utmMedium: "utm_medium",
+  utmCampaign: "utm_campaign",
+  utmTerm: "utm_term",
+  utmContent: "utm_content",
+  referrer: "referrer",
+  landingPage: "landing_page",
+};
 
 export type LeadInput = {
   id: string;
   source: LeadSource;
   sourceRef: string;
   now?: Date;
-} & Partial<Record<LeadField, string | null | undefined>>;
+  /** Sticky: once a lead is test traffic it stays test traffic. */
+  isTest?: boolean;
+  /** Merged key-wise into the stored meta (never erases a known key). */
+  meta?: LeadMeta;
+} & Partial<Record<LeadField, string | null | undefined>> &
+  Partial<Record<AttributionField, string | null | undefined>>;
 
 export type Lead = {
   id: string;
@@ -41,9 +99,12 @@ export type Lead = {
   fridayDealId: string | null;
   fridayPushedAt: Date | null;
   fridayAttemptedAt: Date | null;
+  isTest: boolean;
+  meta: LeadMeta;
   createdAt: Date;
   updatedAt: Date;
-} & Record<LeadField, string | null>;
+} & Record<LeadField, string | null> &
+  Record<AttributionField, string | null>;
 
 export type FridayResult =
   | { status: "sent"; contactId: string | null; dealId: string | null }
@@ -58,6 +119,8 @@ export interface LeadStore {
   /** afterClaim (default true): a lead edited mid-send stays pending so it is re-pushed. */
   markFriday(id: string, result: FridayResult, now: Date, afterClaim?: boolean): Promise<void>;
   listFridayRetryable(opts: { now: Date; retryAfterMs: number; maxAttempts: number; includeSkipped: boolean; limit: number }): Promise<string[]>;
+  /** Oldest real (non-test, non-checkout) lead with this email: a paid checkout joins it in Friday. */
+  findPriorByEmail(email: string): Promise<Lead | undefined>;
 }
 
 /* ------------------------------------------------------------------ */
@@ -75,6 +138,7 @@ const FIELD_MAX: Record<LeadField, number> = {
   timing: 300,
   pagePath: 500,
 };
+const ATTRIBUTION_MAX = 500;
 
 /** Source precedence: a callback request is never downgraded to a plain intake. */
 const SOURCE_RANK: Record<LeadSource, number> = {
@@ -83,6 +147,8 @@ const SOURCE_RANK: Record<LeadSource, number> = {
   chat_callback: 2,
   voice: 2,
   web_voice: 2,
+  email_capture: 0,
+  checkout: 3,
 };
 
 function clean(field: LeadField, v: unknown): string | null {
@@ -103,11 +169,14 @@ export function emptyLead(input: LeadInput, now: Date): Lead {
     fridayDealId: null,
     fridayPushedAt: null,
     fridayAttemptedAt: null,
+    isTest: false,
+    meta: {} as LeadMeta,
     createdAt: now,
     updatedAt: now,
   };
   const fields = Object.fromEntries(LEAD_FIELDS.map((f) => [f, null])) as Record<LeadField, string | null>;
-  return { ...base, ...fields };
+  const attribution = Object.fromEntries(ATTRIBUTION_FIELDS.map((f) => [f, null])) as Record<AttributionField, string | null>;
+  return { ...base, ...fields, ...attribution };
 }
 
 /** Non-empty incoming values win; empty/missing never erase what we already have. */
@@ -122,6 +191,16 @@ export function mergeLead(existing: Lead | undefined, input: LeadInput, now: Dat
       if (f !== "pagePath") changed = true;
     }
   }
+  // First-touch attribution: fill gaps only (never counts as a "change" that re-pushes).
+  for (const f of ATTRIBUTION_FIELDS) {
+    const raw = input[f];
+    const v = typeof raw === "string" && raw.trim() ? raw.trim().slice(0, ATTRIBUTION_MAX) : null;
+    if (v !== null && base[f] === null) next[f] = v;
+  }
+  if (input.isTest && !base.isTest) next.isTest = true;
+  // Friday meta: merge known keys (side data, like attribution; not a "change" that re-emails).
+  const incomingMeta = cleanLeadMeta(input.meta);
+  if (Object.keys(incomingMeta).length) next.meta = { ...base.meta, ...incomingMeta };
   if (SOURCE_RANK[input.source] > SOURCE_RANK[base.source]) {
     next.source = input.source;
     changed = true;
@@ -136,6 +215,10 @@ export function mergeLead(existing: Lead | undefined, input: LeadInput, now: Dat
     }
   }
   return { lead: next, changed };
+}
+
+export function leadMetaEqual(a: LeadMeta, b: LeadMeta): boolean {
+  return JSON.stringify(Object.entries(a).sort()) === JSON.stringify(Object.entries(b).sort());
 }
 
 /** True when a lead has something a human can follow up on. */
@@ -192,6 +275,16 @@ export class MemoryLeadStore implements LeadStore {
     }
     return out;
   }
+
+  async findPriorByEmail(email: string) {
+    const e = email.trim().toLowerCase();
+    let best: Lead | undefined;
+    for (const l of this.rows.values()) {
+      if (l.isTest || l.source === "checkout" || l.email?.toLowerCase() !== e) continue;
+      if (!best || l.createdAt < best.createdAt) best = l;
+    }
+    return best ? { ...best } : undefined;
+  }
 }
 
 function applyFridayResult(l: Lead, result: FridayResult, now: Date, repush: boolean): void {
@@ -212,6 +305,7 @@ function retryable(
   opts: { now: Date; retryAfterMs: number; maxAttempts: number; includeSkipped: boolean },
 ): boolean {
   if (!leadIsActionable(l)) return false;
+  if (l.isTest) return false;
   const last = l.fridayAttemptedAt?.getTime() ?? 0;
   const aged = opts.now.getTime() - last >= opts.retryAfterMs;
   if (l.fridayStatus === "skipped") return opts.includeSkipped;
@@ -249,6 +343,22 @@ export const LEADS_DDL = [
   `CREATE INDEX IF NOT EXISTS leads_friday_status_idx ON leads (friday_status, updated_at)`,
 ] as const;
 
+/**
+ * 6:50pm hygiene + attribution columns. ADD COLUMN IF NOT EXISTS only (no drops,
+ * renames or type changes). Mirrors scripts/sql/2026-09-24-test-hygiene-attribution.sql.
+ */
+export const LEADS_HYGIENE_DDL = [
+  `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS is_test boolean NOT NULL DEFAULT false`,
+  `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS utm_source text`,
+  `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS utm_medium text`,
+  `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS utm_campaign text`,
+  `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS utm_term text`,
+  `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS utm_content text`,
+  `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS referrer text`,
+  `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS landing_page text`,
+  `ALTER TABLE IF EXISTS leads ADD COLUMN IF NOT EXISTS meta jsonb`,
+] as const;
+
 type DbModule = typeof import("@workspace/db");
 type RawRow = Record<string, unknown>;
 
@@ -260,6 +370,14 @@ function toDate(v: unknown): Date | null {
 
 function str(v: unknown): string | null {
   return v == null ? null : String(v);
+}
+
+function safeJson(v: string): unknown {
+  try {
+    return JSON.parse(v);
+  } catch {
+    return null;
+  }
 }
 
 function rowToLead(r: RawRow): Lead {
@@ -283,6 +401,15 @@ function rowToLead(r: RawRow): Lead {
     fridayDealId: str(r["friday_deal_id"]),
     fridayPushedAt: toDate(r["friday_pushed_at"]),
     fridayAttemptedAt: toDate(r["friday_attempted_at"]),
+    isTest: r["is_test"] === true,
+    meta: cleanLeadMeta(typeof r["meta"] === "string" ? safeJson(r["meta"]) : r["meta"]),
+    utmSource: str(r["utm_source"]),
+    utmMedium: str(r["utm_medium"]),
+    utmCampaign: str(r["utm_campaign"]),
+    utmTerm: str(r["utm_term"]),
+    utmContent: str(r["utm_content"]),
+    referrer: str(r["referrer"]),
+    landingPage: str(r["landing_page"]),
     createdAt: toDate(r["created_at"]) ?? new Date(),
     updatedAt: toDate(r["updated_at"]) ?? new Date(),
   };
@@ -297,6 +424,7 @@ export async function leadsDb(): Promise<DbModule> {
   const m = await dbModPromise;
   if (!leadsEnsured) {
     for (const stmt of LEADS_DDL) await m.pool.query(stmt);
+    await applyAdditiveColumns(m.pool, LEADS_HYGIENE_DDL);
     leadsEnsured = true;
   }
   return m;
@@ -312,25 +440,55 @@ export class PgLeadStore implements LeadStore {
       const found = await client.query("SELECT * FROM leads WHERE id = $1 FOR UPDATE", [input.id]);
       const existing = found.rows[0] ? rowToLead(found.rows[0] as RawRow) : undefined;
       const { lead, changed } = mergeLead(existing, input, now);
+      const sideChanged =
+        existing !== undefined &&
+        (lead.isTest !== existing.isTest ||
+          !leadMetaEqual(lead.meta, existing.meta) ||
+          ATTRIBUTION_FIELDS.some((f) => lead[f] !== existing[f]));
       if (changed || !existing) {
         await client.query(
           `INSERT INTO leads (id, source, source_ref, name, company, role, phone, email, need, size, timing,
-                              page_path, friday_status, friday_attempts, created_at, updated_at)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+                              page_path, friday_status, friday_attempts, created_at, updated_at,
+                              is_test, utm_source, utm_medium, utm_campaign, utm_term, utm_content,
+                              referrer, landing_page, meta)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25::jsonb)
            ON CONFLICT (id) DO UPDATE SET
              source = EXCLUDED.source, name = EXCLUDED.name, company = EXCLUDED.company,
              role = EXCLUDED.role, phone = EXCLUDED.phone, email = EXCLUDED.email,
              need = EXCLUDED.need, size = EXCLUDED.size, timing = EXCLUDED.timing,
              page_path = EXCLUDED.page_path, friday_status = EXCLUDED.friday_status,
-             friday_attempts = EXCLUDED.friday_attempts, updated_at = EXCLUDED.updated_at`,
+             friday_attempts = EXCLUDED.friday_attempts, updated_at = EXCLUDED.updated_at,
+             is_test = leads.is_test OR EXCLUDED.is_test,
+             utm_source = COALESCE(leads.utm_source, EXCLUDED.utm_source),
+             utm_medium = COALESCE(leads.utm_medium, EXCLUDED.utm_medium),
+             utm_campaign = COALESCE(leads.utm_campaign, EXCLUDED.utm_campaign),
+             utm_term = COALESCE(leads.utm_term, EXCLUDED.utm_term),
+             utm_content = COALESCE(leads.utm_content, EXCLUDED.utm_content),
+             referrer = COALESCE(leads.referrer, EXCLUDED.referrer),
+             landing_page = COALESCE(leads.landing_page, EXCLUDED.landing_page),
+             meta = COALESCE(leads.meta, '{}'::jsonb) || COALESCE(EXCLUDED.meta, '{}'::jsonb)`,
           [
             lead.id, lead.source, lead.sourceRef, lead.name, lead.company, lead.role, lead.phone,
             lead.email, lead.need, lead.size, lead.timing, lead.pagePath, lead.fridayStatus,
-            lead.fridayAttempts, lead.createdAt, lead.updatedAt,
+            lead.fridayAttempts, lead.createdAt, lead.updatedAt, lead.isTest,
+            ...ATTRIBUTION_FIELDS.map((f) => lead[f]),
+            Object.keys(lead.meta).length ? JSON.stringify(lead.meta) : null,
           ],
         );
-      } else if (lead.pagePath !== existing.pagePath) {
-        await client.query("UPDATE leads SET page_path = $2 WHERE id = $1", [lead.id, lead.pagePath]);
+      } else if (lead.pagePath !== existing.pagePath || sideChanged) {
+        await client.query(
+          `UPDATE leads SET page_path = $2, is_test = is_test OR $3,
+                  ${ATTRIBUTION_FIELDS.map((f, i) => `${ATTRIBUTION_COLUMN[f]} = COALESCE(${ATTRIBUTION_COLUMN[f]}, $${i + 4})`).join(", ")},
+                  meta = COALESCE(meta, '{}'::jsonb) || COALESCE($${ATTRIBUTION_FIELDS.length + 4}::jsonb, '{}'::jsonb)
+            WHERE id = $1`,
+          [
+            lead.id,
+            lead.pagePath,
+            lead.isTest,
+            ...ATTRIBUTION_FIELDS.map((f) => lead[f]),
+            Object.keys(lead.meta).length ? JSON.stringify(lead.meta) : null,
+          ],
+        );
       }
       await client.query("COMMIT");
       return { lead, created: !existing, changed };
@@ -340,6 +498,16 @@ export class PgLeadStore implements LeadStore {
     } finally {
       client.release();
     }
+  }
+
+  async findPriorByEmail(email: string) {
+    const m = await leadsDb();
+    const res = await m.pool.query(
+      `SELECT * FROM leads WHERE lower(email) = lower($1) AND source <> 'checkout' AND NOT is_test
+        ORDER BY created_at LIMIT 1`,
+      [email.trim()],
+    );
+    return res.rows[0] ? rowToLead(res.rows[0] as RawRow) : undefined;
   }
 
   async get(id: string) {
@@ -390,6 +558,7 @@ export class PgLeadStore implements LeadStore {
     const res = await m.pool.query(
       `SELECT id FROM leads
         WHERE (phone IS NOT NULL OR email IS NOT NULL OR name IS NOT NULL OR company IS NOT NULL)
+          AND NOT is_test
           AND updated_at >= $5
           AND (
             ($4 AND friday_status = 'skipped')
@@ -425,6 +594,19 @@ export async function upsertLeadSafe(input: LeadInput): Promise<Lead | undefined
   try {
     const { lead } = await leadStore.upsert(input);
     return lead;
+  } catch (error) {
+    logger.warn(
+      { err: error instanceof Error ? error.message : "lead_upsert_failed", lead: input.id, source: input.source },
+      "Lead upsert failed",
+    );
+    return undefined;
+  }
+}
+
+/** Like upsertLeadSafe, but also reports whether the row was created. Never throws. */
+export async function upsertLeadSafeDetailed(input: LeadInput): Promise<{ lead: Lead; created: boolean; changed: boolean } | undefined> {
+  try {
+    return await leadStore.upsert(input);
   } catch (error) {
     logger.warn(
       { err: error instanceof Error ? error.message : "lead_upsert_failed", lead: input.id, source: input.source },

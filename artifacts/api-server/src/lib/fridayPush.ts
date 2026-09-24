@@ -6,6 +6,9 @@
  *   Authorization: Bearer <Friday INTAKE_WEBHOOK_SECRET>   (or X-Intake-Secret)
  *   JSON { externalId, email, firstName, lastName, phone, title, company,
  *          message, site, org, source, kind, tags[] }
+ *   + (7:21pm) meta { category, hubs, source, sku, utm_source, utm_campaign, need,
+ *          size, timing, is_test, paid?, stripe_session_id? } and value (number) when
+ *          known. Unknown keys are omitted, never sent as empty strings.
  *   → 201 created / 200 idempotent: { orgId, contactId, companyId, dealId, ... }
  * Friday upserts a contact (+ company) and an open deal on the workspace's
  * "Sales Pipeline", idempotent by externalId (then email). birchreserve.net maps
@@ -74,7 +77,54 @@ const SOURCE_LABEL: Record<Lead["source"], string> = {
   voice: "Birch voice call",
   web_voice: "Birch web voice call",
   advertiser_intake: "Birch advertiser form",
+  email_capture: "Birch email capture",
+  checkout: "Birch checkout (paid)",
 };
+
+/** meta.source buckets Emma asked for. */
+const META_SOURCE: Record<Lead["source"], "chat" | "voice" | "form" | "email_capture" | "checkout"> = {
+  chat_intake: "chat",
+  chat_callback: "chat",
+  voice: "voice",
+  web_voice: "voice",
+  advertiser_intake: "form",
+  email_capture: "email_capture",
+  checkout: "checkout",
+};
+
+/** Public SKUs only: $190 hold, $490 seat. */
+export const SKU_VALUE: Record<string, number> = { "hold-190": 190, "reserve-490": 490 };
+
+export function fridayExternalId(lead: Pick<Lead, "id" | "meta">): string {
+  return (lead.meta.friday_external_id || `birch-${lead.id}`).slice(0, 160);
+}
+
+/** Friday `meta` object: only keys we actually know. */
+export function buildFridayMeta(lead: Lead): Record<string, string | number | boolean> {
+  const meta: Record<string, string | number | boolean> = {};
+  const put = (k: string, v: string | null | undefined, max = 300) => {
+    const t = v?.trim();
+    if (t) meta[k] = t.slice(0, max);
+  };
+  put("category", lead.meta.category);
+  put("hubs", lead.meta.hubs);
+  meta["source"] = META_SOURCE[lead.source];
+  put("sku", lead.meta.sku);
+  put("utm_source", lead.utmSource);
+  put("utm_campaign", lead.utmCampaign);
+  put("need", lead.need, 500);
+  put("size", lead.size);
+  put("timing", lead.timing);
+  meta["is_test"] = lead.isTest;
+  if (lead.meta.paid) meta["paid"] = true;
+  put("stripe_session_id", lead.meta.stripe_session_id);
+  return meta;
+}
+
+export function fridayValue(lead: Pick<Lead, "meta">): number | undefined {
+  if (typeof lead.meta.value === "number") return lead.meta.value;
+  return lead.meta.sku ? SKU_VALUE[lead.meta.sku] : undefined;
+}
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -94,10 +144,17 @@ export function buildFridayPayload(lead: Lead, cfg: Pick<FridayConfig, "workspac
     lead.size ? `Size: ${lead.size}` : "",
     lead.timing ? `Timing: ${lead.timing}` : "",
     lead.role ? `Role: ${lead.role}` : "",
+    lead.utmSource || lead.utmMedium || lead.utmCampaign
+      ? `UTM: ${[lead.utmSource, lead.utmMedium, lead.utmCampaign].map((x) => x ?? "-").join(" / ")}`
+      : "",
+    lead.referrer ? `Referrer: ${lead.referrer}` : "",
+    lead.landingPage ? `Landing page: ${lead.landingPage}` : "",
+    lead.meta.paid ? `Paid checkout: ${lead.meta.sku ?? "unknown sku"}${lead.meta.stripe_session_id ? ` (Stripe ${lead.meta.stripe_session_id})` : ""}` : "",
+    lead.isTest ? "QA TEST LEAD (is_test): safe to ignore / delete." : "",
     `Birch lead id: ${lead.id}`,
   ].filter(Boolean);
   const payload: Record<string, unknown> = {
-    externalId: `birch-${lead.id}`.slice(0, 160),
+    externalId: fridayExternalId(lead),
     ...(email ? { email } : {}),
     ...splitName(lead.name),
     ...(lead.phone ? { phone: lead.phone.slice(0, 40) } : {}),
@@ -110,8 +167,17 @@ export function buildFridayPayload(lead: Lead, cfg: Pick<FridayConfig, "workspac
     kind: lead.source === "voice" || lead.source === "web_voice" ? "bot" : "form",
     ...(lead.pagePath ? { path: lead.pagePath.slice(0, 200) } : {}),
     stage: cfg.stage,
-    tags: ["birch-inbound", "stage:birch-inbound", `birch:${lead.source.replace(/_/g, "-")}`],
+    tags: [
+      "birch-inbound",
+      "stage:birch-inbound",
+      `birch:${lead.source.replace(/_/g, "-")}`,
+      ...(lead.meta.sku && SKU_VALUE[lead.meta.sku] ? [`birch:${lead.meta.sku}`] : []),
+      ...(lead.isTest ? ["birch:qa-test"] : []),
+    ],
+    meta: buildFridayMeta(lead),
   };
+  const value = fridayValue(lead);
+  if (value !== undefined) payload["value"] = value;
   return payload;
 }
 
@@ -212,6 +278,12 @@ export async function pushLeadToFriday(leadId: string, now: Date = new Date()): 
   try {
     const current = await store.get(leadId);
     if (!current || !leadIsActionable(current)) return undefined;
+    if (current.isTest && !current.meta.friday_qa_ok) {
+      // Test traffic (6:50pm): stored, never pushed to Friday (unless the QA Friday check opted in).
+      const result: FridayResult = { status: "skipped", error: "is_test" };
+      if (current.fridayStatus !== "sent") await store.markFriday(leadId, result, now, false);
+      return result;
+    }
     const cfg = fridayConfig();
     if (!cfg) {
       const result: FridayResult = { status: "skipped", error: "friday_not_configured" };

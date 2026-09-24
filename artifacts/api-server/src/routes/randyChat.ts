@@ -23,6 +23,9 @@ import {
   type QualifyAnswers,
 } from "../lib/randyChatTranscripts";
 import { captureChatLead } from "../lib/leadCapture";
+import { hasValidQaHeader } from "../lib/testTraffic";
+import { FRIENDLY_429, LIMITS, limiter } from "../lib/rateLimit";
+import { attributionFrom } from "../lib/publicGuards";
 
 type ChatRole = "user" | "assistant";
 
@@ -156,6 +159,10 @@ const CHIP_INTENT_NOTES: Record<string, string> = {
   talk_human:
     "Visitor tapped \"Talk to a human\": say you can set that up, ask the first quick question (company or brand), and mention the AI call or a callback come right after.",
 };
+
+/** 6:50pm: per-session 20 msgs/min and per-IP 60 per 10 min on the Grok route. */
+const chatSessionLimiter = limiter(LIMITS.chatPerSession);
+const chatIpLimiter = limiter(LIMITS.chatPerIp);
 
 const requestBuckets = new Map<
   string,
@@ -543,13 +550,26 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
     return;
   }
   const body = parsed.body;
+  // X-Birch-QA → the session is stored as is_test (never emailed / pushed).
+  const qa = hasValidQaHeader(req);
+  const testFlag = qa ? { isTest: true } : {};
+
+  if (!qa) {
+    const ipHit = chatIpLimiter.hit(req.ip || "unknown");
+    const sessionHit = body.sessionId ? chatSessionLimiter.hit(body.sessionId) : { limited: false, retryAfterSec: 0 };
+    if (ipHit.limited || sessionHit.limited) {
+      res.setHeader("Retry-After", String(Math.max(ipHit.retryAfterSec, sessionHit.retryAfterSec)));
+      res.status(429).json({ error: FRIENDLY_429, rateLimited: true });
+      return;
+    }
+  }
 
   ensureTranscriptSweepTimer();
   maybeSweepTranscripts();
 
   if (isAiDisabled()) {
     if (body.sessionId) {
-      void recordTranscript({ id: body.sessionId, messages: body.messages, ...(body.pagePath ? { pagePath: body.pagePath } : {}) });
+      void recordTranscript({ id: body.sessionId, messages: body.messages, ...testFlag, ...(body.pagePath ? { pagePath: body.pagePath } : {}) });
     }
     res.status(503).json(disabledPayload("disabled", "Randy chat AI disabled (RANDY_CHAT_AI_DISABLED)."));
     return;
@@ -558,14 +578,9 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
   const apiKey = getXaiApiKey();
   if (!apiKey) {
     if (body.sessionId) {
-      void recordTranscript({ id: body.sessionId, messages: body.messages, ...(body.pagePath ? { pagePath: body.pagePath } : {}) });
+      void recordTranscript({ id: body.sessionId, messages: body.messages, ...testFlag, ...(body.pagePath ? { pagePath: body.pagePath } : {}) });
     }
     res.status(503).json(disabledPayload("missing_key", "Randy chat AI unavailable (missing XAI_API_KEY)."));
-    return;
-  }
-
-  if (isRateLimited(req.ip || "unknown")) {
-    res.status(429).json({ error: "Rate limit exceeded. Try again shortly." });
     return;
   }
 
@@ -598,6 +613,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
         recordTranscript({
           id: body.sessionId,
           messages: [...body.messages, { role: "assistant", content: text }],
+          ...testFlag,
           ...(body.pagePath ? { pagePath: body.pagePath } : {}),
         }),
         TRANSCRIPT_AWAIT_MS,
@@ -629,7 +645,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
       "Randy chat Grok call failed",
     );
     if (body.sessionId) {
-      void recordTranscript({ id: body.sessionId, messages: body.messages });
+      void recordTranscript({ id: body.sessionId, messages: body.messages, ...testFlag });
     }
     res.status(503).json(disabledPayload("provider_error", "Randy chat AI temporarily unavailable."));
   }
@@ -650,7 +666,7 @@ router.post("/launch/randy-chat/event", async (req, res): Promise<void> => {
     return;
   }
   if (isRateLimited(`event:${req.ip || "unknown"}`, EVENT_RATE_LIMIT_MAX)) {
-    res.status(429).json({ error: "Rate limit exceeded. Try again shortly." });
+    res.status(429).json({ error: FRIENDLY_429, rateLimited: true });
     return;
   }
   const b = parsed.body;
@@ -658,6 +674,7 @@ router.post("/launch/randy-chat/event", async (req, res): Promise<void> => {
   await recordTranscript({
     id: b.sessionId,
     event: b.type,
+    ...(hasValidQaHeader(req) ? { isTest: true } : {}),
     ...(b.messages.length ? { messages: b.messages } : {}),
     ...(b.qualify ? { qualify: b.qualify } : {}),
     ...(b.contact ? { contact: b.contact } : {}),
@@ -668,7 +685,7 @@ router.post("/launch/randy-chat/event", async (req, res): Promise<void> => {
     await logIntakeForSession(b.sessionId, "callback_request");
   }
   // Single system of record (HARD 5:46pm): intake/callback → leads row + Friday push (non-blocking).
-  await captureChatLead(b.sessionId, b.type);
+  await captureChatLead(b.sessionId, b.type, attributionFrom(res));
   if (b.type === "tel_click" || b.type === "callback_request" || b.type === "cal_shown") {
     // Await (bounded by the mailer's 10s timeout) so Autoscale can't freeze the
     // instance before the handoff email goes out.

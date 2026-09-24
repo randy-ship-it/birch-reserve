@@ -8,6 +8,8 @@ import publicBuyingRouter from "./routes/publicBuying";
 import { logger } from "./lib/logger";
 import { uiEventsJsonParser } from "./lib/uiEvents";
 import { handleStripeWebhook } from "./routes/splashAdReservations";
+import { publicPostGuards, voiceStartGuards } from "./lib/publicGuards";
+import { requireHuman } from "./lib/humanGate";
 import {
   CLERK_PROXY_PATH,
   clerkProxyMiddleware,
@@ -105,6 +107,16 @@ app.use("/api/launch/randy-chat", randyChatJsonParser());
 app.use("/api/voice/call-ended", express.json({ limit: "1mb" }));
 app.use(express.json({ limit: "32kb" }));
 app.use(express.urlencoded({ extended: true, limit: "32kb" }));
+
+// ── Humans only (Randy 6:50pm) ────────────────────────────────────────────────
+// Registered AFTER the Stripe webhook (never guarded) and after body parsing.
+// Bot / headless UAs → 403 and honeypot drop on public chat, voice and form POSTs
+// (skips /api/voice/call-ended, /v1 + /ucp machine buying, and valid X-Birch-QA).
+app.use(publicPostGuards());
+// Voice / live-audio start endpoints: Turnstile pass + per-IP / per-session limits.
+app.use(voiceStartGuards());
+// Turnstile before the chat opens a Grok session (no-op until both TURNSTILE_* keys are set).
+app.post("/api/launch/randy-chat", requireHuman());
 
 // ── Application routes ────────────────────────────────────────────────────────
 // Machine-buying and human-buying surfaces intentionally live at the origin
