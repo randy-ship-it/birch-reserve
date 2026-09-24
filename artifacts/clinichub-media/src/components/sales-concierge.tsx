@@ -172,7 +172,7 @@ export function SalesConcierge({
       setIsTyping(true);
       window.setTimeout(() => {
         setIsTyping(false);
-        appendAdvisorMessage("Reservations start at $990 USD. The Access Reserve holds first right on one category in the shared eight-seat pool and is applied as 100% media credit. It is not a live flight; nothing runs until a final insertion order names the surface.", [
+        appendAdvisorMessage("Reservations start at $899 USD. The Access Reserve holds first right on one category in the shared eight-seat pool and is applied as 100% media credit. It is not a live flight; nothing runs until a final insertion order names the surface.", [
           { label: "Open Reservation Form", action: () => onHandoff(), primary: true },
           { label: "Compare advertising paths", action: () => handleChoosePath(true) }
         ]);
@@ -335,7 +335,7 @@ export function SalesConcierge({
       case "pricing_or_availability":
       case "self_serve_purchase":
         return {
-          text: "Reservations start at $990 USD. The Access Reserve holds first right on one category in the shared eight-seat pool and is applied as 100% media credit. It is not a live flight; nothing runs until a final insertion order names the surface.",
+          text: "Reservations start at $899 USD. The Access Reserve holds first right on one category in the shared eight-seat pool and is applied as 100% media credit. It is not a live flight; nothing runs until a final insertion order names the surface.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "Compare advertising paths", action: () => handleChoosePath(true) },
@@ -351,7 +351,7 @@ export function SalesConcierge({
         };
       case "media_kit":
         return {
-          text: "The $990 Access Reserve holds first right on one category before broader release. It is 100% media credit, not a live flight, and no media runs until a final insertion order names the surface.",
+          text: "The $899 Access Reserve holds first right on one category before broader release. It is 100% media credit, not a live flight, and no media runs until a final insertion order names the surface.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },

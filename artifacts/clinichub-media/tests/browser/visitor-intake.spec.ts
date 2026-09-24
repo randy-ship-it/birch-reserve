@@ -95,9 +95,9 @@ async function capturePublicRequests(page: Page): Promise<NetworkCapture> {
           reservationId: "7e67ef03-0c6a-4a66-a01c-8ebf89f7bfc7",
           status: "held_pending_payments",
           checkoutUrl: null,
-          amountCents: reserveBody.expectedAmountCents ?? 99000,
+          amountCents: reserveBody.expectedAmountCents ?? 89900,
           currency: "usd",
-          offer: reserveBody.offer ?? "reserve-990",
+          offer: reserveBody.offer ?? "reserve-899",
         }),
       });
       return;
@@ -173,7 +173,7 @@ test("public offer leads with the three-tier USD ladder", async ({ page }) => {
   await expect(
     page
       .getByRole("button", {
-        name: "Reserve first access - $990 USD",
+        name: "Reserve first access - $899 USD",
         exact: true,
       })
       .first(),

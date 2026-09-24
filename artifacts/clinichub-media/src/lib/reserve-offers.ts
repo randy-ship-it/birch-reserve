@@ -1,9 +1,9 @@
 export const RESERVE_OFFERS = [
   {
-    key: "reserve-990",
+    key: "reserve-899",
     name: "Access Reserve",
-    amountCents: 99_000,
-    description: "First-right planning access before a final insertion order.",
+    amountCents: 89_900,
+    description: "First-right planning access. $899 is media credit plus a category hold, before a final insertion order.",
   },
   {
     key: "pilot-4900",
@@ -21,7 +21,7 @@ export const RESERVE_OFFERS = [
 
 export type ReserveOfferKey = (typeof RESERVE_OFFERS)[number]["key"];
 
-export const DEFAULT_RESERVE_OFFER_KEY: ReserveOfferKey = "reserve-990";
+export const DEFAULT_RESERVE_OFFER_KEY: ReserveOfferKey = "reserve-899";
 
 export function getReserveOffer(key: ReserveOfferKey) {
   return RESERVE_OFFERS.find((offer) => offer.key === key) ?? RESERVE_OFFERS[0];

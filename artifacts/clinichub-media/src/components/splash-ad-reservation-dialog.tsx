@@ -38,7 +38,7 @@ const reserveSchema = z.object({
   email: z.string().trim().email("Valid email required").min(3).max(320),
   websiteUrl: z.string().trim().url("Must be a valid URL").optional().or(z.literal('')),
   buyerPath: z.enum(["auto_buy", "private_distribution"]),
-  offer: z.enum(["reserve-990", "pilot-4900", "network-9900"]),
+  offer: z.enum(["reserve-899", "pilot-4900", "network-9900"]),
 });
 
 type ReserveFormValues = z.infer<typeof reserveSchema>;

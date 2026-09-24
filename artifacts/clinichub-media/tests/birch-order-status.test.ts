@@ -19,7 +19,7 @@ test("an expired unpaid hold is terminal and does not imply a charge", () => {
   const presentation = birchOrderPresentation({
     status: "recycled",
     payment_status: "not_paid",
-    amountCents: 99000,
+    amountCents: 89900,
     currency: "usd",
   });
   assert.equal(presentation.kind, "expired");
