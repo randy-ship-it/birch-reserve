@@ -1,5 +1,5 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:24 EDT. Edit sales-brain, not this file. -->
-# RDGDH-PORTFOLIO.md — factual overview only
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:39 EDT. Edit sales-brain, not this file. -->
+# RDGDH-PORTFOLIO.md, factual overview only
 
 **Holdco:** RDG Digital Holdings Inc. (RDGDH) · https://rdgdh.com  
 **Founder:** Randy Gilling  
@@ -14,11 +14,11 @@ No invented metrics. If a number is only on an investor CIM or diligence pack, d
 | **AlignWellness** | https://alignwellness.ca | Allied health / rehab partner-location network under RDG operational control; public site cites scaled from 19 to over 80 active locations (tracking 90+ by YE 2026). |
 | **Scale Health** | https://scalehealth.ca | Digitally-native customer activation platform launching across the Align partner-location network in 2026. |
 | **Silver Birch Growth (SBG)** | https://silverbirchgrowth.com | RDGDH value-creation engine / operator bench; builds Scale Health and Birch Reserve; advertising revenue flows to Scale Health (per RDGDH schema). |
-| **Birch Reserve** | https://birchreserve.net | Automated ad-buying / recovery-economy media channel — category seats on Scale hubs (this closer’s primary product). |
+| **Birch Reserve** | https://birchreserve.net | Automated ad-buying / recovery-economy media channel, category seats on Scale hubs (this closer’s primary product). |
 | **AIforHealth Alliance** | https://rdgdh.com/portfolio/aiforhealth | Members-only alliance of North American health & wellness operators; SBG bench; holdco funnel. |
 | **Reforged** | https://getreforged.org | Indigenous-led brick-and-mortar opportunity platform; public launch sequenced after Scale Health in Fall 2026 per schema (timing = site claim; do not invent progress). |
 
-Friday paste also positions **Friday** (https://fridayapp.org) as portfolio innovation / public pilot CRM built by SBG bench — free during pilot, not monetizing yet. Treat as portfolio-adjacent product; confirm live card on rdgdh if citing as “on the portfolio page.”
+Friday paste also positions **Friday** (https://fridayapp.org) as portfolio innovation / public pilot CRM built by SBG bench, free during pilot, not monetizing yet. Treat as portfolio-adjacent product; confirm live card on rdgdh if citing as “on the portfolio page.”
 
 ## Friday CRM (ops spine)
 
@@ -32,18 +32,18 @@ Friday paste also positions **Friday** (https://fridayapp.org) as portfolio inno
 | Product | URL / note | Factual blurb from files |
 |---------|------------|--------------------------|
 | **WePrize** | weprize / Contest Bot engine; domain attach TBD (weprize.ca candidates) | Canada-first contest aggregator: friction badges before click, free board, apply assist. Tagline: “Don’t gamble with your time. We apply to free contests for you.” Former name WeContest retired. |
-| **WeFlush** | https://weflush.org (also poopmap.org redirect family) | Bathroom / flush map PWA — “Get the inside flush.” Community map product; WeFlush Bot owns. |
+| **WeFlush** | https://weflush.org (also poopmap.org redirect family) | Bathroom / flush map PWA, “Get the inside flush.” Community map product; WeFlush Bot owns. |
 | **ParKings / GetParkings** | https://getparkings.com | Toronto-first: parking-ticket screening letter (you file on toronto.ca/aps; first eligible letter free; not a law firm) + user-drop street parking map. No promised outcome. |
 
 Do not invent ARR, user counts, or “customers paying” for Friday / WePrize / WeFlush / ParKings.
 
-## Entity map (accounting primer — one sentence each)
+## Entity map (accounting primer, one sentence each)
 
-- **RDGDH** — holdco.  
+- **RDGDH**, holdco.  
 - **CHI** = Align Wellness operating company.  
-- **Scale Health** — separate from CHI sheet; demand engine.  
-- **SBG** — Silver Birch Growth; interco items FLAG until coded — do not discuss on sales calls.  
-- **DPW** — former Align opco; debts stay DPW unless Randy says otherwise — never discuss on voice closer.
+- **Scale Health**, separate from CHI sheet; demand engine.  
+- **SBG**, Silver Birch Growth; interco items FLAG until coded, do not discuss on sales calls.  
+- **DPW**, former Align opco; debts stay DPW unless Randy says otherwise, never discuss on voice closer.
 
 ## What never to mix into a Birch call
 

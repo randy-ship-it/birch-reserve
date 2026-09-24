@@ -1,5 +1,5 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:24 EDT. Edit sales-brain, not this file. -->
-# BIRCH-OFFER — public SKUs and product locks
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:39 EDT. Edit sales-brain, not this file. -->
+# BIRCH-OFFER, public SKUs and product locks
 
 **SoT:** BIRCH-RESERVE-BOT-LOCK + AD-SALES-LOCK + companion (2026-09-24).  
 **Door:** https://birchreserve.net  
@@ -7,14 +7,14 @@
 
 ## Purpose of this closer
 
-**Click-to-callback closer** for brands who request a call from birchreserve.net. Persuade toward Hold $190, Reserve $490, or Book a call. Reservation credit — not a live flight, not guaranteed impressions.
+**Click-to-callback closer** for brands who request a call from birchreserve.net. Persuade toward Hold $190, Reserve $490, or Book a call. Reservation credit, not a live flight, not guaranteed impressions.
 
 ## Public SKUs (NOW)
 
 | SKU | Price | What it is |
 |-----|-------|------------|
 | `hold-190` | **$190 USD** | 7-day category look. Does **not** consume an 8-seat. 100% credit if converted to a seat within 7 days, else cash refund. |
-| `reserve-490` | **$490 USD** | Named category seat in the 8-pool. 100% media credit. IO before flight. Credit expires 12 months. |
+| `reserve-490` | **$490 USD** | Named category seat (one of eight category seats). The full $490 is credited toward your ad placements. Insertion order (IO) before flight. Credit expires 12 months. |
 | Book a call | Custom | Multi-hub / exclusive / on-prem Align / custom package. **Cal only after a short qualifying chat or call with Randy** (no bare Cal). |
 
 ## Unpublished / legacy only
@@ -46,13 +46,13 @@ Network: signed Scale Health hubs (live proof below) plus a launching cohort of 
 ## Live proof
 
 **https://physio.drhonow.com/dr-ho/portal**  
-Caption on every mock: “Illustrative — not your receipt.”
+Caption on every mock: “Illustrative, not your receipt.”
 
 ## Formats (names only)
 
 post_checkout · recovery_plan · scheduled_service · member_hub · motion_15s
 
-## Checkout status — HARD
+## Checkout status, HARD
 
 **Checkout OFF until Gordon stamps.** Live site has blocked new offers with Gordon-pending messaging. Voice closer must:
 

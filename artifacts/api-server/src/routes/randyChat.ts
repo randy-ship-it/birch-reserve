@@ -181,6 +181,36 @@ function isRateLimited(key: string, max = RATE_LIMIT_MAX): boolean {
 type ParseOk<T> = { ok: true; body: T };
 type ParseErr = { ok: false; error: string };
 
+const WHO_ASK = /\b(who (are|r) (you|u)|who is this|who am i (talking|speaking)|your name|are you (a |an )?(ai|bot|human|real))\b/i;
+const LINK_ASK = /\b(link|url|website|site|page|send( me)?|where can i|show me|see (it|a|the|an)|kit|portal|calendar|book)\b/i;
+const REINTRO = /^\s*(hi|hey|hello)?[,!.\s]*i'?\s*a?m randy(?: gilling)?(?: from birch reserve)?[.!,:;]?\s*/i;
+
+/**
+ * Safety net on every Grok reply: no em/en dashes, and no re-introduction once
+ * Randy (or the widget opener) has already spoken, unless the visitor asked who he is.
+ */
+export function polishReply(text: string, history: ReadonlyArray<{ role: string; content: string }>): string {
+  let out = text
+    .replace(/\s+[\u2014\u2013]\s+/g, ", ")
+    .replace(/[\u2014\u2013](?=\s*$)/gm, ".")
+    .replace(/[\u2014\u2013]/g, ", ");
+  const hasSpoken = history.some((m) => m.role === "assistant");
+  const lastUser = [...history].reverse().find((m) => m.role === "user")?.content ?? "";
+  if (hasSpoken && !WHO_ASK.test(lastUser)) {
+    const stripped = out.replace(REINTRO, "");
+    if (stripped.trim()) out = stripped.charAt(0).toUpperCase() + stripped.slice(1);
+  }
+  // Link spam guard: drop a trailing bare URL line if Randy linked in either of his
+  // last two replies, unless the visitor asked for a link.
+  const recentAssistant = history.filter((m) => m.role === "assistant").slice(-2);
+  const linkedRecently = recentAssistant.some((m) => /https?:\/\//i.test(m.content));
+  if (linkedRecently && !LINK_ASK.test(lastUser)) {
+    const withoutTail = out.replace(/\n+\s*https?:\/\/\S+\s*$/i, "");
+    if (withoutTail.trim()) out = withoutTail;
+  }
+  return out.trim();
+}
+
 function clip(text: string): string {
   return text.length > MAX_CONTENT_CHARS ? `${text.slice(0, MAX_CONTENT_CHARS - 1)}…` : text;
 }
@@ -516,7 +546,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
 
   const startedAt = Date.now();
   try {
-    const text = await callGrok(systemPrompt, body, apiKey);
+    const text = polishReply(await callGrok(systemPrompt, body, apiKey), body.messages);
     const offerHandoff = inferOfferHandoff(body);
     const success: RandyChatSuccess = {
       text,

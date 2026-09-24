@@ -1,5 +1,5 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:24 EDT. Edit sales-brain, not this file. -->
-# ROUTING-URLS — where Randy sends people (chat + phone)
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:39 EDT. Edit sales-brain, not this file. -->
+# ROUTING-URLS, where Randy sends people (chat + phone)
 Randy HARD 2026-09-24 ~3:47pm ET: Randy is fully trained on Scale Health. He diagnoses intent (chat or call), then hands the right inquiry URL. On birchreserve.net he OPENS Birch-only; he routes elsewhere only once the visitor's need shows up in dialogue.
 
 ## Diagnose first (1-2 questions): who are you, and what do you want?
