@@ -22,6 +22,7 @@ import {
   type ContactInfo,
   type QualifyAnswers,
 } from "../lib/randyChatTranscripts";
+import { captureChatLead } from "../lib/leadCapture";
 
 type ChatRole = "user" | "assistant";
 
@@ -666,6 +667,8 @@ router.post("/launch/randy-chat/event", async (req, res): Promise<void> => {
     // Logged even if email is not configured; response below never echoes contact info.
     await logIntakeForSession(b.sessionId, "callback_request");
   }
+  // Single system of record (HARD 5:46pm): intake/callback → leads row + Friday push (non-blocking).
+  await captureChatLead(b.sessionId, b.type);
   if (b.type === "tel_click" || b.type === "callback_request" || b.type === "cal_shown") {
     // Await (bounded by the mailer's 10s timeout) so Autoscale can't freeze the
     // instance before the handoff email goes out.
