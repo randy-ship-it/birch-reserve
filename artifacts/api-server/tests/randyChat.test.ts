@@ -81,7 +81,9 @@ test("vendored voice-closer knowledge loads", () => {
   const dir = resolveVoiceCloserKnowledgeDir();
   assert.ok(dir, "knowledge dir should resolve");
   const prompt = loadVoiceCloserSystemPrompt(true);
-  assert.match(prompt, /FILE: SYSTEM-PROMPT\.md/);
+  // Single sales-brain prompt (dist/birch-chat.prompt.txt), not the 9-file assembly.
+  assert.match(prompt, /SURFACE: birchreserve\.net site chat/);
+  assert.doesNotMatch(prompt, /## FILE: /);
   assert.match(prompt, /NEVER-SAY|hold-190|Hold \$190/i);
   assert.doesNotMatch(prompt, /xai-[a-z0-9]{20,}/i);
 });
@@ -130,7 +132,7 @@ test("randy-chat rejects unknown fields", async () => {
 });
 
 test("randy-chat site scope is Birch Reserve only", () => {
-  assert.match(BIRCH_SITE_SCOPE_PROMPT, /Birch Reserve only/);
+  assert.match(BIRCH_SITE_SCOPE_PROMPT, /You are Randy from Birch Reserve\. Lead with Birch Reserve/);
   assert.match(BIRCH_SITE_SCOPE_PROMPT, /Never pitch the portfolio/);
   assert.match(BIRCH_SITE_SCOPE_PROMPT, /physio\.drhonow\.com/);
   assert.doesNotMatch(BIRCH_SITE_SCOPE_PROMPT, /899|50\s*MM/i);
@@ -220,7 +222,7 @@ test("assembled prompt includes verified routing, excludes do-not-route URLs and
   assert.match(prompt, /No per-session fee/i);
   assert.match(prompt, /https:\/\/scalehealth\.ca\/providers/);
   assert.match(prompt, /https:\/\/scalehealth\.ca\/clinichubs/);
-  assert.match(prompt, /ONE fitting URL/);
+  assert.match(prompt, /ONE URL that fits/);
   for (const bad of [
     "alignwellness.ca/book",
     "alignwellness.ca/careers",
@@ -365,4 +367,37 @@ test("transcript email: plain text + simple HTML with naked URLs, escaped", () =
   );
   assert.match(email.text, /Randy: Live hub: https:\/\/physio\.drhonow\.com\/dr-ho\/portal\./);
   assert.doesNotMatch(email.text + email.html, /899/);
+});
+
+test("transcript-test endpoint: 404 without env, 401 on bad token, sends with the right token", async () => {
+  const url = `${baseUrl}/launch/randy-chat/transcript-test`;
+  const prev = process.env["RANDY_CHAT_ADMIN_TOKEN"];
+  try {
+    delete process.env["RANDY_CHAT_ADMIN_TOKEN"];
+    assert.equal((await fetch(url, { method: "POST" })).status, 404);
+    process.env["RANDY_CHAT_ADMIN_TOKEN"] = "test-admin-token";
+    assert.equal((await fetch(url, { method: "POST", headers: { "x-randy-admin-token": "nope" } })).status, 401);
+    const before = sentEmails.length;
+    const ok = await fetch(url, { method: "POST", headers: { "x-randy-admin-token": "test-admin-token" } });
+    assert.equal(ok.status, 200);
+    assert.equal(sentEmails.length, before + 1);
+    assert.equal(sentEmails.at(-1)!.subject, "Birch chat transcript: Transcript test");
+  } finally {
+    if (prev === undefined) delete process.env["RANDY_CHAT_ADMIN_TOKEN"];
+    else process.env["RANDY_CHAT_ADMIN_TOKEN"] = prev;
+  }
+});
+
+test("sales-brain prompt: QA answers present, no phone digits, identity fixed", () => {
+  const prompt = loadVoiceCloserSystemPrompt(true);
+  const full = `${prompt}\n${BIRCH_SITE_SCOPE_PROMPT}`;
+  assert.doesNotMatch(full, /504|5045046526/, "no hardcoded tel digits in prompt");
+  assert.match(prompt, /No per-session fees/);
+  assert.match(prompt, /can you send me patients/i);
+  assert.match(prompt, /never "this isn't for clinics"/i);
+  assert.match(prompt, /What's Scale Health\?/);
+  assert.match(prompt, /I want to talk to someone/);
+  assert.match(prompt, /https:\/\/birchreserve\.net\/kit/);
+  assert.match(prompt, /I'm Randy from Birch Reserve/);
+  assert.doesNotMatch(prompt.replace(/Do not call yourself[^.]*\./g, "").replace(/Never “Randy’s assistant”[^\n]*/g, ""), /voice assistant/i);
 });

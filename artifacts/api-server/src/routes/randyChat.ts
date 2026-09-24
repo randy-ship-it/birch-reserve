@@ -9,11 +9,13 @@
  *
  * Auth: XAI_API_KEY (alias GROK_API_KEY). Never log or echo the key.
  */
+import { createHash, timingSafeEqual } from "node:crypto";
 import { Router, type IRouter, type Request } from "express";
 import { loadVoiceCloserSystemPrompt } from "../lib/voiceCloserKnowledge";
 import {
   ensureTranscriptSweepTimer,
   maybeSweepTranscripts,
+  sendTestTranscript,
   recordTranscript,
   sweepTranscripts,
   type ContactInfo,
@@ -99,21 +101,18 @@ const PAGE_PATH_PATTERN = /^\/[A-Za-z0-9._~/?=&%-]{0,199}$/;
 const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal";
 
 /**
- * Site scope for birchreserve.net. Layered on top of the shared voice-closer
- * pack (same brain, different front door). The vendored knowledge files are
- * untouched; this only scopes how Randy leads on this site.
+ * Thin birchreserve.net wrapper. The brain (identity, qualify flow, routing, Scale
+ * answers, NEVER-SAY) lives in src/knowledge/birch-chat.prompt.txt, vendored from
+ * /workspace/sales-brain/dist. Only widget-specific rules live here.
  */
 export const BIRCH_SITE_SCOPE_PROMPT = [
-  "SITE SCOPE (overrides any portfolio-routing or multi-brand opener in the pack): You are Randy from Birch Reserve, on birchreserve.net, and you represent Birch Reserve only.",
-  "IDENTITY (overrides any voice-assistant wording in the pack for this chat): if asked \"who are you?\" or similar, answer as Randy from Birch Reserve: \"I'm Randy from Birch Reserve. I help brands get a category seat inside recovery hubs. What are you working on?\" Do not call yourself Randy's voice assistant, Randy's assistant, or Randy Gilling. If asked directly whether you are an AI or a bot, say yes, you're an AI version of Randy from Birch Reserve, and offer a call with the team; never claim to be human. Never describe yourself or the process with internal team labels, role nicknames, or process jargon.",
-  "Lead with Birch Reserve category seats inside the recovery hubs. Do not open with or offer a menu of brands (no \"Birch, Scale, Align, or something else\").",
-  "Use Scale Health, Align Wellness, or RDGDH knowledge only if the visitor raises it themselves (for example \"what are the hubs?\"); answer briefly and bring it back to the Birch seat. Never pitch the portfolio or other companies.",
-  "ROUTING (ROUTING-URLS.md): diagnose who the visitor is and what they want in 1-2 short questions. Once the need is clear, give exactly ONE fitting URL from the verified ROUTING-URLS.md table, written as a full https:// URL on its own (the widget turns it into a link). Never give any URL or sub-path that is not in that table, never make up paths, and never list several URLs at once. If nothing fits, offer the live line or a callback.",
-  "Public prices are Hold $190 (7-day look) and Reserve $490 (the seat) only. Never mention any other price or SKU. Online checkout is off: never invent checkout or payment links.",
-  "Never claim reach, impression, CTR, unique-visitor, or audience-size numbers to a brand buyer, and never guarantee patient outcomes.",
-  `Live proof of a hub surface: ${LIVE_HUB_PROOF_URL}. Share it when the visitor asks to see a live hub.`,
-  "Human path: the next step is an AI call first. The visitor can tap \"Get a call from Randy's AI now\" (+1 (504) 504-6526) or leave a number for a callback in this chat. Only point to the calendar https://cal.com/randy-gilling/30min after a few qualifying questions (company, category, who they want to reach, timing or budget) AND after they have taken the call or callback step.",
-  "If the visitor gives a phone number or email, thank them and confirm Randy's team will follow up. Do not repeat it back in full.",
+  "WIDGET RULES (birchreserve.net chat): You are Randy from Birch Reserve. Lead with Birch Reserve category seats; never open with a menu of brands.",
+  "Never pitch the portfolio or other companies unprompted.",
+  `Live proof hub: ${LIVE_HUB_PROOF_URL} (share when they ask to see a live hub or who sees the ads).`,
+  "When the visitor raises Scale Health, Align, clinics, providers, or care, answer properly from the brain (never brush them off) and give the ONE routing URL that fits.",
+  "Links: write each as a full https:// URL on its own; the widget makes it clickable. Only URLs from the routing table.",
+  "Never type a phone number: the chat's Call button and callback form carry it. The human path is qualify (2-3 questions), then the AI call or a callback, then the calendar only after both.",
+  "Public prices: Hold $190 and Reserve $490 only. Checkout is off: never invent payment links. No reach, impression, CTR, or audience-size numbers.",
 ].join(" ");
 
 const CHIP_INTENT_NOTES: Record<string, string> = {
@@ -123,7 +122,7 @@ const CHIP_INTENT_NOTES: Record<string, string> = {
     "Visitor tapped \"Hold a category $190\": explain the $190 7-day hold vs $490 Reserve, note checkout is off, and ask which category to hold.",
   live_hub: `Visitor tapped \"See a live hub\": share ${LIVE_HUB_PROOF_URL} as the live proof, then ask what category they would want there.`,
   talk_human:
-    "Visitor tapped \"Talk to a human\": offer the AI call now (+1 (504) 504-6526) or a callback in this chat, and ask one quick qualifying question.",
+    "Visitor tapped \"Talk to a human\": say you can set that up, ask the first quick question (company or brand), and mention the AI call or a callback come right after.",
 };
 
 const requestBuckets = new Map<
@@ -593,12 +592,42 @@ router.post("/launch/randy-chat/event", async (req, res): Promise<void> => {
     ...(b.pagePath ? { pagePath: b.pagePath } : {}),
   });
   if (b.type === "tel_click" || b.type === "callback_request" || b.type === "cal_shown") {
-    void sweepTranscripts({ onlyId: b.sessionId }).catch(() => undefined);
+    // Await (bounded by the mailer's 10s timeout) so Autoscale can't freeze the
+    // instance before the handoff email goes out.
+    await sweepTranscripts({ onlyId: b.sessionId }).catch((error) =>
+      req.log?.warn({ err: error }, "Randy chat handoff transcript send failed"),
+    );
   } else {
     maybeSweepTranscripts();
   }
   req.log?.info({ type: b.type, messageCount: b.messages.length }, "Randy chat event");
   res.status(200).json({ ok: true });
+});
+
+/**
+ * Post-publish smoke test: POST /api/launch/randy-chat/transcript-test with header
+ * x-randy-admin-token equal to env RANDY_CHAT_ADMIN_TOKEN. 404 when the env is unset.
+ */
+router.post("/launch/randy-chat/transcript-test", async (req, res): Promise<void> => {
+  const expected = process.env["RANDY_CHAT_ADMIN_TOKEN"]?.trim();
+  if (!expected) {
+    res.status(404).json({ error: "Not found." });
+    return;
+  }
+  const given = String(req.get("x-randy-admin-token") ?? "");
+  const a = createHash("sha256").update(given).digest();
+  const b = createHash("sha256").update(expected).digest();
+  if (!timingSafeEqual(a, b)) {
+    res.status(401).json({ error: "Unauthorized." });
+    return;
+  }
+  try {
+    const result = await sendTestTranscript();
+    res.status(result.sent ? 200 : 503).json(result);
+  } catch (error) {
+    req.log?.warn({ err: error }, "Randy chat test transcript failed");
+    res.status(502).json({ sent: false, reason: "send_failed" });
+  }
 });
 
 export default router;

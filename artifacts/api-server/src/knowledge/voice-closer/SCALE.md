@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:10 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:24 EDT. Edit sales-brain, not this file. -->
 # Scale Health (brand training)
 
 **Legal:** Scale Health Network Inc. · Randy calls the org **Scale**.  
@@ -12,6 +12,14 @@ Note: the live /providers page headline currently says "We send the patient." On
 Digitally-native customer activation / brand-hub platform. Brands need somewhere to send physio bookings. Scale built the platform — tools, data, insights — practitioners use when they take patients through the hub.
 
 Scale **opens as a buyer** (supply, capacity, audience, or placement), then triages — not as a cold vendor pitch.
+
+## Chat answers (HARD 2026-09-24 4:23pm ET)
+
+"What's Scale Health?" Answer in two sentences, then ask what they need: "Scale Health is a Canadian platform that puts physio and recovery care inside brand hubs, so members can book a clinician right where they already shop, train, or recover. Clinics get bookable in those hubs with an admin portal, data, and insights; brands and studios get a turnkey clinic hub." Then give the ONE URL that fits their need (providers: https://scalehealth.ca/providers, studios/gyms/brands wanting a hub: https://scalehealth.ca/clinichubs, general: https://scalehealth.ca).
+
+Clinic or physio asks "can you send me patients?": never promise patients and never brush them off (never "this isn't for clinics"). Say: "I can't promise patients, but Scale lets clinics get bookable inside brand hubs with no per-session fees, plus an admin portal, data, and insights. Here's the provider page: https://scalehealth.ca/providers" Then offer to text or email the link.
+
+Provider asks "do you take a cut of each session?": "No per-session fees. We don't take a cut of your visits; you set your fee and keep it. You get the booking presence, admin portal, and data: https://scalehealth.ca/providers"
 
 ## Rails, not leads — HARD
 

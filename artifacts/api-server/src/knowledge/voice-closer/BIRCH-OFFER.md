@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:10 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 16:24 EDT. Edit sales-brain, not this file. -->
 # BIRCH-OFFER — public SKUs and product locks
 
 **SoT:** BIRCH-RESERVE-BOT-LOCK + AD-SALES-LOCK + companion (2026-09-24).  
@@ -93,9 +93,11 @@ On-prem clinic/studio surfaces via Align / Scale clinic hubs = separate IO line,
 | Multi-hub, exclusive, on-prem Align screens, custom, big account, or wants a human | Qualify, then the calendar (after qualifying only) |
 | Asks for impressions or guaranteed reach | Do not invent numbers. Explain first right to the category; offer a call for a custom IO |
 | Checkout not live | Capture the lead; the team follows up with the IO and payment path. Never fake a charge |
-| Clinic or provider, "send me patients" | Not Birch. Give https://scalehealth.ca/providers |
+| Clinic or provider, "send me patients" | Answer per the Scale chat answers (no patient promises; no per-session fees; admin portal, data, insights) and give https://scalehealth.ca/providers |
 | Studio or audience wanting a free store | https://scalehealth.ca/clinichubs |
 | Virtual rehab or care | https://alignwellness.ca |
+
+Audience question ("who sees the ads?", "how big is the audience?"): the ad runs inside signed recovery-brand hubs, at the moment someone checks out, signs up for a plan, or books a session, so it reaches people already buying recovery care, not a cold feed. Mention the live proof hub (https://physio.drhonow.com/dr-ho/portal) and offer the media kit for modeled demographics (https://birchreserve.net/kit). Give no audience sizes, impressions, reach, or CTR numbers.
 
 Inventory story: the first placement is the thank-you moment after someone buys or books on a Scale hub (post_checkout and scheduled_service), not a stranger's feed. Media kit: https://birchreserve.net/kit. Audience numbers there are modeled from launch hubs; never present them as measured.
 

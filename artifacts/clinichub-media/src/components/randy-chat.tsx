@@ -509,6 +509,10 @@ export function RandyChat() {
       role: "user",
       text: `Please call me back at ${callbackPhone.trim()}${callbackName.trim() ? ` (${callbackName.trim()})` : ""}.`,
     });
+    if (qualified) {
+      // Ack first so it lands before the calendar message the call step unlocks.
+      pushMessages({ id: newId(), role: "randy", text: "Got it, thanks. Randy's team will call you back shortly." });
+    }
     const ok = await markCallStep("callback_request", {
       phone: callbackPhone.trim(),
       ...(callbackName.trim() ? { name: callbackName.trim() } : {}),
@@ -534,8 +538,6 @@ export function RandyChat() {
       });
       setQualifyStep(0);
       pushMessages({ id: newId(), role: "randy", text: QUALIFY_QUESTIONS[0]!.prompt });
-    } else {
-      localReply("Got it, thanks. Randy's team will call you back shortly.");
     }
   };
 

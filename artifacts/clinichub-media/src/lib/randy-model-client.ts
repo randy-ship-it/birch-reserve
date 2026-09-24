@@ -15,6 +15,7 @@
 
 import {
   CHECKOUT_LIVE,
+  RANDY_TEL_DISPLAY,
   LIVE_HUB_PROOF_URL,
   PUBLIC_SKU_KEYS,
   VOICE_CLOSER_KNOWLEDGE_SOT,
@@ -126,7 +127,7 @@ async function stubRandyReply(
 
   if (chip === "talk_human" || /\b(call|human|phone)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "Happy to connect you live. Tap Call for +1 (504) 504-6526. After a couple of quick questions here I can also open the calendar.",
+      text: `Happy to connect you live. Tap Call for ${RANDY_TEL_DISPLAY}. After a couple of quick questions here I can also open the calendar.`,
       source: "stub",
       offerHandoff: true,
     };

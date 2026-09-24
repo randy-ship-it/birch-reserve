@@ -84,7 +84,8 @@ const MAX_STORED_MESSAGES = 200;
 const MAX_EVENTS = 50;
 
 export const HANDOFF_EVENTS = new Set(["tel_click", "callback_request", "cal_shown"]);
-const RANDY_TEL_DIGITS = "5045046526";
+/** Our own line (env RANDY_TEL when the Toronto number lands), skipped when extracting visitor phones. */
+const RANDY_TEL_DIGITS = (process.env["RANDY_TEL"] ?? "+15045046526").replace(/\D/g, "").slice(-10);
 
 /* ------------------------------------------------------------------ */
 /* Pure helpers                                                        */
@@ -609,6 +610,27 @@ export async function recordTranscript(update: Omit<TranscriptUpdate, "now"> & {
 }
 
 export type SweepResult = { sent: number; failed: number; skipped?: "resend_not_configured" | "disabled" };
+
+/**
+ * Admin smoke test after publish: sends one sample transcript through the real mailer
+ * (same from/to/subject format). Does not touch the sessions table.
+ */
+export async function sendTestTranscript(now: Date = new Date()): Promise<{ sent: boolean; reason?: string }> {
+  if (!mailerReady()) return { sent: false, reason: "resend_not_configured" };
+  const id = `test-${now.getTime()}`;
+  const session = applyUpdate(undefined, {
+    id,
+    now,
+    messages: [
+      { role: "assistant", content: "Hey, I'm Randy. Want to see how a seat inside the recovery hubs works?" },
+      { role: "user", content: "Test transcript from the admin endpoint." },
+    ],
+    qualify: { company: "Transcript test" },
+    event: "callback_request",
+  });
+  await mailer(renderTranscriptEmail(session));
+  return { sent: true };
+}
 
 /** Send every due transcript (or just `onlyId`). Idempotent; safe to call often. */
 export async function sweepTranscripts(opts: { now?: Date; onlyId?: string } = {}): Promise<SweepResult> {
