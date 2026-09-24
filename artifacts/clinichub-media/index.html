@@ -60,6 +60,46 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=IBM+Plex+Sans:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <!-- Freshness: never run a stale cached shell/bundle (HARD 2026-09-24 3:56pm ET). -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <script>
+      (function () {
+        try {
+          if ("serviceWorker" in navigator && navigator.serviceWorker.getRegistrations) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+              regs.forEach(function (r) { r.unregister(); });
+            }).catch(function () {});
+          }
+        } catch (e) {}
+        // If this page is running an older bundle than the server now serves, reload once.
+        var KEY = "birch:bundle-reload-at";
+        function currentBundle() {
+          var s = document.querySelector('script[type="module"][src*="/assets/index-"]');
+          return s ? s.getAttribute("src") : null;
+        }
+        function check() {
+          var cur = currentBundle();
+          if (!cur || !window.fetch) return;
+          fetch("/?__fresh=" + Date.now(), { cache: "no-store", credentials: "same-origin" })
+            .then(function (r) { return r.ok ? r.text() : ""; })
+            .then(function (html) {
+              var m = html.match(/\/assets\/index-[A-Za-z0-9_-]+\.js/);
+              if (!m || cur.indexOf(m[0]) !== -1) return;
+              var last = Number(sessionStorage.getItem(KEY) || 0);
+              if (Date.now() - last < 60000) return;
+              sessionStorage.setItem(KEY, String(Date.now()));
+              location.reload();
+            })
+            .catch(function () {});
+        }
+        window.addEventListener("load", function () { setTimeout(check, 1500); });
+        document.addEventListener("visibilitychange", function () {
+          if (document.visibilityState === "visible") check();
+        });
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

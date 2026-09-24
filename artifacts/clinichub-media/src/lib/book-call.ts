@@ -2,7 +2,7 @@
  * Book a call URL locks — HARD Randy 2026-09-24 ~3:00pm ET.
  *
  * Primary "Book a call" CTAs must OPEN/FOCUS the Randy chat widget for
- * pre-screen dialogue. Do NOT navigate straight to Cal (never cold-dump).
+ * qualifying dialogue. Do NOT navigate straight to Cal (never cold-dump).
  *
  * Cal is ONLY offered in-thread after qualification
  * (2–3 smart discovery turns OR clear fit) OR after Hear Randy / Call

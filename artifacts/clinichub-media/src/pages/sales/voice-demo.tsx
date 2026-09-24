@@ -107,13 +107,13 @@ export default function VoiceDemo() {
 
       <div className="mt-12 border-t border-border pt-8">
         <p className="text-muted-foreground">
-          Prefer a chat pre-screen (Cal unlocks after qualify) instead of the voice line?
+          Prefer to chat with Randy first instead of the voice line?
         </p>
         <button
           type="button"
           onClick={() => {
             trackCta("cta_book_call");
-            // Pre-screen in Randy chat — Cal only after qualification in-thread.
+            // Qualify in Randy chat — Cal only after qualification in-thread.
             openRandyChat({ reason: "voice-demo", mode: "chat" });
           }}
           className="mt-3 inline-block border border-border px-4 py-2 text-xs font-medium uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent"

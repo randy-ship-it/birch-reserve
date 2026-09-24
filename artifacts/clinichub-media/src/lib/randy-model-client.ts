@@ -77,7 +77,7 @@ async function stubRandyReply(
 
   if (req.mode === "hear") {
     return {
-      text: "Hear Randy text is live when Grok is on; in-widget Eve/Grok voice is next. Stay in Chat or tap Call for the live phone closer.",
+      text: "Voice is coming soon. Keep chatting here, or tap Call for the live line.",
       source: "stub",
       offerHandoff: true,
     };
@@ -124,7 +124,7 @@ async function stubRandyReply(
   }
 
   return {
-    text: "Got it. Which category are you thinking about for the recovery hubs? Call is there whenever you want it; the calendar opens after a quick pre-screen.",
+    text: "Got it. Which category are you thinking about for the recovery hubs? Call is there whenever you want it.",
     source: "stub",
     offerHandoff: stubOfferHandoff(req),
   };
@@ -207,6 +207,6 @@ export async function startRandyVoiceSession(): Promise<RandyVoiceSession> {
     status: "eve_pending",
     reason: "Eve / Grok realtime voice not wired yet — text Grok still serves Hear mode.",
     uiNote:
-      "Hear Randy: text via Grok when AI is on; live Eve/Grok voice is next. Call uses the phone closer now.",
+      "Voice coming soon. Chat here, or tap Call for the live line.",
   };
 }
