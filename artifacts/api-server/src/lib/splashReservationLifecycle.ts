@@ -12,6 +12,7 @@ import type Stripe from "stripe";
 import {
   createStripeCheckoutSession,
   expireStripeCheckoutSession,
+  isDefinitelyUncreatedStripeCheckoutError,
   retrieveStripePaymentIntent,
   retrieveStripeCheckoutSession,
 } from "./stripeClient";
@@ -1125,11 +1126,18 @@ async function reconcileCheckoutCreation(
     return "skipped";
   }
 
+  let createRejected = false;
   try {
-    const recovered = await createStripeCheckoutSession(
-      reservation.checkoutRequest as Stripe.Checkout.SessionCreateParams,
-      reservation.checkoutIdempotencyKey,
-    );
+    let recovered: Stripe.Checkout.Session;
+    try {
+      recovered = await createStripeCheckoutSession(
+        reservation.checkoutRequest as Stripe.Checkout.SessionCreateParams,
+        reservation.checkoutIdempotencyKey,
+      );
+    } catch (createError) {
+      createRejected = isDefinitelyUncreatedStripeCheckoutError(createError);
+      throw createError;
+    }
     const session = await retrieveStripeCheckoutSession(recovered.id);
     if (
       session.metadata?.reservationId !== reservation.id ||
@@ -1192,6 +1200,31 @@ async function reconcileCheckoutCreation(
     }
     throw new Error(`Stripe checkout remains ${session.status ?? "unresolved"}.`);
   } catch (error) {
+    if (createRejected) {
+      // Replaying the stored request was rejected outright, so no session
+      // exists. Hand the row to the unpaid-hold sweep instead of stranding
+      // the seat in checkout_creating forever.
+      const [released] = await db
+        .update(splashAdReservationsTable)
+        .set({
+          status: "seat_held",
+          paymentStatus: "failed",
+          lifecycleReason: "checkout_create_rejected",
+          checkoutRecoveryError: recoveryError(error),
+          checkoutRecoveryAttemptedAt: now,
+        })
+        .where(
+          and(
+            eq(splashAdReservationsTable.id, reservation.id),
+            eq(splashAdReservationsTable.status, "payment_pending"),
+            eq(splashAdReservationsTable.paymentStatus, "checkout_creating"),
+            eq(splashAdReservationsTable.checkoutAttempt, reservation.checkoutAttempt),
+            isNull(splashAdReservationsTable.stripeCheckoutSessionId),
+          ),
+        )
+        .returning({ id: splashAdReservationsTable.id });
+      return released ? "reconciled" : "skipped";
+    }
     await db
       .update(splashAdReservationsTable)
       .set({

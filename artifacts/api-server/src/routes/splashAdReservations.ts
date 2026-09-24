@@ -28,6 +28,7 @@ import {
   createStripeCheckoutSession,
   expireStripeCheckoutSession,
   getStripeClient,
+  isDefinitelyUncreatedStripeCheckoutError,
   isStripeSecretConfigured,
   retrieveStripeCheckoutSession,
 } from "../lib/stripeClient";
@@ -97,7 +98,7 @@ function createActivationToken(): string {
 
 function configuredPublicAppUrl(): string | null {
   const configured =
-    process.env.PUBLIC_BASE_URL?.trim() ??
+    process.env.PUBLIC_BASE_URL?.trim() ||
     process.env.SPLASH_AD_PUBLIC_URL?.trim();
   if (configured) {
     try {
@@ -846,6 +847,29 @@ router.post(
                   lifecycleReason: "checkout_reconciliation_required",
                 },
           )
+          .where(
+            and(
+              eq(splashAdReservationsTable.id, claimedReservation.id),
+              eq(splashAdReservationsTable.status, "payment_pending"),
+              eq(splashAdReservationsTable.paymentStatus, "checkout_creating"),
+              eq(splashAdReservationsTable.checkoutAttempt, 1),
+            ),
+          );
+      } else if (isDefinitelyUncreatedStripeCheckoutError(error)) {
+        // Stripe rejected the create (for example an invalid Price ID), so no
+        // session exists. Mark the claim failed so the unpaid-hold sweep
+        // releases the seat instead of stranding it in checkout_creating.
+        await db
+          .update(splashAdReservationsTable)
+          .set({
+            status: "seat_held",
+            paymentStatus: "failed",
+            lifecycleReason: "checkout_create_rejected",
+            checkoutRecoveryError: (error instanceof Error
+              ? error.message
+              : "Stripe rejected the checkout request."
+            ).slice(0, 500),
+          })
           .where(
             and(
               eq(splashAdReservationsTable.id, claimedReservation.id),

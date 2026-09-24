@@ -23,7 +23,12 @@ import {
   recordSplashCreativeReceipt,
 } from "../src/lib/splashReservationLifecycle";
 import { sendCreativeDeadlineSlackWarning } from "../src/lib/splashAdReserveAlerts";
-import { setStripeCheckoutFunctionsForTests } from "../src/lib/stripeClient";
+import Stripe from "stripe";
+import {
+  StripeProxyError,
+  isDefinitelyUncreatedStripeCheckoutError,
+  setStripeCheckoutFunctionsForTests,
+} from "../src/lib/stripeClient";
 import { setSalesStaffIdentityProviderForTests } from "../src/lib/salesStaffAccess";
 
 const createdReservationIds: string[] = [];
@@ -2328,4 +2333,220 @@ test("recording paid creative is idempotent and prevents 72-hour recycling", asy
     },
   );
   assert.ok([401, 403].includes(unauthorized.status));
+});
+
+function rejectedPriceError(): Error {
+  return new Stripe.errors.StripeInvalidRequestError({
+    message: "No such price: 'price_not_in_this_account'",
+    type: "invalid_request_error",
+    statusCode: 400,
+  } as never);
+}
+
+test("only definite Stripe create rejections count as an uncreated checkout", () => {
+  assert.equal(isDefinitelyUncreatedStripeCheckoutError(rejectedPriceError()), true);
+  assert.equal(
+    isDefinitelyUncreatedStripeCheckoutError(
+      new StripeProxyError("No such price", 400, {}),
+    ),
+    true,
+  );
+  assert.equal(
+    isDefinitelyUncreatedStripeCheckoutError(
+      new Stripe.errors.StripeIdempotencyError({
+        message: "Keys for idempotent requests can only be used with the same parameters",
+        type: "idempotency_error",
+        statusCode: 400,
+      } as never),
+    ),
+    false,
+  );
+  assert.equal(
+    isDefinitelyUncreatedStripeCheckoutError(
+      new Stripe.errors.StripeRateLimitError({ message: "slow down", statusCode: 429 } as never),
+    ),
+    false,
+  );
+  assert.equal(
+    isDefinitelyUncreatedStripeCheckoutError(
+      new StripeProxyError("conflict", 409, {}),
+    ),
+    false,
+  );
+  assert.equal(
+    isDefinitelyUncreatedStripeCheckoutError(new Error("socket hang up")),
+    false,
+  );
+});
+
+async function withLiveReserveCheckout<T>(run: () => Promise<T>): Promise<T> {
+  const keys = [
+    "STRIPE_CHECKOUT_DISABLED",
+    "STRIPE_SECRET_KEY",
+    "SPLASH_AD_PUBLIC_URL",
+    "PUBLIC_BASE_URL",
+    "SEATS_TOTAL",
+    "STRIPE_PRICE_RESERVE_490",
+  ] as const;
+  const previous = Object.fromEntries(keys.map((key) => [key, process.env[key]]));
+  process.env.STRIPE_CHECKOUT_DISABLED = "false";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
+  process.env.PUBLIC_BASE_URL = "";
+  process.env.SPLASH_AD_PUBLIC_URL = "https://reserve.example.com";
+  process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_PRICE_RESERVE_490 = "price_not_in_this_account";
+  try {
+    return await run();
+  } finally {
+    setStripeCheckoutFunctionsForTests();
+    for (const key of keys) {
+      if (previous[key] === undefined) delete process.env[key];
+      else process.env[key] = previous[key];
+    }
+  }
+}
+
+async function postReserve490(email: string) {
+  const response = await fetch(`${baseUrl}/launch/splash/reserve`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      brandName: "Rejected Price QA",
+      email,
+      expectedAmountCents: 49000,
+      expectedCurrency: "usd",
+      offer: "reserve-490",
+    }),
+  });
+  const receipt = (await response.json()) as {
+    reservationId: string;
+    status: string;
+    checkoutUrl: string | null;
+  };
+  createdReservationIds.push(receipt.reservationId);
+  return { response, receipt };
+}
+
+test("reserve-490 whose Stripe Price is rejected releases the seat instead of stranding it", async () => {
+  await withLiveReserveCheckout(async () => {
+    let capturedPrice: unknown;
+    let capturedSuccessUrl: unknown;
+    setStripeCheckoutFunctionsForTests({
+      create: async (params) => {
+        capturedPrice = params.line_items?.[0]?.price;
+        capturedSuccessUrl = params.success_url;
+        throw rejectedPriceError();
+      },
+    });
+
+    const { response, receipt } = await postReserve490(
+      `rejected-price-${randomUUID()}@example.com`,
+    );
+    assert.equal(response.status, 202);
+    assert.equal(receipt.status, "held_pending_payments");
+    assert.equal(receipt.checkoutUrl, null);
+    assert.equal(capturedPrice, "price_not_in_this_account");
+    // An empty PUBLIC_BASE_URL falls through to SPLASH_AD_PUBLIC_URL.
+    assert.match(String(capturedSuccessUrl), /^https:\/\/reserve\.example\.com\//);
+
+    const [row] = await db
+      .select()
+      .from(splashAdReservationsTable)
+      .where(eq(splashAdReservationsTable.id, receipt.reservationId));
+    assert.equal(row?.status, "seat_held");
+    assert.equal(row?.paymentStatus, "failed");
+    assert.equal(row?.lifecycleReason, "checkout_create_rejected");
+    assert.match(row?.checkoutRecoveryError ?? "", /No such price/);
+    assert.equal(row?.stripeCheckoutSessionId, null);
+
+    const later = new Date(Date.now() + 21 * 60 * 1000);
+    const swept = await cleanupSplashReservations({
+      now: later,
+      reservationIds: [receipt.reservationId],
+    });
+    assert.equal(swept.expiredUnpaid, 1);
+    const [expired] = await db
+      .select()
+      .from(splashAdReservationsTable)
+      .where(eq(splashAdReservationsTable.id, receipt.reservationId));
+    assert.equal(expired?.status, "expired");
+    assert.equal(expired?.lifecycleReason, "unpaid_hold_timeout");
+  });
+});
+
+test("reserve-490 with an ambiguous Stripe failure still waits for reconciliation", async () => {
+  await withLiveReserveCheckout(async () => {
+    setStripeCheckoutFunctionsForTests({
+      create: async () => {
+        throw new Error("socket hang up");
+      },
+    });
+    const { response, receipt } = await postReserve490(
+      `ambiguous-${randomUUID()}@example.com`,
+    );
+    assert.equal(response.status, 202);
+    const [row] = await db
+      .select()
+      .from(splashAdReservationsTable)
+      .where(eq(splashAdReservationsTable.id, receipt.reservationId));
+    assert.equal(row?.status, "payment_pending");
+    assert.equal(row?.paymentStatus, "checkout_creating");
+    assert.equal(row?.lifecycleReason, "checkout_reconciliation_required");
+  });
+});
+
+test("checkout recovery releases a stranded claim when Stripe rejects the stored request", async () => {
+  const old = new Date(Date.now() - 21 * 60 * 1000);
+  const [reservation] = await db
+    .insert(splashAdReservationsTable)
+    .values({
+      email: `stranded-${randomUUID()}@example.com`,
+      status: "payment_pending",
+      offerKey: "reserve-490",
+      amountCents: 49000,
+      currency: "usd",
+      source: "birch_reserve_public_checkout",
+      paymentStatus: "checkout_creating",
+      creativeStatus: "locked",
+      checkoutAttempt: 1,
+      checkoutRequest: {
+        mode: "payment",
+        line_items: [{ price: "price_not_in_this_account", quantity: 1 }],
+        success_url: "https://reserve.example.com/success",
+        cancel_url: "https://reserve.example.com/cancel",
+      },
+      checkoutIdempotencyKey: `stranded:${randomUUID()}`,
+      checkoutAttemptStartedAt: old,
+      lifecycleReason: "checkout_reconciliation_required",
+      inventoryHeldAt: old,
+      createdAt: old,
+      updatedAt: old,
+      followUpBy: old,
+    })
+    .returning();
+  assert.ok(reservation);
+  createdReservationIds.push(reservation.id);
+
+  setStripeCheckoutFunctionsForTests({
+    create: async () => {
+      throw rejectedPriceError();
+    },
+  });
+  try {
+    const result = await cleanupSplashReservations({
+      now: new Date(),
+      reservationIds: [reservation.id],
+    });
+    assert.equal(result.reconciledCheckouts, 1);
+    assert.equal(result.expiredUnpaid, 1);
+    const [released] = await db
+      .select()
+      .from(splashAdReservationsTable)
+      .where(eq(splashAdReservationsTable.id, reservation.id));
+    assert.equal(released?.status, "expired");
+    assert.equal(released?.paymentStatus, "failed");
+    assert.match(released?.checkoutRecoveryError ?? "", /No such price/);
+  } finally {
+    setStripeCheckoutFunctionsForTests();
+  }
 });
