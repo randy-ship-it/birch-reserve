@@ -645,7 +645,8 @@ test("machine surfaces expose text, JSON, YAML, and fixed USD contracts", async 
   assert.match(llmsText, /reserve-490/);
   assert.match(llmsText, /\$190 USD/);
   assert.match(llmsText, /\$490 USD/);
-  assert.match(llmsText, /unpublished\/legacy/);
+  assert.doesNotMatch(llmsText, /899/);
+  assert.doesNotMatch(llmsText, /Book a call/);
   assert.doesNotMatch(llmsText, /\$4,900/);
   assert.doesNotMatch(llmsText, /\$9,900/);
   assert.doesNotMatch(llmsText, /reserve-990/);

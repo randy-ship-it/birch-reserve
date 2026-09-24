@@ -110,7 +110,7 @@ function formatTel(href: string): string {
 /** Short label for a safe href (never the full URL). */
 export function labelForHref(href: string): string {
   if (href.startsWith("tel:")) return formatTel(href);
-  if (href.startsWith("mailto:")) return "email Randy's team";
+  if (href.startsWith("mailto:")) return "email sales";
   let u: URL;
   try {
     u = new URL(href);
