@@ -1,10 +1,8 @@
 /**
  * Site mail core (Resend) + Reply-To policy (Randy 7:27pm).
  *
- *   BIRCH_REPLY_TO (env, default unset = OFF): when set to a valid address it is the
- *   Reply-To on every BUYER-facing email the site sends (sendBuyerEmail). Unset or
- *   invalid means no Reply-To header (Emma 7:37pm: sales@ auto-replies with an old
- *   commission-jobs message, so the sales@ default is on hold). Internal lead / transcript
+ *   BIRCH_REPLY_TO (env, default sales@silverbirchgrowth.com): Reply-To on every
+ *   BUYER-facing email the site sends (sendBuyerEmail). Internal lead / transcript
  *   notifications keep going TO randy@ + jon@ with Reply-To = the visitor, unchanged.
  *
  * Today the site itself sends no buyer-facing email: Stripe sends checkout receipts
@@ -12,7 +10,7 @@
  * the linger capture delivers the media kit in-page, and intake confirmations are
  * on-screen. Any future buyer email must go through sendBuyerEmail so Reply-To is enforced.
  */
-export const DEFAULT_BIRCH_REPLY_TO = "";
+export const DEFAULT_BIRCH_REPLY_TO = "sales@silverbirchgrowth.com";
 export const RESEND_ENDPOINT = "https://api.resend.com/emails";
 
 const EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
@@ -84,8 +82,7 @@ export async function resendSend(mail: SiteMail): Promise<{ id: string | null }>
   }
 }
 
-/** Buyer-facing email: Reply-To is BIRCH_REPLY_TO when set (never the caller's choice); unset = no Reply-To. */
+/** Buyer-facing email: Reply-To is always BIRCH_REPLY_TO (never the caller's choice). */
 export async function sendBuyerEmail(mail: Omit<SiteMail, "replyTo">): Promise<{ id: string | null }> {
-  const replyTo = birchReplyTo();
-  return resendSend({ ...mail, ...(replyTo ? { replyTo } : {}) });
+  return resendSend({ ...mail, replyTo: birchReplyTo() });
 }
