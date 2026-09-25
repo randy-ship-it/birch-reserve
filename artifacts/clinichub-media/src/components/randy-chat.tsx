@@ -1,7 +1,7 @@
 /**
  * Chat Randy widget. Grok text via /api/launch/randy-chat.
  *
- * Header: Randy · Birch Reserve, online dot, Call pill (tel). Voice tab hidden until voice ships.
+ * Header: Randy · Birch Reserve, online dot, Call pill (tel). Hear Randy = ElevenLabs ConvAI widget (layout, bottom-left).
  * HARD 2026-09-24 3:31–3:33pm ET: birchreserve.net = Birch Reserve only (opener + chips).
  * Full-body Randy (/avatars/randy-fullbody.png, transparent cutout) stands bottom-right
  * on a floating WHITE card (never navy behind him), object-fit: contain, bottom center:

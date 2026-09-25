@@ -59,7 +59,7 @@ export type RandyVoiceSession =
       ok: false;
       reason: string;
       status: "eve_pending";
-      /** Clear UI copy for Hear Randy while realtime voice is next PR. */
+      /** Legacy stub note; Hear Randy is the ElevenLabs ConvAI widget (layout). */
       uiNote: string;
     };
 
@@ -342,17 +342,16 @@ export function beaconRandyEvent(evt: RandyChatEvent): void {
 }
 
 /**
- * Hear Randy voice session — Eve / Grok realtime is next PR.
- * Returns structured eve_pending so UI can label progress clearly.
- * Text replies still go through requestRandyReply (Grok when available).
+ * Legacy stub — Hear Randy voice is the ElevenLabs ConvAI widget mounted in layout
+ * (agent_id via ELEVENLABS_RANDY_AGENT_ID). randy-chat Mode is chat|call only;
+ * this helper is unused by UI. Kept for type compatibility / tests.
  */
 export async function startRandyVoiceSession(): Promise<RandyVoiceSession> {
-  // TODO(next PR): Wire Grok / Eve realtime voice in-widget (WebRTC or xAI voice).
   return {
     ok: false,
     status: "eve_pending",
-    reason: "Eve / Grok realtime voice not wired yet — text Grok still serves Hear mode.",
+    reason: "In-widget Eve/Grok voice unused — Hear Randy is ElevenLabs ConvAI widget.",
     uiNote:
-      "Voice coming soon. Chat here, or tap Call for the live phone line.",
+      "Use Hear Randy (bottom-left) for voice, or Call for the live phone line.",
   };
 }

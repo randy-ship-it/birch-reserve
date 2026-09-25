@@ -5,6 +5,7 @@ import birchReserveMark from '@assets/brand/birch-reserve-mark-v2.svg';
 import { SELLER_EMAIL_HREF, SELLER_IDENTITY } from '@/lib/seller-identity';
 import { trackCta } from '@/lib/track-cta';
 import { RandyChat } from '@/components/randy-chat';
+import { HearRandyElevenLabs } from '@/components/hear-randy-elevenlabs';
 import { LingerCapture } from '@/components/linger-capture';
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -151,8 +152,9 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
       </footer>
 
-      {/* DRAFT: Chat Randy — site-wide; Book a call opens this, not Cal */}
+      {/* Chat Randy (bottom-right); Hear Randy ElevenLabs ConvAI (bottom-left) */}
       <RandyChat />
+      <HearRandyElevenLabs />
       <LingerCapture />
     </div>
   )
