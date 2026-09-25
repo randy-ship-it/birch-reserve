@@ -148,21 +148,22 @@ async function stubRandyReply(
 
   if (chip === "hold_190") {
     return {
-      text: "Hold $190 gives you a 7-day look at a category before you commit; Reserve $490 locks the seat. Online checkout is off right now, so I’ll take it from here with you. Which category do you want to hold?",
+      text: "Hold $190 gives you a 7-day look at a category before you commit; Reserve $490 locks the seat. Online checkout is live on birchreserve.net — pay there, or keep going here and I’ll walk you through it. Which category do you want to hold?",
       source: "stub",
     };
   }
 
   if (chip === "live_hub") {
     return {
-      text: `Here’s a live hub: ${LIVE_HUB_PROOF_URL} That’s the kind of surface a seat shows up on. What category would you want in front of those patients?`,
+      // Emma HARD: never spell raw hub URLs as visible prose — label / markdown href only.
+      text: `Tap See a live hub — or open [See a live hub](${LIVE_HUB_PROOF_URL}). That’s the kind of surface a seat shows up on. What category would you want in front of those patients?`,
       source: "stub",
     };
   }
 
   if (/\b(190|490|hold|reserve|seat|price|pricing|buy|checkout)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "Two options: Hold $190 for a 7-day look, or Reserve $490 for the seat. Online checkout is off for now. Want to call, or keep going here so I can open the calendar?",
+      text: "Two options: Hold $190 for a 7-day look, or Reserve $490 for the seat. Online checkout is live on birchreserve.net. Want to pay there, call, or keep going here?",
       source: "stub",
       offerHandoff: true,
     };

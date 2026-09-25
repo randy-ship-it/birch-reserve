@@ -11,7 +11,7 @@
  * No calendar CTA anywhere (HARD 5:28pm): partnerships get a callback intake. Every session is logged
  * server-side and emailed to Randy.
  * HARD 3:52pm ET: visitor-facing identity is "Randy from Birch Reserve"; no internal labels.
- * Checkout OFF. Public SKUs hold-190 / reserve-490 only.
+ * Checkout ON for hold-190 / reserve-490. Enterprise inquire-within only (no Stripe SKU).
  */
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -281,7 +281,7 @@ export function RandyChat() {
       setTeaserDone(true);
       setMode("chat");
       if (detail?.reason === "reserve-intake") {
-        // Checkout paused: straight into the callback intake, seat + category preselected.
+        // Checkout-on fallback intake: seat + category preselected; steer to birchreserve.net pay.
         const sku = detail.sku === "hold-190" ? "hold-190" : "reserve-490";
         const need = reserveIntakeNeed(sku, detail.category);
         ensureThread();
@@ -292,7 +292,7 @@ export function RandyChat() {
         pushMessages({
           id: newId(),
           role: "randy",
-          text: `Online checkout is paused, so I'll lock this with you directly. Leave your details and the team will send the insertion order and invoice for the ${sku === "hold-190" ? "$190 hold" : "$490 seat"}.`,
+          text: `Checkout is live on birchreserve.net for the ${sku === "hold-190" ? "$190 hold" : "$490 seat"}. You can pay there, or leave your details here and I'll walk you through it.`,
         });
         setHandoffReady(true);
         setCallbackOpen(true);

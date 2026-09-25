@@ -22,7 +22,7 @@ import {
   type ReserveOfferKey,
 } from "@/lib/reserve-offers";
 import { trackCta, trackReserveDialogOpen, type CtaEvent } from "@/lib/track-cta";
-import { openRandyChat } from "@/lib/book-call";
+import { BOOK_CALL_LABEL, BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
 import { fetchCheckoutEnabled } from "@/lib/checkout-status";
 import { ExampleHubsGallery } from "@/components/example-hubs-gallery";
 import {
@@ -410,22 +410,43 @@ export default function Home() {
             ))}
           </div>
 
-          <article className="mt-6 border border-border p-6 md:p-8">
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/60">Custom</p>
-            <p className="mt-4 font-display text-4xl text-foreground">Talk to the team</p>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Multi-hub, exclusive, or on-prem Align. Credit, not a flight.
+          <article className="mt-6 border border-border p-6 md:p-8" data-testid="card-enterprise">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/60">Enterprise</p>
+            <p className="mt-4 font-display text-3xl text-foreground md:text-4xl">
+              $100K–$250K+ · Coming soon / Inquire within
             </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              Multi-hub, exclusive, or on-prem Align. Credit, not a flight. Not a self-serve Stripe SKU — inquire within.
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Button
                 type="button"
                 className="h-11 rounded-none bg-accent text-accent-foreground hover:bg-foreground hover:text-background"
+                onClick={() => {
+                  trackCta("cta_book_call");
+                  openRandyChat({ reason: "book-a-call" });
+                }}
+                data-testid="button-enterprise-book-call"
+              >
+                {BOOK_CALL_LABEL}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 rounded-none"
                 onClick={callBack}
-                data-testid="button-custom-call-back"
+                data-testid="button-enterprise-call-back"
               >
                 <Phone className="mr-2 size-4" aria-hidden />
                 Call {VOICE_TEL_DISPLAY}
               </Button>
+              <a
+                href={BOOK_CALL_MAILTO_HREF}
+                className="text-sm underline underline-offset-4"
+                data-testid="link-enterprise-email-sales"
+              >
+                Email sales
+              </a>
             </div>
           </article>
           <div className="mt-10">
