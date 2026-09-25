@@ -51,7 +51,7 @@ const RANDY_TEL_E164 = (() => {
   const digits = raw.replace(/\D/g, "");
   if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
   if (digits.length === 10) return `+1${digits}`;
-  return "+15045046526";
+  return "+16479316278";
 })();
 export const RANDY_TEL_HREF = `tel:${RANDY_TEL_E164}`;
 /** HARD 3:42pm ET: after qualifying, the next step is an AI call first. */
