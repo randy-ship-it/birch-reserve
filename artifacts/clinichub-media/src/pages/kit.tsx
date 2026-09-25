@@ -118,7 +118,7 @@ export default function Kit() {
           />
         </div>
         <div className="container relative mx-auto grid gap-12 px-6 py-16 md:py-24 lg:grid-cols-12 lg:gap-16 lg:py-28">
-          <div className="flex flex-col justify-center lg:col-span-6">
+          <div className="flex flex-col justify-center lg:col-span-5">
             <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.22em] text-background/55">
               Birch Reserve · Media kit
             </p>
@@ -153,16 +153,16 @@ export default function Kit() {
             </p>
           </div>
 
-          <div className="lg:col-span-6">
+          <div className="lg:col-span-7">
             <div className="mb-3 flex items-center justify-between text-[9px] uppercase tracking-[0.18em] text-background/50">
               <span>Illustrative — not your receipt</span>
               <span>Live hub proof</span>
             </div>
             <div
-              className="overflow-hidden border border-background/20 bg-background/5"
+              className="overflow-hidden border border-background/20 bg-background/5 shadow-lg shadow-black/20"
               data-testid="kit-hero-hub-video"
             >
-              <div className="aspect-[16/10] w-full bg-black/40">
+              <div className="aspect-video min-h-[280px] w-full bg-black/40 md:min-h-[360px]">
                 <HubWalkthroughVideo
                   testId="video-kit-hub-walkthrough"
                   className="h-full w-full object-cover object-top"
