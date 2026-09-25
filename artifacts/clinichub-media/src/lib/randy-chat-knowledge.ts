@@ -45,14 +45,15 @@ export const CHECKOUT_LIVE = true;
 /**
  * The ONE place the live/AI call number lives on the client. Set VITE_RANDY_TEL
  * (E.164, e.g. +14165550123) at build time to swap numbers.
- * Public CTA default is +15045046526 / +1 (504) 504-6526 until Randy voice/Twilio ID clears.
+ * Public CTA default is +16479316278 / +1 (647) 931-6278 (Toronto) on Randy clone voice.
+ * Still honors VITE_RANDY_TEL override at build time.
  */
 const RANDY_TEL_E164 = (() => {
   const raw = String(import.meta.env.VITE_RANDY_TEL ?? "").trim();
   const digits = raw.replace(/\D/g, "");
   if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
   if (digits.length === 10) return `+1${digits}`;
-  return "+15045046526";
+  return "+16479316278";
 })();
 export const RANDY_TEL_HREF = `tel:${RANDY_TEL_E164}`;
 /** HARD 3:42pm ET: after qualifying, the next step is an AI call first. */
