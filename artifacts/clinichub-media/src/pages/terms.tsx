@@ -4,9 +4,6 @@ import { SELLER_IDENTITY } from "@/lib/seller-identity";
 export default function Terms() {
   return (
     <article className="container mx-auto max-w-3xl px-6 py-16 md:py-24">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-        DRAFT — counsel stamps before the first real card
-      </p>
       <h1 className="mt-4 font-display text-4xl tracking-tight md:text-6xl">
         Terms of sale
       </h1>
@@ -51,9 +48,6 @@ export default function Terms() {
         <Link href="/privacy" className="underline">
           Privacy
         </Link>
-      </p>
-      <p className="mt-8 text-xs uppercase tracking-widest text-muted-foreground">
-        Draft until counsel stamps.
       </p>
     </article>
   );
