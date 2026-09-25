@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-25 16:14 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-25 16:16 EDT. Edit sales-brain, not this file. -->
 # BIRCH-OFFER, public SKUs and product locks
 
 **SoT:** BIRCH-RESERVE-BOT-LOCK + AD-SALES-LOCK + companion (2026-09-24).  
@@ -56,13 +56,15 @@ Network: signed Scale Health hubs (live proof below) plus a launching cohort of 
 **https://physio.drhonow.com/dr-ho/portal**  
 Caption on every mock: “Illustrative, not your receipt.”
 
+**Also (quiet secondary, not hero):** https://weprize.net — live SBG / Birch Reserve exclusive display placement example. Placement example only — not a Scale hub seat; no reach / impression / traffic claims. WePrize points brands to birchreserve.net to buy space; Birch reciprocates as a quiet proof point.
+
 ## Also exclusive display (quiet examples — not hero hubs)
 
 Birch’s primary inventory is category seats inside signed Scale Health hubs. In addition, Birch sells **exclusive display** on a small set of sister EXAMPLE properties so the buy path is reciprocal (those sites already point brands to birchreserve.net):
 
 | Property | URL | What it is | Placement rule |
 |----------|-----|------------|----------------|
-| **WePrize** | https://weprize.net | Canada-first free-contest assist site (friction badges, free board, apply assist) | Exclusive display sold by Birch. Quiet EXAMPLE only on birchreserve.net — footer / “also on” / kit list. **Never** hero, Featured Format, or CLEAR_HUBS co-branded banner. |
+| **WePrize** | https://weprize.net | Canada-first free-contest assist site (friction badges, free board, apply assist) | Exclusive display sold by Birch. Quiet EXAMPLE only on birchreserve.net — muted footer inventory line, home Digital inventory “also on request” note, “Also on” chip under Example hubs (not a hub card), kit “Also exclusive placement examples” list. **Never** hero, Featured Format, EXAMPLE_HUBS card, or CLEAR_HUBS co-branded banner. Placement only; no reach claims. |
 
 Do not invent WePrize traffic, DAU, or contest-win rates. If asked: name the surface, say exclusive display is available via Birch, and route checkout / inquire the same as other custom / exclusive paths.
 
@@ -132,7 +134,7 @@ Never tell a Birch buyer their seat equals any view count. Partner range to name
 |---|---|
 | Difference $190 vs $490 | Hold $190 = 7-day category look, does not consume a seat, credit if converted in 7 days else refund. Reserve $490 = named category seat, full $490 credited toward ad placements, insertion order (IO) before flight. |
 | Exclusivity | One brand per category aisle at a time across the eight advertiser categories. |
-| Proof / mock | Live hub: https://physio.drhonow.com/dr-ho/portal ("illustrative, not your receipt"). Kit: https://birchreserve.net/kit. |
+| Proof / mock | Primary: live DR-HO hub https://physio.drhonow.com/dr-ho/portal ("illustrative, not your receipt"). Secondary placement example (not hero, no reach): https://weprize.net. Kit: https://birchreserve.net/kit. |
 | Impressions / CTR / guarantees | Refuse invented numbers. Platform scale story only (50MM+ uniques in 4 months, on track for 100MM+ by year end). Pivot to category first-right + checkout/booking moments. |
 | Enterprise / big annual | $100K–$250K+ Coming soon / Inquire within. Intake + team callback. No invented CPM. |
 | Person / calendar | Qualify first. Callback default. Cal https://cal.com/randy-gilling/30min only post-qualify if they insist on a set time. |

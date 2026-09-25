@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-25 16:14 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-25 16:16 EDT. Edit sales-brain, not this file. -->
 # NEVER-SAY, hard bans for the Randy-voice closer
 
 **Owner:** Birch Reserve knowledge pack (SoT).  
@@ -73,4 +73,10 @@ Never push Randy's calendar link. Don't put it in greetings, closes, option list
 - Never invent reach, impressions, CTR, or sample-distribution promises.
 - Never invent a mailing address. Only the locked mailbox: 777-2255B Queen St E, Toronto ON M4E 1G3, Attn: Randy Gilling (Scale Health Network Inc attn Randy Gilling OK as mail name). Confirm fit by email before they ship.
 - Never reject a brand solely for not being "pure recovery" when it cross-sells into recovery audiences (hormonal health is a real lane).
+
+## WePrize placement example (Randy HARD 2026-09-25 ~4:12pm ET)
+
+- Never invent WePrize traffic, reach, CTR, impressions, seat-as-views, or user counts.
+- WePrize is a **placement example only** (quiet exclusive display inventory Birch/SBG sells). Not a Scale hub seat. Not hero / Featured Format.
+- Do not claim WePrize is part of the eight category seats or the Example hubs gallery.
 
