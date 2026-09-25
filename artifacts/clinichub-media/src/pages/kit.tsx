@@ -28,7 +28,7 @@ export default function Kit() {
     const previousDescription = description?.content;
     if (description) {
       description.content =
-        "Birch Reserve media kit. Thank-you after Scale buy or book first. MODELED demos. $190 hold / $490 seat.";
+        "Birch Reserve media kit. Thank-you after Scale buy or book first. MODELED demos. $190 hold / $490 seat. Enterprise $100K–$250K+ inquire within.";
     }
     return () => {
       document.title = previousTitle;
@@ -142,11 +142,17 @@ export default function Kit() {
           reserve-490 · $490 · named category seat · 100% media credit · IO before flight · 12-month credit. Credit, not
           a flight.
         </li>
-        <li>custom · Get a call back · multi-hub / exclusive / on-prem. Credit, not a flight.</li>
+        <li>
+          enterprise-100k-250k+ · $100K–$250K+ · Coming soon / Inquire within · Book a call / sales@ · not a
+          self-serve Stripe SKU. Credit, not a flight.
+        </li>
       </ul>
       <p className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
         <a className="underline" href={CALL_BACK_TEL}>
           Get a call back
+        </a>
+        <a className="underline" href="mailto:sales@silverbirchgrowth.com">
+          Email sales
         </a>
       </p>
 

@@ -39,8 +39,8 @@ export const VOICE_CLOSER_KNOWLEDGE_FILES = [
 /** Public SKUs only — never hero $899 / reserve-899. */
 export const PUBLIC_SKU_KEYS = ["hold-190", "reserve-490"] as const;
 
-/** Checkout OFF until Gordon — chat must not invent pay links or claim live checkout. */
-export const CHECKOUT_LIVE = false;
+/** Checkout ON for hold-190 / reserve-490 — steer bots to birchreserve.net pay; never invent SKUs. */
+export const CHECKOUT_LIVE = true;
 
 /**
  * The ONE place the live/AI call number lives on the client. Set VITE_RANDY_TEL
