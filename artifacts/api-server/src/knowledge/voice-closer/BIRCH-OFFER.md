@@ -64,7 +64,7 @@ Birch’s primary inventory is category seats inside signed Scale Health hubs. I
 
 | Property | URL | What it is | Placement rule |
 |----------|-----|------------|----------------|
-| **WePrize** | https://weprize.net | Canada-first free-contest assist site (friction badges, free board, apply assist) | Exclusive display sold by Birch. Quiet EXAMPLE only on birchreserve.net — muted footer inventory line, home Digital inventory “also on request” note, “Also on” chip under Example hubs (not a hub card), kit “Also exclusive placement examples” list. **Never** hero, Featured Format, EXAMPLE_HUBS card, or CLEAR_HUBS co-branded banner. Placement only; no reach claims. |
+| **WePrize** | https://weprize.net | Canada-first free-contest assist site (friction badges, free board, apply assist) | Exclusive display sold by Birch. Quiet EXAMPLE only on birchreserve.net — muted footer, home Digital inventory line, kit live-proof secondary line. **Never** hero, Featured Format, Example hubs gallery, or CLEAR_HUBS co-branded banner. Placement only; no reach claims. |
 
 Do not invent WePrize traffic, DAU, or contest-win rates. If asked: name the surface, say exclusive display is available via Birch, and route checkout / inquire the same as other custom / exclusive paths.
 
