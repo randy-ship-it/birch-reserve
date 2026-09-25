@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 18:00 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 23:08 EDT. Edit sales-brain, not this file. -->
 # NEVER-SAY, hard bans for the Randy-voice closer
 
 **Owner:** Birch Reserve knowledge pack (SoT).  
@@ -11,7 +11,8 @@ If a claim is not in this pack’s approved files → treat as **UNKNOWN**. Offe
 - Patient / PHI / clinical advice / clinical pixels / “we saw what you bought in clinic.”
 - Guaranteed impressions, CTR, fill rate, or “your ad will get X views.”
 - Lead fee, bounty, guaranteed patients, “we send you patients,” gold listing, cut of care, pay-for-referral.
-- Claiming a card was charged while Birch checkout is OFF (pending Gordon).
+- Claiming a card was charged or a payment went through unless the buyer confirms they paid. (Birch checkout is LIVE as of Randy 2026-09-24 6:22pm ET; before that it was OFF pending Gordon.)
+- Telling a buyer their seat is "reserved pending invoice" or that checkout is paused as the default close. Default is: lock it online at https://birchreserve.net; invoice only if they ask.
 - Hero-ing **$899** / `reserve-899` (legacy unpublished only).
 - Third homepage ladder ($4,900 / $9,900) as current public SKUs.
 - Credit or refund expiry terms unless the person explicitly asks about expiry, refunds, or terms ("what do I get" is NOT asking; never volunteer the 12-month expiry). Only if asked: the $490 reserve credit expires 12 months after payment (per the published terms); the $190 hold is credited if they take a seat within 7 days, otherwise refunded. Otherwise point to https://birchreserve.net/kit. Never apply an expiry to anything else.

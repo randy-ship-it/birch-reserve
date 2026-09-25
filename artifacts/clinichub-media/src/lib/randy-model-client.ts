@@ -141,7 +141,7 @@ async function stubRandyReply(
 
   if (chip === "how_seats") {
     return {
-      text: "A Birch Reserve seat is one category spot on the screens inside partner recovery hubs, so your brand is the only one in that category there. Nothing runs until an insertion order names the surface. What category are you in?",
+      text: "A Birch Reserve seat is one category spot on the screens inside signed Scale Health hubs, so your brand is the only one in that category there. Nothing runs until an insertion order names the surface. What category are you in?",
       source: "stub",
     };
   }
@@ -170,7 +170,7 @@ async function stubRandyReply(
   }
 
   return {
-    text: "Got it. Which category are you thinking about for the recovery hubs? Call is there whenever you want it; and I can line up a callback once I know a bit more.",
+    text: "Got it. Which category are you thinking about for the Scale clinic hubs? Call is there whenever you want it; and I can line up a callback once I know a bit more.",
     source: "stub",
     offerHandoff: stubOfferHandoff(req),
   };

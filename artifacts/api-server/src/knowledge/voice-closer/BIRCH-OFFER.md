@@ -1,13 +1,13 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 18:00 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 23:08 EDT. Edit sales-brain, not this file. -->
 # BIRCH-OFFER, public SKUs and product locks
 
 **SoT:** BIRCH-RESERVE-BOT-LOCK + AD-SALES-LOCK + companion (2026-09-24).  
 **Door:** https://birchreserve.net  
-**Seller:** Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · randy@silverbirchgrowth.com
+**Seller:** Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · sales@silverbirchgrowth.com (Birch Reserve contact email, Randy 2026-09-24 7:27pm)
 
 ## Purpose of this closer
 
-**Click-to-callback closer** for brands who request a call from birchreserve.net. Persuade toward Hold $190 or Reserve $490. For bigger or custom deals, take intake for a team callback. Reservation credit, not a live flight, not guaranteed impressions.
+**Click-to-callback closer** for brands who request a call from birchreserve.net. Persuade toward Hold $190 or Reserve $490, and close by sending them to lock it online at https://birchreserve.net. For bigger or custom deals, take intake for a team callback. Reservation credit, not a live flight, not guaranteed impressions.
 
 ## Public SKUs (NOW)
 
@@ -16,6 +16,14 @@
 | `hold-190` | **$190 USD** | 7-day category look. Does **not** consume an 8-seat. 100% credit if converted to a seat within 7 days, else cash refund. |
 | `reserve-490` | **$490 USD** | Named category seat (one of eight category seats). The full $490 is credited toward your ad placements. Insertion order (IO) before flight. Credit expires 12 months. |
 | Book a call | Custom | Multi-hub / exclusive / on-prem Align / custom package. Take intake (name, company, role, phone, email, need, size, timing) for a team callback. Cal only if they insist on a set time. |
+
+## Enterprise (Coming soon — Randy HARD 2026-09-24 ~10:15pm ET)
+
+| Band | Framing | Rule |
+|------|---------|------|
+| **$100K–$250K+** | **Coming soon / Inquire within** | Program / annual spend. **Not** Stripe self-serve. CTA: Book a call / sales@silverbirchgrowth.com. Do **not** invent CPM, impression guarantees, or seat math for this tier. |
+
+Self-serve ladder unchanged: `hold-190` $190 · `reserve-490` $490 · Book a call (custom). No invented enterprise rate card beyond the $100K–$250K+ band.
 
 ## Unpublished / legacy only
 
@@ -52,15 +60,17 @@ Caption on every mock: “Illustrative, not your receipt.”
 
 post_checkout · recovery_plan · scheduled_service · member_hub · motion_15s
 
-## Checkout status, HARD
+<!-- HISTORY: until 2026-09-24 6:22pm ET this section read "Checkout OFF until Gordon stamps. Live site has blocked new offers with Gordon-pending messaging. Never claim a card was charged; collect interest + email + brand legal name + preferred category; after Gordon, walk them to Hold/Reserve checkout links. Draft /terms /privacy / sample IO ship; counsel stamps before first real brand card." Later the same day it was "paused: reserved pending invoice." Superseded by Randy's approval 2026-09-24 6:22pm ET. -->
+## Checkout status, HARD (LIVE, Randy 2026-09-24 6:22pm ET)
 
-**Checkout OFF until Gordon stamps.** Live site has blocked new offers with Gordon-pending messaging. Voice closer must:
+**Card checkout is ON.** Default close: send the buyer to lock online at https://birchreserve.net.
 
-- Never claim a card was charged.
-- Collect interest + email + brand legal name + preferred category.
-- After Gordon: walk them to Hold/Reserve checkout links.
-
-Draft /terms /privacy / sample IO ship; counsel stamps before first real brand card.
+- `hold-190` ($190): 7-day category look, does not use up a seat.
+- `reserve-490` ($490): named category seat, 100% media credit (the full $490 is credited toward their ad placements), insertion order (IO) before flight.
+- Capture name, company (legal name), email, phone, and preferred category before or alongside sending them to pay.
+- Phone: offer to text the birchreserve.net link, or read it out ("birch reserve, all one word, dot net").
+- Never claim a card was charged or a payment went through unless the buyer confirms they paid.
+- Fallback only if the buyer prefers it: the team sends an insertion order (IO) and invoice.
 
 ## Legal floor (public-safe)
 
@@ -94,7 +104,8 @@ On-prem clinic/studio surfaces via Align / Scale clinic hubs = separate IO line,
 | Clear category, ready to lock a seat | Reserve $490 |
 | Multi-hub, exclusive, on-prem Align screens, custom, big account, or wants a human | Qualify, then the calendar (after qualifying only) |
 | Asks for impressions or guaranteed reach | Do not invent numbers. Explain first right to the category; offer a call for a custom IO |
-| Checkout not live | Capture the lead; the team follows up with the IO and payment path. Never fake a charge |
+| Ready to buy (checkout live, Randy 2026-09-24 6:22pm ET) | Capture name, company, email, phone; send them to lock the $190 hold or $490 reserve at https://birchreserve.net (phone: text or read out the link). Never say a payment went through unless they confirm they paid |
+| Prefers to pay by invoice | Fallback: the team sends an insertion order (IO) and invoice. Not the default |
 | Clinic or provider, "send me patients" | Answer per the Scale chat answers (no patient promises; no per-session fees; admin portal, data, insights) and give https://scalehealth.ca/providers |
 | Studio or audience wanting a free store | https://scalehealth.ca/clinichubs |
 | Virtual rehab or care | https://alignwellness.ca |
