@@ -34,9 +34,6 @@ import {
   HubMockup,
 } from "@/components/ad-previews";
 
-// Randy can add a real MP4, Loom, or YouTube source when the walkthrough is ready.
-const VIDEO_SRC = "";
-
 const NETWORK_SIGNALS = [
   "Prepared Meals", "Mobility", "Sleep", "Recovery", "Nutrition", "Skin",
   "Virtual Care", "Wellness Services", "Fitness", "Diagnostics", "Family Health",
@@ -783,20 +780,20 @@ export default function Home() {
                  </div>
                   <h4 className="text-3xl md:text-4xl font-display text-foreground tracking-wide">See a hub walk-through</h4>
                  <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                    A real walkthrough will show the live page, the customer moment, and the neighboring catalog products. No generated stand-in.
+                    Real walkthrough of the live DR-HO&apos;S hub — the page, the customer moment, and the neighboring catalog. No generated stand-in.
                  </p>
                </div>
-                 <div className="bg-background border border-border flex items-center justify-center aspect-video relative overflow-hidden">
-                   {VIDEO_SRC ? (
-                     <video className="h-full w-full object-cover" src={VIDEO_SRC} controls preload="metadata" />
-                   ) : (
-                     <div className="absolute inset-0 bg-secondary/20" />
-                   )}
-                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                     <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-foreground/40 px-4 py-2 border border-border/50 bg-background/80 backdrop-blur-sm">
-                       Real hub walkthrough coming soon
-                     </div>
-                   </div>
+                 <div
+                   className="bg-background border border-border relative overflow-hidden aspect-[16/10] md:aspect-video"
+                   data-testid="featured-format-hub-video"
+                 >
+                   <HubWalkthroughVideo
+                     testId="video-featured-hub-walkthrough"
+                     className="h-full w-full object-cover object-top"
+                   />
+                   <p className="absolute bottom-0 left-0 right-0 bg-background/85 px-3 py-2 text-[10px] font-medium uppercase tracking-[0.16em] text-foreground/70 backdrop-blur-sm">
+                     Live DR-HO&apos;S hub walkthrough · illustrative
+                   </p>
                  </div>
              </div>
           </div>
