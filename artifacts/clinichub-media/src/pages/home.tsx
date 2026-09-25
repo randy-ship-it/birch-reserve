@@ -24,6 +24,7 @@ import {
 import { trackCta, trackReserveDialogOpen, type CtaEvent } from "@/lib/track-cta";
 import { BOOK_CALL_LABEL, BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
 import { fetchCheckoutEnabled } from "@/lib/checkout-status";
+import { HubWalkthroughVideo } from "@/components/hub-walkthrough-video";
 import { ExampleHubsGallery } from "@/components/example-hubs-gallery";
 import {
   PostCheckoutMockup,
@@ -728,9 +729,9 @@ export default function Home() {
               </div>
               <div className="p-6 md:p-8 bg-background flex-1">
                 <div className="border border-border/50 shadow-sm overflow-hidden aspect-[4/3] bg-muted relative">
-                  <img src="/hub-proof/drho-hub-home.png" alt="DR-HO'S Insider Hub screenshot" className="w-full h-full object-cover object-top" loading="lazy" />
+                  <HubWalkthroughVideo testId="video-hub-walkthrough" />
                 </div>
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Illustrative — not your receipt.</p>
+                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Live DR-HO&apos;S hub walkthrough — illustrative of seat placement context.</p>
                 <a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold">
                   Open the live hub <ArrowUpRight className="size-4" />
                 </a>

@@ -8,6 +8,7 @@ import {
   ProtocolMockup,
 } from "@/components/ad-previews";
 import { useEffect } from "react";
+import { HubWalkthroughVideo } from "@/components/hub-walkthrough-video";
 import {
   ArrowUpRight,
   Download,
@@ -166,30 +167,32 @@ export default function Kit() {
               <span>Illustrative — not your receipt</span>
               <span>Live hub proof</span>
             </div>
-            <a
-              href={LIVE_PROOF_HREF}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block overflow-hidden border border-background/20 bg-background/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              data-testid="link-kit-hero-proof"
+            <div
+              className="overflow-hidden border border-background/20 bg-background/5"
+              data-testid="kit-hero-hub-video"
             >
-              <img
-                src="/hub-proof/drho-hub-home.png"
-                alt="DR-HO’S live Scale Health hub homepage"
-                width={1440}
-                height={900}
-                className="aspect-[16/10] w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
-              />
-              <div className="flex items-center justify-between gap-3 border-t border-background/15 px-4 py-3.5">
+              <div className="aspect-[16/10] w-full bg-black/40">
+                <HubWalkthroughVideo
+                  testId="video-kit-hub-walkthrough"
+                  className="h-full w-full object-cover object-top"
+                />
+              </div>
+              <a
+                href={LIVE_PROOF_HREF}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-3 border-t border-background/15 px-4 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                data-testid="link-kit-hero-proof"
+              >
                 <div>
-                  <p className="font-display text-lg text-background">Tour the DR-HO hub</p>
+                  <p className="font-display text-lg text-background">Live DR-HO&apos;S hub walkthrough</p>
                   <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-background/50">
-                    physio.drhonow.com
+                    physio.drhonow.com · open live hub
                   </p>
                 </div>
                 <ArrowUpRight className="size-5 text-accent" aria-hidden />
-              </div>
-            </a>
+              </a>
+            </div>
           </div>
         </div>
       </section>
