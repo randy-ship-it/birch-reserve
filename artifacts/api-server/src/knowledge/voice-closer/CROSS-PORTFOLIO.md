@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 23:08 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-25 16:17 EDT. Edit sales-brain, not this file. -->
 # CROSS-PORTFOLIO — one Randy brain, one pack
 
 **HARD (Randy via Emma, 2026-09-24 ~2:26pm ET):**  
@@ -52,6 +52,6 @@ Chat Randy (site chat / voice) **qualifies first** as Randy from Birch Reserve, 
 
 - **Cal SoT (post-qualify only):** https://cal.com/randy-gilling/30min (Mon–Fri 1–3pm ET → SBG Growth)
 - Offer Cal **only after** screen: fit confirmed (brand/display vs provider rails vs Align MSP vs other), category/intent captured, and they still want a human.
-- Until then: keep talking, tel:+16479316278 for immediate closer voice, or capture email — **do not** dump the Cal URL cold in first turn / widget default CTA.
+- Until then: keep talking, tel:+15045046526 for immediate closer voice, or capture email — **do not** dump the Cal URL cold in first turn / widget default CTA.
 - Mailto randy@silverbirchgrowth.com remains backup after screen if Cal unavailable.
 - Build-once widget+brain — Scale / Align / RDGDH consume this pack; no siloed Cal shortcuts.

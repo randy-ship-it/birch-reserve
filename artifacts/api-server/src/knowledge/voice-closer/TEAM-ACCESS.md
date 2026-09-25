@@ -1,17 +1,17 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 23:08 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-25 16:17 EDT. Edit sales-brain, not this file. -->
 # TEAM-ACCESS — shared demo URL + public click-to-call
 
-**As of:** 2026-09-25 ~11:00am ET  
-**Status:** Voice cutover GO — Randy finished Twilio photo ID + $50 credit. Public Call SoT is Toronto `+16479316278` / `+1 (647) 931-6278`.
+**As of:** 2026-09-24 ~2:35pm ET  
+**Status:** Randy GO (via Emma). Private team page + public home click-to-call in same PR. **Pending Autoscale** (Emma/Replit pull after merge) before live on birchreserve.net.
 
 ## Public click-to-call (home)
 
-- **tel:** `+16479316278`
-- **Display:** `+1 (647) 931-6278`
+- **tel:** `+15045046526`
+- **Display:** `+1 (504) 504-6526`
 - Labels: **Get a call back** / **Call**
 - Mailto **Book a call** remains as secondary backup (not removed)
 - Checkout **ON** per Randy 2026-09-24 6:22pm ET
-- **Voice cutover (2026-09-25):** public CTA is Toronto `+16479316278` / `+1 (647) 931-6278`. Legacy `+15045046526` retired from public shells/CTAs.
+- **Overnight lock (Emma):** public CTA stays **504** until Randy voice / Twilio ID clears. Toronto `+16479316278` / `+1 (647) 931-6278` is a future cutover line — not the public default.
 
 ## Private team demo URL (unlisted)
 
@@ -25,9 +25,9 @@
 
 | Field | Value |
 |-------|-------|
-| Display (public CTA) | `+1 (647) 931-6278` |
-| tel: (public CTA) | `+16479316278` |
-| Legacy (retired public CTA) | `+15045046526` — do not use on public CTAs |
+| Display (public CTA) | `+1 (504) 504-6526` |
+| tel: (public CTA) | `+15045046526` |
+| Future Toronto line (not public yet) | `+1 (647) 931-6278` / `+16479316278` — pending Twilio / voice ID clear |
 | phone_id | `phone_C783YjLWRxSQCZG9` |
 | agent_id | `agent_mjC3JJcsPZFglfpb` |
 | team | rdgdh |
@@ -46,6 +46,6 @@ Chat Randy (site chat / voice) **qualifies first** as Randy from Birch Reserve, 
 
 - **Cal SoT (post-qualify only):** https://cal.com/randy-gilling/30min (Mon–Fri 1–3pm ET → SBG Growth)
 - Offer Cal **only after** screen: fit confirmed (brand/display vs provider rails vs Align MSP vs other), category/intent captured, and they still want a human.
-- Until then: keep talking, tel:+16479316278 for immediate closer voice, or capture email — **do not** dump the Cal URL cold in first turn / widget default CTA.
+- Until then: keep talking, tel:+15045046526 for immediate closer voice, or capture email — **do not** dump the Cal URL cold in first turn / widget default CTA.
 - Mailto randy@silverbirchgrowth.com remains backup after screen if Cal unavailable.
 - Build-once widget+brain — Scale / Align / RDGDH consume this pack; no siloed Cal shortcuts.

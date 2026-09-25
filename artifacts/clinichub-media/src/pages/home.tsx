@@ -27,6 +27,7 @@ import { fetchCheckoutEnabled } from "@/lib/checkout-status";
 import { HubWalkthroughVideo } from "@/components/hub-walkthrough-video";
 import { ExampleHubsGallery } from "@/components/example-hubs-gallery";
 import { CobrandedHubsBanner } from "@/components/cobranded-hubs-banner";
+import { WEPRIZE } from "@/lib/example-exclusive-properties";
 import {
   PostCheckoutMockup,
   ProtocolMockup,
@@ -501,6 +502,19 @@ export default function Home() {
               <h3 className="mb-3 font-display text-3xl text-foreground">Digital inventory</h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 Sponsored placements, offers, content and category visibility inside closed customer and partner hubs.
+              </p>
+              <p className="mt-4 text-xs leading-relaxed text-muted-foreground/80" data-testid="home-also-exclusive-weprize">
+                Also on request: exclusive display example at{" "}
+                <a
+                  href={WEPRIZE.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 hover:text-foreground"
+                >
+                  {WEPRIZE.name}
+                </a>
+                {" "}
+                — placement example only; not a Scale hub seat.
               </p>
             </article>
             <article className="border border-border bg-foreground p-7 text-background md:p-9">

@@ -650,6 +650,7 @@ test("machine surfaces expose text, JSON, YAML, and fixed USD contracts", async 
   assert.doesNotMatch(llmsText, /\$4,900/);
   assert.doesNotMatch(llmsText, /\$9,900/);
   assert.doesNotMatch(llmsText, /reserve-990/);
+  assert.match(llmsText, /weprize\.net/);
 
   const catalogResponse = await fetch(`${origin}/v1/catalog.json`);
   assert.match(catalogResponse.headers.get("content-type") ?? "", /^application\/json/);

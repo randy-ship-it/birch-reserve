@@ -7,6 +7,7 @@ import { trackCta } from '@/lib/track-cta';
 import { RandyChat } from '@/components/randy-chat';
 import { HearRandyElevenLabs } from '@/components/hear-randy-elevenlabs';
 import { LingerCapture } from '@/components/linger-capture';
+import { EXAMPLE_EXCLUSIVE_PROPERTIES } from '@/lib/example-exclusive-properties';
 
 export function Layout({ children }: { children: ReactNode }) {
   const basePath = import.meta.env.BASE_URL;
@@ -116,8 +117,28 @@ export function Layout({ children }: { children: ReactNode }) {
               />
               <span className="font-display text-2xl tracking-tight italic">Birch Reserve</span>
             </div>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
               Eight category seats inside signed Scale Health hubs. Credit, not a flight.
+            </p>
+            <p
+              className="mb-6 text-[11px] leading-relaxed text-muted-foreground"
+              data-testid="footer-inventory-also"
+            >
+              Also exclusive display (examples):{" "}
+              {EXAMPLE_EXCLUSIVE_PROPERTIES.map((prop, i) => (
+                <span key={prop.id}>
+                  {i > 0 ? " · " : null}
+                  <a
+                    href={prop.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline underline-offset-2 hover:text-accent"
+                  >
+                    {prop.name}
+                  </a>
+                </span>
+              ))}
+              . Not featured inventory — inquire for an exclusive seat.
             </p>
             <p className="text-xs leading-relaxed text-foreground">
               {SELLER_IDENTITY} · <a href={SELLER_EMAIL_HREF} className="underline underline-offset-2 hover:text-accent">Email sales</a>

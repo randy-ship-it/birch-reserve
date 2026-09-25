@@ -1,6 +1,7 @@
 import { RANDY_TEL_HREF, RANDY_TEL_DISPLAY } from "@/lib/randy-chat-knowledge";
 import { SELLER_EMAIL_HREF, SELLER_IDENTITY } from "@/lib/seller-identity";
 import { EXAMPLE_HUBS } from "@/components/example-hubs-gallery";
+import { WEPRIZE } from "@/lib/example-exclusive-properties";
 import {
   PostCheckoutMockup,
   BookingMockup,
@@ -183,6 +184,22 @@ export default function Kit() {
                 </div>
                 <ArrowUpRight className="size-5 text-accent" aria-hidden />
               </a>
+              <p
+                className="border-t border-background/10 px-4 py-2.5 text-[11px] leading-relaxed text-background/45"
+                data-testid="kit-also-exclusive-weprize"
+              >
+                Also (placement example, not hero): exclusive display at{" "}
+                <a
+                  href={WEPRIZE.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline underline-offset-2 hover:text-background/70"
+                >
+                  {WEPRIZE.name}
+                </a>
+                {" "}
+                — not a Scale hub seat; no reach claim.
+              </p>
             </div>
           </div>
         </div>
