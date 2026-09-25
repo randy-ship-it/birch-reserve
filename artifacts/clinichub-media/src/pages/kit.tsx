@@ -1,12 +1,6 @@
 import { RANDY_TEL_HREF, RANDY_TEL_DISPLAY } from "@/lib/randy-chat-knowledge";
 import { SELLER_EMAIL_HREF, SELLER_IDENTITY } from "@/lib/seller-identity";
 import { EXAMPLE_HUBS } from "@/components/example-hubs-gallery";
-import {
-  PostCheckoutMockup,
-  BookingMockup,
-  HubMockup,
-  ProtocolMockup,
-} from "@/components/ad-previews";
 import { useEffect } from "react";
 import {
   ArrowUpRight,
@@ -70,28 +64,32 @@ const FORMATS = [
     tag: "Hero · thank-you",
     title: "Post-checkout",
     desc: "After a Scale buy — first story on the thank-you.",
-    Preview: PostCheckoutMockup,
+    image: "/kit-assets/post-checkout.jpg",
+    imageAlt: "Illustrative post-checkout thank-you placement",
   },
   {
     id: "scheduled-service",
     tag: "Hero twin",
     title: "Post-book thank-you",
     desc: "After a Scale book — same unit, booking confirmation.",
-    Preview: BookingMockup,
+    image: "/kit-assets/post-book.jpg",
+    imageAlt: "Illustrative post-book thank-you placement",
   },
   {
     id: "member-hub",
     tag: "In-experience",
     title: "Member hub module",
     desc: "Native shelf inside an approved member dashboard.",
-    Preview: HubMockup,
+    image: "/kit-assets/member-hub.jpg",
+    imageAlt: "Illustrative member hub module placement",
   },
   {
     id: "recovery-plan",
     tag: "In-experience",
     title: "Plan placement",
     desc: "Sponsored module inside a recovery or wellness plan.",
-    Preview: ProtocolMockup,
+    image: "/kit-assets/size-map.jpg",
+    imageAlt: "Illustrative format size map",
   },
 ] as const;
 
@@ -214,6 +212,19 @@ export default function Kit() {
               Eight category seats. Credit toward media under an approved IO — not a CPM guarantee.
             </p>
           </div>
+
+          <figure className="mb-10 overflow-hidden border border-border bg-background" data-testid="kit-seats-diagram">
+            <img
+              src="/kit-assets/eight-seats.png"
+              alt="Eight exclusive category seats — one brand per aisle"
+              width={1400}
+              height={780}
+              className="w-full object-cover object-top"
+            />
+            <figcaption className="border-t border-border px-4 py-3 text-xs text-muted-foreground">
+              Eight seats. One brand per category. Not an open auction.
+            </figcaption>
+          </figure>
 
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-testid="kit-category-grid">
             {CATEGORY_SEATS.map((seat) => (
@@ -418,7 +429,15 @@ export default function Kit() {
                   <span className="pointer-events-none absolute right-5 top-5 z-10 border border-border bg-background/95 px-2 py-1 text-[8px] font-bold uppercase tracking-widest text-muted-foreground backdrop-blur-sm">
                     Illustrative
                   </span>
-                  <format.Preview />
+                  <img
+                    src={format.image}
+                    alt={format.imageAlt}
+                    width={1600}
+                    height={1000}
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-[16/10] w-full rounded-sm object-cover object-top"
+                  />
                 </div>
               </article>
             ))}
@@ -440,6 +459,16 @@ export default function Kit() {
               Nothing runs until an approved insertion order names the hub and surface.
             </p>
           </div>
+
+          <figure className="mb-8 overflow-hidden border border-border bg-background" data-testid="kit-rate-visual">
+            <img
+              src="/kit-assets/rate-card.png"
+              alt="Birch Reserve rate card — hold $190, reserve $490, custom, enterprise"
+              width={1400}
+              height={860}
+              className="w-full object-cover object-top"
+            />
+          </figure>
 
           <div className="grid gap-4 lg:grid-cols-4" data-testid="kit-rate-cards">
             {/* Hold */}
