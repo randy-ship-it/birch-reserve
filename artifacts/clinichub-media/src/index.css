@@ -219,15 +219,26 @@
     font-size: 9pt !important;
   }
 
-  /* Cohort wordmarks wrap tight */
-  [data-testid="kit-cohort-wordmarks"] {
+  /* Co-branded hubs banner — centered clear + In Queue for PDF */
+  [data-testid="cobranded-hubs-banner"] {
+    text-align: center !important;
+    break-inside: avoid !important;
+  }
+  [data-testid="cobranded-hubs-clear"],
+  [data-testid="cobranded-hubs-queue"] {
     display: flex !important;
     flex-wrap: wrap !important;
+    justify-content: center !important;
     gap: 0.08in !important;
   }
-  [data-testid="kit-cohort-wordmarks"] li {
-    padding: 0.06in 0.12in !important;
-    font-size: 10pt !important;
+  [data-testid="cobranded-hubs-clear"] li,
+  [data-testid="cobranded-hubs-queue"] li {
+    padding: 0.05in 0.1in !important;
+    font-size: 9pt !important;
+  }
+  [data-testid="cobranded-hubs-queue"] li {
+    filter: blur(2px) !important;
+    opacity: 0.45 !important;
   }
 
   /* Proof shots: 3 across; hide extra hubs */
