@@ -143,10 +143,17 @@ export default function Kit() {
           a flight.
         </li>
         <li>custom · Get a call back · multi-hub / exclusive / on-prem. Credit, not a flight.</li>
+        <li>
+          enterprise · $100K–$250K+ · Coming soon / Inquire within · not Stripe self-serve. Credit, not a
+          flight.
+        </li>
       </ul>
       <p className="mt-4 flex flex-wrap gap-x-4 gap-y-2">
         <a className="underline" href={CALL_BACK_TEL}>
           Get a call back
+        </a>
+        <a className="underline" href="mailto:sales@silverbirchgrowth.com">
+          Email sales
         </a>
       </p>
 

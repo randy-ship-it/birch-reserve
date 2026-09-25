@@ -428,6 +428,32 @@ export default function Home() {
               </Button>
             </div>
           </article>
+
+          <article className="mt-6 border border-dashed border-border p-6 md:p-8">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/60">Enterprise</p>
+            <p className="mt-4 font-display text-4xl text-foreground">$100K–$250K+</p>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              Coming soon / Inquire within. Program / annual spend. Not Stripe self-serve.
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Button
+                type="button"
+                className="h-11 rounded-none bg-accent text-accent-foreground hover:bg-foreground hover:text-background"
+                onClick={callBack}
+                data-testid="button-enterprise-call-back"
+              >
+                <Phone className="mr-2 size-4" aria-hidden />
+                Call {VOICE_TEL_DISPLAY}
+              </Button>
+              <a
+                href="mailto:sales@silverbirchgrowth.com"
+                className="text-sm underline underline-offset-4"
+                onClick={() => trackCta("cta_enterprise_email")}
+              >
+                Email sales
+              </a>
+            </div>
+          </article>
           <div className="mt-10">
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/60">
               Eight advertiser categories
