@@ -144,3 +144,149 @@
   color: #70818b;
   opacity: 1;
 }
+
+/* Media kit print sheet — clean Letter PDF from /kit (target 2–4 pages) */
+@media print {
+  @page {
+    size: letter;
+    margin: 0.3in 0.35in;
+  }
+
+  html, body {
+    background: white !important;
+    color: #0b1a2e !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    font-size: 9px !important;
+  }
+
+  header,
+  footer,
+  .kit-download,
+  elevenlabs-convai {
+    display: none !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  main {
+    padding-top: 0 !important;
+  }
+
+  .kit-page .container {
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .kit-page section {
+    padding-top: 0.28in !important;
+    padding-bottom: 0.28in !important;
+  }
+
+  .kit-page h1 { font-size: 22pt !important; line-height: 0.95 !important; margin: 0 !important; }
+  .kit-page h2 { font-size: 14pt !important; line-height: 1.05 !important; }
+  .kit-page h3 { font-size: 11pt !important; }
+  .kit-page p { margin-top: 0.08in !important; margin-bottom: 0 !important; }
+
+  /* Force hero 2-col even when print UA is "narrow" */
+  .kit-page > section:first-child > .container {
+    display: grid !important;
+    grid-template-columns: 1.05fr 0.95fr !important;
+    gap: 0.25in !important;
+    align-items: center !important;
+  }
+  .kit-page > section:first-child img {
+    max-height: 2.1in !important;
+    width: 100% !important;
+    object-fit: cover !important;
+    object-position: top !important;
+  }
+
+  /* Category seats: 4 across */
+  [data-testid="kit-category-grid"] {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.12in !important;
+  }
+  [data-testid="kit-category-grid"] img {
+    max-height: 0.75in !important;
+    aspect-ratio: auto !important;
+  }
+  [data-testid="kit-category-grid"] .font-display {
+    font-size: 9pt !important;
+  }
+
+  /* Cohort wordmarks wrap tight */
+  [data-testid="kit-cohort-wordmarks"] {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.08in !important;
+  }
+  [data-testid="kit-cohort-wordmarks"] li {
+    padding: 0.06in 0.12in !important;
+    font-size: 10pt !important;
+  }
+
+  /* Proof shots: 3 across; hide extra hubs */
+  [data-testid="kit-proof-shots"] {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.12in !important;
+  }
+  [data-testid="kit-proof-shots"] img {
+    max-height: 1.05in !important;
+    aspect-ratio: auto !important;
+  }
+  [data-testid="kit-extra-hubs"] {
+    display: none !important;
+  }
+
+  /* Formats: 2 thank-you mockups side by side, capped height */
+  [data-testid="kit-formats-grid"] {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.15in !important;
+  }
+  [data-testid="kit-formats-grid"] > article {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  [data-testid="kit-formats-grid"] > article > div:last-child {
+    max-height: 2.15in !important;
+    overflow: hidden !important;
+  }
+  [data-testid="kit-formats-grid"] [class*="min-h-"] {
+    min-height: 0 !important;
+  }
+
+  /* Rate cards: 4 across on one band */
+  [data-testid="kit-rate-cards"] {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.1in !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  [data-testid="kit-rate-cards"] article {
+    padding: 0.14in !important;
+  }
+  [data-testid="kit-rate-cards"] .text-4xl,
+  [data-testid="kit-rate-cards"] .md\:text-4xl {
+    font-size: 16pt !important;
+  }
+  [data-testid="kit-rate-cards"] a {
+    display: none !important; /* CTAs are for web; PDF keeps contact block */
+  }
+
+  /* Legal + contact: 2-col */
+  .kit-page > section:last-child > .container {
+    display: grid !important;
+    grid-template-columns: 1.2fr 0.8fr !important;
+    gap: 0.2in !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

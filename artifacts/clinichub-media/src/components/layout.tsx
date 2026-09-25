@@ -22,7 +22,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background text-foreground font-sans">
-      <header className="fixed top-0 z-50 w-full border-b border-border bg-background/90 backdrop-blur-md">
+      <header className="fixed top-0 z-50 w-full border-b border-border bg-background/90 backdrop-blur-md print:hidden">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
             <img
@@ -100,11 +100,11 @@ export function Layout({ children }: { children: ReactNode }) {
         )}
       </header>
 
-      <main className="flex-1 flex flex-col pt-16">
+      <main className="flex-1 flex flex-col pt-16 print:pt-0">
         {children}
       </main>
 
-      <footer className="border-t border-border pt-16 pb-16 md:py-24 bg-background mt-auto">
+      <footer className="border-t border-border pt-16 pb-16 md:py-24 bg-background mt-auto print:hidden">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-start gap-12">
           <div className="max-w-sm">
             <div className="flex items-center gap-3 mb-6">
@@ -153,9 +153,11 @@ export function Layout({ children }: { children: ReactNode }) {
       </footer>
 
       {/* Chat Randy (bottom-right); Hear Randy ElevenLabs ConvAI (bottom-left) */}
-      <RandyChat />
-      <HearRandyElevenLabs />
-      <LingerCapture />
+      <div className="print:hidden">
+        <RandyChat />
+        <HearRandyElevenLabs />
+        <LingerCapture />
+      </div>
     </div>
   )
 }
