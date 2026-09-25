@@ -9,6 +9,7 @@ import {
 } from "@/components/ad-previews";
 import { useEffect } from "react";
 import { HubWalkthroughVideo } from "@/components/hub-walkthrough-video";
+import { CobrandedHubsBanner } from "@/components/cobranded-hubs-banner";
 import {
   ArrowUpRight,
   Download,
@@ -36,16 +37,6 @@ const CATEGORY_SEATS: ReadonlyArray<{ label: string; shelf: string; hubImage: st
   { label: "Diagnostics / services", shelf: "Exclusive aisle", hubImage: "/hub-gallery/integrity.webp" },
 ];
 
-const COHORT = [
-  "DR-HO’S",
-  "Kalaya",
-  "Jill Health",
-  "Jack Health",
-  "Integrity Fitness",
-  "Bird & Be",
-  "NutriProCan",
-  "Roll Recovery",
-] as const;
 
 const PROOF_SHOTS = [
   {
@@ -251,32 +242,8 @@ export default function Kit() {
         </div>
       </section>
 
-      {/* ── Launching cohort ─────────────────────────────────── */}
-      <section className="border-b border-border bg-secondary/10 py-12 md:py-16" aria-labelledby="kit-cohort-title">
-        <div className="container mx-auto px-6">
-          <div className="mb-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/50">
-                Launching cohort
-              </p>
-              <h2 id="kit-cohort-title" className="font-display text-2xl tracking-tight md:text-3xl">
-                Signed Scale Health hubs
-              </h2>
-            </div>
-            <p className="text-xs text-muted-foreground">Logos, not reach.</p>
-          </div>
-          <ul className="flex flex-wrap gap-3" data-testid="kit-cohort-wordmarks">
-            {COHORT.map((name) => (
-              <li
-                key={name}
-                className="border border-border bg-background px-4 py-3 font-display text-lg tracking-tight text-foreground md:text-xl"
-              >
-                {name}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+      {/* ── Co-branded hubs banner (public lock) ─────────────── */}
+      <CobrandedHubsBanner id="kit-cobranded-hubs" compact />
 
       {/* ── Live proof ───────────────────────────────────────── */}
       <section className="border-b border-border py-16 md:py-24" aria-labelledby="kit-proof-title">

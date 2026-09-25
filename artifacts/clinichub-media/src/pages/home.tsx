@@ -26,6 +26,7 @@ import { BOOK_CALL_LABEL, BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/boo
 import { fetchCheckoutEnabled } from "@/lib/checkout-status";
 import { HubWalkthroughVideo } from "@/components/hub-walkthrough-video";
 import { ExampleHubsGallery } from "@/components/example-hubs-gallery";
+import { CobrandedHubsBanner } from "@/components/cobranded-hubs-banner";
 import {
   PostCheckoutMockup,
   ProtocolMockup,
@@ -88,16 +89,6 @@ const CATEGORY_SEATS = [
   "Diagnostics / services",
 ];
 
-const SIGNED_HUB_BRANDS = [
-  "DR-HO'S",
-  "Kalaya",
-  "Jill Health",
-  "Jack Health",
-  "Integrity Fitness",
-  "Bird & Be",
-  "NutriProCan",
-  "Roll Recovery",
-];
 
 const SUPPLIER_ADJACENCY = [
   "DR-HO recovery equipment",
@@ -698,25 +689,18 @@ export default function Home() {
       <section className="py-20 md:py-28 border-b border-border bg-background relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full bg-secondary/10 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10">
-          <div className="mb-12 max-w-2xl">
-            <h3 className="text-3xl md:text-5xl font-display tracking-tight text-foreground mb-4">Signed hubs. Real customer environments.</h3>
+          <div className="mb-12 mx-auto max-w-3xl text-center">
+            <h3 className="text-3xl md:text-5xl font-display tracking-tight text-foreground mb-4">Co-branded hubs. Real customer environments.</h3>
             <p className="text-muted-foreground leading-relaxed text-lg">
               Birch inventory is contracted inside approved Scale Health brand environments. Launch timing varies by hub.
             </p>
           </div>
-          <div className="mb-8 grid border border-border bg-secondary/10 md:grid-cols-3">
-            <div className="p-5 md:border-r md:border-border">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-accent">Live</p>
-              <p className="mt-2 text-sm font-medium">DR-HO'S ·{" "}<a className="underline underline-offset-4 hover:text-accent" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">Tour the DR-HO hub</a></p>
-            </div>
-            <div className="border-t border-border p-5 md:border-r md:border-t-0">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/60">Signed</p>
-              <p className="mt-2 text-sm leading-relaxed">{SIGNED_HUB_BRANDS.slice(1).join(" · ")}</p>
-            </div>
-            <div className="border-t border-border p-5 md:border-t-0">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/60">On request</p>
-              <p className="mt-2 text-sm">On-prem clinic and studio surfaces are a separate insertion order.</p>
-            </div>
+          <div className="mb-8 border border-border bg-secondary/5 p-5 text-center md:p-6">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-accent">LIVE on DR-HO&apos;s</p>
+            <p className="mt-2 text-sm font-medium">
+              <a className="underline underline-offset-4 hover:text-accent" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">Tour the DR-HO hub</a>
+              <span className="text-muted-foreground"> · On-prem clinic and studio surfaces are a separate insertion order.</span>
+            </p>
           </div>
           <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
             <div className="border border-border bg-background flex flex-col">
@@ -742,7 +726,7 @@ export default function Home() {
               <div className="p-6 md:p-8 border-b border-border bg-secondary/5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-accent mb-2 flex items-center gap-2">
                   <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span></span>
-                  Signed hub · launching
+                  Launching
                 </p>
                 <h4 className="font-display text-2xl text-foreground">Kalaya Booking Hub</h4>
               </div>
@@ -750,14 +734,14 @@ export default function Home() {
                 <div className="border border-border/50 shadow-sm overflow-hidden aspect-[4/3] bg-muted relative">
                   <img src="/hub-proof/kalaya-booking-card.png" alt="Kalaya Booking Hub screenshot" className="w-full h-full object-cover object-top" loading="lazy" />
                 </div>
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Signed Scale Health hub. Display inventory is contracted. Launch timing varies.</p>
+                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Co-branded Scale Health hub. Display inventory is contracted. Launch timing varies.</p>
               </div>
             </div>
 
             <div className="border border-border bg-background flex flex-col">
               <div className="p-6 md:p-8 border-b border-border bg-secondary/5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-foreground/50 mb-2 flex items-center gap-2">
-                  Signed hub · launching
+                  Launching
                 </p>
                 <h4 className="font-display text-2xl text-foreground">ROLL Marketplace</h4>
               </div>
@@ -765,12 +749,15 @@ export default function Home() {
                 <div className="border border-border/50 shadow-sm overflow-hidden aspect-[4/3] bg-muted relative">
                   <img src="/hub-proof/roll-marketplace-grid.png" alt="ROLL Marketplace screenshot" className="w-full h-full object-cover object-top" loading="lazy" />
                 </div>
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Signed Scale Health hub. Display inventory is contracted. Launch timing varies.</p>
+                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Co-branded Scale Health hub. Display inventory is contracted. Launch timing varies.</p>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Co-branded hubs banner — public clear vs In Queue lock */}
+      <CobrandedHubsBanner id="home-cobranded-hubs" />
 
       {/* Example hubs gallery — live co-branded hubs (examples, not advertisers) */}
       <ExampleHubsGallery />
