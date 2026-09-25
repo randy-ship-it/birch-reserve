@@ -35,11 +35,11 @@ test("only http/https/tel/mailto are linkable; unsafe schemes are dropped to tex
   assert.equal(links("[click](javascript:alert(1))").length, 0);
   assert.equal(visible("[click](javascript:alert(1))"), "click");
   assert.equal(links("[x](vbscript:msgbox)").length, 0);
-  const tel = links("Call tel:+16479316278 anytime")[0];
+  const tel = links("Call tel:+15045046526 anytime")[0];
   assert.ok(tel && tel.kind === "link");
   if (tel.kind === "link") {
-    assert.equal(tel.href, "tel:+16479316278");
-    assert.equal(tel.label, "+1 (647) 931-6278");
+    assert.equal(tel.href, "tel:+15045046526");
+    assert.equal(tel.label, "+1 (504) 504-6526");
     assert.equal(tel.external, false);
   }
   const mail = links("[Email Randy](mailto:randy@example.com)")[0];

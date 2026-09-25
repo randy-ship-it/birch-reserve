@@ -97,8 +97,8 @@ const MAX_STORED_MESSAGES = 200;
 const MAX_EVENTS = 50;
 
 export const HANDOFF_EVENTS = new Set(["tel_click", "callback_request", "cal_shown"]);
-/** Our own line (env RANDY_TEL; default is Toronto line), skipped when extracting visitor phones. */
-const RANDY_TEL_DIGITS = (process.env["RANDY_TEL"] ?? "+16479316278").replace(/\D/g, "").slice(-10);
+/** Our own line (env RANDY_TEL; public CTA default 504 until Twilio/voice ID clears), skipped when extracting visitor phones. */
+const RANDY_TEL_DIGITS = (process.env["RANDY_TEL"] ?? "+15045046526").replace(/\D/g, "").slice(-10);
 
 /* ------------------------------------------------------------------ */
 /* Pure helpers                                                        */

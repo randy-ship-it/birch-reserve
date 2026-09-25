@@ -339,7 +339,7 @@ export function LingerCapture() {
                     Get the media kit.
                   </h2>
                   <p id={descId} className="mt-2 text-[14px] leading-relaxed text-slate-600">
-                    Placements, formats and how category seats work inside the recovery hubs, in one PDF. Holds start at
+                    Placements, formats and how category seats work inside signed Scale Health hubs, in one PDF. Holds start at
                     $190; a full seat is $490.
                   </p>
                   <form onSubmit={submit} className="relative mt-4 flex flex-col gap-2.5" noValidate data-testid="linger-form">

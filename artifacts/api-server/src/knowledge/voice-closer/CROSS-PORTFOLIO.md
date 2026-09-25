@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 18:00 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 23:08 EDT. Edit sales-brain, not this file. -->
 # CROSS-PORTFOLIO — one Randy brain, one pack
 
 **HARD (Randy via Emma, 2026-09-24 ~2:26pm ET):**  
@@ -10,7 +10,7 @@ Birch Reserve voice genius is the **SOURCE** for Align, Scale, and other portfol
 |------|-----|
 | Pack SoT + file ownership | **Birch Reserve** agent (`/workspace/sales-brain/ (mirror: /workspace/birch-live-ops/voice-closer/knowledge/)`) |
 | Voice agent standup / phone provision | Emma (with Birch help once number + agent exist) |
-| Site CTA / private team demo URL on birchreserve.net | Birch Reserve (checkout stays **false** until Gordon) |
+| Site CTA / private team demo URL on birchreserve.net | Birch Reserve (checkout **ON** per Randy 2026-09-24 6:22pm ET; previously false until Gordon) |
 | Scale then Align product consumers | Pull this pack after Birch callback is stable |
 
 ## Consumer order
@@ -31,7 +31,7 @@ Birch Reserve voice genius is the **SOURCE** for Align, Scale, and other portfol
 - Provisioned number live.  
 - Agent instructions = this pack (SYSTEM-PROMPT + NEVER-SAY minimum).  
 - Private team share URL working for Randy / Jon / Simar / Chris / Barb.  
-- Checkout still false until Gordon — stability ≠ payments on.
+- ~~Checkout still false until Gordon — stability ≠ payments on.~~ Superseded: checkout ON per Randy 2026-09-24 6:22pm ET.
 
 ## Routing reminder
 
@@ -43,7 +43,7 @@ Randy GO: cartoon avatar chat AI on birchreserve.net (site chat + voice). To vis
 
 - **Same knowledge pack** as the phone closer — chat **consumes** this folder; do **not** fork a chat-only talk-track.
 - Birch owns pack SoT; Replit scaffolds UI after PR #5 Publish; avatar image → Emma then onto site.
-- Checkout stays false. No invented metrics.
+- ~~Checkout stays false.~~ Checkout ON per Randy 2026-09-24 6:22pm ET. No invented metrics.
 
 ## Book a call / Cal — HARD (2026-09-24 ~3:00pm ET)
 
@@ -52,6 +52,6 @@ Chat Randy (site chat / voice) **qualifies first** as Randy from Birch Reserve, 
 
 - **Cal SoT (post-qualify only):** https://cal.com/randy-gilling/30min (Mon–Fri 1–3pm ET → SBG Growth)
 - Offer Cal **only after** screen: fit confirmed (brand/display vs provider rails vs Align MSP vs other), category/intent captured, and they still want a human.
-- Until then: keep talking, tel:+16479316278 for immediate closer voice, or capture email — **do not** dump the Cal URL cold in first turn / widget default CTA.
+- Until then: keep talking, tel:+15045046526 for immediate closer voice, or capture email — **do not** dump the Cal URL cold in first turn / widget default CTA.
 - Mailto randy@silverbirchgrowth.com remains backup after screen if Cal unavailable.
 - Build-once widget+brain — Scale / Align / RDGDH consume this pack; no siloed Cal shortcuts.

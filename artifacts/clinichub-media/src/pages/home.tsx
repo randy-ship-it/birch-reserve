@@ -241,7 +241,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="text-5xl md:text-6xl lg:text-[5.5rem] font-display text-background leading-[0.95] tracking-tight mb-6"
             >
-              Eight category seats inside closed recovery hubs.
+              Eight category seats inside signed Scale Health hubs.
             </motion.h1>
 
             <motion.p

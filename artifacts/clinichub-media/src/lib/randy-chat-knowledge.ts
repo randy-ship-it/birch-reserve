@@ -44,14 +44,15 @@ export const CHECKOUT_LIVE = true;
 
 /**
  * The ONE place the live/AI call number lives on the client. Set VITE_RANDY_TEL
- * (E.164, e.g. +14165550123) at build time to swap numbers; fallback is the current line.
+ * (E.164, e.g. +14165550123) at build time to swap numbers.
+ * Public CTA default is +15045046526 / +1 (504) 504-6526 until Randy voice/Twilio ID clears.
  */
 const RANDY_TEL_E164 = (() => {
   const raw = String(import.meta.env.VITE_RANDY_TEL ?? "").trim();
   const digits = raw.replace(/\D/g, "");
   if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
   if (digits.length === 10) return `+1${digits}`;
-  return "+16479316278";
+  return "+15045046526";
 })();
 export const RANDY_TEL_HREF = `tel:${RANDY_TEL_E164}`;
 /** HARD 3:42pm ET: after qualifying, the next step is an AI call first. */
@@ -71,12 +72,12 @@ export type DiscoveryChipId =
   | "live_hub"
   | "talk_human";
 
-/** Live proof of a recovery hub surface (public). */
+/** Live proof of a Scale Health hub surface (public). */
 export const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal" as const;
 export const LIVE_HUB_PROOF_DISPLAY = "the live DR-HO hub" as const;
 
 export const SMART_OPENER =
-  "Hey, I’m Randy. Want to see how a seat inside the recovery hubs works?" as const;
+  "Hey, I’m Randy. Want to see how a seat inside Scale clinic hubs works?" as const;
 
 /** Teaser bubble shown beside the full-body figure (closed state). */
 export const TEASER_TEXT = "Got a category in mind? Ask me." as const;
@@ -90,7 +91,7 @@ export const SUGGESTION_CHIPS: ReadonlyArray<{
   {
     id: "how_seats",
     label: "How seats work",
-    message: "How does a Birch Reserve category seat inside the recovery hubs work?",
+    message: "How does a Birch Reserve category seat inside Scale clinic hubs work?",
   },
   {
     id: "hold_190",
