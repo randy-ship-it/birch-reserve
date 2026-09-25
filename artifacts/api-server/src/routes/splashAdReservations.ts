@@ -654,13 +654,16 @@ router.post(
     }
 
     // 6:50pm test-traffic hygiene: mark only (seat logic untouched).
-    await markSplashReservationTestIfQa(reservation.id, {
+    const markedTest = await markSplashReservationTestIfQa(reservation.id, {
       qaHeader: hasValidQaHeader(req),
       email: normalizedEmail,
       name: parsed.data.brandName,
       attribution: attributionFrom(res),
       log: req.log,
     });
+    const reservationForAlert = markedTest
+      ? { ...reservation, isTest: true }
+      : reservation;
 
     await db.insert(advertiserIntakesTable).values({
       normalizedEmail,
@@ -675,7 +678,7 @@ router.post(
     });
 
     if (process.env.SPLASH_RESERVE_ALERTS_DISABLED !== "true") {
-      void deliverReservationAlert(reservation, {
+      void deliverReservationAlert(reservationForAlert, {
         send: reservationAlertSender,
         onError: (alertDeliveryError) => {
           req.log.warn(
@@ -1514,7 +1517,20 @@ export async function deliverReservationAlert(
     send?: typeof sendReservationSlackAlert;
     onError?: (message: string) => void;
   },
-): Promise<"sent" | "failed"> {
+): Promise<"sent" | "failed" | "skipped"> {
+  // QA/test traffic (is_test): never Slack staff; mark honest no-op status.
+  if (reservation.isTest === true) {
+    await db
+      .update(splashAdReservationsTable)
+      .set({
+        alertDeliveryStatus: "skipped",
+        alertDeliveryError: null,
+        alertDeliveredAt: new Date(),
+      })
+      .where(eq(splashAdReservationsTable.id, reservation.id));
+    return "skipped";
+  }
+
   let timeout: NodeJS.Timeout | undefined;
   try {
     await Promise.race([

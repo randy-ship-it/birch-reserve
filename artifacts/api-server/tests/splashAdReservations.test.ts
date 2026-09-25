@@ -10,6 +10,7 @@ import { eq, inArray } from "drizzle-orm";
 import app from "../src/app";
 import {
   appendReservationToPipeline,
+  deliverReservationAlert,
   processStripeEvent,
   sendReservationSlackAlert,
   setReservationAlertSenderForTests,
@@ -465,6 +466,81 @@ test("Slack reserve alerts include the buyer details staff need", async () => {
   assert.match(payload.text, /https:\/\/northstar\.example\.com/);
   assert.match(payload.text, /Buying path: auto_buy/);
   assert.match(payload.text, /Payment: unpaid/);
+});
+
+test("is_test reservations skip Slack and mark alert delivery as skipped", async () => {
+  const [reservation] = await db
+    .insert(splashAdReservationsTable)
+    .values({
+      brandName: "QA Test Probe",
+      email: `qa+alert-${randomUUID()}@example.com`,
+      websiteUrl: "https://qa.example.com",
+      status: "seat_held",
+      paymentStatus: "unpaid",
+      followUpBy: new Date(),
+      isTest: true,
+    })
+    .returning();
+  assert.ok(reservation);
+  createdReservationIds.push(reservation.id);
+
+  let slackInvoked = 0;
+  const result = await deliverReservationAlert(reservation, {
+    send: async () => {
+      slackInvoked += 1;
+      throw new Error("Slack should not be called for is_test");
+    },
+  });
+
+  assert.equal(result, "skipped");
+  assert.equal(slackInvoked, 0);
+  const [row] = await db
+    .select()
+    .from(splashAdReservationsTable)
+    .where(eq(splashAdReservationsTable.id, reservation.id));
+  assert.equal(row?.alertDeliveryStatus, "skipped");
+  assert.equal(row?.alertDeliveryError, null);
+  assert.ok(row?.alertDeliveredAt);
+});
+
+test("is_test paid rows do not get creative deadline Slack warnings", async () => {
+  const now = new Date();
+  const paidAt = new Date(now.getTime() - 49 * 60 * 60 * 1000);
+  const [reservation] = await db
+    .insert(splashAdReservationsTable)
+    .values({
+      brandName: "QA Warning Brand",
+      email: `qa+warning-${randomUUID()}@example.com`,
+      status: "paid",
+      paymentStatus: "paid",
+      creativeStatus: "awaiting_upload",
+      paidAt,
+      followUpBy: paidAt,
+      isTest: true,
+      offerKey: "reserve-490",
+      amountCents: 49000,
+      currency: "usd",
+    })
+    .returning();
+  assert.ok(reservation);
+  createdReservationIds.push(reservation.id);
+
+  let deliveries = 0;
+  const result = await cleanupSplashReservations({
+    now,
+    reservationIds: [reservation.id],
+    sendCreativeDeadlineWarning: async () => {
+      deliveries += 1;
+    },
+  });
+  assert.equal(result.creativeWarningsSent, 0);
+  assert.equal(result.creativeWarningsFailed, 0);
+  assert.equal(deliveries, 0);
+  const [row] = await db
+    .select()
+    .from(splashAdReservationsTable)
+    .where(eq(splashAdReservationsTable.id, reservation.id));
+  assert.equal(row?.creativeDeadlineWarningStatus, "pending");
 });
 
 test("Slack failures do not block the reservation receipt and record a private recovery error", async () => {
