@@ -935,6 +935,7 @@ export async function cleanupSplashReservations(
           eq(splashAdReservationsTable.status, "paid"),
           eq(splashAdReservationsTable.paymentStatus, "paid"),
           eq(splashAdReservationsTable.creativeStatus, "awaiting_upload"),
+          eq(splashAdReservationsTable.isTest, false),
           lt(splashAdReservationsTable.paidAt, creativeWarningCutoff),
           gt(splashAdReservationsTable.paidAt, creativeCutoff),
           inArray(splashAdReservationsTable.creativeDeadlineWarningStatus, [
