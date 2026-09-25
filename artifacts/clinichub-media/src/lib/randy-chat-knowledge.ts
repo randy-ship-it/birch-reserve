@@ -77,6 +77,9 @@ export type DiscoveryChipId =
 export const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal" as const;
 export const LIVE_HUB_PROOF_DISPLAY = "the live DR-HO hub" as const;
 
+/** Quiet exclusive-display placement example (not hero; no reach claim). */
+export const WEPRIZE_EXAMPLE_URL = "https://weprize.net" as const;
+
 export const SMART_OPENER =
   "Hey, I’m Randy. Want to see how a seat inside Scale clinic hubs works?" as const;
 

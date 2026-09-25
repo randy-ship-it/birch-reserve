@@ -9,6 +9,7 @@
  * real content, no login wall) — never a mockup or an unlaunched hub.
  */
 import { ArrowUpRight } from "lucide-react";
+import { EXAMPLE_EXCLUSIVE_PROPERTIES } from "@/lib/example-exclusive-properties";
 
 export type ExampleHub = {
   id: string;
@@ -117,6 +118,35 @@ export function ExampleHubsGallery() {
         <p className="mt-5 max-w-3xl text-xs leading-relaxed text-muted-foreground">
           Homepage screenshots of the hubs as they appear today. Birch display runs only on a hub named in an approved insertion order.
         </p>
+
+        {/* Quiet "also on" chip row — alternative exclusive EXAMPLE sites (not hero / not CLEAR_HUBS). */}
+        <div
+          className="mt-8 flex flex-wrap items-center gap-2 border-t border-border/60 pt-6"
+          data-testid="also-on-exclusive-examples"
+        >
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/45">
+            Also on
+          </span>
+          {EXAMPLE_EXCLUSIVE_PROPERTIES.map((prop) => (
+            <a
+              key={prop.id}
+              href={prop.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+              data-testid={`also-on-chip-${prop.id}`}
+              aria-label={`${prop.name} — ${prop.kind} (opens in a new tab)`}
+            >
+              <span className="font-medium text-foreground">{prop.name}</span>
+              <span className="text-[10px] uppercase tracking-[0.12em] text-foreground/40">
+                {prop.kind}
+              </span>
+            </a>
+          ))}
+          <span className="text-[11px] text-muted-foreground">
+            Quiet exclusive-display examples — not featured hub cards. Inquire to lock a seat.
+          </span>
+        </div>
       </div>
     </section>
   );

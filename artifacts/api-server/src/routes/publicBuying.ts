@@ -469,6 +469,7 @@ router.get("/llms.txt", (_req, res) => {
       "",
       "Eight category seats inside signed Scale Health hubs. Not an open auction. Not a guaranteed impression buy.",
       "Live proof: https://physio.drhonow.com/dr-ho/portal",
+      "Also (placement example, not hero): https://weprize.net — live SBG/Birch exclusive display example. Placement only; not a Scale hub seat; no reach/impression claims.",
       "Public SKUs:",
       "- hold-190 · $190 USD · 7-day category look · 100% credit if converted to a seat within 7 days, else cash refund · does not consume an 8-seat",
       "- reserve-490 · $490 USD · named category seat in the 8-pool · 100% media credit · insertion order before flight · credit expires 12 months",

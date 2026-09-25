@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-24 23:08 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-25 16:14 EDT. Edit sales-brain, not this file. -->
 # RDGDH-PORTFOLIO.md, factual overview only
 
 **Holdco:** RDG Digital Holdings Inc. (RDGDH) · https://rdgdh.com  
@@ -31,7 +31,7 @@ Friday paste also positions **Friday** (https://fridayapp.org) as portfolio inno
 
 | Product | URL / note | Factual blurb from files |
 |---------|------------|--------------------------|
-| **WePrize** | weprize / Contest Bot engine; domain attach TBD (weprize.ca candidates) | Canada-first contest aggregator: friction badges before click, free board, apply assist. Tagline: “Don’t gamble with your time. We apply to free contests for you.” Former name WeContest retired. |
+| **WePrize** | https://weprize.net (also weprize.ca) | Canada-first free-contest assist site: friction badges before click, free board, apply assist. Tagline: “Don’t gamble with your time. We apply to free contests for you.” Former name WeContest retired. **Birch Reserve sells exclusive display on WePrize** (quiet EXAMPLE property on birchreserve.net — not a featured Scale hub). WePrize Advertise soft-links brands to https://birchreserve.net so the inventory is reciprocal, not random. Do not invent DAU/ARR. |
 | **WeFlush** | https://weflush.org (also poopmap.org redirect family) | Bathroom / flush map PWA, “Get the inside flush.” Community map product; WeFlush Bot owns. |
 | **ParKings / GetParkings** | https://getparkings.com | Toronto-first: parking-ticket screening letter (you file on toronto.ca/aps; first eligible letter free; not a law firm) + user-drop street parking map. No promised outcome. |
 
@@ -54,4 +54,5 @@ Do not invent ARR, user counts, or “customers paying” for Friday / WePrize /
 ## UNKNOWN
 
 - Whether Friday / WePrize / WeFlush / ParKings cards are all live on rdgdh.com/portfolio at this moment beyond Align/Scale/SBG/AIforHealth/Reforged schema → verify before claiming “on the portfolio page.”
+- WePrize is live at https://weprize.net (confirmed 2026-09-25). Domain attach is no longer TBD.
 - Scale 100% under RDGDH on a signed cap table → flagged unverified in CHI walk-in note; do not assert.
