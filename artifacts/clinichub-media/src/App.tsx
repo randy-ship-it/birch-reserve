@@ -21,6 +21,7 @@ import { MotionConfig } from 'framer-motion';
 import { Layout } from '@/components/layout';
 import Home from '@/pages/home';
 import Kit from '@/pages/kit';
+import SellAdsPage from '@/pages/sell-ads';
 import Terms from '@/pages/terms';
 import Privacy from '@/pages/privacy';
 import SampleIo from '@/pages/sample-io';
@@ -216,6 +217,12 @@ function Router() {
         </Route>
         <Route path="/kit">
           <Layout><Kit /></Layout>
+        </Route>
+        <Route path="/sell-ads">
+          <Layout><SellAdsPage /></Layout>
+        </Route>
+        <Route path="/list-inventory">
+          <Redirect to="/sell-ads" />
         </Route>
         <Route path="/terms">
           <Layout><Terms /></Layout>

@@ -35,6 +35,7 @@ const fakeReceipts: Record<string, FakeReceipt> = {
   "/api/launch/waitlist": (_req, res) => void res.status(202).json({ status: "received", requestId: randomUUID() }),
   "/api/launch/commercial-inquiries": (_req, res) => void res.status(202).json({ status: "received", requestId: randomUUID() }),
   "/api/launch/advertiser-intake": (_req, res) => void res.status(202).json({ intakeId: randomUUID(), status: "received" }),
+  "/api/launch/ads-inventory-signup": (_req, res) => void res.status(202).json({ ok: true, leadId: `ads:${randomUUID()}` }),
   "/api/launch/splash/reserve": (req, res) => {
     const offer = (req.body as Record<string, unknown> | undefined)?.["offer"] === "hold-190" ? "hold-190" : "reserve-490";
     res.status(202).json({

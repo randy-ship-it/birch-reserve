@@ -12,6 +12,8 @@
  *                      matching prior lead's externalId when one exists (meta.friday_external_id)
  *   localbiz:<extId>   Local Biz Bot shared write path (source local_biz); Friday externalId =
  *                      the Local Biz externalId (meta.friday_external_id) for idempotent intake
+ *   ads:<id>           ads-only inventory host signup (source inventory_signup); Friday externalId =
+ *                      birch-ads-<id> via meta.friday_external_id
  *
  * meta (jsonb, 7:21pm): Friday deal metadata (category, hubs, sku, value, paid, ...), merged key-wise.
  *
@@ -28,7 +30,7 @@
 import { logger } from "./logger";
 import { applyAdditiveColumns } from "./schemaEnsure";
 
-export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture" | "checkout" | "local_biz";
+export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture" | "checkout" | "local_biz" | "inventory_signup";
 
 /** Friday deal metadata carried on the lead (unknown keys are simply absent). */
 export type LeadMeta = {
@@ -145,6 +147,7 @@ const ATTRIBUTION_MAX = 500;
 /** Source precedence: a callback request is never downgraded to a plain intake. */
 const SOURCE_RANK: Record<LeadSource, number> = {
   advertiser_intake: 0,
+  inventory_signup: 0,
   chat_intake: 1,
   chat_callback: 2,
   voice: 2,
