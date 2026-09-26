@@ -12,6 +12,7 @@ import humanGateRouter from "./humanGate";
 import qaFridayRouter from "./qaFriday";
 import opsMailTestRouter from "./opsMailTest";
 import localBizLeadRouter from "./localBizLead";
+import adsInventorySignupRouter from "./adsInventorySignup";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(humanGateRouter);
 router.use(qaFridayRouter);
 router.use(opsMailTestRouter);
 router.use(localBizLeadRouter);
+router.use(adsInventorySignupRouter);
 
 export default router;

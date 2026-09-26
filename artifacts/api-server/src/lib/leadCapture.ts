@@ -5,6 +5,7 @@
  *   - Advertiser follow-up form (advertiser_intakes) → leads row `intake:<id>`
  *   - Linger email capture → leads row `email:<sha256(email)>` (source email_capture)
  *   - Local Biz Bot shared write → leads row `localbiz:<externalId>` (source local_biz)
+ *   - Ads-only inventory signup → leads row `ads:<id>` (source inventory_signup)
  * Each upsert queues a non-blocking Friday CRM push (skipped for is_test rows).
  * Attribution (utm_*, referrer, landing page) rides along, first-touch. Never throws.
  */
@@ -190,4 +191,49 @@ export async function captureLocalBizLead(
   });
   if (res) queueFridayPush(res.lead.id);
   return { lead: res?.lead, created: Boolean(res?.created) };
+}
+
+
+/**
+ * Ads-only inventory host signup -> leads row `ads:<id>` (source inventory_signup).
+ * meta.friday_external_id = birch-ads-<id>. Notes fold into need for Friday message.
+ * Never throws (upsertLeadSafe).
+ */
+export async function captureInventorySignupLead(input: {
+  id: string;
+  company: string;
+  name: string;
+  email: string;
+  phone?: string;
+  audienceEstimate: string;
+  inventoryTypes: string[];
+  notes?: string;
+  pagePath?: string;
+  isTest?: boolean;
+  attribution?: Attribution;
+}): Promise<Lead | undefined> {
+  const types = input.inventoryTypes.map((x) => x.trim()).filter(Boolean);
+  const needBase = types.join(",");
+  const notes = typeof input.notes === "string" && input.notes.trim() ? input.notes.trim() : "";
+  const need = (notes ? `${needBase}\nNotes: ${notes}` : needBase).slice(0, 1000);
+  const email = input.email.trim().toLowerCase();
+  const lead = await upsertLeadSafe({
+    id: `ads:${input.id}`,
+    source: "inventory_signup",
+    sourceRef: input.id,
+    name: input.name,
+    company: input.company,
+    email,
+    phone: input.phone,
+    need,
+    size: input.audienceEstimate,
+    pagePath: input.pagePath,
+    isTest: Boolean(input.isTest) || isTestIdentity({ email, name: input.name }),
+    meta: {
+      friday_external_id: `birch-ads-${input.id}`.slice(0, 160),
+    },
+    ...(input.attribution ?? {}),
+  });
+  if (lead) queueFridayPush(lead.id);
+  return lead;
 }

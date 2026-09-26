@@ -80,6 +80,7 @@ const SOURCE_LABEL: Record<Lead["source"], string> = {
   email_capture: "Birch email capture",
   checkout: "Birch checkout (paid)",
   local_biz: "Local Biz lead",
+  inventory_signup: "Birch ads-only inventory signup",
 };
 
 /** meta.source buckets Emma asked for. */
@@ -92,6 +93,7 @@ const META_SOURCE: Record<Lead["source"], "chat" | "voice" | "form" | "email_cap
   email_capture: "email_capture",
   checkout: "checkout",
   local_biz: "form",
+  inventory_signup: "form",
 };
 
 /** Public SKUs only: $190 hold, $490 seat. */
@@ -114,7 +116,11 @@ export function buildFridayMeta(lead: Lead): Record<string, string | number | bo
   put("sku", lead.meta.sku);
   put("utm_source", lead.utmSource);
   put("utm_campaign", lead.utmCampaign);
-  put("need", lead.need, 500);
+  if (lead.source === "inventory_signup") {
+    put("need", lead.need?.split("\n")[0] ?? null, 500);
+  } else {
+    put("need", lead.need, 500);
+  }
   put("size", lead.size);
   put("timing", lead.timing);
   meta["is_test"] = lead.isTest;
@@ -140,10 +146,26 @@ export function splitName(name: string | null): { firstName?: string; lastName?:
 /** Friday /api/intake payload for a lead (matches Friday's parseIntakeBody limits). */
 export function buildFridayPayload(lead: Lead, cfg: Pick<FridayConfig, "workspace" | "stage">): Record<string, unknown> {
   const email = lead.email && EMAIL_RE.test(lead.email) && lead.email.length <= 320 ? lead.email : undefined;
+  const inventoryNeed = lead.source === "inventory_signup" ? (lead.need ?? "") : "";
+  const inventoryTypesLine = inventoryNeed.split("\n")[0] || "";
+  const inventoryNotes = inventoryNeed
+    .split("\n")
+    .slice(1)
+    .join("\n")
+    .replace(/^Notes:\s*/i, "")
+    .trim();
   const details = [
     `${SOURCE_LABEL[lead.source]} (${cfg.stage}).`,
-    lead.need ? `Need: ${lead.need}` : "",
-    lead.size ? `Size: ${lead.size}` : "",
+    ...(lead.source === "inventory_signup"
+      ? [
+          lead.size ? `Audience estimate: ${lead.size}` : "",
+          inventoryTypesLine ? `Inventory: ${inventoryTypesLine}` : "",
+          inventoryNotes ? `Notes: ${inventoryNotes}` : "",
+        ]
+      : [
+          lead.need ? `Need: ${lead.need}` : "",
+          lead.size ? `Size: ${lead.size}` : "",
+        ]),
     lead.timing ? `Timing: ${lead.timing}` : "",
     lead.role ? `Role: ${lead.role}` : "",
     lead.utmSource || lead.utmMedium || lead.utmCampaign
@@ -173,6 +195,7 @@ export function buildFridayPayload(lead: Lead, cfg: Pick<FridayConfig, "workspac
       "birch-inbound",
       "stage:birch-inbound",
       `birch:${lead.source.replace(/_/g, "-")}`,
+      ...(lead.source === "inventory_signup" ? ["door:sell-ads"] : []),
       ...(lead.meta.sku && SKU_VALUE[lead.meta.sku] ? [`birch:${lead.meta.sku}`] : []),
       ...(lead.isTest ? ["birch:qa-test"] : []),
     ],
