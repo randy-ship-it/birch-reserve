@@ -4,6 +4,7 @@
  *     contact jsonb, #18) → leads row `chat:<sessionId>`
  *   - Advertiser follow-up form (advertiser_intakes) → leads row `intake:<id>`
  *   - Linger email capture → leads row `email:<sha256(email)>` (source email_capture)
+ *   - Local Biz Bot shared write → leads row `localbiz:<externalId>` (source local_biz)
  * Each upsert queues a non-blocking Friday CRM push (skipped for is_test rows).
  * Attribution (utm_*, referrer, landing page) rides along, first-touch. Never throws.
  */
@@ -97,6 +98,93 @@ export async function captureEmailLead(input: {
     need: "Birch Reserve media kit + seat updates",
     pagePath: input.pagePath ?? undefined,
     isTest: Boolean(input.isTest) || isTestIdentity({ email, name: input.company ?? null }),
+    ...(input.attribution ?? {}),
+    ...(input.now ? { now: input.now } : {}),
+  });
+  if (res) queueFridayPush(res.lead.id);
+  return { lead: res?.lead, created: Boolean(res?.created) };
+}
+
+/** Sanitize Local Biz externalId to safe chars (alphanumeric, dash, underscore, colon, dot). Max 160. */
+export function sanitizeLocalBizExternalId(raw: string): string | null {
+  const t = raw.trim().slice(0, 160);
+  if (!t) return null;
+  const safe = t.replace(/[^a-zA-Z0-9_\-.:]/g, "");
+  return safe.length ? safe.slice(0, 160) : null;
+}
+
+export type LocalBizLeadInput = {
+  externalId: string;
+  email?: string | null;
+  phone?: string | null;
+  name?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  company?: string | null;
+  role?: string | null;
+  website?: string | null;
+  message?: string | null;
+  need?: string | null;
+  size?: string | null;
+  timing?: string | null;
+  pagePath?: string | null;
+  category?: string | null;
+  hubs?: string | null;
+  isTest?: boolean;
+  attribution?: Attribution;
+  now?: Date;
+};
+
+function buildLocalBizName(input: LocalBizLeadInput): string | undefined {
+  if (input.name?.trim()) return input.name.trim();
+  const parts = [input.firstName, input.lastName].map((x) => (typeof x === "string" ? x.trim() : "")).filter(Boolean);
+  return parts.length ? parts.join(" ") : undefined;
+}
+
+function buildLocalBizNeed(input: LocalBizLeadInput): string | undefined {
+  const bits = [input.need, input.message, input.website ? `Website: ${input.website.trim()}` : null]
+    .map((x) => (typeof x === "string" ? x.trim() : ""))
+    .filter(Boolean);
+  return bits.length ? bits.join("\n").slice(0, 1000) : undefined;
+}
+
+/**
+ * Local Biz Bot → Birch Neon leads (source local_biz). Lead id `localbiz:<externalId>`.
+ * meta.friday_external_id = externalId so Friday intake stays idempotent with Local Biz's own push.
+ * Never throws.
+ */
+export async function captureLocalBizLead(
+  input: LocalBizLeadInput,
+): Promise<{ lead: Lead | undefined; created: boolean }> {
+  const externalId = sanitizeLocalBizExternalId(input.externalId);
+  if (!externalId) return { lead: undefined, created: false };
+  const email = typeof input.email === "string" && input.email.trim() ? input.email.trim().toLowerCase() : undefined;
+  const phone = typeof input.phone === "string" && input.phone.trim() ? input.phone.trim() : undefined;
+  const name = buildLocalBizName(input);
+  const company = typeof input.company === "string" && input.company.trim() ? input.company.trim() : undefined;
+  if (!email && !phone) return { lead: undefined, created: false };
+  const isTest =
+    Boolean(input.isTest) ||
+    isTestIdentity({ email: email ?? null, name: name ?? company ?? null, label: externalId });
+  const res = await upsertLeadSafeDetailed({
+    id: `localbiz:${externalId}`,
+    source: "local_biz",
+    sourceRef: externalId,
+    name,
+    company,
+    role: typeof input.role === "string" && input.role.trim() ? input.role.trim() : undefined,
+    phone,
+    email,
+    need: buildLocalBizNeed(input),
+    size: typeof input.size === "string" && input.size.trim() ? input.size.trim() : undefined,
+    timing: typeof input.timing === "string" && input.timing.trim() ? input.timing.trim() : undefined,
+    pagePath: typeof input.pagePath === "string" && input.pagePath.trim() ? input.pagePath.trim() : undefined,
+    isTest,
+    meta: {
+      friday_external_id: externalId,
+      ...(typeof input.category === "string" && input.category.trim() ? { category: input.category.trim() } : {}),
+      ...(typeof input.hubs === "string" && input.hubs.trim() ? { hubs: input.hubs.trim() } : {}),
+    },
     ...(input.attribution ?? {}),
     ...(input.now ? { now: input.now } : {}),
   });

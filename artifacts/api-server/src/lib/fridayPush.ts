@@ -79,6 +79,7 @@ const SOURCE_LABEL: Record<Lead["source"], string> = {
   advertiser_intake: "Birch advertiser form",
   email_capture: "Birch email capture",
   checkout: "Birch checkout (paid)",
+  local_biz: "Local Biz lead",
 };
 
 /** meta.source buckets Emma asked for. */
@@ -90,6 +91,7 @@ const META_SOURCE: Record<Lead["source"], "chat" | "voice" | "form" | "email_cap
   advertiser_intake: "form",
   email_capture: "email_capture",
   checkout: "checkout",
+  local_biz: "form",
 };
 
 /** Public SKUs only: $190 hold, $490 seat. */
