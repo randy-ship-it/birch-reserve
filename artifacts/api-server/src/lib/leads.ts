@@ -10,6 +10,8 @@
  *   email:<sha256>     linger email capture (source email_capture), keyed by email hash
  *   checkout:<resId>   paid Stripe checkout (source checkout); re-posts to Friday under the
  *                      matching prior lead's externalId when one exists (meta.friday_external_id)
+ *   localbiz:<extId>   Local Biz Bot shared write path (source local_biz); Friday externalId =
+ *                      the Local Biz externalId (meta.friday_external_id) for idempotent intake
  *
  * meta (jsonb, 7:21pm): Friday deal metadata (category, hubs, sku, value, paid, ...), merged key-wise.
  *
@@ -26,7 +28,7 @@
 import { logger } from "./logger";
 import { applyAdditiveColumns } from "./schemaEnsure";
 
-export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture" | "checkout";
+export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture" | "checkout" | "local_biz";
 
 /** Friday deal metadata carried on the lead (unknown keys are simply absent). */
 export type LeadMeta = {
@@ -148,6 +150,7 @@ const SOURCE_RANK: Record<LeadSource, number> = {
   voice: 2,
   web_voice: 2,
   email_capture: 0,
+  local_biz: 0,
   checkout: 3,
 };
 
