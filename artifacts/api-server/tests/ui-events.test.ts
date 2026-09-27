@@ -6,6 +6,7 @@ import {
   legacyReserveCopyPatch,
   mentionsLegacyHeroPrice,
   SCALE_HUBS_ARTICLE,
+  SHELF_AFTER_RECEIPT_ARTICLE,
 } from "../../../lib/db/src/public-insights-copy.ts";
 import {
   seedPublicInsightsWithStore,
@@ -36,6 +37,23 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
   assert.equal(SCALE_HUBS_ARTICLE.authorName, "Birch Reserve Editorial");
   assert.equal(SCALE_HUBS_ARTICLE.publishedAt.toISOString(), "2026-09-24T16:00:00.000Z");
   assert.doesNotMatch(SCALE_HUBS_ARTICLE.body, /50MM|1MM unique|impression guarantee/i);
+
+  assert.equal(SHELF_AFTER_RECEIPT_ARTICLE.slug, "the-shelf-after-the-receipt");
+  assert.equal(SHELF_AFTER_RECEIPT_ARTICLE.title, "The shelf after the receipt");
+  assert.equal(SHELF_AFTER_RECEIPT_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(SHELF_AFTER_RECEIPT_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(
+    SHELF_AFTER_RECEIPT_ARTICLE.publishedAt.toISOString(),
+    "2026-09-27T16:00:00.000Z",
+  );
+  assert.match(SHELF_AFTER_RECEIPT_ARTICLE.summary, /media credit, not a flight that starts itself/);
+  assert.match(SHELF_AFTER_RECEIPT_ARTICLE.body, /^# The shelf after the receipt\n/);
+  assert.doesNotMatch(SHELF_AFTER_RECEIPT_ARTICLE.body, /\*\*Slug:\*\*|\*\*Summary:\*\*|\*\*Author:\*\*/);
+  assert.match(SHELF_AFTER_RECEIPT_ARTICLE.body, /Nothing runs before step 2/);
+  assert.equal(mentionsLegacyHeroPrice(SHELF_AFTER_RECEIPT_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(SHELF_AFTER_RECEIPT_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(SHELF_AFTER_RECEIPT_ARTICLE.body), false);
+  assert.doesNotMatch(SHELF_AFTER_RECEIPT_ARTICLE.body, /1MM|5MM|Align 80|payments paused|\$49 ICA/i);
 
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
@@ -107,10 +125,14 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
   const first = await seedPublicInsightsWithStore(store);
   assert.deepEqual(first, { inserted: true, corrected: 1 });
   assert.deepEqual(updates, ["trusted"]);
-  assert.deepEqual(inserts, [SCALE_HUBS_ARTICLE.slug]);
+  assert.deepEqual(inserts, [
+    SCALE_HUBS_ARTICLE.slug,
+    SHELF_AFTER_RECEIPT_ARTICLE.slug,
+  ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
   assert.equal(rows[1]?.body, untouched);
+  assert.equal(rows[1]?.summary, "What a buyer should require from an advertising agent.");
 
   const second = await seedPublicInsightsWithStore(store);
   assert.deepEqual(second, { inserted: false, corrected: 0 });
@@ -264,6 +286,17 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   // cta_custom_onprem CTA was removed from home in #25 (Book a call CTAs dropped).
   assert.match(concierge, /cta_book_call/);
   assert.match(layout, /nav_insights/);
+  assert.match(layout, /label: 'Ad Examples'/);
+  assert.match(layout, /#placements/);
+  assert.match(home, /id="placements"/);
+  assert.match(home, /data-testid="three-steps"/);
+  assert.match(home, /Nothing runs before step 2/);
+  assert.match(home, /Pay \$190 look or \$490 seat as 100% credit\./);
+  assert.match(home, /Insertion order names the hub\./);
+  assert.match(home, /Unit sits after checkout, on a plan, or at a booking\./);
+  assert.match(home, /href="\/insights\/the-shelf-after-the-receipt"/);
+  assert.doesNotMatch(home, /\$899/);
+  assert.doesNotMatch(home, /payments paused/i);
   assert.match(editorial, /const PUBLIC_SITE_ORIGIN = "https:\/\/birchreserve\.net"/);
   assert.doesNotMatch(editorial, /www\.birchreserve\.net/);
   const surfaces = `${home}\n${concierge}\n${layout}\n${helper}`;
@@ -275,6 +308,64 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.match(analytics, /VITE_GA4_ID/);
   assert.doesNotMatch(analytics, /G-[A-Z0-9]{6,}/);
   assert.doesNotMatch(analytics, /data-domain=["']birchreserve/);
+});
+
+const BRAND_TITLE = "Birch Reserve | Eight category seats";
+const BRAND_DESCRIPTION =
+  "$190 holds a category 7 days. $490 locks a seat inside signed Scale Health hubs. Live hub: physio.drhonow.com. Credit, not a flight.";
+
+test("public marketing title and description match the brand strings", async () => {
+  const indexHtml = await readFile(
+    resolve(process.cwd(), "../clinichub-media/index.html"),
+    "utf8",
+  );
+  assert.ok(indexHtml.includes(`<title>${BRAND_TITLE}</title>`));
+  for (const attr of [
+    'name="description"',
+    'property="og:description"',
+    'name="twitter:description"',
+  ]) {
+    assert.ok(indexHtml.includes(`<meta ${attr} content="${BRAND_DESCRIPTION}" />`));
+  }
+  assert.ok(indexHtml.includes(`property="og:title" content="${BRAND_TITLE}"`));
+  assert.ok(indexHtml.includes(`name="twitter:title" content="${BRAND_TITLE}"`));
+  assert.doesNotMatch(indexHtml, /Eight category seats inside signed Scale Health hubs\./);
+  assert.doesNotMatch(indexHtml, /\$899|payments paused/i);
+
+  const buying = await readFile(resolve(process.cwd(), "src/routes/publicBuying.ts"), "utf8");
+  assert.match(buying, /const PUBLIC_BRAND_DESCRIPTION =\s*\n\s*"\$190 holds a category 7 days\./);
+  assert.doesNotMatch(buying, /\$490 holds a category seat inside signed Scale Health hubs/);
+});
+
+test("GET /oatmeal is a permanent redirect to /buycalc and keeps the query string", async () => {
+  const server = app.listen(0);
+  await new Promise<void>((resolveReady, rejectReady) => {
+    server.once("listening", () => resolveReady());
+    server.once("error", rejectReady);
+  });
+  const address = server.address();
+  if (!address || typeof address === "string") throw new Error("Test server did not bind.");
+  const origin = `http://127.0.0.1:${address.port}`;
+  try {
+    const withQuery = await fetch(`${origin}/oatmeal?sku=hold-190&format=post_checkout`, {
+      redirect: "manual",
+    });
+    assert.equal(withQuery.status, 301);
+    assert.equal(
+      withQuery.headers.get("location"),
+      "/buycalc?sku=hold-190&format=post_checkout",
+    );
+    const body = await withQuery.text();
+    assert.doesNotMatch(body, /id="root"/);
+
+    const bare = await fetch(`${origin}/oatmeal`, { redirect: "manual" });
+    assert.equal(bare.status, 301);
+    assert.equal(bare.headers.get("location"), "/buycalc");
+  } finally {
+    await new Promise<void>((resolveClose, rejectClose) => {
+      server.close((error) => (error ? rejectClose(error) : resolveClose()));
+    });
+  }
 });
 
 after(() => {
