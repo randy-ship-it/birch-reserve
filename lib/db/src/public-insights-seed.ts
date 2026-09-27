@@ -1,7 +1,7 @@
 import {
   legacyReserveCopyPatch,
   mentionsLegacyHeroPrice,
-  SCALE_HUBS_ARTICLE,
+  PUBLIC_INSIGHT_ARTICLES,
 } from "./public-insights-copy";
 
 export type PublishedInsightCopy = {
@@ -51,16 +51,19 @@ export async function seedPublicInsightsWithStore(
     corrected += 1;
   }
 
-  const article: ScaleHubsArticleInsert = {
-    slug: SCALE_HUBS_ARTICLE.slug,
-    title: SCALE_HUBS_ARTICLE.title,
-    authorName: SCALE_HUBS_ARTICLE.authorName,
-    topic: SCALE_HUBS_ARTICLE.topic,
-    summary: SCALE_HUBS_ARTICLE.summary,
-    body: SCALE_HUBS_ARTICLE.body,
-    publishedAt: SCALE_HUBS_ARTICLE.publishedAt,
-  };
-  assertPublishable(article);
-  const inserted = await store.insertPublishedIfMissing(article);
+  let inserted = false;
+  for (const source of PUBLIC_INSIGHT_ARTICLES) {
+    const article: ScaleHubsArticleInsert = {
+      slug: source.slug,
+      title: source.title,
+      authorName: source.authorName,
+      topic: source.topic,
+      summary: source.summary,
+      body: source.body,
+      publishedAt: source.publishedAt,
+    };
+    assertPublishable(article);
+    if (await store.insertPublishedIfMissing(article)) inserted = true;
+  }
   return { inserted, corrected };
 }
