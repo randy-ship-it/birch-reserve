@@ -458,6 +458,18 @@ async function reserveCounts() {
   return getSplashSeatCounts();
 }
 
+const PUBLIC_BRAND_DESCRIPTION =
+  "$190 holds a category 7 days. $490 locks a seat inside signed Scale Health hubs. Live hub: physio.drhonow.com. Credit, not a flight.";
+
+// Registered on the API service (ahead of the static SPA rewrite) so Autoscale
+// answers /oatmeal with a real 301 instead of index.html.
+router.get("/oatmeal", (req, res) => {
+  const query = req.originalUrl.includes("?")
+    ? req.originalUrl.slice(req.originalUrl.indexOf("?"))
+    : "";
+  res.redirect(301, `/buycalc${query}`);
+});
+
 router.post("/v1/ui-events", (req, res) => {
   void handleUiEvent(req, res);
 });
@@ -479,7 +491,7 @@ router.get("/llms.txt", (_req, res) => {
       "Launching cohort (logos, not reach): DR-HO’S · Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery.",
       `Formats: ${FORMATS.join(", ")}.`,
       "Every published dollar is a 100% media credit. Delivery starts when the insertion order names the hub.",
-      "$490 holds a category seat inside signed Scale Health hubs. Live example: physio.drhonow.com/dr-ho/portal. Credit, not a flight.",
+      PUBLIC_BRAND_DESCRIPTION,
       "Quoted public prices are exact, one-time, and USD. Only reserve-490 consumes the eight-seat pool. hold-190 does not.",
       "Exclusions: no PHI, no clinical pixels, no open auction, no impression guarantee.",
       "Seller: Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · sales@silverbirchgrowth.com",
@@ -2031,7 +2043,7 @@ router.get("/buycalc", async (req, res): Promise<void> => {
   const availability = await reserveCounts();
   res.type("html").send(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Buy calculator — Birch Reserve</title><meta name="description" content="$490 holds a category seat inside signed Scale Health hubs. Live example: physio.drhonow.com/dr-ho/portal. Credit, not a flight."><meta property="og:description" content="$490 holds a category seat inside signed Scale Health hubs. Live example: physio.drhonow.com/dr-ho/portal. Credit, not a flight.">
+<title>Buy calculator — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | Eight category seats"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | Eight category seats"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <script type="application/ld+json">${JSON.stringify({
   "@context": "https://schema.org",
