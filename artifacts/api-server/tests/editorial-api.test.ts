@@ -134,6 +134,10 @@ test("editorial API separates pending sources, staff drafts, manager transitions
   assert.doesNotMatch(JSON.stringify(publicItem), /reviewNotes|generationJobId|excerpt|contentHash|approvedByStaff/i);
   const publishedSitemap = await (await fetch(`${baseUrl}/editorial/sitemap.xml`)).text();
   assert.match(publishedSitemap, new RegExp(`https://birchreserve\\.net/insights/${createdArticle.slug}`));
+  for (const path of ["/", "/about", "/insights", "/terms", "/privacy", "/sample-io", "/marketplace", "/buycalc", "/v1/catalog.json", "/llms.txt", "/openapi.yaml"]) {
+    const loc = `https://birchreserve.net${path}`.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    assert.match(publishedSitemap, new RegExp(`<loc>${loc}</loc>`));
+  }
   assert.doesNotMatch(publishedSitemap, /www\.birchreserve\.net/);
   assert.doesNotMatch(publishedSitemap, /reviewNotes|generationJobId|excerpt|contentHash|approvedByStaff/i);
 });
