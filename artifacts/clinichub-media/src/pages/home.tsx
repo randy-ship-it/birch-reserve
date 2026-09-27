@@ -330,6 +330,37 @@ export default function Home() {
         </div>
       </section>
 
+      <section
+        aria-label="Three steps before a unit runs"
+        className="border-b border-border bg-background"
+        data-testid="three-steps"
+      >
+        <div className="container mx-auto px-6 py-8 md:py-10">
+          <p className="mb-5 text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/50">
+            Nothing runs before step 2
+          </p>
+          <ol className="grid border border-border md:grid-cols-3">
+            {(
+              [
+                ["1", "Pay $190 look or $490 seat as 100% credit."],
+                ["2", "Insertion order names the hub."],
+                ["3", "Unit sits after checkout, on a plan, or at a booking."],
+              ] as const
+            ).map(([step, copy], index) => (
+              <li
+                key={step}
+                className={`bg-background p-5 md:p-6 ${
+                  index > 0 ? "border-t border-border md:border-l md:border-t-0" : ""
+                }`}
+              >
+                <p className="font-display text-2xl text-accent">{step}</p>
+                <p className="mt-3 text-sm leading-relaxed text-foreground">{copy}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
       {/* One funnel, two buying paths */}
       <section id="reserve-offers" className="border-b border-border bg-background py-10 md:py-12">
         <div className="container mx-auto px-6">
@@ -711,6 +742,15 @@ export default function Home() {
             <p className="mt-2 text-sm font-medium">
               <a className="underline underline-offset-4 hover:text-accent" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">Tour the DR-HO hub</a>
               <span className="text-muted-foreground"> · On-prem clinic and studio surfaces are a separate insertion order.</span>
+            </p>
+            <p className="mt-3 text-sm">
+              <a
+                href="/insights/the-shelf-after-the-receipt"
+                className="underline underline-offset-4 hover:text-accent"
+                data-testid="link-shelf-after-receipt"
+              >
+                The shelf after the receipt
+              </a>
             </p>
           </div>
           <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
