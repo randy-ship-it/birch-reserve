@@ -7,7 +7,7 @@ id = "3B4_FFSkEVBkAeYMFRJ2e"
 [[services]]
 localPort = 8080
 name = "API Server"
-paths = ["/api", "/v1", "/ucp", "/.well-known/ucp", "/llms.txt", "/openapi.yaml", "/buycalc", "/oatmeal", "/terms", "/privacy", "/sample-io", "/insights"]
+paths = ["/api", "/v1", "/ucp", "/.well-known/ucp", "/llms.txt", "/openapi.yaml", "/buycalc", "/oatmeal", "/terms", "/privacy", "/sample-io", "/insights", "/83e5e0807e991d5343be4f3044fa6da9.txt"]
 
 [services.development]
 run = "pnpm --filter @workspace/api-server run dev"

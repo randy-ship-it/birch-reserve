@@ -11,6 +11,7 @@ import voiceCallEndedRouter from "./voiceCallEnded";
 import humanGateRouter from "./humanGate";
 import qaFridayRouter from "./qaFriday";
 import opsMailTestRouter from "./opsMailTest";
+import indexNowRouter from "./indexNow";
 import localBizLeadRouter from "./localBizLead";
 import adsInventorySignupRouter from "./adsInventorySignup";
 
@@ -28,6 +29,7 @@ router.use(voiceCallEndedRouter);
 router.use(humanGateRouter);
 router.use(qaFridayRouter);
 router.use(opsMailTestRouter);
+router.use(indexNowRouter);
 router.use(localBizLeadRouter);
 router.use(adsInventorySignupRouter);
 

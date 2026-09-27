@@ -6,6 +6,7 @@ import router from "./routes/index";
 import { randyChatJsonParser } from "./routes/randyChat";
 import publicBuyingRouter from "./routes/publicBuying";
 import publicPagesRouter from "./routes/publicPages";
+import { indexNowKeyRouter } from "./routes/indexNow";
 import { logger } from "./lib/logger";
 import { uiEventsJsonParser } from "./lib/uiEvents";
 import { handleStripeWebhook } from "./routes/splashAdReservations";
@@ -65,6 +66,7 @@ app.use(
   }),
 );
 app.use(publicPagesRouter);
+app.use(indexNowKeyRouter);
 app.use(publicBuyingRouter);
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
