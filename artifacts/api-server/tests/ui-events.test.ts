@@ -368,6 +368,70 @@ test("GET /oatmeal is a permanent redirect to /buycalc and keeps the query strin
   }
 });
 
+test("legal and insights routes return readable HTML instead of the SPA shell", async () => {
+  const artifact = await readFile(
+    resolve(process.cwd(), ".replit-artifact/artifact.toml"),
+    "utf8",
+  );
+  for (const path of ["/terms", "/privacy", "/sample-io", "/insights"]) {
+    assert.match(artifact, new RegExp(`"${path.replace("/", "\\/")}"`));
+  }
+
+  const server = app.listen(0);
+  await new Promise<void>((resolveReady, rejectReady) => {
+    server.once("listening", () => resolveReady());
+    server.once("error", rejectReady);
+  });
+  const address = server.address();
+  if (!address || typeof address === "string") throw new Error("Test server did not bind.");
+  const origin = `http://127.0.0.1:${address.port}`;
+  try {
+    const terms = await fetch(`${origin}/terms`);
+    const termsHtml = await terms.text();
+    assert.equal(terms.status, 200);
+    assert.match(terms.headers.get("content-type") ?? "", /text\/html/);
+    assert.match(termsHtml, /<h1>Terms of sale<\/h1>/);
+    assert.match(termsHtml, /counsel stamps this page/);
+    assert.match(termsHtml, /hold-190/);
+    assert.match(termsHtml, /reserve-490/);
+    assert.doesNotMatch(termsHtml, /id="root"/);
+    assert.doesNotMatch(termsHtml, /\$899/);
+
+    const privacy = await (await fetch(`${origin}/privacy`)).text();
+    assert.match(privacy, /<h1>Privacy<\/h1>/);
+    assert.match(privacy, /does not store full card numbers/);
+    assert.match(privacy, /protected health information/);
+    assert.doesNotMatch(privacy, /id="root"/);
+
+    const sample = await (await fetch(`${origin}/sample-io`)).text();
+    assert.match(sample, /<h1>Sample insertion order<\/h1>/);
+    assert.match(sample, /not an approved insertion order/);
+    assert.match(sample, /hold-190/);
+    assert.doesNotMatch(sample, /id="root"/);
+    assert.doesNotMatch(sample, /\$899/);
+
+    const insightsResponse = await fetch(`${origin}/insights`);
+    const insights = await insightsResponse.text();
+    assert.equal(insightsResponse.status, 200);
+    assert.match(insights, /Insights &amp; Evidence/);
+    assert.match(insights, /href="\/insights\/the-shelf-after-the-receipt"/);
+    assert.match(insights, /The shelf after the receipt/);
+    assert.doesNotMatch(insights, /id="root"/);
+    assert.doesNotMatch(insights, /\$899/);
+
+    const article = await (await fetch(`${origin}/insights/the-shelf-after-the-receipt`)).text();
+    assert.match(article, /<h1>The shelf after the receipt<\/h1>/);
+    assert.equal(article.match(/<h1>/g)?.length, 1);
+    assert.match(article, /Nothing runs before step 2/);
+    assert.doesNotMatch(article, /\*\*Slug:\*\*/);
+    assert.doesNotMatch(article, /id="root"/);
+  } finally {
+    await new Promise<void>((resolveClose, rejectClose) => {
+      server.close((error) => (error ? rejectClose(error) : resolveClose()));
+    });
+  }
+});
+
 after(() => {
   setUiEventRecorderForTests(null);
   resetUiEventRateLimitForTests();
