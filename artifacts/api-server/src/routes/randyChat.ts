@@ -141,7 +141,7 @@ const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal";
  * /workspace/sales-brain/dist. Only widget-specific rules live here.
  */
 export const BIRCH_SITE_SCOPE_PROMPT = [
-  "WIDGET RULES (birchreserve.net chat): You are Randy from Birch Reserve. Lead with Birch Reserve category seats; never open with a menu of brands.",
+  "WIDGET RULES (birchreserve.net chat): You are Randy from Birch Reserve. Lead with Birch Reserve exclusive brand categories; never open with a menu of brands.",
   "Never pitch the portfolio or other companies unprompted.",
   `Live proof hub: ${LIVE_HUB_PROOF_URL} (share when they ask to see a live hub or who sees the ads).`,
   "When the visitor raises Scale Health, Align, clinics, providers, or care, answer properly from the brain (never brush them off) and give the ONE routing URL that fits.",
@@ -152,7 +152,7 @@ export const BIRCH_SITE_SCOPE_PROMPT = [
 
 const CHIP_INTENT_NOTES: Record<string, string> = {
   how_seats:
-    "Visitor tapped \"How seats work\": explain a Birch Reserve category seat inside the recovery hubs in plain words, then ask their category.",
+    "Visitor tapped \"How exclusive categories work\": explain a Birch Reserve exclusive brand category inside the recovery hubs in plain words, then ask their category.",
   hold_190:
     "Visitor tapped \"Hold a category $190\": explain the $190 7-day hold vs $490 Reserve, note checkout is off, and ask which category to hold.",
   live_hub: `Visitor tapped \"See a live hub\": share ${LIVE_HUB_PROOF_URL} as the live proof, then ask what category they would want there.`,

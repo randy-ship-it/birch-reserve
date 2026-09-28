@@ -138,9 +138,9 @@ const TERMS_HTML = documentPage(
   `<h1>Terms of sale</h1>
 <p class="fine">${escapeHtml(SELLER)}</p>
 <p>Birch Reserve is operated by Silver Birch Growth Inc. These terms are a draft. They are not in force for a live card until counsel stamps this page. Public prices are $190 USD (<strong>hold-190</strong>, a 7-day category look that does not lock an exclusive category) and $490 USD (<strong>reserve-490</strong>, lock your exclusive category).</p>
-<p>hold-190 is a 100% credit if the buyer takes a seat within 7 days. Otherwise it is a cash refund. It does not consume an 8-seat. reserve-490 is 100% media credit. Credit expires 12 months after payment. A cash refund is available if no approved surface is named within 60 days of payment.</p>
+<p>hold-190 is a 100% credit if the buyer converts within 7 days. Otherwise it is a cash refund. It does not lock an exclusive category. reserve-490 is 100% media credit. Credit expires 12 months after payment. A cash refund is available if no approved surface is named within 60 days of payment.</p>
 <p>Payment is a reservation credit, not a live flight and not an impression guarantee. Nothing runs until an insertion order names the surface. After that order, cancellation and makegood follow IAB. The public sample is <a href="/sample-io">/sample-io</a>.</p>
-<p>Eight seats means eight advertiser categories across hubs, not eight websites. Reporting is aggregate only. No PHI. No clinical pixels.</p>
+<p>8 exclusive brand categories across hubs — not eight websites. One brand per category. Reporting is aggregate only. No PHI. No clinical pixels.</p>
 <p>Checkout is Stripe-hosted. Silver Birch Growth Inc. does not store full card numbers. Questions: <a href="mailto:sales@silverbirchgrowth.com">Email sales</a>.</p>
 <p><a href="/privacy">Privacy</a></p>`,
 );
