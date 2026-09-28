@@ -459,7 +459,7 @@ async function reserveCounts() {
 }
 
 const PUBLIC_BRAND_DESCRIPTION =
-  "$190 holds a category 7 days. $490 locks a seat inside signed Scale Health hubs. Live hub: physio.drhonow.com. Credit, not a flight.";
+  "$190 holds a category 7 days. $490 locks exclusive display inside signed Scale Health hubs. Live hub: physio.drhonow.com. Your payment is media credit, not airfare.";
 
 // Registered on the API service (ahead of the static SPA rewrite) so Autoscale
 // answers /oatmeal with a real 301 instead of index.html.
@@ -479,20 +479,20 @@ router.get("/llms.txt", (_req, res) => {
     [
       "# Birch Reserve",
       "",
-      "Eight category seats inside signed Scale Health hubs. Not an open auction. Not a guaranteed impression buy.",
+      "8 exclusive brand categories inside signed Scale Health clinic hubs — one brand per category. Not an open auction. Not a guaranteed impression buy.",
       "Live proof: https://physio.drhonow.com/dr-ho/portal",
-      "Also (placement example, not hero): https://weprize.net — live SBG/Birch exclusive display example. Placement only; not a Scale hub seat; no reach/impression claims.",
+      "Also (placement example, not hero): https://weprize.net — live SBG/Birch exclusive display example. Placement only; not a Scale hub exclusive category; no reach/impression claims.",
       "Public SKUs:",
-      "- hold-190 · $190 USD · 7-day category look · 100% credit if converted to a seat within 7 days, else cash refund · does not consume an 8-seat",
-      "- reserve-490 · $490 USD · named category seat in the 8-pool · 100% media credit · insertion order before flight · credit expires 12 months",
+      "- hold-190 · $190 USD · 7-day category look · 100% credit if you convert within 7 days, else cash refund · does not lock an exclusive category",
+      "- reserve-490 · $490 USD · lock your exclusive category · 100% media credit · insertion order before flight · credit expires 12 months",
       "- custom · Get a call back · multi-hub / exclusive / on-prem Align",
-      "Eight seats = eight advertiser categories across hubs, not eight websites.",
+      "8 exclusive brand categories across hubs — not eight websites. One brand per category.",
       "Categories: pain relief / topicals, recovery hardware, nutrition, sleep, meal prep, women’s health, men’s health, diagnostics / services.",
       "Launching cohort (logos, not reach): DR-HO’S · Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery.",
       `Formats: ${FORMATS.join(", ")}.`,
       "Every published dollar is a 100% media credit. Delivery starts when the insertion order names the hub.",
       PUBLIC_BRAND_DESCRIPTION,
-      "Quoted public prices are exact, one-time, and USD. Only reserve-490 consumes the eight-seat pool. hold-190 does not.",
+      "Quoted public prices are exact, one-time, and USD. Only reserve-490 locks an exclusive category. hold-190 does not.",
       "Exclusions: no PHI, no clinical pixels, no open auction, no impression guarantee.",
       "Seller: Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · sales@silverbirchgrowth.com",
       "Draft terms: /terms · Draft privacy: /privacy · Sample insertion order: /sample-io · Kit: /kit",
@@ -2043,12 +2043,12 @@ router.get("/buycalc", async (req, res): Promise<void> => {
   const availability = await reserveCounts();
   res.type("html").send(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Buy calculator — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | Eight category seats"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | Eight category seats"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">
+<title>Buy calculator — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | Exclusive brand display in Scale Health hubs"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | Exclusive brand display in Scale Health hubs"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <script type="application/ld+json">${JSON.stringify({
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: "Birch Reserve category seats",
+  name: "Birch Reserve exclusive brand categories",
   itemListElement: PUBLIC_RESERVE_OFFERS.map((offer, index) => ({
     "@type": "ListItem",
     position: index + 1,
@@ -2072,15 +2072,15 @@ router.get("/buycalc", async (req, res): Promise<void> => {
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8f6ef;color:#071A39;font:16px/1.55 "IBM Plex Sans",sans-serif}header,main,footer{max-width:1100px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;border-bottom:1px solid #ccd2d8}h1,h2{font-family:Fraunces,serif;font-weight:400}h1{font-size:clamp(2.7rem,7vw,5.8rem);line-height:.95;margin:.5em 0}.accent{background:#C8F55A;padding:.08em .18em}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:36px}.card{border:1px solid #071A39;padding:24px;margin:18px 0}.figures{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#071A39}.figure{background:#fff;padding:18px}.figure strong{display:block;font:600 1.7rem Fraunces,serif}.offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.offer{border:1px solid #071A39;padding:16px;background:#fff}.offer strong{display:block;font:600 1.35rem Fraunces,serif}.offer small{display:block;margin-top:8px}label{display:block;font-weight:600;margin-top:14px}input,select,button{width:100%;padding:12px;border:1px solid #071A39;background:white;font:inherit}button{margin-top:18px;background:#C8F55A;font-weight:600;cursor:pointer}.fine{font-size:.9rem}#message{padding-top:12px;font-weight:600}@media(max-width:760px){.grid,.figures,.offer-grid{grid-template-columns:1fr}}
 </style></head><body><header><strong>BIRCH RESERVE</strong><a href="/v1/catalog.json">Machine catalog</a></header><main>
-<p>Reservations are open. Campaigns start when the insertion order names the hub.</p><h1>Eight category seats inside signed Scale Health hubs.</h1>
+<p>Reservations are open. Campaigns start when the insertion order names the hub.</p><h1>8 exclusive brand categories inside signed Scale Health clinic hubs.</h1>
 <p>Your offer sits after checkout, on a plan, or at a booking — not in a stranger’s feed.</p>
 <p><a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">See a live hub</a></p>
-<div class="figures"><div class="figure">Category seat<strong>$490 USD</strong></div><div class="figure">7-day look<strong>$190 USD</strong></div><div class="figure">Media credit<strong>100%</strong></div></div>
-<div class="grid"><section><h2>What the seat includes</h2><p><strong>${availability.seats_open} seats remaining</strong> of ${availability.seats_total}. Availability is rolling and subtracts paid and currently held seats.</p>
+<div class="figures"><div class="figure">Exclusive category<strong>$490 USD</strong></div><div class="figure">7-day look<strong>$190 USD</strong></div><div class="figure">Media credit<strong>100%</strong></div></div>
+<div class="grid"><section><h2>What exclusive display includes</h2><p><strong>${availability.seats_open} exclusive categories open</strong> of ${availability.seats_total}. Availability is rolling and subtracts paid and currently held locks.</p>
 <div class="offer-grid">${PUBLIC_RESERVE_OFFERS.map((offer) => `<article class="offer"><small>${offer.offerType.replaceAll("_", " ").toUpperCase()}</small><strong>$${offer.dueTodayUsd.toLocaleString("en-US")} · ${offer.name}</strong><small>${offer.scope}</small></article>`).join("")}</div>
 <div class="card"><h2>Your planning choices</h2><p><strong>Format:</strong> post-checkout, recovery plan, scheduled service, member hub, or motion 15s.</p><p><strong>Window:</strong> 30, 90, or 180 days.</p><p><strong>Exclusivity:</strong> category or RON.</p><p><strong>Creative:</strong> static, native, or motion.</p></div>
 <h2>Non-negotiable exclusions</h2><ul><li>No PHI</li><li>No clinical pixels</li><li>No open auction</li></ul><p>Reporting is aggregate only. Payment is not considered received until Stripe webhook confirmation.</p></section>
-<aside><form id="reserve"><h2>Reserve without a login</h2><label>Offer<select name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${req.query.sku === offer.sku ? " selected" : ""}>$${offer.dueTodayUsd.toLocaleString("en-US")} · ${offer.name}</option>`).join("")}</select></label><label>Brand<input name="brand" required maxlength="160"></label><label>Work email<input name="email" type="email" required></label><label>Website (optional)<input name="website_url" type="url"></label><label>Format<select name="format_pref">${FORMATS.map((f) => `<option value="${f}"${req.query.format === f ? " selected" : ""}>${f.replaceAll("_", " ")}</option>`).join("")}</select></label><label>Window<select id="days"><option>30</option><option>90</option><option>180</option></select></label><label>Exclusivity<select><option>Category</option><option>RON</option></select></label><label>Creative<select><option>Static</option><option>Native</option><option>Motion</option></select></label><label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the draft <a href="/terms">terms</a> before any charge. Draft until counsel stamps.</label><button id="submit" type="submit">Lock the seat — $490 USD</button><button id="copy" type="button">Copy quote JSON</button><p class="fine"><a href="tel:+16479316278">Get a call back</a> · <a href="/buycalc?sku=hold-190">Hold a category for 7 days — $190</a></p><p id="message" role="status"></p><noscript><p class="fine">JavaScript is required to submit this no-login reservation. Complete prices and terms remain available above; <a href="mailto:sales@silverbirchgrowth.com">Email sales</a> to reserve manually.</p></noscript></form></aside></div></main>
+<aside><form id="reserve"><h2>Reserve without a login</h2><label>Offer<select name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${req.query.sku === offer.sku ? " selected" : ""}>$${offer.dueTodayUsd.toLocaleString("en-US")} · ${offer.name}</option>`).join("")}</select></label><label>Brand<input name="brand" required maxlength="160"></label><label>Work email<input name="email" type="email" required></label><label>Website (optional)<input name="website_url" type="url"></label><label>Format<select name="format_pref">${FORMATS.map((f) => `<option value="${f}"${req.query.format === f ? " selected" : ""}>${f.replaceAll("_", " ")}</option>`).join("")}</select></label><label>Window<select id="days"><option>30</option><option>90</option><option>180</option></select></label><label>Exclusivity<select><option>Category</option><option>RON</option></select></label><label>Creative<select><option>Static</option><option>Native</option><option>Motion</option></select></label><label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the draft <a href="/terms">terms</a> before any charge. Draft until counsel stamps.</label><button id="submit" type="submit">Lock your exclusive category — $490 USD</button><button id="copy" type="button">Copy quote JSON</button><p class="fine"><a href="tel:+16479316278">Get a call back</a> · <a href="/buycalc?sku=hold-190">Hold a category for 7 days — $190</a></p><p id="message" role="status"></p><noscript><p class="fine">JavaScript is required to submit this no-login reservation. Complete prices and terms remain available above; <a href="mailto:sales@silverbirchgrowth.com">Email sales</a> to reserve manually.</p></noscript></form></aside></div></main>
 <footer class="fine">Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · <a href="mailto:sales@silverbirchgrowth.com">Email sales</a><p id="selectedSummary"></p></footer>
 <script>
 const form=document.querySelector("#reserve"),message=document.querySelector("#message"),idempotencyKey=crypto.randomUUID(),offers=${JSON.stringify(Object.fromEntries(PUBLIC_RESERVE_OFFERS.map((offer) => [offer.sku, offer])))};
