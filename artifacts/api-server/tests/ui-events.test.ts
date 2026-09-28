@@ -310,7 +310,7 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.doesNotMatch(analytics, /data-domain=["']birchreserve/);
 });
 
-const BRAND_TITLE = "Birch Reserve | Eight category seats";
+const BRAND_TITLE = "Birch Reserve | Exclusive brand display in Scale Health hubs";
 const BRAND_DESCRIPTION =
   "$190 holds a category 7 days. $490 locks a seat inside signed Scale Health hubs. Live hub: physio.drhonow.com. Credit, not a flight.";
 

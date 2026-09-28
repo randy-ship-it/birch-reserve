@@ -829,7 +829,7 @@ export function RandyChat() {
               type="button"
               onClick={() => openWidget({ reason: "launcher", mode: "chat" })}
               className="randy-lift block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-              aria-label="Chat with Randy about Birch Reserve category seats"
+              aria-label="Chat with Randy about Birch Reserve exclusive brand categories"
               data-testid="button-open-randy-chat"
             >
               <FullBodyCard heightClass="h-[130px] md:h-[200px]" sizes="(min-width: 768px) 100px, 66px" eager />
