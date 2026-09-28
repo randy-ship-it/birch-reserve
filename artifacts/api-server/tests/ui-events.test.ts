@@ -291,7 +291,7 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.match(home, /id="placements"/);
   assert.match(home, /data-testid="three-steps"/);
   assert.match(home, /Nothing runs before step 2/);
-  assert.match(home, /Pay \$190 look or \$490 seat as 100% credit\./);
+  assert.match(home, /Pay \$190 look or \$490 exclusive category as 100% media credit\./);
   assert.match(home, /Insertion order names the hub\./);
   assert.match(home, /Unit sits after checkout, on a plan, or at a booking\./);
   assert.match(home, /href="\/insights\/the-shelf-after-the-receipt"/);
@@ -312,7 +312,7 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
 
 const BRAND_TITLE = "Birch Reserve | Exclusive brand display in Scale Health hubs";
 const BRAND_DESCRIPTION =
-  "$190 holds a category 7 days. $490 locks a seat inside signed Scale Health hubs. Live hub: physio.drhonow.com. Credit, not a flight.";
+  "$190 holds a category 7 days. $490 locks exclusive display inside signed Scale Health hubs. Live hub: physio.drhonow.com. Your payment is media credit, not airfare.";
 
 test("public marketing title and description match the brand strings", async () => {
   const indexHtml = await readFile(
@@ -368,12 +368,92 @@ test("GET /oatmeal is a permanent redirect to /buycalc and keeps the query strin
   }
 });
 
+
+test("GET /advertise is a permanent redirect to /buycalc and keeps the query string", async () => {
+  const server = app.listen(0);
+  await new Promise<void>((resolveReady, rejectReady) => {
+    server.once("listening", () => resolveReady());
+    server.once("error", rejectReady);
+  });
+  const address = server.address();
+  if (!address || typeof address === "string") throw new Error("Test server did not bind.");
+  const origin = `http://127.0.0.1:${address.port}`;
+  try {
+    const withQuery = await fetch(`${origin}/advertise?sku=hold-190&format=post_checkout`, {
+      redirect: "manual",
+    });
+    assert.equal(withQuery.status, 301);
+    assert.equal(
+      withQuery.headers.get("location"),
+      "/buycalc?sku=hold-190&format=post_checkout",
+    );
+    const body = await withQuery.text();
+    assert.doesNotMatch(body, /id="root"/);
+
+    const bare = await fetch(`${origin}/advertise`, { redirect: "manual" });
+    assert.equal(bare.status, 301);
+    assert.equal(bare.headers.get("location"), "/buycalc");
+  } finally {
+    await new Promise<void>((resolveClose, rejectClose) => {
+      server.close((error) => (error ? rejectClose(error) : resolveClose()));
+    });
+  }
+});
+
+
+test("GET /availability.json aliases /v1/availability.json (same handler, not SPA)", async () => {
+  const buying = await readFile(resolve(process.cwd(), "src/routes/publicBuying.ts"), "utf8");
+  assert.match(buying, /router\.get\("\/availability\.json"/);
+  assert.match(buying, /async function sendAvailabilityJson/);
+  assert.match(
+    buying,
+    /router\.get\("\/availability\.json"[\s\S]*?await sendAvailabilityJson\(res\)/,
+  );
+  assert.match(
+    buying,
+    /router\.get\("\/v1\/availability\.json"[\s\S]*?await sendAvailabilityJson\(res\)/,
+  );
+
+  const server = app.listen(0);
+  await new Promise<void>((resolveReady, rejectReady) => {
+    server.once("listening", () => resolveReady());
+    server.once("error", rejectReady);
+  });
+  const address = server.address();
+  if (!address || typeof address === "string") throw new Error("Test server did not bind.");
+  const origin = `http://127.0.0.1:${address.port}`;
+  try {
+    const v1 = await fetch(`${origin}/v1/availability.json`);
+    const alias = await fetch(`${origin}/availability.json`);
+    // Without a live DB both may 500; they must still match each other and not be SPA HTML.
+    assert.equal(alias.status, v1.status);
+    const v1Text = await v1.text();
+    const aliasText = await alias.text();
+    assert.doesNotMatch(v1Text, /id="root"/);
+    assert.doesNotMatch(aliasText, /id="root"/);
+    if (v1.status === 200 && alias.status === 200) {
+      assert.match(alias.headers.get("content-type") ?? "", /application\/json/);
+      const v1Body = JSON.parse(v1Text) as Record<string, unknown>;
+      const aliasBody = JSON.parse(aliasText) as Record<string, unknown>;
+      assert.equal(typeof v1Body.seats_open, "number");
+      assert.equal(typeof aliasBody.seats_open, "number");
+      assert.equal(aliasBody.inventory_model, v1Body.inventory_model);
+      assert.equal(aliasBody.default_sku, v1Body.default_sku);
+      assert.deepEqual(aliasBody.formats, v1Body.formats);
+    }
+  } finally {
+    await new Promise<void>((resolveClose, rejectClose) => {
+      server.close((error) => (error ? rejectClose(error) : resolveClose()));
+    });
+  }
+});
+
 test("legal and insights routes return readable HTML instead of the SPA shell", async () => {
   const artifact = await readFile(
     resolve(process.cwd(), ".replit-artifact/artifact.toml"),
     "utf8",
   );
-  for (const path of ["/terms", "/privacy", "/sample-io", "/insights"]) {
+  for (const path of ["/terms", "/privacy", "/sample-io", "/kit", "/insights", "/advertise", "/availability.json"]) {
     assert.match(artifact, new RegExp(`"${path.replace("/", "\\/")}"`));
   }
 
@@ -409,6 +489,15 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(sample, /hold-190/);
     assert.doesNotMatch(sample, /id="root"/);
     assert.doesNotMatch(sample, /\$899/);
+
+    const kit = await (await fetch(`${origin}/kit`)).text();
+    assert.match(kit, /<h1>Creative brief for Birch Reserve placements<\/h1>/);
+    assert.match(kit, /Square still/);
+    assert.match(kit, /Pain relief \/ topicals/);
+    assert.match(kit, /post_checkout/);
+    assert.match(kit, /sales@silverbirchgrowth\.com/);
+    assert.doesNotMatch(kit, /id="root"/);
+    assert.doesNotMatch(kit, /\$899/);
 
     const insightsResponse = await fetch(`${origin}/insights`);
     const insights = await insightsResponse.text();
