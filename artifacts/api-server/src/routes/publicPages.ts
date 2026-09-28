@@ -301,6 +301,48 @@ ${article.citations.length
   );
 }
 
+
+const KIT_HTML = documentPage(
+  "Creative brief — Birch Reserve placements",
+  "What to send for Birch Reserve category placements: square still, optional 15s silent motion, destination URL, category, and contact.",
+  `<h1>Creative brief for Birch Reserve placements</h1>
+<p class="fine">${escapeHtml(SELLER)}</p>
+<p>This page is the creative brief for a Birch Reserve category placement. It is not a media-kit demos dump. Captions and mock placements are illustrative until an insertion order names the hub.</p>
+<h2>What to send</h2>
+<ul>
+<li>Square still (primary creative)</li>
+<li>Optional 15-second silent motion</li>
+<li>Destination URL</li>
+<li>One of the eight exclusive brand categories</li>
+<li>Contact email for creative and IO follow-up</li>
+</ul>
+<p class="fine">Caption: illustrative until an insertion order names the hub.</p>
+<h2>Eight exclusive brand categories</h2>
+<ul>
+<li>Pain relief / topicals</li>
+<li>Recovery hardware</li>
+<li>Nutrition</li>
+<li>Sleep</li>
+<li>Meal prep</li>
+<li>Women’s health</li>
+<li>Men’s health</li>
+<li>Diagnostics / services</li>
+</ul>
+<p>One brand per category. Not eight websites.</p>
+<h2>Formats (context only)</h2>
+<p>Placement formats for IO discussion — not CTR or impression guarantees:</p>
+<ul>
+<li>post_checkout</li>
+<li>scheduled_service</li>
+<li>recovery_plan</li>
+<li>member_hub</li>
+<li>motion_15s</li>
+</ul>
+<h2>Contact</h2>
+<p><a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · human calculator: <a href="/buycalc">/buycalc</a></p>
+<p><a href="/sample-io">Sample insertion order</a> · <a href="/terms">Terms</a></p>`,
+);
+
 router.get("/terms", (_req, res) => {
   sendPage(res, TERMS_HTML);
 });
@@ -311,6 +353,10 @@ router.get("/privacy", (_req, res) => {
 
 router.get("/sample-io", (_req, res) => {
   sendPage(res, SAMPLE_IO_HTML);
+});
+
+router.get("/kit", (_req, res) => {
+  sendPage(res, KIT_HTML);
 });
 
 router.get("/insights", async (_req, res) => {

@@ -470,6 +470,15 @@ router.get("/oatmeal", (req, res) => {
   res.redirect(301, `/buycalc${query}`);
 });
 
+// Same pattern as /oatmeal: Autoscale must answer /advertise with a real 301
+// instead of the SPA index.html.
+router.get("/advertise", (req, res) => {
+  const query = req.originalUrl.includes("?")
+    ? req.originalUrl.slice(req.originalUrl.indexOf("?"))
+    : "";
+  res.redirect(301, `/buycalc${query}`);
+});
+
 router.post("/v1/ui-events", (req, res) => {
   void handleUiEvent(req, res);
 });
@@ -548,7 +557,7 @@ router.get("/v1/catalog.json", (_req, res) => {
   });
 });
 
-router.get("/v1/availability.json", async (_req, res): Promise<void> => {
+async function sendAvailabilityJson(res: { json: (body: unknown) => void }): Promise<void> {
   res.json({
     currency: "USD",
     default_sku: DEFAULT_RESERVE_OFFER.sku,
@@ -562,6 +571,15 @@ router.get("/v1/availability.json", async (_req, res): Promise<void> => {
     checkout: "/v1/checkout",
     last_updated: new Date().toISOString(),
   });
+}
+
+// Public alias so /availability.json is JSON (not the SPA shell). Same payload as /v1.
+router.get("/availability.json", async (_req, res): Promise<void> => {
+  await sendAvailabilityJson(res);
+});
+
+router.get("/v1/availability.json", async (_req, res): Promise<void> => {
+  await sendAvailabilityJson(res);
 });
 
 router.get("/v1/quote", async (req, res): Promise<void> => {

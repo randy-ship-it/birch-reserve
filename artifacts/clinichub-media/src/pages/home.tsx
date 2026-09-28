@@ -119,12 +119,32 @@ export default function Home() {
 
   useEffect(() => {
     let cancelled = false;
+    const apply = (data: unknown) => {
+      if (
+        !cancelled &&
+        data &&
+        typeof data === "object" &&
+        typeof (data as { seats_open?: unknown }).seats_open === "number"
+      ) {
+        setAvailability(data as {
+          seats_open: number;
+          seats_held: number;
+          seats_paid: number;
+          seats_total: number;
+        });
+        return true;
+      }
+      return false;
+    };
     fetch("/v1/availability.json")
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
-        if (!cancelled && data && typeof data.seats_open === "number") {
-          setAvailability(data);
-        }
+        if (apply(data)) return;
+        return fetch("/availability.json")
+          .then((response) => (response.ok ? response.json() : null))
+          .then((fallback) => {
+            apply(fallback);
+          });
       })
       .catch(() => undefined);
     return () => {
