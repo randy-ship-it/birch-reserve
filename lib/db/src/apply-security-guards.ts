@@ -69,8 +69,8 @@ try {
       SET
         body = replace(
           body,
-          'The first Display Reserve is deliberately concrete: a fixed $899 USD reservation for eight seats, with a media credit and a final insertion order.',
-          'Public offers are Hold $190 for a seven-day category look that does not consume one of the eight seats, or Reserve $490 for a named category seat in the eight-pool. Both amounts are media credit, and the insertion order names the surface before anything runs.'
+          'The first Display Reserve is deliberately concrete: a fixed $899 USD reservation for eight exclusive brand categories, with a media credit and a final insertion order.',
+          'Public offers are Hold $190 for a seven-day category look that does not take an exclusive category, or Reserve $490 to lock your exclusive category among eight brand categories. Both amounts are media credit, and the insertion order names the surface before anything runs.'
         ),
         updated_at = now()
       WHERE status = 'published'

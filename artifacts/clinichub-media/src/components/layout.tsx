@@ -118,7 +118,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <span className="font-display text-2xl tracking-tight italic">Birch Reserve</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-              Eight category seats inside signed Scale Health hubs. Credit, not a flight.
+              8 exclusive brand categories inside signed Scale Health hubs. Your payment is media credit, not airfare.
             </p>
             <p
               className="mb-6 text-[11px] leading-relaxed text-muted-foreground"
@@ -138,7 +138,7 @@ export function Layout({ children }: { children: ReactNode }) {
                   </a>
                 </span>
               ))}
-              . Not featured inventory — inquire for an exclusive seat.
+              . Not featured inventory — inquire for an exclusive category.
             </p>
             <p className="text-xs leading-relaxed text-foreground">
               {SELLER_IDENTITY} · <a href={SELLER_EMAIL_HREF} className="underline underline-offset-2 hover:text-accent">Email sales</a>

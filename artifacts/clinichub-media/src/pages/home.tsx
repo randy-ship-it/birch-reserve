@@ -201,7 +201,7 @@ export default function Home() {
             onClick={() => openReserveDialog()}
             className="flex h-12 w-full items-center justify-center bg-accent font-medium text-accent-foreground transition-colors hover:bg-foreground hover:text-background"
           >
-            Lock the seat — {reservePriceLabel} <ArrowRight className="ml-2 size-4" />
+            Lock your exclusive category — {reservePriceLabel} <ArrowRight className="ml-2 size-4" />
           </button>
         </div>
       )}
@@ -231,7 +231,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="text-5xl md:text-6xl lg:text-[5.5rem] font-display text-background leading-[0.95] tracking-tight mb-6"
             >
-              Eight category seats inside signed Scale Health hubs.
+              8 exclusive brand categories inside signed Scale Health clinic hubs.
             </motion.h1>
 
             <motion.p
@@ -255,7 +255,7 @@ export default function Home() {
                 onClick={() => openReserveDialog(undefined, "reserve-490", "cta_hero_reserve")}
                 data-testid="button-hero-reserve"
               >
-                Lock the seat — {reservePriceLabel}
+                Lock your exclusive category — {reservePriceLabel}
               </Button>
               <Button
                 size="lg"
@@ -293,7 +293,7 @@ export default function Home() {
               </a>
             </div>
             <p className="mt-4 max-w-xl text-sm text-background/70">
-              Eight seats = eight advertiser categories across hubs, not eight websites.
+              8 exclusive brand categories across hubs — not eight websites. One brand per category.
             </p>
           </div>
 
@@ -342,7 +342,7 @@ export default function Home() {
           <ol className="grid border border-border md:grid-cols-3">
             {(
               [
-                ["1", "Pay $190 look or $490 seat as 100% credit."],
+                ["1", "Pay $190 look or $490 exclusive category as 100% media credit."],
                 ["2", "Insertion order names the hub."],
                 ["3", "Unit sits after checkout, on a plan, or at a booking."],
               ] as const
@@ -370,10 +370,10 @@ export default function Home() {
                 Reserve before campaigns open
               </p>
               <h2 className="font-display text-3xl text-foreground">
-                Eight category seats. One brand per aisle.
+                8 exclusive brand categories. One brand per category.
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Every dollar is a 100% media credit. Delivery starts when the insertion order names the hub. Hubs are the rooms. The seat is the exclusive shelf in those rooms.
+                Every dollar is a 100% media credit. Delivery starts when the insertion order names the hub. Hubs are the rooms. Your exclusive category is the shelf in those rooms.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[620px]">
@@ -476,8 +476,8 @@ export default function Home() {
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
               {availability
-                ? `${availability.seats_open} open · ${availability.seats_held} held · ${availability.seats_paid} paid · ${availability.seats_total} seats`
-                : "Live open, held, and paid counts load from availability."}
+                ? `${availability.seats_open} categories open · ${availability.seats_held} held · ${availability.seats_paid} locked · ${availability.seats_total} total`
+                : "Live categories open / held / locked counts load from availability."}
             </p>
             <div className="mt-4 grid border border-border sm:grid-cols-2 lg:grid-cols-4">
               {CATEGORY_SEATS.map((category) => (
@@ -502,7 +502,7 @@ export default function Home() {
               }}
               className="h-12 rounded-none bg-accent px-6 text-accent-foreground hover:bg-foreground hover:text-background"
             >
-              Lock the seat — $490 USD
+              Lock your exclusive category — $490
             </Button>
             <Button
               type="button"
@@ -545,7 +545,7 @@ export default function Home() {
                   {WEPRIZE.name}
                 </a>
                 {" "}
-                — placement example only; not a Scale hub seat.
+                — placement example only; not a Scale hub exclusive category.
               </p>
             </article>
             <article className="border border-border bg-foreground p-7 text-background md:p-9">
@@ -653,7 +653,7 @@ export default function Home() {
               </p>
               <p className="mt-6 text-muted-foreground text-lg leading-relaxed max-w-md">
                 <strong className="text-foreground font-medium">For auto-buyers:</strong> no insertion-order theatre or 12-week RFP.<br/>
-                <strong className="text-foreground font-medium">For distribution buyers:</strong> one exclusive category seat, outside the open auction.
+                <strong className="text-foreground font-medium">For distribution buyers:</strong> one exclusive brand category, outside the open auction.
               </p>
               <div className="mt-8">
                 <span className="bg-foreground text-accent px-4 py-2 inline-block font-medium tracking-wide rounded-sm text-sm">Reserve payments act as 100% media credit and hold first rights to available inventory.</span>
@@ -766,7 +766,7 @@ export default function Home() {
                 <div className="border border-border/50 shadow-sm overflow-hidden aspect-[4/3] bg-muted relative">
                   <HubWalkthroughVideo testId="video-hub-walkthrough" />
                 </div>
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Live DR-HO&apos;S hub walkthrough — illustrative of seat placement context.</p>
+                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Live DR-HO&apos;S hub walkthrough — illustrative of exclusive category placement context.</p>
                 <a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold">
                   Open the live hub <ArrowUpRight className="size-4" />
                 </a>
@@ -907,14 +907,14 @@ export default function Home() {
                 Reserve and fulfillment
               </p>
               <h2 className="max-w-xl font-display text-4xl leading-tight tracking-tight md:text-6xl">
-                Hold the seat. We coordinate the rest.
+                Lock your exclusive category. We coordinate the rest.
               </h2>
             </div>
             <div className="grid gap-8 border-l border-background/20 pl-6 sm:grid-cols-2 md:pl-10">
               <div>
                 <p className="font-display text-3xl text-accent">$490 USD</p>
                 <p className="mt-2 text-sm leading-relaxed text-background/80">
-                  Locks a named category seat. A 7-day look is $190 and does not consume a seat.
+                  Locks your exclusive category. A 7-day look is $190 and does not take an exclusive category.
                 </p>
               </div>
               <div>
@@ -973,9 +973,9 @@ export default function Home() {
       <section className="py-20 md:py-28 bg-foreground text-background text-center border-b border-foreground">
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto flex flex-col items-center">
-            <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">Lock the seat before the aisle is gone.</h2>
+            <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">Lock your exclusive category before it is gone.</h2>
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
-              {reservePriceLabel} is a named category seat and a 100% media credit. Nothing runs until the insertion order names the hub.
+              {reservePriceLabel} locks your exclusive category as 100% media credit. Nothing runs until the insertion order names the hub.
             </p>
             <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:justify-center">
               <Button
@@ -984,7 +984,7 @@ export default function Home() {
                 onClick={() => openReserveDialog()}
                 data-testid="button-final-splash-access"
               >
-                Lock the seat — {reservePriceLabel}
+                Lock your exclusive category — {reservePriceLabel}
               </Button>
               <Button
                 size="lg"

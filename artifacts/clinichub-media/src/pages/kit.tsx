@@ -25,7 +25,7 @@ const MEDIA_KIT_PDF_HREF = "/birch-reserve-media-kit.pdf" as const;
 const LIVE_PROOF_HREF = "https://physio.drhonow.com/dr-ho/portal" as const;
 const LIVE_PROOF_HOME = "https://physio.drhonow.com" as const;
 
-const PAGE_TITLE = "Media kit — Birch Reserve | Eight category seats";
+const PAGE_TITLE = "Media kit — Birch Reserve | Exclusive brand display in Scale Health hubs";
 
 const CATEGORY_SEATS: ReadonlyArray<{ label: string; shelf: string; hubImage: string }> = [
   { label: "Pain relief / topicals", shelf: "Exclusive aisle", hubImage: "/hub-gallery/kalaya.webp" },
@@ -96,7 +96,7 @@ export default function Kit() {
     const previousDescription = description?.content;
     if (description) {
       description.content =
-        "Birch Reserve media kit. Eight exclusive category seats inside signed Scale Health hubs. Hold $190 · Reserve $490 · Enterprise inquire. Credit, not a flight.";
+        "Birch Reserve media kit. 8 exclusive brand categories inside signed Scale Health clinic hubs. One brand per category. Hold $190 · Reserve $490 · Enterprise inquire. Media credit, not airfare.";
     }
     return () => {
       document.title = previousTitle;
@@ -127,8 +127,8 @@ export default function Kit() {
               Display beside the product they already trust.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-relaxed text-background/75 md:text-lg">
-              Eight exclusive category seats inside signed Scale Health hubs. Your offer sits after
-              checkout, on a plan, or at a booking — not in a stranger’s feed. Credit, not a flight.
+              8 exclusive brand categories inside signed Scale Health clinic hubs. One brand per category. Your offer sits after
+              checkout, on a plan, or at a booking — not in a stranger’s feed. Media credit, not airfare.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <a
@@ -150,7 +150,7 @@ export default function Kit() {
               </a>
             </div>
             <p className="mt-5 text-sm text-background/65">
-              Eight seats = eight advertiser categories across hubs, not eight websites.
+              8 exclusive brand categories across hubs — not eight websites. One brand per category.
             </p>
           </div>
 
@@ -198,7 +198,7 @@ export default function Kit() {
                   {WEPRIZE.name}
                 </a>
                 {" "}
-                — not a Scale hub seat; no reach claim.
+                — not a Scale hub exclusive category; no reach claim.
               </p>
             </div>
           </div>
@@ -217,12 +217,12 @@ export default function Kit() {
                 One brand per aisle.
               </h2>
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
-                Hubs are the rooms. The seat is the exclusive shelf in those rooms. You are not
+                Hubs are the rooms. Your exclusive category is the shelf in those rooms. You are not
                 auctioned against a competitor in the same category.
               </p>
             </div>
             <p className="max-w-xs text-sm text-muted-foreground">
-              Eight category seats. Credit toward media under an approved IO — not a CPM guarantee.
+              8 exclusive brand categories. Credit toward media under an approved IO — not a CPM guarantee.
             </p>
           </div>
 
@@ -250,7 +250,7 @@ export default function Kit() {
                 <div className="px-4 py-4">
                   <p className="font-display text-lg leading-tight text-foreground">{seat.label}</p>
                   <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground/45">
-                    Named category seat
+                    Exclusive category
                   </p>
                 </div>
               </li>
@@ -275,7 +275,7 @@ export default function Kit() {
               </h2>
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
                 Screenshots from live co-branded hubs. Featured brands are examples of the network —
-                not Birch advertisers or seat holders.
+                not Birch advertisers or exclusive category holders.
               </p>
             </div>
             <a
@@ -438,7 +438,7 @@ export default function Kit() {
               <p className="mt-1 text-sm font-medium text-foreground">7-day look</p>
               <ul className="mt-5 flex-1 space-y-2 text-sm text-muted-foreground">
                 <li>Refund or credit</li>
-                <li>Does not consume a seat</li>
+                <li>Does not take an exclusive category</li>
                 <li>Credit, not a flight</li>
               </ul>
               <a
@@ -461,7 +461,7 @@ export default function Kit() {
                 </span>
               </div>
               <p className="mt-3 font-display text-4xl tracking-tight">$490</p>
-              <p className="mt-1 text-sm font-medium text-background/90">Named category seat</p>
+              <p className="mt-1 text-sm font-medium text-background/90">Exclusive category</p>
               <ul className="mt-5 flex-1 space-y-2 text-sm text-background/70">
                 <li>100% media credit</li>
                 <li>IO before flight</li>
@@ -471,7 +471,7 @@ export default function Kit() {
                 href="/"
                 className="mt-6 inline-flex h-11 items-center justify-center bg-accent text-sm font-medium text-accent-foreground transition-colors hover:bg-background hover:text-foreground"
               >
-                Lock the seat
+                Lock your exclusive category
               </a>
             </article>
 
@@ -552,7 +552,7 @@ export default function Kit() {
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-background/55">
               Talk to sales
             </p>
-            <h3 className="mt-3 font-display text-3xl tracking-tight">Ready to lock a seat?</h3>
+            <h3 className="mt-3 font-display text-3xl tracking-tight">Ready to lock your exclusive category?</h3>
             <p className="mt-3 text-sm leading-relaxed text-background/70">
               sales@silverbirchgrowth.com — category exclusivity inside signed hubs.
             </p>
