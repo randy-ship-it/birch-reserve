@@ -162,7 +162,7 @@ export function SalesConcierge({
     window.setTimeout(() => {
       setIsTyping(false);
       appendAdvisorMessage("Got it. How can I help you today?", [
-        { label: "Reserve an advertising seat", action: () => handleIntent("interested"), primary: true },
+        { label: "Reserve an exclusive category", action: () => handleIntent("interested"), primary: true },
         { label: "Just learn", action: () => handleIntent("learning") },
         { label: "Ask a typed question", action: handleAskQuestion }
       ]);
@@ -171,11 +171,11 @@ export function SalesConcierge({
 
   const handleIntent = (selectedIntent: string) => {
       if (selectedIntent === 'interested') {
-      appendUserMessage("Reserve an advertising seat");
+      appendUserMessage("Reserve an exclusive category");
       setIsTyping(true);
       window.setTimeout(() => {
         setIsTyping(false);
-        appendAdvisorMessage("Prices: $190 = 7-day look, does not eat a seat. $490 = category seat + 100% media credit. $899 is a legacy SKU still in checkout — do not hero it. Nothing runs until an insertion order names the surface.", [
+        appendAdvisorMessage("Prices: $190 = 7-day category look (does not take an exclusive category). $490 = lock your exclusive category + 100% media credit. $899 is a legacy SKU still in checkout — do not hero it. Nothing runs until an insertion order names the surface.", [
           { label: "Open Reservation Form", action: () => onHandoff(), primary: true },
           { label: "Compare advertising paths", action: () => handleChoosePath(true) }
         ]);
@@ -242,7 +242,7 @@ export function SalesConcierge({
         }
       ]);
 
-      appendAdvisorMessage("Would you like to reserve a founding seat now?", [
+      appendAdvisorMessage("Would you like to lock your exclusive category now?", [
         { label: "Reserve first access", action: () => onHandoff(path), primary: true },
         { label: "See placement moments", action: showFormatPicker }
       ]);
@@ -338,7 +338,7 @@ export function SalesConcierge({
       case "pricing_or_availability":
       case "self_serve_purchase":
         return {
-          text: "Prices: $190 = 7-day look, does not eat a seat. $490 = category seat + 100% media credit. $899 is a legacy SKU still in checkout — do not hero it. Nothing runs until an insertion order names the surface.",
+          text: "Prices: $190 = 7-day category look (does not take an exclusive category). $490 = lock your exclusive category + 100% media credit. $899 is a legacy SKU still in checkout — do not hero it. Nothing runs until an insertion order names the surface.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "Compare advertising paths", action: () => handleChoosePath(true) },
@@ -350,7 +350,7 @@ export function SalesConcierge({
           options: [
             { label: "Get a call back", href: RANDY_TEL_HREF, primary: true },
             { label: "Book a call", action: () => { trackCta("cta_book_call"); openRandyChat({ reason: "concierge", mode: "chat" }); } },
-            { label: "Lock the seat — $490 USD", action: onHandoff },
+            { label: "Lock your exclusive category — $490", action: onHandoff },
           ],
         };
       case "book_a_call":
@@ -371,7 +371,7 @@ export function SalesConcierge({
         };
       case "media_kit":
         return {
-          text: "Eight category seats inside signed Scale Health hubs. Not an open auction. Not a guaranteed impression buy. $490 is the category seat. Credit, not a flight.",
+          text: "8 exclusive brand categories inside signed Scale Health clinic hubs. Not an open auction. Not a guaranteed impression buy. $490 locks your exclusive category. Media credit, not airfare.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },
@@ -440,7 +440,7 @@ export function SalesConcierge({
             response.handoffAllowed && response.recommendedInterest
               ? [
                   {
-                    label: `Reserve ${response.recommendedInterest} seat`,
+                    label: `Reserve ${response.recommendedInterest} category`,
                     action: () => onHandoff(response.recommendedInterest!),
                     primary: true,
                   },
@@ -469,7 +469,7 @@ export function SalesConcierge({
         {
           id: Date.now().toString(),
           role: "advisor",
-          text: "The live advisor is taking a pause, but you can still explore the paths or reserve your seat directly.",
+          text: "The live advisor is taking a pause, but you can still explore the paths or lock your exclusive category directly.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "Return to advertising paths", action: () => handleChoosePath(true) }

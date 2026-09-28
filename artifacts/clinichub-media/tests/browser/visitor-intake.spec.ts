@@ -128,7 +128,7 @@ async function chooseVisitorType(
   await guide.getByRole("button", { name: visitorType, exact: true }).click();
   await expect(
     guide.getByRole("button", {
-      name: "Reserve an advertising seat",
+      name: "Reserve an exclusive category",
       exact: true,
     }),
   ).toBeVisible();
@@ -173,18 +173,18 @@ test("public offer leads with the three-tier USD ladder", async ({ page }) => {
   await expect(
     page
       .getByRole("button", {
-        name: "Lock the seat — $490 USD",
+        name: "Lock your exclusive category — $490",
         exact: true,
       })
       .first(),
   ).toBeVisible();
   await expect(page.locator("body")).toContainText(
-    "Eight category seats. One brand per aisle.",
+    "8 exclusive brand categories. One brand per category.",
   );
   await expect(page.locator("body")).toContainText("Digital inventory");
   await expect(page.locator("body")).toContainText("On-prem, on request");
   await expect(page.locator("body")).toContainText("7-day category look");
-  await expect(page.locator("body")).toContainText("Category seat");
+  await expect(page.locator("body")).toContainText("Exclusive category");
   await expect(page.locator("body")).toContainText("$190");
   await expect(page.locator("body")).toContainText("$490");
   await expect(page.locator("body")).not.toContainText("$4,900");
@@ -278,7 +278,7 @@ test("Birch Guide hands a ready buyer to the reserve form", async ({ page }) => 
   );
   await guide
     .getByRole("button", {
-      name: "Reserve an advertising seat",
+      name: "Reserve an exclusive category",
       exact: true,
     })
     .click();
@@ -354,12 +354,12 @@ test("reserve form stores the selected tier and shows its held-seat fallback", a
     .locator('input[name="websiteUrl"]')
     .fill("https://northstar.example");
   await dialog
-    .getByRole("button", { name: /Category seat.*\$490/ })
+    .getByRole("button", { name: /Exclusive category.*\$490/ })
     .click();
   await dialog.getByTestId("checkbox-reserve-terms").check();
   await dialog
     .getByRole("button", {
-      name: "Lock the seat — $490 USD",
+      name: "Lock your exclusive category — $490",
       exact: true,
     })
     .click();
@@ -377,7 +377,7 @@ test("reserve form stores the selected tier and shows its held-seat fallback", a
     },
   ]);
   await expect(
-    dialog.getByRole("heading", { name: "Seat reserved", exact: true }),
+    dialog.getByRole("heading", { name: "Category locked", exact: true }),
   ).toBeVisible();
   await expect(dialog).toContainText(
     "Payment is still required; contact Birch Reserve to complete the secure $490 USD checkout",

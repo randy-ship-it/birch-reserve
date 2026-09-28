@@ -5,17 +5,17 @@ export const RESERVE_OFFERS = [
     amountCents: 19_000,
     consumesSeat: false,
     description:
-      "7-day category look. 100% credit if converted to a seat within 7 days, else cash refund. Does not consume an 8-seat.",
-    creditLine: "Credit, not a flight.",
+      "Hold your category for 7 days. 100% credit if you convert to the full reserve within 7 days, else refund. Does not take an exclusive category.",
+    creditLine: "Media credit, not airfare.",
   },
   {
     key: "reserve-490",
-    name: "Category seat",
+    name: "Exclusive category",
     amountCents: 49_000,
     consumesSeat: true,
     description:
-      "Named category seat in the 8-pool. 100% media credit. IO before flight. Credit expires 12 months.",
-    creditLine: "Credit, not a flight.",
+      "Lock your exclusive category. Full $490 is media credit toward your placements (not airfare). Insertion order names the hub before anything runs. Credit expires 12 months.",
+    creditLine: "Media credit, not airfare.",
   },
 ] as const;
 

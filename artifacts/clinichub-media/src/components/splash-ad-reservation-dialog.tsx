@@ -144,7 +144,7 @@ export function SplashAdReservationDialog({
               <div className="size-16 bg-accent/20 rounded-full flex items-center justify-center mb-6 border border-accent/30">
                 <CheckCircle2 className="size-8 text-accent" />
               </div>
-              <h3 className="text-3xl font-display tracking-tight mb-3 text-foreground">Seat reserved</h3>
+              <h3 className="text-3xl font-display tracking-tight mb-3 text-foreground">Category locked</h3>
               <p className="text-muted-foreground mb-8 max-w-sm leading-relaxed text-sm">
                 Your reservation is saved. Payment is still required; contact Birch Reserve to complete the secure {lockedFormattedPrice} USD checkout.
               </p>
@@ -347,7 +347,7 @@ export function SplashAdReservationDialog({
                         {isPending ? (
                           <><Loader2 className="mr-2 size-5 animate-spin" /> Processing</>
                         ) : (
-                          <>{selectedOffer.key === "hold-190" ? "Hold a category for 7 days — $190" : "Lock the seat — $490 USD"} <CreditCard className="ml-2 size-5" /></>
+                          <>{selectedOffer.key === "hold-190" ? "Hold a category 7 days — $190" : "Lock your exclusive category — $490"} <CreditCard className="ml-2 size-5" /></>
                         )}
                       </Button>
                       <div className="text-center text-[11px] text-muted-foreground mt-2">
