@@ -1,10 +1,10 @@
-import { ReplitConnectors } from "@replit/connectors-sdk";
 import {
   db,
   splashAdReservationsTable,
   type SplashAdReservation,
 } from "@workspace/db";
 import { and, eq, inArray } from "drizzle-orm";
+import { defaultSlackProxy } from "./slackPost";
 
 type SlackProxy = (
   path: string,
@@ -47,12 +47,7 @@ export async function sendCreativeDeadlineSlackWarning(
   deadline: Date,
   proxyOverride?: SlackProxy,
 ): Promise<void> {
-  const proxy =
-    proxyOverride ??
-    ((path, options) => {
-      const connectors = new ReplitConnectors();
-      return connectors.proxy("slack", path, options);
-    });
+  const proxy = proxyOverride ?? defaultSlackProxy;
   const response = await proxy("/chat.postMessage", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

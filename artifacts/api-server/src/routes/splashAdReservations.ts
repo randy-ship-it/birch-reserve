@@ -32,6 +32,7 @@ import {
   isStripeSecretConfigured,
   retrieveStripeCheckoutSession,
 } from "../lib/stripeClient";
+import { defaultSlackProxy } from "../lib/slackPost";
 import {
   approveSplashReservationWithCapacity,
   claimSplashReserveSeat,
@@ -1576,12 +1577,7 @@ export async function sendReservationSlackAlert(
   reservation: SplashAdReservation,
   proxyOverride?: SlackProxy,
 ): Promise<void> {
-  const proxy =
-    proxyOverride ??
-    ((path, options) => {
-      const connectors = new ReplitConnectors();
-      return connectors.proxy("slack", path, options);
-    });
+  const proxy = proxyOverride ?? defaultSlackProxy;
   const response = await proxy("/chat.postMessage", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

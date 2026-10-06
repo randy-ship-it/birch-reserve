@@ -8,6 +8,7 @@ import publicBuyingRouter from "./routes/publicBuying";
 import publicPagesRouter from "./routes/publicPages";
 import { indexNowKeyRouter } from "./routes/indexNow";
 import { opsBulletinRouter } from "./routes/opsBulletin";
+import splashExpiryCronRouter from "./routes/splashExpiryCron";
 import { logger } from "./lib/logger";
 import { uiEventsJsonParser } from "./lib/uiEvents";
 import { handleStripeWebhook } from "./routes/splashAdReservations";
@@ -70,6 +71,8 @@ app.use(publicPagesRouter);
 app.use(indexNowKeyRouter);
 app.use(opsBulletinRouter);
 app.use(publicBuyingRouter);
+// Before Clerk so a missing Clerk key cannot block splash expiry.
+app.use(splashExpiryCronRouter);
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 app.use(
