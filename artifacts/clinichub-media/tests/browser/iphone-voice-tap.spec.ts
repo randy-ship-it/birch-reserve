@@ -88,6 +88,16 @@ test("iPhone WebKit tap starts the voice session and the phone link is tappable"
   await page.evaluate(() => window.scrollTo(0, 0));
   const start = host.getByRole("button", { name: /start a call|start talking|hear randy/i });
   await expect(start).toBeVisible({ timeout: 20_000 });
+  const startBox = await start.boundingBox();
+  const heroBox = await page.locator("h1").boundingBox();
+  expect(startBox).not.toBeNull();
+  expect(heroBox).not.toBeNull();
+  expect(startBox!.y).toBeGreaterThanOrEqual(heroBox!.y + heroBox!.height - 1);
+  expect(startBox!.width).toBeLessThanOrEqual(72);
+  expect(startBox!.height).toBeLessThanOrEqual(72);
+  const randyBox = await page.getByTestId("randy-figure-launcher").boundingBox();
+  expect(randyBox).not.toBeNull();
+  expect(randyBox!.y).toBeGreaterThanOrEqual(heroBox!.y + heroBox!.height - 1);
   await start.tap();
 
   const accept = host.getByRole("button", { name: /^accept$/i });

@@ -805,14 +805,14 @@ export function RandyChat() {
       {/* Closed state: full-body Randy on a floating white card, bottom-right */}
       {!open && !dismissed && !lingerOpen && (
         <div
-          className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-3 z-[45] flex items-end gap-2 md:bottom-6 md:right-6"
+          className="fixed bottom-[calc(7.75rem+env(safe-area-inset-bottom))] right-[5.75rem] z-[45] flex items-end gap-2 md:bottom-6 md:right-6"
           data-testid="randy-figure-launcher"
         >
           {teaserVisible && (
             <button
               type="button"
               onClick={() => openWidget({ reason: "launcher", mode: "chat" })}
-              className="randy-teaser relative mb-16 max-w-[150px] rounded-2xl border border-black/5 bg-white px-3 py-2 text-left text-[13px] font-medium leading-snug text-slate-900 shadow-[0_12px_32px_-10px_rgba(15,23,42,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:mb-24 md:max-w-[190px] md:px-4 md:py-3 md:text-sm"
+              className="randy-teaser relative mb-16 hidden max-w-[150px] rounded-2xl border border-black/5 bg-white px-3 py-2 text-left text-[13px] font-medium leading-snug text-slate-900 shadow-[0_12px_32px_-10px_rgba(15,23,42,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:mb-24 md:block md:max-w-[190px] md:px-4 md:py-3 md:text-sm"
               style={{ backgroundColor: "#fff" }}
               aria-label={`${TEASER_TEXT} Open chat with Randy`}
               data-testid="randy-teaser"
@@ -832,7 +832,19 @@ export function RandyChat() {
               aria-label="Chat with Randy about Birch Reserve exclusive brand categories"
               data-testid="button-open-randy-chat"
             >
-              <FullBodyCard heightClass="h-[130px] md:h-[200px]" sizes="(min-width: 768px) 100px, 66px" eager />
+              <span className="flex size-12 items-center justify-center overflow-hidden rounded-full border border-black/10 bg-white shadow-[0_12px_32px_-12px_rgba(15,23,42,0.45)] md:hidden">
+                <img
+                  src={HEAD_SRC}
+                  alt=""
+                  width={96}
+                  height={96}
+                  draggable={false}
+                  className="size-12 object-cover object-top"
+                />
+              </span>
+              <span className="hidden md:block">
+                <FullBodyCard heightClass="md:h-[200px]" sizes="100px" eager />
+              </span>
             </button>
             <button
               type="button"
