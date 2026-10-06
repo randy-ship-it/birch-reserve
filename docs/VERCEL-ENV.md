@@ -99,6 +99,6 @@ The browser bundle also reads these at **build** time. They are not server `proc
 
 ## Splash expiry
 
-`src/index.ts` still owns the one-minute splash-reservation expiry interval for the long-running process. The Vercel function does not start that interval. Production cron `*/10 * * * *` calls `GET /api/cron/splash-expiry`, which runs `cleanupSplashReservations()` once. The same cron is written to `vercel.json` and to `.vercel/output/config.json`. Set `CRON_SECRET` or every invocation is rejected.
+`src/index.ts` still owns the one-minute splash-reservation expiry interval for the long-running process. The Vercel function does not start that interval. Production cron `*/10 * * * *` in `vercel.json` calls `GET /api/cron/splash-expiry`, which runs `cleanupSplashReservations()` once. The Build Output `config.json` does not repeat that cron: Vercel rejects a deploy that lists the same path and schedule twice. Set `CRON_SECRET` or every invocation is rejected.
 
 On a cold start the function still tries the public-insights seed and the additive splash column, and it logs if the database refuses.
