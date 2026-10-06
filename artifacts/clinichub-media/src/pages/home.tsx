@@ -1,4 +1,4 @@
-import { RANDY_TEL_DISPLAY, RANDY_TEL_HREF } from "@/lib/randy-chat-knowledge";
+import { RANDY_TEL_DISPLAY, RANDY_TEL_HREF, TAP_TO_CALL_HREF, TAP_TO_CALL_LABEL } from "@/lib/randy-chat-knowledge";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -213,9 +213,18 @@ export default function Home() {
 
       {!splashDialogOpen && (
         <div
-          className="fixed inset-x-0 bottom-0 z-40 border-t border-foreground/10 bg-background/95 p-4 backdrop-blur-md md:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-foreground/10 bg-background/95 p-3 backdrop-blur-md md:hidden"
           data-testid="mobile-sticky-reserve-cta"
         >
+          <a
+            href={TAP_TO_CALL_HREF}
+            className="mb-2 flex h-11 w-full items-center justify-center border border-foreground/15 font-medium text-foreground"
+            data-testid="link-mobile-tap-to-call"
+            onClick={() => trackCta("cta_book_call")}
+          >
+            <Phone className="mr-2 size-4" aria-hidden />
+            {TAP_TO_CALL_LABEL}
+          </a>
           <button
             type="button"
             onClick={() => openReserveDialog()}
@@ -232,7 +241,7 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-[min(750px,85dvh)] flex items-center pt-12 pb-20 md:pb-24 border-b border-background/20 bg-foreground text-background">
+      <section className="relative min-h-[min(750px,85dvh)] flex items-center pt-12 pb-40 md:pb-24 border-b border-background/20 bg-foreground text-background">
         <div className="container mx-auto px-6 relative z-10 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
 
           <div className="flex flex-col text-left">
@@ -287,12 +296,23 @@ export default function Home() {
                 <Phone className="mr-2 size-4" aria-hidden />
                 Get a call back
               </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background h-14 px-8 font-medium hover:bg-background/10 transition-colors"
+              >
+                <a
+                  href={TAP_TO_CALL_HREF}
+                  data-testid="link-hero-tap-to-call"
+                  onClick={() => trackCta("cta_book_call")}
+                >
+                  <Phone className="mr-2 size-4" aria-hidden />
+                  {TAP_TO_CALL_LABEL}
+                </a>
+              </Button>
             </motion.div>
             <p className="mt-3 text-sm text-background/80">
-              <a href={VOICE_TEL_HREF} className="underline underline-offset-4" onClick={() => trackCta("cta_book_call")}>
-                Call {VOICE_TEL_DISPLAY}
-              </a>
-              <span className="text-background/50"> · </span>
               <a className="underline underline-offset-4" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" data-testid="link-hero-live-hub">See a live hub</a>
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -1016,12 +1036,18 @@ export default function Home() {
                 <Phone className="mr-2 size-4" aria-hidden />
                 Get a call back
               </Button>
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background h-14 px-8 font-medium hover:bg-background/10 transition-colors"
+              >
+                <a href={TAP_TO_CALL_HREF} data-testid="link-final-tap-to-call" onClick={() => trackCta("cta_book_call")}>
+                  <Phone className="mr-2 size-4" aria-hidden />
+                  {TAP_TO_CALL_LABEL}
+                </a>
+              </Button>
             </div>
-            <p className="mt-4 text-sm text-background/70">
-              <a href={VOICE_TEL_HREF} className="underline underline-offset-4" onClick={() => trackCta("cta_book_call")}>
-                {VOICE_TEL_DISPLAY}
-              </a>
-            </p>
           </div>
         </div>
       </section>
