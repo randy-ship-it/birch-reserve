@@ -7,7 +7,9 @@ import { applyAdditiveColumns, SPLASH_HYGIENE_DDL } from "./lib/schemaEnsure";
 /**
  * Vercel invokes this file as a Node function. It does not call src/index.ts,
  * so nothing listens on PORT and the splash-expiry interval stays on the
- * long-running process. Trust every proxy hop: Vercel appends more than one.
+ * long-running process. Production cron calls GET /api/cron/splash-expiry,
+ * which runs the same cleanup once. Trust every proxy hop: Vercel appends
+ * more than one.
  */
 app.set("trust proxy", true);
 

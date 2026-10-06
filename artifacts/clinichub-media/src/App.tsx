@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import {
   MutationCache,
   QueryCache,
@@ -40,6 +40,7 @@ import { EditorialAuthGuard } from '@/components/editorial-auth-guard';
 import {
   ClerkProvider,
   Show,
+  useAuth,
   SignIn,
   SignUp,
   useClerk,
@@ -191,9 +192,29 @@ if (import.meta.env.VITE_BROWSER_TEST_AUTH === 'true') {
   });
 }
 
+// How long the signed-out home waits for Clerk before rendering anyway.
+const CLERK_HOME_GRACE_MS = 2500;
+
 function HomeRedirect() {
   // Browser tests have no Clerk frontend. The public home is what they exercise.
   if (import.meta.env.VITE_BROWSER_TEST_AUTH === "true") {
+    return <Home />;
+  }
+  return <ClerkHomeRedirect />;
+}
+
+function ClerkHomeRedirect() {
+  const { isLoaded } = useAuth();
+  const [graceOver, setGraceOver] = useState(false);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setGraceOver(true), CLERK_HOME_GRACE_MS);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  // Clerk never finishes loading when its Frontend API rejects the host (for
+  // example a *.vercel.app preview of the birchreserve.net production
+  // instance) or the proxy is down. The public home must not stay blank.
+  if (!isLoaded && graceOver) {
     return <Home />;
   }
   return (

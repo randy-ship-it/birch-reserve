@@ -17,7 +17,8 @@ Set these in the Vercel project (Preview and Production). Do not commit values.
 | `STRIPE_SECRET_KEY` | Stripe Checkout. Without it, checkout does not create a session. |
 | `STRIPE_WEBHOOK_SECRET` | `POST /api/stripe/webhook`. Signature checks fail without it. |
 | `SESSION_SECRET` | Marketplace token crypto. Those routes throw if it is unset. Also the fallback admin secret for splash reservations when `SPLASH_AD_ADMIN_SECRET` is unset. |
-| `CLERK_SECRET_KEY` | Every `/api/*` route. `clerkMiddleware` runs before those routes and throws when this is unset. Also required for the `/api/__clerk` proxy. |
+| `CLERK_SECRET_KEY` | Every `/api/*` route that runs after `clerkMiddleware`. It throws when this is unset. Also required for the `/api/__clerk` proxy. `GET /api/cron/splash-expiry` is mounted before Clerk and does not read this key. |
+| `CRON_SECRET` | `GET /api/cron/splash-expiry`. The route returns 401 when this is unset or the `Authorization: Bearer` token does not match. Vercel Cron sends that header from this variable. The one-minute interval in `src/index.ts` does not read it. |
 
 ## Optional
 
@@ -49,7 +50,8 @@ Set these in the Vercel project (Preview and Production). Do not commit values.
 | `STRIPE_PRICE_HOLD_190` | Checkout uses inline `price_data` for the $190 hold. |
 | `STRIPE_PRICE_RESERVE_490` | Checkout uses inline `price_data` for the $490 reserve. |
 | `STRIPE_PRICE_RESERVE_899` | No catalog price id for that SKU. |
-| `SPLASH_RESERVE_SLACK_CHANNEL_ID` | Alerts use channel `C0AUSTA1V9D`. Delivery still needs the Replit Slack connector, which this repo does not read as a `process.env` name. |
+| `SPLASH_RESERVE_SLACK_CHANNEL_ID` | Alerts use channel `C0AUSTA1V9D`. |
+| `SLACK_BOT_TOKEN` | Off Replit, splash reserve Slack alerts are recorded as failed and the process keeps running. On Replit this variable is ignored and the Replit Slack connector is used, same as before. |
 | `SPLASH_RESERVE_ALERT_TIMEOUT_MS` | Alert wait uses the built-in timeout. |
 | `SPLASH_RESERVE_ALERTS_DISABLED` | Alerts run. Set to `true` to skip them. |
 | `SPLASH_PIPELINE_SYNC_DISABLED` | Sheet sync runs when a spreadsheet id is set. Set to `true` to skip it. |
@@ -95,6 +97,8 @@ The browser bundle also reads these at **build** time. They are not server `proc
 | `VITE_BROWSER_TEST_AUTH` | Must stay unset on Vercel. `true` skips Clerk and renders the public home for browser tests. |
 | `VITE_EDITORIAL_WATCHDOG_INTERVAL_MS` | Editorial watchdog uses 30s. |
 
-## What the function does not run
+## Splash expiry
 
-`src/index.ts` still owns the splash-reservation expiry interval. The Vercel function only serves HTTP. On a cold start it still tries the public-insights seed and the additive splash column, and it logs if the database refuses.
+`src/index.ts` still owns the one-minute splash-reservation expiry interval for the long-running process. The Vercel function does not start that interval. Production cron `*/10 * * * *` calls `GET /api/cron/splash-expiry`, which runs `cleanupSplashReservations()` once. The same cron is written to `vercel.json` and to `.vercel/output/config.json`. Set `CRON_SECRET` or every invocation is rejected.
+
+On a cold start the function still tries the public-insights seed and the additive splash column, and it logs if the database refuses.

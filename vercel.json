@@ -2,5 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "pnpm install --no-frozen-lockfile",
-  "buildCommand": "node scripts/vercel-build.mjs"
+  "buildCommand": "node scripts/vercel-build.mjs",
+  "crons": [
+    {
+      "path": "/api/cron/splash-expiry",
+      "schedule": "*/10 * * * *"
+    }
+  ]
 }
