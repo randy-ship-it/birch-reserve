@@ -4,7 +4,7 @@
  * Mirrors concierge.ts patterns (origin check, rate limit, short caps) but uses
  * xAI Chat Completions (https://api.x.ai/v1) instead of OpenAI.
  *
- * Model: GROK_MODEL env, default `grok-3-mini` (lower latency for widget chat).
+ * Model: GROK_MODEL env, default `grok-4.3`.
  * Override to `grok-4` when quality > latency.
  *
  * Auth: XAI_API_KEY (alias GROK_API_KEY). Never log or echo the key.
@@ -79,8 +79,8 @@ const MAX_RAW_CONTENT_CHARS = 8_000;
 const MODEL_WINDOW_MESSAGES = 20;
 const MODEL_WINDOW_CHARS = 9_000;
 const XAI_BASE = "https://api.x.ai/v1";
-/** Default grok-3-mini for widget latency; set GROK_MODEL=grok-4 for stronger replies. */
-const DEFAULT_GROK_MODEL = "grok-3-mini";
+/** Default model. GROK_MODEL still overrides this on the host. */
+const DEFAULT_GROK_MODEL = "grok-4.3";
 /**
  * Body limit for the chat routes. The widget may send the whole thread (up to 80
  * turns x 1,500 chars, ~125kb of JSON); the app-wide 32kb parser would 413 long

@@ -2,6 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "pnpm install --no-frozen-lockfile",
-  "buildCommand": "PORT=3000 BASE_PATH=/ pnpm run build",
-  "outputDirectory": "artifacts/clinichub-media/dist/public"
+  "buildCommand": "node scripts/vercel-build.mjs"
 }

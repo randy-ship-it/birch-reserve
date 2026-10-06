@@ -11,6 +11,9 @@ out-tsc
 # dependencies
 node_modules
 
+# Vercel Build Output API (produced by scripts/vercel-build.mjs)
+.vercel
+
 # IDEs and editors
 /.idea
 .project
