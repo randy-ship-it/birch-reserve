@@ -68,35 +68,32 @@ const SCRIPT_ATTR = "data-elevenlabs-convai-embed";
 const MOBILE_COMPACT_MQ = "(max-width: 767px)";
 
 /**
- * Closed "Need help? / Start a call" card is the full variant. On a phone
- * that card sits on the hero. Tiny variant plus this shadow CSS leaves a
- * 56px round button. The open call sheet is a different element, so Accept
- * stays untouched.
+ * The closed full variant is a "Need help? / Start a call" card that sits
+ * on the hero. Tiny variant plus this shadow CSS leaves a 56px round button.
+ * The open call sheet is a different element, so Accept stays untouched.
  */
-const MOBILE_COMPACT_SHADOW_CSS = `
-@media (max-width: 767px) {
-  .rounded-compact-sheet {
-    min-width: 0 !important;
-    padding: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border-radius: 9999px !important;
-  }
-  .rounded-compact-sheet > .relative {
-    display: none !important;
-  }
-  .rounded-compact-sheet button[aria-label="Dismiss"] {
-    display: none !important;
-  }
-  .rounded-compact-sheet button[aria-label="Start a call"],
-  .rounded-compact-sheet button[aria-label="Start talking"],
-  .rounded-compact-sheet button[aria-label="Hear Randy"] {
-    width: 56px !important;
-    height: 56px !important;
-    min-width: 56px !important;
-    padding: 0 !important;
-    border-radius: 9999px !important;
-  }
+const COMPACT_SHADOW_CSS = `
+.rounded-compact-sheet {
+  min-width: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 9999px !important;
+}
+.rounded-compact-sheet > .relative {
+  display: none !important;
+}
+.rounded-compact-sheet button[aria-label="Dismiss"] {
+  display: none !important;
+}
+.rounded-compact-sheet button[aria-label="Start a call"],
+.rounded-compact-sheet button[aria-label="Start talking"],
+.rounded-compact-sheet button[aria-label="Hear Randy"] {
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  padding: 0 !important;
+  border-radius: 9999px !important;
 }
 `;
 
@@ -183,7 +180,7 @@ export function HearRandyElevenLabs() {
       if (root.querySelector("[data-birch-convai-compact]")) return;
       const style = document.createElement("style");
       style.setAttribute("data-birch-convai-compact", "1");
-      style.textContent = MOBILE_COMPACT_SHADOW_CSS;
+      style.textContent = COMPACT_SHADOW_CSS;
       root.appendChild(style);
     };
     install();
@@ -212,6 +209,7 @@ export function HearRandyElevenLabs() {
          * full-bleed and above the mobile reserve bar (z-40).
          */
         elevenlabs-convai {
+          --el-overlay-padding: 8px !important;
           position: fixed;
           inset: 0;
           width: 100%;
@@ -241,7 +239,7 @@ export function HearRandyElevenLabs() {
       <elevenlabs-convai
         ref={hostRef}
         agent-id={agentId}
-        variant={compact ? "tiny" : undefined}
+        variant="tiny"
         placement={compact ? "bottom-right" : undefined}
         action-text="Hear Randy"
         start-call-text="Start talking"
