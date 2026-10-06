@@ -56,6 +56,9 @@ const RANDY_TEL_E164 = (() => {
   return "+16479316278";
 })();
 export const RANDY_TEL_HREF = `tel:${RANDY_TEL_E164}`;
+/** Public tap-to-call. Label and href are the live Toronto line. */
+export const TAP_TO_CALL_HREF = "tel:+16479316278" as const;
+export const TAP_TO_CALL_LABEL = "Call (647) 931-6278" as const;
 /** HARD 3:42pm ET: after qualifying, the next step is an AI call first. */
 export const AI_CALL_LABEL = "Get a call from Randy's AI now" as const;
 export const RANDY_TEL_DISPLAY = `+1 (${RANDY_TEL_E164.slice(2, 5)}) ${RANDY_TEL_E164.slice(5, 8)}-${RANDY_TEL_E164.slice(8)}`;

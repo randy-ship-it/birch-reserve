@@ -192,6 +192,10 @@ if (import.meta.env.VITE_BROWSER_TEST_AUTH === 'true') {
 }
 
 function HomeRedirect() {
+  // Browser tests have no Clerk frontend. The public home is what they exercise.
+  if (import.meta.env.VITE_BROWSER_TEST_AUTH === "true") {
+    return <Home />;
+  }
   return (
     <>
       <Show when="signed-in">

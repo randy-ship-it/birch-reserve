@@ -937,6 +937,15 @@ export function RandyChat() {
                 </div>
               </div>
               <div className="mx-5 h-px bg-slate-200/80 shrink-0" />
+              <a
+                href="tel:+16479316278"
+                onClick={onTelClick}
+                className="mx-5 mt-3 inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 text-[13px] font-semibold text-slate-800"
+                data-testid="randy-panel-call"
+              >
+                <Phone className="size-3.5" aria-hidden />
+                Call (647) 931-6278
+              </a>
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto px-5 py-4" aria-live="polite" data-testid="randy-mode-chips">
