@@ -151,13 +151,11 @@ const routes = [
   { src: "/(.*)", dest: "/index.html" },
 ];
 
-const crons = [
-  { path: "/api/cron/splash-expiry", schedule: "*/10 * * * *" },
-];
-
+// Crons live in vercel.json only. Copying them here as well makes Vercel
+// reject the deploy with duplicated_cron_job.
 await writeFile(
   path.join(outputRoot, "config.json"),
-  JSON.stringify({ version: 3, routes, crons }, null, 2),
+  JSON.stringify({ version: 3, routes }, null, 2),
 );
 
 console.log("Vercel Build Output API written to .vercel/output");
