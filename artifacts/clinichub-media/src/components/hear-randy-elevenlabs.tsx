@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ELEVENLABS_RANDY_AVATAR_URL,
   resolveElevenLabsRandyAgentId,
@@ -65,6 +65,40 @@ function unlockIosVoiceGesture(event: Event) {
 
 const SCRIPT_SRC = "https://unpkg.com/@elevenlabs/convai-widget-embed";
 const SCRIPT_ATTR = "data-elevenlabs-convai-embed";
+const MOBILE_COMPACT_MQ = "(max-width: 767px)";
+
+/**
+ * Closed "Need help? / Start a call" card is the full variant. On a phone
+ * that card sits on the hero. Tiny variant plus this shadow CSS leaves a
+ * 56px round button. The open call sheet is a different element, so Accept
+ * stays untouched.
+ */
+const MOBILE_COMPACT_SHADOW_CSS = `
+@media (max-width: 767px) {
+  .rounded-compact-sheet {
+    min-width: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 9999px !important;
+  }
+  .rounded-compact-sheet > .relative {
+    display: none !important;
+  }
+  .rounded-compact-sheet button[aria-label="Dismiss"] {
+    display: none !important;
+  }
+  .rounded-compact-sheet button[aria-label="Start a call"],
+  .rounded-compact-sheet button[aria-label="Start talking"],
+  .rounded-compact-sheet button[aria-label="Hear Randy"] {
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    padding: 0 !important;
+    border-radius: 9999px !important;
+  }
+}
+`;
 
 declare global {
   // React 19 JSX namespace
@@ -80,6 +114,8 @@ declare global {
           "start-call-text"?: string;
           "end-call-text"?: string;
           "avatar-image-url"?: string;
+          variant?: string;
+          placement?: string;
           dismissible?: string | boolean;
         };
       }
@@ -92,7 +128,24 @@ declare global {
  * Chat Randy stays bottom-right. Mode in randy-chat is chat|call only —
  * this floating widget is the Hear path (no second brain / no prompt override).
  */
+function useMobileCompact() {
+  const [compact, setCompact] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia(MOBILE_COMPACT_MQ).matches,
+  );
+  useEffect(() => {
+    const query = window.matchMedia(MOBILE_COMPACT_MQ);
+    const apply = () => setCompact(query.matches);
+    apply();
+    query.addEventListener("change", apply);
+    return () => query.removeEventListener("change", apply);
+  }, []);
+  return compact;
+}
+
 export function HearRandyElevenLabs() {
+  const hostRef = useRef<HTMLElement>(null);
+  const compact = useMobileCompact();
+
   useEffect(() => {
     if (typeof document === "undefined") return;
     if (document.querySelector(`script[${SCRIPT_ATTR}]`)) return;
@@ -113,6 +166,36 @@ export function HearRandyElevenLabs() {
     return () => {
       document.removeEventListener("touchend", unlockIosVoiceGesture, true);
       document.removeEventListener("click", unlockIosVoiceGesture, true);
+    };
+  }, []);
+
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    let shadowObserver: MutationObserver | undefined;
+    const install = () => {
+      const root = host.shadowRoot;
+      if (!root) return;
+      if (!shadowObserver) {
+        shadowObserver = new MutationObserver(install);
+        shadowObserver.observe(root, { childList: true });
+      }
+      if (root.querySelector("[data-birch-convai-compact]")) return;
+      const style = document.createElement("style");
+      style.setAttribute("data-birch-convai-compact", "1");
+      style.textContent = MOBILE_COMPACT_SHADOW_CSS;
+      root.appendChild(style);
+    };
+    install();
+    const hostObserver = new MutationObserver(install);
+    hostObserver.observe(host, { childList: true, attributes: true });
+    const timer = window.setInterval(install, 250);
+    const stop = window.setTimeout(() => window.clearInterval(timer), 8000);
+    return () => {
+      hostObserver.disconnect();
+      shadowObserver?.disconnect();
+      window.clearInterval(timer);
+      window.clearTimeout(stop);
     };
   }, []);
 
@@ -139,19 +222,27 @@ export function HearRandyElevenLabs() {
         }
         @media (max-width: 767px) {
           /*
-           * Absolute controls inside the shadow tree ignore host padding.
-           * Shorten the host so Start / Accept sit above the sticky
-           * call + reserve bar and that bar stays tappable.
+           * Keep the host wide (a 0px host drops iOS taps) but end it at
+           * the sticky bar. The closed control is a 56px circle in that
+           * bottom-right corner, under the hero and above the call link.
+           * 12px overlay padding pulls the circle down off the headline.
            */
           elevenlabs-convai {
+            --el-overlay-padding: 12px !important;
             top: 0;
-            bottom: 11.5rem;
+            right: 0;
+            left: 0;
+            bottom: calc(7.75rem + env(safe-area-inset-bottom));
+            width: 100%;
             height: auto;
           }
         }
       `}</style>
       <elevenlabs-convai
+        ref={hostRef}
         agent-id={agentId}
+        variant={compact ? "tiny" : undefined}
+        placement={compact ? "bottom-right" : undefined}
         action-text="Hear Randy"
         start-call-text="Start talking"
         end-call-text="End"
