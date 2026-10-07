@@ -50,6 +50,7 @@ export function Layout({ children }: { children: ReactNode }) {
               </a>
             ))}
             <Link href="/about" className="hover:text-accent transition-colors">About</Link>
+            <a href="tel:+16479316278" className="font-medium text-accent hover:underline whitespace-nowrap" data-testid="header-call-birch">Call Birch: (647) 931-6278</a>
             <div className="w-px h-4 bg-border" />
             <Link href="/marketplace" className="hover:text-accent transition-colors font-medium">Partner Workspace</Link>
           </nav>
@@ -119,6 +120,10 @@ export function Layout({ children }: { children: ReactNode }) {
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
               8 exclusive brand categories inside signed Scale Health hubs. Your payment is media credit, not airfare.
+            </p>
+            <p className="mb-4 text-sm">
+              <a href="tel:+16479316278" className="font-medium text-accent hover:underline" data-testid="footer-call-birch">Call Birch: (647) 931-6278</a>
+              <span className="block text-[11px] text-muted-foreground">Birch is our AI voice line, 24/7.</span>
             </p>
             <p
               className="mb-6 text-[11px] leading-relaxed text-muted-foreground"
