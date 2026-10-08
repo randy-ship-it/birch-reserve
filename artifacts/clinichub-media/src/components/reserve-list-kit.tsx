@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, ArrowUpRight, CheckCircle2, Loader2, Lock } from "lucide-react";
+import { OrdersInfo } from "@/components/orders-info";
 
 // Reserve List surfaces shared with scalehealth.ca/tam. Every number comes from the same public feed
 // (birchreserve.net/inventory/api/tam, served by birch-inventory) so the two sites never diverge.
@@ -136,7 +137,7 @@ export function ReserveListCalculator({ feed }: { feed: TamFeed | null }) {
         {r ? (
           <>
             <div className="font-display text-6xl leading-none tabular-nums md:text-7xl" data-testid="reserve-list-calc-big">{about(r.orders)}</div>
-            <div className="mt-2 text-lg font-semibold">orders a month</div>
+            <div className="mt-2 text-lg font-semibold">orders<OrdersInfo /> a month</div>
             <p className="mt-3 text-lg font-semibold">About {about(r.clicks)} clicks and {about(r.orders)} orders a month.</p>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               {r.reach >= 1e6 ? (r.reach / 1e6).toFixed(1) + "M" : about(r.reach)} monthly views reached × {(r.ctr * 100).toFixed(2)}% click-through × {Math.round(r.cvr * 100)}% conversion. With the 2027 projection (est.): about {about(r.clicks * r.k27)} clicks and {about(r.orders * r.k27)} orders a month. Estimates from industry benchmarks, not a forecast or a guarantee.
