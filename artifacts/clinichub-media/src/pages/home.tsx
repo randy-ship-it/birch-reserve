@@ -984,7 +984,7 @@ export default function Home() {
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-4 md:gap-6">
-            <a href="https://scalehealth.ca/embedded-recovery-clinic" target="_blank" rel="noopener noreferrer" className="block p-6 md:p-8 border border-border bg-background hover:border-foreground/30 transition-colors group">
+            <a href="https://www.scalehealth.ca/" target="_blank" rel="noopener noreferrer" className="block p-6 md:p-8 border border-border bg-background hover:border-foreground/30 transition-colors group">
               <div className="flex items-center justify-between mb-3">
                 <div className="text-[10px] font-bold uppercase tracking-widest">Brands</div>
                 <ArrowUpRight className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" />

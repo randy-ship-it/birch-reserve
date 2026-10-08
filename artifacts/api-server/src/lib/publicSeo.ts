@@ -12,19 +12,21 @@ export const PUBLIC_SITE_ORIGIN = "https://birchreserve.net";
 /** Existing Birch mark, served from this site. */
 export const PUBLIC_OG_IMAGE = `${PUBLIC_SITE_ORIGIN}/og-birch-reserve.png`;
 
-/** HTML pages a crawler should index. Insight articles are appended at request time. */
+/**
+ * HTML pages a crawler should index. Insight articles are appended at request time.
+ * Only 200, indexable, self-canonical URLs. /list-inventory canonicals to /sell-ads.
+ * /success and /splash/activation are noindex. /oatmeal and /advertise redirect.
+ */
 export const PUBLIC_SITEMAP_PATHS = [
   "/",
   "/about",
+  "/ad-examples",
   "/kit",
   "/sell-ads",
-  "/list-inventory",
   "/terms",
   "/privacy",
   "/sample-io",
   "/marketplace",
-  "/success",
-  "/splash/activation",
   "/insights",
   "/buycalc",
 ] as const;
@@ -35,6 +37,7 @@ export const PUBLIC_SITEMAP_PATHS = [
  */
 export const SPA_SHELL_PATHS = [
   "/about",
+  "/ad-examples",
   "/sell-ads",
   "/list-inventory",
   "/marketplace",
@@ -42,12 +45,30 @@ export const SPA_SHELL_PATHS = [
   "/splash/activation",
 ] as const;
 
+/** Client routes that duplicate another URL. The canonical is the target. */
+const CANONICAL_ALIAS: Readonly<Record<string, string>> = {
+  "/list-inventory": "/sell-ads",
+};
+
+const NOINDEX_PATHS = new Set<string>(["/success", "/splash/activation"]);
+
+export function normalizedPath(pathname: string): string {
+  const withSlash = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  const clean = withSlash.length > 1 ? withSlash.replace(/\/+$/, "") : "/";
+  return clean.split("?")[0] || "/";
+}
+
 const TRAILING_URL_PUNCTUATION = /[.,;:!?)]+$/;
 
 export function publicCanonical(pathname: string): string {
-  const withSlash = pathname.startsWith("/") ? pathname : `/${pathname}`;
-  const clean = withSlash.length > 1 ? withSlash.replace(/\/+$/, "") : "/";
-  return clean === "/" ? `${PUBLIC_SITE_ORIGIN}/` : `${PUBLIC_SITE_ORIGIN}${clean}`;
+  const clean = normalizedPath(pathname);
+  const target = CANONICAL_ALIAS[clean] ?? clean;
+  return target === "/" ? `${PUBLIC_SITE_ORIGIN}/` : `${PUBLIC_SITE_ORIGIN}${target}`;
+}
+
+export function isSelfCanonical(pathname: string): boolean {
+  const clean = normalizedPath(pathname);
+  return publicCanonical(clean) === (clean === "/" ? `${PUBLIC_SITE_ORIGIN}/` : `${PUBLIC_SITE_ORIGIN}${clean}`);
 }
 
 function escapeAttr(value: string): string {
@@ -58,12 +79,20 @@ function escapeAttr(value: string): string {
     .replaceAll('"', "&quot;");
 }
 
-export function publicSeoTags(pathname: string): string {
+export function publicSeoTags(pathname: string, title?: string, description?: string): string {
   const canonical = escapeAttr(publicCanonical(pathname));
   const image = escapeAttr(PUBLIC_OG_IMAGE);
+  const social =
+    title !== undefined && description !== undefined
+      ? [
+          `<meta property="og:title" content="${escapeAttr(title)}" />`,
+          `<meta property="og:description" content="${escapeAttr(description)}" />`,
+        ]
+      : [];
   return [
     `<link rel="canonical" href="${canonical}" />`,
     `<meta property="og:url" content="${canonical}" />`,
+    ...social,
     `<meta property="og:image" content="${image}" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
     `<meta name="twitter:image" content="${image}" />`,
@@ -139,7 +168,15 @@ export function withRouteSeo(html: string, pathname: string): string {
     /<meta\s+name="twitter:image"[^>]*>/i,
     `<meta name="twitter:image" content="${image}" />`,
   );
+  if (NOINDEX_PATHS.has(normalizedPath(pathname))) {
+    next = replaceTag(next, /<meta\s+name="robots"[^>]*>/i, `<meta name="robots" content="noindex" />`);
+  }
   return next;
+}
+
+/** Unknown URLs keep the SPA shell (the client paints Signal Lost) and must not be indexed. */
+export function withNotFoundDocument(html: string): string {
+  return replaceTag(html, /<meta\s+name="robots"[^>]*>/i, `<meta name="robots" content="noindex" />`);
 }
 
 export function resolveSpaIndexHtmlPath(): string {
