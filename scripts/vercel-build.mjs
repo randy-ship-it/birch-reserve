@@ -51,6 +51,16 @@ const API_PATHS = [
   "/marketplace/?",
   "/success/?",
   "/splash/activation/?",
+  "/ad-examples/?",
+];
+
+// Real client routes that stay on the static shell. Anything else that misses
+// the filesystem is the function, which answers unknown pages with 404.
+const SPA_INDEX_PATHS = [
+  "/sales(?:/.*)?",
+  "/sign-in(?:/.*)?",
+  "/sign-up(?:/.*)?",
+  "/editorial(?:/.*)?",
 ];
 
 function run(command, args, env) {
@@ -156,7 +166,8 @@ await writeFile(
 const routes = [
   { handle: "filesystem" },
   ...API_PATHS.map((src) => ({ src, dest: "/api" })),
-  { src: "/(.*)", dest: "/index.html" },
+  ...SPA_INDEX_PATHS.map((src) => ({ src, dest: "/index.html" })),
+  { src: "/(.*)", dest: "/api" },
 ];
 
 // Crons live in vercel.json only. Copying them here as well makes Vercel

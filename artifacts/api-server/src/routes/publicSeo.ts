@@ -8,13 +8,15 @@
  */
 import { PUBLIC_INSIGHT_ARTICLES, db, editorialArticlesTable } from "@workspace/db";
 import { and, asc, eq, lte } from "drizzle-orm";
-import { Router, type IRouter } from "express";
+import { Router, type IRouter, type NextFunction, type Request, type Response } from "express";
 import { logger } from "../lib/logger";
 import {
   PUBLIC_SITEMAP_PATHS,
   SPA_SHELL_PATHS,
+  isSelfCanonical,
   readSpaIndexHtml,
   sitemapXml,
+  withNotFoundDocument,
   withRouteSeo,
 } from "../lib/publicSeo";
 
@@ -48,7 +50,8 @@ async function insightPaths(): Promise<{ paths: string[]; lastmod: Map<string, s
 
 router.get("/sitemap.xml", async (_req, res) => {
   const insights = await insightPaths();
-  const xml = sitemapXml([...PUBLIC_SITEMAP_PATHS, ...insights.paths], insights.lastmod);
+  const pages = [...PUBLIC_SITEMAP_PATHS, ...insights.paths].filter((path) => isSelfCanonical(path));
+  const xml = sitemapXml(pages, insights.lastmod);
   res.set({
     "Cache-Control": "public, max-age=300",
     "Content-Type": "application/xml; charset=utf-8",
@@ -69,6 +72,44 @@ for (const path of SPA_SHELL_PATHS) {
     res.set("Cache-Control", "public, max-age=0, must-revalidate");
     res.type("html").send(html);
   });
+}
+
+const FILE_EXTENSION = /\.[a-z0-9]{1,8}$/i;
+
+/**
+ * Last resort for GET/HEAD that no real route claimed. The shell is the same
+ * document the client uses to paint Signal Lost; the status is 404.
+ * /inventory is a project rewrite and must not be answered here.
+ */
+export function unknownDocument(req: Request, res: Response, next: NextFunction): void {
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    next();
+    return;
+  }
+  const path = req.path || "/";
+  if (
+    path.startsWith("/api") ||
+    path.startsWith("/v1") ||
+    path.startsWith("/ucp") ||
+    path.startsWith("/.well-known") ||
+    path === "/inventory" ||
+    path.startsWith("/inventory/")
+  ) {
+    next();
+    return;
+  }
+  if (FILE_EXTENSION.test(path)) {
+    next();
+    return;
+  }
+  let html: string;
+  try {
+    html = withNotFoundDocument(readSpaIndexHtml());
+  } catch (error) {
+    next(error);
+    return;
+  }
+  res.status(404).set("Cache-Control", "no-store").type("html").send(html);
 }
 
 export default router;

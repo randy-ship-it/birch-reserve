@@ -49,6 +49,11 @@ test("GET /sitemap.xml is XML and lists public pages without API, inventory, or 
     assert.match(xml, new RegExp(`<loc>${publicCanonical(`/insights/${article.slug}`).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}</loc>`));
   }
   assert.doesNotMatch(xml, /\/inventory/);
+  assert.doesNotMatch(xml, /\/list-inventory/);
+  assert.doesNotMatch(xml, /\/success/);
+  assert.doesNotMatch(xml, /\/splash\/activation/);
+  assert.doesNotMatch(xml, /\/oatmeal/);
+  assert.doesNotMatch(xml, /\/advertise/);
   assert.doesNotMatch(xml, /\/api\//);
   assert.doesNotMatch(xml, /\/v1\//);
   assert.doesNotMatch(xml, /llms\.txt/);
@@ -68,10 +73,11 @@ test("server HTML and SPA shells expose canonical, og:url, og:image, and twitter
     ["/sample-io", "https://birchreserve.net/sample-io"],
     ["/about", "https://birchreserve.net/about"],
     ["/sell-ads", "https://birchreserve.net/sell-ads"],
-    ["/list-inventory", "https://birchreserve.net/list-inventory"],
+    ["/list-inventory", "https://birchreserve.net/sell-ads"],
     ["/marketplace", "https://birchreserve.net/marketplace"],
     ["/success", "https://birchreserve.net/success"],
     ["/splash/activation", "https://birchreserve.net/splash/activation"],
+    ["/ad-examples", "https://birchreserve.net/ad-examples"],
   ];
   for (const [path, canonical] of pages) {
     const res = await fetch(`${origin}${path}`);
@@ -82,6 +88,15 @@ test("server HTML and SPA shells expose canonical, og:url, og:image, and twitter
     assert.match(html, new RegExp(`<meta property="og:image" content="${PUBLIC_OG_IMAGE}"\\s*/>`));
     assert.match(html, /<meta name="twitter:card" content="summary_large_image"\s*\/>/);
     assert.equal(html.includes('id="root"') || html.includes("<h1>"), true, path);
+    if (html.includes("<h1>")) {
+      const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
+      const description = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? "";
+      assert.match(html, new RegExp(`<meta property="og:title" content="${title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"\\s*/>`));
+      assert.match(html, new RegExp(`<meta property="og:description" content="${description.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"\\s*/>`));
+    }
+    if (path === "/success" || path === "/splash/activation") {
+      assert.match(html, /<meta name="robots" content="noindex"\s*\/>/);
+    }
   }
 
   const home = await readFile(resolve(process.cwd(), "../clinichub-media/index.html"), "utf8");
@@ -99,6 +114,9 @@ test("server HTML and SPA shells expose canonical, og:url, og:image, and twitter
   const homeSource = await readFile(resolve(process.cwd(), "../clinichub-media/src/pages/home.tsx"), "utf8");
   assert.match(homeSource, /On-prem surfaces in Align's network of health and wellness businesses and in Scale hubs are a separate insertion-order line\./);
   assert.doesNotMatch(homeSource, /clinic and studio surfaces via Align/);
+  assert.match(homeSource, /href="https:\/\/www\.scalehealth\.ca\/"/);
+  assert.doesNotMatch(homeSource, /embedded-recovery-clinic/);
+  assert.match(homeSource, /For product and wellness brands seeking an embedded clinic layer across checkout or loyalty\./);
 
   const robots = await readFile(resolve(process.cwd(), "../clinichub-media/public/robots.txt"), "utf8");
   assert.match(robots, /^Sitemap: https:\/\/birchreserve\.net\/sitemap\.xml$/m);
@@ -107,7 +125,9 @@ test("server HTML and SPA shells expose canonical, og:url, og:image, and twitter
   const build = await readFile(resolve(process.cwd(), "../../scripts/vercel-build.mjs"), "utf8");
   assert.match(build, /\/sitemap\\\\\.xml/);
   assert.match(build, /\/about\/\?/);
+  assert.match(build, /\/ad-examples\/\?/);
   assert.match(build, /spa-index\.html/);
+  assert.match(build, /src: "\/\(\.\*\)", dest: "\/api"/);
 });
 
 test("autolinks drop sentence punctuation from the href and keep it in the text", () => {
@@ -132,6 +152,10 @@ test("published insight HTML keeps sentence periods outside autolink hrefs", asy
   assert.equal(res.status, 200);
   const html = await res.text();
   assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/insights\/the-shelf-after-the-receipt"\s*\/>/);
+  const title = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? "";
+  const description = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? "";
+  assert.match(html, new RegExp(`<meta property="og:title" content="${title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"\\s*/>`));
+  assert.match(html, new RegExp(`<meta property="og:description" content="${description.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"\\s*/>`));
   assert.match(html, /<a href="https:\/\/birchreserve\.net">https:\/\/birchreserve\.net<\/a>\./);
   assert.match(html, /<a href="https:\/\/physio\.drhonow\.com\/dr-ho\/portal">https:\/\/physio\.drhonow\.com\/dr-ho\/portal<\/a>\./);
   assert.doesNotMatch(html, /href="https:\/\/birchreserve\.net\."/);
@@ -142,4 +166,23 @@ test("GET /advertise stays a 301 to /buycalc", async () => {
   const res = await fetch(`${origin}/advertise`, { redirect: "manual" });
   assert.equal(res.status, 301);
   assert.equal(res.headers.get("location"), "/buycalc");
+});
+
+test("GET /oatmeal stays a 301 to /buycalc", async () => {
+  const res = await fetch(`${origin}/oatmeal`, { redirect: "manual" });
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get("location"), "/buycalc");
+});
+
+test("unknown paths return 404 with the SPA shell", async () => {
+  for (const path of ["/reserve", "/made-up-xyz"]) {
+    const res = await fetch(`${origin}${path}`);
+    assert.equal(res.status, 404, path);
+    const html = await res.text();
+    assert.match(html, /id="root"/);
+    assert.match(html, /<meta name="robots" content="noindex"\s*\/>/);
+    assert.match(html, /<script type="module"/);
+  }
+  const kit = await fetch(`${origin}/kit`);
+  assert.equal(kit.status, 200);
 });

@@ -6,7 +6,7 @@ import router from "./routes/index";
 import { randyChatJsonParser } from "./routes/randyChat";
 import publicBuyingRouter from "./routes/publicBuying";
 import publicPagesRouter from "./routes/publicPages";
-import publicSeoRouter from "./routes/publicSeo";
+import publicSeoRouter, { unknownDocument } from "./routes/publicSeo";
 import { indexNowKeyRouter } from "./routes/indexNow";
 import { opsBulletinRouter } from "./routes/opsBulletin";
 import splashExpiryCronRouter from "./routes/splashExpiryCron";
@@ -75,6 +75,9 @@ app.use(opsBulletinRouter);
 app.use(publicBuyingRouter);
 // Before Clerk so a missing Clerk key cannot block splash expiry.
 app.use(splashExpiryCronRouter);
+// Unknown public pages 404 with the SPA shell. Must stay ahead of Clerk so a
+// missing key cannot turn /reserve into a 500. /api, /v1, and /ucp fall through.
+app.use(unknownDocument);
 
 app.use(CLERK_PROXY_PATH, clerkProxyMiddleware());
 app.use(
