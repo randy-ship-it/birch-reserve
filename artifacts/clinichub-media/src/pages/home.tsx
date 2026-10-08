@@ -279,26 +279,31 @@ export default function Home() {
             <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-background/75 md:text-lg">
               A private list of customer flow and digital real estate across Scale Health partner brands and the Align Network of 80+ health and wellness businesses. See what's available, log the placements you want and claim an early slot.
             </p>
-            <dl className="mt-6 grid max-w-xl grid-cols-2 gap-px border border-background/15 bg-background/15">
-              <div className="flex flex-col justify-between bg-foreground p-4 md:p-5">
-                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Purchase orders a year</dt>
-                <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">8.7M</dd>
+            <dl
+              className="mt-6 grid max-w-2xl grid-cols-2 gap-px border border-background/15 bg-background/15 md:grid-cols-[1fr_1fr_1.35fr]"
+              data-testid="reserve-list-stats"
+            >
+              <div className="flex flex-col bg-foreground p-4 md:p-5">
+                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Today</dt>
+                <dd className="mt-2 font-display text-4xl leading-none text-accent md:text-5xl">9M+</dd>
+                <dd className="mt-2 text-xs leading-snug text-background/70">Purchase orders a year in audience</dd>
               </div>
-              <div className="flex flex-col justify-between bg-foreground p-4 md:p-5">
-                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Monthly views</dt>
-                <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">56M</dd>
+              <div className="flex flex-col bg-foreground p-4 md:p-5">
+                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">In the queue<span className="ml-2 inline-block border border-background/30 px-1.5 align-middle font-sans text-[9px] font-bold leading-4 tracking-normal text-background/70">est.</span></dt>
+                <dd className="mt-2 font-display text-4xl leading-none text-accent md:text-5xl">20M+</dd>
+                <dd className="mt-2 text-xs leading-snug text-background/70">Purchase orders a year in the queue</dd>
               </div>
-              <div className="flex flex-col justify-between bg-foreground p-4 md:p-5">
-                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Purchase orders a year in the queue</dt>
-                <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">20M+<span className="ml-2 inline-block border border-background/30 px-1.5 align-middle font-sans text-[10px] font-bold not-italic leading-4 tracking-normal text-background/60">est.</span></dd>
-              </div>
-              <div className="flex flex-col justify-between bg-foreground p-4 md:p-5">
-                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Purchase orders a year (2027 projection)</dt>
-                <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">100M+<span className="ml-2 inline-block border border-background/30 px-1.5 align-middle font-sans text-[10px] font-bold not-italic leading-4 tracking-normal text-background/60">est.</span></dd>
+              <div className="col-span-2 flex flex-col bg-accent p-4 text-accent-foreground md:col-span-1 md:p-5" data-testid="reserve-list-stat-2027">
+                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent-foreground/70">2027 projection<span className="ml-2 inline-block border border-accent-foreground/40 px-1.5 align-middle font-sans text-[9px] font-bold leading-4 tracking-normal text-accent-foreground/80">est.</span></dt>
+                <dd className="mt-2 font-display text-6xl leading-none md:text-[4.25rem]">100M+</dd>
+                <dd className="mt-2 text-xs font-semibold leading-snug text-accent-foreground/85">Purchase orders a year (2027 projection)</dd>
               </div>
             </dl>
-            <p className="mt-3 max-w-xl text-xs leading-relaxed text-background/60">
-              8.7M and 56M are network demand-pool figures for Canada. Queue and 2027 figures are estimates and projections; monthly views grow with orders, to about 180M with the queue live and about 640M at the 2027 projection.
+            <p className="mt-3 max-w-2xl text-sm text-background/80">
+              <span className="font-display text-xl text-accent">56M</span> monthly views today · about 180M with the queue live · about 640M in 2027 <span className="text-background/55">(est.)</span>
+            </p>
+            <p className="mt-2 max-w-2xl text-xs leading-relaxed text-background/60">
+              9M+ and 56M are network demand-pool figures for Canada; 8.7M of those orders are mapped to partner categories on the list. Queue and 2027 figures are estimates and projections.
             </p>
             <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
               <a
@@ -578,7 +583,7 @@ export default function Home() {
               </p>
               <p className="mt-4 font-display text-4xl text-accent">Early slots open</p>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-background/75">
-                See 8.7M purchase orders a year and 56M monthly views by category, plus an est. 20M+ more orders in the queue and 100M+ purchase orders a year (2027 projection). Log the placements you want and claim an early slot. No commitment. Canada only for now.
+                See 9M+ purchase orders a year in audience and 56M monthly views, broken out by category, plus an est. 20M+ more orders in the queue and 100M+ purchase orders a year (2027 projection). Log the placements you want and claim an early slot. No commitment. Canada only for now.
               </p>
               <p className="mt-5 border-t border-background/15 pt-4 text-xs text-background/60">
                 Use an insider code, or request one on the list.
@@ -1164,7 +1169,7 @@ export default function Home() {
           <div className="max-w-2xl mx-auto flex flex-col items-center">
             <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">See the Reserve List while early slots are open.</h2>
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
-              8.7M purchase orders a year and 56M monthly views across Canada today, plus an est. 20M+ more orders in the queue and 100M+ purchase orders a year (2027 projection). Early slots go to Reserve List brands first. Nothing runs until the insertion order names the hub.
+              9M+ purchase orders a year in audience and 56M monthly views across Canada today, plus an est. 20M+ more orders in the queue and 100M+ purchase orders a year (2027 projection). Early slots go to Reserve List brands first. Nothing runs until the insertion order names the hub.
             </p>
             <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
               <a
