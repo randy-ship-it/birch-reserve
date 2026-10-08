@@ -329,7 +329,7 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
 
 const BRAND_TITLE = "Birch Reserve | The Reserve List · Scale Health demand, Canada";
 const BRAND_DESCRIPTION =
-  "See the Reserve List: 8.7M purchase orders a year and 56M monthly views across Scale Health partner brands in Canada, by category. Early slots are open. Paid reserves are 100% media credit.";
+  "See the Reserve List: 8.7M purchase orders a year and 56M monthly views in Canada today, 20M+ more orders in the queue and 100M+ projected for 2027. Early slots are open. Paid reserves are 100% media credit.";
 
 test("public marketing title and description match the brand strings", async () => {
   const indexHtml = await readFile(
