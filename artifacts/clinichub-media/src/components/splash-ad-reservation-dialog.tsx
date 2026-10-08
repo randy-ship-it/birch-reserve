@@ -144,7 +144,7 @@ export function SplashAdReservationDialog({
               <div className="size-16 bg-accent/20 rounded-full flex items-center justify-center mb-6 border border-accent/30">
                 <CheckCircle2 className="size-8 text-accent" />
               </div>
-              <h3 className="text-3xl font-display tracking-tight mb-3 text-foreground">Category locked</h3>
+              <h3 className="text-3xl font-display tracking-tight mb-3 text-foreground">Placement reserved</h3>
               <p className="text-muted-foreground mb-8 max-w-sm leading-relaxed text-sm">
                 Your reservation is saved. Payment is still required; contact Birch Reserve to complete the secure {lockedFormattedPrice} USD checkout.
               </p>
@@ -214,7 +214,7 @@ export function SplashAdReservationDialog({
                           <FormLabel className="text-xs font-medium text-foreground">Select Offer</FormLabel>
                           <FormControl>
                             <div className="grid gap-2">
-                              {RESERVE_OFFERS.map((offer) => {
+                              {RESERVE_OFFERS.filter((offer) => offer.key !== "hold-190" || field.value === "hold-190").map((offer) => {
                                 const isSelected = field.value === offer.key;
                                 const amount = formatReserveAmount(offer.amountCents);
                                 return (
@@ -347,7 +347,7 @@ export function SplashAdReservationDialog({
                         {isPending ? (
                           <><Loader2 className="mr-2 size-5 animate-spin" /> Processing</>
                         ) : (
-                          <>{selectedOffer.key === "hold-190" ? "Hold a category 7 days — $190" : "Lock your exclusive category — $490"} <CreditCard className="ml-2 size-5" /></>
+                          <>{selectedOffer.key === "hold-190" ? "Start a 7-day look — $190" : "Reserve your early placement — $490"} <CreditCard className="ml-2 size-5" /></>
                         )}
                       </Button>
                       <div className="text-center text-[11px] text-muted-foreground mt-2">

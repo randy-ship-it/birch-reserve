@@ -162,7 +162,7 @@ export function SalesConcierge({
     window.setTimeout(() => {
       setIsTyping(false);
       appendAdvisorMessage("Got it. How can I help you today?", [
-        { label: "Reserve an exclusive category", action: () => handleIntent("interested"), primary: true },
+        { label: "Claim an early slot", action: () => handleIntent("interested"), primary: true },
         { label: "Just learn", action: () => handleIntent("learning") },
         { label: "Ask a typed question", action: handleAskQuestion }
       ]);
@@ -171,11 +171,11 @@ export function SalesConcierge({
 
   const handleIntent = (selectedIntent: string) => {
       if (selectedIntent === 'interested') {
-      appendUserMessage("Reserve an exclusive category");
+      appendUserMessage("Claim an early slot");
       setIsTyping(true);
       window.setTimeout(() => {
         setIsTyping(false);
-        appendAdvisorMessage("Prices: $190 = 7-day category look (does not take an exclusive category). $490 = lock your exclusive category + 100% media credit. $899 is a legacy SKU still in checkout — do not hero it. Nothing runs until an insertion order names the surface.", [
+        appendAdvisorMessage("Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 early placement is 100% media credit. Nothing runs until an insertion order names the surface.", [
           { label: "Open Reservation Form", action: () => onHandoff(), primary: true },
           { label: "Compare advertising paths", action: () => handleChoosePath(true) }
         ]);
@@ -242,7 +242,7 @@ export function SalesConcierge({
         }
       ]);
 
-      appendAdvisorMessage("Would you like to lock your exclusive category now?", [
+      appendAdvisorMessage("Would you like to claim an early slot now?", [
         { label: "Reserve first access", action: () => onHandoff(path), primary: true },
         { label: "See placement moments", action: showFormatPicker }
       ]);
@@ -338,7 +338,7 @@ export function SalesConcierge({
       case "pricing_or_availability":
       case "self_serve_purchase":
         return {
-          text: "Prices: $190 = 7-day category look (does not take an exclusive category). $490 = lock your exclusive category + 100% media credit. $899 is a legacy SKU still in checkout — do not hero it. Nothing runs until an insertion order names the surface.",
+          text: "Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 early placement is 100% media credit. Nothing runs until an insertion order names the surface.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "Compare advertising paths", action: () => handleChoosePath(true) },
@@ -350,12 +350,12 @@ export function SalesConcierge({
           options: [
             { label: "Get a call back", href: RANDY_TEL_HREF, primary: true },
             { label: "Book a call", action: () => { trackCta("cta_book_call"); openRandyChat({ reason: "concierge", mode: "chat" }); } },
-            { label: "Lock your exclusive category — $490", action: onHandoff },
+            { label: "Reserve your early placement — $490", action: onHandoff },
           ],
         };
       case "book_a_call":
         return {
-          text: `Multi-hub, exclusive, and on-prem Align are a call, not a public checkout SKU. Dial ${RANDY_TEL_DISPLAY} or email.`,
+          text: `Multi-hub and on-prem Align are a call, not a public checkout SKU. Dial ${RANDY_TEL_DISPLAY} or email.`,
           options: [
             { label: "Get a call back", href: RANDY_TEL_HREF, primary: true },
             { label: "Book a call", action: () => { trackCta("cta_book_call"); openRandyChat({ reason: "concierge", mode: "chat" }); } },
@@ -363,7 +363,7 @@ export function SalesConcierge({
         };
       case "audience_or_metrics":
         return {
-          text: "We do not sell a guaranteed impression count. You buy first-right on a category inside signed hubs. We name the surface on the insertion order.",
+          text: "We do not sell a guaranteed impression count. Reserve List brands get early slots first as each category activates. We name the surface on the insertion order.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },
@@ -371,7 +371,7 @@ export function SalesConcierge({
         };
       case "media_kit":
         return {
-          text: "8 exclusive brand categories inside signed Scale Health clinic hubs. Not an open auction. Not a guaranteed impression buy. $490 locks your exclusive category. Media credit, not airfare.",
+          text: "The Reserve List: 8 advertiser categories inside signed Scale Health hubs, with early slots open. Not an open auction. Not a guaranteed impression buy. The $490 early placement is media credit, not airfare.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },
@@ -469,7 +469,7 @@ export function SalesConcierge({
         {
           id: Date.now().toString(),
           role: "advisor",
-          text: "The live advisor is taking a pause, but you can still explore the paths or lock your exclusive category directly.",
+          text: "The live advisor is taking a pause, but you can still explore the paths or claim an early slot directly.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "Return to advertising paths", action: () => handleChoosePath(true) }

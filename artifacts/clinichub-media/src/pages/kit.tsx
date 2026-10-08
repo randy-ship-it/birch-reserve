@@ -96,7 +96,7 @@ export default function Kit() {
             <li>Square still (primary creative)</li>
             <li>Optional 15-second silent motion</li>
             <li>Destination URL</li>
-            <li>One of the eight exclusive brand categories</li>
+            <li>One of the eight advertiser categories</li>
             <li>Contact email for creative and IO follow-up</li>
           </ul>
           <p className="mt-4 text-sm text-muted-foreground">
@@ -107,7 +107,7 @@ export default function Kit() {
 
       <section className="border-b border-border">
         <div className="container mx-auto max-w-3xl px-6 py-12">
-          <h2 className="font-display text-2xl tracking-tight">Eight exclusive brand categories</h2>
+          <h2 className="font-display text-2xl tracking-tight">Eight categories, early slots open</h2>
           <ul className="mt-4 grid gap-2 sm:grid-cols-2">
             {CATEGORIES.map((label) => (
               <li key={label} className="border border-border px-4 py-3 text-sm">
@@ -116,7 +116,7 @@ export default function Kit() {
             ))}
           </ul>
           <p className="mt-4 text-sm text-muted-foreground">
-            One brand per category. Not eight websites.
+            Categories stay open to more than one brand; no brand gets more than 20%. Not eight websites.
           </p>
         </div>
       </section>

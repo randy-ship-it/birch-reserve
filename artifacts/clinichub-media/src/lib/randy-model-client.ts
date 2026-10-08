@@ -141,14 +141,14 @@ async function stubRandyReply(
 
   if (chip === "how_seats") {
     return {
-      text: "Birch Reserve offers 8 exclusive brand categories inside signed Scale Health clinic hubs — one brand per category. Nothing runs until an insertion order names the surface. What category are you in?",
+      text: "The Reserve List shows high-value Canadian health and wellness demand by category. Reserve List brands get early slots first as each category activates; categories stay open to more than one brand, and no brand gets more than 20%. See it at https://birchreserve.net/inventory. What category are you in?",
       source: "stub",
     };
   }
 
   if (chip === "hold_190") {
     return {
-      text: "Hold $190 gives you a 7-day look at a category before you commit; $490 locks your exclusive category. Online checkout is live on birchreserve.net — pay there, or keep going here and I’ll walk you through it. Which category do you want to hold?",
+      text: "The Reserve List is at https://birchreserve.net/inventory: see what’s available, log the placements you want and claim an early slot. Which category do you want an early slot in?",
       source: "stub",
     };
   }
@@ -156,14 +156,14 @@ async function stubRandyReply(
   if (chip === "live_hub") {
     return {
       // Emma HARD: never spell raw hub URLs as visible prose — label / markdown href only.
-      text: `Tap See a live hub — or open [See a live hub](${LIVE_HUB_PROOF_URL}). That’s the kind of surface an exclusive category shows up on. What category would you want in front of those patients?`,
+      text: `Tap See a live hub — or open [See a live hub](${LIVE_HUB_PROOF_URL}). That’s the kind of surface an early slot shows up on. What category would you want in front of those patients?`,
       source: "stub",
     };
   }
 
   if (/\b(190|490|hold|reserve|seat|price|pricing|buy|checkout)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "Two options: Hold $190 for a 7-day look, or $490 to lock your exclusive category. Online checkout is live on birchreserve.net. Want to pay there, call, or keep going here?",
+      text: "Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot, or take the $490 early placement (100% media credit) with online checkout on birchreserve.net. Want to pay there, call, or keep going here?",
       source: "stub",
       offerHandoff: true,
     };

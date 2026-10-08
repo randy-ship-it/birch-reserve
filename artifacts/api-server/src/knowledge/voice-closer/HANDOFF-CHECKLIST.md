@@ -5,10 +5,10 @@ Capture every call: **name · email · brand/clinic legal name · what they want
 
 | Caller signal | Do this | Do not |
 |---------------|---------|--------|
-| Brand / CPG exploring category seat | **Hold $190** or explain look | Invent impressions |
-| Brand clear on category, ready to lock | **Reserve $490** | Hero $899 |
-| Multi-hub / exclusive / on-prem Align screens / custom | **Book a call** → only **after** a short qualifying chat or call with Randy; then Cal https://cal.com/randy-gilling/30min (Mon–Fri 1–3pm ET) — **no bare/cold Cal** | Fake a checkout charge |
-| Ready to pay (checkout LIVE, Randy 2026-09-24 6:22pm ET) | Capture lead; send to https://birchreserve.net to lock Hold $190 / Reserve $490. Invoice + IO only if they prefer it | Say card was charged unless buyer confirms they paid |
+| Brand / CPG exploring a category | **The Reserve List** https://birchreserve.net/inventory (claim an early slot) | Invent impressions |
+| Brand clear on category, ready to commit | **$490 early placement** | Hero $899 |
+| Multi-hub / on-prem Align screens / custom | **Book a call** → only **after** a short qualifying chat or call with Randy; then Cal https://cal.com/randy-gilling/30min (Mon–Fri 1–3pm ET) — **no bare/cold Cal** | Fake a checkout charge |
+| Ready to pay (checkout LIVE, Randy 2026-09-24 6:22pm ET) | Capture lead; send to https://birchreserve.net/inventory to claim an early slot, or https://birchreserve.net for the $490 early placement. Invoice + IO only if they prefer it | Say card was charged unless buyer confirms they paid |
 | Clinician wants bookings / “send patients” | Scale https://scalehealth.ca/providers — rails-not-leads | Lead fee / bounty language |
 | Studio / audience / free store | Scale https://scalehealth.ca/clinichubs | Promise per-door brand deals |
 | Franchise / multi-loc commercial complexity | **Jon** jon@silverbirchgrowth.com; Randy stays owner | Invent Jon’s cell |

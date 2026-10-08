@@ -94,8 +94,8 @@ test("widget wiring: model client uses the quiet retry and builds the payload on
 import { parseCheckoutStatus, reserveIntakeNeed } from "../src/lib/checkout-status.ts";
 
 test("checkout paused: CTAs open intake with seat + category preselected; enabled falls back to checkout", () => {
-  assert.equal(reserveIntakeNeed("reserve-490", "sports_nutrition"), "Reserve $490 seat — sports nutrition");
-  assert.equal(reserveIntakeNeed("hold-190"), "Hold $190 (7-day category hold)");
+  assert.equal(reserveIntakeNeed("reserve-490", "sports_nutrition"), "Early placement $490 — sports nutrition");
+  assert.equal(reserveIntakeNeed("hold-190"), "7-day look $190");
   assert.equal(parseCheckoutStatus({ checkoutEnabled: true }), true);
   for (const v of [null, {}, { checkoutEnabled: "true" }, { checkoutEnabled: false }]) assert.equal(parseCheckoutStatus(v), false);
   const home = readFileSync(new URL("../src/pages/home.tsx", import.meta.url), "utf8");

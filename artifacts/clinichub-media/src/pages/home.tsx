@@ -592,7 +592,7 @@ export default function Home() {
                   {formatReserveAmount(offer.amountCents)}
                 </p>
                 <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground">
-                  {offer.description.replace(/^Lock your exclusive category\.\s*/, "Paid reserve. ")}
+                  {offer.description}
                 </p>
                 <p className="mt-5 border-t border-border pt-4 text-xs text-muted-foreground">
                   {offer.creditLine}
@@ -614,7 +614,7 @@ export default function Home() {
               $100K–$250K+ · Coming soon / Inquire within
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Multi-hub, exclusive, or on-prem Align. Credit, not a flight. Not a self-serve Stripe SKU — inquire within.
+              Multi-hub or on-prem Align. Credit, not a flight. Not a self-serve Stripe SKU — inquire within.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Button
@@ -831,7 +831,7 @@ export default function Home() {
               </p>
               <p className="mt-6 text-muted-foreground text-lg leading-relaxed max-w-md">
                 <strong className="text-foreground font-medium">For auto-buyers:</strong> no insertion-order theatre or 12-week RFP.<br/>
-                <strong className="text-foreground font-medium">For distribution buyers:</strong> one exclusive brand category, outside the open auction.
+                <strong className="text-foreground font-medium">For distribution buyers:</strong> early slots on the Reserve List, outside the open auction.
               </p>
               <div className="mt-8">
                 <span className="bg-foreground text-accent px-4 py-2 inline-block font-medium tracking-wide rounded-sm text-sm">Reserve payments act as 100% media credit and hold first rights to available inventory.</span>
@@ -944,7 +944,7 @@ export default function Home() {
                 <div className="border border-border/50 shadow-sm overflow-hidden aspect-[4/3] bg-muted relative">
                   <HubWalkthroughVideo testId="video-hub-walkthrough" />
                 </div>
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Live DR-HO&apos;S hub walkthrough — illustrative of exclusive category placement context.</p>
+                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Live DR-HO&apos;S hub walkthrough — illustrative of early-slot placement context.</p>
                 <a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold">
                   Open the live hub <ArrowUpRight className="size-4" />
                 </a>
