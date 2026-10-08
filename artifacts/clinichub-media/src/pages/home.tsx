@@ -592,7 +592,7 @@ export default function Home() {
               <MapPin className="mb-7 size-6 text-accent" />
               <h3 className="mb-3 font-display text-3xl">On-prem, on request</h3>
               <p className="text-sm leading-relaxed text-background/70 mb-4">
-                On-prem clinic and studio surfaces via Align and Scale clinic hubs are a separate insertion-order line. They are not sold as digital reach.
+                On-prem surfaces in Align's network of health and wellness businesses and in Scale hubs are a separate insertion-order line. They are not sold as digital reach.
               </p>
               <div className="flex flex-wrap gap-2">
                 <a

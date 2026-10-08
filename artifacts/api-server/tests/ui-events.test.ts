@@ -5,6 +5,7 @@ import { after, test } from "node:test";
 import {
   legacyReserveCopyPatch,
   mentionsLegacyHeroPrice,
+  rewriteAlignNetworkCopy,
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
 } from "../../../lib/db/src/public-insights-copy.ts";
@@ -59,7 +60,7 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
   const summary = "A practical model for cross-promoting relevant brands after a purchase or booking.";
-  const body = `${LIVE_LEGACY_SENTENCE} Payments are currently paused, so this article is not an active checkout promise.`;
+  const body = `${LIVE_LEGACY_SENTENCE} Payments are currently paused, so this article is not an active checkout promise. describes virtual rehab embedded into clinic, studio, and wellness businesses [2].`;
   const patch = legacyReserveCopyPatch(summary, body);
   assert.ok(patch);
   assert.equal(patch.summary, summary);
@@ -131,6 +132,15 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
+  assert.match(rows[0]?.body ?? "", /embedded into health and wellness businesses \[2\]\./);
+  assert.doesNotMatch(rows[0]?.body ?? "", /clinic, studio, and wellness/);
+  assert.match(rows[0]?.body ?? "", /Payments are currently paused/);
+  assert.equal(
+    rewriteAlignNetworkCopy(
+      "its own site describes virtual rehab embedded into clinic, studio, and wellness businesses [2]. That creates",
+    ),
+    "its own site describes virtual rehab embedded into health and wellness businesses [2]. That creates",
+  );
   assert.equal(rows[1]?.body, untouched);
   assert.equal(rows[1]?.summary, "What a buyer should require from an advertising agent.");
 

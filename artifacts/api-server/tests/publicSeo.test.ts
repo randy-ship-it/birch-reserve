@@ -90,6 +90,16 @@ test("server HTML and SPA shells expose canonical, og:url, og:image, and twitter
   assert.match(home, new RegExp(`<meta property="og:image" content="${PUBLIC_OG_IMAGE}" />`));
   assert.match(home, /<meta name="twitter:card" content="summary_large_image" \/>/);
 
+  const og = await readFile(resolve(process.cwd(), "../clinichub-media/public/og-birch-reserve.png"));
+  assert.equal(og.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
+  assert.equal(og.readUInt32BE(16), 1200);
+  assert.equal(og.readUInt32BE(20), 630);
+  assert.equal(PUBLIC_OG_IMAGE, "https://birchreserve.net/og-birch-reserve.png");
+
+  const homeSource = await readFile(resolve(process.cwd(), "../clinichub-media/src/pages/home.tsx"), "utf8");
+  assert.match(homeSource, /On-prem surfaces in Align's network of health and wellness businesses and in Scale hubs are a separate insertion-order line\./);
+  assert.doesNotMatch(homeSource, /clinic and studio surfaces via Align/);
+
   const robots = await readFile(resolve(process.cwd(), "../clinichub-media/public/robots.txt"), "utf8");
   assert.match(robots, /^Sitemap: https:\/\/birchreserve\.net\/sitemap\.xml$/m);
   assert.doesNotMatch(robots, /api\/editorial\/sitemap\.xml/);

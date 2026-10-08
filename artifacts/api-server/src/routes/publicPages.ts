@@ -4,6 +4,7 @@ import {
   editorialArticlesTable,
   editorialSourcesTable,
   PUBLIC_INSIGHT_ARTICLES,
+  rewriteAlignNetworkCopy,
 } from "@workspace/db";
 import { and, asc, eq, inArray, lte } from "drizzle-orm";
 import { Router, type IRouter } from "express";
@@ -241,7 +242,7 @@ async function listReadableArticles(): Promise<PublicArticle[]> {
       authorName: row.authorName,
       topic: row.topic,
       summary: row.summary,
-      body: row.body,
+      body: rewriteAlignNetworkCopy(row.body),
       publishedAt: row.publishedAt,
       citations: citationRows
         .filter((citation) => citation.articleId === row.id)
