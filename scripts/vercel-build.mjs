@@ -44,6 +44,13 @@ const API_PATHS = [
   "/sample-io/?",
   "/insights(?:/.*)?",
   "/ops(?:/.*)?",
+  "/sitemap\\.xml",
+  "/about/?",
+  "/sell-ads/?",
+  "/list-inventory/?",
+  "/marketplace/?",
+  "/success/?",
+  "/splash/activation/?",
 ];
 
 function run(command, args, env) {
@@ -68,6 +75,7 @@ run("pnpm", ["--filter", "@workspace/clinichub-media", "run", "build"], buildEnv
 await rm(outputRoot, { recursive: true, force: true });
 await mkdir(funcDir, { recursive: true });
 await cp(clientDist, staticDir, { recursive: true });
+await cp(path.join(clientDist, "index.html"), path.join(funcDir, "spa-index.html"));
 
 await build({
   entryPoints: {
