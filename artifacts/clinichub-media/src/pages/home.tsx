@@ -288,7 +288,18 @@ export default function Home() {
                 <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Monthly views</dt>
                 <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">56M</dd>
               </div>
+              <div className="bg-foreground p-4 md:p-5">
+                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Purchase orders in the queue</dt>
+                <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">20M+</dd>
+              </div>
+              <div className="bg-foreground p-4 md:p-5">
+                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Projected for 2027</dt>
+                <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">100M+</dd>
+              </div>
             </dl>
+            <p className="mt-3 max-w-xl text-xs leading-relaxed text-background/60">
+              Purchase orders a year, Canada. Monthly views grow with orders: about 180M with the queue live and about 640M at the 2027 projection. Queue and 2027 figures are estimates.
+            </p>
             <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
               <a
                 href={RESERVE_LIST_HREF}
@@ -567,7 +578,7 @@ export default function Home() {
               </p>
               <p className="mt-4 font-display text-4xl text-accent">Early slots open</p>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-background/75">
-                See 8.7M purchase orders a year and 56M monthly views by category, log the placements you want and claim an early slot. No commitment. Canada only for now.
+                See 8.7M purchase orders a year and 56M monthly views by category, plus 20M+ more orders in the queue and 100M+ projected for 2027. Log the placements you want and claim an early slot. No commitment. Canada only for now.
               </p>
               <p className="mt-5 border-t border-background/15 pt-4 text-xs text-background/60">
                 Use an insider code, or request one on the list.
@@ -1153,7 +1164,7 @@ export default function Home() {
           <div className="max-w-2xl mx-auto flex flex-col items-center">
             <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">See the Reserve List while early slots are open.</h2>
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
-              8.7M purchase orders a year and 56M monthly views across Canada, by category. Early slots go to Reserve List brands first. Nothing runs until the insertion order names the hub.
+              8.7M purchase orders a year and 56M monthly views across Canada today, 20M+ more orders in the queue and 100M+ projected for 2027. Early slots go to Reserve List brands first. Nothing runs until the insertion order names the hub.
             </p>
             <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:justify-center">
               <a
