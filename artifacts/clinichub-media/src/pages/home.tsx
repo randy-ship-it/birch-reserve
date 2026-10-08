@@ -280,25 +280,25 @@ export default function Home() {
               A private list of customer flow and digital real estate across Scale Health partner brands and the Align Network of 80+ health and wellness businesses. See what's available, log the placements you want and claim an early slot.
             </p>
             <dl className="mt-6 grid max-w-xl grid-cols-2 gap-px border border-background/15 bg-background/15">
-              <div className="bg-foreground p-4 md:p-5">
+              <div className="flex flex-col justify-between bg-foreground p-4 md:p-5">
                 <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Purchase orders a year</dt>
                 <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">8.7M</dd>
               </div>
-              <div className="bg-foreground p-4 md:p-5">
+              <div className="flex flex-col justify-between bg-foreground p-4 md:p-5">
                 <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Monthly views</dt>
                 <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">56M</dd>
               </div>
-              <div className="bg-foreground p-4 md:p-5">
-                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Purchase orders in the queue</dt>
-                <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">20M+</dd>
+              <div className="flex flex-col justify-between bg-foreground p-4 md:p-5">
+                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Purchase orders a year in the queue</dt>
+                <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">20M+<span className="ml-2 inline-block border border-background/30 px-1.5 align-middle font-sans text-[10px] font-bold not-italic leading-4 tracking-normal text-background/60">est.</span></dd>
               </div>
-              <div className="bg-foreground p-4 md:p-5">
-                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Projected for 2027</dt>
-                <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">100M+</dd>
+              <div className="flex flex-col justify-between bg-foreground p-4 md:p-5">
+                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Purchase orders a year (2027 projection)</dt>
+                <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">100M+<span className="ml-2 inline-block border border-background/30 px-1.5 align-middle font-sans text-[10px] font-bold not-italic leading-4 tracking-normal text-background/60">est.</span></dd>
               </div>
             </dl>
             <p className="mt-3 max-w-xl text-xs leading-relaxed text-background/60">
-              Purchase orders a year, Canada. Monthly views grow with orders: about 180M with the queue live and about 640M at the 2027 projection. Queue and 2027 figures are estimates.
+              8.7M and 56M are network demand-pool figures for Canada. Queue and 2027 figures are estimates and projections; monthly views grow with orders, to about 180M with the queue live and about 640M at the 2027 projection.
             </p>
             <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
               <a
@@ -322,7 +322,7 @@ export default function Home() {
               Reserve List brands get first offer on placements as each category activates.
             </p>
             <p className="mt-3 text-xs text-background/50">
-              Canada only for now. Figures are demand-pool estimates; the full breakdown by category is inside the list.
+              Canada only for now. The full breakdown by category is inside the list.
             </p>
           </div>
           <a
@@ -578,7 +578,7 @@ export default function Home() {
               </p>
               <p className="mt-4 font-display text-4xl text-accent">Early slots open</p>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-background/75">
-                See 8.7M purchase orders a year and 56M monthly views by category, plus 20M+ more orders in the queue and 100M+ projected for 2027. Log the placements you want and claim an early slot. No commitment. Canada only for now.
+                See 8.7M purchase orders a year and 56M monthly views by category, plus an est. 20M+ more orders in the queue and 100M+ purchase orders a year (2027 projection). Log the placements you want and claim an early slot. No commitment. Canada only for now.
               </p>
               <p className="mt-5 border-t border-background/15 pt-4 text-xs text-background/60">
                 Use an insider code, or request one on the list.
@@ -1164,12 +1164,12 @@ export default function Home() {
           <div className="max-w-2xl mx-auto flex flex-col items-center">
             <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">See the Reserve List while early slots are open.</h2>
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
-              8.7M purchase orders a year and 56M monthly views across Canada today, 20M+ more orders in the queue and 100M+ projected for 2027. Early slots go to Reserve List brands first. Nothing runs until the insertion order names the hub.
+              8.7M purchase orders a year and 56M monthly views across Canada today, plus an est. 20M+ more orders in the queue and 100M+ purchase orders a year (2027 projection). Early slots go to Reserve List brands first. Nothing runs until the insertion order names the hub.
             </p>
-            <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:justify-center">
+            <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
               <a
                 href={RESERVE_LIST_HREF}
-                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 bg-accent text-accent-foreground h-14 px-12 hover:bg-background hover:text-foreground transition-colors font-semibold text-base"
+                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 whitespace-nowrap bg-accent text-accent-foreground h-14 px-12 hover:bg-background hover:text-foreground transition-colors font-semibold text-base"
                 data-testid="button-final-reserve-list"
               >
                 See the Reserve List <ArrowRight className="size-4" aria-hidden />
