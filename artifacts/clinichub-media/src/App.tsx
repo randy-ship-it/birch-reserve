@@ -237,9 +237,6 @@ function Router() {
         <Route path="/">
           <Layout><HomeRedirect /></Layout>
         </Route>
-        <Route path="/ad-examples">
-          <Layout><HomeRedirect /></Layout>
-        </Route>
         <Route path="/about">
           <Layout><About /></Layout>
         </Route>

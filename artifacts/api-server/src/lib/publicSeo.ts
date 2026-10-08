@@ -15,12 +15,11 @@ export const PUBLIC_OG_IMAGE = `${PUBLIC_SITE_ORIGIN}/og-birch-reserve.png`;
 /**
  * HTML pages a crawler should index. Insight articles are appended at request time.
  * Only 200, indexable, self-canonical URLs. /list-inventory canonicals to /sell-ads.
- * /success and /splash/activation are noindex. /oatmeal and /advertise redirect.
+ * /success and /splash/activation are noindex. /ad-examples, /oatmeal, and /advertise redirect.
  */
 export const PUBLIC_SITEMAP_PATHS = [
   "/",
   "/about",
-  "/ad-examples",
   "/kit",
   "/sell-ads",
   "/terms",
@@ -37,7 +36,6 @@ export const PUBLIC_SITEMAP_PATHS = [
  */
 export const SPA_SHELL_PATHS = [
   "/about",
-  "/ad-examples",
   "/sell-ads",
   "/list-inventory",
   "/marketplace",
