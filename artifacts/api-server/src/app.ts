@@ -6,6 +6,7 @@ import router from "./routes/index";
 import { randyChatJsonParser } from "./routes/randyChat";
 import publicBuyingRouter from "./routes/publicBuying";
 import publicPagesRouter from "./routes/publicPages";
+import publicSeoRouter from "./routes/publicSeo";
 import { indexNowKeyRouter } from "./routes/indexNow";
 import { opsBulletinRouter } from "./routes/opsBulletin";
 import splashExpiryCronRouter from "./routes/splashExpiryCron";
@@ -68,6 +69,7 @@ app.use(
   }),
 );
 app.use(publicPagesRouter);
+app.use(publicSeoRouter);
 app.use(indexNowKeyRouter);
 app.use(opsBulletinRouter);
 app.use(publicBuyingRouter);

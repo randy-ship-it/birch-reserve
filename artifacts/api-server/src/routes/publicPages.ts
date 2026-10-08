@@ -8,6 +8,7 @@ import {
 import { and, asc, eq, inArray, lte } from "drizzle-orm";
 import { Router, type IRouter } from "express";
 import { logger } from "../lib/logger";
+import { autolinkPlainUrl, publicSeoTags } from "../lib/publicSeo";
 
 const router: IRouter = Router();
 
@@ -48,8 +49,7 @@ function inline(text: string): string {
         return `<a href="${escapeHtml(linked[2] ?? "")}">${escapeHtml(linked[1] ?? "")}</a>`;
       }
       if (/^https?:\/\//.test(part)) {
-        const href = escapeHtml(part);
-        return `<a href="${href}">${href}</a>`;
+        return autolinkPlainUrl(part);
       }
       return escapeHtml(part);
     })
@@ -108,10 +108,11 @@ function renderMarkdown(markdown: string): string {
   return html.join("");
 }
 
-function documentPage(title: string, description: string, body: string): string {
+function documentPage(title: string, description: string, body: string, path: string): string {
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${escapeHtml(title)}</title><meta name="description" content="${escapeHtml(description)}">
+${publicSeoTags(path)}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -143,6 +144,7 @@ const TERMS_HTML = documentPage(
 <p>8 exclusive brand categories across hubs — not eight websites. One brand per category. Reporting is aggregate only. No PHI. No clinical pixels.</p>
 <p>Checkout is Stripe-hosted. Silver Birch Growth Inc. does not store full card numbers. Questions: <a href="mailto:sales@silverbirchgrowth.com">Email sales</a>.</p>
 <p><a href="/privacy">Privacy</a></p>`,
+  "/terms",
 );
 
 const PRIVACY_HTML = documentPage(
@@ -155,6 +157,7 @@ const PRIVACY_HTML = documentPage(
 <p>Birch Reserve does not collect protected health information, clinical pixels, or patient-level reporting. Birch Guide does not collect patient or PHI data. Placement reporting, when an insertion order later authorizes a flight, is aggregate only.</p>
 <p>The Stripe descriptor should read SCALE HEALTH*BIRCH or BIRCH RESERVE. Contact <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> to ask for a copy of reservation details or to correct a brand name or email on an unpaid hold.</p>
 <p><a href="/terms">Terms of sale</a></p>`,
+  "/privacy",
 );
 
 const SAMPLE_IO_HTML = documentPage(
@@ -173,6 +176,7 @@ const SAMPLE_IO_HTML = documentPage(
 </dl>
 <p class="fine">Draft until counsel stamps.</p>
 <p><a href="/terms">Terms of sale</a></p>`,
+  "/sample-io",
 );
 
 function seedArticles(): PublicArticle[] {
@@ -273,6 +277,7 @@ function insightsIndexHtml(articles: PublicArticle[]): string {
     `<h1>Insights &amp; Evidence</h1>
 <p>Measured, evidence-led reporting on health, wellness, and trusted retail contexts. Public readings from the Birch Reserve editorial desk.</p>
 ${cards || "<p>No insights published yet.</p>"}`,
+    "/insights",
   );
 }
 
@@ -298,6 +303,7 @@ ${renderMarkdown(bodyWithoutRepeatedTitle(article))}
 ${article.citations.length
     ? `<h2>Sources</h2><ul>${article.citations.map((citation) => `<li><a href="${escapeHtml(citation.url)}">${escapeHtml(citation.label || citation.title)}</a> <span class="fine">${escapeHtml(citation.publisher)}</span></li>`).join("")}</ul>`
     : ""}`,
+    `/insights/${article.slug}`,
   );
 }
 
@@ -341,6 +347,7 @@ const KIT_HTML = documentPage(
 <h2>Contact</h2>
 <p><a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · human calculator: <a href="/buycalc">/buycalc</a></p>
 <p><a href="/sample-io">Sample insertion order</a> · <a href="/terms">Terms</a></p>`,
+  "/kit",
 );
 
 router.get("/terms", (_req, res) => {
@@ -366,13 +373,13 @@ router.get("/insights", async (_req, res) => {
 router.get("/insights/:slug", async (req, res) => {
   const slug = req.params.slug;
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
-    res.status(404).type("html").send(documentPage("Article not found — Birch Reserve", "That insight is not published.", "<h1>Article not found</h1><p><a href=\"/insights\">Insights</a></p>"));
+    res.status(404).type("html").send(documentPage("Article not found — Birch Reserve", "That insight is not published.", "<h1>Article not found</h1><p><a href=\"/insights\">Insights</a></p>", "/insights"));
     return;
   }
   const articles = await listReadableArticles();
   const article = articles.find((item) => item.slug === slug);
   if (!article) {
-    res.status(404).type("html").send(documentPage("Article not found — Birch Reserve", "That insight is not published.", "<h1>Article not found</h1><p><a href=\"/insights\">Insights</a></p>"));
+    res.status(404).type("html").send(documentPage("Article not found — Birch Reserve", "That insight is not published.", "<h1>Article not found</h1><p><a href=\"/insights\">Insights</a></p>", "/insights"));
     return;
   }
   sendPage(res, articleHtml(article));

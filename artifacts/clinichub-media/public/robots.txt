@@ -8,4 +8,4 @@ Disallow: /api/editorial/admin
 Disallow: /sales/
 Disallow: /sign-in/
 Disallow: /sign-up/
-Sitemap: https://birchreserve.net/api/editorial/sitemap.xml
+Sitemap: https://birchreserve.net/sitemap.xml

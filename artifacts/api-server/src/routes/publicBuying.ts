@@ -68,6 +68,7 @@ import {
   syncReservationToPipeline,
 } from "./splashAdReservations";
 import { recordUcpProxyForwardingShape } from "../lib/logger";
+import { publicSeoTags } from "../lib/publicSeo";
 import { handleUiEvent } from "../lib/uiEvents";
 
 const router: IRouter = Router();
@@ -2061,7 +2062,7 @@ router.get("/buycalc", async (req, res): Promise<void> => {
   const availability = await reserveCounts();
   res.type("html").send(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Buy calculator — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | Exclusive brand display in Scale Health hubs"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | Exclusive brand display in Scale Health hubs"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">
+<title>Buy calculator — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | Exclusive brand display in Scale Health hubs"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | Exclusive brand display in Scale Health hubs"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">${publicSeoTags("/buycalc")}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <script type="application/ld+json">${JSON.stringify({
   "@context": "https://schema.org",
