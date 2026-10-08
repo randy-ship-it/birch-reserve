@@ -100,6 +100,17 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   SHELF_AFTER_RECEIPT_ARTICLE,
 ] as const;
 
+const ALIGN_NETWORK_CLINIC_SENTENCE =
+  "describes virtual rehab embedded into clinic, studio, and wellness businesses [2].";
+const ALIGN_NETWORK_SENTENCE =
+  "describes virtual rehab embedded into health and wellness businesses [2].";
+
+/** One published sentence. Align's network is health and wellness businesses. */
+export function rewriteAlignNetworkCopy(text: string): string {
+  if (!text.includes(ALIGN_NETWORK_CLINIC_SENTENCE)) return text;
+  return text.replaceAll(ALIGN_NETWORK_CLINIC_SENTENCE, ALIGN_NETWORK_SENTENCE);
+}
+
 const PUBLIC_OFFER_SENTENCE =
   "Public offers are Hold $190 for a seven-day category look that does not take an exclusive category, or Reserve $490 to lock your exclusive category among eight brand categories. Both amounts are media credit, and the insertion order names the surface before anything runs.";
 

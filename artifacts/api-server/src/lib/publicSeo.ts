@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 export const PUBLIC_SITE_ORIGIN = "https://birchreserve.net";
 
 /** Existing Birch mark, served from this site. */
-export const PUBLIC_OG_IMAGE = `${PUBLIC_SITE_ORIGIN}/apple-touch-icon.png`;
+export const PUBLIC_OG_IMAGE = `${PUBLIC_SITE_ORIGIN}/og-birch-reserve.png`;
 
 /** HTML pages a crawler should index. Insight articles are appended at request time. */
 export const PUBLIC_SITEMAP_PATHS = [

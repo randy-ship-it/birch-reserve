@@ -2,6 +2,7 @@ import {
   legacyReserveCopyPatch,
   mentionsLegacyHeroPrice,
   PUBLIC_INSIGHT_ARTICLES,
+  rewriteAlignNetworkCopy,
 } from "./public-insights-copy";
 
 export type PublishedInsightCopy = {
@@ -45,9 +46,11 @@ export async function seedPublicInsightsWithStore(
   const published = await store.listPublished();
   let corrected = 0;
   for (const article of published) {
-    const patch = legacyReserveCopyPatch(article.summary, article.body);
-    if (!patch) continue;
-    await store.updateCopy(article.id, patch);
+    const legacy = legacyReserveCopyPatch(article.summary, article.body);
+    const summary = rewriteAlignNetworkCopy(legacy?.summary ?? article.summary);
+    const body = rewriteAlignNetworkCopy(legacy?.body ?? article.body);
+    if (summary === article.summary && body === article.body) continue;
+    await store.updateCopy(article.id, { summary, body });
     corrected += 1;
   }
 
