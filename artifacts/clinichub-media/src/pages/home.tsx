@@ -29,6 +29,7 @@ import { HubWalkthroughVideo } from "@/components/hub-walkthrough-video";
 import { ExampleHubsGallery } from "@/components/example-hubs-gallery";
 import { CobrandedHubsBanner } from "@/components/cobranded-hubs-banner";
 import { WEPRIZE } from "@/lib/example-exclusive-properties";
+import { NotifyMe, ReserveListCalculator, ReserveListLinks, useTamFeed } from "@/components/reserve-list-kit";
 import {
   PostCheckoutMockup,
   ProtocolMockup,
@@ -116,6 +117,7 @@ const SUPPLIER_ADJACENCY = [
 ];
 
 export default function Home() {
+  const { feed: tamFeed, labels: tl } = useTamFeed();
   const [splashDialogOpen, setSplashDialogOpen] = useState(false);
   const [selectedFormat, setSelectedFormat] = useState<string>();
   const [selectedOffer, setSelectedOffer] = useState<ReserveOfferKey>(
@@ -265,7 +267,7 @@ export default function Home() {
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60 motion-reduce:animate-none" />
                 <span className="relative inline-flex size-2 rounded-full bg-accent" />
               </span>
-              The Reserve List · Canada · By invitation
+              The Reserve List · Canada
             </p>
             <h1
               id="reserve-list-title"
@@ -273,37 +275,40 @@ export default function Home() {
             >
               The Reserve List.
               <span className="mt-3 block text-2xl italic leading-[1.08] text-background/75 md:text-4xl lg:text-[2.6rem]">
-                High-value Canadian demand, by category. Seen by few.
+                High-value Canadian demand, by category.
               </span>
             </h1>
             <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-background/75 md:text-lg">
-              A private list of customer flow and digital real estate across Scale Health partner brands and the Align Network of 80+ health and wellness businesses. See what's available, log the placements you want and claim an early slot.
+              Customer flow and digital real estate across Scale Health partner brands and the Align Network of 80+ health and wellness businesses. Lock in your slot before the minimum goes up.
             </p>
+            <div className="mt-6">
+              <NotifyMe source="br-home" />
+            </div>
             <dl
               className="mt-6 grid max-w-2xl grid-cols-2 gap-px border border-background/15 bg-background/15 md:grid-cols-[1fr_1fr_1.35fr]"
               data-testid="reserve-list-stats"
             >
               <div className="flex flex-col bg-foreground p-4 md:p-5">
                 <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Today</dt>
-                <dd className="mt-2 font-display text-4xl leading-none text-accent md:text-5xl">9M+</dd>
+                <dd className="mt-2 font-display text-4xl leading-none text-accent md:text-5xl">{tl.live_orders}</dd>
                 <dd className="mt-2 text-xs leading-snug text-background/70">Purchase orders a year in audience</dd>
               </div>
               <div className="flex flex-col bg-foreground p-4 md:p-5">
                 <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">In the queue<span className="ml-2 inline-block border border-background/30 px-1.5 align-middle font-sans text-[9px] font-bold leading-4 tracking-normal text-background/70">est.</span></dt>
-                <dd className="mt-2 font-display text-4xl leading-none text-accent md:text-5xl">20M+</dd>
+                <dd className="mt-2 font-display text-4xl leading-none text-accent md:text-5xl">{tl.queue_orders}</dd>
                 <dd className="mt-2 text-xs leading-snug text-background/70">Purchase orders a year in the queue</dd>
               </div>
               <div className="col-span-2 flex flex-col bg-accent p-4 text-accent-foreground md:col-span-1 md:p-5" data-testid="reserve-list-stat-2027">
                 <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent-foreground/70">2027 projection<span className="ml-2 inline-block border border-accent-foreground/40 px-1.5 align-middle font-sans text-[9px] font-bold leading-4 tracking-normal text-accent-foreground/80">est.</span></dt>
-                <dd className="mt-2 font-display text-6xl leading-none md:text-[4.25rem]">100M+</dd>
+                <dd className="mt-2 font-display text-6xl leading-none md:text-[4.25rem]">{tl.y2027_orders}</dd>
                 <dd className="mt-2 text-xs font-semibold leading-snug text-accent-foreground/85">Purchase orders a year (2027 projection)</dd>
               </div>
             </dl>
             <p className="mt-3 max-w-2xl text-sm text-background/80">
-              <span className="font-display text-xl text-accent">56M</span> monthly views today · about 180M with the queue live · about 640M in 2027 <span className="text-background/55">(est.)</span>
+              <span className="font-display text-xl text-accent">{tl.live_views}</span> monthly views today · {tl.live_queue_views} with the queue live · {tl.y2027_views} in 2027 <span className="text-background/55">(est.)</span>
             </p>
             <p className="mt-2 max-w-2xl text-xs leading-relaxed text-background/60">
-              9M+ and 56M are network demand-pool figures for Canada; 8.7M of those orders are mapped to partner categories on the list. Queue and 2027 figures are estimates and projections.
+              {tl.live_orders} and {tl.live_views} are network demand-pool figures for Canada; {tl.mapped_orders} of those orders are mapped to partner categories on the list. Queue and 2027 figures are estimates and projections.
             </p>
             <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
               <a
@@ -322,9 +327,12 @@ export default function Home() {
                 Have an insider code? Unlock it
               </a>
             </div>
+            <div className="mt-5">
+              <ReserveListLinks />
+            </div>
             <p className="mt-6 max-w-xl border-l-2 border-accent pl-4 text-sm leading-relaxed text-background/80" data-testid="text-early-slots">
               <strong className="font-semibold text-background">Early slots are open.</strong>{" "}
-              Reserve List brands get first offer on placements as each category activates.
+              Lock in your slot before the minimum goes up.
             </p>
             <p className="mt-3 text-xs text-background/50">
               Canada only for now. The full breakdown by category is inside the list.
@@ -375,6 +383,15 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
+      <section id="reserve-list-calculator" className="scroll-mt-20 border-b border-border bg-secondary/10 py-12 md:py-16" data-testid="reserve-list-calculator-section">
+        <div className="container mx-auto px-6">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-accent">The Reserve List · calculator</p>
+          <h2 className="font-display text-3xl tracking-tight md:text-4xl">What could your brand capture?</h2>
+          <p className="mb-6 mt-2 text-base text-muted-foreground">Three inputs, one estimate. Same live numbers as the Reserve List and scalehealth.ca/tam.</p>
+          <ReserveListCalculator feed={tamFeed} />
+        </div>
+      </section>
+
       <section className="relative flex items-center py-16 md:py-20 border-b border-background/20 bg-foreground text-background" data-testid="placements-hero">
         <div className="container mx-auto px-6 relative z-10 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
 
@@ -468,7 +485,7 @@ export default function Home() {
               </a>
             </div>
             <p className="mt-4 max-w-xl text-sm text-background/70">
-              Early slots are open across 8 advertiser categories. Reserve List brands get first offer as each category activates.
+              Early slots are open across 8 advertiser categories. Lock in your slot before the minimum goes up.
             </p>
           </div>
 
@@ -517,7 +534,7 @@ export default function Home() {
           <ol className="grid border border-border md:grid-cols-3">
             {(
               [
-                ["1", "Claim an early slot on the Reserve List. Paid reserves are 100% media credit."],
+                ["1", "Lock in your slot on the Reserve List before the minimum goes up. Paid reserves are 100% media credit."],
                 ["2", "Insertion order names the hub."],
                 ["3", "Unit sits after checkout, on a plan, or at a booking."],
               ] as const
@@ -548,7 +565,7 @@ export default function Home() {
                 Early slots across 8 advertiser categories.
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Every dollar is a 100% media credit. Delivery starts when the insertion order names the hub. Hubs are the rooms. Early slots go to Reserve List brands first as each category activates.
+                Every dollar is a 100% media credit. Delivery starts when the insertion order names the hub. Hubs are the rooms. Lock in your slot before the minimum goes up.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[620px]">
@@ -729,7 +746,7 @@ export default function Home() {
                 Sponsored placements, offers, content and category visibility inside closed customer and partner hubs.
               </p>
               <p className="mt-4 text-xs leading-relaxed text-muted-foreground/80" data-testid="home-also-exclusive-weprize">
-                Also on request: exclusive display example at{" "}
+                Also on request: display example at{" "}
                 <a
                   href={WEPRIZE.href}
                   target="_blank"
@@ -739,7 +756,7 @@ export default function Home() {
                   {WEPRIZE.name}
                 </a>
                 {" "}
-                — placement example only; not a Scale hub exclusive category.
+                — placement example only; not a Scale hub category.
               </p>
             </article>
             <article className="border border-border bg-foreground p-7 text-background md:p-9">
@@ -780,7 +797,7 @@ export default function Home() {
                 <ul className="space-y-4">
                   <li className="border-l border-accent pl-4">Already paid once.</li>
                   <li className="border-l border-accent pl-4">Already in-protocol, so the next buy is the recovery stack: sleep, mobility, nutrition, recovery.</li>
-                  <li className="border-l border-accent pl-4">Early slots, outside the open auction. You are not bidding against 40 supplement brands.</li>
+                  <li className="border-l border-accent pl-4">Reserve a slot at today's minimum, before it goes up. You are not bidding against 40 supplement brands.</li>
                   <li className="border-l border-accent pl-4">No brand gets more than 20% of a category's digital real estate.</li>
                 </ul>
               </div>
@@ -843,14 +860,14 @@ export default function Home() {
                 Birch Reserve
               </p>
               <p className="text-2xl md:text-3xl lg:text-4xl text-foreground leading-snug font-display">
-                Add exclusive digital and physical inventory beside your existing channels, reaching customers inside closed brand environments and participating health and wellness locations.
+                Add digital and physical inventory beside your existing channels, reaching customers inside closed brand environments and participating health and wellness locations.
               </p>
               <p className="mt-6 text-muted-foreground text-lg leading-relaxed max-w-md">
                 <strong className="text-foreground font-medium">For auto-buyers:</strong> no insertion-order theatre or 12-week RFP.<br/>
-                <strong className="text-foreground font-medium">For distribution buyers:</strong> early slots on the Reserve List, outside the open auction.
+                <strong className="text-foreground font-medium">For distribution buyers:</strong> lock in a Reserve List slot at today's minimum.
               </p>
               <div className="mt-8">
-                <span className="bg-foreground text-accent px-4 py-2 inline-block font-medium tracking-wide rounded-sm text-sm">Reserve payments act as 100% media credit and hold first rights to available inventory.</span>
+                <span className="bg-foreground text-accent px-4 py-2 inline-block font-medium tracking-wide rounded-sm text-sm">Reserve payments act as 100% media credit and lock in your slot at today's minimum.</span>
               </div>
             </div>
           </div>
@@ -1101,7 +1118,7 @@ export default function Home() {
                 Reserve and fulfillment
               </p>
               <h2 className="max-w-xl font-display text-4xl leading-tight tracking-tight md:text-6xl">
-                Claim an early slot. We coordinate the rest.
+                Lock in your slot before the minimum goes up. We coordinate the rest.
               </h2>
             </div>
             <div className="grid gap-8 border-l border-background/20 pl-6 sm:grid-cols-2 md:pl-10">
@@ -1167,9 +1184,9 @@ export default function Home() {
       <section className="py-20 md:py-28 bg-foreground text-background text-center border-b border-foreground">
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto flex flex-col items-center">
-            <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">See the Reserve List while early slots are open.</h2>
+            <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">Reserve a slot at today's minimum.</h2>
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
-              9M+ purchase orders a year in audience and 56M monthly views across Canada today, plus an est. 20M+ more orders in the queue and 100M+ purchase orders a year (2027 projection). Early slots go to Reserve List brands first. Nothing runs until the insertion order names the hub.
+              9M+ purchase orders a year in audience and 56M monthly views across Canada today, plus an est. 20M+ more orders in the queue and 100M+ purchase orders a year (2027 projection). Lock in your slot before the minimum goes up. Nothing runs until the insertion order names the hub.
             </p>
             <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
               <a

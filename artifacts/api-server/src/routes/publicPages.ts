@@ -320,11 +320,11 @@ const KIT_HTML = documentPage(
 <li>Square still (primary creative)</li>
 <li>Optional 15-second silent motion</li>
 <li>Destination URL</li>
-<li>One of the eight exclusive brand categories</li>
+<li>One of the eight brand categories</li>
 <li>Contact email for creative and IO follow-up</li>
 </ul>
 <p class="fine">Caption: illustrative until an insertion order names the hub.</p>
-<h2>Eight exclusive brand categories</h2>
+<h2>Eight brand categories</h2>
 <ul>
 <li>Pain relief / topicals</li>
 <li>Recovery hardware</li>

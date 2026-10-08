@@ -153,7 +153,7 @@ export function Layout({ children }: { children: ReactNode }) {
               className="mb-6 text-[11px] leading-relaxed text-muted-foreground"
               data-testid="footer-inventory-also"
             >
-              Also exclusive display (examples):{" "}
+              Also display (examples):{" "}
               {EXAMPLE_EXCLUSIVE_PROPERTIES.map((prop, i) => (
                 <span key={prop.id}>
                   {i > 0 ? " · " : null}
@@ -167,7 +167,7 @@ export function Layout({ children }: { children: ReactNode }) {
                   </a>
                 </span>
               ))}
-              . Not featured inventory — inquire for an exclusive category.
+              . Not featured inventory — inquire to reserve a slot at today's minimum.
             </p>
             <p className="text-xs leading-relaxed text-foreground">
               {SELLER_IDENTITY} · <a href={SELLER_EMAIL_HREF} className="underline underline-offset-2 hover:text-accent">Email sales</a>
