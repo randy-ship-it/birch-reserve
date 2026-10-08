@@ -30,6 +30,7 @@ import { ExampleHubsGallery } from "@/components/example-hubs-gallery";
 import { CobrandedHubsBanner } from "@/components/cobranded-hubs-banner";
 import { WEPRIZE } from "@/lib/example-exclusive-properties";
 import { NotifyMe, ReserveListCalculator, ReserveListLinks, useTamFeed } from "@/components/reserve-list-kit";
+import { OrdersInfo } from "@/components/orders-info";
 import {
   PostCheckoutMockup,
   ProtocolMockup,
@@ -291,17 +292,17 @@ export default function Home() {
               <div className="flex flex-col bg-foreground p-4 md:p-5">
                 <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Today</dt>
                 <dd className="mt-2 font-display text-4xl leading-none text-accent md:text-5xl">{tl.live_orders}</dd>
-                <dd className="mt-2 text-xs leading-snug text-background/70">Purchase orders a year in audience</dd>
+                <dd className="mt-2 text-xs leading-snug text-background/70">Orders<OrdersInfo tone="dark" /> a year in audience</dd>
               </div>
               <div className="flex flex-col bg-foreground p-4 md:p-5">
                 <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">In the queue<span className="ml-2 inline-block border border-background/30 px-1.5 align-middle font-sans text-[9px] font-bold leading-4 tracking-normal text-background/70">est.</span></dt>
                 <dd className="mt-2 font-display text-4xl leading-none text-accent md:text-5xl">{tl.queue_orders}</dd>
-                <dd className="mt-2 text-xs leading-snug text-background/70">Purchase orders a year in the queue</dd>
+                <dd className="mt-2 text-xs leading-snug text-background/70">Orders a year in the queue</dd>
               </div>
               <div className="col-span-2 flex flex-col bg-accent p-4 text-accent-foreground md:col-span-1 md:p-5" data-testid="reserve-list-stat-2027">
                 <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent-foreground/70">2027 projection<span className="ml-2 inline-block border border-accent-foreground/40 px-1.5 align-middle font-sans text-[9px] font-bold leading-4 tracking-normal text-accent-foreground/80">est.</span></dt>
                 <dd className="mt-2 font-display text-6xl leading-none md:text-[4.25rem]">{tl.y2027_orders}</dd>
-                <dd className="mt-2 text-xs font-semibold leading-snug text-accent-foreground/85">Purchase orders a year (2027 projection)</dd>
+                <dd className="mt-2 text-xs font-semibold leading-snug text-accent-foreground/85">Orders a year (2027 projection)</dd>
               </div>
             </dl>
             <p className="mt-3 max-w-2xl text-sm text-background/80">
@@ -600,7 +601,7 @@ export default function Home() {
               </p>
               <p className="mt-4 font-display text-4xl text-accent">Early slots open</p>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-background/75">
-                See 9M+ purchase orders a year in audience and 56M monthly views, broken out by category, plus an est. 20M+ more orders in the queue and 100M+ purchase orders a year (2027 projection). Log the placements you want and claim an early slot. No commitment. Canada only for now.
+                See 9M+ orders a year in audience and 56M monthly views, broken out by category, plus an est. 20M+ more orders in the queue and 100M+ orders a year (2027 projection). Log the placements you want and claim an early slot. No commitment. Canada only for now.
               </p>
               <p className="mt-5 border-t border-background/15 pt-4 text-xs text-background/60">
                 Use an insider code, or request one on the list.
@@ -1186,7 +1187,7 @@ export default function Home() {
           <div className="max-w-2xl mx-auto flex flex-col items-center">
             <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">Reserve a slot at today's minimum.</h2>
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
-              9M+ purchase orders a year in audience and 56M monthly views across Canada today, plus an est. 20M+ more orders in the queue and 100M+ purchase orders a year (2027 projection). Lock in your slot before the minimum goes up. Nothing runs until the insertion order names the hub.
+              9M+ orders a year in audience and 56M monthly views across Canada today, plus an est. 20M+ more orders in the queue and 100M+ orders a year (2027 projection). Lock in your slot before the minimum goes up. Nothing runs until the insertion order names the hub.
             </p>
             <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
               <a
