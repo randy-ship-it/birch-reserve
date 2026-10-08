@@ -34,7 +34,7 @@ const HUBS = [
     name: "Integrity Fitness",
     surface: "Member offers",
     displayUrl: "Integrity hub",
-    description: "A local fitness partner augmenting memberships with exclusive recovery offers and physio access.",
+    description: "A local fitness partner augmenting memberships with recovery offers and physio access.",
     image: integrityHub,
     url: "https://www.scalehealth.ca/integrity"
   },
