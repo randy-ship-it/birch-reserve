@@ -480,6 +480,14 @@ router.get("/advertise", (req, res) => {
   res.redirect(301, `/buycalc${query}`);
 });
 
+// No separate ad-examples document. The home page already holds that section.
+router.get("/ad-examples", (req, res) => {
+  const query = req.originalUrl.includes("?")
+    ? req.originalUrl.slice(req.originalUrl.indexOf("?"))
+    : "";
+  res.redirect(301, `/${query}`);
+});
+
 router.post("/v1/ui-events", (req, res) => {
   void handleUiEvent(req, res);
 });

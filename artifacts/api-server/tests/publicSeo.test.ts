@@ -54,6 +54,7 @@ test("GET /sitemap.xml is XML and lists public pages without API, inventory, or 
   assert.doesNotMatch(xml, /\/splash\/activation/);
   assert.doesNotMatch(xml, /\/oatmeal/);
   assert.doesNotMatch(xml, /\/advertise/);
+  assert.doesNotMatch(xml, /\/ad-examples/);
   assert.doesNotMatch(xml, /\/api\//);
   assert.doesNotMatch(xml, /\/v1\//);
   assert.doesNotMatch(xml, /llms\.txt/);
@@ -77,7 +78,6 @@ test("server HTML and SPA shells expose canonical, og:url, og:image, and twitter
     ["/marketplace", "https://birchreserve.net/marketplace"],
     ["/success", "https://birchreserve.net/success"],
     ["/splash/activation", "https://birchreserve.net/splash/activation"],
-    ["/ad-examples", "https://birchreserve.net/ad-examples"],
   ];
   for (const [path, canonical] of pages) {
     const res = await fetch(`${origin}${path}`);
@@ -166,6 +166,15 @@ test("GET /advertise stays a 301 to /buycalc", async () => {
   const res = await fetch(`${origin}/advertise`, { redirect: "manual" });
   assert.equal(res.status, 301);
   assert.equal(res.headers.get("location"), "/buycalc");
+});
+
+test("GET /ad-examples redirects home", async () => {
+  const res = await fetch(`${origin}/ad-examples`, { redirect: "manual" });
+  assert.equal(res.status, 301);
+  assert.equal(res.headers.get("location"), "/");
+  const withQuery = await fetch(`${origin}/ad-examples?sku=hold-190`, { redirect: "manual" });
+  assert.equal(withQuery.status, 301);
+  assert.equal(withQuery.headers.get("location"), "/?sku=hold-190");
 });
 
 test("GET /oatmeal stays a 301 to /buycalc", async () => {
