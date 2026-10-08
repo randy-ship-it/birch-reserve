@@ -23,6 +23,7 @@ export function birchReplyTo(env: NodeJS.ProcessEnv = process.env): string {
 export type SiteMail = {
   from: string;
   to: string[];
+  cc?: string[];
   subject: string;
   text: string;
   html?: string;
@@ -57,6 +58,7 @@ export async function resendSend(mail: SiteMail): Promise<{ id: string | null }>
       body: JSON.stringify({
         from: mail.from,
         to: mail.to,
+        ...(mail.cc?.length ? { cc: mail.cc } : {}),
         subject: mail.subject,
         text: mail.text,
         ...(mail.html ? { html: mail.html } : {}),

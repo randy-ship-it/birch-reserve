@@ -14,6 +14,7 @@ import opsMailTestRouter from "./opsMailTest";
 import indexNowRouter from "./indexNow";
 import localBizLeadRouter from "./localBizLead";
 import adsInventorySignupRouter from "./adsInventorySignup";
+import inventoryNotifyRouter from "./inventoryNotify";
 
 const router: IRouter = Router();
 
@@ -32,5 +33,6 @@ router.use(opsMailTestRouter);
 router.use(indexNowRouter);
 router.use(localBizLeadRouter);
 router.use(adsInventorySignupRouter);
+router.use(inventoryNotifyRouter);
 
 export default router;
