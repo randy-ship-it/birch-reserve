@@ -84,7 +84,7 @@ export const LIVE_HUB_PROOF_DISPLAY = "the live DR-HO hub" as const;
 export const WEPRIZE_EXAMPLE_URL = "https://weprize.net" as const;
 
 export const SMART_OPENER =
-  "Hey, I’m Randy. Want to see how exclusive categories inside Scale clinic hubs work?" as const;
+  "Hey, I’m Randy. Want to see how early slots on the Reserve List work?" as const;
 
 /** Teaser bubble shown beside the full-body figure (closed state). */
 export const TEASER_TEXT = "Got a category in mind? Ask me." as const;
@@ -97,13 +97,13 @@ export const SUGGESTION_CHIPS: ReadonlyArray<{
 }> = [
   {
     id: "how_seats",
-    label: "How exclusive categories work",
-    message: "How do Birch Reserve exclusive brand categories inside Scale clinic hubs work?",
+    label: "How early slots work",
+    message: "How do early slots on the Birch Reserve List work?",
   },
   {
     id: "hold_190",
-    label: "Hold a category $190",
-    message: "I want to hold a category for $190. How does the hold work?",
+    label: "See the Reserve List",
+    message: "I want to see the Reserve List. How do I claim an early slot?",
   },
   {
     id: "live_hub",
@@ -163,7 +163,7 @@ export const QUALIFY_QUESTIONS: ReadonlyArray<{ key: QualifyKey; prompt: string 
   {
     key: "timing",
     prompt:
-      "Last one: what's your timing, and a rough budget range? (For reference, a hold is $190 and locking an exclusive category is $490.)",
+      "Last one: what's your timing, and a rough budget range? (For reference, early slots on the Reserve List are free to claim, and the early placement is $490.)",
   },
 ] as const;
 

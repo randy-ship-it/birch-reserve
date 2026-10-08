@@ -128,7 +128,7 @@ async function chooseVisitorType(
   await guide.getByRole("button", { name: visitorType, exact: true }).click();
   await expect(
     guide.getByRole("button", {
-      name: "Reserve an exclusive category",
+      name: "Claim an early slot",
       exact: true,
     }),
   ).toBeVisible();
@@ -173,19 +173,15 @@ test("public offer leads with the three-tier USD ladder", async ({ page }) => {
   await expect(
     page
       .getByRole("button", {
-        name: "Lock your exclusive category — $490",
+        name: "Reserve a placement — $490",
         exact: true,
       })
       .first(),
   ).toBeVisible();
-  await expect(page.locator("body")).toContainText(
-    "8 exclusive brand categories. One brand per category.",
-  );
   await expect(page.locator("body")).toContainText("Digital inventory");
   await expect(page.locator("body")).toContainText("On-prem, on request");
-  await expect(page.locator("body")).toContainText("7-day category look");
-  await expect(page.locator("body")).toContainText("Exclusive category");
-  await expect(page.locator("body")).toContainText("$190");
+  await expect(page.locator("body")).toContainText("Early placement");
+  await expect(page.locator("body")).not.toContainText("Lock your exclusive category");
   await expect(page.locator("body")).toContainText("$490");
   await expect(page.locator("body")).not.toContainText("$4,900");
   await expect(page.locator("body")).not.toContainText("$9,900");
@@ -278,7 +274,7 @@ test("Birch Guide hands a ready buyer to the reserve form", async ({ page }) => 
   );
   await guide
     .getByRole("button", {
-      name: "Reserve an exclusive category",
+      name: "Claim an early slot",
       exact: true,
     })
     .click();
@@ -354,12 +350,12 @@ test("reserve form stores the selected tier and shows its held-seat fallback", a
     .locator('input[name="websiteUrl"]')
     .fill("https://northstar.example");
   await dialog
-    .getByRole("button", { name: /Exclusive category.*\$490/ })
+    .getByRole("button", { name: /Early placement.*\$490/ })
     .click();
   await dialog.getByTestId("checkbox-reserve-terms").check();
   await dialog
     .getByRole("button", {
-      name: "Lock your exclusive category — $490",
+      name: "Reserve your early placement — $490",
       exact: true,
     })
     .click();

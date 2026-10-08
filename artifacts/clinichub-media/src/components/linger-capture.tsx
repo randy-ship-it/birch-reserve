@@ -339,8 +339,8 @@ export function LingerCapture() {
                     Get the media kit.
                   </h2>
                   <p id={descId} className="mt-2 text-[14px] leading-relaxed text-slate-600">
-                    Placements, formats and how exclusive brand categories work inside signed Scale Health hubs, in one PDF. Holds start at
-                    $190; a full seat is $490.
+                    Placements, formats and how early slots on the Reserve List work inside signed Scale Health hubs, in one PDF. Early
+                    placements are $490, all media credit.
                   </p>
                   <form onSubmit={submit} className="relative mt-4 flex flex-col gap-2.5" noValidate data-testid="linger-form">
                     <HoneypotField inputRef={honeypotRef} idSuffix="linger" />

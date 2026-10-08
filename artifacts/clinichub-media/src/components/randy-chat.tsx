@@ -292,7 +292,7 @@ export function RandyChat() {
         pushMessages({
           id: newId(),
           role: "randy",
-          text: `Checkout is live on birchreserve.net for the ${sku === "hold-190" ? "$190 hold" : "$490 seat"}. You can pay there, or leave your details here and I'll walk you through it.`,
+          text: `Checkout is live on birchreserve.net for the ${sku === "hold-190" ? "$190 7-day look" : "$490 early placement"}. You can pay there, or leave your details here and I'll walk you through it.`,
         });
         setHandoffReady(true);
         setCallbackOpen(true);
@@ -829,7 +829,7 @@ export function RandyChat() {
               type="button"
               onClick={() => openWidget({ reason: "launcher", mode: "chat" })}
               className="randy-lift block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-              aria-label="Chat with Randy about Birch Reserve exclusive brand categories"
+              aria-label="Chat with Randy about the Birch Reserve List and early slots"
               data-testid="button-open-randy-chat"
             >
               <span className="flex size-12 items-center justify-center overflow-hidden rounded-full border border-black/10 bg-white shadow-[0_12px_32px_-12px_rgba(15,23,42,0.45)] md:hidden">

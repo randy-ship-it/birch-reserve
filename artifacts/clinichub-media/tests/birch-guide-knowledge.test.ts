@@ -27,7 +27,7 @@ test("routes an existing Clinic Hubs clinic to Performance", () => {
 
 test("Birch Guide prompt states public prices and refuses reach claims", () => {
   assert.match(BIRCH_GUIDE_SYSTEM_PROMPT, /\$190 = 7-day look/);
-  assert.match(BIRCH_GUIDE_SYSTEM_PROMPT, /\$490 = lock your exclusive category/);
+  assert.match(BIRCH_GUIDE_SYSTEM_PROMPT, /\$490 = early placement/);
   assert.match(BIRCH_GUIDE_SYSTEM_PROMPT, /do not hero it/);
   assert.match(BIRCH_GUIDE_SYSTEM_PROMPT, /We do not sell a guaranteed impression count/);
   assert.match(BIRCH_GUIDE_SYSTEM_PROMPT, /Never state 50MM, 1MM, CTR/);

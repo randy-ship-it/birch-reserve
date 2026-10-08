@@ -143,7 +143,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <span className="font-display text-2xl tracking-tight italic">Birch Reserve</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-              8 exclusive brand categories inside signed Scale Health hubs. Your payment is media credit, not airfare.
+              The Reserve List: early slots inside signed Scale Health hubs, by category. Your payment is media credit, not airfare.
             </p>
             <p className="mb-4 text-sm">
               <a href="tel:+16479316278" className="font-medium text-accent hover:underline" data-testid="footer-call-birch">Call Birch: (647) 931-6278</a>
