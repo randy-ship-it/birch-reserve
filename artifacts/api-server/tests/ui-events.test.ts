@@ -301,7 +301,14 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.match(home, /id="placements"/);
   assert.match(home, /data-testid="three-steps"/);
   assert.match(home, /Nothing runs before step 2/);
-  assert.match(home, /Pay \$190 look or \$490 exclusive category as 100% media credit\./);
+  assert.match(home, /Claim an early slot on the Reserve List\. Paid reserves are 100% media credit\./);
+  assert.match(home, /data-testid="reserve-list-hero"/);
+  assert.match(home, /href=\{RESERVE_LIST_HREF\}/);
+  assert.match(home, /See the Reserve List/);
+  assert.match(home, /Early slots open in \$\{availability\.seats_open\} of \$\{availability\.seats_total\} categories/);
+  assert.match(home, /No brand gets more than 20% of a category's digital real estate\./);
+  assert.doesNotMatch(home, /Hold a category for 7 days — \$190/);
+  assert.doesNotMatch(home, /One brand per aisle/);
   assert.match(home, /Insertion order names the hub\./);
   assert.match(home, /Unit sits after checkout, on a plan, or at a booking\./);
   assert.match(home, /href="\/insights\/the-shelf-after-the-receipt"/);
@@ -320,9 +327,9 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.doesNotMatch(analytics, /data-domain=["']birchreserve/);
 });
 
-const BRAND_TITLE = "Birch Reserve | Exclusive brand display in Scale Health hubs";
+const BRAND_TITLE = "Birch Reserve | The Reserve List · Scale Health demand, Canada";
 const BRAND_DESCRIPTION =
-  "$190 holds a category 7 days. $490 locks exclusive display inside signed Scale Health hubs. Live hub: physio.drhonow.com. Your payment is media credit, not airfare.";
+  "See the Reserve List: 8.7M purchase orders a year and 56M monthly views across Scale Health partner brands in Canada, by category. Early slots are open. Paid reserves are 100% media credit.";
 
 test("public marketing title and description match the brand strings", async () => {
   const indexHtml = await readFile(
