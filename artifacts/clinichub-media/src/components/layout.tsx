@@ -36,7 +36,15 @@ export function Layout({ children }: { children: ReactNode }) {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8 text-sm text-foreground">
+          <nav className="hidden md:flex items-center gap-5 xl:gap-7 text-sm text-foreground">
+            <a
+              href="/inventory"
+              className="inline-flex items-center gap-1.5 bg-foreground px-3.5 py-2 font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground whitespace-nowrap"
+              data-testid="nav-reserve-list"
+            >
+              <span className="size-1.5 rounded-full bg-accent" aria-hidden />
+              Reserve List
+            </a>
             {navLinks.map((link) => (
               <a
                 key={link.label}
@@ -55,21 +63,37 @@ export function Layout({ children }: { children: ReactNode }) {
             <Link href="/marketplace" className="hover:text-accent transition-colors font-medium">Partner Workspace</Link>
           </nav>
 
-          {/* Mobile Menu Toggle */}
-          <button
-            className="md:hidden p-2 -mr-2 text-foreground"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle mobile menu"
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? <X className="size-6" /> : <Menu className="size-6" />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <a
+              href="/inventory"
+              className="inline-flex items-center gap-1.5 bg-foreground px-3 py-2 text-sm font-semibold text-background"
+              data-testid="nav-reserve-list-mobile"
+            >
+              <span className="size-1.5 rounded-full bg-accent" aria-hidden />
+              Reserve List
+            </a>
+            <button
+              className="md:hidden p-2 -mr-2 text-foreground"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? <X className="size-6" /> : <Menu className="size-6" />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Nav Dropdown */}
         {mobileMenuOpen && (
           <div className="md:hidden absolute top-16 left-0 w-full bg-background border-b border-border p-6 flex flex-col gap-6">
             <nav className="flex flex-col gap-4 text-base">
+              <a
+                href="/inventory"
+                className="font-semibold text-foreground hover:text-accent transition-colors py-2 border-b border-border/50"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Reserve List · early slots open
+              </a>
               {navLinks.map((link) => (
                 <a
                   key={link.label}

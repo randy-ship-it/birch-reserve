@@ -7,6 +7,7 @@ import {
   CalendarCheck2,
   ClipboardCheck,
   MonitorUp,
+  Lock,
   MapPin,
   Phone,
   ReceiptText,
@@ -85,6 +86,17 @@ const CATEGORY_SEATS = [
   "Women’s health",
   "Men’s health",
   "Diagnostics / services",
+];
+
+const RESERVE_LIST_HREF = "/inventory";
+
+const RESERVE_LIST_PREVIEW = [
+  "Sports Nutrition & Supplements",
+  "Pain Relief & Topicals",
+  "Recovery Devices & Equipment",
+  "Digital Health & Telehealth",
+  "Wearables & Fitness Tech",
+  "Align Network",
 ];
 
 
@@ -225,15 +237,121 @@ export default function Home() {
             <Phone className="mr-2 size-4" aria-hidden />
             {TAP_TO_CALL_LABEL}
           </a>
-          <button
-            type="button"
-            onClick={() => openReserveDialog()}
-            className="flex h-12 w-full items-center justify-center bg-accent font-medium text-accent-foreground transition-colors hover:bg-foreground hover:text-background"
+          <a
+            href={RESERVE_LIST_HREF}
+            className="flex h-12 w-full items-center justify-center bg-accent font-semibold text-accent-foreground transition-colors hover:bg-foreground hover:text-background"
+            data-testid="link-mobile-reserve-list"
           >
-            Lock your exclusive category — {reservePriceLabel} <ArrowRight className="ml-2 size-4" />
-          </button>
+            See the Reserve List <ArrowRight className="ml-2 size-4" />
+          </a>
         </div>
       )}
+
+      {/* Reserve List */}
+      <section
+        id="reserve-list"
+        aria-labelledby="reserve-list-title"
+        className="relative overflow-hidden border-b border-background/15 bg-foreground text-background"
+        data-testid="reserve-list-hero"
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_480px_at_12%_-10%,hsl(var(--accent)/0.16),transparent_60%),radial-gradient(700px_420px_at_100%_110%,hsl(var(--accent)/0.08),transparent_60%)]"
+        />
+        <div className="container relative z-10 mx-auto grid items-center gap-10 px-6 pb-12 pt-8 md:pb-16 md:pt-12 lg:grid-cols-[1.12fr_0.88fr] lg:gap-14 lg:pb-16 lg:pt-12">
+          <div className="flex flex-col text-left">
+            <p className="mb-5 inline-flex w-max max-w-full items-center gap-2 border border-accent/40 bg-accent/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
+              <span className="relative flex size-2 shrink-0" aria-hidden>
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60 motion-reduce:animate-none" />
+                <span className="relative inline-flex size-2 rounded-full bg-accent" />
+              </span>
+              The Reserve List · Canada · By invitation
+            </p>
+            <h1
+              id="reserve-list-title"
+              className="font-display text-[2.75rem] leading-[0.95] tracking-tight text-background md:text-6xl lg:text-7xl"
+            >
+              The Reserve List.
+              <span className="mt-3 block text-2xl italic leading-[1.08] text-background/75 md:text-4xl lg:text-[2.6rem]">
+                High-value Canadian demand, by category. Seen by few.
+              </span>
+            </h1>
+            <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-background/75 md:text-lg">
+              A private list of customer flow and digital real estate across Scale Health partner brands and the Align Network of 80+ health and wellness businesses. See what's available, log the placements you want and claim an early slot.
+            </p>
+            <dl className="mt-6 grid max-w-xl grid-cols-2 gap-px border border-background/15 bg-background/15">
+              <div className="bg-foreground p-4 md:p-5">
+                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Purchase orders a year</dt>
+                <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">8.7M</dd>
+              </div>
+              <div className="bg-foreground p-4 md:p-5">
+                <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-background/55">Monthly views</dt>
+                <dd className="mt-1 font-display text-3xl text-accent md:text-5xl">56M</dd>
+              </div>
+            </dl>
+            <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <a
+                href={RESERVE_LIST_HREF}
+                className="group inline-flex h-16 w-full items-center justify-center gap-3 bg-accent px-9 text-lg font-semibold text-accent-foreground shadow-[0_0_0_6px_hsl(var(--accent)/0.18)] transition-colors hover:bg-background hover:text-foreground sm:w-auto"
+                data-testid="button-reserve-list-hero"
+              >
+                See the Reserve List
+                <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" aria-hidden />
+              </a>
+              <a
+                href={RESERVE_LIST_HREF}
+                className="text-center text-sm text-background/70 underline underline-offset-4 hover:text-accent sm:text-left"
+                data-testid="link-reserve-list-code"
+              >
+                Have an insider code? Unlock it
+              </a>
+            </div>
+            <p className="mt-6 max-w-xl border-l-2 border-accent pl-4 text-sm leading-relaxed text-background/80" data-testid="text-early-slots">
+              <strong className="font-semibold text-background">Early slots are open.</strong>{" "}
+              Reserve List brands get first offer on placements as each category activates.
+            </p>
+            <p className="mt-3 text-xs text-background/50">
+              Canada only for now. Figures are demand-pool estimates; the full breakdown by category is inside the list.
+            </p>
+          </div>
+          <a
+            href={RESERVE_LIST_HREF}
+            aria-label="See the Reserve List"
+            className="group block w-full max-w-md justify-self-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent lg:justify-self-end"
+            data-testid="reserve-list-preview"
+          >
+            <div className="border border-background/20 bg-background/[0.04] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.6)] transition-colors group-hover:border-accent/60">
+              <div className="flex items-center justify-between border-b border-background/15 px-5 py-4">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-background/60">Reserve List · Preview</span>
+                <span className="inline-flex items-center gap-1.5 border border-background/20 px-2 py-1 text-[10px] uppercase tracking-widest text-background/70">
+                  <Lock className="size-3" aria-hidden /> Insider code
+                </span>
+              </div>
+              <ul className="divide-y divide-background/10">
+                {RESERVE_LIST_PREVIEW.map((category) => (
+                  <li key={category} className="flex items-center justify-between gap-4 px-5 py-3.5">
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium text-background">{category}</span>
+                      <span className="mt-0.5 block select-none text-xs text-background/50 blur-[5px]" aria-hidden>
+                        #.#M orders · ##.#M views
+                      </span>
+                    </span>
+                    <span className="shrink-0 border border-accent/40 bg-accent/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-accent">
+                      Early slots open
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <div className="flex items-center justify-between border-t border-background/15 px-5 py-4 text-sm">
+                <span className="text-background/60">12+ categories · brand names private</span>
+                <span className="inline-flex items-center gap-1.5 font-semibold text-accent">
+                  Unlock <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                </span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
 
       {/* Open-Seats Banner */}
       <div className="bg-accent text-accent-foreground py-3 px-6 text-center text-[11px] md:text-xs font-bold uppercase tracking-widest flex justify-center items-center gap-3 border-b border-foreground/10" data-testid="text-launch-status">
@@ -241,7 +359,7 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-[min(750px,85dvh)] flex items-center pt-12 pb-40 md:pb-24 border-b border-background/20 bg-foreground text-background">
+      <section className="relative flex items-center py-16 md:py-20 border-b border-background/20 bg-foreground text-background" data-testid="placements-hero">
         <div className="container mx-auto px-6 relative z-10 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
 
           <div className="flex flex-col text-left">
@@ -254,14 +372,14 @@ export default function Home() {
               Private media + activation network
             </motion.div>
 
-            <motion.h1
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-5xl md:text-6xl lg:text-[5.5rem] font-display text-background leading-[0.95] tracking-tight mb-6"
+              className="text-4xl md:text-5xl lg:text-6xl font-display text-background leading-[0.98] tracking-tight mb-6"
             >
-              8 exclusive brand categories inside signed Scale Health clinic hubs.
-            </motion.h1>
+              Placements inside signed Scale Health hubs.
+            </motion.h2>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -280,11 +398,12 @@ export default function Home() {
             >
               <Button
                 size="lg"
-                className="w-full sm:w-auto rounded-none bg-accent text-accent-foreground h-14 px-8 font-medium hover:bg-background hover:text-foreground transition-colors text-base"
+                variant="outline"
+                className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background h-14 px-8 font-medium hover:bg-background/10 transition-colors"
                 onClick={() => openReserveDialog(undefined, "reserve-490", "cta_hero_reserve")}
                 data-testid="button-hero-reserve"
               >
-                Lock your exclusive category — {reservePriceLabel}
+                Reserve a placement — {reservePriceLabel}
               </Button>
               <Button
                 size="lg"
@@ -316,13 +435,13 @@ export default function Home() {
               <a className="underline underline-offset-4" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" data-testid="link-hero-live-hub">See a live hub</a>
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
-              <button
-                type="button"
-                className="w-max text-left text-sm text-background/80 underline underline-offset-4"
-                onClick={() => openReserveDialog(undefined, "hold-190")}
+              <a
+                href={RESERVE_LIST_HREF}
+                className="w-max text-left text-sm text-background/80 underline underline-offset-4 hover:text-accent"
+                data-testid="link-placements-reserve-list"
               >
-                Hold a category for 7 days — $190
-              </button>
+                See the Reserve List
+              </a>
               <a
                 href="/kit"
                 className="group inline-flex items-center gap-1.5 rounded-full border border-background/25 px-3.5 py-1.5 text-sm text-background/85 transition-colors hover:border-accent hover:text-accent"
@@ -333,7 +452,7 @@ export default function Home() {
               </a>
             </div>
             <p className="mt-4 max-w-xl text-sm text-background/70">
-              8 exclusive brand categories across hubs — not eight websites. One brand per category.
+              Early slots are open across 8 advertiser categories. Reserve List brands get first offer as each category activates.
             </p>
           </div>
 
@@ -382,7 +501,7 @@ export default function Home() {
           <ol className="grid border border-border md:grid-cols-3">
             {(
               [
-                ["1", "Pay $190 look or $490 exclusive category as 100% media credit."],
+                ["1", "Claim an early slot on the Reserve List. Paid reserves are 100% media credit."],
                 ["2", "Insertion order names the hub."],
                 ["3", "Unit sits after checkout, on a plan, or at a booking."],
               ] as const
@@ -410,10 +529,10 @@ export default function Home() {
                 Reserve before campaigns open
               </p>
               <h2 className="font-display text-3xl text-foreground">
-                8 exclusive brand categories. One brand per category.
+                Early slots across 8 advertiser categories.
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Every dollar is a 100% media credit. Delivery starts when the insertion order names the hub. Hubs are the rooms. Your exclusive category is the shelf in those rooms.
+                Every dollar is a 100% media credit. Delivery starts when the insertion order names the hub. Hubs are the rooms. Early slots go to Reserve List brands first as each category activates.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[620px]">
@@ -434,19 +553,37 @@ export default function Home() {
                 data-testid="button-private-distribution-reserve"
               >
                 <ShieldCheck className="mr-3 size-4 shrink-0" />
-                <span><strong className="block">Managed distribution</strong><span className="text-xs font-normal opacity-70">For a guided exclusive launch</span></span>
+                <span><strong className="block">Managed distribution</strong><span className="text-xs font-normal opacity-70">For a guided launch</span></span>
               </Button>
             </div>
           </div>
-          <div className="mt-12 grid border border-border md:grid-cols-3">
-            {RESERVE_OFFERS.map((offer, index) => (
+          <div className="mt-12 grid border border-border md:grid-cols-2">
+            <article
+              className="flex flex-col bg-foreground p-6 text-background md:p-8"
+              data-testid="card-reserve-list"
+            >
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent">
+                The Reserve List
+              </p>
+              <p className="mt-4 font-display text-4xl text-accent">Early slots open</p>
+              <p className="mt-4 flex-1 text-sm leading-relaxed text-background/75">
+                See 8.7M purchase orders a year and 56M monthly views by category, log the placements you want and claim an early slot. No commitment. Canada only for now.
+              </p>
+              <p className="mt-5 border-t border-background/15 pt-4 text-xs text-background/60">
+                Use an insider code, or request one on the list.
+              </p>
+              <a
+                href={RESERVE_LIST_HREF}
+                className="mt-6 inline-flex h-11 items-center justify-center gap-2 bg-accent px-5 font-semibold text-accent-foreground transition-colors hover:bg-background hover:text-foreground"
+                data-testid="button-offers-reserve-list"
+              >
+                See the Reserve List <ArrowRight className="size-4" aria-hidden />
+              </a>
+            </article>
+            {RESERVE_OFFERS.filter((offer) => offer.key !== "hold-190").map((offer) => (
               <article
                 key={offer.key}
-                className={`flex flex-col p-6 md:p-8 ${
-                  index > 0
-                    ? "border-t border-border md:border-l md:border-t-0"
-                    : ""
-                }`}
+                className="flex flex-col border-t border-border p-6 md:border-l md:border-t-0 md:p-8"
               >
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/60">
                   {offer.name}
@@ -455,7 +592,7 @@ export default function Home() {
                   {formatReserveAmount(offer.amountCents)}
                 </p>
                 <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground">
-                  {offer.description}
+                  {offer.description.replace(/^Lock your exclusive category\.\s*/, "Paid reserve. ")}
                 </p>
                 <p className="mt-5 border-t border-border pt-4 text-xs text-muted-foreground">
                   {offer.creditLine}
@@ -516,8 +653,8 @@ export default function Home() {
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
               {availability
-                ? `${availability.seats_open} categories open · ${availability.seats_held} held · ${availability.seats_paid} locked · ${availability.seats_total} total`
-                : "Live categories open / held / locked counts load from availability."}
+                ? `Early slots open in ${availability.seats_open} of ${availability.seats_total} categories`
+                : "Early-slot availability loads live."}
             </p>
             <div className="mt-4 grid border border-border sm:grid-cols-2 lg:grid-cols-4">
               {CATEGORY_SEATS.map((category) => (
@@ -540,17 +677,18 @@ export default function Home() {
                   window.location.href = "/buycalc?sku=reserve-490";
                 });
               }}
-              className="h-12 rounded-none bg-accent px-6 text-accent-foreground hover:bg-foreground hover:text-background"
-            >
-              Lock your exclusive category — $490
-            </Button>
-            <Button
-              type="button"
               variant="outline"
-              onClick={() => openReserveDialog(undefined, "hold-190")}
               className="h-12 rounded-none px-6"
             >
-              Hold a category for 7 days — $190
+              Reserve a placement — $490
+            </Button>
+            <Button
+              asChild
+              className="h-12 rounded-none bg-accent px-6 text-accent-foreground hover:bg-foreground hover:text-background"
+            >
+              <a href={RESERVE_LIST_HREF} data-testid="link-seats-reserve-list">
+                See the Reserve List <ArrowRight className="ml-2 size-4" aria-hidden />
+              </a>
             </Button>
           </div>
         </div>
@@ -626,8 +764,8 @@ export default function Home() {
                 <ul className="space-y-4">
                   <li className="border-l border-accent pl-4">Already paid once.</li>
                   <li className="border-l border-accent pl-4">Already in-protocol, so the next buy is the recovery stack: sleep, mobility, nutrition, recovery.</li>
-                  <li className="border-l border-accent pl-4">Exclusive category—you are not auctioning against 40 supplement brands.</li>
-                  <li className="border-l border-accent pl-4">One brand per aisle. You are not auctioned against a competitor in the same category.</li>
+                  <li className="border-l border-accent pl-4">Early slots, outside the open auction. You are not bidding against 40 supplement brands.</li>
+                  <li className="border-l border-accent pl-4">No brand gets more than 20% of a category's digital real estate.</li>
                 </ul>
               </div>
 
@@ -947,14 +1085,14 @@ export default function Home() {
                 Reserve and fulfillment
               </p>
               <h2 className="max-w-xl font-display text-4xl leading-tight tracking-tight md:text-6xl">
-                Lock your exclusive category. We coordinate the rest.
+                Claim an early slot. We coordinate the rest.
               </h2>
             </div>
             <div className="grid gap-8 border-l border-background/20 pl-6 sm:grid-cols-2 md:pl-10">
               <div>
                 <p className="font-display text-3xl text-accent">$490 USD</p>
                 <p className="mt-2 text-sm leading-relaxed text-background/80">
-                  Locks your exclusive category. A 7-day look is $190 and does not take an exclusive category.
+                  Paid reserve, applied in full as media credit toward your placements.
                 </p>
               </div>
               <div>
@@ -1013,18 +1151,26 @@ export default function Home() {
       <section className="py-20 md:py-28 bg-foreground text-background text-center border-b border-foreground">
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto flex flex-col items-center">
-            <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">Lock your exclusive category before it is gone.</h2>
+            <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">See the Reserve List while early slots are open.</h2>
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
-              {reservePriceLabel} locks your exclusive category as 100% media credit. Nothing runs until the insertion order names the hub.
+              8.7M purchase orders a year and 56M monthly views across Canada, by category. Early slots go to Reserve List brands first. Nothing runs until the insertion order names the hub.
             </p>
             <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:justify-center">
+              <a
+                href={RESERVE_LIST_HREF}
+                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 bg-accent text-accent-foreground h-14 px-12 hover:bg-background hover:text-foreground transition-colors font-semibold text-base"
+                data-testid="button-final-reserve-list"
+              >
+                See the Reserve List <ArrowRight className="size-4" aria-hidden />
+              </a>
               <Button
                 size="lg"
-                className="w-full sm:w-auto rounded-none bg-accent text-accent-foreground h-14 px-12 hover:bg-background hover:text-foreground transition-colors font-medium text-base"
+                variant="outline"
+                className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background h-14 px-8 font-medium hover:bg-background/10 transition-colors"
                 onClick={() => openReserveDialog()}
                 data-testid="button-final-splash-access"
               >
-                Lock your exclusive category — {reservePriceLabel}
+                Reserve a placement — {reservePriceLabel}
               </Button>
               <Button
                 size="lg"
