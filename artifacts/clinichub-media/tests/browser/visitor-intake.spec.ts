@@ -168,7 +168,7 @@ test("public offer leads with the three-tier USD ladder", async ({ page }) => {
     "Buy reach one impression at a time; compete in an open auction; interrupt a stranger; hope the feed found the right moment. You bought attention, not context.",
   );
   await expect(page.locator("body")).toContainText(
-    "Add exclusive digital and physical inventory beside your existing channels, reaching customers inside closed brand environments and participating health and wellness locations.",
+    "Add digital and physical inventory beside your existing channels, reaching customers inside closed brand environments and participating health and wellness locations.",
   );
   await expect(
     page

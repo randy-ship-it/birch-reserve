@@ -45,7 +45,7 @@ router.get("/launch/sponsor/offer", (_req, res): void => {
           currency: CURRENCY,
           termDays: 90,
           description:
-            "Indicative CAD 5,000 commercial package. One complementary seat on one approved live hub, host veto with an alternative offer, category exclusivity, and an end-of-term view/click note. Request-only and pending manual review; no payment is collected here.",
+            "Indicative CAD 5,000 commercial package. One complementary seat on one approved live hub, host veto with an alternative offer, an early category slot locked in before the minimum rises, and an end-of-term view/click note. Request-only and pending manual review; no payment is collected here.",
         },
         {
           packageKey: PACKAGE_TEST_PILOT,
