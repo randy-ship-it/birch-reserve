@@ -301,7 +301,7 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.match(home, /id="placements"/);
   assert.match(home, /data-testid="three-steps"/);
   assert.match(home, /Nothing runs before step 2/);
-  assert.match(home, /Claim an early slot on the Reserve List\. Paid reserves are 100% media credit\./);
+  assert.match(home, /Lock in your slot on the Reserve List before the minimum goes up\. Paid reserves are 100% media credit\./);
   assert.match(home, /data-testid="reserve-list-hero"/);
   assert.match(home, /href=\{RESERVE_LIST_HREF\}/);
   assert.match(home, /See the Reserve List/);
@@ -329,7 +329,7 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
 
 const BRAND_TITLE = "Birch Reserve | The Reserve List · Scale Health demand, Canada";
 const BRAND_DESCRIPTION =
-  "See the Reserve List: 8.7M orders a year in audience and 56M monthly views (est.) in Canada, plus an est. 20M+ more in the queue and 100M+ orders a year (2027 projection). Early slots are open. Paid reserves are 100% media credit.";
+  "The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.";
 
 test("public marketing title and description match the brand strings", async () => {
   const indexHtml = await readFile(
@@ -346,6 +346,10 @@ test("public marketing title and description match the brand strings", async () 
   }
   assert.ok(indexHtml.includes(`property="og:title" content="${BRAND_TITLE}"`));
   assert.ok(indexHtml.includes(`name="twitter:title" content="${BRAND_TITLE}"`));
+  assert.match(indexHtml, /<link rel="canonical" href="https:\/\/birchreserve\.net\/" \/>/);
+  assert.match(indexHtml, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-birch-reserve\.png" \/>/);
+  assert.match(indexHtml, /The \$190 look does not burn a seat/);
+  assert.doesNotMatch(indexHtml, /8\.7M|56M monthly views|20M\+|100M\+ orders/);
   assert.doesNotMatch(indexHtml, /Eight category seats inside signed Scale Health hubs\./);
   assert.doesNotMatch(indexHtml, /\$899|payments paused/i);
 

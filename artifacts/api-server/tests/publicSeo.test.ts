@@ -7,6 +7,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { after, before, test } from "node:test";
 import app from "../src/app";
+import { renderBuycalcHtml } from "../src/routes/publicBuying";
 import { PUBLIC_INSIGHT_ARTICLES } from "@workspace/db";
 import {
   PUBLIC_OG_IMAGE,
@@ -97,6 +98,13 @@ test("server HTML and SPA shells expose canonical, og:url, og:image, and twitter
     if (path === "/success" || path === "/splash/activation") {
       assert.match(html, /<meta name="robots" content="noindex"\s*\/>/);
     }
+    if (path === "/about") {
+      assert.match(html, /The \$190 look does not burn a seat/);
+      assert.match(html, /The \$490 seat is the named category/);
+      assert.match(html, /The insertion order names the hub before anything runs/);
+      assert.match(html, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-birch-reserve\.png"\s*\/>/);
+      assert.doesNotMatch(html, /8\.7M|56M monthly views|20M\+|100M\+ orders/);
+    }
   }
 
   const home = await readFile(resolve(process.cwd(), "../clinichub-media/index.html"), "utf8");
@@ -160,6 +168,30 @@ test("published insight HTML keeps sentence periods outside autolink hrefs", asy
   assert.match(html, /<a href="https:\/\/physio\.drhonow\.com\/dr-ho\/portal">https:\/\/physio\.drhonow\.com\/dr-ho\/portal<\/a>\./);
   assert.doesNotMatch(html, /href="https:\/\/birchreserve\.net\."/);
   assert.doesNotMatch(html, /href="https:\/\/physio\.drhonow\.com\/dr-ho\/portal\."/);
+});
+
+test("buycalc HTML keeps the category facts and drops the price-rise line", () => {
+  const html = renderBuycalcHtml({ seatsOpen: 3, seatsTotal: 8, sku: "hold-190", format: "post_checkout" });
+  assert.match(html, /\$490 USD/);
+  assert.match(html, /\$190 USD/);
+  assert.match(html, /One unit inside the hub\. Not a stack of banners\. The category names the card\./);
+  assert.match(html, /The zone is the category\. You can open a signed hub before the look\. The look does not serve\./);
+  assert.match(html, /The \$190 look is a draft you build\. It does not serve until the insertion order names the hub\./);
+  assert.match(html, /One brand header on the category the customer already opened\. Not a second page\./);
+  assert.match(html, /The unit matches the page the customer already opened\. It is not a banner beside the letter\./);
+  assert.match(html, /data-sku="hold-190"[\s\S]*<a href="\/kit">What you send is on the creative brief<\/a>/);
+  assert.match(html, /data-sku="reserve-490"[\s\S]*You buy the category header\. You do not bid on a search\./);
+  assert.match(html, /<a href="https:\/\/physio\.drhonow\.com\/dr-ho\/portal"/);
+  assert.match(html, /This is the place\. Not a view chart\. Illustrative until the insertion order names the hub\./);
+  assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/buycalc"\s*\/>/);
+  assert.match(html, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-birch-reserve\.png"\s*\/>/);
+  assert.doesNotMatch(html, /Lock in your slot before the minimum goes up/);
+  assert.doesNotMatch(html, /8\.7M|56M monthly views|20M\+|100M\+ orders/);
+  assert.doesNotMatch(html, /reserve-899/);
+  const skuOptions = html.match(/<select name="sku">([\s\S]*?)<\/select>/)?.[1] ?? "";
+  assert.equal((skuOptions.match(/<option /g) ?? []).length, 2);
+  assert.match(skuOptions, /value="hold-190"/);
+  assert.match(skuOptions, /value="reserve-490"/);
 });
 
 test("GET /advertise stays a 301 to /buycalc", async () => {
