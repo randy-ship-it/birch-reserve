@@ -2144,7 +2144,8 @@ export function renderBuycalcHtml(input: {
 ${BUYCALC_SEAT_CALC_HTML}
 <div class="grid"><section><h2>What a reserved slot includes</h2><p><strong>${availability.seats_open} categories open</strong> of ${availability.seats_total}. Availability is rolling and subtracts paid and currently held locks.</p>
 <div class="offer-grid">${PUBLIC_RESERVE_OFFERS.map((offer) => {
-    const eyebrow = offer.offerType === "category_seat" ? "RESERVE YOUR SLOT" : offer.offerType === "category_look" ? "7-DAY LOOK" : offer.offerType.replaceAll("_", " ").toUpperCase();
+    const offerType = String(offer.offerType);
+    const eyebrow = offerType === "category_seat" ? "RESERVE YOUR SLOT" : offerType === "category_look" ? "7-DAY LOOK" : offerType.replaceAll("_", " ").toUpperCase();
     const beside = offer.sku === "reserve-490"
       ? `<p>You buy the category header. You do not bid on a search.</p>`
       : offer.sku === "hold-190"
