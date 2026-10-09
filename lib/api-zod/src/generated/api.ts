@@ -397,7 +397,7 @@ export const GetBirchReserveCatalogResponse = zod.object({
 })).min(1).max(1),
   "discount_vs_published": zod.literal(0.25),
   "formats": zod.array(zod.enum(['post_checkout', 'recovery_plan', 'scheduled_service', 'member_hub', 'motion_15s'])),
-  "exclusivity": zod.string(),
+  "category_slot": zod.string(),
   "fulfillment": zod.string(),
   "reporting": zod.string(),
   "checkout": zod.string(),

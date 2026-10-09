@@ -1410,7 +1410,7 @@ components:
     BirchReserveCatalog:
       type: object
       additionalProperties: false
-      required: [catalog_version, currency, default_sku, inventory_model, offers, legacy_offers, discount_vs_published, formats, exclusivity, fulfillment, reporting, checkout, human]
+      required: [catalog_version, currency, default_sku, inventory_model, offers, legacy_offers, discount_vs_published, formats, category_slot, fulfillment, reporting, checkout, human]
       properties:
         catalog_version: { type: string }
         currency: { type: string, enum: [USD] }
@@ -1440,7 +1440,7 @@ components:
               note: { type: string }
         discount_vs_published: { type: number, enum: [0.25] }
         formats: { type: array, items: { type: string, enum: [post_checkout, recovery_plan, scheduled_service, member_hub, motion_15s] } }
-        exclusivity: { type: string }
+        category_slot: { type: string }
         fulfillment: { type: string }
         reporting: { type: string }
         checkout: { type: string }

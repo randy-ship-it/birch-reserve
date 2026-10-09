@@ -558,7 +558,7 @@ router.get("/v1/catalog.json", (_req, res) => {
     })),
     discount_vs_published: 0.25,
     formats: FORMATS,
-    exclusivity: "category_lock",
+    category_slot: "early_slot",
     fulfillment: "coordinated_72h",
     reporting: "aggregate_only",
     checkout: "/v1/checkout",

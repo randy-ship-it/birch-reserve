@@ -22,8 +22,8 @@ export type TamFeed = {
   pipeline: { live_orders: number; y2027_orders: number; labels: Record<string, string> };
 };
 export const FALLBACK_LABELS: Record<string, string> = {
-  live_orders: "9M+", mapped_orders: "8.7M", live_views: "56M", queue_orders: "20M+", queue_views: "~130M",
-  live_queue_orders: "29M+", live_queue_views: "~180M", y2027_orders: "100M+", y2027_views: "~640M",
+  live_orders: "8.7M", mapped_orders: "8.7M", live_views: "56M", queue_orders: "20M+", queue_views: "~130M",
+  live_queue_orders: "28.7M", live_queue_views: "~180M", y2027_orders: "100M+", y2027_views: "~640M",
 };
 
 export function useTamFeed() {

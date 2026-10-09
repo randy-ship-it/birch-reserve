@@ -1,5 +1,5 @@
 import { RANDY_TEL_DISPLAY, RANDY_TEL_HREF, TAP_TO_CALL_HREF, TAP_TO_CALL_LABEL } from "@/lib/randy-chat-knowledge";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -120,6 +120,25 @@ const SUPPLIER_ADJACENCY = [
 export default function Home() {
   const { feed: tamFeed, labels: tl } = useTamFeed();
   const [splashDialogOpen, setSplashDialogOpen] = useState(false);
+  // 390px: hide the sticky bar, chat avatar and call button while the final CTA is on screen.
+  const finalCtaRef = useRef<HTMLElement | null>(null);
+  const [finalCtaInView, setFinalCtaInView] = useState(false);
+  useEffect(() => {
+    const node = finalCtaRef.current;
+    if (!node || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setFinalCtaInView(Boolean(entry?.isIntersecting)),
+      { threshold: 0 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    const root = document.documentElement;
+    if (finalCtaInView) root.setAttribute("data-final-cta-in-view", "true");
+    else root.removeAttribute("data-final-cta-in-view");
+    return () => root.removeAttribute("data-final-cta-in-view");
+  }, [finalCtaInView]);
   const [selectedFormat, setSelectedFormat] = useState<string>();
   const [selectedOffer, setSelectedOffer] = useState<ReserveOfferKey>(
     DEFAULT_RESERVE_OFFER_KEY,
@@ -226,7 +245,7 @@ export default function Home() {
       />
 
 
-      {!splashDialogOpen && (
+      {!splashDialogOpen && !finalCtaInView && (
         <div
           className="fixed inset-x-0 bottom-0 z-40 border-t border-foreground/10 bg-background/95 p-3 backdrop-blur-md md:hidden"
           data-testid="mobile-sticky-reserve-cta"
@@ -306,10 +325,10 @@ export default function Home() {
               </div>
             </dl>
             <p className="mt-3 max-w-2xl text-sm text-background/80">
-              <span className="font-display text-xl text-accent">{tl.live_views}</span> monthly views today · {tl.live_queue_views} with the queue live · {tl.y2027_views} in 2027 <span className="text-background/55">(est.)</span>
+              <span className="font-display text-xl text-accent">{tl.live_views}</span> monthly views today (est.) · {tl.live_queue_views} with the queue live · {tl.y2027_views} in 2027 <span className="text-background/55">(est.)</span>
             </p>
             <p className="mt-2 max-w-2xl text-xs leading-relaxed text-background/60">
-              {tl.live_orders} and {tl.live_views} are network demand-pool figures for Canada; {tl.mapped_orders} of those orders are mapped to partner categories on the list. Queue and 2027 figures are estimates and projections.
+              {tl.live_orders} orders a year and {tl.live_views} monthly views (est.) are network demand-pool figures for Canada; {tl.mapped_orders} orders are mapped to partner categories on the list. Queue and 2027 figures are estimates and projections.
             </p>
             <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
               <a
@@ -601,7 +620,7 @@ export default function Home() {
               </p>
               <p className="mt-4 font-display text-4xl text-accent">Early slots open</p>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-background/75">
-                See 9M+ orders a year in audience and 56M monthly views, broken out by category, plus an est. 20M+ more orders in the queue and 100M+ orders a year (2027 projection). Log the placements you want and claim an early slot. No commitment. Canada only for now.
+                See 8.7M orders a year in audience and 56M monthly views (est.), broken out by category, plus an est. 20M+ more orders in the queue and 100M+ orders a year (2027 projection). Log the placements you want and claim an early slot. No commitment. Canada only for now.
               </p>
               <p className="mt-5 border-t border-background/15 pt-4 text-xs text-background/60">
                 Use an insider code, or request one on the list.
@@ -1182,12 +1201,16 @@ export default function Home() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 md:py-28 bg-foreground text-background text-center border-b border-foreground">
+      <section
+        ref={finalCtaRef}
+        className="pt-20 pb-52 md:py-28 bg-foreground text-background text-center border-b border-foreground"
+        data-testid="home-final-cta"
+      >
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto flex flex-col items-center">
             <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">Reserve a slot at today's minimum.</h2>
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
-              9M+ orders a year in audience and 56M monthly views across Canada today, plus an est. 20M+ more orders in the queue and 100M+ orders a year (2027 projection). Lock in your slot before the minimum goes up. Nothing runs until the insertion order names the hub.
+              8.7M orders a year in audience and 56M monthly views (est.) across Canada today, plus an est. 20M+ more orders in the queue and 100M+ orders a year (2027 projection). Lock in your slot before the minimum goes up. Nothing runs until the insertion order names the hub.
             </p>
             <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
               <a

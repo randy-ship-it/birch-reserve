@@ -301,3 +301,15 @@
     page-break-inside: avoid;
   }
 }
+
+/*
+ * 390px (ship 2026-10-09): while the home final CTA is on screen, hide the mobile
+ * overlays (chat avatar launcher + Hear Randy call button) so nothing covers it.
+ * The sticky reserve bar is unmounted by home.tsx for the same window.
+ */
+@media (max-width: 767px) {
+  html[data-final-cta-in-view="true"] elevenlabs-convai,
+  html[data-final-cta-in-view="true"] [data-testid="randy-figure-launcher"] {
+    display: none !important;
+  }
+}
