@@ -336,7 +336,7 @@ const KIT_HTML = documentPage(
 <li>Men’s health</li>
 <li>Diagnostics / services</li>
 </ul>
-<p>One brand per category. Not eight websites.</p>
+<p>Categories stay open to more than one brand; no brand gets more than 20%. Not eight websites.</p>
 <h2>Formats (context only)</h2>
 <p>Placement formats for IO discussion — not CTR or impression guarantees:</p>
 <ul>

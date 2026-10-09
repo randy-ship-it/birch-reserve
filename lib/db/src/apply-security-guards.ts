@@ -70,7 +70,7 @@ try {
         body = replace(
           body,
           'The first Display Reserve is deliberately concrete: a fixed $899 USD reservation for eight exclusive brand categories, with a media credit and a final insertion order.',
-          'Public offers are Hold $190 for a seven-day category look that does not take an exclusive category, or Reserve $490 to lock your exclusive category among eight brand categories. Both amounts are media credit, and the insertion order names the surface before anything runs.'
+          'Public offers are Hold $190 for a seven-day category look that does not take a category slot, or Reserve $490 to lock in an early category slot among eight brand categories before the minimum goes up. Both amounts are media credit, and the insertion order names the surface before anything runs.'
         ),
         updated_at = now()
       WHERE status = 'published'
