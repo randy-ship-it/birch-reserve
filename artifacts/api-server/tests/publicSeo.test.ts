@@ -181,8 +181,10 @@ test("buycalc HTML keeps the category facts and drops the price-rise line", () =
   assert.match(html, /The unit matches the page the customer already opened\. It is not a banner beside the letter\./);
   assert.match(html, /data-sku="hold-190"[\s\S]*<a href="\/kit">What you send is on the creative brief<\/a>/);
   assert.match(html, /data-sku="reserve-490"[\s\S]*You buy the category header\. You do not bid on a search\./);
-  assert.match(html, /<a href="https:\/\/physio\.drhonow\.com\/dr-ho\/portal"/);
-  assert.match(html, /This is the place\. Not a view chart\. Illustrative until the insertion order names the hub\./);
+  assert.match(html, /<a href="https:\/\/physio\.drhonow\.com"/);
+  assert.match(html, /Lock one category inside signed health hubs\. Not an open auction\./);
+  assert.match(html, /No impression guarantee/);
+  assert.doesNotMatch(html, /exclusiv/i);
   assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/buycalc"\s*\/>/);
   assert.match(html, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-birch-reserve\.png"\s*\/>/);
   assert.doesNotMatch(html, /Lock in your slot before the minimum goes up/);

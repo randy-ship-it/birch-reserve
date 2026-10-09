@@ -92,14 +92,6 @@ const CATEGORY_SEATS = [
 
 const RESERVE_LIST_HREF = "/inventory";
 
-const RESERVE_LIST_PREVIEW = [
-  "Sports Nutrition & Supplements",
-  "Pain Relief & Topicals",
-  "Recovery Devices & Equipment",
-  "Digital Health & Telehealth",
-  "Wearables & Fitness Tech",
-  "Align Network",
-];
 
 
 const SUPPLIER_ADJACENCY = [
@@ -270,8 +262,8 @@ export default function Home() {
       )}
 
       {/* Signed-hub category seat: hero, calculator, closed method drawer */}
-      <SignedHubHero eyebrow="Birch Reserve · Canada" reserveHref="/buycalc?sku=reserve-490#reserve" lookHref="/buycalc?sku=hold-190#reserve" />
-      <section id="reserve-list-calculator" className="scroll-mt-20 bg-white py-12 md:py-16" data-testid="reserve-list-calculator-section">
+      <div data-testid="reserve-list-hero"><SignedHubHero eyebrow="Birch Reserve · Canada" reserveHref="/buycalc?sku=reserve-490#reserve" lookHref="/buycalc?sku=hold-190#reserve" /></div>
+      <section id="reserve-list-calculator" className="scroll-mt-24 bg-white py-12 md:py-16" data-testid="reserve-list-calculator-section">
         <div className="mx-auto max-w-5xl space-y-5 px-6">
           <h2 className="text-3xl font-bold tracking-tight text-[#0A1D56] md:text-4xl">Check the math.</h2>
           <SeatCalculator feed={tamFeed as any} />

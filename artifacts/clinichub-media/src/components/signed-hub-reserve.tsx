@@ -34,7 +34,7 @@ const pct = (x: number) => (x * 100).toFixed(2).replace(/0$/, "") + "%";
 
 export function SignedHubHero({ reserveHref, lookHref, cardsLive = true, eyebrow }: { reserveHref: string; lookHref: string; cardsLive?: boolean; eyebrow: string }) {
   return (
-    <section style={{ background: NAVY }} className="text-white" data-testid="signed-hub-hero">
+    <section style={{ background: NAVY }}  className="text-white" data-testid="signed-hub-hero">
       <div className="mx-auto max-w-5xl px-6 py-14 md:py-20">
         <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: PURPLE }}>{eyebrow}</p>
         <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">Lock one category inside signed health hubs. Not an open auction.</h1>
@@ -116,14 +116,16 @@ export function SeatCalculator({ feed }: { feed: Feed | null }) {
   );
 }
 
-export function HowCalculated({ feed }: { feed: Feed | null }) {
+export function HowCalculated({ feed, showAudience = false }: { feed: Feed | null; showAudience?: boolean }) {
   const L = feed?.pipeline?.labels || {};
   return (
     <details className="rounded-lg border border-[#0A1D56]/15 p-5 text-[#0A1D56]" style={{ background: CARD }} data-testid="how-calculated">
       <summary className="cursor-pointer text-base font-semibold">How this is calculated <span className="ml-2 text-xs font-normal opacity-70">Scenario, not a guarantee, not Scale measured performance.</span></summary>
       <ul className="mt-4 list-disc space-y-2 pl-5 text-sm">
-        <li>Audience: {L.live_orders || "8.7M"} orders a year mapped across partner categories, about {L.live_views || "56M"} monthly views (est.).</li>
-        <li>2027 projection (est.): {L.y2027_orders || "100M+"} orders a year. Used only when "Illustrative 2027" is on.</li>
+        {showAudience ? (<>
+          <li>Audience: {L.live_orders || "8.7M"} orders a year mapped across partner categories, about {L.live_views || "56M"} monthly views (est.).</li>
+          <li>2027 projection (est.): {L.y2027_orders || "100M+"} orders a year. Used only when "Illustrative 2027" is on.</li>
+        </>) : <li>"Illustrative 2027" scales views by the partner pipeline projection (est.). Off by default.</li>}
         <li>Views are modeled at 6.4 monthly views per annual order. They are not served impressions.</li>
         <li>Surface CTR bands come from industry ranges. They are not Scale measured results.</li>
         <li>Orders use click-to-order, not view-to-order. Email CTR is not used.</li>
