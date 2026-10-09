@@ -74,6 +74,9 @@ export default function About() {
               partners and help create thoughtful connections across Clinic
               Member Hubs and trusted retail networks.
             </p>
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground" data-testid="about-offer-body">
+              The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.
+            </p>
           </div>
         </div>
       </section>

@@ -462,6 +462,24 @@ async function reserveCounts() {
 const PUBLIC_BRAND_DESCRIPTION =
   "$190 holds a category 7 days. $490 locks in your slot at today's minimum inside signed Scale Health hubs. Live hub: physio.drhonow.com. Your payment is media credit, not airfare.";
 
+/** Price-rise line stays off /buycalc until a change is locked in writing. */
+const BUYCALC_PRICE_RISE = "Lock in your slot before the minimum goes up";
+
+function buycalcPublicScope(scope: string): string {
+  return scope
+    .replaceAll(`${BUYCALC_PRICE_RISE}. `, "")
+    .replaceAll(BUYCALC_PRICE_RISE, "")
+    .trim();
+}
+
+const BUYCALC_SKU_LINES = [
+  "One unit inside the hub. Not a stack of banners. The category names the card.",
+  "The zone is the category. You can open a signed hub before the look. The look does not serve.",
+  "The $190 look is a draft you build. It does not serve until the insertion order names the hub.",
+  "One brand header on the category the customer already opened. Not a second page.",
+  "The unit matches the page the customer already opened. It is not a banner beside the letter.",
+] as const;
+
 // Registered on the API service (ahead of the static SPA rewrite) so Autoscale
 // answers /oatmeal with a real 301 instead of index.html.
 router.get("/oatmeal", (req, res) => {
@@ -2066,11 +2084,17 @@ router.get("/openapi.yaml", async (_req, res): Promise<void> => {
   res.status(500).type("text/plain").send("OpenAPI contract is unavailable.");
 });
 
-router.get("/buycalc", async (req, res): Promise<void> => {
-  const availability = await reserveCounts();
-  res.type("html").send(`<!doctype html>
+export function renderBuycalcHtml(input: {
+  seatsOpen: number;
+  seatsTotal: number;
+  sku?: unknown;
+  format?: unknown;
+}): string {
+  const availability = { seats_open: input.seatsOpen, seats_total: input.seatsTotal };
+  const req = { query: { sku: input.sku, format: input.format } };
+  return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Buy calculator — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | Lock in your slot before the minimum goes up"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | Lock in your slot before the minimum goes up"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">${publicSeoTags("/buycalc")}
+<title>Buy calculator — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | The $490 seat is the named category"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | The $490 seat is the named category"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">${publicSeoTags("/buycalc")}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <script type="application/ld+json">${JSON.stringify({
   "@context": "https://schema.org",
@@ -2099,23 +2123,43 @@ router.get("/buycalc", async (req, res): Promise<void> => {
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8f6ef;color:#071A39;font:16px/1.55 "IBM Plex Sans",sans-serif}header,main,footer{max-width:1100px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;border-bottom:1px solid #ccd2d8}h1,h2{font-family:Fraunces,serif;font-weight:400}h1{font-size:clamp(2.7rem,7vw,5.8rem);line-height:.95;margin:.5em 0}.accent{background:#C8F55A;padding:.08em .18em}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:36px}.card{border:1px solid #071A39;padding:24px;margin:18px 0}.figures{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#071A39}.figure{background:#fff;padding:18px}.figure strong{display:block;font:600 1.7rem Fraunces,serif}.offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.offer{border:1px solid #071A39;padding:16px;background:#fff}.offer strong{display:block;font:600 1.35rem Fraunces,serif}.offer small{display:block;margin-top:8px}label{display:block;font-weight:600;margin-top:14px}input,select,button{width:100%;padding:12px;border:1px solid #071A39;background:white;font:inherit}button{margin-top:18px;background:#C8F55A;font-weight:600;cursor:pointer}.fine{font-size:.9rem}#message{padding-top:12px;font-weight:600}@media(max-width:760px){.grid,.figures,.offer-grid{grid-template-columns:1fr}}
 </style></head><body><header><strong>BIRCH RESERVE</strong><a href="/v1/catalog.json">Machine catalog</a></header><main>
-<p>Reservations are open. Campaigns start when the insertion order names the hub.</p><h1>Lock in your slot before the minimum goes up.</h1>
+<p>Reservations are open. Campaigns start when the insertion order names the hub.</p><h1>The $490 seat is the named category.</h1>
 <p>Your offer sits after checkout, on a plan, or at a booking — not in a stranger’s feed.</p>
-<p><a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">See a live hub</a></p>
+<p><a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">See a live hub</a></p><p>This is the place. Not a view chart. Illustrative until the insertion order names the hub.</p>
 <div class="figures"><div class="figure">Reserve your slot<strong>$490 USD</strong></div><div class="figure">7-day look<strong>$190 USD</strong></div><div class="figure">Media credit<strong>100%</strong></div></div>
 <div class="grid"><section><h2>What a reserved slot includes</h2><p><strong>${availability.seats_open} categories open</strong> of ${availability.seats_total}. Availability is rolling and subtracts paid and currently held locks.</p>
-<div class="offer-grid">${PUBLIC_RESERVE_OFFERS.map((offer) => `<article class="offer"><small>${offer.offerType === "category_seat" ? "RESERVE YOUR SLOT" : offer.offerType === "category_look" ? "7-DAY LOOK" : offer.offerType.replaceAll("_", " ").toUpperCase()}</small><strong>$${offer.dueTodayUsd.toLocaleString("en-US")} · ${offer.name}</strong><small>${offer.scope}</small></article>`).join("")}</div>
+<div class="offer-grid">${PUBLIC_RESERVE_OFFERS.map((offer) => {
+    const eyebrow = offer.offerType === "category_seat" ? "RESERVE YOUR SLOT" : offer.offerType === "category_look" ? "7-DAY LOOK" : offer.offerType.replaceAll("_", " ").toUpperCase();
+    const beside = offer.sku === "reserve-490"
+      ? `<p>You buy the category header. You do not bid on a search.</p>`
+      : offer.sku === "hold-190"
+        ? `<p><a href="/kit">What you send is on the creative brief</a></p>`
+        : "";
+    return `<article class="offer" data-sku="${offer.sku}"><small>${eyebrow}</small><strong>$${offer.dueTodayUsd.toLocaleString("en-US")} · ${offer.name}</strong><small>${buycalcPublicScope(offer.scope)}</small>${beside}</article>`;
+  }).join("")}</div>
 <div class="card"><h2>Your planning choices</h2><p><strong>Format:</strong> post-checkout, recovery plan, scheduled service, member hub, or motion 15s.</p><p><strong>Window:</strong> 30, 90, or 180 days.</p><p><strong>Placement:</strong> category or RON.</p><p><strong>Creative:</strong> static, native, or motion.</p></div>
 <h2>Non-negotiable exclusions</h2><ul><li>No PHI</li><li>No clinical pixels</li><li>No open auction</li></ul><p>Reporting is aggregate only. Payment is not considered received until Stripe webhook confirmation.</p></section>
-<aside><form id="reserve"><h2>Reserve without a login</h2><label>Offer<select name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${req.query.sku === offer.sku ? " selected" : ""}>$${offer.dueTodayUsd.toLocaleString("en-US")} · ${offer.name}</option>`).join("")}</select></label><label>Brand<input name="brand" required maxlength="160"></label><label>Work email<input name="email" type="email" required></label><label>Website (optional)<input name="website_url" type="url"></label><label>Format<select name="format_pref">${FORMATS.map((f) => `<option value="${f}"${req.query.format === f ? " selected" : ""}>${f.replaceAll("_", " ")}</option>`).join("")}</select></label><label>Window<select id="days"><option>30</option><option>90</option><option>180</option></select></label><label>Placement<select><option>Category</option><option>RON</option></select></label><label>Creative<select><option>Static</option><option>Native</option><option>Motion</option></select></label><label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the draft <a href="/terms">terms</a> before any charge. Draft until counsel stamps.</label><button id="submit" type="submit">Lock in your slot — $490 USD</button><button id="copy" type="button">Copy quote JSON</button><p class="fine"><a href="tel:+16479316278">Get a call back</a> · <a href="/buycalc?sku=hold-190">Hold a category for 7 days — $190</a></p><p id="message" role="status"></p><noscript><p class="fine">JavaScript is required to submit this no-login reservation. Complete prices and terms remain available above; <a href="mailto:sales@silverbirchgrowth.com">Email sales</a> to reserve manually.</p></noscript></form></aside></div></main>
+<aside><form id="reserve"><h2>Reserve without a login</h2><label>Offer<select name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${req.query.sku === offer.sku ? " selected" : ""}>$${offer.dueTodayUsd.toLocaleString("en-US")} · ${offer.name}</option>`).join("")}</select></label><div class="fine">${BUYCALC_SKU_LINES.map((line) => `<p>${line}</p>`).join("")}</div><label>Brand<input name="brand" required maxlength="160"></label><label>Work email<input name="email" type="email" required></label><label>Website (optional)<input name="website_url" type="url"></label><label>Format<select name="format_pref">${FORMATS.map((f) => `<option value="${f}"${req.query.format === f ? " selected" : ""}>${f.replaceAll("_", " ")}</option>`).join("")}</select></label><label>Window<select id="days"><option>30</option><option>90</option><option>180</option></select></label><label>Placement<select><option>Category</option><option>RON</option></select></label><label>Creative<select><option>Static</option><option>Native</option><option>Motion</option></select></label><label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the draft <a href="/terms">terms</a> before any charge. Draft until counsel stamps.</label><button id="submit" type="submit">Lock in your slot — $490 USD</button><button id="copy" type="button">Copy quote JSON</button><p class="fine"><a href="tel:+16479316278">Get a call back</a> · <a href="/buycalc?sku=hold-190">Hold a category for 7 days — $190</a> · <a href="/kit">What you send is on the creative brief</a></p><p id="message" role="status"></p><noscript><p class="fine">JavaScript is required to submit this no-login reservation. Complete prices and terms remain available above; <a href="mailto:sales@silverbirchgrowth.com">Email sales</a> to reserve manually.</p></noscript></form></aside></div></main>
 <footer class="fine">Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · <a href="mailto:sales@silverbirchgrowth.com">Email sales</a><p id="selectedSummary"></p></footer>
 <script>
-const form=document.querySelector("#reserve"),message=document.querySelector("#message"),idempotencyKey=crypto.randomUUID(),offers=${JSON.stringify(Object.fromEntries(PUBLIC_RESERVE_OFFERS.map((offer) => [offer.sku, offer])))};
+const form=document.querySelector("#reserve"),message=document.querySelector("#message"),idempotencyKey=crypto.randomUUID(),offers=${JSON.stringify(Object.fromEntries(PUBLIC_RESERVE_OFFERS.map((offer) => [offer.sku, { ...offer, scope: buycalcPublicScope(offer.scope) }])))};
 function selected(){return offers[form.elements.sku.value]}function refresh(){const offer=selected();document.querySelector("#submit").textContent="Continue — $"+offer.dueTodayUsd.toLocaleString("en-US")+" USD";document.querySelector("#selectedSummary").textContent="SKU "+offer.sku+" · Offer "+offer.offerKey+" · Exactly $"+offer.dueTodayUsd.toLocaleString("en-US")+" USD due today and applied as media credit."}form.elements.sku.onchange=refresh;refresh();
 async function quote(){const sku=form.elements.sku.value,format=form.elements.format_pref.value,days=document.querySelector("#days").value;const r=await fetch("/v1/quote?sku="+encodeURIComponent(sku)+"&format="+encodeURIComponent(format)+"&days="+days);return r.json()}
 document.querySelector("#copy").onclick=async()=>{try{await navigator.clipboard.writeText(JSON.stringify(await quote(),null,2));message.textContent="Quote JSON copied."}catch{message.textContent="Unable to copy automatically. Open the machine catalog link to copy the contract."}};
 form.onsubmit=async(e)=>{e.preventDefault();if(!document.querySelector("#terms").checked){message.textContent="Accept the draft terms before any charge.";return}message.textContent="Saving your reservation…";const data=Object.fromEntries(new FormData(form));delete data.terms;data.idempotency_key=idempotencyKey;if(!data.website_url)delete data.website_url;try{const r=await fetch("/v1/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)});const out=await r.json();if(out.checkout_url){location.assign(out.checkout_url);return}message.textContent=(out.error||"Your hold was saved, but checkout is unavailable.")+(out.order_id?" Order: "+out.order_id:"")}catch{message.textContent="The reservation could not be submitted. No payment was claimed."}};
-</script></body></html>`);
+</script></body></html>`;
+}
+
+router.get("/buycalc", async (req, res): Promise<void> => {
+  const availability = await reserveCounts();
+  res.type("html").send(
+    renderBuycalcHtml({
+      seatsOpen: availability.seats_open,
+      seatsTotal: availability.seats_total,
+      sku: req.query.sku,
+      format: req.query.format,
+    }),
+  );
 });
 
 export default router;
