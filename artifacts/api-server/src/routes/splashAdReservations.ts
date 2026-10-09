@@ -201,7 +201,7 @@ function pipelineRow(reservation: SplashAdReservation): string[][] {
       reservation.email,
       reservation.adInterest,
       reservation.brandName ?? "",
-      reservation.promotedOffer ?? "Exclusive high-value display reserve",
+      reservation.promotedOffer ?? "High-value display reserve",
       reservation.websiteUrl ?? "",
       reservation.source,
       reservation.createdAt.toISOString(),

@@ -31,7 +31,7 @@ Friday paste also positions **Friday** (https://fridayapp.org) as portfolio inno
 
 | Product | URL / note | Factual blurb from files |
 |---------|------------|--------------------------|
-| **WePrize** | https://weprize.net (also weprize.ca) | Canada-first free-contest assist site: friction badges before click, free board, apply assist. Tagline: “Don’t gamble with your time. We apply to free contests for you.” Former name WeContest retired. **Birch Reserve sells exclusive display on WePrize** (quiet EXAMPLE property on birchreserve.net — not a featured Scale hub). WePrize Advertise soft-links brands to https://birchreserve.net so the inventory is reciprocal, not random. Do not invent DAU/ARR. |
+| **WePrize** | https://weprize.net (also weprize.ca) | Canada-first free-contest assist site: friction badges before click, free board, apply assist. Tagline: “Don’t gamble with your time. We apply to free contests for you.” Former name WeContest retired. **Birch Reserve sells display on WePrize** (quiet EXAMPLE property on birchreserve.net — not a featured Scale hub). WePrize Advertise soft-links brands to https://birchreserve.net so the inventory is reciprocal, not random. Do not invent DAU/ARR. |
 | **WeFlush** | https://weflush.org (also poopmap.org redirect family) | Bathroom / flush map PWA, “Get the inside flush.” Community map product; WeFlush Bot owns. |
 | **ParKings / GetParkings** | https://getparkings.com | Toronto-first: parking-ticket screening letter (you file on toronto.ca/aps; first eligible letter free; not a law firm) + user-drop street parking map. No promised outcome. |
 
