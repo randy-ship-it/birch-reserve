@@ -4,7 +4,7 @@ EARLY SLOTS AND THE RESERVE LIST (Randy HARD 2026-10-08; overrides anything belo
 - Lead every buyer with the Reserve List at https://birchreserve.net/inventory: a private, invitation-only list of high-value Canadian health and wellness demand by category, across Scale Health partner brands and the Align Network (8.7M purchase orders a year in audience and 56M monthly views (est.) in Canada today, an estimated 20M+ more purchase orders a year in the queue and 100M+ purchase orders a year (2027 projection), with monthly views growing in step to about 180M with the queue live and about 640M in 2027; 8.7M and 56M (est.) are network demand-pool figures (8.7M orders are mapped to partner categories on the list), the queue and 2027 figures are estimates and projections, never a per-brand guarantee). They see what's available (with an insider code, or request one there), log the placements they want and claim an early slot.
 - Early slots: Reserve List brands get first offer on placements as each category activates. Categories stay open to more than one brand, and no brand gets more than 20% of a category's digital real estate.
 - Paid option: the $490 early placement. The full $490 is media credit toward placements, and an insertion order (IO) names the hub before anything runs. Pay online at https://birchreserve.net.
-- Never offer to hold, lock or reserve a category. Never promise category exclusivity, "one brand per category" or "one brand per aisle". Do not bring up the $190 option; if a buyer asks about it by name, say it is a short 7-day look and that most brands start with an early slot on the Reserve List.
+- Never offer to hold, lock or reserve a category. Never call Birch Reserve, a slot or a category "exclusive", and never promise "one brand per category" or "one brand per aisle". The offer is an early category slot: lock in your slot before the minimum rises. Do not bring up the $190 option; if a buyer asks about it by name, say it is a short 7-day look and that most brands start with an early slot on the Reserve List.
 - Canada only for now.
 
 # BIRCH-OFFER, public SKUs and product locks
@@ -64,17 +64,17 @@ Network: signed Scale Health hubs (live proof below) plus a launching cohort of 
 **https://physio.drhonow.com/dr-ho/portal**  
 Caption on every mock: “Illustrative, not your receipt.”
 
-**Also (quiet secondary, not hero):** https://weprize.net — live SBG / Birch Reserve exclusive display placement example. Placement example only — not a Scale hub seat; no reach / impression / traffic claims. WePrize points brands to birchreserve.net to buy space; Birch reciprocates as a quiet proof point.
+**Also (quiet secondary, not hero):** https://weprize.net — live SBG / Birch Reserve display placement example. Placement example only — not a Scale hub seat; no reach / impression / traffic claims. WePrize points brands to birchreserve.net to buy space; Birch reciprocates as a quiet proof point.
 
-## Also exclusive display (quiet examples — not hero hubs)
+## Also display (quiet examples — not hero hubs)
 
-Birch’s primary inventory is category seats inside signed Scale Health hubs. In addition, Birch sells **exclusive display** on a small set of sister EXAMPLE properties so the buy path is reciprocal (those sites already point brands to birchreserve.net):
+Birch’s primary inventory is category seats inside signed Scale Health hubs. In addition, Birch sells **display** on a small set of sister EXAMPLE properties so the buy path is reciprocal (those sites already point brands to birchreserve.net):
 
 | Property | URL | What it is | Placement rule |
 |----------|-----|------------|----------------|
-| **WePrize** | https://weprize.net | Canada-first free-contest assist site (friction badges, free board, apply assist) | Exclusive display sold by Birch. Quiet EXAMPLE only on birchreserve.net — muted footer, home Digital inventory line, kit live-proof secondary line. **Never** hero, Featured Format, Example hubs gallery, or CLEAR_HUBS co-branded banner. Placement only; no reach claims. |
+| **WePrize** | https://weprize.net | Canada-first free-contest assist site (friction badges, free board, apply assist) | Display sold by Birch. Quiet EXAMPLE only on birchreserve.net — muted footer, home Digital inventory line, kit live-proof secondary line. **Never** hero, Featured Format, Example hubs gallery, or CLEAR_HUBS co-branded banner. Placement only; no reach claims. |
 
-Do not invent WePrize traffic, DAU, or contest-win rates. If asked: name the surface, say exclusive display is available via Birch, and route checkout / inquire the same as other custom / exclusive paths.
+Do not invent WePrize traffic, DAU, or contest-win rates. If asked: name the surface, say display is available via Birch, and route checkout / inquire the same as other custom paths.
 
 ## Formats (names only)
 
@@ -141,7 +141,7 @@ Never tell a Birch buyer their seat equals any view count. Partner range to name
 | They say | You say / do |
 |---|---|
 | Options | Reserve List early slot = free to claim, first offer on placements as each category activates. $490 early placement = full $490 credited toward ad placements, insertion order (IO) before flight. |
-| Exclusivity / holding a category | We don't hold or lock categories. Early slots go to Reserve List brands first; no brand gets more than 20% of a category's digital real estate. |
+| "Is it exclusive?" / holding a category | It's a category slot, not a lock. Early slots go to Reserve List brands first; no brand gets more than 20% of a category's digital real estate. Lock in your slot before the minimum rises. |
 | Proof / mock | Primary: live DR-HO hub https://physio.drhonow.com/dr-ho/portal ("illustrative, not your receipt"). Secondary placement example (not hero, no reach): https://weprize.net. Kit: https://birchreserve.net/kit. |
 | Impressions / CTR / guarantees | Refuse invented numbers. Platform scale story only (50MM+ uniques in 4 months, on track for 100MM+ by year end). Pivot to early slots + checkout/booking moments. |
 | Enterprise / big annual | $100K–$250K+ Coming soon / Inquire within. Intake + team callback. No invented CPM. |
