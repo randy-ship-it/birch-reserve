@@ -29,7 +29,8 @@ import { HubWalkthroughVideo } from "@/components/hub-walkthrough-video";
 import { ExampleHubsGallery } from "@/components/example-hubs-gallery";
 import { CobrandedHubsBanner } from "@/components/cobranded-hubs-banner";
 import { WEPRIZE } from "@/lib/example-exclusive-properties";
-import { NotifyMe, ReserveListCalculator, ReserveListLinks, useTamFeed } from "@/components/reserve-list-kit";
+import { useTamFeed } from "@/components/reserve-list-kit";
+import { SignedHubHero, SeatCalculator, HowCalculated } from "@/components/signed-hub-reserve";
 import {
   PostCheckoutMockup,
   ProtocolMockup,
@@ -268,125 +269,16 @@ export default function Home() {
         </div>
       )}
 
-      {/* Reserve List */}
-      <section
-        id="reserve-list"
-        aria-labelledby="reserve-list-title"
-        className="relative overflow-hidden border-b border-background/15 bg-foreground text-background"
-        data-testid="reserve-list-hero"
-      >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_480px_at_12%_-10%,hsl(var(--accent)/0.16),transparent_60%),radial-gradient(700px_420px_at_100%_110%,hsl(var(--accent)/0.08),transparent_60%)]"
-        />
-        <div className="container relative z-10 mx-auto grid items-center gap-10 px-6 pb-12 pt-8 md:pb-16 md:pt-12 lg:grid-cols-[1.12fr_0.88fr] lg:gap-14 lg:pb-16 lg:pt-12">
-          <div className="flex flex-col text-left">
-            <p className="mb-5 inline-flex w-max max-w-full items-center gap-2 border border-accent/40 bg-accent/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
-              <span className="relative flex size-2 shrink-0" aria-hidden>
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60 motion-reduce:animate-none" />
-                <span className="relative inline-flex size-2 rounded-full bg-accent" />
-              </span>
-              The Reserve List · Canada
-            </p>
-            <h1
-              id="reserve-list-title"
-              className="font-display text-[2.75rem] leading-[0.95] tracking-tight text-background md:text-6xl lg:text-7xl"
-            >
-              The Reserve List.
-              <span className="mt-3 block text-2xl italic leading-[1.08] text-background/75 md:text-4xl lg:text-[2.6rem]">
-                High-value Canadian demand, by category.
-              </span>
-            </h1>
-            <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-background/75 md:text-lg">
-              Customer flow and digital real estate across Scale Health partner brands and the Align Network of 80+ health and wellness businesses. Lock in your slot before the minimum goes up.
-            </p>
-            <div className="mt-6">
-              <NotifyMe source="br-home" />
-            </div>
-            <p className="mt-6 max-w-2xl text-sm leading-relaxed text-background/80" data-testid="reserve-list-stats">
-              The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.
-            </p>
-            <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
-              <a
-                href={RESERVE_LIST_HREF}
-                className="group inline-flex h-16 w-full items-center justify-center gap-3 bg-accent px-9 text-lg font-semibold text-accent-foreground shadow-[0_0_0_6px_hsl(var(--accent)/0.18)] transition-colors hover:bg-background hover:text-foreground sm:w-auto"
-                data-testid="button-reserve-list-hero"
-              >
-                See the Reserve List
-                <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" aria-hidden />
-              </a>
-              <a
-                href={RESERVE_LIST_HREF}
-                className="text-center text-sm text-background/70 underline underline-offset-4 hover:text-accent sm:text-left"
-                data-testid="link-reserve-list-code"
-              >
-                Have an insider code? Unlock it
-              </a>
-            </div>
-            <div className="mt-5">
-              <ReserveListLinks />
-            </div>
-            <p className="mt-6 max-w-xl border-l-2 border-accent pl-4 text-sm leading-relaxed text-background/80" data-testid="text-early-slots">
-              <strong className="font-semibold text-background">Early slots are open.</strong>{" "}
-              Lock in your slot before the minimum goes up.
-            </p>
-            <p className="mt-3 text-xs text-background/50">
-              Canada only for now. The full breakdown by category is inside the list.
-            </p>
-          </div>
-          <a
-            href={RESERVE_LIST_HREF}
-            aria-label="See the Reserve List"
-            className="group block w-full max-w-md justify-self-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent lg:justify-self-end"
-            data-testid="reserve-list-preview"
-          >
-            <div className="border border-background/20 bg-background/[0.04] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.6)] transition-colors group-hover:border-accent/60">
-              <div className="flex items-center justify-between border-b border-background/15 px-5 py-4">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-background/60">Reserve List · Preview</span>
-                <span className="inline-flex items-center gap-1.5 border border-background/20 px-2 py-1 text-[10px] uppercase tracking-widest text-background/70">
-                  <Lock className="size-3" aria-hidden /> Insider code
-                </span>
-              </div>
-              <ul className="divide-y divide-background/10">
-                {RESERVE_LIST_PREVIEW.map((category) => (
-                  <li key={category} className="flex items-center justify-between gap-4 px-5 py-3.5">
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium text-background">{category}</span>
-                      <span className="mt-0.5 block select-none text-xs text-background/50 blur-[5px]" aria-hidden>
-                        #.#M orders · ##.#M views
-                      </span>
-                    </span>
-                    <span className="shrink-0 border border-accent/40 bg-accent/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-accent">
-                      Early slots open
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex items-center justify-between border-t border-background/15 px-5 py-4 text-sm">
-                <span className="text-background/60">12+ categories · brand names private</span>
-                <span className="inline-flex items-center gap-1.5 font-semibold text-accent">
-                  Unlock <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
-                </span>
-              </div>
-            </div>
-          </a>
+      {/* Signed-hub category seat: hero, calculator, closed method drawer */}
+      <SignedHubHero eyebrow="Birch Reserve · Canada" reserveHref="/buycalc?sku=reserve-490#reserve" lookHref="/buycalc?sku=hold-190#reserve" />
+      <section id="reserve-list-calculator" className="scroll-mt-20 bg-white py-12 md:py-16" data-testid="reserve-list-calculator-section">
+        <div className="mx-auto max-w-5xl space-y-5 px-6">
+          <h2 className="text-3xl font-bold tracking-tight text-[#0A1D56] md:text-4xl">Check the math.</h2>
+          <SeatCalculator feed={tamFeed as any} />
+          <HowCalculated feed={tamFeed as any} />
         </div>
       </section>
 
-      {/* Open-Seats Banner */}
-      <div className="bg-accent text-accent-foreground py-3 px-6 text-center text-[11px] md:text-xs font-bold uppercase tracking-widest flex justify-center items-center gap-3 border-b border-foreground/10" data-testid="text-launch-status">
-          <span>Reservations are open. Campaigns start when the insertion order names the hub.</span>
-      </div>
-
-      {/* Hero Section */}
-      <section id="reserve-list-calculator" className="scroll-mt-20 border-b border-border bg-secondary/10 py-12 md:py-16" data-testid="reserve-list-calculator-section">
-        <div className="container mx-auto px-6">
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-accent">The Reserve List · calculator</p>
-          <h2 className="font-display text-3xl tracking-tight md:text-4xl">What could your brand capture?</h2>
-          <p className="mb-6 mt-2 text-base text-muted-foreground">Three inputs, one estimate. Same live numbers as the Reserve List and scalehealth.ca/tam.</p>
-          <ReserveListCalculator feed={tamFeed} />
-        </div>
-      </section>
 
       <section className="relative flex items-center py-16 md:py-20 border-b border-background/20 bg-foreground text-background" data-testid="placements-hero">
         <div className="container mx-auto px-6 relative z-10 grid lg:grid-cols-[1.1fr_0.9fr] gap-12 lg:gap-16 items-center">
