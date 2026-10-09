@@ -24,7 +24,7 @@ export interface BirchReserveCatalog {
   offers: BirchReserveOffer[];
   discount_vs_published: BirchReserveCatalogDiscountVsPublished;
   formats: BirchReserveCatalogFormatsItem[];
-  exclusivity: string;
+  category_slot: string;
   fulfillment: string;
   reporting: string;
   checkout: string;

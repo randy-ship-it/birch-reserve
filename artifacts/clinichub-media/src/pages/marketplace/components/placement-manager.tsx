@@ -211,7 +211,7 @@ export function PlacementManager({ hostId, partnerKey, hostStatus }: PlacementMa
 
                 <FormField control={form.control} name="exclusivityHours" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-bold">Category Exclusivity Window (hours)</FormLabel>
+                    <FormLabel className="font-bold">Category priority window (hours)</FormLabel>
                     <FormControl><Input type="number" {...field} data-testid="input-placement-exclusivity" /></FormControl>
                     <FormMessage />
                   </FormItem>

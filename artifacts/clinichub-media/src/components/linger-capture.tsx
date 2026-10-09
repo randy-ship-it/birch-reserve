@@ -1,7 +1,8 @@
 /**
  * Linger email capture (Randy 6:50pm): a quiet 2026-style slide-in.
  *   desktop: bottom-right card, triggered by exit intent
- *   mobile:  bottom sheet, after ~35s on the page or 50% scroll
+ *   mobile:  never auto-opens (ship 2026-10-09: it covered the final CTA at 390px);
+ *            ?linger=show still forces the bottom sheet for QA
  * Once per visitor (localStorage, 30 days; also set on submit / close). Never while
  * the chat is open, and the chat launcher hides while this is showing (overlay-bus).
  * Hook (Randy 7:03pm): "Get the media kit". After the email saves, the success
@@ -23,7 +24,6 @@ import { OPEN_RANDY_CHAT_EVENT } from "@/lib/book-call";
 
 const SEEN_KEY = "birch_linger_seen_v1";
 const SEEN_TTL_MS = 30 * 24 * 60 * 60_000;
-const MOBILE_DELAY_MS = 35_000;
 const DESKTOP_MIN_DWELL_MS = 4_000;
 const MEDIA_KIT_PDF = "/birch-reserve-media-kit.pdf";
 const MEDIA_KIT_PAGE = "/kit";
@@ -141,16 +141,8 @@ export function LingerCapture() {
       };
       document.addEventListener("mouseout", onOut);
       cleanups.push(() => document.removeEventListener("mouseout", onOut));
-    } else {
-      const t = window.setTimeout(show, MOBILE_DELAY_MS);
-      cleanups.push(() => window.clearTimeout(t));
-      const onScroll = () => {
-        const max = document.documentElement.scrollHeight - window.innerHeight;
-        if (max > 0 && window.scrollY / max >= 0.5) show();
-      };
-      window.addEventListener("scroll", onScroll, { passive: true });
-      cleanups.push(() => window.removeEventListener("scroll", onScroll));
     }
+    // Mobile: no automatic open (no timer, no scroll trigger).
     return () => cleanups.forEach((c) => c());
   }, [hiddenRoute, show]);
 

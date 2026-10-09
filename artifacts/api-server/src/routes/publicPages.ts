@@ -5,6 +5,7 @@ import {
   editorialSourcesTable,
   PUBLIC_INSIGHT_ARTICLES,
   rewriteAlignNetworkCopy,
+  rewriteExclusiveInsightCopy,
 } from "@workspace/db";
 import { and, asc, eq, inArray, lte } from "drizzle-orm";
 import { Router, type IRouter } from "express";
@@ -183,11 +184,11 @@ const SAMPLE_IO_HTML = documentPage(
 function seedArticles(): PublicArticle[] {
   return PUBLIC_INSIGHT_ARTICLES.map((article) => ({
     slug: article.slug,
-    title: article.title,
+    title: rewriteExclusiveInsightCopy(article.title),
     authorName: article.authorName,
     topic: article.topic,
-    summary: article.summary,
-    body: article.body,
+    summary: rewriteExclusiveInsightCopy(article.summary),
+    body: rewriteExclusiveInsightCopy(article.body),
     publishedAt: article.publishedAt,
     citations: [],
   }));
@@ -238,11 +239,11 @@ async function listReadableArticles(): Promise<PublicArticle[]> {
     }
     const bySlug = new Map(rows.map((row) => [row.slug, {
       slug: row.slug,
-      title: row.title,
+      title: rewriteExclusiveInsightCopy(row.title),
       authorName: row.authorName,
       topic: row.topic,
-      summary: row.summary,
-      body: rewriteAlignNetworkCopy(row.body),
+      summary: rewriteExclusiveInsightCopy(row.summary),
+      body: rewriteExclusiveInsightCopy(rewriteAlignNetworkCopy(row.body)),
       publishedAt: row.publishedAt,
       citations: citationRows
         .filter((citation) => citation.articleId === row.id)

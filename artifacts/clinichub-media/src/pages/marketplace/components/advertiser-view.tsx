@@ -180,7 +180,7 @@ export function AdvertiserView() {
       <CardHeader>
         <CardTitle className="font-display text-2xl">Enroll as an Advertiser</CardTitle>
         <CardDescription className="font-medium text-base">
-          Join Birch Reserve to access exclusive, high-trust media properties. Subject to approval.
+          Join Birch Reserve to access high-trust media properties. Subject to approval.
         </CardDescription>
       </CardHeader>
       <CardContent>

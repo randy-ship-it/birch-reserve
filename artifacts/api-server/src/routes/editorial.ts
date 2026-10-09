@@ -9,6 +9,7 @@ import {
   editorialPublicContextTable,
   editorialRevisionsTable,
   editorialSourcesTable,
+  rewriteExclusiveInsightCopy,
 } from "@workspace/db";
 import { z } from "zod/v4";
 import {
@@ -66,7 +67,7 @@ function escapeXml(value: string): string {
 
 export function publicArticle(article: typeof editorialArticlesTable.$inferSelect, citations: Array<{ citationLabel: string; canonicalUrl: string; publisher: string; title: string; publishedAt: Date | null }>) {
   return {
-    slug: article.slug, title: article.title, authorName: article.authorName, topic: article.topic, summary: article.summary, body: article.body,
+    slug: article.slug, title: rewriteExclusiveInsightCopy(article.title), authorName: article.authorName, topic: article.topic, summary: rewriteExclusiveInsightCopy(article.summary), body: rewriteExclusiveInsightCopy(article.body),
     publishedAt: article.publishedAt, citations,
   };
 }
