@@ -625,7 +625,7 @@ export default function Home() {
               <p className="text-sm leading-relaxed text-muted-foreground">
                 Sponsored placements, offers, content and category visibility inside closed customer and partner hubs.
               </p>
-              <p className="mt-4 text-xs leading-relaxed text-muted-foreground/80" data-testid="home-also-exclusive-weprize">
+              <p className="mt-4 text-xs leading-relaxed text-muted-foreground/80" data-testid="home-also-weprize">
                 Also on request: display example at{" "}
                 <a
                   href={WEPRIZE.href}
