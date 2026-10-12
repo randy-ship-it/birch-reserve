@@ -35,8 +35,8 @@ export const PUBLIC_RESERVE_OFFERS = [
     dueTodayUsd: 490,
     offerType: "category_seat",
     scope:
-      "Lock in your slot before the minimum goes up. Full $490 is media credit toward your placements (not airfare). Insertion order names the hub before anything runs. Credit expires 12 months.",
-    bestFor: "Brands locking in one category slot across signed hubs at today's minimum.",
+      "Lock in your slot. Full $490 is media credit toward your placements (not airfare). Insertion order names the hub before anything runs. Credit expires 12 months.",
+    bestFor: "Brands locking in one category slot across signed hubs.",
     consumesSeat: true,
     published: true,
   },

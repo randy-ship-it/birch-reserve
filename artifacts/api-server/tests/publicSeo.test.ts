@@ -182,18 +182,39 @@ test("buycalc HTML keeps the category facts and drops the price-rise line", () =
   assert.match(html, /data-sku="hold-190"[\s\S]*<a href="\/kit">What you send is on the creative brief<\/a>/);
   assert.match(html, /data-sku="reserve-490"[\s\S]*You buy the category header\. You do not bid on a search\./);
   assert.match(html, /<a href="https:\/\/physio\.drhonow\.com"/);
+  assert.match(html, /This is the place\. Not a view chart\. Illustrative until the insertion order names the hub\./);
+  assert.match(html, /The unit is one card on a page the visitor already opened\. You do not send them to a new feed\. The card stays small enough that the hub page remains the page\./);
   assert.match(html, /Lock one category inside signed health hubs\. Not an open auction\./);
   assert.match(html, /No impression guarantee/);
   assert.doesNotMatch(html, /exclusiv/i);
   assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/buycalc"\s*\/>/);
   assert.match(html, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-birch-reserve\.png"\s*\/>/);
-  assert.doesNotMatch(html, /Lock in your slot before the minimum goes up/);
+  assert.doesNotMatch(html, /minimum goes up/);
+  assert.doesNotMatch(html, /today's minimum/);
+  const openStrip = html.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
+  assert.match(openStrip, /data-source="\/availability\.json" data-seats-open="3"/);
+  assert.equal((openStrip.match(/href="\/buycalc\?sku=hold-190"/g) ?? []).length, 8);
+  const closed = renderBuycalcHtml({ seatsOpen: 0, seatsTotal: 8 });
+  const closedStrip = closed.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
+  assert.match(closedStrip, /data-seats-open="0"/);
+  assert.equal((closedStrip.match(/<li>/g) ?? []).length, 8);
+  assert.doesNotMatch(closedStrip, /href=/);
   assert.doesNotMatch(html, /8\.7M|56M monthly views|20M\+|100M\+ orders/);
   assert.doesNotMatch(html, /reserve-899/);
   const skuOptions = html.match(/<select name="sku">([\s\S]*?)<\/select>/)?.[1] ?? "";
   assert.equal((skuOptions.match(/<option /g) ?? []).length, 2);
   assert.match(skuOptions, /value="hold-190"/);
   assert.match(skuOptions, /value="reserve-490"/);
+});
+
+test("catalog and llms.txt use plain lock language", async () => {
+  const llms = await (await fetch(`${origin}/llms.txt`)).text();
+  const catalog = JSON.stringify(await (await fetch(`${origin}/v1/catalog.json`)).json());
+  for (const body of [llms, catalog]) {
+    assert.match(body, /Lock in your slot\./);
+    assert.doesNotMatch(body, /minimum goes up/);
+    assert.doesNotMatch(body, /today's minimum/);
+  }
 });
 
 test("GET /advertise stays a 301 to /buycalc", async () => {
