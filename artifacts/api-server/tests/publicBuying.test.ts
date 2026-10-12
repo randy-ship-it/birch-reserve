@@ -651,6 +651,9 @@ test("machine surfaces expose text, JSON, YAML, and fixed USD contracts", async 
   assert.doesNotMatch(llmsText, /\$9,900/);
   assert.doesNotMatch(llmsText, /reserve-990/);
   assert.match(llmsText, /weprize\.net/);
+  assert.match(llmsText, /Lock in your slot\./);
+  assert.doesNotMatch(llmsText, /minimum goes up/);
+  assert.doesNotMatch(llmsText, /today's minimum/);
 
   const catalogResponse = await fetch(`${origin}/v1/catalog.json`);
   assert.match(catalogResponse.headers.get("content-type") ?? "", /^application\/json/);
@@ -680,6 +683,10 @@ test("machine surfaces expose text, JSON, YAML, and fixed USD contracts", async 
     89900,
   );
   assert.equal(catalog.currency, "USD");
+  const catalogText = JSON.stringify(catalog);
+  assert.match(catalogText, /Lock in your slot\./);
+  assert.doesNotMatch(catalogText, /minimum goes up/);
+  assert.doesNotMatch(catalogText, /today's minimum/);
   assert.deepEqual(catalog.formats, [
     "post_checkout",
     "recovery_plan",
@@ -4329,9 +4336,31 @@ test("availability is integer-valued and buycalc remains useful without JavaScri
   assert.match(html, /data-sku="hold-190"/);
   assert.match(html, /data-sku="reserve-490"/);
   assert.match(html, /You buy the category header\. You do not bid on a search\./);
-  assert.match(html, /https:\/\/physio\.drhonow\.com\/dr-ho\/portal/);
+  assert.match(html, /<a href="https:\/\/physio\.drhonow\.com" target="_blank" rel="noopener">physio\.drhonow\.com<\/a>/);
   assert.match(html, /This is the place\. Not a view chart\. Illustrative until the insertion order names the hub\./);
-  assert.doesNotMatch(html, /Lock in your slot before the minimum goes up/);
+  assert.match(html, /The unit is one card on a page the visitor already opened\. You do not send them to a new feed\. The card stays small enough that the hub page remains the page\./);
+  assert.doesNotMatch(html, /minimum goes up/);
+  assert.doesNotMatch(html, /today's minimum/);
+  const categoryStrip = html.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
+  assert.match(categoryStrip, /data-source="\/availability\.json"/);
+  const seatsOpen = Number(categoryStrip.match(/data-seats-open="(\d+)"/)?.[1]);
+  assert.equal(Number.isInteger(seatsOpen), true);
+  const categoryLabels = [
+    "Pain relief / topicals",
+    "Recovery hardware",
+    "Nutrition",
+    "Sleep",
+    "Meal prep",
+    "Women’s health",
+    "Men’s health",
+    "Diagnostics / services",
+  ];
+  for (const label of categoryLabels) assert.match(categoryStrip, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  assert.equal((categoryStrip.match(/<li>/g) ?? []).length, 8);
+  assert.equal(
+    (categoryStrip.match(/href="\/buycalc\?sku=hold-190"/g) ?? []).length,
+    seatsOpen > 0 ? 8 : 0,
+  );
   assert.doesNotMatch(html, /8\.7M|56M monthly views|20M\+|100M\+ orders/);
   assert.doesNotMatch(html, /reserve-899/);
 });
