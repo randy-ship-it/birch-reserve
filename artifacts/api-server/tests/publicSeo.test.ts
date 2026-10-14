@@ -183,7 +183,7 @@ test("buycalc HTML keeps the category facts and drops the price-rise line", () =
   assert.match(html, /data-sku="reserve-490"[\s\S]*You buy the category header\. You do not bid on a search\./);
   assert.match(html, /<a href="https:\/\/physio\.drhonow\.com"/);
   assert.match(html, /This is the place\. Not a view chart\. Illustrative until the insertion order names the hub\./);
-  assert.match(html, /The unit is one card on a page the visitor already opened\. You do not send them to a new feed\. The card stays small enough that the hub page remains the page\.<\/p>\s*<p class="sh-proof">The category is the named zone\. You do not buy an open slot\. The insertion order names the hub and the category before anything runs\.<\/p>/);
+  assert.match(html, /The unit is one card on a page the visitor already opened\. You do not send them to a new feed\. The card stays small enough that the hub page remains the page\.<\/p>\s*<p class="sh-proof">The category is the named zone\. You do not buy an open slot\. The insertion order names the hub and the category before anything runs\.<\/p>\s*<p class="sh-proof">The look is the preview\. You assemble the square still on the creative brief\. Nothing on the hub changes until the insertion order names the hub\.<\/p>/);
   assert.match(html, /Lock one category inside signed health hubs\. Not an open auction\./);
   assert.match(html, /No impression guarantee/);
   assert.doesNotMatch(html, /exclusiv/i);
