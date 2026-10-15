@@ -170,6 +170,22 @@ test("published insight HTML keeps sentence periods outside autolink hrefs", asy
   assert.doesNotMatch(html, /href="https:\/\/physio\.drhonow\.com\/dr-ho\/portal\."/);
 });
 
+test("GET /insights/what-you-send-for-a-seat publishes the handoff and stays on the index", async () => {
+  const articleRes = await fetch(`${origin}/insights/what-you-send-for-a-seat`);
+  assert.equal(articleRes.status, 200);
+  const html = await articleRes.text();
+  assert.match(html, /<title>What you send for a seat \| Birch Reserve<\/title>/);
+  assert.match(html, /<h1>What you send for a seat<\/h1>/);
+  assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/insights\/what-you-send-for-a-seat"\s*\/>/);
+  assert.match(html, /Send four things\./);
+  assert.match(html, /A 7-day look is \$190 USD\. It does not burn a seat\./);
+  assert.match(html, /<a href="https:\/\/birchreserve\.net">https:\/\/birchreserve\.net<\/a>/);
+  assert.doesNotMatch(html, /\$4,?900|\$9,?900|Align 80/);
+  const index = await (await fetch(`${origin}/insights`)).text();
+  assert.match(index, /href="\/insights\/what-you-send-for-a-seat"/);
+  assert.match(index, /What you send for a seat/);
+});
+
 test("buycalc HTML keeps the category facts and drops the price-rise line", () => {
   const html = renderBuycalcHtml({ seatsOpen: 3, seatsTotal: 8, sku: "hold-190", format: "post_checkout" });
   assert.match(html, /\$490 USD/);
@@ -183,7 +199,7 @@ test("buycalc HTML keeps the category facts and drops the price-rise line", () =
   assert.match(html, /data-sku="reserve-490"[\s\S]*You buy the category header\. You do not bid on a search\./);
   assert.match(html, /<a href="https:\/\/physio\.drhonow\.com"/);
   assert.match(html, /This is the place\. Not a view chart\. Illustrative until the insertion order names the hub\./);
-  assert.match(html, /The unit is one card on a page the visitor already opened\. You do not send them to a new feed\. The card stays small enough that the hub page remains the page\.<\/p>\s*<p class="sh-proof">The category is the named zone\. You do not buy an open slot\. The insertion order names the hub and the category before anything runs\.<\/p>\s*<p class="sh-proof">The look is the preview\. You assemble the square still on the creative brief\. Nothing on the hub changes until the insertion order names the hub\.<\/p>/);
+  assert.match(html, /The unit is one card on a page the visitor already opened\. You do not send them to a new feed\. The card stays small enough that the hub page remains the page\.<\/p>\s*<p class="sh-proof">The category is the named zone\. You do not buy an open slot\. The insertion order names the hub and the category before anything runs\.<\/p>\s*<p class="sh-proof">The look is the preview\. You assemble the square still on the creative brief\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">The header is the placement\. You sit in the category the visitor already opened\. You do not create a new search\.<\/p>/);
   assert.match(html, /Lock one category inside signed health hubs\. Not an open auction\./);
   assert.match(html, /No impression guarantee/);
   assert.doesNotMatch(html, /exclusiv/i);

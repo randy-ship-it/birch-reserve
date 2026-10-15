@@ -8,6 +8,7 @@ import {
   rewriteAlignNetworkCopy,
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
+  WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE,
 } from "../../../lib/db/src/public-insights-copy.ts";
 import {
   seedPublicInsightsWithStore,
@@ -55,6 +56,24 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
   assert.equal(mentionsLegacyHeroPrice(SHELF_AFTER_RECEIPT_ARTICLE.summary), false);
   assert.equal(mentionsLegacyHeroPrice(SHELF_AFTER_RECEIPT_ARTICLE.body), false);
   assert.doesNotMatch(SHELF_AFTER_RECEIPT_ARTICLE.body, /1MM|5MM|Align 80|payments paused|\$49 ICA/i);
+
+  assert.equal(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.slug, "what-you-send-for-a-seat");
+  assert.equal(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.title, "What you send for a seat");
+  assert.equal(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.publishedAt.toISOString(), "2026-10-15T16:00:00.000Z");
+  assert.equal(
+    WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.summary,
+    "Birch Reserve sells the aisle, not the auction. Eight category seats sit inside signed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.",
+  );
+  assert.match(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.body, /^# What you send for a seat\n\nMost ad networks ask for a banner and a bid\.\n/);
+  assert.match(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.body, /Send four things\./);
+  assert.match(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.body, /A 7-day look is \$190 USD\. It does not burn a seat\./);
+  assert.match(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.body, /The aisle itself is \$490 and stays a credit for twelve months\./);
+  assert.equal(mentionsLegacyHeroPrice(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.body), false);
+  assert.doesNotMatch(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.body, /Align 80|\$49 ICA|\$4,?900|\$9,?900|impression/i);
 
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
@@ -129,6 +148,7 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
   assert.deepEqual(inserts, [
     SCALE_HUBS_ARTICLE.slug,
     SHELF_AFTER_RECEIPT_ARTICLE.slug,
+    WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -526,6 +546,8 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /Insights &amp; Evidence/);
     assert.match(insights, /href="\/insights\/the-shelf-after-the-receipt"/);
     assert.match(insights, /The shelf after the receipt/);
+    assert.match(insights, /href="\/insights\/what-you-send-for-a-seat"/);
+    assert.match(insights, /What you send for a seat/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
 
@@ -535,6 +557,21 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(article, /Nothing runs before step 2/);
     assert.doesNotMatch(article, /\*\*Slug:\*\*/);
     assert.doesNotMatch(article, /id="root"/);
+
+    const handoffResponse = await fetch(`${origin}/insights/what-you-send-for-a-seat`);
+    const handoff = await handoffResponse.text();
+    assert.equal(handoffResponse.status, 200);
+    assert.match(handoff, /<title>What you send for a seat \| Birch Reserve<\/title>/);
+    assert.match(handoff, /<h1>What you send for a seat<\/h1>/);
+    assert.equal(handoff.match(/<h1>/g)?.length, 1);
+    assert.match(handoff, /Most ad networks ask for a banner and a bid\./);
+    assert.match(handoff, /Send four things\./);
+    assert.match(handoff, /<li>A square still of the product as it should sit after checkout or on a plan\. No lifestyle collage\. No tiny legal text on the image\.<\/li>/);
+    assert.match(handoff, /A 7-day look is \$190 USD\. It does not burn a seat\. Cash refund if you walk\./);
+    assert.match(handoff, /<a href="https:\/\/physio\.drhonow\.com\/dr-ho\/portal">https:\/\/physio\.drhonow\.com\/dr-ho\/portal<\/a>/);
+    assert.match(handoff, /<a href="https:\/\/birchreserve\.net">https:\/\/birchreserve\.net<\/a>/);
+    assert.doesNotMatch(handoff, /\$4,?900|\$9,?900|Align 80|\$49 ICA/);
+    assert.doesNotMatch(handoff, /id="root"/);
   } finally {
     await new Promise<void>((resolveClose, rejectClose) => {
       server.close((error) => (error ? rejectClose(error) : resolveClose()));
