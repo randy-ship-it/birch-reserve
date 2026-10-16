@@ -19,6 +19,7 @@ export const INDEXNOW_URL_LIST = [
   `https://${INDEXNOW_HOST}/insights`,
   `https://${INDEXNOW_HOST}/insights/the-shelf-after-the-receipt`,
   `https://${INDEXNOW_HOST}/insights/what-you-send-for-a-seat`,
+  `https://${INDEXNOW_HOST}/insights/the-face-before-the-flight`,
   `https://${INDEXNOW_HOST}/buycalc`,
 ] as const;
 
