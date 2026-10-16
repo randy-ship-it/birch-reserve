@@ -8,6 +8,7 @@ import {
   rewriteAlignNetworkCopy,
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
+  THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE,
 } from "../../../lib/db/src/public-insights-copy.ts";
 import {
@@ -74,6 +75,24 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
   assert.equal(mentionsLegacyHeroPrice(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.summary), false);
   assert.equal(mentionsLegacyHeroPrice(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.body), false);
   assert.doesNotMatch(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.body, /Align 80|\$49 ICA|\$4,?900|\$9,?900|impression/i);
+
+  assert.equal(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.slug, "the-face-before-the-flight");
+  assert.equal(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.title, "The face before the flight");
+  assert.equal(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.publishedAt.toISOString(), "2026-10-16T16:00:00.000Z");
+  assert.equal(
+    THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.summary,
+    "You see the face before the flight. Birch Reserve sells the aisle, not the auction. The square still is the preview. Nothing on the hub changes until the insertion order names the hub.",
+  );
+  assert.match(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.body, /^# The face before the flight\n\nMost ad networks start the flight when the card clears\.\n/);
+  assert.match(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.body, /You see the face before the flight\. The square still is the preview\./);
+  assert.match(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.body, /A 7-day look is \$190 USD\. It does not burn a seat\./);
+  assert.match(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.body, /The aisle itself is \$490 and stays a credit for twelve months\./);
+  assert.equal(mentionsLegacyHeroPrice(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.body), false);
+  assert.doesNotMatch(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.body, /Align 80|\$49 ICA|\$4,?900|\$9,?900|reserve-899|impression/i);
 
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
@@ -149,6 +168,7 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
     SCALE_HUBS_ARTICLE.slug,
     SHELF_AFTER_RECEIPT_ARTICLE.slug,
     WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.slug,
+    THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -548,6 +568,8 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /The shelf after the receipt/);
     assert.match(insights, /href="\/insights\/what-you-send-for-a-seat"/);
     assert.match(insights, /What you send for a seat/);
+    assert.match(insights, /href="\/insights\/the-face-before-the-flight"/);
+    assert.match(insights, /The face before the flight/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
 
@@ -572,6 +594,21 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(handoff, /<a href="https:\/\/birchreserve\.net">https:\/\/birchreserve\.net<\/a>/);
     assert.doesNotMatch(handoff, /\$4,?900|\$9,?900|Align 80|\$49 ICA/);
     assert.doesNotMatch(handoff, /id="root"/);
+
+    const faceResponse = await fetch(`${origin}/insights/the-face-before-the-flight`);
+    const face = await faceResponse.text();
+    assert.equal(faceResponse.status, 200);
+    assert.match(face, /<title>The face before the flight \| Birch Reserve<\/title>/);
+    assert.match(face, /<h1>The face before the flight<\/h1>/);
+    assert.equal(face.match(/<h1>/g)?.length, 1);
+    assert.match(face, /Most ad networks start the flight when the card clears\./);
+    assert.match(face, /You see the face before the flight\. The square still is the preview\./);
+    assert.match(face, /Nothing on the hub changes until the insertion order names the hub and the surface/);
+    assert.match(face, /A 7-day look is \$190 USD\. It does not burn a seat\. Cash refund if you walk\./);
+    assert.match(face, /<a href="https:\/\/physio\.drhonow\.com\/dr-ho\/portal">https:\/\/physio\.drhonow\.com\/dr-ho\/portal<\/a>/);
+    assert.match(face, /<a href="https:\/\/birchreserve\.net">https:\/\/birchreserve\.net<\/a>/);
+    assert.doesNotMatch(face, /\$4,?900|\$9,?900|Align 80|\$49 ICA|reserve-899/);
+    assert.doesNotMatch(face, /id="root"/);
   } finally {
     await new Promise<void>((resolveClose, rejectClose) => {
       server.close((error) => (error ? rejectClose(error) : resolveClose()));
