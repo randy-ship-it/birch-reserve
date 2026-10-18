@@ -486,22 +486,23 @@ test("GET /availability.json aliases /v1/availability.json (same handler, not SP
   try {
     const v1 = await fetch(`${origin}/v1/availability.json`);
     const alias = await fetch(`${origin}/availability.json`);
-    // Without a live DB both may 500; they must still match each other and not be SPA HTML.
-    assert.equal(alias.status, v1.status);
+    assert.equal(v1.status, 200);
+    assert.equal(alias.status, 200);
     const v1Text = await v1.text();
     const aliasText = await alias.text();
     assert.doesNotMatch(v1Text, /id="root"/);
     assert.doesNotMatch(aliasText, /id="root"/);
-    if (v1.status === 200 && alias.status === 200) {
-      assert.match(alias.headers.get("content-type") ?? "", /application\/json/);
-      const v1Body = JSON.parse(v1Text) as Record<string, unknown>;
-      const aliasBody = JSON.parse(aliasText) as Record<string, unknown>;
-      assert.equal(typeof v1Body.seats_open, "number");
-      assert.equal(typeof aliasBody.seats_open, "number");
-      assert.equal(aliasBody.inventory_model, v1Body.inventory_model);
-      assert.equal(aliasBody.default_sku, v1Body.default_sku);
-      assert.deepEqual(aliasBody.formats, v1Body.formats);
-    }
+    assert.match(alias.headers.get("content-type") ?? "", /application\/json/);
+    const v1Body = JSON.parse(v1Text) as Record<string, unknown>;
+    const aliasBody = JSON.parse(aliasText) as Record<string, unknown>;
+    assert.equal(v1Body.seats_total, 8);
+    assert.equal(v1Body.seats_paid, 0);
+    assert.equal(v1Body.seats_held, 0);
+    assert.equal(v1Body.seats_open, 8);
+    assert.equal(aliasBody.seats_open, v1Body.seats_open);
+    assert.equal(aliasBody.inventory_model, v1Body.inventory_model);
+    assert.equal(aliasBody.default_sku, v1Body.default_sku);
+    assert.deepEqual(aliasBody.formats, v1Body.formats);
   } finally {
     await new Promise<void>((resolveClose, rejectClose) => {
       server.close((error) => (error ? rejectClose(error) : resolveClose()));

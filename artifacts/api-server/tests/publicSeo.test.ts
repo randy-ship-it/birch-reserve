@@ -267,6 +267,33 @@ test("GET /ad-examples redirects home", async () => {
   assert.equal(withQuery.headers.get("location"), "/?sku=hold-190");
 });
 
+test("availability and buycalc stay up when Postgres cannot answer the seat query", async () => {
+  const availability = await fetch(`${origin}/v1/availability.json`);
+  assert.equal(availability.status, 200);
+  assert.match(availability.headers.get("content-type") ?? "", /application\/json/);
+  const body = (await availability.json()) as Record<string, unknown>;
+  assert.equal(body.seats_total, 8);
+  assert.equal(body.seats_paid, 0);
+  assert.equal(body.seats_held, 0);
+  assert.equal(body.seats_open, 8);
+  assert.equal(body.currency, "USD");
+  assert.equal(body.default_sku, "reserve-490");
+  assert.equal(body.inventory_model, "shared_reserve_pool");
+  assert.deepEqual(body.skus, ["hold-190", "reserve-490"]);
+
+  const buy = await fetch(`${origin}/buycalc`);
+  assert.equal(buy.status, 200);
+  assert.match(buy.headers.get("content-type") ?? "", /^text\/html/);
+  const html = await buy.text();
+  assert.match(html, /8 categories open/);
+  assert.match(html, /The category is the named zone\. You do not buy an open slot\. The insertion order names the hub and the category before anything runs\./);
+  assert.match(html, /The look is the preview\. You assemble the square still on the creative brief\. Nothing on the hub changes until the insertion order names the hub\./);
+  assert.match(html, /The header is the placement\. You sit in the category the visitor already opened\. You do not create a new search\./);
+  assert.match(html, /You see the face before the flight\. The square still is the preview\. Nothing on the hub changes until the insertion order names the hub\./);
+  assert.doesNotMatch(html, /reserve-899/);
+  assert.doesNotMatch(html, /id="root"/);
+});
+
 test("GET /oatmeal stays a 301 to /buycalc", async () => {
   const res = await fetch(`${origin}/oatmeal`, { redirect: "manual" });
   assert.equal(res.status, 301);

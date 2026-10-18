@@ -34,7 +34,14 @@ import {
 } from "../src/lib/randyChatTranscripts";
 import { setEmailCaptureDepsForTests } from "../src/lib/emailCapture";
 import { emailCaptureLeadId } from "../src/lib/leadCapture";
-import { applyAdditiveColumns, parseAdditiveColumn, SPLASH_HYGIENE_DDL } from "../src/lib/schemaEnsure";
+import {
+  applyAdditiveColumns,
+  ensureSplashSeatSchema,
+  parseAdditiveColumn,
+  SPLASH_HYGIENE_DDL,
+  SPLASH_SEAT_COLUMN_DDL,
+  SPLASH_SEAT_CREATE_DDL,
+} from "../src/lib/schemaEnsure";
 
 const VOICE_SECRET = "voice-secret-for-tests-7c1d";
 const QA_SECRET = "qa-secret-for-tests-19ab";
@@ -513,4 +520,50 @@ test("runtime column ensure only ALTERs when a column is missing (no lock on war
   assert.equal(await applyAdditiveColumns(fake(["id"]), LEADS_HYGIENE_DDL), LEADS_HYGIENE_DDL.length);
   assert.equal(await applyAdditiveColumns(fake([]), SPLASH_HYGIENE_DDL), 0);
   assert.equal(ran.length, LEADS_HYGIENE_DDL.length);
+});
+
+test("splash seat SQL is additive and matches the runtime ensure", () => {
+  const body = repoFile("scripts/sql/2026-10-18-splash-ad-reservations-offer-key.sql").replace(/--.*$/gm, "");
+  assert.doesNotMatch(body, /\b(DROP|RENAME|TRUNCATE|DELETE|UPDATE)\b/i);
+  const stmts = body
+    .split(";")
+    .map((stmt) => squash(stmt))
+    .filter(Boolean);
+  assert.deepEqual(stmts, [...SPLASH_SEAT_CREATE_DDL, ...SPLASH_SEAT_COLUMN_DDL].map(squash));
+  assert.match(stmts.join(" "), /offer_key text NOT NULL DEFAULT 'reserve-490'/);
+});
+
+test("splash seat ensure creates a missing table and only adds missing seat columns", async () => {
+  const ran: string[] = [];
+  const fake = (present: boolean, columns: string[]) => ({
+    query: async (sql: string, params?: unknown[]) => {
+      if (sql.includes("information_schema.tables")) {
+        assert.deepEqual(params, ["splash_ad_reservations"]);
+        return { rows: present ? [{ present: 1 }] : [] };
+      }
+      if (sql.includes("information_schema.columns")) {
+        assert.deepEqual(params, ["splash_ad_reservations"]);
+        return { rows: columns.map((column_name) => ({ column_name })) };
+      }
+      ran.push(squash(sql));
+      return { rows: [] };
+    },
+  });
+
+  assert.equal(await ensureSplashSeatSchema(fake(false, [])), "created");
+  assert.deepEqual(ran, SPLASH_SEAT_CREATE_DDL.map(squash));
+
+  ran.length = 0;
+  assert.equal(
+    await ensureSplashSeatSchema(fake(true, ["id", "email", "status", "payment_status"])),
+    "added_columns",
+  );
+  assert.deepEqual(ran, [squash(SPLASH_SEAT_COLUMN_DDL[0])]);
+
+  ran.length = 0;
+  assert.equal(
+    await ensureSplashSeatSchema(fake(true, ["id", "status", "payment_status", "offer_key"])),
+    "ready",
+  );
+  assert.deepEqual(ran, []);
 });
