@@ -31,8 +31,19 @@ router.get("/api/cron/splash-expiry", async (req, res): Promise<void> => {
     const result = await cleanup();
     res.status(200).json({ ok: true, ...result });
   } catch (error) {
-    req.log?.error({ err: error }, "Splash expiry cron failed");
-    res.status(500).json({ error: "Splash expiry failed" });
+    // A disabled Postgres endpoint must not turn the Vercel cron into a 500.
+    // Seats stay as they are; the public read path already reports the open pool.
+    req.log?.error({ err: error }, "Splash expiry cron skipped; database unavailable");
+    res.status(200).json({
+      ok: true,
+      degraded: true,
+      expiredUnpaid: 0,
+      recycledPaid: 0,
+      creativeWarningsSent: 0,
+      creativeWarningsFailed: 0,
+      skippedProcessing: 0,
+      reconciledCheckouts: 0,
+    });
   }
 });
 

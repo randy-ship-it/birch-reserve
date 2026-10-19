@@ -2,7 +2,11 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { pool, seedPublicInsights } from "@workspace/db";
 import app from "./app";
 import { logger } from "./lib/logger";
-import { applyAdditiveColumns, SPLASH_HYGIENE_DDL } from "./lib/schemaEnsure";
+import {
+  applyAdditiveColumns,
+  ensureSplashSeatSchemaOnce,
+  SPLASH_HYGIENE_DDL,
+} from "./lib/schemaEnsure";
 
 /**
  * Vercel invokes this file as a Node function. It does not call src/index.ts,
@@ -25,9 +29,15 @@ function bootOnce(): void {
     .catch((error: unknown) => {
       logger.error({ err: error }, "Public insights seed failed");
     });
-  void applyAdditiveColumns(pool, SPLASH_HYGIENE_DDL).catch((error: unknown) => {
-    logger.error({ err: error }, "splash_ad_reservations.is_test ensure failed");
-  });
+  void ensureSplashSeatSchemaOnce(pool)
+    .catch((error: unknown) => {
+      logger.error({ err: error }, "splash_ad_reservations schema ensure failed");
+    })
+    .finally(() => {
+      void applyAdditiveColumns(pool, SPLASH_HYGIENE_DDL).catch((error: unknown) => {
+        logger.error({ err: error }, "splash_ad_reservations.is_test ensure failed");
+      });
+    });
 }
 
 export default function vercelHandler(req: IncomingMessage, res: ServerResponse): void {

@@ -166,11 +166,41 @@ Hold a category for 7 days: https://birchreserve.net
 `,
 } as const;
 
+export const ONE_CARD_NAMES_THE_CATEGORY_ARTICLE = {
+  slug: "one-card-names-the-category",
+  title: "One card names the category",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "Carbon places one native card on the page the reader already opened. One image. One short line. Not a feed.",
+  publishedAt: new Date("2026-10-19T16:00:00.000Z"),
+  body: `# One card names the category
+
+Carbon places one native card on the page the reader already opened.
+One image. One short line. Not a feed.
+
+Birch places one card inside a signed hub. The category names the
+card. It sits after checkout, on a plan, or at a booking.
+
+The $190 look is that card for 7 days. It does not burn a seat. It
+does not start a flight. You see the card before the insertion order
+names the hub.
+
+Nothing runs on the look alone.
+
+RDG Digital Holdings builds Scale Health. Birch Reserve is the media
+seat on that network.
+
+Start with the $190 look.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
   WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
+  ONE_CARD_NAMES_THE_CATEGORY_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =

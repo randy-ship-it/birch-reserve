@@ -30,6 +30,7 @@ import {
   UpdateAdvertiserIntakeReviewStatusParams,
   UpdateAdvertiserIntakeReviewStatusResponse,
 } from "@workspace/api-zod";
+import { logger } from "../lib/logger";
 import { getPublicLaunchMode } from "../lib/launchMode";
 import { captureAdvertiserIntakeLead } from "../lib/leadCapture";
 import { attributionFrom } from "../lib/publicGuards";
@@ -795,7 +796,9 @@ router.get("/launch/category-insights", async (_req, res): Promise<void> => {
     Date.now() - INSIGHT_WINDOW_DAYS * 24 * 60 * 60 * 1000,
   );
 
-  const result = await db.execute(sql`
+  let result: { rows: unknown[] };
+  try {
+    result = await db.execute(sql`
     with categorized_campaigns as (
       select
         id,
@@ -825,6 +828,10 @@ router.get("/launch/category-insights", async (_req, res): Promise<void> => {
     group by cc.public_category
     order by cc.public_category
   `);
+  } catch (error) {
+    logger.warn({ err: error }, "Category insights fell back to an empty collection");
+    result = { rows: [] };
+  }
 
   const items = (result.rows as InsightRow[]).map(buildPublicCategoryInsight);
 

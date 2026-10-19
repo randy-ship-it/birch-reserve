@@ -8,6 +8,7 @@ import {
   rewriteAlignNetworkCopy,
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
+  ONE_CARD_NAMES_THE_CATEGORY_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE,
 } from "../../../lib/db/src/public-insights-copy.ts";
@@ -94,6 +95,24 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
   assert.equal(mentionsLegacyHeroPrice(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.body), false);
   assert.doesNotMatch(THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.body, /Align 80|\$49 ICA|\$4,?900|\$9,?900|reserve-899|impression/i);
 
+  assert.equal(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.slug, "one-card-names-the-category");
+  assert.equal(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.title, "One card names the category");
+  assert.equal(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.publishedAt.toISOString(), "2026-10-19T16:00:00.000Z");
+  assert.equal(
+    ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.summary,
+    "Carbon places one native card on the page the reader already opened. One image. One short line. Not a feed.",
+  );
+  assert.match(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.body, /^# One card names the category\n\nCarbon places one native card on the page the reader already opened\.\n/);
+  assert.match(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.body, /The \$190 look is that card for 7 days\. It does not burn a seat\./);
+  assert.match(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.body, /Nothing runs on the look alone\./);
+  assert.match(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.body, /Start with the \$190 look\./);
+  assert.equal(mentionsLegacyHeroPrice(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.body), false);
+  assert.doesNotMatch(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.body, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b/i);
+
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
@@ -169,6 +188,7 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
     SHELF_AFTER_RECEIPT_ARTICLE.slug,
     WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.slug,
     THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.slug,
+    ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -486,22 +506,23 @@ test("GET /availability.json aliases /v1/availability.json (same handler, not SP
   try {
     const v1 = await fetch(`${origin}/v1/availability.json`);
     const alias = await fetch(`${origin}/availability.json`);
-    // Without a live DB both may 500; they must still match each other and not be SPA HTML.
-    assert.equal(alias.status, v1.status);
+    assert.equal(v1.status, 200);
+    assert.equal(alias.status, 200);
     const v1Text = await v1.text();
     const aliasText = await alias.text();
     assert.doesNotMatch(v1Text, /id="root"/);
     assert.doesNotMatch(aliasText, /id="root"/);
-    if (v1.status === 200 && alias.status === 200) {
-      assert.match(alias.headers.get("content-type") ?? "", /application\/json/);
-      const v1Body = JSON.parse(v1Text) as Record<string, unknown>;
-      const aliasBody = JSON.parse(aliasText) as Record<string, unknown>;
-      assert.equal(typeof v1Body.seats_open, "number");
-      assert.equal(typeof aliasBody.seats_open, "number");
-      assert.equal(aliasBody.inventory_model, v1Body.inventory_model);
-      assert.equal(aliasBody.default_sku, v1Body.default_sku);
-      assert.deepEqual(aliasBody.formats, v1Body.formats);
-    }
+    assert.match(alias.headers.get("content-type") ?? "", /application\/json/);
+    const v1Body = JSON.parse(v1Text) as Record<string, unknown>;
+    const aliasBody = JSON.parse(aliasText) as Record<string, unknown>;
+    assert.equal(v1Body.seats_total, 8);
+    assert.equal(v1Body.seats_paid, 0);
+    assert.equal(v1Body.seats_held, 0);
+    assert.equal(v1Body.seats_open, 8);
+    assert.equal(aliasBody.seats_open, v1Body.seats_open);
+    assert.equal(aliasBody.inventory_model, v1Body.inventory_model);
+    assert.equal(aliasBody.default_sku, v1Body.default_sku);
+    assert.deepEqual(aliasBody.formats, v1Body.formats);
   } finally {
     await new Promise<void>((resolveClose, rejectClose) => {
       server.close((error) => (error ? rejectClose(error) : resolveClose()));
@@ -570,6 +591,8 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /What you send for a seat/);
     assert.match(insights, /href="\/insights\/the-face-before-the-flight"/);
     assert.match(insights, /The face before the flight/);
+    assert.match(insights, /href="\/insights\/one-card-names-the-category"/);
+    assert.match(insights, /One card names the category/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
 
@@ -609,6 +632,16 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(face, /<a href="https:\/\/birchreserve\.net">https:\/\/birchreserve\.net<\/a>/);
     assert.doesNotMatch(face, /\$4,?900|\$9,?900|Align 80|\$49 ICA|reserve-899/);
     assert.doesNotMatch(face, /id="root"/);
+
+    const cardResponse = await fetch(`${origin}/insights/one-card-names-the-category`);
+    const card = await cardResponse.text();
+    assert.equal(cardResponse.status, 200);
+    assert.match(card, /<h1>One card names the category<\/h1>/);
+    assert.equal(card.match(/<h1>/g)?.length, 1);
+    assert.match(card, /Carbon places one native card on the page the reader already opened\. One image\. One short line\. Not a feed\./);
+    assert.match(card, /Start with the \$190 look\./);
+    assert.doesNotMatch(card, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899/);
+    assert.doesNotMatch(card, /id="root"/);
   } finally {
     await new Promise<void>((resolveClose, rejectClose) => {
       server.close((error) => (error ? rejectClose(error) : resolveClose()));

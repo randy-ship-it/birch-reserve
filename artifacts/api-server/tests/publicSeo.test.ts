@@ -205,6 +205,29 @@ test("GET /insights/the-face-before-the-flight publishes the preview and stays o
   assert.match(index, /href="\/insights\/after-booking-category-seats-scale-hubs"/);
 });
 
+test("GET /insights/one-card-names-the-category publishes the supplied copy and stays on the index", async () => {
+  const articleRes = await fetch(`${origin}/insights/one-card-names-the-category`);
+  assert.equal(articleRes.status, 200);
+  const html = await articleRes.text();
+  assert.match(html, /<title>One card names the category \| Birch Reserve<\/title>/);
+  assert.match(html, /<h1>One card names the category<\/h1>/);
+  assert.equal(html.match(/<h1>/g)?.length, 1);
+  assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/insights\/one-card-names-the-category"\s*\/>/);
+  assert.match(html, /Carbon places one native card on the page the reader already opened\. One image\. One short line\. Not a feed\./);
+  assert.match(html, /Birch places one card inside a signed hub\. The category names the card\. It sits after checkout, on a plan, or at a booking\./);
+  assert.match(html, /The \$190 look is that card for 7 days\. It does not burn a seat\. It does not start a flight\. You see the card before the insertion order names the hub\./);
+  assert.match(html, /Nothing runs on the look alone\./);
+  assert.match(html, /RDG Digital Holdings builds Scale Health\. Birch Reserve is the media seat on that network\./);
+  assert.match(html, /Start with the \$190 look\./);
+  assert.doesNotMatch(html, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899/);
+  assert.doesNotMatch(html, /\bCTR\b|reach/i);
+  const index = await (await fetch(`${origin}/insights`)).text();
+  assert.match(index, /href="\/insights\/one-card-names-the-category"/);
+  assert.match(index, /One card names the category/);
+  assert.match(index, /href="\/insights\/the-face-before-the-flight"/);
+  assert.match(index, /href="\/insights\/what-you-send-for-a-seat"/);
+});
+
 test("buycalc HTML keeps the category facts and drops the price-rise line", () => {
   const html = renderBuycalcHtml({ seatsOpen: 3, seatsTotal: 8, sku: "hold-190", format: "post_checkout" });
   assert.match(html, /\$490 USD/);
@@ -218,7 +241,7 @@ test("buycalc HTML keeps the category facts and drops the price-rise line", () =
   assert.match(html, /data-sku="reserve-490"[\s\S]*You buy the category header\. You do not bid on a search\./);
   assert.match(html, /<a href="https:\/\/physio\.drhonow\.com"/);
   assert.match(html, /This is the place\. Not a view chart\. Illustrative until the insertion order names the hub\./);
-  assert.match(html, /The unit is one card on a page the visitor already opened\. You do not send them to a new feed\. The card stays small enough that the hub page remains the page\.<\/p>\s*<p class="sh-proof">The category is the named zone\. You do not buy an open slot\. The insertion order names the hub and the category before anything runs\.<\/p>\s*<p class="sh-proof">The look is the preview\. You assemble the square still on the creative brief\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">The header is the placement\. You sit in the category the visitor already opened\. You do not create a new search\.<\/p>\s*<p class="sh-proof">You see the face before the flight\. The square still is the preview\. Nothing on the hub changes until the insertion order names the hub\.<\/p>/);
+  assert.match(html, /The unit is one card on a page the visitor already opened\. You do not send them to a new feed\. The card stays small enough that the hub page remains the page\.<\/p>\s*<p class="sh-proof">The category is the named zone\. You do not buy an open slot\. The insertion order names the hub and the category before anything runs\.<\/p>\s*<p class="sh-proof">The look is the preview\. You assemble the square still on the creative brief\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">The header is the placement\. You sit in the category the visitor already opened\. You do not create a new search\.<\/p>\s*<p class="sh-proof">You see the face before the flight\. The square still is the preview\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">One card names the category\. The card sits on the hub page the visitor already opened\.<\/p>/);
   assert.match(html, /Lock one category inside signed health hubs\. Not an open auction\./);
   assert.match(html, /No impression guarantee/);
   assert.doesNotMatch(html, /exclusiv/i);
@@ -265,6 +288,74 @@ test("GET /ad-examples redirects home", async () => {
   const withQuery = await fetch(`${origin}/ad-examples?sku=hold-190`, { redirect: "manual" });
   assert.equal(withQuery.status, 301);
   assert.equal(withQuery.headers.get("location"), "/?sku=hold-190");
+});
+
+test("availability and buycalc stay up when Postgres cannot answer the seat query", async () => {
+  const availability = await fetch(`${origin}/v1/availability.json`);
+  assert.equal(availability.status, 200);
+  assert.match(availability.headers.get("content-type") ?? "", /application\/json/);
+  const body = (await availability.json()) as Record<string, unknown>;
+  assert.equal(body.seats_total, 8);
+  assert.equal(body.seats_paid, 0);
+  assert.equal(body.seats_held, 0);
+  assert.equal(body.seats_open, 8);
+  assert.equal(body.currency, "USD");
+  assert.equal(body.default_sku, "reserve-490");
+  assert.equal(body.inventory_model, "shared_reserve_pool");
+  assert.deepEqual(body.skus, ["hold-190", "reserve-490"]);
+
+  const buy = await fetch(`${origin}/buycalc`);
+  assert.equal(buy.status, 200);
+  assert.match(buy.headers.get("content-type") ?? "", /^text\/html/);
+  const html = await buy.text();
+  assert.match(html, /8 categories open/);
+  assert.match(html, /The category is the named zone\. You do not buy an open slot\. The insertion order names the hub and the category before anything runs\./);
+  assert.match(html, /The look is the preview\. You assemble the square still on the creative brief\. Nothing on the hub changes until the insertion order names the hub\./);
+  assert.match(html, /The header is the placement\. You sit in the category the visitor already opened\. You do not create a new search\./);
+  assert.match(html, /You see the face before the flight\. The square still is the preview\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">One card names the category\. The card sits on the hub page the visitor already opened\./);
+  assert.doesNotMatch(html, /reserve-899/);
+  assert.doesNotMatch(html, /id="root"/);
+});
+
+test("GET /v1/placements stays 200 when Postgres cannot be reached", async () => {
+  const res = await fetch(`${origin}/v1/placements?status=open`);
+  assert.equal(res.status, 200);
+  const rows = (await res.json()) as Array<{ id?: string; format?: string; reserve_url?: string }>;
+  assert.deepEqual(rows.map((row) => row.format), [
+    "post_checkout",
+    "recovery_plan",
+    "scheduled_service",
+    "member_hub",
+    "motion_15s",
+  ]);
+  assert.deepEqual(rows.map((row) => row.id), [
+    "birch-reserve-post_checkout",
+    "birch-reserve-recovery_plan",
+    "birch-reserve-scheduled_service",
+    "birch-reserve-member_hub",
+    "birch-reserve-motion_15s",
+  ]);
+  assert.equal(rows.every((row) => row.reserve_url?.startsWith("/buycalc?format=")), true);
+});
+
+test("splash expiry cron answers 200 when Postgres cannot be reached", async () => {
+  const previous = process.env.CRON_SECRET;
+  process.env.CRON_SECRET = "seo-cron-secret";
+  try {
+    const denied = await fetch(`${origin}/api/cron/splash-expiry`);
+    assert.equal(denied.status, 401);
+    const ok = await fetch(`${origin}/api/cron/splash-expiry`, {
+      headers: { authorization: "Bearer seo-cron-secret" },
+    });
+    assert.equal(ok.status, 200);
+    const body = (await ok.json()) as { ok?: boolean; degraded?: boolean; expiredUnpaid?: number };
+    assert.equal(body.ok, true);
+    assert.equal(body.degraded, true);
+    assert.equal(body.expiredUnpaid, 0);
+  } finally {
+    if (previous === undefined) delete process.env.CRON_SECRET;
+    else process.env.CRON_SECRET = previous;
+  }
 });
 
 test("GET /oatmeal stays a 301 to /buycalc", async () => {

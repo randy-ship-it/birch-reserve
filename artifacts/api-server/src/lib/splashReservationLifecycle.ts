@@ -1,5 +1,6 @@
 import {
   db,
+  pool,
   type WorkspaceDatabase,
   splashAdReservationsTable,
   ucpAgentCheckoutIdempotencyTable,
@@ -27,6 +28,8 @@ import {
   deliverCreativeDeadlineWarning,
   type CreativeDeadlineWarningSender,
 } from "./splashAdReserveAlerts";
+import { logger } from "./logger";
+import { ensureSplashSeatSchemaOnce } from "./schemaEnsure";
 export const SPLASH_RESERVE_HOLD_TTL_MS = 20 * 60 * 1000;
 
 export type UcpLegacyPublicIdempotencyCandidate = {
@@ -132,14 +135,26 @@ function seatCounts(rows: Array<Pick<SplashAdReservation, "status" | "paymentSta
 }
 
 export async function getSplashSeatCounts(): Promise<SplashSeatCounts> {
-  const rows = await db
-    .select({
-      status: splashAdReservationsTable.status,
-      paymentStatus: splashAdReservationsTable.paymentStatus,
-    })
-    .from(splashAdReservationsTable)
-    .where(inArray(splashAdReservationsTable.offerKey, INVENTORY_OFFER_KEYS));
-  return seatCounts(rows);
+  try {
+    // Create the table or offer_key when they are missing. A disabled
+    // Postgres endpoint still throws here; the open pool keeps /buycalc
+    // and /v1/availability.json from returning 500.
+    await ensureSplashSeatSchemaOnce(pool);
+    const rows = await db
+      .select({
+        status: splashAdReservationsTable.status,
+        paymentStatus: splashAdReservationsTable.paymentStatus,
+      })
+      .from(splashAdReservationsTable)
+      .where(inArray(splashAdReservationsTable.offerKey, INVENTORY_OFFER_KEYS));
+    return seatCounts(rows);
+  } catch (error) {
+    logger.error(
+      { err: error },
+      "splash seat counts unavailable; reporting the open pool",
+    );
+    return seatCounts([]);
+  }
 }
 
 export async function claimSplashReserveSeat(

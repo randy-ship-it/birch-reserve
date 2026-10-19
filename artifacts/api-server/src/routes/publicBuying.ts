@@ -67,7 +67,7 @@ import {
   syncReservationUpdateToPipeline,
   syncReservationToPipeline,
 } from "./splashAdReservations";
-import { recordUcpProxyForwardingShape } from "../lib/logger";
+import { logger, recordUcpProxyForwardingShape } from "../lib/logger";
 import { publicSeoTags } from "../lib/publicSeo";
 import { handleUiEvent } from "../lib/uiEvents";
 
@@ -1973,11 +1973,18 @@ router.post(
 
 router.get("/v1/orders/:id", async (req, res): Promise<void> => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const [row] = await db
-    .select()
-    .from(splashAdReservationsTable)
-    .where(eq(splashAdReservationsTable.id, id ?? ""))
-    .limit(1);
+  let row: typeof splashAdReservationsTable.$inferSelect | undefined;
+  try {
+    [row] = await db
+      .select()
+      .from(splashAdReservationsTable)
+      .where(eq(splashAdReservationsTable.id, id ?? ""))
+      .limit(1);
+  } catch (error) {
+    logger.warn({ err: error }, "Order lookup unavailable");
+    res.status(503).json({ error: "Order lookup unavailable." });
+    return;
+  }
   const view = row ? orderView(row) : null;
   if (!view) {
     res.status(404).json({ error: "Order not found." });
@@ -2040,7 +2047,14 @@ router.post("/v1/orders/:id/confirm", async (req, res): Promise<void> => {
 
 router.get("/v1/orders/:id/io.json", async (req, res): Promise<void> => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const [row] = await db.select().from(splashAdReservationsTable).where(eq(splashAdReservationsTable.id, id ?? "")).limit(1);
+  let row: typeof splashAdReservationsTable.$inferSelect | undefined;
+  try {
+    [row] = await db.select().from(splashAdReservationsTable).where(eq(splashAdReservationsTable.id, id ?? "")).limit(1);
+  } catch (error) {
+    logger.warn({ err: error }, "Order lookup unavailable");
+    res.status(503).json({ error: "Order lookup unavailable." });
+    return;
+  }
   const view = row ? orderView(row) : null;
   if (!view) {
     res.status(404).json({ error: "Order not found." });
@@ -2065,17 +2079,22 @@ router.get("/v1/placements", async (req, res): Promise<void> => {
     res.status(400).json({ error: "status=open and a supported format are required." });
     return;
   }
-  const placements = await db
-    .select({
-      id: marketplacePlacementsTable.id,
-    })
-    .from(marketplacePlacementsTable)
-    .where(
-      and(
-        eq(marketplacePlacementsTable.status, "approved"),
-        eq(marketplacePlacementsTable.currency, RESERVE_CURRENCY),
-      ),
-    );
+  let placements: Array<{ id: string }> = [];
+  try {
+    placements = await db
+      .select({
+        id: marketplacePlacementsTable.id,
+      })
+      .from(marketplacePlacementsTable)
+      .where(
+        and(
+          eq(marketplacePlacementsTable.status, "approved"),
+          eq(marketplacePlacementsTable.currency, RESERVE_CURRENCY),
+        ),
+      );
+  } catch (error) {
+    logger.warn({ err: error }, "Public placements fell back to static ids");
+  }
   const requested = isFormat(req.query.format) ? [req.query.format] : [...FORMATS];
   res.json(
     requested.map((format, index) => ({
@@ -2168,6 +2187,7 @@ export function renderBuycalcHtml(input: {
 <p class="sh-proof">The look is the preview. You assemble the square still on the creative brief. Nothing on the hub changes until the insertion order names the hub.</p>
 <p class="sh-proof">The header is the placement. You sit in the category the visitor already opened. You do not create a new search.</p>
 <p class="sh-proof">You see the face before the flight. The square still is the preview. Nothing on the hub changes until the insertion order names the hub.</p>
+<p class="sh-proof">One card names the category. The card sits on the hub page the visitor already opened.</p>
 <p class="sh-excl">One brand per category · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only · Canada only</p></section>
 ${BUYCALC_SEAT_CALC_HTML}
 <div class="grid"><section><h2>What a reserved slot includes</h2><p><strong>${availability.seats_open} categories open</strong> of ${availability.seats_total}. Availability is rolling and subtracts paid and currently held locks.</p>
