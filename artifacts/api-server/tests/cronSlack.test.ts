@@ -188,6 +188,18 @@ test("splash expiry cron rejects a bad bearer and runs cleanup once when authori
     assert.equal(body.ok, true);
     assert.equal(body.expiredUnpaid, 1);
     assert.equal(calls, 1);
+    setSplashExpiryCleanupForTests(async () => {
+      throw new Error("The endpoint has been disabled. Enable it using the API and retry.");
+    });
+    const degraded = await fetch(url, {
+      headers: { authorization: "Bearer cron-secret-value" },
+    });
+    assert.equal(degraded.status, 200);
+    const degradedBody = (await degraded.json()) as { ok?: boolean; degraded?: boolean; expiredUnpaid?: number };
+    assert.equal(degradedBody.ok, true);
+    assert.equal(degradedBody.degraded, true);
+    assert.equal(degradedBody.expiredUnpaid, 0);
+    setSplashExpiryCleanupForTests(null);
   } finally {
     await new Promise<void>((resolve, reject) => {
       server.close((error) => (error ? reject(error) : resolve()));

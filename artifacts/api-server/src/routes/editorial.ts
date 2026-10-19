@@ -9,8 +9,10 @@ import {
   editorialPublicContextTable,
   editorialRevisionsTable,
   editorialSourcesTable,
+  PUBLIC_INSIGHT_ARTICLES,
   rewriteExclusiveInsightCopy,
 } from "@workspace/db";
+import { logger } from "../lib/logger";
 import { z } from "zod/v4";
 import {
   getAuthorizedSalesStaff,
@@ -72,6 +74,19 @@ export function publicArticle(article: typeof editorialArticlesTable.$inferSelec
   };
 }
 
+function seededPublicArticles() {
+  return PUBLIC_INSIGHT_ARTICLES.map((article) => ({
+    slug: article.slug,
+    title: article.title,
+    authorName: article.authorName,
+    topic: article.topic,
+    summary: article.summary,
+    body: article.body,
+    publishedAt: article.publishedAt,
+    citations: [] as Array<{ citationLabel: string; canonicalUrl: string; publisher: string; title: string; publishedAt: Date | null }>,
+  }));
+}
+
 async function verifyCitations(sourceIds: string[]) {
   const sources = await db.select().from(editorialSourcesTable).where(
     and(inArray(editorialSourcesTable.id, sourceIds), eq(editorialSourcesTable.publicApproved, "approved")),
@@ -104,20 +119,30 @@ async function transitionArticle(
 }
 
 router.get("/editorial/sitemap.xml", async (_req, res) => {
-  const articles = await db
-    .select({
-      slug: editorialArticlesTable.slug,
-      publishedAt: editorialArticlesTable.publishedAt,
-      updatedAt: editorialArticlesTable.updatedAt,
-    })
-    .from(editorialArticlesTable)
-    .where(
-      and(
-        eq(editorialArticlesTable.status, "published"),
-        lte(editorialArticlesTable.publishedAt, new Date()),
-      ),
-    )
-    .orderBy(asc(editorialArticlesTable.publishedAt));
+  let articles: Array<{ slug: string; publishedAt: Date | null; updatedAt: Date | null }>;
+  try {
+    articles = await db
+      .select({
+        slug: editorialArticlesTable.slug,
+        publishedAt: editorialArticlesTable.publishedAt,
+        updatedAt: editorialArticlesTable.updatedAt,
+      })
+      .from(editorialArticlesTable)
+      .where(
+        and(
+          eq(editorialArticlesTable.status, "published"),
+          lte(editorialArticlesTable.publishedAt, new Date()),
+        ),
+      )
+      .orderBy(asc(editorialArticlesTable.publishedAt));
+  } catch (error) {
+    logger.warn({ err: error }, "Editorial sitemap fell back to seeded insight paths");
+    articles = PUBLIC_INSIGHT_ARTICLES.map((article) => ({
+      slug: article.slug,
+      publishedAt: article.publishedAt,
+      updatedAt: article.publishedAt,
+    }));
+  }
 
   const staticUrls = [
     "/",
@@ -150,32 +175,45 @@ router.get("/editorial/sitemap.xml", async (_req, res) => {
 });
 
 router.get("/editorial/articles", async (_req, res) => {
-  const now = new Date();
-  const articles = await db.select().from(editorialArticlesTable).where(
-    and(eq(editorialArticlesTable.status, "published"), lte(editorialArticlesTable.publishedAt, now)),
-  ).orderBy(asc(editorialArticlesTable.publishedAt));
-  const ids = articles.map((a) => a.id);
-  const citations = ids.length ? await db.select({
-    articleId: editorialArticleSourcesTable.articleId, citationLabel: editorialArticleSourcesTable.citationLabel,
-    canonicalUrl: editorialSourcesTable.canonicalUrl, publisher: editorialSourcesTable.publisher,
-    title: editorialSourcesTable.title, publishedAt: editorialSourcesTable.publishedAt,
-  }).from(editorialArticleSourcesTable).innerJoin(editorialSourcesTable, eq(editorialArticleSourcesTable.sourceId, editorialSourcesTable.id))
-    .where(inArray(editorialArticleSourcesTable.articleId, ids)) : [];
-  res.json(articles.map((article) => publicArticle(article, citations.filter((citation) => citation.articleId === article.id))));
+  try {
+    const now = new Date();
+    const articles = await db.select().from(editorialArticlesTable).where(
+      and(eq(editorialArticlesTable.status, "published"), lte(editorialArticlesTable.publishedAt, now)),
+    ).orderBy(asc(editorialArticlesTable.publishedAt));
+    const ids = articles.map((a) => a.id);
+    const citations = ids.length ? await db.select({
+      articleId: editorialArticleSourcesTable.articleId, citationLabel: editorialArticleSourcesTable.citationLabel,
+      canonicalUrl: editorialSourcesTable.canonicalUrl, publisher: editorialSourcesTable.publisher,
+      title: editorialSourcesTable.title, publishedAt: editorialSourcesTable.publishedAt,
+    }).from(editorialArticleSourcesTable).innerJoin(editorialSourcesTable, eq(editorialArticleSourcesTable.sourceId, editorialSourcesTable.id))
+      .where(inArray(editorialArticleSourcesTable.articleId, ids)) : [];
+    res.json(articles.map((article) => publicArticle(article, citations.filter((citation) => citation.articleId === article.id))));
+  } catch (error) {
+    logger.warn({ err: error }, "Editorial articles fell back to seeded copy");
+    res.json(seededPublicArticles());
+  }
 });
 
 router.get("/editorial/articles/:slug", async (req, res) => {
-  const [article] = await db.select().from(editorialArticlesTable).where(and(
-    eq(editorialArticlesTable.slug, req.params.slug), eq(editorialArticlesTable.status, "published"),
-    lte(editorialArticlesTable.publishedAt, new Date()),
-  )).limit(1);
-  if (!article) { res.status(404).json({ error: "Article not found." }); return; }
-  const citations = await db.select({
-    citationLabel: editorialArticleSourcesTable.citationLabel, canonicalUrl: editorialSourcesTable.canonicalUrl,
-    publisher: editorialSourcesTable.publisher, title: editorialSourcesTable.title, publishedAt: editorialSourcesTable.publishedAt,
-  }).from(editorialArticleSourcesTable).innerJoin(editorialSourcesTable, eq(editorialArticleSourcesTable.sourceId, editorialSourcesTable.id))
-    .where(eq(editorialArticleSourcesTable.articleId, article.id));
-  res.json(publicArticle(article, citations));
+  const slug = Array.isArray(req.params.slug) ? req.params.slug[0] : req.params.slug;
+  try {
+    const [article] = await db.select().from(editorialArticlesTable).where(and(
+      eq(editorialArticlesTable.slug, slug ?? ""), eq(editorialArticlesTable.status, "published"),
+      lte(editorialArticlesTable.publishedAt, new Date()),
+    )).limit(1);
+    if (!article) { res.status(404).json({ error: "Article not found." }); return; }
+    const citations = await db.select({
+      citationLabel: editorialArticleSourcesTable.citationLabel, canonicalUrl: editorialSourcesTable.canonicalUrl,
+      publisher: editorialSourcesTable.publisher, title: editorialSourcesTable.title, publishedAt: editorialSourcesTable.publishedAt,
+    }).from(editorialArticleSourcesTable).innerJoin(editorialSourcesTable, eq(editorialArticleSourcesTable.sourceId, editorialSourcesTable.id))
+      .where(eq(editorialArticleSourcesTable.articleId, article.id));
+    res.json(publicArticle(article, citations));
+  } catch (error) {
+    logger.warn({ err: error, slug }, "Editorial article fell back to seeded copy");
+    const seeded = seededPublicArticles().find((article) => article.slug === slug);
+    if (!seeded) { res.status(404).json({ error: "Article not found." }); return; }
+    res.json(seeded);
+  }
 });
 
 router.get("/editorial/admin/articles", requireSalesStaff, async (_req, res) => {
