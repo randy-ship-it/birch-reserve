@@ -10,6 +10,7 @@ import {
   SHELF_AFTER_RECEIPT_ARTICLE,
   ONE_CARD_NAMES_THE_CATEGORY_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
+  THE_ZONE_HAS_A_PRICE_ARTICLE,
   WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE,
 } from "../../../lib/db/src/public-insights-copy.ts";
 import {
@@ -113,6 +114,37 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
   assert.equal(mentionsLegacyHeroPrice(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.body), false);
   assert.doesNotMatch(ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.body, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b/i);
 
+  assert.equal(THE_ZONE_HAS_A_PRICE_ARTICLE.slug, "the-zone-has-a-price");
+  assert.equal(THE_ZONE_HAS_A_PRICE_ARTICLE.title, "The zone has a price");
+  assert.equal(THE_ZONE_HAS_A_PRICE_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_ZONE_HAS_A_PRICE_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_ZONE_HAS_A_PRICE_ARTICLE.publishedAt.toISOString(), "2026-10-20T16:00:00.000Z");
+  assert.equal(
+    THE_ZONE_HAS_A_PRICE_ARTICLE.summary,
+    "BuySellAds sells named zones at a fixed price. You do not enter an auction.",
+  );
+  assert.equal(
+    THE_ZONE_HAS_A_PRICE_ARTICLE.body,
+    `# The zone has a price
+
+BuySellAds sells named zones at a fixed price. You do not enter an auction.
+
+Birch Reserve sells named category seats at a fixed price. The $490 seat is the zone. The insertion order names the hub and the category before anything runs.
+
+The $190 look is that zone for 7 days. It does not burn a seat. You see the price before the insertion order names the hub.
+
+Nothing runs on the look alone.
+
+RDG Digital Holdings builds Scale Health. Birch Reserve is the media seat on that network.
+
+Start with the $190 look.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_ZONE_HAS_A_PRICE_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_ZONE_HAS_A_PRICE_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_ZONE_HAS_A_PRICE_ARTICLE.body), false);
+  assert.doesNotMatch(THE_ZONE_HAS_A_PRICE_ARTICLE.body, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b/i);
+
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
@@ -189,6 +221,7 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
     WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.slug,
     THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.slug,
     ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.slug,
+    THE_ZONE_HAS_A_PRICE_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -593,6 +626,8 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /The face before the flight/);
     assert.match(insights, /href="\/insights\/one-card-names-the-category"/);
     assert.match(insights, /One card names the category/);
+    assert.match(insights, /href="\/insights\/the-zone-has-a-price"/);
+    assert.match(insights, /The zone has a price/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
 
@@ -642,6 +677,19 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(card, /Start with the \$190 look\./);
     assert.doesNotMatch(card, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899/);
     assert.doesNotMatch(card, /id="root"/);
+
+    const zoneResponse = await fetch(`${origin}/insights/the-zone-has-a-price`);
+    const zone = await zoneResponse.text();
+    assert.equal(zoneResponse.status, 200);
+    assert.match(zone, /<h1>The zone has a price<\/h1>/);
+    assert.equal(zone.match(/<h1>/g)?.length, 1);
+    assert.match(zone, /BuySellAds sells named zones at a fixed price\. You do not enter an auction\./);
+    assert.match(zone, /The \$490 seat is the zone\./);
+    assert.match(zone, /The \$190 look is that zone for 7 days\. It does not burn a seat\./);
+    assert.match(zone, /Nothing runs on the look alone\./);
+    assert.match(zone, /Start with the \$190 look\./);
+    assert.doesNotMatch(zone, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899/);
+    assert.doesNotMatch(zone, /id="root"/);
   } finally {
     await new Promise<void>((resolveClose, rejectClose) => {
       server.close((error) => (error ? rejectClose(error) : resolveClose()));

@@ -195,12 +195,37 @@ Start with the $190 look.
 `,
 } as const;
 
+export const THE_ZONE_HAS_A_PRICE_ARTICLE = {
+  slug: "the-zone-has-a-price",
+  title: "The zone has a price",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "BuySellAds sells named zones at a fixed price. You do not enter an auction.",
+  publishedAt: new Date("2026-10-20T16:00:00.000Z"),
+  body: `# The zone has a price
+
+BuySellAds sells named zones at a fixed price. You do not enter an auction.
+
+Birch Reserve sells named category seats at a fixed price. The $490 seat is the zone. The insertion order names the hub and the category before anything runs.
+
+The $190 look is that zone for 7 days. It does not burn a seat. You see the price before the insertion order names the hub.
+
+Nothing runs on the look alone.
+
+RDG Digital Holdings builds Scale Health. Birch Reserve is the media seat on that network.
+
+Start with the $190 look.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
   WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   ONE_CARD_NAMES_THE_CATEGORY_ARTICLE,
+  THE_ZONE_HAS_A_PRICE_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =
