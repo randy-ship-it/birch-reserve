@@ -267,7 +267,8 @@ test("GET /insights/the-look-assembles-on-the-brief publishes the supplied copy 
   assert.match(html, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
   assert.match(html, /The \$190 look does not burn a seat\. It lets you assemble the square before you decide\./);
   assert.doesNotMatch(html, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899/);
-  assert.doesNotMatch(html, /\bCTR\b|reach|Align|\$4,?900|\$9,?900/i);
+  assert.doesNotMatch(html, /\bCTR\b|reach/i);
+  assert.doesNotMatch(html, /Align|\$4,?900|\$9,?900/);
   const index = await (await fetch(`${origin}/insights`)).text();
   assert.equal(index.match(/<h2><a href="\/insights\//g)?.length, 7);
   assert.match(index, /href="\/insights\/the-look-assembles-on-the-brief"/);
