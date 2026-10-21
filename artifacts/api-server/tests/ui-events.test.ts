@@ -10,6 +10,7 @@ import {
   SHELF_AFTER_RECEIPT_ARTICLE,
   ONE_CARD_NAMES_THE_CATEGORY_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
+  THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
   THE_ZONE_HAS_A_PRICE_ARTICLE,
   WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE,
 } from "../../../lib/db/src/public-insights-copy.ts";
@@ -145,6 +146,33 @@ Start with the $190 look.
   assert.equal(mentionsLegacyHeroPrice(THE_ZONE_HAS_A_PRICE_ARTICLE.body), false);
   assert.doesNotMatch(THE_ZONE_HAS_A_PRICE_ARTICLE.body, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b/i);
 
+  assert.equal(THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.slug, "the-look-assembles-on-the-brief");
+  assert.equal(THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.title, "The look assembles on the brief.");
+  assert.equal(THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.publishedAt.toISOString(), "2026-10-21T16:00:00.000Z");
+  assert.equal(
+    THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.summary,
+    "You build the square still on the creative brief. You do not wait for the seat.",
+  );
+  assert.equal(
+    THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.body,
+    `# The look assembles on the brief.
+
+You build the square still on the creative brief. You do not wait for the seat.
+
+The brief is the place the look starts. The insertion order is the place it flies.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you assemble the square before you decide.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.body), false);
+  assert.doesNotMatch(THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.body, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
@@ -222,6 +250,7 @@ Start with the $190 look.
     THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.slug,
     ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.slug,
     THE_ZONE_HAS_A_PRICE_ARTICLE.slug,
+    THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -628,6 +657,8 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /One card names the category/);
     assert.match(insights, /href="\/insights\/the-zone-has-a-price"/);
     assert.match(insights, /The zone has a price/);
+    assert.match(insights, /href="\/insights\/the-look-assembles-on-the-brief"/);
+    assert.match(insights, /The look assembles on the brief\./);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
 
@@ -690,6 +721,18 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(zone, /Start with the \$190 look\./);
     assert.doesNotMatch(zone, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899/);
     assert.doesNotMatch(zone, /id="root"/);
+
+    const lookResponse = await fetch(`${origin}/insights/the-look-assembles-on-the-brief`);
+    const look = await lookResponse.text();
+    assert.equal(lookResponse.status, 200);
+    assert.match(look, /<h1>The look assembles on the brief\.<\/h1>/);
+    assert.equal(look.match(/<h1>/g)?.length, 1);
+    assert.match(look, /You build the square still on the creative brief\. You do not wait for the seat\./);
+    assert.match(look, /The brief is the place the look starts\. The insertion order is the place it flies\./);
+    assert.match(look, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(look, /The \$190 look does not burn a seat\. It lets you assemble the square before you decide\./);
+    assert.doesNotMatch(look, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(look, /id="root"/);
   } finally {
     await new Promise<void>((resolveClose, rejectClose) => {
       server.close((error) => (error ? rejectClose(error) : resolveClose()));

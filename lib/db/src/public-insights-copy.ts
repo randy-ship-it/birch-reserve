@@ -219,6 +219,26 @@ Start with the $190 look.
 `,
 } as const;
 
+export const THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE = {
+  slug: "the-look-assembles-on-the-brief",
+  title: "The look assembles on the brief.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "You build the square still on the creative brief. You do not wait for the seat.",
+  publishedAt: new Date("2026-10-21T16:00:00.000Z"),
+  body: `# The look assembles on the brief.
+
+You build the square still on the creative brief. You do not wait for the seat.
+
+The brief is the place the look starts. The insertion order is the place it flies.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you assemble the square before you decide.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
@@ -226,6 +246,7 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   ONE_CARD_NAMES_THE_CATEGORY_ARTICLE,
   THE_ZONE_HAS_A_PRICE_ARTICLE,
+  THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =
