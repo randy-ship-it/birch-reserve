@@ -239,6 +239,26 @@ The $190 look does not burn a seat. It lets you assemble the square before you d
 `,
 } as const;
 
+export const THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE = {
+  slug: "the-category-is-already-open",
+  title: "The category is already open.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "Amazon, Instacart, and Walmart place the brand on the aisle the shopper already opened. The header sits where the category is already shopped.",
+  publishedAt: new Date("2026-10-22T16:00:00.000Z"),
+  body: `# The category is already open.
+
+Amazon, Instacart, and Walmart place the brand on the aisle the shopper already opened. The header sits where the category is already shopped.
+
+Birch Reserve sells the same shape inside a signed hub. You do not build a new page. The insertion order names the hub and the category the member already has open.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the open aisle before you decide.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
@@ -247,6 +267,7 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   ONE_CARD_NAMES_THE_CATEGORY_ARTICLE,
   THE_ZONE_HAS_A_PRICE_ARTICLE,
   THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
+  THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =
