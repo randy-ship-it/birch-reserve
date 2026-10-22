@@ -9,6 +9,7 @@ import {
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
   ONE_CARD_NAMES_THE_CATEGORY_ARTICLE,
+  THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
   THE_ZONE_HAS_A_PRICE_ARTICLE,
@@ -173,6 +174,33 @@ The $190 look does not burn a seat. It lets you assemble the square before you d
   assert.equal(mentionsLegacyHeroPrice(THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.body), false);
   assert.doesNotMatch(THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.body, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
 
+  assert.equal(THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.slug, "the-category-is-already-open");
+  assert.equal(THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.title, "The category is already open.");
+  assert.equal(THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.publishedAt.toISOString(), "2026-10-22T16:00:00.000Z");
+  assert.equal(
+    THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.summary,
+    "Amazon, Instacart, and Walmart place the brand on the aisle the shopper already opened. The header sits where the category is already shopped.",
+  );
+  assert.equal(
+    THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.body,
+    `# The category is already open.
+
+Amazon, Instacart, and Walmart place the brand on the aisle the shopper already opened. The header sits where the category is already shopped.
+
+Birch Reserve sells the same shape inside a signed hub. You do not build a new page. The insertion order names the hub and the category the member already has open.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the open aisle before you decide.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.body), false);
+  assert.doesNotMatch(THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.body, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
@@ -251,6 +279,7 @@ The $190 look does not burn a seat. It lets you assemble the square before you d
     ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.slug,
     THE_ZONE_HAS_A_PRICE_ARTICLE.slug,
     THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.slug,
+    THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -659,6 +688,9 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /The zone has a price/);
     assert.match(insights, /href="\/insights\/the-look-assembles-on-the-brief"/);
     assert.match(insights, /The look assembles on the brief\./);
+    assert.match(insights, /href="\/insights\/the-category-is-already-open"/);
+    assert.match(insights, /The category is already open\./);
+    assert.doesNotMatch(insights, /the-look-starts-itself/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
 
@@ -733,6 +765,20 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(look, /The \$190 look does not burn a seat\. It lets you assemble the square before you decide\./);
     assert.doesNotMatch(look, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
     assert.doesNotMatch(look, /id="root"/);
+
+    const categoryResponse = await fetch(`${origin}/insights/the-category-is-already-open`);
+    const category = await categoryResponse.text();
+    assert.equal(categoryResponse.status, 200);
+    assert.match(category, /<h1>The category is already open\.<\/h1>/);
+    assert.equal(category.match(/<h1>/g)?.length, 1);
+    assert.match(category, /Amazon, Instacart, and Walmart place the brand on the aisle the shopper already opened\. The header sits where the category is already shopped\./);
+    assert.match(category, /Birch Reserve sells the same shape inside a signed hub\. You do not build a new page\. The insertion order names the hub and the category the member already has open\./);
+    assert.match(category, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(category, /The \$190 look does not burn a seat\. It lets you see the open aisle before you decide\./);
+    assert.doesNotMatch(category, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(category, /id="root"/);
+    const unpublishedLook = await fetch(`${origin}/insights/the-look-starts-itself`);
+    assert.equal(unpublishedLook.status, 404);
   } finally {
     await new Promise<void>((resolveClose, rejectClose) => {
       server.close((error) => (error ? rejectClose(error) : resolveClose()));
