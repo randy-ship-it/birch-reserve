@@ -259,6 +259,26 @@ The $190 look does not burn a seat. It lets you see the open aisle before you de
 `,
 } as const;
 
+export const THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE = {
+  slug: "the-square-sits-inside-the-hub-already-open",
+  title: "The square sits inside the hub already open.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "LiveIntent places the unit inside the newsletter the reader already opened. You do not open a new tab.",
+  publishedAt: new Date("2026-10-23T16:00:00.000Z"),
+  body: `# The square sits inside the hub already open.
+
+LiveIntent places the unit inside the newsletter the reader already opened. You do not open a new tab.
+
+Birch Reserve sells the same shape inside a signed hub. The square sits on the page the member already has open. After the booking. On the plan. In the category.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the open hub before you decide.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
@@ -268,6 +288,7 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   THE_ZONE_HAS_A_PRICE_ARTICLE,
   THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
   THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE,
+  THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =
