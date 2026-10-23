@@ -10,6 +10,7 @@ import {
   SHELF_AFTER_RECEIPT_ARTICLE,
   ONE_CARD_NAMES_THE_CATEGORY_ARTICLE,
   THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE,
+  THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
   THE_ZONE_HAS_A_PRICE_ARTICLE,
@@ -201,6 +202,33 @@ The $190 look does not burn a seat. It lets you see the open aisle before you de
   assert.equal(mentionsLegacyHeroPrice(THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.body), false);
   assert.doesNotMatch(THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.body, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
 
+  assert.equal(THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.slug, "the-square-sits-inside-the-hub-already-open");
+  assert.equal(THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.title, "The square sits inside the hub already open.");
+  assert.equal(THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.publishedAt.toISOString(), "2026-10-23T16:00:00.000Z");
+  assert.equal(
+    THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.summary,
+    "LiveIntent places the unit inside the newsletter the reader already opened. You do not open a new tab.",
+  );
+  assert.equal(
+    THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.body,
+    `# The square sits inside the hub already open.
+
+LiveIntent places the unit inside the newsletter the reader already opened. You do not open a new tab.
+
+Birch Reserve sells the same shape inside a signed hub. The square sits on the page the member already has open. After the booking. On the plan. In the category.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the open hub before you decide.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.body), false);
+  assert.doesNotMatch(THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.body, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
@@ -280,6 +308,7 @@ The $190 look does not burn a seat. It lets you see the open aisle before you de
     THE_ZONE_HAS_A_PRICE_ARTICLE.slug,
     THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.slug,
     THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.slug,
+    THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -690,6 +719,8 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /The look assembles on the brief\./);
     assert.match(insights, /href="\/insights\/the-category-is-already-open"/);
     assert.match(insights, /The category is already open\./);
+    assert.match(insights, /href="\/insights\/the-square-sits-inside-the-hub-already-open"/);
+    assert.match(insights, /The square sits inside the hub already open\./);
     assert.doesNotMatch(insights, /the-look-starts-itself/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
@@ -777,6 +808,18 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(category, /The \$190 look does not burn a seat\. It lets you see the open aisle before you decide\./);
     assert.doesNotMatch(category, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
     assert.doesNotMatch(category, /id="root"/);
+
+    const squareResponse = await fetch(`${origin}/insights/the-square-sits-inside-the-hub-already-open`);
+    const square = await squareResponse.text();
+    assert.equal(squareResponse.status, 200);
+    assert.match(square, /<h1>The square sits inside the hub already open\.<\/h1>/);
+    assert.equal(square.match(/<h1>/g)?.length, 1);
+    assert.match(square, /LiveIntent places the unit inside the newsletter the reader already opened\. You do not open a new tab\./);
+    assert.match(square, /Birch Reserve sells the same shape inside a signed hub\. The square sits on the page the member already has open\. After the booking\. On the plan\. In the category\./);
+    assert.match(square, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(square, /The \$190 look does not burn a seat\. It lets you see the open hub before you decide\./);
+    assert.doesNotMatch(square, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(square, /id="root"/);
     const unpublishedLook = await fetch(`${origin}/insights/the-look-starts-itself`);
     assert.equal(unpublishedLook.status, 404);
   } finally {

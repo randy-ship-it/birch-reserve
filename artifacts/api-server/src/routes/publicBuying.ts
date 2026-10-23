@@ -2191,6 +2191,7 @@ export function renderBuycalcHtml(input: {
 <p class="sh-proof">The zone has a price. You do not bid for the category. The $490 is the named seat.</p>
 <p class="sh-proof">The look assembles on the brief. You do not wait for the $490 to start the square.</p>
 <p class="sh-proof">The category is already open. You sit where the member is already shopping. The $490 is the header on that aisle.</p>
+<p class="sh-proof">The square sits inside the hub already open. You approve the still on the brief. The $490 names the category.</p>
 <p class="sh-excl">One brand per category · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only · Canada only</p></section>
 ${BUYCALC_SEAT_CALC_HTML}
 <div class="grid"><section><h2>What a reserved slot includes</h2><p><strong>${availability.seats_open} categories open</strong> of ${availability.seats_total}. Availability is rolling and subtracts paid and currently held locks.</p>
