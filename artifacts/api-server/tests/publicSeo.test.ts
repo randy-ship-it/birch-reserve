@@ -100,8 +100,8 @@ test("server HTML and SPA shells expose canonical, og:url, og:image, and twitter
       assert.match(html, /<meta name="robots" content="noindex"\s*\/>/);
     }
     if (path === "/about") {
-      assert.match(html, /The \$190 look does not burn a seat/);
-      assert.match(html, /The \$490 seat is the named category/);
+      assert.match(html, /The look does not burn a seat/);
+      assert.match(html, /The seat is the named category/);
       assert.match(html, /The insertion order names the hub before anything runs/);
       assert.match(html, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-birch-reserve\.png"\s*\/>/);
       assert.doesNotMatch(html, /8\.7M|56M monthly views|20M\+|100M\+ orders/);
