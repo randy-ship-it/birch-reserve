@@ -1,5 +1,85 @@
 export const RESERVE_CURRENCY = "usd" as const;
 
+/** Currencies a public buyer can pay in. USD is the default for everyone not in Canada. */
+export const RESERVE_CURRENCIES = ["usd", "cad"] as const;
+export type ReserveCurrency = (typeof RESERVE_CURRENCIES)[number];
+
+export function parseReserveCurrency(value: unknown): ReserveCurrency | null {
+  if (typeof value !== "string") return null;
+  const lower = value.trim().toLowerCase();
+  return (RESERVE_CURRENCIES as readonly string[]).includes(lower)
+    ? (lower as ReserveCurrency)
+    : null;
+}
+
+/**
+ * Local CAD prices for the two public SKUs, in cents. These are rounded local
+ * prices (nearest $10), not a live FX conversion, so the page, the Stripe page
+ * and the ledger always show the same number.
+ * Basis: Bank of Canada FXUSDCAD 1.3993 on 2026-10-23 -> $190 = C$265.87,
+ * $490 = C$685.66, rounded to C$270 and C$690.
+ */
+export const PUBLIC_CAD_AMOUNT_CENTS = {
+  "hold-190": 27_000,
+  "reserve-490": 69_000,
+} as const satisfies Record<string, number>;
+
+export function offerAmountCents(
+  offer: { sku: string; amountCents: number },
+  currency: ReserveCurrency,
+): number {
+  if (currency === "cad") {
+    const cad = (PUBLIC_CAD_AMOUNT_CENTS as Record<string, number>)[offer.sku];
+    if (cad === undefined) {
+      throw new Error(`No CAD price for ${offer.sku}.`);
+    }
+    return cad;
+  }
+  return offer.amountCents;
+}
+
+/** Offer scope text with its dollar figure in the buyer's currency. */
+export function offerScope(
+  offer: { sku: string; amountCents: number; scope: string },
+  currency: ReserveCurrency,
+): string {
+  if (currency === RESERVE_CURRENCY) return offer.scope;
+  const usd = `$${offer.amountCents / 100}`;
+  const local = `$${offerAmountCents(offer, currency) / 100} ${currency.toUpperCase()}`;
+  return offer.scope.split(usd).join(local);
+}
+
+/**
+ * Rewrite static USD price copy into CAD. "$490 USD" and bare "$490" become the
+ * CAD seat price, "$190 USD" and bare "$190" become the CAD look price.
+ * Use on server-rendered pages after the template is built; never on money
+ * that is not one of the two public SKUs.
+ */
+export function localizeReservePriceCopy(
+  html: string,
+  currency: ReserveCurrency,
+): string {
+  if (currency === RESERVE_CURRENCY) return html;
+  let out = html;
+  for (const offer of PUBLIC_RESERVE_OFFERS) {
+    const usd = `$${offer.amountCents / 100}`;
+    const local = offerPriceLabel(offer, currency);
+    out = out.split(`${usd} USD`).join(local);
+    out = out.replace(new RegExp(`\\${usd}(?![0-9,.])`, "g"), local);
+  }
+  return out;
+}
+
+/** "$190 USD" / "$270 CAD" — the exact label shown to the buyer. */
+export function offerPriceLabel(
+  offer: { sku: string; amountCents: number },
+  currency: ReserveCurrency,
+): string {
+  const cents = offerAmountCents(offer, currency);
+  const whole = cents % 100 === 0 ? String(cents / 100) : (cents / 100).toFixed(2);
+  return `$${whole} ${currency.toUpperCase()}`;
+}
+
 type ReserveOfferShape = {
   sku: string;
   offerKey: string;
@@ -153,6 +233,15 @@ export function getPayableReserveOffer(
   amountCents: number,
   currency: string,
 ): ReserveOffer | null {
+  if (currency === "cad") {
+    return (
+      PUBLIC_RESERVE_OFFERS.find(
+        (offer) =>
+          offer.offerKey === offerKey &&
+          PUBLIC_CAD_AMOUNT_CENTS[offer.sku] === amountCents,
+      ) ?? null
+    );
+  }
   if (currency !== RESERVE_CURRENCY) return null;
   return (
     PAYABLE_USD_OFFERS.find(
@@ -180,8 +269,19 @@ const STRIPE_PRICE_ENV_BY_SKU: Record<string, string> = {
   "reserve-899": "STRIPE_PRICE_RESERVE_899",
 };
 
-export function stripePriceIdForSku(sku: string): string | null {
-  const envName = STRIPE_PRICE_ENV_BY_SKU[sku];
+/** Optional CAD Price IDs. When unset, CAD checkout uses inline price_data in cad. */
+const STRIPE_CAD_PRICE_ENV_BY_SKU: Record<string, string> = {
+  "hold-190": "STRIPE_PRICE_HOLD_190_CAD",
+  "reserve-490": "STRIPE_PRICE_RESERVE_490_CAD",
+};
+
+export function stripePriceIdForSku(
+  sku: string,
+  currency: ReserveCurrency = RESERVE_CURRENCY,
+): string | null {
+  const envName = (currency === "cad"
+    ? STRIPE_CAD_PRICE_ENV_BY_SKU
+    : STRIPE_PRICE_ENV_BY_SKU)[sku];
   if (!envName) return null;
   const value = process.env[envName]?.trim();
   return value ? value : null;
@@ -196,11 +296,14 @@ type CheckoutLineOffer = {
   scope: string;
 };
 
-export function reserveCheckoutLineItem(offer: CheckoutLineOffer):
+export function reserveCheckoutLineItem(
+  offer: CheckoutLineOffer,
+  currency: ReserveCurrency = RESERVE_CURRENCY,
+):
   | { price: string; quantity: 1 }
   | {
       price_data: {
-        currency: typeof RESERVE_CURRENCY;
+        currency: ReserveCurrency;
         unit_amount: number;
         product_data: {
           name: string;
@@ -210,15 +313,15 @@ export function reserveCheckoutLineItem(offer: CheckoutLineOffer):
       };
       quantity: 1;
     } {
-  const price = stripePriceIdForSku(offer.sku);
+  const price = stripePriceIdForSku(offer.sku, currency);
   if (price) return { price, quantity: 1 };
   return {
     price_data: {
-      currency: RESERVE_CURRENCY,
-      unit_amount: offer.amountCents,
+      currency,
+      unit_amount: offerAmountCents(offer, currency),
       product_data: {
         name: `Birch Reserve — ${offer.name}`,
-        description: offer.scope,
+        description: offerScope(offer, currency),
         metadata: {
           sku: offer.sku,
           offerKey: offer.offerKey,

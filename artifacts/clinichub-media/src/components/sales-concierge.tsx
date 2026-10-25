@@ -1,4 +1,5 @@
 import { RANDY_TEL_DISPLAY, RANDY_TEL_HREF } from "@/lib/randy-chat-knowledge";
+import { localizeNow } from "@/lib/currency";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShieldCheck } from "lucide-react";
@@ -175,7 +176,7 @@ export function SalesConcierge({
       setIsTyping(true);
       window.setTimeout(() => {
         setIsTyping(false);
-        appendAdvisorMessage("Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 early placement is 100% media credit. Nothing runs until an insertion order names the surface.", [
+        appendAdvisorMessage(localizeNow("Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 early placement is 100% media credit. Nothing runs until an insertion order names the surface."), [
           { label: "Open Reservation Form", action: () => onHandoff(), primary: true },
           { label: "Compare advertising paths", action: () => handleChoosePath(true) }
         ]);
@@ -338,7 +339,7 @@ export function SalesConcierge({
       case "pricing_or_availability":
       case "self_serve_purchase":
         return {
-          text: "Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 early placement is 100% media credit. Nothing runs until an insertion order names the surface.",
+          text: localizeNow("Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 early placement is 100% media credit. Nothing runs until an insertion order names the surface."),
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "Compare advertising paths", action: () => handleChoosePath(true) },
@@ -350,7 +351,7 @@ export function SalesConcierge({
           options: [
             { label: "Get a call back", href: RANDY_TEL_HREF, primary: true },
             { label: "Book a call", action: () => { trackCta("cta_book_call"); openRandyChat({ reason: "concierge", mode: "chat" }); } },
-            { label: "Reserve your early placement — $490", action: onHandoff },
+            { label: localizeNow("Reserve your early placement — $490"), action: onHandoff },
           ],
         };
       case "book_a_call":
@@ -371,7 +372,7 @@ export function SalesConcierge({
         };
       case "media_kit":
         return {
-          text: "The Reserve List: 8 advertiser categories inside signed Scale Health hubs, with early slots open. Not an open auction. Not a guaranteed impression buy. The $490 early placement is media credit, not airfare.",
+          text: localizeNow("The Reserve List: 8 advertiser categories inside signed Scale Health hubs, with early slots open. Not an open auction. Not a guaranteed impression buy. The $490 early placement is media credit, not airfare."),
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },

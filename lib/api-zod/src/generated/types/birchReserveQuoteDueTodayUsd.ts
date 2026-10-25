@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * The USD list price
+ */
 export type BirchReserveQuoteDueTodayUsd = typeof BirchReserveQuoteDueTodayUsd[keyof typeof BirchReserveQuoteDueTodayUsd];
 
 

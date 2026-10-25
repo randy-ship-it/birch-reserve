@@ -1,4 +1,5 @@
 import { RANDY_TEL_DISPLAY, RANDY_TEL_HREF, TAP_TO_CALL_HREF, TAP_TO_CALL_LABEL } from "@/lib/randy-chat-knowledge";
+import { useCurrency, usePriceText, priceLabel } from "@/lib/currency";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,7 @@ import { SplashAdReservationDialog } from "@/components/splash-ad-reservation-di
 import {
   DEFAULT_RESERVE_OFFER_KEY,
   formatReserveAmount,
+  reserveOfferAmountCents,
   RESERVE_OFFERS,
   type ReserveOfferKey,
 } from "@/lib/reserve-offers";
@@ -141,7 +143,9 @@ export default function Home() {
     seats_paid: number;
     seats_total: number;
   } | null>(null);
-  const reservePriceLabel = "$490 USD";
+  const { currency } = useCurrency();
+  const t = usePriceText();
+  const reservePriceLabel = priceLabel("reserve-490", currency);
 
   useEffect(() => {
     let cancelled = false;
@@ -480,7 +484,7 @@ export default function Home() {
               </p>
               <p className="mt-4 font-display text-4xl text-accent">Early slots open</p>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-background/75">
-                Log the placements you want and claim an early slot. No commitment. Canada only for now. The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.
+                Log the placements you want and claim an early slot. No commitment. Canada only for now. {t("The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.")}
               </p>
               <p className="mt-5 border-t border-background/15 pt-4 text-xs text-background/60">
                 Use an insider code, or request one on the list.
@@ -502,10 +506,10 @@ export default function Home() {
                   {offer.name}
                 </p>
                 <p className="mt-4 font-display text-4xl text-accent">
-                  {formatReserveAmount(offer.amountCents)}
+                  {formatReserveAmount(reserveOfferAmountCents(offer.key, currency), currency)} {currency.toUpperCase()}
                 </p>
                 <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground">
-                  {offer.description}
+                  {t(offer.description)}
                 </p>
                 <p className="mt-5 border-t border-border pt-4 text-xs text-muted-foreground">
                   {offer.creditLine}
@@ -593,7 +597,7 @@ export default function Home() {
               variant="outline"
               className="h-12 rounded-none px-6"
             >
-              Reserve a placement — $490
+              {t("Reserve a placement — $490")}
             </Button>
             <Button
               asChild
@@ -1003,7 +1007,7 @@ export default function Home() {
             </div>
             <div className="grid gap-8 border-l border-background/20 pl-6 sm:grid-cols-2 md:pl-10">
               <div>
-                <p className="font-display text-3xl text-accent">$490 USD</p>
+                <p className="font-display text-3xl text-accent">{reservePriceLabel}</p>
                 <p className="mt-2 text-sm leading-relaxed text-background/80">
                   Paid reserve, applied in full as media credit toward your placements.
                 </p>
@@ -1070,7 +1074,7 @@ export default function Home() {
           <div className="max-w-2xl mx-auto flex flex-col items-center">
             <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">Reserve a slot at today's minimum.</h2>
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
-              The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.
+              {t("The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.")}
             </p>
             <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
               <a

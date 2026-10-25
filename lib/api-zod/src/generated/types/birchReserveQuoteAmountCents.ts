@@ -6,10 +6,15 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * Exact amount due today in the quote currency.
+ */
 export type BirchReserveQuoteAmountCents = typeof BirchReserveQuoteAmountCents[keyof typeof BirchReserveQuoteAmountCents];
 
 
 export const BirchReserveQuoteAmountCents = {
   NUMBER_19000: 19000,
   NUMBER_49000: 49000,
+  NUMBER_27000: 27000,
+  NUMBER_69000: 69000,
 } as const;

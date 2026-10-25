@@ -11,4 +11,5 @@ export type BirchReserveQuoteCurrency = typeof BirchReserveQuoteCurrency[keyof t
 
 export const BirchReserveQuoteCurrency = {
   USD: 'USD',
+  CAD: 'CAD',
 } as const;

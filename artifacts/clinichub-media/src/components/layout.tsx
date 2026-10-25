@@ -7,6 +7,7 @@ import { trackCta } from '@/lib/track-cta';
 import { RandyChat } from '@/components/randy-chat';
 import { HearRandyElevenLabs } from '@/components/hear-randy-elevenlabs';
 import { LingerCapture } from '@/components/linger-capture';
+import { CurrencyToggle } from '@/components/currency-toggle';
 import { EXAMPLE_EXCLUSIVE_PROPERTIES } from '@/lib/example-exclusive-properties';
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -24,15 +25,15 @@ export function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background text-foreground font-sans">
       <header className="fixed top-0 z-50 w-full border-b border-border bg-background/90 backdrop-blur-md print:hidden">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
+        <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group min-w-0">
             <img
               src={birchReserveMark}
               alt=""
               aria-hidden="true"
-              className="size-8 rounded-[0.65rem] shadow-sm transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105"
+              className="size-7 sm:size-8 shrink-0 rounded-[0.65rem] shadow-sm transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105"
             />
-            <span className="font-display text-2xl text-foreground tracking-tight italic">Birch Reserve</span>
+            <span className="font-display text-base sm:text-2xl text-foreground tracking-tight italic whitespace-nowrap max-[374px]:hidden">Birch Reserve</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -59,14 +60,16 @@ export function Layout({ children }: { children: ReactNode }) {
             ))}
             <Link href="/about" className="hover:text-accent transition-colors">About</Link>
             <a href="tel:+16479316278" className="font-medium text-accent hover:underline whitespace-nowrap" data-testid="header-call-birch">Call Birch: (647) 931-6278</a>
+            <CurrencyToggle />
             <div className="w-px h-4 bg-border" />
             <Link href="/marketplace" className="hover:text-accent transition-colors font-medium">Partner Workspace</Link>
           </nav>
 
-          <div className="md:hidden flex items-center gap-2">
+          <div className="md:hidden flex items-center gap-1.5 shrink-0">
+            <CurrencyToggle className="shrink-0" />
             <a
               href="/inventory"
-              className="inline-flex items-center gap-1.5 bg-foreground px-3 py-2 text-sm font-semibold text-background"
+              className="inline-flex items-center gap-1 bg-foreground px-2 py-1.5 text-xs font-semibold text-background whitespace-nowrap"
               data-testid="nav-reserve-list-mobile"
             >
               <span className="size-1.5 rounded-full bg-accent" aria-hidden />

@@ -7,14 +7,18 @@
  */
 import type { BirchReserveAvailabilityCurrency } from './birchReserveAvailabilityCurrency';
 import type { BirchReserveAvailabilityInventoryModel } from './birchReserveAvailabilityInventoryModel';
+import type { BirchReserveAvailabilityPrices } from './birchReserveAvailabilityPrices';
 import type { BirchReserveSku } from './birchReserveSku';
 
 export interface BirchReserveAvailability {
+  /** Currency for this response: ?currency, then the br_currency cookie, then Canada -> CAD, else USD. */
   currency: BirchReserveAvailabilityCurrency;
+  /** Exact due-today price per SKU in every payable currency. */
+  prices?: BirchReserveAvailabilityPrices;
   default_sku: BirchReserveSku;
   /**
-     * @minItems 3
-     * @maxItems 3
+     * @minItems 2
+     * @maxItems 2
      */
   skus: BirchReserveSku[];
   inventory_model: BirchReserveAvailabilityInventoryModel;

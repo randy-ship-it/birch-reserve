@@ -171,6 +171,17 @@ test("paid checkout with no prior lead → birch-checkout-<reservationId>, hold-
   assert.ok((p["tags"] as string[]).includes("birch:hold-190"));
 });
 
+test("paid CAD checkout → Friday value is the CAD amount charged, with currency in meta and the message", async () => {
+  reservations.set("r-cad", { id: "r-cad", email: "ca@brand.example", brandName: "Maple Brand", offerKey: "reserve-490", isTest: false, amountCents: 69000, currency: "cad" } as never);
+  const out = await recordPaidCheckoutSafe(session("cs_cad", "r-cad", "reserve-490"));
+  assert.equal(out.status, "recorded");
+  const p = buildFridayPayload((await store.get("checkout:r-cad"))!, CFG);
+  assert.equal(p["value"], 690);
+  assert.equal((p["meta"] as Record<string, unknown>)["currency"], "CAD");
+  assert.match(String(p["message"]), /690 CAD/);
+  assert.ok((p["tags"] as string[]).includes("birch:reserve-490"));
+});
+
 test("paid checkout from QA (qa+ email / QA name / reservation is_test) is stored but never pushed", async () => {
   reservations.set("r-3", { id: "r-3", email: "qa+buyer@birchreserve.net", brandName: "Brand", offerKey: "hold-190", isTest: false });
   reservations.set("r-4", { id: "r-4", email: "real@brand.example", brandName: "QA Test Brand", offerKey: "hold-190", isTest: false });

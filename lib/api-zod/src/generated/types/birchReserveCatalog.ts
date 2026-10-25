@@ -5,23 +5,34 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { BirchReserveCatalogCurrenciesItem } from './birchReserveCatalogCurrenciesItem';
 import type { BirchReserveCatalogCurrency } from './birchReserveCatalogCurrency';
 import type { BirchReserveCatalogDiscountVsPublished } from './birchReserveCatalogDiscountVsPublished';
 import type { BirchReserveCatalogFormatsItem } from './birchReserveCatalogFormatsItem';
 import type { BirchReserveCatalogInventoryModel } from './birchReserveCatalogInventoryModel';
+import type { BirchReserveCatalogLegacyOffersItem } from './birchReserveCatalogLegacyOffersItem';
 import type { BirchReserveOffer } from './birchReserveOffer';
 import type { BirchReserveSku } from './birchReserveSku';
 
 export interface BirchReserveCatalog {
   catalog_version: string;
+  /** Currency of amount_cents and due_today. See each offer's prices for CAD. */
   currency: BirchReserveCatalogCurrency;
+  currencies?: BirchReserveCatalogCurrenciesItem[];
+  currency_note?: string;
   default_sku: BirchReserveSku;
   inventory_model: BirchReserveCatalogInventoryModel;
   /**
-     * @minItems 3
-     * @maxItems 3
+     * @minItems 2
+     * @maxItems 2
      */
   offers: BirchReserveOffer[];
+  /**
+     * Unpublished legacy SKUs kept so existing Stripe Checkout sessions still match. Not offered for new public checkout.
+     * @minItems 1
+     * @maxItems 1
+     */
+  legacy_offers: BirchReserveCatalogLegacyOffersItem[];
   discount_vs_published: BirchReserveCatalogDiscountVsPublished;
   formats: BirchReserveCatalogFormatsItem[];
   category_slot: string;

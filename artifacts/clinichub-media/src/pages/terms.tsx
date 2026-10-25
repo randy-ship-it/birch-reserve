@@ -12,11 +12,13 @@ export default function Terms() {
         <p>
           Birch Reserve is operated by Silver Birch Growth Inc. These terms are
           a draft. They are not in force for a live card until counsel stamps
-          this page. Public prices are $190 USD (
+          this page. Public prices are $190 USD, or $270 CAD for buyers in Canada (
           <span className="text-foreground">hold-190</span>, a 7-day category
-          look that does not lock an exclusive category) and $490 USD (
+          look that does not lock an exclusive category) and $490 USD, or $690 CAD
+          for buyers in Canada (
           <span className="text-foreground">reserve-490</span>, lock your exclusive
-          category).
+          category). The currency you see at checkout is the currency you are
+          charged, and you can switch between USD and CAD on the page before you pay.
         </p>
         <p>
           hold-190 is a 100% credit if the buyer converts within 7 days.

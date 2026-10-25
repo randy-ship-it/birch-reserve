@@ -114,6 +114,7 @@ export function buildFridayMeta(lead: Lead): Record<string, string | number | bo
   put("hubs", lead.meta.hubs);
   meta["source"] = META_SOURCE[lead.source];
   put("sku", lead.meta.sku);
+  put("currency", lead.meta.currency?.toUpperCase());
   put("utm_source", lead.utmSource);
   put("utm_campaign", lead.utmCampaign);
   if (lead.source === "inventory_signup") {
@@ -173,7 +174,7 @@ export function buildFridayPayload(lead: Lead, cfg: Pick<FridayConfig, "workspac
       : "",
     lead.referrer ? `Referrer: ${lead.referrer}` : "",
     lead.landingPage ? `Landing page: ${lead.landingPage}` : "",
-    lead.meta.paid ? `Paid checkout: ${lead.meta.sku ?? "unknown sku"}${lead.meta.stripe_session_id ? ` (Stripe ${lead.meta.stripe_session_id})` : ""}` : "",
+    lead.meta.paid ? `Paid checkout: ${lead.meta.sku ?? "unknown sku"}${lead.meta.currency && lead.meta.value !== undefined ? ` ${lead.meta.value} ${lead.meta.currency.toUpperCase()}` : ""}${lead.meta.stripe_session_id ? ` (Stripe ${lead.meta.stripe_session_id})` : ""}` : "",
     lead.isTest ? "QA TEST LEAD (is_test): safe to ignore / delete." : "",
     `Birch lead id: ${lead.id}`,
   ].filter(Boolean);

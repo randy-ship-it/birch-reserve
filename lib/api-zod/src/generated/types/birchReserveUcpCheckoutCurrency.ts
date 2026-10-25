@@ -11,4 +11,5 @@ export type BirchReserveUcpCheckoutCurrency = typeof BirchReserveUcpCheckoutCurr
 
 export const BirchReserveUcpCheckoutCurrency = {
   USD: 'USD',
+  CAD: 'CAD',
 } as const;

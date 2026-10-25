@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { usePriceText } from "@/lib/currency";
 
 // Signed-hub category seat: hero + calculator shared by birchreserve.net (Reserve List, /buycalc) and scalehealth.ca/tam.
 // Engine unchanged: reached views x CTR x click-to-order, from the public feed /inventory/api/tam.
@@ -33,6 +34,7 @@ const fmt = (n: number) => (n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e4 ? M
 const pct = (x: number) => (x * 100).toFixed(2).replace(/0$/, "") + "%";
 
 export function SignedHubHero({ reserveHref, lookHref, cardsLive = true, eyebrow }: { reserveHref: string; lookHref: string; cardsLive?: boolean; eyebrow: string }) {
+  const t = usePriceText();
   return (
     <section style={{ background: NAVY }}  className="text-white" data-testid="signed-hub-hero">
       <div className="mx-auto max-w-5xl px-6 py-14 md:py-20">
@@ -40,17 +42,17 @@ export function SignedHubHero({ reserveHref, lookHref, cardsLive = true, eyebrow
         <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">Lock one category inside signed health hubs. Not an open auction.</h1>
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           <div className="rounded-lg bg-white p-5 text-[#0A1D56]">
-            <p className="text-sm font-bold">$490 USD locks the category.</p>
+            <p className="text-sm font-bold">{t("$490 USD locks the category.")}</p>
             <p className="mt-1 text-sm">100% media credit. Nothing runs until the insertion order names the hub. Credit expires 12 months.</p>
-            <a href={reserveHref} className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-md px-5 text-base font-semibold text-white" style={{ background: NAVY }} data-testid="cta-lock-category">Lock the category · $490 USD</a>
+            <a href={reserveHref} className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-md px-5 text-base font-semibold text-white" style={{ background: NAVY }} data-testid="cta-lock-category">{t("Lock the category · $490 USD")}</a>
           </div>
           <div className="rounded-lg p-5 text-[#0A1D56]" style={{ background: CARD }}>
-            <p className="text-sm font-bold">$190 USD is a 7-day look.</p>
-            <p className="mt-1 text-sm">It does not lock a seat. Converts in full to the $490 within 7 days, else refunded.</p>
-            <a href={lookHref} className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-md border-2 px-5 text-base font-semibold" style={{ borderColor: NAVY }} data-testid="cta-look">Take a 7-day look · $190 USD</a>
+            <p className="text-sm font-bold">{t("$190 USD is a 7-day look.")}</p>
+            <p className="mt-1 text-sm">{t("It does not lock a seat. Converts in full to the $490 within 7 days, else refunded.")}</p>
+            <a href={lookHref} className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-md border-2 px-5 text-base font-semibold" style={{ borderColor: NAVY }} data-testid="cta-look">{t("Take a 7-day look · $190 USD")}</a>
           </div>
         </div>
-        {!cardsLive && <p className="mt-3 text-sm text-white/80">Card checkout is not live yet. Reserve by email and we invoice in USD.</p>}
+        {!cardsLive && <p className="mt-3 text-sm text-white/80">Card checkout is not live yet. Reserve by email and we invoice in USD or CAD.</p>}
         <p className="mt-6 text-sm text-white/85">
           Live placement: <a href={LIVE_HUB_URL} target="_blank" rel="noopener" className="font-semibold underline underline-offset-4" style={{ textDecorationColor: PURPLE }}>physio.drhonow.com</a>. A signed physio hub. Your module sits at the booking and the plan, in the category.
         </p>

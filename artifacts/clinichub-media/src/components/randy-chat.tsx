@@ -14,6 +14,7 @@
  * Checkout ON for hold-190 / reserve-490. Enterprise inquire-within only (no Stripe SKU).
  */
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { localizeNow } from "@/lib/currency";
 import { AnimatePresence, motion } from "framer-motion";
 import { Phone, X, PhoneIncoming, RotateCw, ArrowUp } from "lucide-react";
 import { trackCta } from "@/lib/track-cta";
@@ -292,7 +293,7 @@ export function RandyChat() {
         pushMessages({
           id: newId(),
           role: "randy",
-          text: `Checkout is live on birchreserve.net for the ${sku === "hold-190" ? "$190 7-day look" : "$490 early placement"}. You can pay there, or leave your details here and I'll walk you through it.`,
+          text: `Checkout is live on birchreserve.net for the ${localizeNow(sku === "hold-190" ? "$190 7-day look" : "$490 early placement")}. You can pay there, or leave your details here and I'll walk you through it.`,
         });
         setHandoffReady(true);
         setCallbackOpen(true);

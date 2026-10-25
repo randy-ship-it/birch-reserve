@@ -11,4 +11,5 @@ export type CreateBirchReserveCheckout503Currency = typeof CreateBirchReserveChe
 
 export const CreateBirchReserveCheckout503Currency = {
   usd: 'usd',
+  cad: 'cad',
 } as const;

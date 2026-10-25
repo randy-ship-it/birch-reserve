@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useCurrency, usePriceText } from "@/lib/currency";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   useCreateSplashAdReservation,
@@ -29,6 +30,7 @@ import {
 import {
   DEFAULT_RESERVE_OFFER_KEY,
   formatReserveAmount,
+  reserveOfferAmountCents,
   getReserveOffer,
   RESERVE_OFFERS,
   type ReserveOfferKey,
@@ -79,7 +81,10 @@ export function SplashAdReservationDialog({
 
   const selectedOfferKey = form.watch("offer") as ReserveOfferKey;
   const selectedOffer = getReserveOffer(selectedOfferKey);
-  const formattedPrice = formatReserveAmount(selectedOffer.amountCents);
+  const { currency } = useCurrency();
+  const priceText = usePriceText();
+  const selectedAmountCents = reserveOfferAmountCents(selectedOfferKey, currency);
+  const formattedPrice = `${formatReserveAmount(selectedAmountCents, currency)} ${currency.toUpperCase()}`;
 
   useEffect(() => {
     if (open) {
@@ -108,8 +113,8 @@ export function SplashAdReservationDialog({
             email: values.email,
             websiteUrl: values.websiteUrl || undefined,
             buyerPath: values.buyerPath,
-            expectedAmountCents: offerDetails.amountCents,
-            expectedCurrency: "usd",
+            expectedAmountCents: reserveOfferAmountCents(values.offer as ReserveOfferKey, currency),
+            expectedCurrency: currency,
             offer: values.offer,
           },
           honeypotRef,
@@ -119,7 +124,7 @@ export function SplashAdReservationDialog({
       if (receipt.checkoutUrl) {
         window.location.href = receipt.checkoutUrl;
       } else {
-        setSuccessReceipt({ ...receipt, lockedAmountCents: offerDetails.amountCents });
+        setSuccessReceipt({ ...receipt, lockedAmountCents: reserveOfferAmountCents(values.offer as ReserveOfferKey, currency) });
       }
     } catch {
       setIsError(true);
@@ -127,8 +132,8 @@ export function SplashAdReservationDialog({
   }
 
   const lockedFormattedPrice = successReceipt?.lockedAmountCents
-    ? formatReserveAmount(successReceipt.lockedAmountCents)
-    : formattedPrice;
+    ? formatReserveAmount(successReceipt.lockedAmountCents, currency)
+    : formatReserveAmount(selectedAmountCents, currency);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -146,7 +151,7 @@ export function SplashAdReservationDialog({
               </div>
               <h3 className="text-3xl font-display tracking-tight mb-3 text-foreground">Placement reserved</h3>
               <p className="text-muted-foreground mb-8 max-w-sm leading-relaxed text-sm">
-                Your reservation is saved. Payment is still required; contact Birch Reserve to complete the secure {lockedFormattedPrice} USD checkout.
+                Your reservation is saved. Payment is still required; contact Birch Reserve to complete the secure {lockedFormattedPrice} {currency.toUpperCase()} checkout.
               </p>
 
               <div className="w-full border border-border bg-secondary/20 p-5 text-left space-y-4 mb-8">
@@ -216,7 +221,7 @@ export function SplashAdReservationDialog({
                             <div className="grid gap-2">
                               {RESERVE_OFFERS.filter((offer) => offer.key !== "hold-190" || field.value === "hold-190").map((offer) => {
                                 const isSelected = field.value === offer.key;
-                                const amount = formatReserveAmount(offer.amountCents);
+                                const amount = `${formatReserveAmount(reserveOfferAmountCents(offer.key, currency), currency)} ${currency.toUpperCase()}`;
                                 return (
                                   <Button
                                     key={offer.key}
@@ -230,7 +235,7 @@ export function SplashAdReservationDialog({
                                       <span className="font-display text-accent-foreground">{amount}</span>
                                     </div>
                                     <span className="text-[10px] font-normal text-muted-foreground whitespace-normal">
-                                      100% media credit · {offer.description}
+                                      100% media credit · {priceText(offer.description)}
                                     </span>
                                   </Button>
                                 );
@@ -347,11 +352,11 @@ export function SplashAdReservationDialog({
                         {isPending ? (
                           <><Loader2 className="mr-2 size-5 animate-spin" /> Processing</>
                         ) : (
-                          <>{selectedOffer.key === "hold-190" ? "Start a 7-day look — $190" : "Reserve your early placement — $490"} <CreditCard className="ml-2 size-5" /></>
+                          <>{priceText(selectedOffer.key === "hold-190" ? "Start a 7-day look — $190" : "Reserve your early placement — $490")} <CreditCard className="ml-2 size-5" /></>
                         )}
                       </Button>
                       <div className="text-center text-[11px] text-muted-foreground mt-2">
-                        {formattedPrice} one-time payment USD
+                        {formattedPrice} one-time payment
                       </div>
                     </div>
 

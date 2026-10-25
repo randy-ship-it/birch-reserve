@@ -5,6 +5,7 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { BirchReserveCheckoutInputCurrency } from './birchReserveCheckoutInputCurrency';
 import type { BirchReserveCheckoutInputFormatPref } from './birchReserveCheckoutInputFormatPref';
 import type { BirchReserveSku } from './birchReserveSku';
 
@@ -28,4 +29,6 @@ export interface BirchReserveCheckoutInput {
      * @maxLength 200
      */
   idempotency_key: string;
+  /** Payment currency. Optional; default usd. CAD is $270 look / $690 seat. */
+  currency?: BirchReserveCheckoutInputCurrency;
 }
