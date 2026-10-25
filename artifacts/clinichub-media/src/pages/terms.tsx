@@ -23,9 +23,12 @@ export default function Terms() {
         <p>
           hold-190 is a 100% credit if the buyer converts within 7 days.
           Otherwise it is a cash refund. It does not lock an exclusive category.
-          reserve-490 is 100% media credit. Credit expires 12 months after
-          payment. A cash refund is available if no approved surface is named
-          within 60 days of payment.
+          reserve-490 is 100% display credit, fully refundable until 14 days
+          before the launch date written in your insertion order. To cancel,
+          reply to your confirmation email. We refund the full amount to the
+          original card. After that date the credit is not refundable but stays
+          usable for 12 months after payment. A cash refund is also available
+          if no approved surface is named within 60 days of payment.
         </p>
         <p>
           Payment is a reservation credit, not a live flight and not an

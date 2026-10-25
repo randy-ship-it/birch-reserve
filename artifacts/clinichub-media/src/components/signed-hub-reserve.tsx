@@ -33,29 +33,30 @@ const SEAT = 1; // one brand per category: the seat is the whole category surfac
 const fmt = (n: number) => (n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e4 ? Math.round(n / 1000) + "K" : n >= 100 ? (Math.round(n / 10) * 10).toLocaleString() : Math.round(n).toString());
 const pct = (x: number) => (x * 100).toFixed(2).replace(/0$/, "") + "%";
 
+export const PREPAY_REFUND_CUTOFF_DAYS = 14;
+
 export function SignedHubHero({ reserveHref, lookHref, cardsLive = true, eyebrow }: { reserveHref: string; lookHref: string; cardsLive?: boolean; eyebrow: string }) {
   const t = usePriceText();
   return (
     <section style={{ background: NAVY }}  className="text-white" data-testid="signed-hub-hero">
       <div className="mx-auto max-w-5xl px-6 py-14 md:py-20">
         <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: PURPLE }}>{eyebrow}</p>
-        <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">Lock one category inside signed health hubs. Not an open auction.</h1>
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          <div className="rounded-lg bg-white p-5 text-[#0A1D56]">
-            <p className="text-sm font-bold">{t("$490 USD locks the category.")}</p>
-            <p className="mt-1 text-sm">100% media credit. Nothing runs until the insertion order names the hub. Credit expires 12 months.</p>
-            <a href={reserveHref} className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-md px-5 text-base font-semibold text-white" style={{ background: NAVY }} data-testid="cta-lock-category">{t("Lock the category · $490 USD")}</a>
-          </div>
-          <div className="rounded-lg p-5 text-[#0A1D56]" style={{ background: CARD }}>
-            <p className="text-sm font-bold">{t("$190 USD is a 7-day look.")}</p>
-            <p className="mt-1 text-sm">{t("It does not lock a seat. Converts in full to the $490 within 7 days, else refunded.")}</p>
-            <a href={lookHref} className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-md border-2 px-5 text-base font-semibold" style={{ borderColor: NAVY }} data-testid="cta-look">{t("Take a 7-day look · $190 USD")}</a>
-          </div>
+        <h1 className="mt-4 max-w-3xl text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl">Prepay your category's display space. One brand. No bidding.</h1>
+        <div className="mt-8 max-w-xl rounded-lg bg-white p-6 text-[#0A1D56]" data-testid="prepay-offer">
+          <p className="text-4xl font-bold tracking-tight" data-testid="prepay-price">{t("$490 USD")}</p>
+          <p className="mt-2 text-base font-semibold">Prepay once. All of it becomes display credit in your category.</p>
+          <p className="mt-1 text-sm" data-testid="prepay-refund">Fully refundable until {PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
+          <p className="mt-3 text-sm" data-testid="prepay-why">Why it beats Meta: Meta sells you a cold click in an auction. Here you pay once, own the category, and your offer meets customers right after they have bought.</p>
+          <a href={reserveHref} className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-md px-5 text-base font-semibold text-white" style={{ background: NAVY }} data-testid="cta-lock-category">{t("Prepay your category · $490 USD")}</a>
+          <p className="mt-4 text-sm">
+            Not ready? <a href={lookHref} className="font-semibold underline underline-offset-4" data-testid="cta-look">{t("Take a 7-day look for $190 USD")}</a>. It converts in full to the prepay, or it is refunded.
+          </p>
         </div>
         {!cardsLive && <p className="mt-3 text-sm text-white/80">Card checkout is not live yet. Reserve by email and we invoice in USD or CAD.</p>}
         <p className="mt-6 text-sm text-white/85">
-          Live placement: <a href={LIVE_HUB_URL} target="_blank" rel="noopener" className="font-semibold underline underline-offset-4" style={{ textDecorationColor: PURPLE }}>physio.drhonow.com</a>. A signed physio hub. Your module sits at the booking and the plan, in the category.
+          Live placement: <a href={LIVE_HUB_URL} target="_blank" rel="noopener" className="font-semibold underline underline-offset-4" style={{ textDecorationColor: PURPLE }}>physio.drhonow.com</a>. A listed physio hub. Your module sits at the booking and the plan, in the category.
         </p>
+        <p className="mt-3 text-xs text-white/65" data-testid="meta-benchmark">Public benchmark, not a Birch result: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p>
         <p className="mt-3 text-xs text-white/65" data-testid="exclusions">One brand per category · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only · Canada only</p>
       </div>
     </section>

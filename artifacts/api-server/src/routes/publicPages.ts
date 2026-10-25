@@ -142,7 +142,7 @@ const TERMS_HTML = documentPage(
   `<h1>Terms of sale</h1>
 <p class="fine">${escapeHtml(SELLER)}</p>
 <p>Birch Reserve is operated by Silver Birch Growth Inc. These terms are a draft. They are not in force for a live card until counsel stamps this page. Public prices are $190 USD, or $270 CAD for buyers in Canada (<strong>hold-190</strong>, a 7-day category look that does not lock an exclusive category) and $490 USD, or $690 CAD for buyers in Canada (<strong>reserve-490</strong>, lock your exclusive category). The currency you see at checkout is the currency you are charged. You can switch between USD and CAD on the page before you pay.</p>
-<p>hold-190 is a 100% credit if the buyer converts within 7 days. Otherwise it is a cash refund. It does not lock an exclusive category. reserve-490 is 100% media credit. Credit expires 12 months after payment. A cash refund is available if no approved surface is named within 60 days of payment.</p>
+<p>hold-190 is a 100% credit if the buyer converts within 7 days. Otherwise it is a cash refund. It does not lock an exclusive category. reserve-490 is 100% display credit, fully refundable until 14 days before the launch date written in your insertion order. To cancel, reply to your confirmation email. We refund the full amount to the original card. After that date the credit is not refundable but stays usable for 12 months after payment. A cash refund is also available if no approved surface is named within 60 days of payment.</p>
 <p>Payment is a reservation credit, not a live flight and not an impression guarantee. Nothing runs until an insertion order names the surface. After that order, cancellation and makegood follow IAB. The public sample is <a href="/sample-io">/sample-io</a>.</p>
 <p>8 exclusive brand categories across hubs — not eight websites. One brand per category. Reporting is aggregate only. No PHI. No clinical pixels.</p>
 <p>Checkout is Stripe-hosted. Silver Birch Growth Inc. does not store full card numbers. Questions: <a href="mailto:sales@silverbirchgrowth.com">Email sales</a>.</p>
@@ -175,7 +175,7 @@ const SAMPLE_IO_HTML = documentPage(
 <div><dt><strong>Named surface</strong></dt><dd>[Hub URL, for example a signed Scale Health hub]</dd></div>
 <div><dt><strong>Format</strong></dt><dd>post-checkout, recovery plan, booking confirmation, native hub module, or motion :15</dd></div>
 <div><dt><strong>Category</strong></dt><dd>One of eight: pain relief / topicals, recovery hardware, nutrition, sleep, meal prep, women’s health, men’s health, diagnostics / services</dd></div>
-<div><dt><strong>Credit</strong></dt><dd>100% media credit. Credit expires 12 months. Cash refund if no approved surface can be named within 60 days.</dd></div>
+<div><dt><strong>Credit</strong></dt><dd>100% display credit. Fully refundable until 14 days before the launch date. Credit expires 12 months. Cash refund if no approved surface can be named within 60 days.</dd></div>
 </dl>
 <p class="fine">Draft until counsel stamps.</p>
 <p><a href="/terms">Terms of sale</a></p>`,

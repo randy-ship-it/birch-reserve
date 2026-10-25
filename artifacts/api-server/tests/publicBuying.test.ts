@@ -651,7 +651,7 @@ test("machine surfaces expose text, JSON, YAML, and fixed USD contracts", async 
   assert.doesNotMatch(llmsText, /\$9,900/);
   assert.doesNotMatch(llmsText, /reserve-990/);
   assert.match(llmsText, /weprize\.net/);
-  assert.match(llmsText, /Lock in your slot\./);
+  assert.match(llmsText, /Prepay your category\./);
   assert.doesNotMatch(llmsText, /minimum goes up/);
   assert.doesNotMatch(llmsText, /today's minimum/);
 
@@ -684,7 +684,7 @@ test("machine surfaces expose text, JSON, YAML, and fixed USD contracts", async 
   );
   assert.equal(catalog.currency, "USD");
   const catalogText = JSON.stringify(catalog);
-  assert.match(catalogText, /Lock in your slot\./);
+  assert.match(catalogText, /Prepay your category\./);
   assert.doesNotMatch(catalogText, /minimum goes up/);
   assert.doesNotMatch(catalogText, /today's minimum/);
   assert.deepEqual(catalog.formats, [
@@ -3963,6 +3963,78 @@ test("CAD checkout is stored and charged in CAD, USD stays the default", async (
     });
     assert.equal(bad.status, 400);
     assert.equal(sessions.length, 4);
+  } finally {
+    setStripeCheckoutFunctionsForTests();
+    if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
+    else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
+    if (previousPublicUrl === undefined) delete process.env.PUBLIC_BASE_URL;
+    else process.env.PUBLIC_BASE_URL = previousPublicUrl;
+    if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
+    else process.env.SEATS_TOTAL = previousTotal;
+  }
+});
+
+test("/v1/checkout with no currency defaults by x-vercel-ip-country: CA -> CAD, else USD; explicit currency wins", async () => {
+  const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
+  const previousPublicUrl = process.env.PUBLIC_BASE_URL;
+  const previousTotal = process.env.SEATS_TOTAL;
+  process.env.STRIPE_CHECKOUT_DISABLED = "false";
+  process.env.PUBLIC_BASE_URL = "https://reserve.example.com";
+  process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
+  const sessions: Array<{ amount?: number; currency?: string }> = [];
+  setStripeCheckoutFunctionsForTests({
+    create: async (params) => {
+      const priceData = params.line_items?.[0]?.price_data;
+      sessions.push({ amount: priceData?.unit_amount, currency: priceData?.currency });
+      return {
+        id: `cs_test_geo_${randomUUID().replaceAll("-", "")}`,
+        url: `https://checkout.stripe.test/geo-${sessions.length}`,
+        client_reference_id: params.client_reference_id,
+        currency: priceData?.currency,
+        amount_total: priceData?.unit_amount,
+        metadata: params.metadata,
+      } as never;
+    },
+  });
+  try {
+    const cases: Array<[string, Record<string, string>, string | undefined, string, number]> = [
+      ["reserve-490", { "x-vercel-ip-country": "CA" }, undefined, "cad", 69000],
+      ["hold-190", { "x-vercel-ip-country": "CA" }, undefined, "cad", 27000],
+      ["reserve-490", { "x-vercel-ip-country": "US" }, undefined, "usd", 49000],
+      ["reserve-490", { "x-vercel-ip-country": "GB" }, undefined, "usd", 49000],
+      ["hold-190", {}, undefined, "usd", 19000],
+      ["reserve-490", { "x-vercel-ip-country": "CA" }, "usd", "usd", 49000],
+      ["reserve-490", { "x-vercel-ip-country": "US" }, "cad", "cad", 69000],
+    ];
+    for (const [sku, headers, currency, expectedCurrency, expectedCents] of cases) {
+      const response = await fetch(`${origin}/v1/checkout`, {
+        method: "POST",
+        headers: { "content-type": "application/json", ...headers },
+        body: JSON.stringify({
+          sku,
+          ...(currency ? { currency } : {}),
+          email: `geo-${randomUUID()}@example.com`,
+          brand: `Geo ${sku}`,
+          idempotency_key: randomUUID(),
+        }),
+      });
+      assert.equal(response.status, 200);
+      const receipt = (await response.json()) as Record<string, unknown>;
+      createdIds.push(String(receipt.order_id));
+      assert.equal(receipt.currency, expectedCurrency);
+      assert.equal(receipt.amountCents, expectedCents);
+      assert.deepEqual(sessions.at(-1), { amount: expectedCents, currency: expectedCurrency });
+    }
+    const caQuote = (await (
+      await fetch(`${origin}/v1/quote?sku=reserve-490&format=post_checkout&days=30`, {
+        headers: { "x-vercel-ip-country": "CA" },
+      })
+    ).json()) as { currency?: string };
+    assert.equal(caQuote.currency, "CAD");
   } finally {
     setStripeCheckoutFunctionsForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;

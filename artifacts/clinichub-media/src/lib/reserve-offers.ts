@@ -16,7 +16,7 @@ export const RESERVE_OFFERS = [
     amountCents: 49_000,
     consumesSeat: true,
     description:
-      "Reserve your early placement. Full $490 is media credit toward your placements (not airfare). Insertion order names the hub before anything runs. Credit expires 12 months.",
+      "Prepay your category. All $490 becomes display credit in your category (not airfare). Fully refundable until 14 days before your launch date. The insertion order names the hub before anything runs. Credit expires 12 months.",
     creditLine: "Media credit, not airfare.",
   },
 ] as const;

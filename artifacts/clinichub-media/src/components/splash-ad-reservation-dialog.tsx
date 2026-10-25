@@ -322,6 +322,7 @@ export function SplashAdReservationDialog({
 
                     <div className="border-y border-border py-4 text-xs leading-relaxed text-muted-foreground">
                       <p><strong className="text-foreground">Credit, not a flight.</strong> Nothing runs until an insertion order names the surface.</p>
+                      {selectedOffer.key !== "hold-190" && <p><strong className="text-foreground">Fully refundable</strong> until 14 days before your launch date.</p>}
                       <p className="mt-1">Draft terms apply until counsel stamps them.</p>
                     </div>
 
@@ -352,7 +353,7 @@ export function SplashAdReservationDialog({
                         {isPending ? (
                           <><Loader2 className="mr-2 size-5 animate-spin" /> Processing</>
                         ) : (
-                          <>{priceText(selectedOffer.key === "hold-190" ? "Start a 7-day look — $190" : "Reserve your early placement — $490")} <CreditCard className="ml-2 size-5" /></>
+                          <>{priceText(selectedOffer.key === "hold-190" ? "Start a 7-day look — $190" : "Prepay your category — $490")} <CreditCard className="ml-2 size-5" /></>
                         )}
                       </Button>
                       <div className="text-center text-[11px] text-muted-foreground mt-2">

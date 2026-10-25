@@ -59,6 +59,7 @@ import {
 import { hasValidQaHeader } from "../lib/testTraffic";
 import { attributionFrom } from "../lib/publicGuards";
 import { recordPaidCheckoutSafe } from "../lib/checkoutLead";
+import { sendPrepayConfirmationSafe } from "../lib/prepayConfirmationEmail";
 import { markSplashReservationTestIfQa } from "../lib/splashTestTraffic";
 
 const router: IRouter = Router();
@@ -570,7 +571,11 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
     if (session.payment_status === "paid") {
       const paid = await markSplashReservationPaidFromSession(session);
       // 7:21pm: paid checkout → Friday (never throws; Stripe still gets its 2xx).
-      if (paid === "paid") await recordPaidCheckoutSafe(session);
+      if (paid === "paid") {
+        await recordPaidCheckoutSafe(session);
+        // Buyer prepay confirmation (no URLs; off unless PREPAY_CONFIRMATION_EMAIL=true; never throws).
+        await sendPrepayConfirmationSafe(session);
+      }
     }
     return;
   }

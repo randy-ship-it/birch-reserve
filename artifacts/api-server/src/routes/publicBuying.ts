@@ -77,6 +77,7 @@ import {
 } from "./splashAdReservations";
 import { logger, recordUcpProxyForwardingShape } from "../lib/logger";
 import { publicSeoTags } from "../lib/publicSeo";
+import { PREPAY_REFUND_CUTOFF_DAYS } from "../lib/reserveOffers";
 import { handleUiEvent } from "../lib/uiEvents";
 
 const router: IRouter = Router();
@@ -548,14 +549,14 @@ router.get("/llms.txt", (_req, res) => {
     [
       "# Birch Reserve",
       "",
-      "8 brand categories inside signed Scale Health clinic hubs. Lock in your slot. Not an open auction. Not a guaranteed impression buy.",
+      "8 brand categories inside listed Scale Health clinic hubs. Prepay your category. Not an open auction. Not a guaranteed impression buy.",
       "Live proof: https://physio.drhonow.com/dr-ho/portal",
       "Also (placement example, not hero): https://weprize.net — live SBG/Birch display example. Placement only; not a Scale hub category; no reach/impression claims.",
       "Public SKUs:",
       "- hold-190 · $190 USD ($270 CAD for Canadian buyers) · 7-day category look · 100% credit if you convert within 7 days, else cash refund · does not lock in a slot",
-      "- reserve-490 · $490 USD ($690 CAD for Canadian buyers) · lock in your slot · 100% media credit · insertion order before flight · credit expires 12 months",
+      "- reserve-490 · $490 USD ($690 CAD for Canadian buyers) · prepay your category · 100% display credit · fully refundable until 14 days before your launch date · insertion order before flight · credit expires 12 months",
       "- custom · Get a call back · multi-hub / on-prem Align",
-      "8 brand categories across hubs — not eight websites. Lock in your slot.",
+      "8 brand categories across hubs — not eight websites. Prepay your category.",
       "Categories: pain relief / topicals, recovery hardware, nutrition, sleep, meal prep, women’s health, men’s health, diagnostics / services.",
       "Launching cohort (logos, not reach): DR-HO’S · Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery.",
       `Formats: ${FORMATS.join(", ")}.`,
@@ -704,7 +705,7 @@ router.get("/v1/quote", async (req, res): Promise<void> => {
   const offer = getPublicReserveOfferBySku(req.query.sku);
   const quoteCurrency =
     req.query.currency === undefined
-      ? RESERVE_CURRENCY
+      ? decideCurrency(req).currency
       : parseReserveCurrency(req.query.currency);
   if (!offer || !isFormat(format) || !isWindow(days) || quoteCurrency === null) {
     res.status(400).json({ error: "A supported SKU, format, 30, 90, or 180 day window, and usd or cad currency are required." });
@@ -762,8 +763,11 @@ async function handleMachineCheckout(
     "currency",
   ]);
   const offer = getPublicReserveOfferBySku(body.sku);
+  // Omitted currency: geo default (x-vercel-ip-country CA -> CAD, else USD). An explicit
+  // currency always wins; an unsupported explicit value still falls back to USD (and is
+  // rejected below as invalid input).
   const requestedCurrency =
-    body.currency === undefined ? RESERVE_CURRENCY : parseReserveCurrency(body.currency);
+    body.currency === undefined ? decideCurrency(req).currency : parseReserveCurrency(body.currency);
   const currency: ReserveCurrency = requestedCurrency ?? RESERVE_CURRENCY;
   const amountCents = offer ? offerAmountCents(offer, currency) : 0;
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
@@ -2285,9 +2289,10 @@ function renderBuycalcHtmlUsd(input: {
 *{box-sizing:border-box}body{margin:0;background:#f8f6ef;color:#071A39;font:16px/1.55 "IBM Plex Sans",sans-serif}header,main,footer{max-width:1100px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;border-bottom:1px solid #ccd2d8}h1,h2{font-family:Fraunces,serif;font-weight:400}h1{font-size:clamp(2.7rem,7vw,5.8rem);line-height:.95;margin:.5em 0}.accent{background:#C8F55A;padding:.08em .18em}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:36px}.card{border:1px solid #071A39;padding:24px;margin:18px 0}.figures{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#071A39}.figure{background:#fff;padding:18px}.figure strong{display:block;font:600 1.7rem Fraunces,serif}.offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.offer{border:1px solid #071A39;padding:16px;background:#fff}.offer strong{display:block;font:600 1.35rem Fraunces,serif}.offer small{display:block;margin-top:8px}label{display:block;font-weight:600;margin-top:14px}input,select,button{width:100%;padding:12px;border:1px solid #071A39;background:white;font:inherit}button{margin-top:18px;background:#C8F55A;font-weight:600;cursor:pointer}.fine{font-size:.9rem}#message{padding-top:12px;font-weight:600}@media(max-width:760px){.grid,.figures,.offer-grid{grid-template-columns:1fr}}
 .sh-hero{background:#0A1D56;color:#fff;margin:0 -24px;padding:48px 24px}.sh-eyebrow{color:#9D4EDD;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:12px}.sh-hero h1{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:clamp(2.1rem,5vw,3.6rem);line-height:1.05;margin:.3em 0 .6em;max-width:850px}.sh-prices{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sh-price{border-radius:8px;padding:20px;color:#0A1D56}.sh-white{background:#fff}.sh-card{background:#F0F4F8}.sh-price p{margin:.3em 0 1em;font-size:14px}.sh-btn{display:block;text-align:center;background:#0A1D56;color:#fff;padding:13px;border-radius:6px;font-weight:600;text-decoration:none}.sh-ghost{background:transparent;color:#0A1D56;border:2px solid #0A1D56}.sh-proof{margin-top:22px;font-size:14px}.sh-proof a{color:#fff;font-weight:600;text-decoration-color:#9D4EDD}.sh-excl{font-size:12px;opacity:.7}.sc{display:grid;grid-template-columns:1fr 1fr;border:1px solid #0A1D5626;border-radius:8px;overflow:hidden;margin:28px 0;background:#fff}.sc-in{padding:22px}.sc-in label,.sc-in .lab{display:block;font-weight:600;font-size:14px;margin:12px 0 6px}.sc select{width:100%;min-height:44px}.sc-opt{display:block;width:100%;text-align:left;border:0;border-radius:6px;background:#F0F4F8;padding:11px;margin:3px 0;font:600 14px "IBM Plex Sans";color:#0A1D56;cursor:pointer}.sc-opt[aria-checked=true]{background:#0A1D56;color:#fff}.sc-band{display:flex;gap:4px}.sc-band .sc-opt{text-align:center}.sc-out{background:#0A1D56;color:#fff;padding:26px;display:flex;flex-direction:column;justify-content:center}.sc-seat{color:#00FF88;font-size:64px;font-weight:700;line-height:1}.sc-grey{color:#ffffff8c;font-size:14px}.sc-f{font-size:12px;color:#ffffff99}.sc-foot{grid-column:1/-1;font-size:12px;color:#0A1D56a6;padding:16px 22px;border-top:1px solid #0A1D561a}.sc-drawer{background:#F0F4F8;border-radius:8px;padding:18px;margin:0 0 28px}.sc-drawer summary{font-weight:600;cursor:pointer}.sc-drawer summary small{font-weight:400;opacity:.7;margin-left:8px}.cat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0;padding:0;list-style:none}.cat-strip li{border:1px solid #071A39;background:#fff}.cat-strip a,.cat-strip span{display:flex;align-items:center;justify-content:center;min-height:72px;padding:12px;text-align:center;color:inherit;text-decoration:none;font-size:14px;font-weight:600}@media(max-width:760px){.sh-prices,.sc{grid-template-columns:1fr}.cat-strip{grid-template-columns:1fr 1fr}}
 </style></head><body><header><strong>BIRCH RESERVE</strong>${currencyToggleHtml(currency, { sku: input.sku, format: input.format })}<a href="/v1/catalog.json">Machine catalog</a></header><main>
-<section class="sh-hero"><p class="sh-eyebrow">Birch Reserve · Canada</p><h1>Lock one category inside signed health hubs. Not an open auction.</h1>
-<div class="sh-prices"><div class="sh-price sh-white"><strong>$490 USD locks the category.</strong><p>100% media credit. Nothing runs until the insertion order names the hub. Credit expires 12 months.</p><a class="sh-btn" href="/buycalc?sku=reserve-490#reserve">Lock the category · $490 USD</a></div><div class="sh-price sh-card"><strong>$190 USD is a 7-day look.</strong><p>It does not lock a seat. Converts in full to the $490 within 7 days, else refunded.</p><a class="sh-btn sh-ghost" href="/buycalc?sku=hold-190#reserve">Take a 7-day look · $190 USD</a></div></div>
-<p class="sh-proof">Live placement: <a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>. A signed physio hub. Your module sits at the booking and the plan, in the category.</p>
+<section class="sh-hero"><p class="sh-eyebrow">Birch Reserve · Canada</p><h1>Prepay your category's display space. One brand. No bidding.</h1>
+<div class="sh-prices"><div class="sh-price sh-white"><strong style="font-size:2rem">$490 USD</strong><p><b>Prepay once. All of it becomes display credit in your category.</b></p><p>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p><p>Why it beats Meta: Meta sells you a cold click in an auction. Here you pay once, own the category, and your offer meets customers right after they have bought.</p><a class="sh-btn" href="/buycalc?sku=reserve-490#reserve">Prepay your category · $490 USD</a><p>Not ready? <a href="/buycalc?sku=hold-190#reserve">Take a 7-day look for $190 USD</a>. It converts in full to the prepay, or it is refunded.</p></div></div>
+<p class="sh-proof">Live placement: <a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>. A listed physio hub. Your module sits at the booking and the plan, in the category.</p>
+<p class="sh-proof">Public benchmark, not a Birch result: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p>
 <p class="sh-proof">This is the place. Not a view chart. Illustrative until the insertion order names the hub.</p>
 <p class="sh-proof">The unit is one card on a page the visitor already opened. You do not send them to a new feed. The card stays small enough that the hub page remains the page.</p>
 <p class="sh-proof">The category is the named zone. You do not buy an open slot. The insertion order names the hub and the category before anything runs.</p>

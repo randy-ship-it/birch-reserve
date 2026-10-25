@@ -945,7 +945,7 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
 
 const BRAND_TITLE = "Birch Reserve | The Reserve List · Scale Health demand, Canada";
 const BRAND_DESCRIPTION =
-  "The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.";
+  "The look does not burn a seat. The seat is the named category. The insertion order names the hub before anything runs. Priced in CAD for Canada and USD elsewhere.";
 
 test("public marketing title and description match the brand strings", async () => {
   const indexHtml = await readFile(
@@ -964,7 +964,7 @@ test("public marketing title and description match the brand strings", async () 
   assert.ok(indexHtml.includes(`name="twitter:title" content="${BRAND_TITLE}"`));
   assert.match(indexHtml, /<link rel="canonical" href="https:\/\/birchreserve\.net\/" \/>/);
   assert.match(indexHtml, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-birch-reserve\.png" \/>/);
-  assert.match(indexHtml, /The \$190 look does not burn a seat/);
+  assert.match(indexHtml, /The look does not burn a seat/);
   assert.doesNotMatch(indexHtml, /8\.7M|56M monthly views|20M\+|100M\+ orders/);
   assert.doesNotMatch(indexHtml, /Eight category seats inside signed Scale Health hubs\./);
   assert.doesNotMatch(indexHtml, /\$899|payments paused/i);
@@ -1044,11 +1044,11 @@ test("GET /availability.json aliases /v1/availability.json (same handler, not SP
   assert.match(buying, /async function sendAvailabilityJson/);
   assert.match(
     buying,
-    /router\.get\("\/availability\.json"[\s\S]*?await sendAvailabilityJson\(res\)/,
+    /router\.get\("\/availability\.json"[\s\S]*?await sendAvailabilityJson\(req, res\)/,
   );
   assert.match(
     buying,
-    /router\.get\("\/v1\/availability\.json"[\s\S]*?await sendAvailabilityJson\(res\)/,
+    /router\.get\("\/v1\/availability\.json"[\s\S]*?await sendAvailabilityJson\(req, res\)/,
   );
 
   const server = app.listen(0);

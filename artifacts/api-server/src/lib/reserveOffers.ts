@@ -93,6 +93,9 @@ type ReserveOfferShape = {
   published: boolean;
 };
 
+/** Campaign deposit is fully refundable until this many days before the launch date written in the insertion order. */
+export const PREPAY_REFUND_CUTOFF_DAYS = 14;
+
 export const PUBLIC_RESERVE_OFFERS = [
   {
     sku: "hold-190",
@@ -115,8 +118,8 @@ export const PUBLIC_RESERVE_OFFERS = [
     dueTodayUsd: 490,
     offerType: "category_seat",
     scope:
-      "Lock in your slot. Full $490 is media credit toward your placements (not airfare). Insertion order names the hub before anything runs. Credit expires 12 months.",
-    bestFor: "Brands locking in one category slot across signed hubs.",
+      "Prepay your category. All $490 becomes display credit in your category (not airfare). Fully refundable until 14 days before your launch date. The insertion order names the hub before anything runs. Credit expires 12 months.",
+    bestFor: "Brands prepaying one category slot across listed hubs.",
     consumesSeat: true,
     published: true,
   },
