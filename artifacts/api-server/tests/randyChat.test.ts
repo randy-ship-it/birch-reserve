@@ -204,7 +204,7 @@ test("payload contract: garbage chip and unknown fields are rejected", async () 
 });
 
 test("long Grok replies and long threads no longer poison the chat (was: 400 → silent stub)", async () => {
-  const longReply = "Hubs are signed Scale Health sites. ".repeat(40); // ~1,440 chars
+  const longReply = "Hubs are listed Scale Health sites. ".repeat(40); // ~1,440 chars
   assert.equal(
     (await postChat({ messages: [{ role: "assistant", content: longReply }, { role: "user", content: "ok" }] })).status,
     503,

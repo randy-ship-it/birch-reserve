@@ -6,6 +6,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { PUBLIC_RESERVE_OFFERS, offerAmountCents } from "./reserveOffers";
+import type { ReserveCurrency } from "./reserveOffers";
 
 export const PUBLIC_SITE_ORIGIN = "https://birchreserve.net";
 
@@ -194,4 +196,51 @@ export function resolveSpaIndexHtmlPath(): string {
 
 export function readSpaIndexHtml(): string {
   return readFileSync(resolveSpaIndexHtmlPath(), "utf8");
+}
+
+
+/**
+ * Home-page structured data in the visitor's currency. The static shell ships a
+ * USD fallback; the function swaps the whole Product/Offer block for the
+ * detected or forced currency (CAD for Canada, USD elsewhere).
+ */
+export function homeOfferJsonLd(currency: ReserveCurrency): string {
+  const offer = PUBLIC_RESERVE_OFFERS.find((o) => o.sku === "reserve-490");
+  if (!offer) throw new Error("reserve-490 offer is missing.");
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Birch Reserve category prepay",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        item: {
+          "@type": "Product",
+          name: "Birch Reserve category prepay",
+          sku: offer.sku,
+          category: "Private health and wellness media inventory",
+          offers: {
+            "@type": "Offer",
+            price: String(offerAmountCents(offer, currency) / 100),
+            priceCurrency: currency.toUpperCase(),
+            availability: "https://schema.org/LimitedAvailability",
+            url: `${PUBLIC_SITE_ORIGIN}/buycalc?sku=${offer.sku}`,
+          },
+        },
+      },
+    ],
+  };
+  return JSON.stringify(data).replaceAll("<", "\\u003c");
+}
+
+export function withLocalizedOffer(html: string, currency: ReserveCurrency): string {
+  const block = /<script type="application\/ld\+json">[\s\S]*?<\/script>/g;
+  let replaced = false;
+  const next = html.replace(block, (match) => {
+    if (replaced || !match.includes("reserve-490")) return match;
+    replaced = true;
+    return `<script type="application/ld+json">${homeOfferJsonLd(currency)}</script>`;
+  });
+  return next;
 }

@@ -3,7 +3,7 @@
  *
  * Public labels ONLY: "Co-Branded Hubs with Available Ad Slots" | "In Queue" | "LIVE" on DR-HO's.
  * Never surface internal stage words (Contract Out / Late Discussions / Revisiting).
- * Clear chips = live + signed/launching. Blurred chips = In Queue (pipe + supply-only).
+ * Clear chips = live + listed/launching. Blurred chips = In Queue (pipe + supply-only).
  */
 export type HubBannerChip = {
   id: string;
@@ -13,7 +13,7 @@ export type HubBannerChip = {
   live?: boolean;
 };
 
-/** LIVE + signed/launching — clear (unblurred). */
+/** LIVE + listed/launching — clear (unblurred). */
 export const CLEAR_HUBS: ReadonlyArray<HubBannerChip> = [
   { id: "dr-ho", name: "DR-HO's", live: true },
   { id: "kalaya", name: "Kalaya" },
@@ -26,7 +26,7 @@ export const CLEAR_HUBS: ReadonlyArray<HubBannerChip> = [
   { id: "sole", name: "Sole" },
 ];
 
-/** Non-signed pipe — In Queue, blurred. */
+/** Non-listed pipe — In Queue, blurred. */
 export const QUEUE_PIPE_HUBS: ReadonlyArray<HubBannerChip> = [
   { id: "airwaav", name: "AirWaav" },
   { id: "effortless-admin", name: "Effortless Admin" },
@@ -114,7 +114,7 @@ type CobrandedHubsBannerProps = {
 };
 
 /**
- * Full-width centered banner: clear live/signed hubs + blurred In Queue row.
+ * Full-width centered banner: clear live/listed hubs + blurred In Queue row.
  */
 export function CobrandedHubsBanner({
   id = "cobranded-hubs",

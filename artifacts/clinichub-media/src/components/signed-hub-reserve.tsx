@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePriceText } from "@/lib/currency";
 
-// Signed-hub category seat: hero + calculator shared by birchreserve.net (Reserve List, /buycalc) and scalehealth.ca/tam.
-// Engine unchanged: reached views x CTR x click-to-order, from the public feed /inventory/api/tam.
+// Listed-hub category seat: hero + reach calculator shared by birchreserve.net (Reserve List, /buycalc) and scalehealth.ca/tam.
+// Reach only: modelled monthly category views x activation, from the public feed /inventory/api/tam. No CTR or conversion inputs.
 // Palette: navy #0A1D56, green #00FF88 only on the seat number, purple #9D4EDD single accent, white + #F0F4F8 cards.
 const NAVY = "#0A1D56", GREEN = "#00FF88", PURPLE = "#9D4EDD", CARD = "#F0F4F8";
 export const LIVE_HUB_URL = "https://physio.drhonow.com";
@@ -21,17 +21,9 @@ export function useFeed(url: string) {
   return feed;
 }
 
-const SURFACES = [
-  { key: "hub", label: "Confirmation, plan, booking, member hub", ctr: [0.0025, 0.0045, 0.007] },
-  { key: "brand", label: "Brand-site display", ctr: [0.0008, 0.0014, 0.002] },
-  { key: "post", label: "Post-purchase module only", ctr: [0.015, 0.025, 0.04] },
-] as const;
-const C2O = [0.012, 0.022, 0.035];
-const BANDS = ["Low", "Mid", "High"] as const;
 const ACTIVATION = 0.8;
 const SEAT = 1; // one brand per category: the seat is the whole category surface
 const fmt = (n: number) => (n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e4 ? Math.round(n / 1000) + "K" : n >= 100 ? (Math.round(n / 10) * 10).toLocaleString() : Math.round(n).toString());
-const pct = (x: number) => (x * 100).toFixed(2).replace(/0$/, "") + "%";
 
 export const PREPAY_REFUND_CUTOFF_DAYS = 14;
 
@@ -65,19 +57,15 @@ export function SignedHubHero({ reserveHref, lookHref, cardsLive = true, eyebrow
 
 export function SeatCalculator({ feed }: { feed: Feed | null }) {
   const [scope, setScope] = useState("");
-  const [surface, setSurface] = useState<(typeof SURFACES)[number]["key"]>("hub");
-  const [band, setBand] = useState(1);
   const [y27, setY27] = useState(false);
   const cats = feed?.categories || [];
   const cat = cats.find((c) => c.category === scope) || cats[0];
   const r = useMemo(() => {
     if (!feed || !cat) return null;
-    const s = SURFACES.find((x) => x.key === surface)!;
     const k = y27 ? feed.pipeline.y2027_orders / (feed.pipeline.live_orders || 1) : 1;
     const reached = (Number(cat.pv_total) || 0) * ACTIVATION * SEAT * k;
-    const ctr = s.ctr[band], c2o = C2O[band], clicks = reached * ctr;
-    return { reached, ctr, c2o, clicks, orders: clicks * c2o };
-  }, [feed, cat, surface, band, y27]);
+    return { reached };
+  }, [feed, cat, y27]);
   return (
     <div className="grid overflow-hidden rounded-lg border border-[#0A1D56]/15 bg-white text-[#0A1D56] lg:grid-cols-2" data-testid="seat-calculator">
       <div className="space-y-5 p-5 md:p-7">
@@ -85,35 +73,20 @@ export function SeatCalculator({ feed }: { feed: Feed | null }) {
           <select value={cat?.category || ""} onChange={(e) => setScope(e.target.value)} className="min-h-12 w-full rounded-md border border-[#0A1D56]/20 bg-white px-3">
             {cats.map((c) => <option key={c.category}>{c.category}</option>)}
           </select></label>
-        <div><span className="mb-1.5 block text-sm font-semibold">Surface</span>
-          <div className="grid gap-1" role="radiogroup">
-            {SURFACES.map((s) => (
-              <button key={s.key} type="button" role="radio" aria-checked={surface === s.key} onClick={() => setSurface(s.key)}
-                className="min-h-11 rounded-md px-3 text-left text-sm font-semibold" style={surface === s.key ? { background: NAVY, color: "#fff" } : { background: CARD }}>
-                {s.label} <span className="font-normal opacity-75">· {s.ctr.map(pct).join(" / ")} CTR</span>
-              </button>))}
-          </div>
-          {surface === "post" && <p className="mt-1.5 text-xs text-[#0A1D56]/70">Post-purchase rate applies to that module only. Never blended into the hub rate.</p>}
-        </div>
-        <div><span className="mb-1.5 block text-sm font-semibold">Band</span>
-          <div className="flex gap-1">{BANDS.map((b, i) => (
-            <button key={b} type="button" onClick={() => setBand(i)} className="min-h-11 flex-1 rounded-md text-sm font-semibold" style={band === i ? { background: NAVY, color: "#fff" } : { background: CARD }}>{b}</button>))}</div>
-          <p className="mt-1.5 text-xs text-[#0A1D56]/70">Click-to-order 1.2 / 2.2 / 3.5%. Click-to-order, not view-to-order.</p>
-        </div>
-        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={y27} onChange={(e) => setY27(e.target.checked)} /> Illustrative 2027</label>
+        <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={y27} onChange={(e) => setY27(e.target.checked)} /> Illustrative 2027 (modelled)</label>
+        <p className="text-xs text-[#0A1D56]/70">Assumption: {Math.round(ACTIVATION * 100)}% of listed partner surfaces in the category are switched on to carry your module. One brand per category.</p>
       </div>
       <div className="flex flex-col justify-center p-5 md:p-8" style={{ background: NAVY }} aria-live="polite">
         {r && cat ? (<>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/70">Your category surface</p>
           <div className="mt-1 text-6xl font-bold leading-none md:text-7xl" style={{ color: GREEN }} data-testid="seat-number">1 seat</div>
           <p className="mt-2 text-lg font-semibold text-white">{cat.category}. One brand in the category.</p>
-          <p className="mt-5 text-base text-white/80">Scenario clicks: about {fmt(r.clicks)} a month</p>
-          <p className="mt-1 text-sm text-white/55">Scenario orders: about {fmt(r.orders)} a month{y27 ? " (illustrative 2027)" : ""}</p>
-          <p className="mt-4 text-xs leading-relaxed text-white/60">Reached views × surface CTR × click-to-order: {fmt(r.reached)} × {pct(r.ctr)} × {pct(r.c2o)}. Reached views = category monthly views × 80% activation × seat. Activation is the share of signed partner surfaces switched on to carry your module.</p>
-        </>) : <p className="text-sm text-white/70">Loading the live feed…</p>}
+          <p className="mt-5 text-base text-white/80" data-testid="seat-reach">Modelled monthly views in your category surface: about {fmt(r.reached)}{y27 ? " (illustrative 2027)" : ""}</p>
+          <p className="mt-4 text-xs leading-relaxed text-white/60">Modelled category monthly views × {Math.round(ACTIVATION * 100)}% activation × 1 seat. Activation is the share of listed partner surfaces switched on to carry your module.</p>
+        </>) : <p className="text-sm text-white/70">Loading the modelled feed…</p>}
       </div>
       <p className="border-t border-[#0A1D56]/10 p-5 text-xs leading-relaxed text-[#0A1D56]/65 lg:col-span-2">
-        Views modeled at 6.4 monthly views per annual order from partner category data. Not audited served impressions. Bands are industry scenarios (healthcare display 0.10–0.25%, native floor above 0.4%). Email CTR is not used.
+        Modelled estimate. Views are modelled at 6.4 monthly views per annual order from partner category data. Not audited served impressions, not a delivery or impression guarantee, and not a performance or click forecast.
       </p>
     </div>
   );
@@ -123,15 +96,14 @@ export function HowCalculated({ feed, showAudience = false }: { feed: Feed | nul
   const L = feed?.pipeline?.labels || {};
   return (
     <details className="rounded-lg border border-[#0A1D56]/15 p-5 text-[#0A1D56]" style={{ background: CARD }} data-testid="how-calculated">
-      <summary className="cursor-pointer text-base font-semibold">How this is calculated <span className="ml-2 text-xs font-normal opacity-70">Scenario, not a guarantee, not Scale measured performance.</span></summary>
+      <summary className="cursor-pointer text-base font-semibold">How this is calculated <span className="ml-2 text-xs font-normal opacity-70">Modelled estimate, not a guarantee, not Scale measured performance.</span></summary>
       <ul className="mt-4 list-disc space-y-2 pl-5 text-sm">
         {showAudience ? (<>
-          <li>Audience: {L.live_orders || "8.7M"} orders a year mapped across partner categories, about {L.live_views || "56M"} monthly views (est.).</li>
+          <li>Audience: {L.live_orders || "8.7M"} modelled network audience orders a year across listed partner categories, about {L.live_views || "56M"} monthly views (est.).</li>
           <li>2027 projection (est.): {L.y2027_orders || "100M+"} orders a year. Used only when "Illustrative 2027" is on.</li>
         </>) : <li>"Illustrative 2027" scales views by the partner pipeline projection (est.). Off by default.</li>}
         <li>Views are modeled at 6.4 monthly views per annual order. They are not served impressions.</li>
-        <li>Surface CTR bands come from industry ranges. They are not Scale measured results.</li>
-        <li>Orders use click-to-order, not view-to-order. Email CTR is not used.</li>
+        <li>This calculator shows modelled reach only. It makes no click, conversion or order forecast.</li>
       </ul>
     </details>
   );

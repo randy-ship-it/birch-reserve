@@ -10,7 +10,7 @@
 
 LiveIntent places the unit inside the newsletter the reader already opened. You do not open a new tab.
 
-Birch Reserve sells the same shape inside a signed hub. The square sits on the page the member already has open. After the booking. On the plan. In the category.
+Birch Reserve sells the same shape inside a listed hub. The square sits on the page the member already has open. After the booking. On the plan. In the category.
 
 RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
 

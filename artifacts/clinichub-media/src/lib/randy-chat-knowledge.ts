@@ -163,7 +163,7 @@ export const QUALIFY_QUESTIONS: ReadonlyArray<{ key: QualifyKey; prompt: string 
   {
     key: "timing",
     prompt:
-      "Last one: what's your timing, and a rough budget range? (For reference, early slots on the Reserve List are free to claim, and the early placement is $490.)",
+      "Last one: what's your timing, and a rough budget range? (For reference, early slots on the Reserve List are free to claim, and the category prepay is $490.)",
   },
 ] as const;
 

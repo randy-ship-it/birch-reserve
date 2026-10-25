@@ -113,7 +113,7 @@ export const PUBLIC_RESERVE_OFFERS = [
   {
     sku: "reserve-490",
     offerKey: "reserve-490",
-    name: "Reserve your slot",
+    name: "Category prepay",
     amountCents: 49_000,
     dueTodayUsd: 490,
     offerType: "category_seat",

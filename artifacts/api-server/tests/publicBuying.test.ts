@@ -4537,7 +4537,7 @@ test("availability is integer-valued and buycalc remains useful without JavaScri
   assert.match(html, /<noscript>/);
   assert.match(html, /#C8F55A/);
   assert.match(html, /One unit inside the hub\. Not a stack of banners\. The category names the card\./);
-  assert.match(html, /The zone is the category\. You can open a signed hub before the look\. The look does not serve\./);
+  assert.match(html, /The zone is the category\. You can open a listed hub before the look\. The look does not serve\./);
   assert.match(html, /The \$190 look is a draft you build\. It does not serve until the insertion order names the hub\./);
   assert.match(html, /One brand header on the category the customer already opened\. Not a second page\./);
   assert.match(html, /The unit matches the page the customer already opened\. It is not a banner beside the letter\./);

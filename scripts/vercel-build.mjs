@@ -165,6 +165,8 @@ await writeFile(
 );
 
 const routes = [
+  // The home page is served by the function so its Offer JSON-LD matches the visitor's currency.
+  { src: "^/$", dest: "/api" },
   { handle: "filesystem" },
   ...API_PATHS.map((src) => ({ src, dest: "/api" })),
   ...SPA_INDEX_PATHS.map((src) => ({ src, dest: "/index.html" })),

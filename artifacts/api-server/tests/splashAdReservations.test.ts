@@ -153,7 +153,7 @@ test("public reserve stores the canonical $490 offer and holds the seat without 
   assert.equal(row.adInterest, "display");
   assert.equal(
     row.promotedOffer,
-    "Birch Reserve Category seat",
+    "Birch Reserve Category prepay",
   );
   assert.equal(row.launchWindow, null);
   assert.equal(row.status, "seat_held");

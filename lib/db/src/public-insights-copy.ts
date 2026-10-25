@@ -9,7 +9,7 @@ export const SCALE_HUBS_ARTICLE = {
   authorName: "Birch Reserve Editorial",
   topic: "Closed-hub advertising",
   summary:
-    "Brand display works differently when it sits after a purchase or booking inside a signed recovery hub. Birch Reserve sells early category slots on those hubs—Hold $190 or Reserve $490—not guaranteed impressions on the open web.",
+    "Brand display works differently when it sits after a purchase or booking inside a listed recovery hub. Birch Reserve sells early category slots on those hubs—Hold $190 or Reserve $490—not guaranteed impressions on the open web.",
   publishedAt: new Date("2026-09-24T16:00:00.000Z"),
   body: `# After the booking: why category seats beat open-web noise
 
@@ -17,7 +17,7 @@ Most performance channels buy attention before someone has decided anything. Sca
 
 ## What a Birch Reserve seat actually is
 
-Birch Reserve is the paid-display layer for signed Scale Health recovery hubs. Inventory is eight advertiser categories across those hubs, not eight websites. One brand per aisle. Live proof of a participating hub: https://physio.drhonow.com/dr-ho/portal.
+Birch Reserve is the paid-display layer for listed Scale Health recovery hubs. Inventory is eight advertiser categories across those hubs, not eight websites. One brand per aisle. Live proof of a participating hub: https://physio.drhonow.com/dr-ho/portal.
 
 Public offers (USD):
 
@@ -37,7 +37,7 @@ Useful mental model: the hub earns trust; Birch lets a fitting brand show up in 
 
 ## What we do not claim
 
-We do not sell guaranteed impression counts, CTR floors, or “how many people will see this.” If a brand asks for a reach number, the honest answer is: you buy first-right on a category inside signed hubs; the IO names the surface. Anything else is a different product.
+We do not sell guaranteed impression counts, CTR floors, or “how many people will see this.” If a brand asks for a reach number, the honest answer is: you buy first-right on a category inside listed hubs; the IO names the surface. Anything else is a different product.
 
 ## Practical next step
 
@@ -57,7 +57,7 @@ export const SHELF_AFTER_RECEIPT_ARTICLE = {
   publishedAt: new Date("2026-09-27T16:00:00.000Z"),
   body: `# The shelf after the receipt
 
-Most ad products sell you a start date. Birch sells you a shelf that only appears after someone already finished a real step inside a signed Scale Health hub.
+Most ad products sell you a start date. Birch sells you a shelf that only appears after someone already finished a real step inside a listed Scale Health hub.
 
 That is the whole point.
 
@@ -101,7 +101,7 @@ export const WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE = {
   authorName: "Birch Reserve Editorial",
   topic: "Closed-hub advertising",
   summary:
-    "Birch Reserve sells the aisle, not the auction. Eight category seats sit inside signed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.",
+    "Birch Reserve sells the aisle, not the auction. Eight category seats sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.",
   publishedAt: new Date("2026-10-15T16:00:00.000Z"),
   body: `# What you send for a seat
 
@@ -109,7 +109,7 @@ Most ad networks ask for a banner and a bid.
 
 That is the wrong first file for a room a brand already paid to fill. The customer already checked out, booked, or opened a plan. The next unit has to look like it belongs on that shelf, not like it escaped a feed.
 
-Birch Reserve sells the aisle, not the auction. Eight category seats sit inside signed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
+Birch Reserve sells the aisle, not the auction. Eight category seats sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
 
 Here is the actual handoff after you look or lock.
 
@@ -148,7 +148,7 @@ Most ad networks start the flight when the card clears.
 
 That is the wrong order for a room a brand already paid to fill. The customer already checked out, booked, or opened a plan. The next unit has to look like it belongs on that shelf before anything runs.
 
-Birch Reserve sells the aisle, not the auction. Eight category seats sit inside signed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
+Birch Reserve sells the aisle, not the auction. Eight category seats sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
 
 You see the face before the flight. The square still is the preview. Nothing on the hub changes until the insertion order names the hub and the surface: post-checkout, plan, booking, or member hub.
 
@@ -179,7 +179,7 @@ export const ONE_CARD_NAMES_THE_CATEGORY_ARTICLE = {
 Carbon places one native card on the page the reader already opened.
 One image. One short line. Not a feed.
 
-Birch places one card inside a signed hub. The category names the
+Birch places one card inside a listed hub. The category names the
 card. It sits after checkout, on a plan, or at a booking.
 
 The $190 look is that card for 7 days. It does not burn a seat. It
@@ -251,7 +251,7 @@ export const THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE = {
 
 Amazon, Instacart, and Walmart place the brand on the aisle the shopper already opened. The header sits where the category is already shopped.
 
-Birch Reserve sells the same shape inside a signed hub. You do not build a new page. The insertion order names the hub and the category the member already has open.
+Birch Reserve sells the same shape inside a listed hub. You do not build a new page. The insertion order names the hub and the category the member already has open.
 
 RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
 
@@ -271,7 +271,7 @@ export const THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE = {
 
 LiveIntent places the unit inside the newsletter the reader already opened. You do not open a new tab.
 
-Birch Reserve sells the same shape inside a signed hub. The square sits on the page the member already has open. After the booking. On the plan. In the category.
+Birch Reserve sells the same shape inside a listed hub. The square sits on the page the member already has open. After the booking. On the plan. In the category.
 
 RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
 

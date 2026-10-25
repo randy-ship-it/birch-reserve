@@ -17,8 +17,10 @@ import {
   readSpaIndexHtml,
   sitemapXml,
   withNotFoundDocument,
+  withLocalizedOffer,
   withRouteSeo,
 } from "../lib/publicSeo";
+import { currencyCookieHeader, decideCurrency } from "../lib/currency";
 
 const router: IRouter = Router();
 
@@ -62,6 +64,24 @@ router.get("/sitemap.xml", async (_req, res) => {
     "Content-Type": "application/xml; charset=utf-8",
   });
   res.send(xml);
+});
+
+// Home: the shell with the Offer JSON-LD in the visitor's currency (CAD for Canada, USD elsewhere,
+// or the forced ?currency / saved choice). Server-rendered so crawlers and agents see the same price.
+router.get("/", (req, res) => {
+  let html: string;
+  try {
+    html = readSpaIndexHtml();
+  } catch (error) {
+    logger.error({ err: error }, "SPA shell for home is missing");
+    res.status(500).type("text/plain").send("Page unavailable.");
+    return;
+  }
+  const decision = decideCurrency(req);
+  res.setHeader("Vary", "Cookie, x-vercel-ip-country");
+  res.set("Cache-Control", "private, max-age=0, must-revalidate");
+  if (decision.source === "query") res.append("Set-Cookie", currencyCookieHeader(decision.currency));
+  res.type("html").send(withLocalizedOffer(html, decision.currency));
 });
 
 for (const path of SPA_SHELL_PATHS) {

@@ -7,12 +7,12 @@ export const RESERVE_OFFERS = [
     amountCents: 19_000,
     consumesSeat: false,
     description:
-      "A 7-day look at the inventory. 100% credit if you move to an early placement within 7 days, else refund.",
+      "A 7-day look at the inventory. 100% credit if you move to a category prepay within 7 days, else refund.",
     creditLine: "Media credit, not airfare.",
   },
   {
     key: "reserve-490",
-    name: "Early placement",
+    name: "Category prepay",
     amountCents: 49_000,
     consumesSeat: true,
     description:

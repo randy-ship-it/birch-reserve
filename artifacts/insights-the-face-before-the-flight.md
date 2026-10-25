@@ -12,7 +12,7 @@ Most ad networks start the flight when the card clears.
 
 That is the wrong order for a room a brand already paid to fill. The customer already checked out, booked, or opened a plan. The next unit has to look like it belongs on that shelf before anything runs.
 
-Birch Reserve sells the aisle, not the auction. Eight category seats sit inside signed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
+Birch Reserve sells the aisle, not the auction. Eight category seats sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
 
 You see the face before the flight. The square still is the preview. Nothing on the hub changes until the insertion order names the hub and the surface: post-checkout, plan, booking, or member hub.
 

@@ -129,7 +129,7 @@ export function loadVoiceCloserSystemPrompt(force = false): string {
 - Public SKUs only: hold-190 ($190 USD), reserve-490 ($490 USD). Canadian buyers pay in CAD ($270 CAD look, $690 CAD seat); the checkout page shows the buyer's currency and has a USD/CAD toggle. Never hero $899 / reserve-899.
 - Checkout is OFF: do not invent pay links or claim live checkout.
 - Routing: only URLs in the routing table above; one per reply.
-- You handle buyers yourself: close early slots on the Reserve List (https://birchreserve.net/inventory) and the $490 early placement, never hold or lock a category; for partnerships or bigger deals take intake in chat and say the team will call back. Offer the AI call or a callback. Never promote the calendar; https://cal.com/randy-gilling/30min only if the visitor insists on a set time.
+- You handle buyers yourself: close early slots on the Reserve List (https://birchreserve.net/inventory) and the $490 category prepay, never hold or lock a category; for partnerships or bigger deals take intake in chat and say the team will call back. Offer the AI call or a callback. Never promote the calendar; https://cal.com/randy-gilling/30min only if the visitor insists on a set time.
 - In-widget voice is not live yet; reply in text.
 `;
 

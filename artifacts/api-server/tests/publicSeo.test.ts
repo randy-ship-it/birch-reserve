@@ -215,7 +215,7 @@ test("GET /insights/one-card-names-the-category publishes the supplied copy and 
   assert.equal(html.match(/<h1>/g)?.length, 1);
   assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/insights\/one-card-names-the-category"\s*\/>/);
   assert.match(html, /Carbon places one native card on the page the reader already opened\. One image\. One short line\. Not a feed\./);
-  assert.match(html, /Birch places one card inside a signed hub\. The category names the card\. It sits after checkout, on a plan, or at a booking\./);
+  assert.match(html, /Birch places one card inside a listed hub\. The category names the card\. It sits after checkout, on a plan, or at a booking\./);
   assert.match(html, /The \$190 look is that card for 7 days\. It does not burn a seat\. It does not start a flight\. You see the card before the insertion order names the hub\./);
   assert.match(html, /Nothing runs on the look alone\./);
   assert.match(html, /RDG Digital Holdings builds Scale Health\. Birch Reserve is the media seat on that network\./);
@@ -293,7 +293,7 @@ test("GET /insights/the-category-is-already-open publishes the supplied copy and
   assert.equal(html.match(/<h1>/g)?.length, 1);
   assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/insights\/the-category-is-already-open"\s*\/>/);
   assert.match(html, /Amazon, Instacart, and Walmart place the brand on the aisle the shopper already opened\. The header sits where the category is already shopped\./);
-  assert.match(html, /Birch Reserve sells the same shape inside a signed hub\. You do not build a new page\. The insertion order names the hub and the category the member already has open\./);
+  assert.match(html, /Birch Reserve sells the same shape inside a listed hub\. You do not build a new page\. The insertion order names the hub and the category the member already has open\./);
   assert.match(html, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
   assert.match(html, /The \$190 look does not burn a seat\. It lets you see the open aisle before you decide\./);
   assert.doesNotMatch(html, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899/);
@@ -326,7 +326,7 @@ test("GET /insights/the-square-sits-inside-the-hub-already-open publishes the su
   assert.equal(html.match(/<h1>/g)?.length, 1);
   assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/insights\/the-square-sits-inside-the-hub-already-open"\s*\/>/);
   assert.match(html, /LiveIntent places the unit inside the newsletter the reader already opened\. You do not open a new tab\./);
-  assert.match(html, /Birch Reserve sells the same shape inside a signed hub\. The square sits on the page the member already has open\. After the booking\. On the plan\. In the category\./);
+  assert.match(html, /Birch Reserve sells the same shape inside a listed hub\. The square sits on the page the member already has open\. After the booking\. On the plan\. In the category\./);
   assert.match(html, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
   assert.match(html, /The \$190 look does not burn a seat\. It lets you see the open hub before you decide\./);
   assert.doesNotMatch(html, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899/);
@@ -1010,7 +1010,7 @@ test("buycalc HTML keeps the category facts and drops the price-rise line", () =
   assert.match(html, /\$490 USD/);
   assert.match(html, /\$190 USD/);
   assert.match(html, /One unit inside the hub\. Not a stack of banners\. The category names the card\./);
-  assert.match(html, /The zone is the category\. You can open a signed hub before the look\. The look does not serve\./);
+  assert.match(html, /The zone is the category\. You can open a listed hub before the look\. The look does not serve\./);
   assert.match(html, /The \$190 look is a draft you build\. It does not serve until the insertion order names the hub\./);
   assert.match(html, /One brand header on the category the customer already opened\. Not a second page\./);
   assert.match(html, /The unit matches the page the customer already opened\. It is not a banner beside the letter\./);
@@ -1155,4 +1155,62 @@ test("unknown paths return 404 with the SPA shell", async () => {
   }
   const kit = await fetch(`${origin}/kit`);
   assert.equal(kit.status, 200);
+});
+
+function homeOffer(html: string): { price: string; priceCurrency: string } {
+  const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1] ?? "");
+  const block = blocks.find((b) => b.includes("reserve-490"));
+  assert.ok(block, "home JSON-LD with the reserve-490 offer");
+  const data = JSON.parse(block!);
+  return data.itemListElement[0].item.offers;
+}
+
+test("GET / serves the Offer JSON-LD in the visitor's currency (CA -> CAD, else USD, ?currency wins)", async () => {
+  const cases: Array<[string, Record<string, string>, string, string]> = [
+    ["/", { "x-vercel-ip-country": "CA" }, "690", "CAD"],
+    ["/", { "x-vercel-ip-country": "US" }, "490", "USD"],
+    ["/", {}, "490", "USD"],
+    ["/?currency=cad", { "x-vercel-ip-country": "US" }, "690", "CAD"],
+    ["/?currency=usd", { "x-vercel-ip-country": "CA" }, "490", "USD"],
+  ];
+  for (const [path, headers, price, cur] of cases) {
+    const res = await fetch(`${origin}${path}`, { headers });
+    assert.equal(res.status, 200);
+    assert.match(res.headers.get("vary") ?? "", /x-vercel-ip-country/i);
+    const html = await res.text();
+    const offer = homeOffer(html);
+    assert.equal(offer.price, price, `${path} ${JSON.stringify(headers)}`);
+    assert.equal(offer.priceCurrency, cur);
+    assert.doesNotMatch(html, /early placement/i);
+  }
+});
+
+test("/buycalc calculator shows modelled reach only: no CTR, click or order assumptions, no 'signed' hubs", () => {
+  for (const currency of ["usd", "cad"] as const) {
+    const html = renderBuycalcHtml({ seatsOpen: 8, seatsTotal: 8, currency });
+    assert.match(html, /id="seat-calc"/);
+    assert.match(html, /Modelled monthly views in your category surface/);
+    assert.doesNotMatch(html, /CTR|click-to-order|Click-to-order|Scenario clicks|Scenario orders|sc-surf|sc-band/);
+    assert.doesNotMatch(html, /0\.08|0\.25 \/ 0\.45|4\.00%/);
+    assert.doesNotMatch(html, /\bsigned (?:Scale Health|hubs?|partner)/i);
+    assert.doesNotMatch(html, /bonus-tier-draft/);
+    assert.match(html, /refundable until 14 days before|14 days before your launch date/i);
+  }
+});
+
+test("the volume-bonus draft renders only with the draft flag, in the page currency, and keeps the base price", () => {
+  const off = renderBuycalcHtml({ seatsOpen: 8, seatsTotal: 8, currency: "cad" });
+  assert.doesNotMatch(off, /Volume prepay bonus/);
+  const cad = renderBuycalcHtml({ seatsOpen: 8, seatsTotal: 8, currency: "cad", draftBonus: true });
+  assert.match(cad, /Draft · not for sale/);
+  assert.match(cad, /\$2,100 CAD/);
+  assert.match(cad, /\$2,205 CAD/);
+  assert.match(cad, /\$9,660 CAD/);
+  assert.match(cad, /\$690 CAD/);
+  assert.match(cad, /<meta name="robots" content="noindex">/);
+  const usd = renderBuycalcHtml({ seatsOpen: 8, seatsTotal: 8, currency: "usd", draftBonus: true });
+  assert.match(usd, /\$1,575 USD/);
+  assert.match(usd, /\$6,900 USD/);
+  assert.match(usd, /13\.0%/);
+  assert.match(usd, /\$490 USD/);
 });

@@ -48,6 +48,7 @@ import {
   type ReserveCurrency,
 } from "../lib/reserveOffers";
 import { currencyCookieHeader, decideCurrency } from "../lib/currency";
+import { isBonusDraftRequested, renderBonusTierDraftHtml } from "../lib/bonusTierDraft";
 import {
   admitUcpProfileResolution,
   authenticateUcpAgentRequest,
@@ -472,7 +473,7 @@ async function reserveCounts() {
 }
 
 const PUBLIC_BRAND_DESCRIPTION =
-  "$190 holds a category 7 days. $490 locks in your slot inside signed Scale Health hubs. Live hub: physio.drhonow.com. Your payment is media credit, not airfare.";
+  "Prepay your category's display space across listed Scale Health hubs. One brand per category, no bidding. Fully refundable until 14 days before launch. Live hub: physio.drhonow.com. Your payment is display credit, not airfare.";
 
 /** Price-rise line stays off /buycalc until a change is locked in writing. */
 const BUYCALC_PRICE_RISE = "Lock in your slot before the minimum goes up";
@@ -486,7 +487,7 @@ function buycalcPublicScope(scope: string): string {
 
 const BUYCALC_SKU_LINES = [
   "One unit inside the hub. Not a stack of banners. The category names the card.",
-  "The zone is the category. You can open a signed hub before the look. The look does not serve.",
+  "The zone is the category. You can open a listed hub before the look. The look does not serve.",
   "The $190 look is a draft you build. It does not serve until the insertion order names the hub.",
   "One brand header on the category the customer already opened. Not a second page.",
   "The unit matches the page the customer already opened. It is not a banner beside the letter.",
@@ -2210,17 +2211,16 @@ router.get("/openapi.yaml", async (_req, res): Promise<void> => {
 });
 
 
-// Signed-hub seat calculator for /buycalc. Same engine as the Reserve List: reached views x surface CTR x click-to-order.
+// Listed-hub reach calculator for /buycalc. Modelled monthly category views x activation only: no CTR or conversion inputs.
 const BUYCALC_SEAT_CALC_HTML = `<section class="sc" id="seat-calc"><div class="sc-in"><label for="sc-cat">Category</label><select id="sc-cat"></select>
-<span class="lab">Surface</span><div id="sc-surf"><button type="button" class="sc-opt" data-s="hub" aria-checked="true">Confirmation, plan, booking, member hub · 0.25 / 0.45 / 0.70% CTR</button><button type="button" class="sc-opt" data-s="brand" aria-checked="false">Brand-site display · 0.08 / 0.14 / 0.20% CTR</button><button type="button" class="sc-opt" data-s="post" aria-checked="false">Post-purchase module only · 1.50 / 2.50 / 4.00% CTR</button></div>
-<span class="lab">Band</span><div class="sc-band" id="sc-band"><button type="button" class="sc-opt" data-b="0" aria-checked="false">Low</button><button type="button" class="sc-opt" data-b="1" aria-checked="true">Mid</button><button type="button" class="sc-opt" data-b="2" aria-checked="false">High</button></div>
-<p style="font-size:12px;margin:6px 0">Click-to-order 1.2 / 2.2 / 3.5%. Click-to-order, not view-to-order.</p><label style="font-weight:400"><input type="checkbox" id="sc-27"> Illustrative 2027</label></div>
-<div class="sc-out" aria-live="polite"><small style="letter-spacing:.16em;text-transform:uppercase;opacity:.7">Your category surface</small><div class="sc-seat">1 seat</div><p id="sc-catname" style="font-weight:600;font-size:18px;margin:.3em 0 1em"></p><p id="sc-clicks" style="margin:0"></p><p id="sc-orders" class="sc-grey"></p><p id="sc-f" class="sc-f"></p></div>
-<p class="sc-foot">Views modeled at 6.4 monthly views per annual order from partner category data. Not audited served impressions. Bands are industry scenarios (healthcare display 0.10–0.25%, native floor above 0.4%). Email CTR is not used.</p></section>
-<details class="sc-drawer"><summary>How this is calculated<small>Scenario, not a guarantee, not Scale measured performance.</small></summary><ul id="sc-how"><li>"Illustrative 2027" scales views by the partner pipeline projection (est.). Off by default.</li><li>Views are modeled at 6.4 monthly views per annual order. They are not served impressions.</li><li>Surface CTR bands come from industry ranges. They are not Scale measured results.</li><li>Orders use click-to-order, not view-to-order. Email CTR is not used.</li></ul></details>
-<script>(function(){var S={hub:[.0025,.0045,.007],brand:[.0008,.0014,.002],post:[.015,.025,.04]},C=[.012,.022,.035],s="hub",b=1,F=null;function f(n){return n>=1e6?(n/1e6).toFixed(1)+"M":n>=1e4?Math.round(n/1e3)+"K":n>=100?(Math.round(n/10)*10).toLocaleString():String(Math.round(n))}function p(x){return(x*100).toFixed(2)+"%"}var sel=document.getElementById("sc-cat");function run(){if(!F)return;var c=F.categories.find(function(x){return x.category===sel.value})||F.categories[0],k=document.getElementById("sc-27").checked?F.pipeline.y2027_orders/(F.pipeline.live_orders||1):1,r=c.pv_total*.8*1*k,t=S[s][b],cl=r*t,o=cl*C[b];document.getElementById("sc-catname").textContent=c.category+". One brand in the category.";document.getElementById("sc-clicks").textContent="Scenario clicks: about "+f(cl)+" a month";document.getElementById("sc-orders").textContent="Scenario orders: about "+f(o)+" a month"+(k>1?" (illustrative 2027)":"");document.getElementById("sc-f").textContent="Reached views × surface CTR × click-to-order: "+f(r)+" × "+p(t)+" × "+p(C[b])+". Reached views = category monthly views × 80% activation × seat. Activation is the share of signed partner surfaces switched on to carry your module."}
-function grp(id,attr,set){document.querySelectorAll("#"+id+" .sc-opt").forEach(function(btn){btn.onclick=function(){document.querySelectorAll("#"+id+" .sc-opt").forEach(function(x){x.setAttribute("aria-checked","false")});btn.setAttribute("aria-checked","true");set(btn.getAttribute(attr));run()}})}grp("sc-surf","data-s",function(v){s=v});grp("sc-band","data-b",function(v){b=+v});sel.onchange=run;document.getElementById("sc-27").onchange=run;
-fetch("/inventory/api/tam").then(function(r){return r.json()}).then(function(j){F=j;sel.innerHTML=j.categories.map(function(c){return"<option>"+c.category+"</option>"}).join("");run()}).catch(function(){document.getElementById("sc-catname").textContent="Live feed unavailable."})})();</script>`;
+<label style="font-weight:400;margin-top:12px"><input type="checkbox" id="sc-27"> Illustrative 2027 (modelled)</label>
+<p style="font-size:12px;margin:8px 0 0">Assumption: 80% of listed partner surfaces in the category are switched on to carry your module. One brand per category.</p></div>
+<div class="sc-out" aria-live="polite"><small style="letter-spacing:.16em;text-transform:uppercase;opacity:.7">Your category surface</small><div class="sc-seat">1 seat</div><p id="sc-catname" style="font-weight:600;font-size:18px;margin:.3em 0 1em"></p><p id="sc-reach" style="margin:0"></p><p id="sc-f" class="sc-f"></p></div>
+<p class="sc-foot">Modelled estimate. Views are modelled at 6.4 monthly views per annual order from partner category data. Not audited served impressions, not a delivery or impression guarantee, and not a performance or click forecast.</p></section>
+<details class="sc-drawer"><summary>How this is calculated<small>Modelled estimate, not a guarantee, not Scale measured performance.</small></summary><ul id="sc-how"><li>"Illustrative 2027" scales views by the partner pipeline projection (est.). Off by default.</li><li>Views are modelled at 6.4 monthly views per annual order. They are not served impressions.</li><li>This calculator shows modelled reach only. It makes no click, conversion or order forecast.</li></ul></details>
+<script>(function(){var F=null;function f(n){return n>=1e6?(n/1e6).toFixed(1)+"M":n>=1e4?Math.round(n/1e3)+"K":n>=100?(Math.round(n/10)*10).toLocaleString():String(Math.round(n))}var sel=document.getElementById("sc-cat");function run(){if(!F)return;var c=F.categories.find(function(x){return x.category===sel.value})||F.categories[0],y=document.getElementById("sc-27").checked,k=y?F.pipeline.y2027_orders/(F.pipeline.live_orders||1):1,r=c.pv_total*.8*1*k;document.getElementById("sc-catname").textContent=c.category+". One brand in the category.";document.getElementById("sc-reach").textContent="Modelled monthly views in your category surface: about "+f(r)+(y?" (illustrative 2027)":"");document.getElementById("sc-f").textContent="Modelled category monthly views × 80% activation × 1 seat. Activation is the share of listed partner surfaces switched on to carry your module."}
+sel.onchange=run;document.getElementById("sc-27").onchange=run;
+fetch("/inventory/api/tam").then(function(r){return r.json()}).then(function(j){F=j;sel.innerHTML=j.categories.map(function(c){return"<option>"+c.category+"</option>"}).join("");run()}).catch(function(){document.getElementById("sc-catname").textContent="Modelled feed unavailable."})})();</script>`;
 
 export function renderBuycalcHtml(input: {
   seatsOpen: number;
@@ -2228,10 +2228,17 @@ export function renderBuycalcHtml(input: {
   sku?: unknown;
   format?: unknown;
   currency?: ReserveCurrency;
+  draftBonus?: boolean;
 }): string {
   const currency: ReserveCurrency = input.currency ?? RESERVE_CURRENCY;
   const html = renderBuycalcHtmlUsd(input, currency);
-  return localizeReservePriceCopy(html, currency);
+  const localized = localizeReservePriceCopy(html, currency);
+  // Draft bonus tiers are added after localizing so their explicit amounts are never rewritten.
+  if (!input.draftBonus) return localized.replace("<!--BONUS_TIER_DRAFT-->", "");
+  const section = renderBonusTierDraftHtml(currency);
+  return localized
+    .replace("<!--BONUS_TIER_DRAFT-->", () => section)
+    .replace('<meta charset="utf-8">', () => '<meta charset="utf-8"><meta name="robots" content="noindex">');
 }
 
 function currencyToggleHtml(
@@ -2259,7 +2266,7 @@ function renderBuycalcHtmlUsd(input: {
   const req = { query: { sku: input.sku, format: input.format } };
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Lock one category — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | The $490 seat is the named category"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | The $490 seat is the named category"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">${publicSeoTags("/buycalc")}
+<title>Prepay your category — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | The $490 seat is the named category"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | The $490 seat is the named category"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">${publicSeoTags("/buycalc")}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <script type="application/ld+json">${JSON.stringify({
   "@context": "https://schema.org",
@@ -2287,7 +2294,7 @@ function renderBuycalcHtmlUsd(input: {
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8f6ef;color:#071A39;font:16px/1.55 "IBM Plex Sans",sans-serif}header,main,footer{max-width:1100px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;border-bottom:1px solid #ccd2d8}h1,h2{font-family:Fraunces,serif;font-weight:400}h1{font-size:clamp(2.7rem,7vw,5.8rem);line-height:.95;margin:.5em 0}.accent{background:#C8F55A;padding:.08em .18em}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:36px}.card{border:1px solid #071A39;padding:24px;margin:18px 0}.figures{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#071A39}.figure{background:#fff;padding:18px}.figure strong{display:block;font:600 1.7rem Fraunces,serif}.offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.offer{border:1px solid #071A39;padding:16px;background:#fff}.offer strong{display:block;font:600 1.35rem Fraunces,serif}.offer small{display:block;margin-top:8px}label{display:block;font-weight:600;margin-top:14px}input,select,button{width:100%;padding:12px;border:1px solid #071A39;background:white;font:inherit}button{margin-top:18px;background:#C8F55A;font-weight:600;cursor:pointer}.fine{font-size:.9rem}#message{padding-top:12px;font-weight:600}@media(max-width:760px){.grid,.figures,.offer-grid{grid-template-columns:1fr}}
-.sh-hero{background:#0A1D56;color:#fff;margin:0 -24px;padding:48px 24px}.sh-eyebrow{color:#9D4EDD;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:12px}.sh-hero h1{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:clamp(2.1rem,5vw,3.6rem);line-height:1.05;margin:.3em 0 .6em;max-width:850px}.sh-prices{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sh-price{border-radius:8px;padding:20px;color:#0A1D56}.sh-white{background:#fff}.sh-card{background:#F0F4F8}.sh-price p{margin:.3em 0 1em;font-size:14px}.sh-btn{display:block;text-align:center;background:#0A1D56;color:#fff;padding:13px;border-radius:6px;font-weight:600;text-decoration:none}.sh-ghost{background:transparent;color:#0A1D56;border:2px solid #0A1D56}.sh-proof{margin-top:22px;font-size:14px}.sh-proof a{color:#fff;font-weight:600;text-decoration-color:#9D4EDD}.sh-excl{font-size:12px;opacity:.7}.sc{display:grid;grid-template-columns:1fr 1fr;border:1px solid #0A1D5626;border-radius:8px;overflow:hidden;margin:28px 0;background:#fff}.sc-in{padding:22px}.sc-in label,.sc-in .lab{display:block;font-weight:600;font-size:14px;margin:12px 0 6px}.sc select{width:100%;min-height:44px}.sc-opt{display:block;width:100%;text-align:left;border:0;border-radius:6px;background:#F0F4F8;padding:11px;margin:3px 0;font:600 14px "IBM Plex Sans";color:#0A1D56;cursor:pointer}.sc-opt[aria-checked=true]{background:#0A1D56;color:#fff}.sc-band{display:flex;gap:4px}.sc-band .sc-opt{text-align:center}.sc-out{background:#0A1D56;color:#fff;padding:26px;display:flex;flex-direction:column;justify-content:center}.sc-seat{color:#00FF88;font-size:64px;font-weight:700;line-height:1}.sc-grey{color:#ffffff8c;font-size:14px}.sc-f{font-size:12px;color:#ffffff99}.sc-foot{grid-column:1/-1;font-size:12px;color:#0A1D56a6;padding:16px 22px;border-top:1px solid #0A1D561a}.sc-drawer{background:#F0F4F8;border-radius:8px;padding:18px;margin:0 0 28px}.sc-drawer summary{font-weight:600;cursor:pointer}.sc-drawer summary small{font-weight:400;opacity:.7;margin-left:8px}.cat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0;padding:0;list-style:none}.cat-strip li{border:1px solid #071A39;background:#fff}.cat-strip a,.cat-strip span{display:flex;align-items:center;justify-content:center;min-height:72px;padding:12px;text-align:center;color:inherit;text-decoration:none;font-size:14px;font-weight:600}@media(max-width:760px){.sh-prices,.sc{grid-template-columns:1fr}.cat-strip{grid-template-columns:1fr 1fr}}
+.sh-hero{background:#0A1D56;color:#fff;margin:0 -24px;padding:48px 24px}.sh-eyebrow{color:#9D4EDD;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:12px}.sh-hero h1{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:clamp(2.1rem,5vw,3.6rem);line-height:1.05;margin:.3em 0 .6em;max-width:850px}.sh-prices{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sh-price{border-radius:8px;padding:20px;color:#0A1D56}.sh-white{background:#fff}.sh-card{background:#F0F4F8}.sh-price p{margin:.3em 0 1em;font-size:14px}.sh-btn{display:block;text-align:center;background:#0A1D56;color:#fff;padding:13px;border-radius:6px;font-weight:600;text-decoration:none}.sh-ghost{background:transparent;color:#0A1D56;border:2px solid #0A1D56}.sh-proof{margin-top:22px;font-size:14px}.sh-proof a{color:#fff;font-weight:600;text-decoration-color:#9D4EDD}.sh-excl{font-size:12px;opacity:.7}.sc{display:grid;grid-template-columns:1fr 1fr;border:1px solid #0A1D5626;border-radius:8px;overflow:hidden;margin:28px 0;background:#fff}.sc-in{padding:22px}.sc-in label,.sc-in .lab{display:block;font-weight:600;font-size:14px;margin:12px 0 6px}.sc select{width:100%;min-height:44px}.sc-opt{display:block;width:100%;text-align:left;border:0;border-radius:6px;background:#F0F4F8;padding:11px;margin:3px 0;font:600 14px "IBM Plex Sans";color:#0A1D56;cursor:pointer}.sc-opt[aria-checked=true]{background:#0A1D56;color:#fff}.sc-out{background:#0A1D56;color:#fff;padding:26px;display:flex;flex-direction:column;justify-content:center}.sc-seat{color:#00FF88;font-size:64px;font-weight:700;line-height:1}.sc-grey{color:#ffffff8c;font-size:14px}.sc-f{font-size:12px;color:#ffffff99}.sc-foot{grid-column:1/-1;font-size:12px;color:#0A1D56a6;padding:16px 22px;border-top:1px solid #0A1D561a}.sc-drawer{background:#F0F4F8;border-radius:8px;padding:18px;margin:0 0 28px}.sc-drawer summary{font-weight:600;cursor:pointer}.sc-drawer summary small{font-weight:400;opacity:.7;margin-left:8px}.cat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0;padding:0;list-style:none}.cat-strip li{border:1px solid #071A39;background:#fff}.cat-strip a,.cat-strip span{display:flex;align-items:center;justify-content:center;min-height:72px;padding:12px;text-align:center;color:inherit;text-decoration:none;font-size:14px;font-weight:600}@media(max-width:760px){.sh-prices,.sc{grid-template-columns:1fr}.cat-strip{grid-template-columns:1fr 1fr}}
 </style></head><body><header><strong>BIRCH RESERVE</strong>${currencyToggleHtml(currency, { sku: input.sku, format: input.format })}<a href="/v1/catalog.json">Machine catalog</a></header><main>
 <section class="sh-hero"><p class="sh-eyebrow">Birch Reserve · Canada</p><h1>Prepay your category's display space. One brand. No bidding.</h1>
 <div class="sh-prices"><div class="sh-price sh-white"><strong style="font-size:2rem">$490 USD</strong><p><b>Prepay once. All of it becomes display credit in your category.</b></p><p>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p><p>Why it beats Meta: Meta sells you a cold click in an auction. Here you pay once, own the category, and your offer meets customers right after they have bought.</p><a class="sh-btn" href="/buycalc?sku=reserve-490#reserve">Prepay your category · $490 USD</a><p>Not ready? <a href="/buycalc?sku=hold-190#reserve">Take a 7-day look for $190 USD</a>. It converts in full to the prepay, or it is refunded.</p></div></div>
@@ -2321,6 +2328,7 @@ function renderBuycalcHtmlUsd(input: {
 <p class="sh-proof">The card is the only unit. You place one square on the page the member already opened. The $490 is the named category.</p>
 <p class="sh-excl">One brand per category · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only · Canada only</p></section>
 ${BUYCALC_SEAT_CALC_HTML}
+<!--BONUS_TIER_DRAFT-->
 <div class="grid"><section><h2>What a reserved slot includes</h2><p><strong>${availability.seats_open} categories open</strong> of ${availability.seats_total}. Availability is rolling and subtracts paid and currently held locks.</p>
 ${buycalcCategoryStrip(availability.seats_open)}
 <div class="offer-grid">${PUBLIC_RESERVE_OFFERS.map((offer) => {
@@ -2362,6 +2370,7 @@ router.get("/buycalc", async (req, res): Promise<void> => {
       seatsTotal: availability.seats_total,
       sku: req.query.sku,
       format: req.query.format,
+      draftBonus: isBonusDraftRequested(req.query),
     }),
   );
 });

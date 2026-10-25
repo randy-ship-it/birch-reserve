@@ -163,7 +163,7 @@ async function stubRandyReply(
 
   if (/\b(190|490|hold|reserve|seat|price|pricing|buy|checkout)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot, or take the $490 early placement (100% media credit) with online checkout on birchreserve.net. Want to pay there, call, or keep going here?",
+      text: "Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot, or take the $490 category prepay (100% media credit) with online checkout on birchreserve.net. Want to pay there, call, or keep going here?",
       source: "stub",
       offerHandoff: true,
     };

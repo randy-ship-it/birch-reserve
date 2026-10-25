@@ -88,7 +88,7 @@ export function SalesConcierge({
         {
           id: "init-1",
           role: "advisor",
-          text: "Birch Reserve places brands inside signed Scale Health customer hubs, beside products people already buy—not on the open web. I can help you inquire or reserve the right path.",
+          text: "Birch Reserve places brands inside listed Scale Health customer hubs, beside products people already buy—not on the open web. I can help you inquire or reserve the right path.",
           isPrivacyNote: true
         },
         {
@@ -176,7 +176,7 @@ export function SalesConcierge({
       setIsTyping(true);
       window.setTimeout(() => {
         setIsTyping(false);
-        appendAdvisorMessage(localizeNow("Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 early placement is 100% media credit. Nothing runs until an insertion order names the surface."), [
+        appendAdvisorMessage(localizeNow("Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 category prepay is 100% media credit. Nothing runs until an insertion order names the surface."), [
           { label: "Open Reservation Form", action: () => onHandoff(), primary: true },
           { label: "Compare advertising paths", action: () => handleChoosePath(true) }
         ]);
@@ -227,7 +227,7 @@ export function SalesConcierge({
       if (path === "performance") {
         responseText = "Performance is a strong fit when the focus is direct bookings and the clinic is set up to receive them.";
       } else if (path === "display") {
-        responseText = "Display reaches high-intent customers inside signed Scale Health brand hubs—after purchase, booking, or plan start—and beside products they already trust.";
+        responseText = "Display reaches high-intent customers inside listed Scale Health brand hubs—after purchase, booking, or plan start—and beside products they already trust.";
       } else if (path === "both") {
         responseText = "A side-by-side approach compares Performance and Display contexts to see what works best.";
       } else {
@@ -339,7 +339,7 @@ export function SalesConcierge({
       case "pricing_or_availability":
       case "self_serve_purchase":
         return {
-          text: localizeNow("Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 early placement is 100% media credit. Nothing runs until an insertion order names the surface."),
+          text: localizeNow("Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 category prepay is 100% media credit. Nothing runs until an insertion order names the surface."),
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "Compare advertising paths", action: () => handleChoosePath(true) },
@@ -351,7 +351,7 @@ export function SalesConcierge({
           options: [
             { label: "Get a call back", href: RANDY_TEL_HREF, primary: true },
             { label: "Book a call", action: () => { trackCta("cta_book_call"); openRandyChat({ reason: "concierge", mode: "chat" }); } },
-            { label: localizeNow("Reserve your early placement — $490"), action: onHandoff },
+            { label: localizeNow("Prepay your category — $490"), action: onHandoff },
           ],
         };
       case "book_a_call":
@@ -372,7 +372,7 @@ export function SalesConcierge({
         };
       case "media_kit":
         return {
-          text: localizeNow("The Reserve List: 8 advertiser categories inside signed Scale Health hubs, with early slots open. Not an open auction. Not a guaranteed impression buy. The $490 early placement is media credit, not airfare."),
+          text: localizeNow("The Reserve List: 8 advertiser categories inside listed Scale Health hubs, with early slots open. Not an open auction. Not a guaranteed impression buy. The $490 category prepay is media credit, not airfare."),
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },
@@ -380,7 +380,7 @@ export function SalesConcierge({
         };
       case "auction_comparison":
         return {
-          text: "This is a curated network, not an open auction. Digital units sit inside signed Scale Health customer hubs beside recognized recovery and wellness products. Physical activations are planned for participating locations, with details TBA for Fall 2026.",
+          text: "This is a curated network, not an open auction. Digital units sit inside listed Scale Health customer hubs beside recognized recovery and wellness products. Physical activations are planned for participating locations, with details TBA for Fall 2026.",
           options: [
             { label: "Explore Display", action: () => handlePathSelection("display"), primary: true },
             { label: "Compare advertising paths", action: () => handleChoosePath(true) },
