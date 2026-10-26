@@ -279,6 +279,26 @@ The $190 look does not burn a seat. It lets you see the open hub before you deci
 `,
 } as const;
 
+export const THE_CARD_STAYS_ON_THE_PAGE_ARTICLE = {
+  slug: "the-card-stays-on-the-page",
+  title: "The card stays on the page.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "Carbon places one native card on the page the reader already opened. One square. One short line. Not a feed.",
+  publishedAt: new Date("2026-10-26T16:00:00.000Z"),
+  body: `# The card stays on the page.
+
+Carbon places one native card on the page the reader already opened. One square. One short line. Not a feed.
+
+Birch Reserve works the same way. The unit is one card on the hub page the visitor already opened. The card stays small enough that the hub remains the page. You do not send them to a new tab.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the card before you lock the category.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
@@ -289,6 +309,7 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
   THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE,
   THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE,
+  THE_CARD_STAYS_ON_THE_PAGE_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =
