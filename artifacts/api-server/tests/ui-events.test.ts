@@ -11,6 +11,7 @@ import {
   ONE_CARD_NAMES_THE_CATEGORY_ARTICLE,
   THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE,
   THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE,
+  THE_CARD_STAYS_ON_THE_PAGE_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
   THE_ZONE_HAS_A_PRICE_ARTICLE,
@@ -229,6 +230,33 @@ The $190 look does not burn a seat. It lets you see the open hub before you deci
   assert.equal(mentionsLegacyHeroPrice(THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.body), false);
   assert.doesNotMatch(THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.body, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
 
+  assert.equal(THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.slug, "the-card-stays-on-the-page");
+  assert.equal(THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.title, "The card stays on the page.");
+  assert.equal(THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.publishedAt.toISOString(), "2026-10-26T16:00:00.000Z");
+  assert.equal(
+    THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.summary,
+    "Carbon places one native card on the page the reader already opened. One square. One short line. Not a feed.",
+  );
+  assert.equal(
+    THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.body,
+    `# The card stays on the page.
+
+Carbon places one native card on the page the reader already opened. One square. One short line. Not a feed.
+
+Birch Reserve works the same way. The unit is one card on the hub page the visitor already opened. The card stays small enough that the hub remains the page. You do not send them to a new tab.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the card before you lock the category.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.body), false);
+  assert.doesNotMatch(THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
@@ -309,6 +337,7 @@ The $190 look does not burn a seat. It lets you see the open hub before you deci
     THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.slug,
     THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.slug,
     THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.slug,
+    THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -721,7 +750,10 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /The category is already open\./);
     assert.match(insights, /href="\/insights\/the-square-sits-inside-the-hub-already-open"/);
     assert.match(insights, /The square sits inside the hub already open\./);
-    assert.doesNotMatch(insights, /the-look-starts-itself/);
+    assert.match(insights, /href="\/insights\/the-card-stays-on-the-page"/);
+    assert.match(insights, /The card stays on the page\./);
+    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 10);
+    assert.doesNotMatch(insights, /the-look-starts-itself|the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
 
@@ -820,8 +852,25 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(square, /The \$190 look does not burn a seat\. It lets you see the open hub before you decide\./);
     assert.doesNotMatch(square, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
     assert.doesNotMatch(square, /id="root"/);
+
+    const cardStaysResponse = await fetch(`${origin}/insights/the-card-stays-on-the-page`);
+    const cardStays = await cardStaysResponse.text();
+    assert.equal(cardStaysResponse.status, 200);
+    assert.match(cardStays, /<h1>The card stays on the page\.<\/h1>/);
+    assert.equal(cardStays.match(/<h1>/g)?.length, 1);
+    assert.match(cardStays, /October 26, 2026/);
+    assert.match(cardStays, /Carbon places one native card on the page the reader already opened\. One square\. One short line\. Not a feed\./);
+    assert.match(cardStays, /Birch Reserve works the same way\. The unit is one card on the hub page the visitor already opened\. The card stays small enough that the hub remains the page\. You do not send them to a new tab\./);
+    assert.match(cardStays, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(cardStays, /The \$190 look does not burn a seat\. It lets you see the card before you lock the category\./);
+    assert.doesNotMatch(cardStays, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(cardStays, /id="root"/);
     const unpublishedLook = await fetch(`${origin}/insights/the-look-starts-itself`);
     assert.equal(unpublishedLook.status, 404);
+    const unpublishedStill = await fetch(`${origin}/insights/the-still-starts-on-the-brief`);
+    assert.equal(unpublishedStill.status, 404);
+    const unpublishedUnit = await fetch(`${origin}/insights/the-unit-matches-the-recovery-already-open`);
+    assert.equal(unpublishedUnit.status, 404);
   } finally {
     await new Promise<void>((resolveClose, rejectClose) => {
       server.close((error) => (error ? rejectClose(error) : resolveClose()));
