@@ -270,7 +270,7 @@ test("GET /insights/the-look-assembles-on-the-brief publishes the supplied copy 
   assert.doesNotMatch(html, /\bCTR\b|reach/i);
   assert.doesNotMatch(html, /Align|\$4,?900|\$9,?900/);
   const index = await (await fetch(`${origin}/insights`)).text();
-  assert.equal(index.match(/<h2><a href="\/insights\//g)?.length, 10);
+  assert.equal(index.match(/<h2><a href="\/insights\//g)?.length, 11);
   assert.match(index, /href="\/insights\/the-square-sits-inside-the-hub-already-open"/);
   assert.match(index, /href="\/insights\/the-category-is-already-open"/);
   assert.match(index, /href="\/insights\/the-look-assembles-on-the-brief"/);
@@ -299,7 +299,7 @@ test("GET /insights/the-category-is-already-open publishes the supplied copy and
   assert.doesNotMatch(html, /\bCTR\b|reach/i);
   assert.doesNotMatch(html, /Align|\$4,?900|\$9,?900/);
   const index = await (await fetch(`${origin}/insights`)).text();
-  assert.equal(index.match(/<h2><a href="\/insights\//g)?.length, 10);
+  assert.equal(index.match(/<h2><a href="\/insights\//g)?.length, 11);
   assert.match(index, /href="\/insights\/the-square-sits-inside-the-hub-already-open"/);
   assert.match(index, /href="\/insights\/the-category-is-already-open"/);
   assert.match(index, /The category is already open\./);
@@ -332,7 +332,7 @@ test("GET /insights/the-square-sits-inside-the-hub-already-open publishes the su
   assert.doesNotMatch(html, /\bCTR\b|reach/i);
   assert.doesNotMatch(html, /Align|\$4,?900|\$9,?900/);
   const index = await (await fetch(`${origin}/insights`)).text();
-  assert.equal(index.match(/<h2><a href="\/insights\//g)?.length, 10);
+  assert.equal(index.match(/<h2><a href="\/insights\//g)?.length, 11);
   assert.match(index, /href="\/insights\/the-square-sits-inside-the-hub-already-open"/);
   assert.match(index, /The square sits inside the hub already open\./);
   assert.match(index, /href="\/insights\/the-category-is-already-open"/);
@@ -369,7 +369,7 @@ test("GET /insights/the-card-stays-on-the-page publishes the supplied copy and s
   assert.doesNotMatch(html, /\bCTR\b|reach/i);
   assert.doesNotMatch(html, /Align|\$4,?900|\$9,?900|\$49 ICA/);
   const index = await (await fetch(`${origin}/insights`)).text();
-  assert.equal(index.match(/<h2><a href="\/insights\//g)?.length, 10);
+  assert.equal(index.match(/<h2><a href="\/insights\//g)?.length, 11);
   assert.match(index, /href="\/insights\/the-card-stays-on-the-page"/);
   assert.match(index, /The card stays on the page\./);
   assert.match(index, /October 26, 2026/);
@@ -392,6 +392,48 @@ test("GET /insights/the-card-stays-on-the-page publishes the supplied copy and s
   assert.equal(squareStillLive.status, 200);
 });
 
+test("GET /insights/the-zone-is-sold-by-name publishes the supplied copy and stays on the index", async () => {
+  const articleRes = await fetch(`${origin}/insights/the-zone-is-sold-by-name`);
+  assert.equal(articleRes.status, 200);
+  const html = await articleRes.text();
+  assert.match(html, /<title>The zone is sold by name\. \| Birch Reserve<\/title>/);
+  assert.match(html, /<h1>The zone is sold by name\.<\/h1>/);
+  assert.equal(html.match(/<h1>/g)?.length, 1);
+  assert.match(html, /October 27, 2026/);
+  assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/insights\/the-zone-is-sold-by-name"\s*\/>/);
+  assert.match(html, /BuySellAds sells named zones at a fixed price\. You do not enter a remnant auction\./);
+  assert.match(html, /Birch Reserve works the same way\. The category is the named zone\. You do not buy a slice of open inventory\. The \$490 is the zone\./);
+  assert.match(html, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+  assert.match(html, /The \$190 look does not burn a seat\. It lets you see the zone before you lock the category\./);
+  assert.doesNotMatch(html, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899/);
+  assert.doesNotMatch(html, /\bCTR\b|reach/i);
+  assert.doesNotMatch(html, /Align|\$4,?900|\$9,?900|\$49 ICA/);
+  const index = await (await fetch(`${origin}/insights`)).text();
+  assert.equal(index.match(/<h2><a href="\/insights\//g)?.length, 11);
+  assert.match(index, /href="\/insights\/the-zone-is-sold-by-name"/);
+  assert.match(index, /The zone is sold by name\./);
+  assert.match(index, /October 27, 2026/);
+  assert.match(index, /href="\/insights\/the-card-stays-on-the-page"/);
+  assert.match(index, /The card stays on the page\./);
+  assert.match(index, /href="\/insights\/the-square-sits-inside-the-hub-already-open"/);
+  assert.match(index, /The square sits inside the hub already open\./);
+  assert.match(index, /href="\/insights\/the-category-is-already-open"/);
+  assert.match(index, /href="\/insights\/the-look-assembles-on-the-brief"/);
+  assert.match(index, /href="\/insights\/the-zone-has-a-price"/);
+  assert.match(index, /href="\/insights\/one-card-names-the-category"/);
+  assert.match(index, /href="\/insights\/the-face-before-the-flight"/);
+  assert.match(index, /href="\/insights\/what-you-send-for-a-seat"/);
+  assert.match(index, /href="\/insights\/the-shelf-after-the-receipt"/);
+  assert.match(index, /href="\/insights\/after-booking-category-seats-scale-hubs"/);
+  assert.doesNotMatch(index, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself/);
+  const unpublishedStill = await fetch(`${origin}/insights/the-still-starts-on-the-brief`);
+  assert.equal(unpublishedStill.status, 404);
+  const unpublishedUnit = await fetch(`${origin}/insights/the-unit-matches-the-recovery-already-open`);
+  assert.equal(unpublishedUnit.status, 404);
+  const cardStillLive = await fetch(`${origin}/insights/the-card-stays-on-the-page`);
+  assert.equal(cardStillLive.status, 200);
+});
+
 test("buycalc HTML keeps the category facts and drops the price-rise line", () => {
   const html = renderBuycalcHtml({ seatsOpen: 3, seatsTotal: 8, sku: "hold-190", format: "post_checkout" });
   assert.match(html, /\$490 USD/);
@@ -405,7 +447,7 @@ test("buycalc HTML keeps the category facts and drops the price-rise line", () =
   assert.match(html, /data-sku="reserve-490"[\s\S]*You buy the category header\. You do not bid on a search\./);
   assert.match(html, /<a href="https:\/\/physio\.drhonow\.com"/);
   assert.match(html, /This is the place\. Not a view chart\. Illustrative until the insertion order names the hub\./);
-  assert.match(html, /The unit is one card on a page the visitor already opened\. You do not send them to a new feed\. The card stays small enough that the hub page remains the page\.<\/p>\s*<p class="sh-proof">The category is the named zone\. You do not buy an open slot\. The insertion order names the hub and the category before anything runs\.<\/p>\s*<p class="sh-proof">The look is the preview\. You assemble the square still on the creative brief\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">The header is the placement\. You sit in the category the visitor already opened\. You do not create a new search\.<\/p>\s*<p class="sh-proof">You see the face before the flight\. The square still is the preview\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">One card names the category\. The card sits on the hub page the visitor already opened\.<\/p>\s*<p class="sh-proof">The zone has a price\. You do not bid for the category\. The \$490 is the named seat\.<\/p>\s*<p class="sh-proof">The look assembles on the brief\. You do not wait for the \$490 to start the square\.<\/p>\s*<p class="sh-proof">The category is already open\. You sit where the member is already shopping\. The \$490 is the header on that aisle\.<\/p>\s*<p class="sh-proof">The square sits inside the hub already open\. You approve the still on the brief\. The \$490 names the category\.<\/p>\s*<p class="sh-proof">The card stays on the page the visitor already opened\. One square\. Not a feed\. The \$490 names the category\.<\/p>/);
+  assert.match(html, /The unit is one card on a page the visitor already opened\. You do not send them to a new feed\. The card stays small enough that the hub page remains the page\.<\/p>\s*<p class="sh-proof">The category is the named zone\. You do not buy an open slot\. The insertion order names the hub and the category before anything runs\.<\/p>\s*<p class="sh-proof">The look is the preview\. You assemble the square still on the creative brief\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">The header is the placement\. You sit in the category the visitor already opened\. You do not create a new search\.<\/p>\s*<p class="sh-proof">You see the face before the flight\. The square still is the preview\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">One card names the category\. The card sits on the hub page the visitor already opened\.<\/p>\s*<p class="sh-proof">The zone has a price\. You do not bid for the category\. The \$490 is the named seat\.<\/p>\s*<p class="sh-proof">The look assembles on the brief\. You do not wait for the \$490 to start the square\.<\/p>\s*<p class="sh-proof">The category is already open\. You sit where the member is already shopping\. The \$490 is the header on that aisle\.<\/p>\s*<p class="sh-proof">The square sits inside the hub already open\. You approve the still on the brief\. The \$490 names the category\.<\/p>\s*<p class="sh-proof">The card stays on the page the visitor already opened\. One square\. Not a feed\. The \$490 names the category\.<\/p>\s*<p class="sh-proof">The zone is sold by name\. You do not buy a remnant\. The \$490 is the zone\.<\/p>/);
   assert.match(html, /Lock one category inside signed health hubs\. Not an open auction\./);
   assert.match(html, /No impression guarantee/);
   assert.doesNotMatch(html, /exclusiv/i);
@@ -476,7 +518,7 @@ test("availability and buycalc stay up when Postgres cannot answer the seat quer
   assert.match(html, /The category is the named zone\. You do not buy an open slot\. The insertion order names the hub and the category before anything runs\./);
   assert.match(html, /The look is the preview\. You assemble the square still on the creative brief\. Nothing on the hub changes until the insertion order names the hub\./);
   assert.match(html, /The header is the placement\. You sit in the category the visitor already opened\. You do not create a new search\./);
-  assert.match(html, /You see the face before the flight\. The square still is the preview\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">One card names the category\. The card sits on the hub page the visitor already opened\.<\/p>\s*<p class="sh-proof">The zone has a price\. You do not bid for the category\. The \$490 is the named seat\.<\/p>\s*<p class="sh-proof">The look assembles on the brief\. You do not wait for the \$490 to start the square\.<\/p>\s*<p class="sh-proof">The category is already open\. You sit where the member is already shopping\. The \$490 is the header on that aisle\.<\/p>\s*<p class="sh-proof">The square sits inside the hub already open\. You approve the still on the brief\. The \$490 names the category\.<\/p>\s*<p class="sh-proof">The card stays on the page the visitor already opened\. One square\. Not a feed\. The \$490 names the category\./);
+  assert.match(html, /You see the face before the flight\. The square still is the preview\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">One card names the category\. The card sits on the hub page the visitor already opened\.<\/p>\s*<p class="sh-proof">The zone has a price\. You do not bid for the category\. The \$490 is the named seat\.<\/p>\s*<p class="sh-proof">The look assembles on the brief\. You do not wait for the \$490 to start the square\.<\/p>\s*<p class="sh-proof">The category is already open\. You sit where the member is already shopping\. The \$490 is the header on that aisle\.<\/p>\s*<p class="sh-proof">The square sits inside the hub already open\. You approve the still on the brief\. The \$490 names the category\.<\/p>\s*<p class="sh-proof">The card stays on the page the visitor already opened\. One square\. Not a feed\. The \$490 names the category\.<\/p>\s*<p class="sh-proof">The zone is sold by name\. You do not buy a remnant\. The \$490 is the zone\./);
   assert.doesNotMatch(html, /reserve-899/);
   assert.doesNotMatch(html, /id="root"/);
 });
