@@ -299,6 +299,26 @@ The $190 look does not burn a seat. It lets you see the card before you lock the
 `,
 } as const;
 
+export const THE_ZONE_IS_SOLD_BY_NAME_ARTICLE = {
+  slug: "the-zone-is-sold-by-name",
+  title: "The zone is sold by name.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "BuySellAds sells named zones at a fixed price. You do not enter a remnant auction.",
+  publishedAt: new Date("2026-10-27T16:00:00.000Z"),
+  body: `# The zone is sold by name.
+
+BuySellAds sells named zones at a fixed price. You do not enter a remnant auction.
+
+Birch Reserve works the same way. The category is the named zone. You do not buy a slice of open inventory. The $490 is the zone.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the zone before you lock the category.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
@@ -310,6 +330,7 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE,
   THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE,
   THE_CARD_STAYS_ON_THE_PAGE_ARTICLE,
+  THE_ZONE_IS_SOLD_BY_NAME_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =

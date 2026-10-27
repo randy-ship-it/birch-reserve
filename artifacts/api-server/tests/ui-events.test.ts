@@ -12,6 +12,7 @@ import {
   THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE,
   THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE,
   THE_CARD_STAYS_ON_THE_PAGE_ARTICLE,
+  THE_ZONE_IS_SOLD_BY_NAME_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
   THE_ZONE_HAS_A_PRICE_ARTICLE,
@@ -257,6 +258,33 @@ The $190 look does not burn a seat. It lets you see the card before you lock the
   assert.equal(mentionsLegacyHeroPrice(THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.body), false);
   assert.doesNotMatch(THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
 
+  assert.equal(THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.slug, "the-zone-is-sold-by-name");
+  assert.equal(THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.title, "The zone is sold by name.");
+  assert.equal(THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.publishedAt.toISOString(), "2026-10-27T16:00:00.000Z");
+  assert.equal(
+    THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.summary,
+    "BuySellAds sells named zones at a fixed price. You do not enter a remnant auction.",
+  );
+  assert.equal(
+    THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.body,
+    `# The zone is sold by name.
+
+BuySellAds sells named zones at a fixed price. You do not enter a remnant auction.
+
+Birch Reserve works the same way. The category is the named zone. You do not buy a slice of open inventory. The $490 is the zone.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the zone before you lock the category.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.body), false);
+  assert.doesNotMatch(THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
@@ -338,6 +366,7 @@ The $190 look does not burn a seat. It lets you see the card before you lock the
     THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.slug,
     THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.slug,
     THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.slug,
+    THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -752,7 +781,9 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /The square sits inside the hub already open\./);
     assert.match(insights, /href="\/insights\/the-card-stays-on-the-page"/);
     assert.match(insights, /The card stays on the page\./);
-    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 10);
+    assert.match(insights, /href="\/insights\/the-zone-is-sold-by-name"/);
+    assert.match(insights, /The zone is sold by name\./);
+    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 11);
     assert.doesNotMatch(insights, /the-look-starts-itself|the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
@@ -865,6 +896,19 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(cardStays, /The \$190 look does not burn a seat\. It lets you see the card before you lock the category\./);
     assert.doesNotMatch(cardStays, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
     assert.doesNotMatch(cardStays, /id="root"/);
+
+    const zoneSoldResponse = await fetch(`${origin}/insights/the-zone-is-sold-by-name`);
+    const zoneSold = await zoneSoldResponse.text();
+    assert.equal(zoneSoldResponse.status, 200);
+    assert.match(zoneSold, /<h1>The zone is sold by name\.<\/h1>/);
+    assert.equal(zoneSold.match(/<h1>/g)?.length, 1);
+    assert.match(zoneSold, /October 27, 2026/);
+    assert.match(zoneSold, /BuySellAds sells named zones at a fixed price\. You do not enter a remnant auction\./);
+    assert.match(zoneSold, /Birch Reserve works the same way\. The category is the named zone\. You do not buy a slice of open inventory\. The \$490 is the zone\./);
+    assert.match(zoneSold, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(zoneSold, /The \$190 look does not burn a seat\. It lets you see the zone before you lock the category\./);
+    assert.doesNotMatch(zoneSold, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(zoneSold, /id="root"/);
     const unpublishedLook = await fetch(`${origin}/insights/the-look-starts-itself`);
     assert.equal(unpublishedLook.status, 404);
     const unpublishedStill = await fetch(`${origin}/insights/the-still-starts-on-the-brief`);
