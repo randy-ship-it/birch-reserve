@@ -319,6 +319,26 @@ The $190 look does not burn a seat. It lets you see the zone before you lock the
 `,
 } as const;
 
+export const THE_LOOK_IS_THE_DRAFT_ARTICLE = {
+  slug: "the-look-is-the-draft",
+  title: "The look is the draft.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "Spotify Ads Manager lets you build the creative before the campaign starts. You see the preview on the brief.",
+  publishedAt: new Date("2026-10-28T16:00:00.000Z"),
+  body: `# The look is the draft.
+
+Spotify Ads Manager lets you build the creative before the campaign starts. You see the preview on the brief.
+
+Birch Reserve works the same way. The square still is the draft. You assemble it on the creative brief. You do not wait for the seat.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the draft before you lock the category.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
@@ -331,6 +351,7 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE,
   THE_CARD_STAYS_ON_THE_PAGE_ARTICLE,
   THE_ZONE_IS_SOLD_BY_NAME_ARTICLE,
+  THE_LOOK_IS_THE_DRAFT_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =
