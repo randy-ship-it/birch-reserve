@@ -19,7 +19,7 @@ export const CLEAR_HUBS: ReadonlyArray<HubBannerChip> = [
   { id: "kalaya", name: "Kalaya" },
   { id: "jill-health", name: "Jill Health" },
   { id: "jack-health", name: "Jack Health" },
-  { id: "integrity", name: "Integrity Fitness" },
+  { id: "studio-bon-pilates", name: "Studio Bon Pilates" },
   { id: "bird-and-be", name: "Bird & Be" },
   { id: "nutriprocan", name: "NutriProCan" },
   { id: "roll-recovery", name: "Roll Recovery" },
