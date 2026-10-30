@@ -339,6 +339,46 @@ The $190 look does not burn a seat. It lets you see the draft before you lock th
 `,
 } as const;
 
+export const THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE = {
+  slug: "the-header-sits-on-the-aisle-already-open",
+  title: "The header sits on the aisle already open.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "Amazon, Instacart, and Walmart place the brand where the category is already shopped. You do not create a new search.",
+  publishedAt: new Date("2026-10-29T16:00:00.000Z"),
+  body: `# The header sits on the aisle already open.
+
+Amazon, Instacart, and Walmart place the brand where the category is already shopped. You do not create a new search.
+
+Birch Reserve works the same way. The square sits on the recovery plan or the booking the member already opened. The insertion order names the hub and the category before anything runs.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the square on the brief before you lock the category.
+`,
+} as const;
+
+export const THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE = {
+  slug: "the-face-is-approved-on-the-brief",
+  title: "The face is approved on the brief.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "LiveIntent and AdQuick show you the unit in the page the reader already opened. You approve the face before anything flies.",
+  publishedAt: new Date("2026-10-30T16:00:00.000Z"),
+  body: `# The face is approved on the brief.
+
+LiveIntent and AdQuick show you the unit in the page the reader already opened. You approve the face before anything flies.
+
+Birch Reserve works the same way. You see the square still on the creative brief. You approve it. Nothing on the hub changes until the insertion order names the hub and the category.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you approve the face on the brief before you lock the category.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
@@ -352,6 +392,8 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   THE_CARD_STAYS_ON_THE_PAGE_ARTICLE,
   THE_ZONE_IS_SOLD_BY_NAME_ARTICLE,
   THE_LOOK_IS_THE_DRAFT_ARTICLE,
+  THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE,
+  THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =

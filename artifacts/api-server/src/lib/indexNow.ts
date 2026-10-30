@@ -28,6 +28,8 @@ export const INDEXNOW_URL_LIST = [
   `https://${INDEXNOW_HOST}/insights/the-card-stays-on-the-page`,
   `https://${INDEXNOW_HOST}/insights/the-zone-is-sold-by-name`,
   `https://${INDEXNOW_HOST}/insights/the-look-is-the-draft`,
+  `https://${INDEXNOW_HOST}/insights/the-header-sits-on-the-aisle-already-open`,
+  `https://${INDEXNOW_HOST}/insights/the-face-is-approved-on-the-brief`,
   `https://${INDEXNOW_HOST}/buycalc`,
 ] as const;
 
