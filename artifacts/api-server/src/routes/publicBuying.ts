@@ -2195,6 +2195,8 @@ export function renderBuycalcHtml(input: {
 <p class="sh-proof">The card stays on the page the visitor already opened. One square. Not a feed. The $490 names the category.</p>
 <p class="sh-proof">The zone is sold by name. You do not buy a remnant. The $490 is the zone.</p>
 <p class="sh-proof">The look is the draft. You build the square on the brief. The $490 is the stamp.</p>
+<p class="sh-proof">The header sits on the aisle already open. You do not open a new search. The $490 is the named category.</p>
+<p class="sh-proof">The face is approved on the brief. You see the still before anything flies. The $490 is the stamp.</p>
 <p class="sh-excl">One brand per category · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only · Canada only</p></section>
 ${BUYCALC_SEAT_CALC_HTML}
 <div class="grid"><section><h2>What a reserved slot includes</h2><p><strong>${availability.seats_open} categories open</strong> of ${availability.seats_total}. Availability is rolling and subtracts paid and currently held locks.</p>

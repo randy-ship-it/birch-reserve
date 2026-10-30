@@ -14,6 +14,8 @@ import {
   THE_CARD_STAYS_ON_THE_PAGE_ARTICLE,
   THE_ZONE_IS_SOLD_BY_NAME_ARTICLE,
   THE_LOOK_IS_THE_DRAFT_ARTICLE,
+  THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE,
+  THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
   THE_ZONE_HAS_A_PRICE_ARTICLE,
@@ -313,6 +315,60 @@ The $190 look does not burn a seat. It lets you see the draft before you lock th
   assert.equal(mentionsLegacyHeroPrice(THE_LOOK_IS_THE_DRAFT_ARTICLE.body), false);
   assert.doesNotMatch(THE_LOOK_IS_THE_DRAFT_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
 
+  assert.equal(THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.slug, "the-header-sits-on-the-aisle-already-open");
+  assert.equal(THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.title, "The header sits on the aisle already open.");
+  assert.equal(THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.publishedAt.toISOString(), "2026-10-29T16:00:00.000Z");
+  assert.equal(
+    THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.summary,
+    "Amazon, Instacart, and Walmart place the brand where the category is already shopped. You do not create a new search.",
+  );
+  assert.equal(
+    THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.body,
+    `# The header sits on the aisle already open.
+
+Amazon, Instacart, and Walmart place the brand where the category is already shopped. You do not create a new search.
+
+Birch Reserve works the same way. The square sits on the recovery plan or the booking the member already opened. The insertion order names the hub and the category before anything runs.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the square on the brief before you lock the category.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.body), false);
+  assert.doesNotMatch(THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
+  assert.equal(THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.slug, "the-face-is-approved-on-the-brief");
+  assert.equal(THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.title, "The face is approved on the brief.");
+  assert.equal(THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.publishedAt.toISOString(), "2026-10-30T16:00:00.000Z");
+  assert.equal(
+    THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.summary,
+    "LiveIntent and AdQuick show you the unit in the page the reader already opened. You approve the face before anything flies.",
+  );
+  assert.equal(
+    THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.body,
+    `# The face is approved on the brief.
+
+LiveIntent and AdQuick show you the unit in the page the reader already opened. You approve the face before anything flies.
+
+Birch Reserve works the same way. You see the square still on the creative brief. You approve it. Nothing on the hub changes until the insertion order names the hub and the category.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you approve the face on the brief before you lock the category.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.body), false);
+  assert.doesNotMatch(THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
@@ -396,6 +452,8 @@ The $190 look does not burn a seat. It lets you see the draft before you lock th
     THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.slug,
     THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.slug,
     THE_LOOK_IS_THE_DRAFT_ARTICLE.slug,
+    THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.slug,
+    THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -814,7 +872,11 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /The zone is sold by name\./);
     assert.match(insights, /href="\/insights\/the-look-is-the-draft"/);
     assert.match(insights, /The look is the draft\./);
-    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 12);
+    assert.match(insights, /href="\/insights\/the-header-sits-on-the-aisle-already-open"/);
+    assert.match(insights, /The header sits on the aisle already open\./);
+    assert.match(insights, /href="\/insights\/the-face-is-approved-on-the-brief"/);
+    assert.match(insights, /The face is approved on the brief\./);
+    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 14);
     assert.doesNotMatch(insights, /the-look-starts-itself|the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
@@ -953,6 +1015,32 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(lookDraft, /The \$190 look does not burn a seat\. It lets you see the draft before you lock the category\./);
     assert.doesNotMatch(lookDraft, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
     assert.doesNotMatch(lookDraft, /id="root"/);
+
+    const headerAisleResponse = await fetch(`${origin}/insights/the-header-sits-on-the-aisle-already-open`);
+    const headerAisle = await headerAisleResponse.text();
+    assert.equal(headerAisleResponse.status, 200);
+    assert.match(headerAisle, /<h1>The header sits on the aisle already open\.<\/h1>/);
+    assert.equal(headerAisle.match(/<h1>/g)?.length, 1);
+    assert.match(headerAisle, /October 29, 2026/);
+    assert.match(headerAisle, /Amazon, Instacart, and Walmart place the brand where the category is already shopped\. You do not create a new search\./);
+    assert.match(headerAisle, /Birch Reserve works the same way\. The square sits on the recovery plan or the booking the member already opened\. The insertion order names the hub and the category before anything runs\./);
+    assert.match(headerAisle, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(headerAisle, /The \$190 look does not burn a seat\. It lets you see the square on the brief before you lock the category\./);
+    assert.doesNotMatch(headerAisle, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(headerAisle, /id="root"/);
+
+    const faceApprovedResponse = await fetch(`${origin}/insights/the-face-is-approved-on-the-brief`);
+    const faceApproved = await faceApprovedResponse.text();
+    assert.equal(faceApprovedResponse.status, 200);
+    assert.match(faceApproved, /<h1>The face is approved on the brief\.<\/h1>/);
+    assert.equal(faceApproved.match(/<h1>/g)?.length, 1);
+    assert.match(faceApproved, /October 30, 2026/);
+    assert.match(faceApproved, /LiveIntent and AdQuick show you the unit in the page the reader already opened\. You approve the face before anything flies\./);
+    assert.match(faceApproved, /Birch Reserve works the same way\. You see the square still on the creative brief\. You approve it\. Nothing on the hub changes until the insertion order names the hub and the category\./);
+    assert.match(faceApproved, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(faceApproved, /The \$190 look does not burn a seat\. It lets you approve the face on the brief before you lock the category\./);
+    assert.doesNotMatch(faceApproved, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(faceApproved, /id="root"/);
     const unpublishedLook = await fetch(`${origin}/insights/the-look-starts-itself`);
     assert.equal(unpublishedLook.status, 404);
     const unpublishedStill = await fetch(`${origin}/insights/the-still-starts-on-the-brief`);
