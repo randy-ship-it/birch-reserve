@@ -16,6 +16,9 @@ import {
   THE_LOOK_IS_THE_DRAFT_ARTICLE,
   THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE,
   THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE,
+  THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE,
+  THE_PREVIEW_IS_SELF_SERVE_ARTICLE,
+  THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
   THE_ZONE_HAS_A_PRICE_ARTICLE,
@@ -369,6 +372,87 @@ The $190 look does not burn a seat. It lets you approve the face on the brief be
   assert.equal(mentionsLegacyHeroPrice(THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.body), false);
   assert.doesNotMatch(THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
 
+  assert.equal(THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.slug, "the-square-is-endemic-to-the-recovery-already-open");
+  assert.equal(THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.title, "The square is endemic to the recovery already open.");
+  assert.equal(THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.publishedAt.toISOString(), "2026-10-31T16:00:00.000Z");
+  assert.equal(
+    THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.summary,
+    "eHealthcareSolutions and PulsePoint place an endemic health kit inside the environment the reader already opened. You do not buy a general feed.",
+  );
+  assert.equal(
+    THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.body,
+    `# The square is endemic to the recovery already open.
+
+eHealthcareSolutions and PulsePoint place an endemic health kit inside the environment the reader already opened. You do not buy a general feed.
+
+Birch Reserve works the same way. The square sits inside the protocol the member started. You do not open a new protocol.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the square inside that protocol before you lock the category.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.body), false);
+  assert.doesNotMatch(THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
+  assert.equal(THE_PREVIEW_IS_SELF_SERVE_ARTICLE.slug, "the-preview-is-self-serve");
+  assert.equal(THE_PREVIEW_IS_SELF_SERVE_ARTICLE.title, "The preview is self-serve.");
+  assert.equal(THE_PREVIEW_IS_SELF_SERVE_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_PREVIEW_IS_SELF_SERVE_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_PREVIEW_IS_SELF_SERVE_ARTICLE.publishedAt.toISOString(), "2026-11-01T16:00:00.000Z");
+  assert.equal(
+    THE_PREVIEW_IS_SELF_SERVE_ARTICLE.summary,
+    "StackAdapt lets you preview the creative before the campaign starts. You start it yourself.",
+  );
+  assert.equal(
+    THE_PREVIEW_IS_SELF_SERVE_ARTICLE.body,
+    `# The preview is self-serve.
+
+StackAdapt lets you preview the creative before the campaign starts. You start it yourself.
+
+Birch Reserve works the same way. You start the square on the brief. You do not wait for someone else to open the preview.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you start the preview on the brief before you lock the category.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_PREVIEW_IS_SELF_SERVE_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_PREVIEW_IS_SELF_SERVE_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_PREVIEW_IS_SELF_SERVE_ARTICLE.body), false);
+  assert.doesNotMatch(THE_PREVIEW_IS_SELF_SERVE_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
+  assert.equal(THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.slug, "the-card-does-not-leave-the-page");
+  assert.equal(THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.title, "The card does not leave the page.");
+  assert.equal(THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.publishedAt.toISOString(), "2026-11-02T16:00:00.000Z");
+  assert.equal(
+    THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.summary,
+    "Carbon places one native card on the page the reader already opened. The card stays on that page.",
+  );
+  assert.equal(
+    THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.body,
+    `# The card does not leave the page.
+
+Carbon places one native card on the page the reader already opened. The card stays on that page.
+
+Birch Reserve works the same way. The card does not leave the hub page. You stay where the member already is.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the card on the page before you lock the category.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.body), false);
+  assert.doesNotMatch(THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
@@ -454,6 +538,9 @@ The $190 look does not burn a seat. It lets you approve the face on the brief be
     THE_LOOK_IS_THE_DRAFT_ARTICLE.slug,
     THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.slug,
     THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.slug,
+    THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.slug,
+    THE_PREVIEW_IS_SELF_SERVE_ARTICLE.slug,
+    THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -876,7 +963,14 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /The header sits on the aisle already open\./);
     assert.match(insights, /href="\/insights\/the-face-is-approved-on-the-brief"/);
     assert.match(insights, /The face is approved on the brief\./);
-    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 14);
+    assert.match(insights, /href="\/insights\/the-square-is-endemic-to-the-recovery-already-open"/);
+    assert.match(insights, /The square is endemic to the recovery already open\./);
+    assert.match(insights, /href="\/insights\/the-preview-is-self-serve"/);
+    assert.match(insights, /The preview is self-serve\./);
+    assert.match(insights, /href="\/insights\/the-card-does-not-leave-the-page"/);
+    assert.match(insights, /The card does not leave the page\./);
+    assert.match(insights, /href="\/insights\/the-face-is-approved-on-the-brief"[\s\S]*href="\/insights\/the-square-is-endemic-to-the-recovery-already-open"[\s\S]*href="\/insights\/the-preview-is-self-serve"[\s\S]*href="\/insights\/the-card-does-not-leave-the-page"/);
+    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 17);
     assert.doesNotMatch(insights, /the-look-starts-itself|the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
@@ -1041,6 +1135,46 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(faceApproved, /The \$190 look does not burn a seat\. It lets you approve the face on the brief before you lock the category\./);
     assert.doesNotMatch(faceApproved, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
     assert.doesNotMatch(faceApproved, /id="root"/);
+
+    const endemicResponse = await fetch(`${origin}/insights/the-square-is-endemic-to-the-recovery-already-open`);
+    const endemic = await endemicResponse.text();
+    assert.equal(endemicResponse.status, 200);
+    assert.match(endemic, /<h1>The square is endemic to the recovery already open\.<\/h1>/);
+    assert.equal(endemic.match(/<h1>/g)?.length, 1);
+    assert.match(endemic, /October 31, 2026/);
+    assert.match(endemic, /eHealthcareSolutions and PulsePoint place an endemic health kit inside the environment the reader already opened\. You do not buy a general feed\./);
+    assert.match(endemic, /Birch Reserve works the same way\. The square sits inside the protocol the member started\. You do not open a new protocol\./);
+    assert.match(endemic, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(endemic, /The \$190 look does not burn a seat\. It lets you see the square inside that protocol before you lock the category\./);
+    assert.doesNotMatch(endemic, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(endemic, /id="root"/);
+
+    const previewResponse = await fetch(`${origin}/insights/the-preview-is-self-serve`);
+    const preview = await previewResponse.text();
+    assert.equal(previewResponse.status, 200);
+    assert.match(preview, /<h1>The preview is self-serve\.<\/h1>/);
+    assert.equal(preview.match(/<h1>/g)?.length, 1);
+    assert.match(preview, /November 1, 2026/);
+    assert.match(preview, /StackAdapt lets you preview the creative before the campaign starts\. You start it yourself\./);
+    assert.match(preview, /Birch Reserve works the same way\. You start the square on the brief\. You do not wait for someone else to open the preview\./);
+    assert.match(preview, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(preview, /The \$190 look does not burn a seat\. It lets you start the preview on the brief before you lock the category\./);
+    assert.doesNotMatch(preview, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(preview, /id="root"/);
+
+    const cardLeavesResponse = await fetch(`${origin}/insights/the-card-does-not-leave-the-page`);
+    const cardLeaves = await cardLeavesResponse.text();
+    assert.equal(cardLeavesResponse.status, 200);
+    assert.match(cardLeaves, /<h1>The card does not leave the page\.<\/h1>/);
+    assert.equal(cardLeaves.match(/<h1>/g)?.length, 1);
+    assert.match(cardLeaves, /November 2, 2026/);
+    assert.match(cardLeaves, /Carbon places one native card on the page the reader already opened\. The card stays on that page\./);
+    assert.match(cardLeaves, /Birch Reserve works the same way\. The card does not leave the hub page\. You stay where the member already is\./);
+    assert.match(cardLeaves, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(cardLeaves, /The \$190 look does not burn a seat\. It lets you see the card on the page before you lock the category\./);
+    assert.doesNotMatch(cardLeaves, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(cardLeaves, /id="root"/);
+
     const unpublishedLook = await fetch(`${origin}/insights/the-look-starts-itself`);
     assert.equal(unpublishedLook.status, 404);
     const unpublishedStill = await fetch(`${origin}/insights/the-still-starts-on-the-brief`);
