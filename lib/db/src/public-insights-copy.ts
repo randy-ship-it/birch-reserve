@@ -439,6 +439,26 @@ The $190 look does not burn a seat. It lets you see the card on the page before 
 `,
 } as const;
 
+export const THE_ZONE_IS_ONE_NAME_ARTICLE = {
+  slug: "the-zone-is-one-name",
+  title: "The zone is one name.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "BuySellAds sells the zone by its name. One buyer for that zone. You do not share the slot.",
+  publishedAt: new Date("2026-11-03T16:00:00.000Z"),
+  body: `# The zone is one name.
+
+BuySellAds sells the zone by its name. One buyer for that zone. You do not share the slot.
+
+Birch Reserve works the same way. The category is one name. You lock that name. You do not share the seat.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the zone before you lock the name.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
@@ -457,6 +477,7 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE,
   THE_PREVIEW_IS_SELF_SERVE_ARTICLE,
   THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE,
+  THE_ZONE_IS_ONE_NAME_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =
