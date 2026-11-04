@@ -459,6 +459,26 @@ The $190 look does not burn a seat. It lets you see the zone before you lock the
 `,
 } as const;
 
+export const THE_STILL_IS_THE_PREVIEW_ARTICLE = {
+  slug: "the-still-is-the-preview",
+  title: "The still is the preview.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "Spotify Ads Manager lets you build the creative on the brief. You see the still before the campaign starts.",
+  publishedAt: new Date("2026-11-04T16:00:00.000Z"),
+  body: `# The still is the preview.
+
+Spotify Ads Manager lets you build the creative on the brief. You see the still before the campaign starts.
+
+Birch Reserve works the same way. You assemble the square on the creative brief. Nothing on the hub changes until the insertion order names the hub.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the still before you lock the category.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
@@ -478,6 +498,7 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   THE_PREVIEW_IS_SELF_SERVE_ARTICLE,
   THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE,
   THE_ZONE_IS_ONE_NAME_ARTICLE,
+  THE_STILL_IS_THE_PREVIEW_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =

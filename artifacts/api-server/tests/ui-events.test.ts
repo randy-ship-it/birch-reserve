@@ -20,6 +20,7 @@ import {
   THE_PREVIEW_IS_SELF_SERVE_ARTICLE,
   THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE,
   THE_ZONE_IS_ONE_NAME_ARTICLE,
+  THE_STILL_IS_THE_PREVIEW_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
   THE_ZONE_HAS_A_PRICE_ARTICLE,
@@ -481,6 +482,33 @@ The $190 look does not burn a seat. It lets you see the zone before you lock the
   assert.equal(mentionsLegacyHeroPrice(THE_ZONE_IS_ONE_NAME_ARTICLE.body), false);
   assert.doesNotMatch(THE_ZONE_IS_ONE_NAME_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
 
+  assert.equal(THE_STILL_IS_THE_PREVIEW_ARTICLE.slug, "the-still-is-the-preview");
+  assert.equal(THE_STILL_IS_THE_PREVIEW_ARTICLE.title, "The still is the preview.");
+  assert.equal(THE_STILL_IS_THE_PREVIEW_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_STILL_IS_THE_PREVIEW_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_STILL_IS_THE_PREVIEW_ARTICLE.publishedAt.toISOString(), "2026-11-04T16:00:00.000Z");
+  assert.equal(
+    THE_STILL_IS_THE_PREVIEW_ARTICLE.summary,
+    "Spotify Ads Manager lets you build the creative on the brief. You see the still before the campaign starts.",
+  );
+  assert.equal(
+    THE_STILL_IS_THE_PREVIEW_ARTICLE.body,
+    `# The still is the preview.
+
+Spotify Ads Manager lets you build the creative on the brief. You see the still before the campaign starts.
+
+Birch Reserve works the same way. You assemble the square on the creative brief. Nothing on the hub changes until the insertion order names the hub.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the still before you lock the category.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_STILL_IS_THE_PREVIEW_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_STILL_IS_THE_PREVIEW_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_STILL_IS_THE_PREVIEW_ARTICLE.body), false);
+  assert.doesNotMatch(THE_STILL_IS_THE_PREVIEW_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
@@ -570,6 +598,7 @@ The $190 look does not burn a seat. It lets you see the zone before you lock the
     THE_PREVIEW_IS_SELF_SERVE_ARTICLE.slug,
     THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.slug,
     THE_ZONE_IS_ONE_NAME_ARTICLE.slug,
+    THE_STILL_IS_THE_PREVIEW_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -1000,8 +1029,10 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /The card does not leave the page\./);
     assert.match(insights, /href="\/insights\/the-zone-is-one-name"/);
     assert.match(insights, /The zone is one name\./);
-    assert.match(insights, /href="\/insights\/the-face-is-approved-on-the-brief"[\s\S]*href="\/insights\/the-square-is-endemic-to-the-recovery-already-open"[\s\S]*href="\/insights\/the-preview-is-self-serve"[\s\S]*href="\/insights\/the-card-does-not-leave-the-page"[\s\S]*href="\/insights\/the-zone-is-one-name"/);
-    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 18);
+    assert.match(insights, /href="\/insights\/the-still-is-the-preview"/);
+    assert.match(insights, /The still is the preview\./);
+    assert.match(insights, /href="\/insights\/the-face-is-approved-on-the-brief"[\s\S]*href="\/insights\/the-square-is-endemic-to-the-recovery-already-open"[\s\S]*href="\/insights\/the-preview-is-self-serve"[\s\S]*href="\/insights\/the-card-does-not-leave-the-page"[\s\S]*href="\/insights\/the-zone-is-one-name"[\s\S]*href="\/insights\/the-still-is-the-preview"/);
+    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 19);
     assert.doesNotMatch(insights, /the-look-starts-itself|the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
@@ -1218,6 +1249,19 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(zoneName, /The \$190 look does not burn a seat\. It lets you see the zone before you lock the name\./);
     assert.doesNotMatch(zoneName, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
     assert.doesNotMatch(zoneName, /id="root"/);
+
+    const stillPreviewResponse = await fetch(`${origin}/insights/the-still-is-the-preview`);
+    const stillPreview = await stillPreviewResponse.text();
+    assert.equal(stillPreviewResponse.status, 200);
+    assert.match(stillPreview, /<h1>The still is the preview\.<\/h1>/);
+    assert.equal(stillPreview.match(/<h1>/g)?.length, 1);
+    assert.match(stillPreview, /November 4, 2026/);
+    assert.match(stillPreview, /Spotify Ads Manager lets you build the creative on the brief\. You see the still before the campaign starts\./);
+    assert.match(stillPreview, /Birch Reserve works the same way\. You assemble the square on the creative brief\. Nothing on the hub changes until the insertion order names the hub\./);
+    assert.match(stillPreview, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(stillPreview, /The \$190 look does not burn a seat\. It lets you see the still before you lock the category\./);
+    assert.doesNotMatch(stillPreview, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(stillPreview, /id="root"/);
 
     const unpublishedLook = await fetch(`${origin}/insights/the-look-starts-itself`);
     assert.equal(unpublishedLook.status, 404);
