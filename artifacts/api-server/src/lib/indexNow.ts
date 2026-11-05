@@ -35,6 +35,7 @@ export const INDEXNOW_URL_LIST = [
   `https://${INDEXNOW_HOST}/insights/the-card-does-not-leave-the-page`,
   `https://${INDEXNOW_HOST}/insights/the-zone-is-one-name`,
   `https://${INDEXNOW_HOST}/insights/the-still-is-the-preview`,
+  `https://${INDEXNOW_HOST}/insights/the-shelf-is-already-shopped`,
   `https://${INDEXNOW_HOST}/buycalc`,
 ] as const;
 
