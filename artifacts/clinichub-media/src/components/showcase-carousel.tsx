@@ -4,7 +4,7 @@ import { Play, Pause, ChevronLeft, ChevronRight, ExternalLink } from "lucide-rea
 
 import drHoHub from "@assets/hub-showcase/dr-ho-hub.png";
 import jillHealthHub from "@assets/hub-showcase/jill-health-hub-clean.png";
-import integrityHub from "@assets/hub-showcase/integrity-hub.png";
+import studioBonPilatesHub from "@assets/hub-showcase/studio-bon-pilates-hub.png";
 import birdAndBeHub from "@assets/hub-showcase/bird-and-be-hub.png";
 import nutriprocanHub from "@assets/hub-showcase/nutriprocan-hub-clean.png";
 import birdAndBePortal from "@assets/hub-showcase/bird-and-be-member-portal.png";
@@ -30,13 +30,13 @@ const HUBS = [
     url: "https://jill-health.replit.app/my-brand-landing/"
   },
   {
-    id: "integrity",
-    name: "Integrity Fitness",
+    id: "studio-bon-pilates",
+    name: "Studio Bon Pilates",
     surface: "Member offers",
-    displayUrl: "Integrity hub",
-    description: "A local fitness partner augmenting memberships with recovery offers and physio access.",
-    image: integrityHub,
-    url: "https://www.scalehealth.ca/integrity"
+    displayUrl: "Studio Bon Pilates member hub",
+    description: "A pilates studio giving members partner-brand perks plus in-person physio access.",
+    image: studioBonPilatesHub,
+    url: "https://www.scalehealth.ca/studio-bon-pilates-toronto"
   },
   {
     id: "bird-and-be",

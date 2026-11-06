@@ -546,7 +546,7 @@ router.get("/llms.txt", (_req, res) => {
       "- custom · Get a call back · multi-hub / on-prem Align",
       "8 brand categories across hubs — not eight websites. Lock in your slot.",
       "Categories: pain relief / topicals, recovery hardware, nutrition, sleep, meal prep, women’s health, men’s health, diagnostics / services.",
-      "Launching cohort (logos, not reach): DR-HO’S · Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery.",
+      "Launching cohort (logos, not reach): DR-HO’S · Kalaya · Jill Health · Jack Health · Studio Bon Pilates · Bird & Be · NutriProCan · Roll Recovery.",
       `Formats: ${FORMATS.join(", ")}.`,
       "Every published dollar is a 100% media credit. Delivery starts when the insertion order names the hub.",
       PUBLIC_BRAND_DESCRIPTION,
