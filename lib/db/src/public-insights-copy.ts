@@ -499,6 +499,26 @@ The $190 look does not burn a seat. It lets you see the square on that shelf bef
 `,
 } as const;
 
+export const THE_SQUARE_IS_ALREADY_IN_THE_LETTER_ARTICLE = {
+  slug: "the-square-is-already-in-the-letter",
+  title: "The square is already in the letter.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "LiveIntent and AdQuick place the unit inside the page the member already opened. You do not invent a new feed.",
+  publishedAt: new Date("2026-11-06T16:00:00.000Z"),
+  body: `# The square is already in the letter.
+
+LiveIntent and AdQuick place the unit inside the page the member already opened. You do not invent a new feed.
+
+Birch Reserve works the same way. You place the square inside the letter the member already opened. The insertion order names the hub and the category before anything sits there.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you see the stamp before you lock the category.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
@@ -520,6 +540,7 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   THE_ZONE_IS_ONE_NAME_ARTICLE,
   THE_STILL_IS_THE_PREVIEW_ARTICLE,
   THE_SHELF_IS_ALREADY_SHOPPED_ARTICLE,
+  THE_SQUARE_IS_ALREADY_IN_THE_LETTER_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =
