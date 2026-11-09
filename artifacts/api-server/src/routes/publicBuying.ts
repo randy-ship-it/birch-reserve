@@ -2204,6 +2204,9 @@ export function renderBuycalcHtml(input: {
 <p class="sh-proof">The still is the preview. You assemble the square on the brief. The $490 is the stamp.</p>
 <p class="sh-proof">The shelf is already shopped. You place the square on the aisle the member already opened. The $490 is the header.</p>
 <p class="sh-proof">The square is already in the letter. You place the unit inside the page the member already opened. The $490 is the stamp.</p>
+<p class="sh-proof">The kit sits inside the recovery already open. You place the square on the protocol the member already started. The $490 is the named category.</p>
+<p class="sh-proof">The look starts on the brief. You start the square yourself. The $490 is the stamp.</p>
+<p class="sh-proof">The card is the only unit. You place one square on the page the member already opened. The $490 is the named category.</p>
 <p class="sh-excl">One brand per category · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only · Canada only</p></section>
 ${BUYCALC_SEAT_CALC_HTML}
 <div class="grid"><section><h2>What a reserved slot includes</h2><p><strong>${availability.seats_open} categories open</strong> of ${availability.seats_total}. Availability is rolling and subtracts paid and currently held locks.</p>

@@ -519,6 +519,66 @@ The $190 look does not burn a seat. It lets you see the stamp before you lock th
 `,
 } as const;
 
+export const THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE = {
+  slug: "the-kit-sits-inside-the-recovery-already-open",
+  title: "The kit sits inside the recovery already open.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "An endemic health kit sits inside the recovery the reader already opened. You do not open a new protocol.",
+  publishedAt: new Date("2026-11-07T16:00:00.000Z"),
+  body: `# The kit sits inside the recovery already open.
+
+An endemic health kit sits inside the recovery the reader already opened. You do not open a new protocol.
+
+Birch Reserve works the same way. You place the square on the protocol the member already started. Nothing on the hub changes until the insertion order names the hub.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you place the kit before you lock the category.
+`,
+} as const;
+
+export const THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE = {
+  slug: "the-look-starts-on-the-brief",
+  title: "The look starts on the brief.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "StackAdapt lets you preview the unit before the campaign starts. You start it yourself.",
+  publishedAt: new Date("2026-11-08T16:00:00.000Z"),
+  body: `# The look starts on the brief.
+
+StackAdapt lets you preview the unit before the campaign starts. You start it yourself.
+
+Birch Reserve works the same way. You start the square on the creative brief. Nothing on the hub changes until the insertion order names the hub.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you start the square before you lock the category.
+`,
+} as const;
+
+export const THE_CARD_IS_THE_ONLY_UNIT_ARTICLE = {
+  slug: "the-card-is-the-only-unit",
+  title: "The card is the only unit.",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "Carbon places one native card on the page the reader already opened. One square. Not a stack.",
+  publishedAt: new Date("2026-11-09T16:00:00.000Z"),
+  body: `# The card is the only unit.
+
+Carbon places one native card on the page the reader already opened. One square. Not a stack.
+
+Birch Reserve works the same way. You place one card on the hub page the member already opened. Nothing on the hub changes until the insertion order names the hub.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you start the card before you lock the category.
+`,
+} as const;
+
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
@@ -541,6 +601,9 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   THE_STILL_IS_THE_PREVIEW_ARTICLE,
   THE_SHELF_IS_ALREADY_SHOPPED_ARTICLE,
   THE_SQUARE_IS_ALREADY_IN_THE_LETTER_ARTICLE,
+  THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE,
+  THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE,
+  THE_CARD_IS_THE_ONLY_UNIT_ARTICLE,
 ] as const;
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =
