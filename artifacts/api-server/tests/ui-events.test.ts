@@ -23,6 +23,9 @@ import {
   THE_STILL_IS_THE_PREVIEW_ARTICLE,
   THE_SHELF_IS_ALREADY_SHOPPED_ARTICLE,
   THE_SQUARE_IS_ALREADY_IN_THE_LETTER_ARTICLE,
+  THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE,
+  THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE,
+  THE_CARD_IS_THE_ONLY_UNIT_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
   THE_ZONE_HAS_A_PRICE_ARTICLE,
@@ -565,6 +568,88 @@ The $190 look does not burn a seat. It lets you see the stamp before you lock th
   assert.equal(mentionsLegacyHeroPrice(THE_SQUARE_IS_ALREADY_IN_THE_LETTER_ARTICLE.body), false);
   assert.doesNotMatch(THE_SQUARE_IS_ALREADY_IN_THE_LETTER_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
 
+  assert.equal(THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.slug, "the-kit-sits-inside-the-recovery-already-open");
+  assert.equal(THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.title, "The kit sits inside the recovery already open.");
+  assert.equal(THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.publishedAt.toISOString(), "2026-11-07T16:00:00.000Z");
+  assert.equal(
+    THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.summary,
+    "An endemic health kit sits inside the recovery the reader already opened. You do not open a new protocol.",
+  );
+  assert.equal(
+    THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.body,
+    `# The kit sits inside the recovery already open.
+
+An endemic health kit sits inside the recovery the reader already opened. You do not open a new protocol.
+
+Birch Reserve works the same way. You place the square on the protocol the member already started. Nothing on the hub changes until the insertion order names the hub.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you place the kit before you lock the category.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.body), false);
+  assert.doesNotMatch(THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+  assert.doesNotMatch(THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.summary, /eHealthcareSolutions|PulsePoint|StackAdapt|Carbon|\d/);
+
+  assert.equal(THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.slug, "the-look-starts-on-the-brief");
+  assert.equal(THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.title, "The look starts on the brief.");
+  assert.equal(THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.publishedAt.toISOString(), "2026-11-08T16:00:00.000Z");
+  assert.equal(
+    THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.summary,
+    "StackAdapt lets you preview the unit before the campaign starts. You start it yourself.",
+  );
+  assert.equal(
+    THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.body,
+    `# The look starts on the brief.
+
+StackAdapt lets you preview the unit before the campaign starts. You start it yourself.
+
+Birch Reserve works the same way. You start the square on the creative brief. Nothing on the hub changes until the insertion order names the hub.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you start the square before you lock the category.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.body), false);
+  assert.doesNotMatch(THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
+  assert.equal(THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.slug, "the-card-is-the-only-unit");
+  assert.equal(THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.title, "The card is the only unit.");
+  assert.equal(THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.authorName, "Birch Reserve Editorial");
+  assert.equal(THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.topic, "Closed-hub advertising");
+  assert.equal(THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.publishedAt.toISOString(), "2026-11-09T16:00:00.000Z");
+  assert.equal(
+    THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.summary,
+    "Carbon places one native card on the page the reader already opened. One square. Not a stack.",
+  );
+  assert.equal(
+    THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.body,
+    `# The card is the only unit.
+
+Carbon places one native card on the page the reader already opened. One square. Not a stack.
+
+Birch Reserve works the same way. You place one card on the hub page the member already opened. Nothing on the hub changes until the insertion order names the hub.
+
+RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
+
+The $190 look does not burn a seat. It lets you start the card before you lock the category.
+`,
+  );
+  assert.equal(mentionsLegacyHeroPrice(THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.title), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.summary), false);
+  assert.equal(mentionsLegacyHeroPrice(THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.body), false);
+  assert.doesNotMatch(THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
+
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
@@ -657,6 +742,9 @@ The $190 look does not burn a seat. It lets you see the stamp before you lock th
     THE_STILL_IS_THE_PREVIEW_ARTICLE.slug,
     THE_SHELF_IS_ALREADY_SHOPPED_ARTICLE.slug,
     THE_SQUARE_IS_ALREADY_IN_THE_LETTER_ARTICLE.slug,
+    THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.slug,
+    THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.slug,
+    THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -1093,8 +1181,14 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /The shelf is already shopped\./);
     assert.match(insights, /href="\/insights\/the-square-is-already-in-the-letter"/);
     assert.match(insights, /The square is already in the letter\./);
-    assert.match(insights, /href="\/insights\/the-face-is-approved-on-the-brief"[\s\S]*href="\/insights\/the-square-is-endemic-to-the-recovery-already-open"[\s\S]*href="\/insights\/the-preview-is-self-serve"[\s\S]*href="\/insights\/the-card-does-not-leave-the-page"[\s\S]*href="\/insights\/the-zone-is-one-name"[\s\S]*href="\/insights\/the-still-is-the-preview"[\s\S]*href="\/insights\/the-shelf-is-already-shopped"[\s\S]*href="\/insights\/the-square-is-already-in-the-letter"/);
-    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 21);
+    assert.match(insights, /href="\/insights\/the-kit-sits-inside-the-recovery-already-open"/);
+    assert.match(insights, /The kit sits inside the recovery already open\./);
+    assert.match(insights, /href="\/insights\/the-look-starts-on-the-brief"/);
+    assert.match(insights, /The look starts on the brief\./);
+    assert.match(insights, /href="\/insights\/the-card-is-the-only-unit"/);
+    assert.match(insights, /The card is the only unit\./);
+    assert.match(insights, /href="\/insights\/the-face-is-approved-on-the-brief"[\s\S]*href="\/insights\/the-square-is-endemic-to-the-recovery-already-open"[\s\S]*href="\/insights\/the-preview-is-self-serve"[\s\S]*href="\/insights\/the-card-does-not-leave-the-page"[\s\S]*href="\/insights\/the-zone-is-one-name"[\s\S]*href="\/insights\/the-still-is-the-preview"[\s\S]*href="\/insights\/the-shelf-is-already-shopped"[\s\S]*href="\/insights\/the-square-is-already-in-the-letter"[\s\S]*href="\/insights\/the-kit-sits-inside-the-recovery-already-open"[\s\S]*href="\/insights\/the-look-starts-on-the-brief"[\s\S]*href="\/insights\/the-card-is-the-only-unit"/);
+    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 24);
     assert.doesNotMatch(insights, /the-look-starts-itself|the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
@@ -1350,6 +1444,45 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(letter, /The \$190 look does not burn a seat\. It lets you see the stamp before you lock the category\./);
     assert.doesNotMatch(letter, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
     assert.doesNotMatch(letter, /id="root"/);
+
+    const kitOpenResponse = await fetch(`${origin}/insights/the-kit-sits-inside-the-recovery-already-open`);
+    const kitOpen = await kitOpenResponse.text();
+    assert.equal(kitOpenResponse.status, 200);
+    assert.match(kitOpen, /<h1>The kit sits inside the recovery already open\.<\/h1>/);
+    assert.equal(kitOpen.match(/<h1>/g)?.length, 1);
+    assert.match(kitOpen, /November 7, 2026/);
+    assert.match(kitOpen, /An endemic health kit sits inside the recovery the reader already opened\. You do not open a new protocol\./);
+    assert.match(kitOpen, /Birch Reserve works the same way\. You place the square on the protocol the member already started\. Nothing on the hub changes until the insertion order names the hub\./);
+    assert.match(kitOpen, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(kitOpen, /The \$190 look does not burn a seat\. It lets you place the kit before you lock the category\./);
+    assert.doesNotMatch(kitOpen, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(kitOpen, /id="root"/);
+
+    const lookStartsResponse = await fetch(`${origin}/insights/the-look-starts-on-the-brief`);
+    const lookStarts = await lookStartsResponse.text();
+    assert.equal(lookStartsResponse.status, 200);
+    assert.match(lookStarts, /<h1>The look starts on the brief\.<\/h1>/);
+    assert.equal(lookStarts.match(/<h1>/g)?.length, 1);
+    assert.match(lookStarts, /November 8, 2026/);
+    assert.match(lookStarts, /StackAdapt lets you preview the unit before the campaign starts\. You start it yourself\./);
+    assert.match(lookStarts, /Birch Reserve works the same way\. You start the square on the creative brief\. Nothing on the hub changes until the insertion order names the hub\./);
+    assert.match(lookStarts, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(lookStarts, /The \$190 look does not burn a seat\. It lets you start the square before you lock the category\./);
+    assert.doesNotMatch(lookStarts, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(lookStarts, /id="root"/);
+
+    const onlyUnitResponse = await fetch(`${origin}/insights/the-card-is-the-only-unit`);
+    const onlyUnit = await onlyUnitResponse.text();
+    assert.equal(onlyUnitResponse.status, 200);
+    assert.match(onlyUnit, /<h1>The card is the only unit\.<\/h1>/);
+    assert.equal(onlyUnit.match(/<h1>/g)?.length, 1);
+    assert.match(onlyUnit, /November 9, 2026/);
+    assert.match(onlyUnit, /Carbon places one native card on the page the reader already opened\. One square\. Not a stack\./);
+    assert.match(onlyUnit, /Birch Reserve works the same way\. You place one card on the hub page the member already opened\. Nothing on the hub changes until the insertion order names the hub\./);
+    assert.match(onlyUnit, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
+    assert.match(onlyUnit, /The \$190 look does not burn a seat\. It lets you start the card before you lock the category\./);
+    assert.doesNotMatch(onlyUnit, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
+    assert.doesNotMatch(onlyUnit, /id="root"/);
 
     const unpublishedLook = await fetch(`${origin}/insights/the-look-starts-itself`);
     assert.equal(unpublishedLook.status, 404);
