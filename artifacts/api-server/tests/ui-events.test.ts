@@ -26,7 +26,6 @@ import {
   THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE,
   THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE,
   THE_CARD_IS_THE_ONLY_UNIT_ARTICLE,
-  THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE,
   THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
   THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
   THE_ZONE_HAS_A_PRICE_ARTICLE,
@@ -651,33 +650,6 @@ The $190 look does not burn a seat. It lets you start the card before you lock t
   assert.equal(mentionsLegacyHeroPrice(THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.body), false);
   assert.doesNotMatch(THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
 
-  assert.equal(THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE.slug, "the-zone-is-locked-by-the-buyer");
-  assert.equal(THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE.title, "The zone is locked by the buyer.");
-  assert.equal(THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE.authorName, "Birch Reserve Editorial");
-  assert.equal(THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE.topic, "Closed-hub advertising");
-  assert.equal(THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE.publishedAt.toISOString(), "2026-11-10T16:00:00.000Z");
-  assert.equal(
-    THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE.summary,
-    "BuySellAds sells a zone by its name. One buyer for that zone. The zone does not share.",
-  );
-  assert.equal(
-    THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE.body,
-    `# The zone is locked by the buyer.
-
-BuySellAds sells a zone by its name. One buyer for that zone. The zone does not share.
-
-Birch Reserve works the same way. You lock one category. The insertion order names the hub. The seat does not rotate.
-
-RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
-
-The $190 look does not burn a seat. It lets you start the zone before you lock the category.
-`,
-  );
-  assert.equal(mentionsLegacyHeroPrice(THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE.title), false);
-  assert.equal(mentionsLegacyHeroPrice(THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE.summary), false);
-  assert.equal(mentionsLegacyHeroPrice(THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE.body), false);
-  assert.doesNotMatch(THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE.body, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|impression|\bCTR\b|Align|\$4,?900|\$9,?900/i);
-
   const untouched = "Agent-led advertising needs a receipt, not a price.";
   assert.equal(legacyReserveCopyPatch(untouched, untouched), null);
 
@@ -773,7 +745,6 @@ The $190 look does not burn a seat. It lets you start the zone before you lock t
     THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.slug,
     THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.slug,
     THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.slug,
-    THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE.slug,
   ]);
   assert.equal(rows[0]?.slug, "trusted-context-loop-curated-private-network");
   assert.equal(mentionsLegacyHeroPrice(rows[0]?.body ?? ""), false);
@@ -1216,11 +1187,9 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(insights, /The look starts on the brief\./);
     assert.match(insights, /href="\/insights\/the-card-is-the-only-unit"/);
     assert.match(insights, /The card is the only unit\./);
-    assert.match(insights, /href="\/insights\/the-zone-is-locked-by-the-buyer"/);
-    assert.match(insights, /The zone is locked by the buyer\./);
-    assert.match(insights, /href="\/insights\/the-face-is-approved-on-the-brief"[\s\S]*href="\/insights\/the-square-is-endemic-to-the-recovery-already-open"[\s\S]*href="\/insights\/the-preview-is-self-serve"[\s\S]*href="\/insights\/the-card-does-not-leave-the-page"[\s\S]*href="\/insights\/the-zone-is-one-name"[\s\S]*href="\/insights\/the-still-is-the-preview"[\s\S]*href="\/insights\/the-shelf-is-already-shopped"[\s\S]*href="\/insights\/the-square-is-already-in-the-letter"[\s\S]*href="\/insights\/the-kit-sits-inside-the-recovery-already-open"[\s\S]*href="\/insights\/the-look-starts-on-the-brief"[\s\S]*href="\/insights\/the-card-is-the-only-unit"[\s\S]*href="\/insights\/the-zone-is-locked-by-the-buyer"/);
-    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 25);
-    assert.doesNotMatch(insights, /the-look-starts-itself|the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open/);
+    assert.match(insights, /href="\/insights\/the-face-is-approved-on-the-brief"[\s\S]*href="\/insights\/the-square-is-endemic-to-the-recovery-already-open"[\s\S]*href="\/insights\/the-preview-is-self-serve"[\s\S]*href="\/insights\/the-card-does-not-leave-the-page"[\s\S]*href="\/insights\/the-zone-is-one-name"[\s\S]*href="\/insights\/the-still-is-the-preview"[\s\S]*href="\/insights\/the-shelf-is-already-shopped"[\s\S]*href="\/insights\/the-square-is-already-in-the-letter"[\s\S]*href="\/insights\/the-kit-sits-inside-the-recovery-already-open"[\s\S]*href="\/insights\/the-look-starts-on-the-brief"[\s\S]*href="\/insights\/the-card-is-the-only-unit"/);
+    assert.equal(insights.match(/<h2><a href="\/insights\//g)?.length, 24);
+    assert.doesNotMatch(insights, /the-look-starts-itself|the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-zone-is-locked-by-the-buyer/);
     assert.doesNotMatch(insights, /id="root"/);
     assert.doesNotMatch(insights, /\$899/);
 
@@ -1515,19 +1484,9 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.doesNotMatch(onlyUnit, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
     assert.doesNotMatch(onlyUnit, /id="root"/);
 
-    const zoneLockedResponse = await fetch(`${origin}/insights/the-zone-is-locked-by-the-buyer`);
-    const zoneLocked = await zoneLockedResponse.text();
-    assert.equal(zoneLockedResponse.status, 200);
-    assert.match(zoneLocked, /<h1>The zone is locked by the buyer\.<\/h1>/);
-    assert.equal(zoneLocked.match(/<h1>/g)?.length, 1);
-    assert.match(zoneLocked, /November 10, 2026/);
-    assert.match(zoneLocked, /BuySellAds sells a zone by its name\. One buyer for that zone\. The zone does not share\./);
-    assert.match(zoneLocked, /Birch Reserve works the same way\. You lock one category\. The insertion order names the hub\. The seat does not rotate\./);
-    assert.match(zoneLocked, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
-    assert.match(zoneLocked, /The \$190 look does not burn a seat\. It lets you start the zone before you lock the category\./);
-    assert.doesNotMatch(zoneLocked, /the-still-starts-on-the-brief|the-unit-matches-the-recovery-already-open|the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
-    assert.doesNotMatch(zoneLocked, /id="root"/);
-
+    const rejectedZone = await fetch(`${origin}/insights/the-zone-is-locked-by-the-buyer`);
+    assert.equal(rejectedZone.status, 404);
+    assert.doesNotMatch(await rejectedZone.text(), /The zone is locked by the buyer/);
     const unpublishedLook = await fetch(`${origin}/insights/the-look-starts-itself`);
     assert.equal(unpublishedLook.status, 404);
     const unpublishedStill = await fetch(`${origin}/insights/the-still-starts-on-the-brief`);

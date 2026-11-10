@@ -20,6 +20,12 @@ export function databaseForClient(client: PoolClient): WorkspaceDatabase {
 }
 
 export * from "./schema";
-export { PUBLIC_INSIGHT_ARTICLES, rewriteAlignNetworkCopy, rewriteExclusiveInsightCopy } from "./public-insights-copy";
+export {
+  PUBLIC_INSIGHT_ARTICLES,
+  RETRACTED_PUBLIC_INSIGHT_SLUGS,
+  isRetractedPublicInsight,
+  rewriteAlignNetworkCopy,
+  rewriteExclusiveInsightCopy,
+} from "./public-insights-copy";
 
 export const seedPublicInsights = bindPublicInsightsSeed(db);

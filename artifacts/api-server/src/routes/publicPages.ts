@@ -4,6 +4,7 @@ import {
   editorialArticlesTable,
   editorialSourcesTable,
   PUBLIC_INSIGHT_ARTICLES,
+  isRetractedPublicInsight,
   rewriteAlignNetworkCopy,
   rewriteExclusiveInsightCopy,
 } from "@workspace/db";
@@ -255,12 +256,15 @@ async function listReadableArticles(): Promise<PublicArticle[]> {
         })),
     }]));
     for (const article of seeded) {
+      if (isRetractedPublicInsight(article.slug)) continue;
       if (!bySlug.has(article.slug)) bySlug.set(article.slug, article);
     }
-    return [...bySlug.values()].sort((a, b) => (a.publishedAt?.getTime() ?? 0) - (b.publishedAt?.getTime() ?? 0));
+    return [...bySlug.values()]
+      .filter((article) => !isRetractedPublicInsight(article.slug))
+      .sort((a, b) => (a.publishedAt?.getTime() ?? 0) - (b.publishedAt?.getTime() ?? 0));
   } catch (error) {
     logger.warn({ err: error }, "Public insights HTML fell back to seeded articles");
-    return seeded;
+    return seeded.filter((article) => !isRetractedPublicInsight(article.slug));
   }
 }
 

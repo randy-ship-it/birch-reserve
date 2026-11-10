@@ -100,6 +100,13 @@ test("public key file and API route are the key only, and Autoscale claims the p
   }
 });
 
+test("IndexNow allowlist omits the rejected Nov 10 zone post", () => {
+  assert.equal(
+    INDEXNOW_URL_LIST.some((url) => url.endsWith("/insights/the-zone-is-locked-by-the-buyer")),
+    false,
+  );
+});
+
 test("editorial sitemap static list keeps existing URLs and adds the legal pages", async () => {
   const source = await readFile(resolve(process.cwd(), "src/routes/editorial.ts"), "utf8");
   const block = source.match(/const staticUrls = \[([\s\S]*?)\]\.map/)?.[1] ?? "";
