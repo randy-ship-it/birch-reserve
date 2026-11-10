@@ -6,7 +6,7 @@
  * the API function (ahead of the SPA rewrite) and the head is rewritten here.
  * Server-rendered pages set the same tags in their own HTML.
  */
-import { PUBLIC_INSIGHT_ARTICLES, db, editorialArticlesTable } from "@workspace/db";
+import { PUBLIC_INSIGHT_ARTICLES, db, editorialArticlesTable, isRetractedPublicInsight } from "@workspace/db";
 import { and, asc, eq, lte } from "drizzle-orm";
 import { Router, type IRouter, type NextFunction, type Request, type Response } from "express";
 import { logger } from "../lib/logger";
@@ -24,7 +24,11 @@ const router: IRouter = Router();
 
 async function insightPaths(): Promise<{ paths: string[]; lastmod: Map<string, string> }> {
   const lastmod = new Map<string, string>();
-  const paths = new Set<string>(PUBLIC_INSIGHT_ARTICLES.map((article) => `/insights/${article.slug}`));
+  const paths = new Set<string>(
+    PUBLIC_INSIGHT_ARTICLES
+      .filter((article) => !isRetractedPublicInsight(article.slug))
+      .map((article) => `/insights/${article.slug}`),
+  );
   try {
     const rows = await db
       .select({
@@ -37,6 +41,7 @@ async function insightPaths(): Promise<{ paths: string[]; lastmod: Map<string, s
       .orderBy(asc(editorialArticlesTable.publishedAt));
     for (const row of rows) {
       if (!/^[a-z0-9-]+$/.test(row.slug)) continue;
+      if (isRetractedPublicInsight(row.slug)) continue;
       const path = `/insights/${row.slug}`;
       paths.add(path);
       const stamp = row.updatedAt ?? row.publishedAt;

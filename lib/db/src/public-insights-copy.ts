@@ -579,26 +579,6 @@ The $190 look does not burn a seat. It lets you start the card before you lock t
 `,
 } as const;
 
-export const THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE = {
-  slug: "the-zone-is-locked-by-the-buyer",
-  title: "The zone is locked by the buyer.",
-  authorName: "Birch Reserve Editorial",
-  topic: "Closed-hub advertising",
-  summary:
-    "BuySellAds sells a zone by its name. One buyer for that zone. The zone does not share.",
-  publishedAt: new Date("2026-11-10T16:00:00.000Z"),
-  body: `# The zone is locked by the buyer.
-
-BuySellAds sells a zone by its name. One buyer for that zone. The zone does not share.
-
-Birch Reserve works the same way. You lock one category. The insertion order names the hub. The seat does not rotate.
-
-RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
-
-The $190 look does not burn a seat. It lets you start the zone before you lock the category.
-`,
-} as const;
-
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
@@ -624,8 +604,17 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE,
   THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE,
   THE_CARD_IS_THE_ONLY_UNIT_ARTICLE,
-  THE_ZONE_IS_LOCKED_BY_THE_BUYER_ARTICLE,
 ] as const;
+
+/**
+ * Randy rejected this post on 10 Nov 2026. PR #106 seeded it as published.
+ * Public routes must not serve the slug even if that row is still in the database.
+ */
+export const RETRACTED_PUBLIC_INSIGHT_SLUGS = ["the-zone-is-locked-by-the-buyer"] as const;
+
+export function isRetractedPublicInsight(slug: string): boolean {
+  return (RETRACTED_PUBLIC_INSIGHT_SLUGS as readonly string[]).includes(slug);
+}
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =
   "describes virtual rehab embedded into clinic, studio, and wellness businesses [2].";

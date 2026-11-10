@@ -40,7 +40,6 @@ export const INDEXNOW_URL_LIST = [
   `https://${INDEXNOW_HOST}/insights/the-kit-sits-inside-the-recovery-already-open`,
   `https://${INDEXNOW_HOST}/insights/the-look-starts-on-the-brief`,
   `https://${INDEXNOW_HOST}/insights/the-card-is-the-only-unit`,
-  `https://${INDEXNOW_HOST}/insights/the-zone-is-locked-by-the-buyer`,
   `https://${INDEXNOW_HOST}/buycalc`,
 ] as const;
 

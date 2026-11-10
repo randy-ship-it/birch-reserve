@@ -1,5 +1,6 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import { isRetractedPublicInsight, RETRACTED_PUBLIC_INSIGHT_SLUGS } from "./public-insights-copy";
 import {
   seedPublicInsightsWithStore,
   type InsightsSeedStore,
@@ -30,6 +31,7 @@ function drizzleInsightsSeedStore(database: InsightsDatabase): InsightsSeedStore
         .where(and(eq(editorialArticlesTable.id, id), eq(editorialArticlesTable.status, "published")));
     },
     async insertPublishedIfMissing(article) {
+      if (isRetractedPublicInsight(article.slug)) return false;
       const rows = await database
         .insert(editorialArticlesTable)
         .values({
@@ -49,9 +51,19 @@ function drizzleInsightsSeedStore(database: InsightsDatabase): InsightsSeedStore
   };
 }
 
+async function retractRejectedInsights(database: InsightsDatabase): Promise<void> {
+  await database
+    .update(editorialArticlesTable)
+    .set({ status: "withdrawn" })
+    .where(inArray(editorialArticlesTable.slug, [...RETRACTED_PUBLIC_INSIGHT_SLUGS]));
+}
+
 export function bindPublicInsightsSeed(
   database: InsightsDatabase,
 ): () => Promise<PublicInsightsSeedResult> {
   const store = drizzleInsightsSeedStore(database);
-  return () => seedPublicInsightsWithStore(store);
+  return async () => {
+    await retractRejectedInsights(database);
+    return seedPublicInsightsWithStore(store);
+  };
 }

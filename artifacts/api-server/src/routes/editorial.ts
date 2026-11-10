@@ -10,6 +10,7 @@ import {
   editorialRevisionsTable,
   editorialSourcesTable,
   PUBLIC_INSIGHT_ARTICLES,
+  isRetractedPublicInsight,
   rewriteExclusiveInsightCopy,
 } from "@workspace/db";
 import { logger } from "../lib/logger";
@@ -75,7 +76,7 @@ export function publicArticle(article: typeof editorialArticlesTable.$inferSelec
 }
 
 function seededPublicArticles() {
-  return PUBLIC_INSIGHT_ARTICLES.map((article) => ({
+  return PUBLIC_INSIGHT_ARTICLES.filter((article) => !isRetractedPublicInsight(article.slug)).map((article) => ({
     slug: article.slug,
     title: article.title,
     authorName: article.authorName,
@@ -137,12 +138,13 @@ router.get("/editorial/sitemap.xml", async (_req, res) => {
       .orderBy(asc(editorialArticlesTable.publishedAt));
   } catch (error) {
     logger.warn({ err: error }, "Editorial sitemap fell back to seeded insight paths");
-    articles = PUBLIC_INSIGHT_ARTICLES.map((article) => ({
+    articles = PUBLIC_INSIGHT_ARTICLES.filter((article) => !isRetractedPublicInsight(article.slug)).map((article) => ({
       slug: article.slug,
       publishedAt: article.publishedAt,
       updatedAt: article.publishedAt,
     }));
   }
+  articles = articles.filter((article) => !isRetractedPublicInsight(article.slug));
 
   const staticUrls = [
     "/",
@@ -177,9 +179,9 @@ router.get("/editorial/sitemap.xml", async (_req, res) => {
 router.get("/editorial/articles", async (_req, res) => {
   try {
     const now = new Date();
-    const articles = await db.select().from(editorialArticlesTable).where(
+    const articles = (await db.select().from(editorialArticlesTable).where(
       and(eq(editorialArticlesTable.status, "published"), lte(editorialArticlesTable.publishedAt, now)),
-    ).orderBy(asc(editorialArticlesTable.publishedAt));
+    ).orderBy(asc(editorialArticlesTable.publishedAt))).filter((article) => !isRetractedPublicInsight(article.slug));
     const ids = articles.map((a) => a.id);
     const citations = ids.length ? await db.select({
       articleId: editorialArticleSourcesTable.articleId, citationLabel: editorialArticleSourcesTable.citationLabel,
@@ -196,6 +198,10 @@ router.get("/editorial/articles", async (_req, res) => {
 
 router.get("/editorial/articles/:slug", async (req, res) => {
   const slug = Array.isArray(req.params.slug) ? req.params.slug[0] : req.params.slug;
+  if (slug && isRetractedPublicInsight(slug)) {
+    res.status(404).json({ error: "Article not found." });
+    return;
+  }
   try {
     const [article] = await db.select().from(editorialArticlesTable).where(and(
       eq(editorialArticlesTable.slug, slug ?? ""), eq(editorialArticlesTable.status, "published"),
