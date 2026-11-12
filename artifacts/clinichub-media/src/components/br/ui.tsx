@@ -37,13 +37,15 @@ export function Modelled({ children = "Modelled" }: { children?: ReactNode }) {
   );
 }
 
-export function Cta({ href, children, variant = "lime", className = "", onClick, testId }: { href: string; children: ReactNode; variant?: "lime" | "ink" | "line"; className?: string; onClick?: () => void; testId?: string }) {
+export function Cta({ href, children, variant = "lime", className = "", onClick, testId }: { href: string; children: ReactNode; variant?: "lime" | "ink" | "line" | "lineDark"; className?: string; onClick?: () => void; testId?: string }) {
   const v =
     variant === "lime"
       ? "bg-accent text-accent-foreground hover:bg-foreground hover:text-background"
       : variant === "ink"
         ? "bg-foreground text-background hover:bg-accent hover:text-accent-foreground"
-        : "border border-foreground/25 text-foreground hover:border-foreground hover:bg-foreground hover:text-background";
+        : variant === "lineDark"
+          ? "border border-background/45 text-background hover:border-background hover:bg-background hover:text-foreground"
+          : "border border-foreground/25 text-foreground hover:border-foreground hover:bg-foreground hover:text-background";
   return (
     <a href={href} onClick={onClick} data-testid={testId} className={`inline-flex h-12 items-center justify-center gap-2 px-6 text-sm font-semibold transition-colors ${v} ${className}`}>
       {children} <ArrowRight className="size-4" aria-hidden />

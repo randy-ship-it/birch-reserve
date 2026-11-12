@@ -2,6 +2,7 @@ import { ConveyorHero } from "@/components/br/conveyor";
 import { BrandBanners } from "@/components/br/brand-banners";
 import { FourPaths, MetaComparison, PositioningBand, SurfacesGrid, TamStrip } from "@/components/br/blocks";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
+import { MetaHook, PackPicker, ProveItLadder, RateCardV2 } from "@/components/br/pricing";
 import { AGENCY, AREA_LOCK, INVENTORY, PUBLISHER_INCENTIVE, areaLockGuaranteedViews } from "../../../../api-server/src/lib/overhaul/model";
 
 const FAQ = [
@@ -50,13 +51,48 @@ export default function BrHome() {
                 <Cta href="/advertise/local" variant="ink" testId="hero-lock">Lock down my area</Cta>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
-                Brands: <a className="underline underline-offset-2" href="/advertise/brands">lock in spend</a> · Agencies: <a className="underline underline-offset-2" href="/agencies">prepay a client test</a>
+                Brands: <a className="underline underline-offset-2" href="/advertise/brands">lock in spend</a> · Agencies: <a className="underline underline-offset-2" href="/agencies">prepay a client test</a> · <a className="underline underline-offset-2" href="#rates">See rates</a>
               </p>
             </div>
           </div>
           <ConveyorHero className="mt-10" />
         </div>
       </section>
+
+      <Section tone="ink">
+        <MetaHook />
+      </Section>
+
+      <Section id="rates">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <Eyebrow>Rate card</Eyebrow>
+            <H2>Five surfaces. Starting-at rates.</H2>
+          </div>
+          <p className="max-w-md text-sm text-muted-foreground">New placements open at starter rates. They only move up once your reporting proves they work.</p>
+        </div>
+        <RateCardV2 />
+      </Section>
+
+      <Section tone="soft" id="packs">
+        <Eyebrow>View blocks</Eyebrow>
+        <H2>Build a pack in 10 seconds.</H2>
+        <Lede>Pick surfaces and a block size. Bundles get a modest discount. Start self-serve with a category prepay, or take it to an IO for large or exclusive deals.</Lede>
+        <div className="mt-10">
+          <PackPicker />
+        </div>
+        <p className="mt-6 text-sm">
+          <a href="/rates#scenario" className="font-semibold underline underline-offset-4">Run a 100k to 1B view scenario</a>
+        </p>
+      </Section>
+
+      <Section>
+        <Eyebrow>Prove it, then raise</Eyebrow>
+        <H2>You pay starter rates until it works.</H2>
+        <div className="mt-10">
+          <ProveItLadder />
+        </div>
+      </Section>
 
       <Section>
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">

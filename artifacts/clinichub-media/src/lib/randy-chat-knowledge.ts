@@ -84,7 +84,7 @@ export const LIVE_HUB_PROOF_DISPLAY = "the live DR-HO hub" as const;
 export const WEPRIZE_EXAMPLE_URL = "https://weprize.net" as const;
 
 export const SMART_OPENER =
-  "Hey, I’m Randy. Want to see how early slots on the Reserve List work?" as const;
+  "Hey! Birch Q&A Squirrel here. Want to see how early slots on the Reserve List work?" as const;
 
 /** Teaser bubble shown beside the full-body figure (closed state). */
 export const TEASER_TEXT = "Got a category in mind? Ask me." as const;

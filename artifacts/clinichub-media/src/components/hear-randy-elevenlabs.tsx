@@ -230,7 +230,8 @@ export function HearRandyElevenLabs() {
             top: 0;
             right: 0;
             left: 0;
-            bottom: calc(7.75rem + env(safe-area-inset-bottom));
+            /* Shared mobile dock with the Birch Q&A Squirrel (see randy-chat). */
+            bottom: calc(var(--birch-dock-bottom, 14px) - 14px);
             width: 100%;
             height: auto;
           }

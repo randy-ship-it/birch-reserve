@@ -1,6 +1,15 @@
 import { ArrowUpRight, Building2, Megaphone, Store, Users } from "lucide-react";
 import { BENCHMARKS, POSITIONING, SURFACES, TAM, areaLockGuaranteedViews, blendedHubCpmUsd, CPC_FLOOR_USD } from "../../../../api-server/src/lib/overhaul/model";
 import { Modelled } from "./ui";
+import { BLENDED, RATE_SURFACES } from "../../../../api-server/src/lib/overhaul/pricing";
+
+/** Starter (starting-at) rate per hub placement, from the rate card v2 surfaces. */
+const STARTER_BY_SURFACE: Record<string, { cpm: number; cpc: number }> = {
+  post_purchase: { cpm: RATE_SURFACES[4]!.cpmStarter[0], cpc: RATE_SURFACES[4]!.cpcStarter[0] },
+  hub_home: { cpm: RATE_SURFACES[0]!.cpmStarter[0], cpc: RATE_SURFACES[0]!.cpcStarter[0] },
+  product_services: { cpm: RATE_SURFACES[2]!.cpmStarter[0], cpc: RATE_SURFACES[2]!.cpcStarter[0] },
+  member_dashboard: { cpm: RATE_SURFACES[1]!.cpmStarter[0], cpc: RATE_SURFACES[1]!.cpcStarter[0] },
+};
 
 export const PATHS = [
   { group: "Advertise", who: "Brands", href: "/advertise/brands", Icon: Megaphone, line: "Lock in spend across co-branded hubs. Prepay and get bonus credit.", cta: "Brand spend commits" },
@@ -70,15 +79,15 @@ export function SurfacesGrid() {
             </div>
             <div>
               <dt className="text-[11px] uppercase tracking-wider text-foreground/50">Display</dt>
-              <dd className="font-semibold">${s.cpmUsd} CPM</dd>
+              <dd className="font-semibold">from ${STARTER_BY_SURFACE[s.key]?.cpm ?? s.cpmUsd} CPM</dd>
             </div>
             <div>
               <dt className="text-[11px] uppercase tracking-wider text-foreground/50">CPC</dt>
-              <dd className="font-semibold">from ${CPC_FLOOR_USD.toFixed(2)}</dd>
+              <dd className="font-semibold">from ${(STARTER_BY_SURFACE[s.key]?.cpc ?? CPC_FLOOR_USD).toFixed(2)}</dd>
             </div>
           </dl>
           <p className="mt-3 text-[11px] text-muted-foreground">
-            Views <Modelled /> USD rate card, proposed.
+            Views <Modelled /> USD starting-at rates, illustrative estimates.
           </p>
         </article>
       ))}
@@ -140,7 +149,7 @@ export function MetaComparison() {
               <td className="py-3 pr-4 font-medium">CPM, health &amp; wellness</td>
               <td className="py-3 pr-4 text-muted-foreground">$20.70 USD (Meta, 2025)¹</td>
               <td className="py-3">
-                ${blendedHubCpmUsd().toFixed(2)} USD rate card · ${g.effectiveCpmUsd.toFixed(2)} with an area lock <Modelled />
+                Starting at ${RATE_SURFACES[0]!.cpmStarter[0]}–{RATE_SURFACES[4]!.cpmStarter[0]} USD by surface (~${BLENDED.starterCpm} blended) · 5 km area lock ~${g.effectiveCpmUsd.toFixed(2)} <Modelled>Estimate</Modelled>
               </td>
             </tr>
             <tr>
@@ -170,7 +179,7 @@ export function MetaComparison() {
             </a>
           </li>
         ))}
-        <li>Our CPMs are a proposed rate card and our views are modelled from the TAM feed. Hub ads are expected to work better because of trust and timing; we will prove it with pilot reporting, not claim it.</li>
+        <li>Our CPMs are illustrative starting-at estimates, not sold rates, and our views are modelled from the TAM feed. Hub ads are expected to work better because of trust and timing; we will prove it with pilot reporting, not claim it.</li>
       </ol>
     </div>
   );

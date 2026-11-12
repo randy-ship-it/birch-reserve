@@ -26,6 +26,7 @@ const NAV_GROUPS = [
 ] as const;
 
 const NAV_LINKS = [
+  { href: '/rates', label: 'Rates' },
   { href: '/hubs', label: 'Hubs' },
   { href: '/media-kit', label: 'Marketing kit' },
   { href: '/agencies', label: 'Agencies' },
@@ -33,7 +34,7 @@ const NAV_LINKS = [
 ] as const;
 
 const FOOTER_COLS = [
-  { label: 'Advertise', items: [{ href: '/advertise/brands', label: 'Brands' }, { href: '/advertise/local', label: 'Lock down my area' }, { href: '/match', label: 'Match your audience' }, { href: '/media-kit', label: 'Marketing kit' }] },
+  { label: 'Advertise', items: [{ href: '/advertise/brands', label: 'Brands' }, { href: '/advertise/local', label: 'Lock down my area' }, { href: '/rates', label: 'Rates' }, { href: '/match', label: 'Match your audience' }, { href: '/media-kit', label: 'Marketing kit' }] },
   { label: 'Publish', items: [{ href: '/publish/brands', label: 'Brands' }, { href: '/publish/studios', label: 'Studios & retail' }, { href: 'https://www.scalehealth.ca/clinichubs', label: 'scalehealth.ca/clinichubs' }] },
   { label: 'More', items: [{ href: '/hubs', label: 'Hubs in queue' }, { href: '/agencies', label: 'Agencies' }, { href: '/ai-buyers', label: 'For AI buying agents' }, { href: '/llms.txt', label: 'llms.txt' }, { href: '/inventory', label: 'Live inventory' }, { href: '/insights', label: 'Insights' }, { href: '/about', label: 'About' }, { href: '/terms', label: 'Terms' }, { href: '/privacy', label: 'Privacy' }] },
 ] as const;
