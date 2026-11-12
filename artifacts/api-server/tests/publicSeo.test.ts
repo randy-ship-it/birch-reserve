@@ -1190,7 +1190,7 @@ test("/buycalc seat picker: no public reach figure, no CTR, click or order assum
     const html = renderBuycalcHtml({ seatsOpen: 8, seatsTotal: 8, currency });
     assert.match(html, /id="seat-calc"/);
     assert.match(html, /sizes views against live hub supply/);
-    assert.doesNotMatch(html, /Modelled monthly views in your category surface|Illustrative 2027|128\s?MM/);
+    assert.doesNotMatch(html, /Modelled monthly views in your category surface|Illustrative 2027|128\s?MM|80% of listed partner surfaces/);
     assert.doesNotMatch(html, /CTR|click-to-order|Click-to-order|Scenario clicks|Scenario orders|sc-surf|sc-band/);
     assert.doesNotMatch(html, /0\.08|0\.25 \/ 0\.45|4\.00%/);
     assert.doesNotMatch(html, /\bsigned (?:Scale Health|hubs?|partner)/i);
