@@ -56,12 +56,14 @@ test("area lookup: 50% standard, 25% dense downtown cores, rural FSAs", () => {
   assert.equal(lookupArea("hello").ok, false);
 });
 
-test("area lock math: $4,900 CAD / $3,500 USD, 25% off, 210,000 modelled views", () => {
+test("area lock math: $4,900 CAD / $3,500 USD, 25% off, 200,000 modelled views, four placements", () => {
   assert.equal(AREA_LOCK.priceCad, 4900);
   assert.equal(AREA_LOCK.priceUsd, 3500);
-  assert.ok(Math.abs(blendedHubCpmUsd() - 22.17) < 0.01);
+  assert.ok(Math.abs(blendedHubCpmUsd() - 22.61) < 0.01);
+  assert.equal(AREA_LOCK.launchRateUntil, "Dec 31, 2026");
+  assert.equal(AREA_LOCK.followOnCapUsd, 100000);
   const g = areaLockGuaranteedViews();
-  assert.equal(g.views, 210000);
+  assert.equal(g.views, 200000);
   const q = quoteAreaLock("L4C 3G5", 9);
   assert.ok(q.ok);
   if (q.ok) {
@@ -84,7 +86,7 @@ test("area lock Stripe session: price_data in the visitor currency, metadata, no
   const md = built.params.metadata as Record<string, string>;
   assert.equal(md.kind, "area_lock");
   assert.equal(md.share_pct, "25");
-  assert.equal(md.guaranteed_views_modelled, "210000");
+  assert.equal(md.guaranteed_views_modelled, "200000");
   assert.equal(buildAreaLockSession({ postal: "M5V", category: "x", business: "b", email: "a@b.co" }, "https://x").ok, false); // no agree
 });
 
@@ -128,11 +130,14 @@ test("agent catalog lists every slot + area lock with prices and modelled views"
   const c = agentCatalog({ slotsCheckout: false, areaLockCheckout: false });
   assert.deepEqual(c.offers.map((o) => o.offer_key), ["slot-490", ...SLOT_LADDER.slice(1).map((s) => s.key), "area-lock"]);
   assert.equal(c.inventory.modelled, true);
-  assert.equal(c.inventory.signed_partners, 0);
+  assert.equal(c.inventory.surfaces.length, 4);
+  assert.ok(c.inventory.surfaces.some((x) => /dashboard/i.test(x.label)));
+  assert.equal(c.agency.commission_pct_of_media_spend, 10);
+  assert.ok(c.inventory.live_hubs.every((h) => h.status === "live inventory"));
   assert.equal(c.checkout_status.spend_commits, "held");
   const s3000 = slotOffers().find((o) => o.prices.usd === 3000)!;
   assert.equal(s3000.media_credit.usd, 3300);
-  assert.equal(s3000.modelled_hub_page_views, 148800);
+  assert.equal(s3000.modelled_hub_page_views, 145900);
   assert.equal(slotProductsJsonLd().length, SLOT_LADDER.length);
 });
 

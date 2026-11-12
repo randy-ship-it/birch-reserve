@@ -32,8 +32,9 @@ export const TAM = {
   signedPartners: 0,
   /** Monthly modelled views by surface, CA market feed snapshot 2026-11-12. */
   monthly: {
-    hubHome: 1212719, // pv_hub
-    inHub: 1212719, // pv_dash (in-hub product / services / member pages)
+    hubHome: 606360, // half of pv_hub (modelled split)
+    productServices: 606359, // half of pv_hub (modelled split)
+    memberDashboard: 1212719, // pv_dash (logged-in member dashboard)
     postPurchase: 1758251, // pv_pp
     partnerSite: 69049468, // pv_web
     partnerEmail: 33276408, // pv_email
@@ -45,14 +46,17 @@ export const TAM = {
   ctrHi: 0.0107,
 } as const;
 
-/** The three hub surfaces in the hero visual, each sold as display or CPC. */
+/** The four hub placements (Randy, Nov 12 1:10 PM), each sold as display or CPC. */
 export const SURFACES = [
-  { key: "hub_home", label: "Hub Home Page", cpmUsd: 15, monthly: TAM.monthly.hubHome, blurb: "Top-of-hub banner and native tiles on the co-branded hub home." },
-  { key: "in_hub", label: "In-Hub Product / Services pages", cpmUsd: 18, monthly: TAM.monthly.inHub, blurb: "Inside product, service and member pages while the visitor is browsing." },
   { key: "post_purchase", label: "Post-Purchase", cpmUsd: 30, monthly: TAM.monthly.postPurchase, blurb: "On the thank-you and booking-confirmation page, right after a paid order or booking." },
+  { key: "hub_home", label: "Hub Home Page", cpmUsd: 15, monthly: TAM.monthly.hubHome, blurb: "Top-of-hub banner and native tiles on the co-branded hub home." },
+  { key: "product_services", label: "Product / Services pages", cpmUsd: 18, monthly: TAM.monthly.productServices, blurb: "Inside product, service and booking pages while the visitor is browsing." },
+  { key: "member_dashboard", label: "Member Dashboard (behind login)", cpmUsd: 18, monthly: TAM.monthly.memberDashboard, blurb: "On the logged-in member dashboard, where members come back to track orders, plans and bookings." },
 ] as const;
 
-/** Rate-card CPM blended across the three hub surfaces, weighted by modelled views. */
+export const PLACEMENT_LABELS = SURFACES.map((s) => s.label);
+
+/** Rate-card CPM blended across the four hub placements, weighted by modelled views. */
 export function blendedHubCpmUsd(): number {
   const views = SURFACES.reduce((a, s) => a + s.monthly, 0);
   const dollars = SURFACES.reduce((a, s) => a + (s.monthly * s.cpmUsd) / 1000, 0);
@@ -62,7 +66,7 @@ export function blendedHubCpmUsd(): number {
 /** Proposed CPC floor (USD) for click-priced versions of the same surfaces. */
 export const CPC_FLOOR_USD = 0.85;
 
-/** Effortless Admin is in queue and has no hub feed row: network median like the others. */
+/** Effortless Admin has no hub feed row yet: network median like the others (modelled). */
 const MEDIAN_VIEWS = KIT_HUBS.find((h) => h.key === "jack-health")!.views;
 
 export type BrandHub = Hub & {
@@ -70,27 +74,27 @@ export type BrandHub = Hub & {
   banner: string;
   recovery: "Recovery" | "Longevity" | "Food" | "Wellness services";
   audience: string;
-  bannerStatus: "Live" | "Launching" | "In queue";
+  bannerStatus: "Live";
 };
 
 const EXTRA: Record<string, Pick<BrandHub, "logo" | "banner" | "recovery" | "audience" | "bannerStatus">> = {
   "dr-ho": { logo: "/partner-logos/dr-ho.png", banner: "/hub-banners/dr-ho.webp", recovery: "Recovery", audience: "Pain-relief device buyers (TENS / EMS), mostly 45+", bannerStatus: "Live" },
-  "jack-health": { logo: "/partner-logos/jack-health.png", banner: "/hub-banners/jack-health.webp", recovery: "Longevity", audience: "Men's health and longevity members", bannerStatus: "Launching" },
-  "jill-health": { logo: "/partner-logos/jill-health.png", banner: "/hub-banners/jill-health.webp", recovery: "Longevity", audience: "Women's health, midlife and menopause members", bannerStatus: "Launching" },
-  "bird-and-be": { logo: "/partner-logos/bird-and-be.png", banner: "/hub-banners/bird-and-be.webp", recovery: "Recovery", audience: "Postpartum recovery and pelvic-floor care", bannerStatus: "Launching" },
-  "roll-recovery": { logo: "/partner-logos/roll-recovery.png", banner: "/hub-banners/roll-recovery.webp", recovery: "Recovery", audience: "Athletes and active adults buying recovery hardware", bannerStatus: "Launching" },
-  nutriprocan: { logo: "/partner-logos/nutriprocan.png", banner: "/hub-banners/nutriprocan.webp", recovery: "Food", audience: "Nutrition and dietitian-guided eating", bannerStatus: "Launching" },
-  sole: { logo: "/partner-logos/sole.png", banner: "/hub-banners/sole.webp", recovery: "Recovery", audience: "Foot pain, insoles and active footwear buyers", bannerStatus: "Launching" },
+  "jack-health": { logo: "/partner-logos/jack-health.png", banner: "/hub-banners/jack-health.webp", recovery: "Longevity", audience: "Men's health and longevity members", bannerStatus: "Live" },
+  "jill-health": { logo: "/partner-logos/jill-health.png", banner: "/hub-banners/jill-health.webp", recovery: "Longevity", audience: "Women's health, midlife and menopause members", bannerStatus: "Live" },
+  "bird-and-be": { logo: "/partner-logos/bird-and-be.png", banner: "/hub-banners/bird-and-be.webp", recovery: "Recovery", audience: "Postpartum recovery and pelvic-floor care", bannerStatus: "Live" },
+  "roll-recovery": { logo: "/partner-logos/roll-recovery.png", banner: "/hub-banners/roll-recovery.webp", recovery: "Recovery", audience: "Athletes and active adults buying recovery hardware", bannerStatus: "Live" },
+  nutriprocan: { logo: "/partner-logos/nutriprocan.png", banner: "/hub-banners/nutriprocan.webp", recovery: "Food", audience: "Nutrition and dietitian-guided eating", bannerStatus: "Live" },
+  sole: { logo: "/partner-logos/sole.png", banner: "/hub-banners/sole.webp", recovery: "Recovery", audience: "Foot pain, insoles and active footwear buyers", bannerStatus: "Live" },
 };
 
-/** The eight brand hubs Randy named (Nov 12), in queue for email-registered viewers. */
+/** The eight brand hubs Randy named (Nov 12): live inventory, details for email-registered viewers. */
 export const BRAND_HUBS: BrandHub[] = [
   ...KIT_HUBS.filter((h) => h.kind === "brand").map((h) => ({ ...h, ...EXTRA[h.key]! })),
   {
     key: "effortless-admin",
     name: "Effortless Admin",
     kind: "brand",
-    status: "In queue",
+    status: "Live inventory",
     url: "",
     category: "Workplace benefits and admin",
     basis: "Network median partner (no hub feed yet)",
@@ -99,9 +103,18 @@ export const BRAND_HUBS: BrandHub[] = [
     banner: "/hub-banners/effortless-admin.webp",
     recovery: "Wellness services",
     audience: "Employees reaching care through their benefits",
-    bannerStatus: "In queue",
+    bannerStatus: "Live",
   },
 ];
+
+/** Inventory framing (Randy, Nov 12 1:10 PM): named hubs are live inventory now; more in queue by year end. */
+export const INVENTORY = {
+  liveSpendDownMonths: 6,
+  queueMultiple: 3,
+  queueBy: "year end 2026",
+  line: "All eight named hubs are live inventory, spending down over the 6 months after your deposit lands.",
+  queueLine: "3x more inventory is in queue by year end, and we're taking deposits for queued inventory too.",
+} as const;
 
 export const CLINIC_NETWORK = KIT_HUBS.find((h) => h.kind === "clinic")!;
 
@@ -129,7 +142,14 @@ export const AREA_LOCK = {
   denseCoreSharePct: 25,
   minTermMonths: 1,
   maxTermMonths: 6,
-  termsVersion: "area-lock-draft-2026-11-12",
+  termsVersion: "area-lock-2026-11-12",
+  /** The lock price itself is a launch rate (year-end discount). */
+  launchRateUntil: "Dec 31, 2026",
+  /** Locking also unlocks discounted follow-on spend. */
+  followOnDiscountPct: 25,
+  followOnCapUsd: 100000,
+  followOnCapCad: 140000,
+  unusedCredit: "Unused credit at the end of the term: take a refund, or extend the spend-down month by month at the same discount.",
 } as const;
 
 export type Density = "dense_core" | "standard" | "rural";
@@ -199,7 +219,7 @@ export function lookupArea(raw: string): AreaLookup {
   return { ok: false, error: "Enter a Canadian postal code (like L4C 3G5) or a US ZIP (like 98052)." };
 }
 
-/** Guaranteed views the deposit buys: credit at rate card ÷ blended hub CPM, rounded down to 10k. */
+/** Guaranteed views (modelled) the deposit buys: credit at rate card ÷ blended hub CPM, rounded down to 10k. */
 export function areaLockGuaranteedViews(): { creditUsd: number; blendedCpmUsd: number; views: number; effectiveCpmUsd: number } {
   const creditUsd = AREA_LOCK.priceUsd / (1 - AREA_LOCK.discountPct / 100);
   const blendedCpmUsd = blendedHubCpmUsd();
@@ -270,8 +290,20 @@ export const PUBLISHER_INCENTIVE = {
   cashCad: 500,
   creditCad: 700,
   paidDaysAfterFirstTransaction: 90,
+  activationChannels: ["email", "text", "a link on your website", "at checkout", "social media"],
+  clockRule: "The 90-day clock starts once we see real traffic or transactions from your audience.",
+  selfPurchaseRule: "Self-purchases (you, your staff or your own accounts buying) are excluded and don't count.",
   ladder: SMB_LADDER,
   clinicHubsUrl: "https://www.scalehealth.ca/clinichubs",
+} as const;
+
+// ---------------------------------------------------------------- agencies
+
+/** Market-friendly agency deal (Randy: "10% of spend"). Bonus tiers already apply to agency prepay, so no extra stacking. */
+export const AGENCY = {
+  commissionPct: 10,
+  line: "10% of media spend, paid to the agency of record.",
+  bonusNote: "Agency prepay earns the same bonus credit as brands: +5% from $1,500, +10% from $3,000, +15% from $6,000 USD.",
 } as const;
 
 // ---------------------------------------------------------------- benchmarks

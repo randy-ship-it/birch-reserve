@@ -22,7 +22,7 @@ export function buildAreaLockSession(body: AreaCheckoutRequest, origin: string):
   const category = String(body.category ?? "").trim().slice(0, 80);
   if (!business || !EMAIL_RE.test(email)) return { ok: false, error: "Add your business name and a work email." };
   if (!category) return { ok: false, error: "Pick your category so we can hold it in your area." };
-  if (body.agree !== true) return { ok: false, error: "Please agree to the draft area-lock terms." };
+  if (body.agree !== true) return { ok: false, error: "Please agree to the area-lock terms." };
   const currency: Currency | undefined = body.currency === "cad" ? "cad" : body.currency === "usd" ? "usd" : undefined;
   const q = quoteAreaLock(String(body.postal ?? ""), Number(body.term ?? 3), currency);
   if (!q.ok) return { ok: false, error: q.error };
@@ -60,7 +60,7 @@ export function buildAreaLockSession(body: AreaCheckoutRequest, origin: string):
             unit_amount: amountCents,
             product_data: {
               name: `Birch Reserve area lock · ${q.area.area} · ${category}`,
-              description: `Exclusive ${category} rights to up to ${q.sharePct}% of hub display within ${q.radiusKm} km of ${q.area.code} for ${q.termMonths} month${q.termMonths === 1 ? "" : "s"} from display start. Includes media credit at ${q.discountPct}% off rate card and ${q.guaranteedViews.toLocaleString("en-US")} modelled hub page views.`,
+              description: `Exclusive ${category} rights to up to ${q.sharePct}% of hub display within ${q.radiusKm} km of ${q.area.code} for ${q.termMonths} month${q.termMonths === 1 ? "" : "s"} from display start. Includes media credit at ${q.discountPct}% off rate card and ${q.guaranteedViews.toLocaleString("en-US")} modelled hub page views. Launch rate until ${AREA_LOCK.launchRateUntil}; ${AREA_LOCK.followOnDiscountPct}% off follow-on spend up to $${AREA_LOCK.followOnCapUsd.toLocaleString("en-US")} USD. Unused credit: refund or extend at the same discount.`,
             },
           },
         },

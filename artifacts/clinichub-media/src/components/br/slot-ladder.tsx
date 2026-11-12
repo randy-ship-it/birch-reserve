@@ -15,14 +15,14 @@ export function SlotLadder({ currency, audience }: { currency: Currency; audienc
     setMsg(null);
     const body = { brand: fd.get("brand"), email: fd.get("email"), agree: fd.get("agree") === "on", currency, ...(tier.key === "slot-490" ? { amount: currency === "cad" ? tier.cad : tier.usd } : { tier: tier.key }) };
     try {
-      const r = await postJson<{ url?: string; error?: string }>("/v1/sponsor/deposit", body);
+      const r = await postJson<{ url?: string; error?: string; held?: boolean; message?: string }>("/v1/sponsor/deposit", body);
       if (r.ok && r.data.url) {
         window.location.href = r.data.url;
         return;
       }
-      // Not open yet: record the interest in Friday so nobody is lost.
-      await postJson("/v1/leads", { kind: "deposit_interest", email: fd.get("email"), company: fd.get("brand"), fields: { tier: tier.key, currency, audience } });
-      setMsg(r.data.error ?? "Deposits open soon. We saved your pick and will email you first.");
+      // Not open yet: the server records held requests in Friday; otherwise record it here so nobody is lost.
+      if (!r.data.held) await postJson("/v1/leads", { kind: "deposit_interest", email: fd.get("email"), company: fd.get("brand"), fields: { tier: tier.key, currency, audience } });
+      setMsg("Reserved by inquiry. We'll confirm your slot within 1 business day. No charge today.");
     } catch {
       setMsg("Couldn't open checkout. Email sales@silverbirchgrowth.com.");
     } finally {
@@ -62,10 +62,10 @@ export function SlotLadder({ currency, audience }: { currency: Currency; audienc
             <input name="email" type="email" required className={inputClass} />
           </Field>
           <button type="submit" disabled={busy} className="h-12 bg-accent px-6 text-sm font-semibold text-accent-foreground hover:bg-foreground hover:text-background disabled:opacity-60">
-            {busy ? "Opening…" : status?.depositCheckout ? "Pay deposit" : "Hold my slot"}
+            {busy ? "Opening…" : status?.depositCheckout ? "Pay deposit" : "Reserve by inquiry"}
           </button>
           <label className="flex items-start gap-2 text-xs text-muted-foreground md:col-span-3">
-            <input type="checkbox" name="agree" required className="mt-0.5" /> I agree to the draft deposit terms: credit is open-dated, drawn down only under an insertion order that names the hubs, refundable before any ad runs. Terms are being finalized.
+            <input type="checkbox" name="agree" required className="mt-0.5" /> I agree to the deposit terms: credit spends down on live hubs over 6 months from when my deposit lands, under an insertion order that names the hubs; unused credit can be refunded or extended month by month at the same rate.
           </label>
           {msg ? <p className="text-sm md:col-span-3" data-testid="slot-msg">{msg}</p> : null}
         </form>

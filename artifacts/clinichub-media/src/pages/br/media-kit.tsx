@@ -17,7 +17,7 @@ export default function BrMediaKit() {
           <div>
             <Eyebrow>Marketing kit · Nov 2026</Eyebrow>
             <H1>Birch Reserve in one page.</H1>
-            <Lede>Ads inside co-branded Recovery Brand hubs and health &amp; wellness business hubs. Display or CPC, on three surfaces. Prepay once, run when the right hub launches.</Lede>
+            <Lede>Ads inside co-branded Recovery Brand hubs and health &amp; wellness business hubs. Display or CPC, on four placements: post-purchase, hub home, product and services pages, and the member dashboard behind login. The named hubs are live inventory now.</Lede>
           </div>
           <div className="flex gap-2 print:hidden">
             <div className="flex border border-foreground/25 text-sm" role="group" aria-label="Currency">
@@ -145,7 +145,7 @@ export default function BrMediaKit() {
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               <li>· Aggregate reporting only. No patient data, no clinical pixels.</li>
               <li>· Audience and view figures are modelled from scalehealth.ca/tam until campaigns report.</li>
-              <li>· Listed partners are not signed media deals until an insertion order names the hub.</li>
+              <li>· Every buy runs under an insertion order that names the hubs.</li>
               <li>· Contact: <a className="underline" href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></li>
             </ul>
           </div>

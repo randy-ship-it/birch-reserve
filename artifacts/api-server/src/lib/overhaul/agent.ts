@@ -3,7 +3,7 @@
  * Pure builders for the agent catalog, quote, OpenAPI spec and agent card.
  * Every audience number here is modelled from the TAM feed and labelled as such.
  */
-import { AREA_LOCK, BRAND_HUBS, CPC_FLOOR_USD, SLOT_LADDER, SURFACES, TAM, areaLockGuaranteedViews, blendedHubCpmUsd, quoteAreaLock, type Currency } from "./model";
+import { AGENCY, AREA_LOCK, BRAND_HUBS, INVENTORY, PLACEMENT_LABELS, PUBLISHER_INCENTIVE, CPC_FLOOR_USD, SLOT_LADDER, SURFACES, TAM, areaLockGuaranteedViews, blendedHubCpmUsd, quoteAreaLock, type Currency } from "./model";
 
 export const AGENT_CATALOG_VERSION = "2026-11-12";
 export const SITE = "https://birchreserve.net";
@@ -52,7 +52,11 @@ export function areaLockOffer() {
     display_share_pct: { standard: AREA_LOCK.standardSharePct, dense_core: AREA_LOCK.denseCoreSharePct },
     term_months: { min: AREA_LOCK.minTermMonths, max: AREA_LOCK.maxTermMonths, starts: "display start" },
     keep_pace: "Right to keep pace: if hub traffic in your area grows, you may top up to hold your share.",
-    terms_status: "draft, pending owner review",
+    launch_rate_until: AREA_LOCK.launchRateUntil,
+    launch_rate_note: `The lock price is a launch rate, held until ${AREA_LOCK.launchRateUntil}.`,
+    follow_on_spend: { discount_pct_vs_rate_card: AREA_LOCK.followOnDiscountPct, cap_usd: AREA_LOCK.followOnCapUsd, cap_cad_approx: AREA_LOCK.followOnCapCad, over: "the lock term, per locker" },
+    unused_credit: AREA_LOCK.unusedCredit,
+    terms_version: AREA_LOCK.termsVersion,
     quote: { method: "GET", path: "/v1/agent/quote?offer=area-lock&postal=M4E1G3&term=3&currency=cad" },
     checkout: { method: "POST", path: "/v1/agent/checkout", body: { offer: "area-lock", postal: "string", term: "1-6", category: "string", business: "string", email: "string", currency: "usd|cad", agree: true } },
     human_page: `${SITE}/advertise/local`,
@@ -63,7 +67,7 @@ export function agentCatalog(status: { slotsCheckout: boolean; areaLockCheckout:
   return {
     catalog_version: AGENT_CATALOG_VERSION,
     seller: { name: "Birch Reserve", legal_name: "Silver Birch Growth Inc.", url: SITE, email: HANDOFF_EMAIL, address: "777-2255B Queen St E, Toronto ON M4E 1G3, Canada" },
-    what_you_buy: "Display and CPC placements inside co-branded Recovery Brand hubs and health & wellness business hubs, on three surfaces: Hub Home Page, In-Hub Product / Services pages, Post-Purchase.",
+    what_you_buy: `Display and CPC placements inside co-branded Recovery Brand hubs and health & wellness business hubs, on four placements: ${PLACEMENT_LABELS.join(", ")}.`,
     currencies: ["USD", "CAD"],
     currency_rule: "Canadian buyers pay CAD; everyone else USD. Pass currency explicitly to override.",
     inventory: {
@@ -71,19 +75,29 @@ export function agentCatalog(status: { slotsCheckout: boolean; areaLockCheckout:
       source: TAM.source,
       read_on: TAM.readOn,
       listed_partners: TAM.listedPartners,
-      signed_partners: TAM.signedPartners,
       monthly_views_total_modelled: TAM.monthly.viewsTotal,
       surfaces: SURFACES.map((s) => ({ key: s.key, label: s.label, formats: ["display", "cpc"], rate_card_cpm_usd: s.cpmUsd, monthly_views_modelled: s.monthly, description: s.blurb })),
       blended_hub_cpm_usd: Number(blendedHubCpmUsd().toFixed(2)),
       cpc_floor_usd: CPC_FLOOR_USD,
       modelled_ctr_band: [TAM.ctrLo, TAM.ctrHi],
-      hubs_in_queue: BRAND_HUBS.map((h) => ({ name: h.name, category: h.category, status: h.bannerStatus, listed_not_signed: true })),
+      live_hubs: BRAND_HUBS.map((h) => ({ name: h.name, category: h.category, status: "live inventory" })),
+      live_inventory: INVENTORY.line,
+      spend_down_months_from_deposit: INVENTORY.liveSpendDownMonths,
+      queue: { multiple_of_live: INVENTORY.queueMultiple, by: INVENTORY.queueBy, deposits_accepted: true, note: INVENTORY.queueLine },
     },
     offers: [...slotOffers(), areaLockOffer()],
     checkout_status: {
       spend_commits: status.slotsCheckout ? "open" : "held",
       area_lock: status.areaLockCheckout ? "open" : "held",
-      held_means: `Checkout returns status "held": the request is saved and a person follows up by email from ${HANDOFF_EMAIL}. No charge is made.`,
+      held_means: `Checkout returns status "held": reserved by inquiry, confirmed within 1 business day by email from ${HANDOFF_EMAIL}. No charge is made.`,
+    },
+    agency: { commission_pct_of_media_spend: AGENCY.commissionPct, paid_to: "agency of record", bonus_credit: AGENCY.bonusNote },
+    publisher_payout: {
+      cash_cad: PUBLISHER_INCENTIVE.cashCad,
+      ad_credit_cad: PUBLISHER_INCENTIVE.creditCad,
+      activate_via: PUBLISHER_INCENTIVE.activationChannels,
+      clock: PUBLISHER_INCENTIVE.clockRule,
+      exclusions: PUBLISHER_INCENTIVE.selfPurchaseRule,
     },
     endpoints: {
       catalog: "/v1/agent/catalog.json",
@@ -98,9 +112,9 @@ export function agentCatalog(status: { slotsCheckout: boolean; areaLockCheckout:
     },
     rules: [
       "Aggregate reporting only. No patient data, no clinical pixels, no open auction.",
-      "Modelled figures are labelled modelled. Only the area lock carries a views guarantee, and its terms are draft.",
-      "Payment is media credit, drawn down under an insertion order that names the hubs.",
-      "Agents must pass agree:true only after showing the buyer the draft terms.",
+      "Modelled figures are labelled modelled. Only the area lock carries a views guarantee (modelled).",
+      "Payment is media credit, spent down on live hubs under an insertion order that names the hubs. Unused credit: refund, or extend month by month at the same discount.",
+      "Agents must pass agree:true only after showing the buyer the terms and price.",
     ],
   };
 }
@@ -197,7 +211,7 @@ export function agentOpenApi() {
                     term: { type: "integer", minimum: 1, maximum: 6 },
                     website: { type: "string" },
                     agent: { type: "string", description: "Name of the buying agent, for reporting." },
-                    agree: { type: "boolean", const: true, description: "Buyer accepted the draft terms." },
+                    agree: { type: "boolean", const: true, description: "Buyer accepted the terms." },
                   },
                 },
               },

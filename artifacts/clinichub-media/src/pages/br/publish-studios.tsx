@@ -36,9 +36,10 @@ export default function BrPublishStudios() {
             </div>
             <ul className="mt-6 space-y-2 text-sm">
               {[
-                "Activate your audience: invite your customers to your hub",
-                "Activate customers on the hub monetizer (our marketplace)",
-                `Paid ${P.paidDaysAfterFirstTransaction} days after your first unique transaction`,
+                "Activate your audience: email, text, a link on your website, at checkout, social media",
+                "Your customers use the hub monetizer (our marketplace)",
+                `The ${P.paidDaysAfterFirstTransaction}-day clock starts once we see real traffic or transactions`,
+                "Self-purchases don't count: you, your staff or your own accounts buying are excluded",
                 "Bigger audiences earn more (see the ladder)",
               ].map((t) => (
                 <li key={t} className="flex gap-2">
@@ -55,8 +56,8 @@ export default function BrPublishStudios() {
         <ol className="mt-10 grid gap-6 md:grid-cols-3">
           {[
             { t: "Set up your hub", d: "DIY onboarding at scalehealth.ca/clinichubs: your logo, your services, your booking link." },
-            { t: "Activate your customers", d: "Share your hub with your members. They get care, member offers and the marketplace." },
-            { t: "Get paid", d: `After your first unique transaction we start a ${P.paidDaysAfterFirstTransaction}-day clock. Then you get $${P.cashCad} cash, or $${P.creditCad}+ in ad credit to promote yourself on other hubs.` },
+            { t: "Activate your audience", d: "Promote your hub by email, text, a link on your website, at checkout and on social media. Your members get care, member offers and the marketplace." },
+            { t: "Get paid", d: `Once we see real traffic or transactions from your audience, a ${P.paidDaysAfterFirstTransaction}-day clock starts. Then you get $${P.cashCad} cash, or $${P.creditCad}+ in ad credit to promote yourself on other hubs.` },
           ].map((s, i) => (
             <li key={s.t} className="border border-foreground/15 bg-white p-6">
               <span className="font-display text-5xl text-foreground/25">{i + 1}</span>
@@ -84,7 +85,7 @@ export default function BrPublishStudios() {
               ))}
             </tbody>
           </table>
-          <p className="mt-3 text-[11px] text-muted-foreground">Draft terms: an active customer has made a paid order or booking. Refunds reverse the count. Paid {P.paidDaysAfterFirstTransaction} days after the first unique transaction. Final terms are being confirmed.</p>
+          <p className="mt-3 text-[11px] text-muted-foreground">An active customer has made a paid order or booking. Refunds reverse the count. Self-purchases (you, your staff or your own accounts) are excluded. Paid {P.paidDaysAfterFirstTransaction} days after we first see real traffic or transactions.</p>
         </div>
       </Section>
       <Section>

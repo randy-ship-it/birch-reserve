@@ -911,9 +911,7 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.match(home, /cta_book_call/);
   // cta_custom_onprem CTA was removed from home in #25 (Book a call CTAs dropped).
   assert.match(concierge, /cta_book_call/);
-  assert.match(layout, /nav_insights/);
-  assert.match(layout, /label: 'Ad Examples'/);
-  assert.match(layout, /#placements/);
+  // Nov 12 overhaul: the public site moved to the /br layout; legacy nav events stay in the helper.
   assert.match(home, /id="placements"/);
   assert.match(home, /data-testid="three-steps"/);
   assert.match(home, /Nothing runs before step 2/);
@@ -943,9 +941,9 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.doesNotMatch(analytics, /data-domain=["']birchreserve/);
 });
 
-const BRAND_TITLE = "Birch Reserve | The Reserve List · Scale Health demand, Canada";
+const BRAND_TITLE = "Birch Reserve | Ads inside co-branded health &amp; wellness hubs";
 const BRAND_DESCRIPTION =
-  "The look does not burn a seat. The seat is the named category. The insertion order names the hub before anything runs. Priced in CAD for Canada and USD elsewhere.";
+  "Display and CPC inside co-branded Recovery Brand hubs and health &amp; wellness business hubs: post-purchase, hub home, product and services pages, and the member dashboard. Brands lock in spend, local businesses lock down their area, studios earn by publishing.";
 
 test("public marketing title and description match the brand strings", async () => {
   const indexHtml = await readFile(
@@ -964,7 +962,7 @@ test("public marketing title and description match the brand strings", async () 
   assert.ok(indexHtml.includes(`name="twitter:title" content="${BRAND_TITLE}"`));
   assert.match(indexHtml, /<link rel="canonical" href="https:\/\/birchreserve\.net\/" \/>/);
   assert.match(indexHtml, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-birch-reserve\.png" \/>/);
-  assert.match(indexHtml, /The look does not burn a seat/);
+  assert.match(indexHtml, /four placements: post-purchase, hub home, product and services pages, and the member dashboard behind login/);
   assert.doesNotMatch(indexHtml, /8\.7M|56M monthly views|20M\+|100M\+ orders/);
   assert.doesNotMatch(indexHtml, /Eight category seats inside listed Scale Health hubs\./);
   assert.doesNotMatch(indexHtml, /\$899|payments paused/i);

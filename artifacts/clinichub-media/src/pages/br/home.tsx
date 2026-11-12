@@ -2,19 +2,20 @@ import { ConveyorHero } from "@/components/br/conveyor";
 import { BrandBanners } from "@/components/br/brand-banners";
 import { FourPaths, MetaComparison, PositioningBand, SurfacesGrid, TamStrip } from "@/components/br/blocks";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
-import { AREA_LOCK, PUBLISHER_INCENTIVE, areaLockGuaranteedViews } from "../../../../api-server/src/lib/overhaul/model";
+import { AGENCY, AREA_LOCK, INVENTORY, PUBLISHER_INCENTIVE, areaLockGuaranteedViews } from "../../../../api-server/src/lib/overhaul/model";
 
 const FAQ = [
-  { q: "Where exactly do the ads run?", a: "Only inside co-branded hubs from Recovery Brands (recovery, longevity and food today; pets in queue) and inside health and wellness business hubs such as physio, gym, studio and clinic hubs. Each hub has three surfaces: the hub home page, in-hub product and services pages, and the post-purchase page." },
-  { q: "Is this display or cost-per-click?", a: "Both. Every surface can be bought as display (priced per thousand views) or CPC (priced per click). Deposits and area locks draw down against either." },
+  { q: "Where exactly do the ads run?", a: "Only inside co-branded hubs from Recovery Brands (recovery, longevity and food today; pets in queue) and inside health and wellness business hubs such as physio, gym, studio and clinic hubs. Each hub has four placements: post-purchase, the hub home page, product and services pages, and the member dashboard behind login." },
+  { q: "Is the inventory live?", a: `Yes. ${INVENTORY.line} ${INVENTORY.queueLine}` },
+  { q: "Is this display or cost-per-click?", a: "Both. Every placement can be bought as display (priced per thousand views) or CPC (priced per click). Deposits and area locks draw down against either." },
   { q: "Are the audience numbers measured?", a: "Not yet. Audience and view numbers are modelled from the TAM feed at scalehealth.ca/tam: 20MM+ audience orders being onboarded and about 128MM views a month across 42 listed partners. Reporting on your campaign is measured with UTM links and promo codes." },
   { q: "Can a local business or studio buy?", a: `Yes. Lock down your area holds up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of your postal code (${AREA_LOCK.denseCoreSharePct}% in dense downtown cores) for 1 to 6 months from when displays start.` },
-  { q: "How do I become a publisher?", a: `Studios and retailers activate a hub at scalehealth.ca/clinichubs and earn $${PUBLISHER_INCENTIVE.cashCad} cash or $${PUBLISHER_INCENTIVE.creditCad}+ in ad credit, paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after the first unique transaction. Brands with a recovery audience can apply for a co-branded hub.` },
-  { q: "Do agencies get anything?", a: "Yes. Agencies can prepay a client test budget, get UTM and promo-code reporting, and an agency commission is available. Ask us for the rate." },
+  { q: "How do I become a publisher?", a: `Studios and retailers activate a hub at scalehealth.ca/clinichubs and earn $${PUBLISHER_INCENTIVE.cashCad} cash or $${PUBLISHER_INCENTIVE.creditCad}+ in ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded hub.` },
+  { q: "Do agencies get anything?", a: `Yes. Agencies can prepay a client test budget, get UTM and promo-code reporting, and the agency of record earns ${AGENCY.commissionPct}% of media spend.` },
 ];
 
 export default function BrHome() {
-  usePageMeta("Birch Reserve | Ads inside co-branded health & wellness hubs", "Advertise inside co-branded Recovery Brand hubs and health & wellness business hubs: hub home, in-hub product pages and post-purchase. Lock in spend, lock down your area, or publish your own hub.");
+  usePageMeta("Birch Reserve | Ads inside co-branded health & wellness hubs", "Advertise inside co-branded Recovery Brand hubs and health & wellness business hubs: post-purchase, hub home, product and services pages, and the member dashboard. Lock in spend, lock down your area, or publish your own hub.");
   const g = areaLockGuaranteedViews();
   return (
     <div className="w-full overflow-x-hidden" data-testid="br-home">
@@ -27,7 +28,7 @@ export default function BrHome() {
           logo: "https://birchreserve.net/logo.svg",
           parentOrganization: { "@type": "Organization", name: "Silver Birch Growth Inc." },
           email: "sales@silverbirchgrowth.com",
-          description: "Ad space inside co-branded Recovery Brand hubs and health & wellness business hubs. Display and CPC on hub home, in-hub product and services, and post-purchase pages.",
+          description: "Ad space inside co-branded Recovery Brand hubs and health & wellness business hubs. Display and CPC on post-purchase, hub home, product and services, and member dashboard pages.",
           address: { "@type": "PostalAddress", streetAddress: "777-2255B Queen St E", addressLocality: "Toronto", addressRegion: "ON", postalCode: "M4E 1G3", addressCountry: "CA" },
         }}
       />
@@ -42,7 +43,7 @@ export default function BrHome() {
             </div>
             <div>
               <Lede>
-                Co-branded Recovery Brand hubs and health &amp; wellness business hubs keep coming online. Each one opens display and CPC slots on its home page, inside its product and services pages, and right after purchase.
+                Co-branded Recovery Brand hubs and health &amp; wellness business hubs keep coming online. Each one opens display and CPC slots right after purchase, on its home page, inside its product and services pages, and on the member dashboard behind login.
               </Lede>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Cta href="/match" testId="hero-match">Match your audience</Cta>
@@ -74,8 +75,8 @@ export default function BrHome() {
 
       <Section>
         <Eyebrow>Where your ad shows</Eyebrow>
-        <H2>Three surfaces in every hub.</H2>
-        <Lede>Display or CPC, on the pages where members browse, buy and book.</Lede>
+        <H2>Four placements in every hub.</H2>
+        <Lede>Display or CPC, on the pages where members buy, browse, book and log back in.</Lede>
         <div className="mt-10">
           <SurfacesGrid />
         </div>
@@ -94,7 +95,7 @@ export default function BrHome() {
             <Eyebrow>Lock down my area</Eyebrow>
             <H2>Own your 5 km.</H2>
             <Lede>
-              One deposit, ${AREA_LOCK.priceCad.toLocaleString()} CAD or ${AREA_LOCK.priceUsd.toLocaleString()} USD, holds up to {AREA_LOCK.standardSharePct}% of hub display around your postal code ({AREA_LOCK.denseCoreSharePct}% in busy downtown cores) for 1 to 6 months. It buys media at {AREA_LOCK.discountPct}% off the rate card and {g.views.toLocaleString()} page views across hubs (modelled).
+              One deposit, ${AREA_LOCK.priceCad.toLocaleString()} CAD or ${AREA_LOCK.priceUsd.toLocaleString()} USD (launch rate until {AREA_LOCK.launchRateUntil}), holds up to {AREA_LOCK.standardSharePct}% of hub display around your postal code ({AREA_LOCK.denseCoreSharePct}% in busy downtown cores) for 1 to 6 months. It buys media at {AREA_LOCK.discountPct}% off the rate card and {g.views.toLocaleString()} page views across hubs (modelled), and unlocks {AREA_LOCK.followOnDiscountPct}% off follow-on spend up to ${AREA_LOCK.followOnCapUsd.toLocaleString()} USD.
             </Lede>
             <div className="mt-8">
               <Cta href="/advertise/local">Check my postal code</Cta>

@@ -57,7 +57,7 @@ export function PositioningBand() {
 
 export function SurfacesGrid() {
   return (
-    <div className="grid gap-6 md:grid-cols-3" data-testid="surfaces-grid">
+    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4" data-testid="surfaces-grid">
       {SURFACES.map((s, i) => (
         <article key={s.key} className="border border-foreground/15 bg-white p-6">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/50">Surface {i + 1}</p>
@@ -94,7 +94,7 @@ export function TamStrip({ tone = "light", compact = false }: { tone?: "light" |
         { v: TAM.ordersLabel, l: TAM.ordersNote },
         { v: TAM.viewsLabel, l: TAM.viewsNote },
         { v: String(TAM.listedPartners), l: "listed partners" },
-        { v: "3", l: "hub surfaces, display + CPC" },
+        { v: "4", l: "hub placements, display + CPC" },
       ].map((x) => (
         <div key={x.l}>
           <div className={`font-display ${compact ? "text-4xl" : "text-4xl md:text-5xl"}`}>{x.v}</div>
@@ -106,7 +106,7 @@ export function TamStrip({ tone = "light", compact = false }: { tone?: "light" |
         <a href={TAM.source} className="underline underline-offset-2" target="_blank" rel="noopener noreferrer">
           scalehealth.ca/tam
         </a>
-        . {TAM.signedPartners} partners signed to date; listed is not signed.
+        . Partners are listed; views are modelled, not measured.
       </p>
     </div>
   );

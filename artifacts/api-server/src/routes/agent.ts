@@ -79,7 +79,7 @@ export function createAgentRouter(deps: { createSession?: CreateSession; log?: (
       meta: { ...meta, offer, agent: str(body.agent, 120) || undefined, checkout_open: gateOpen, amount: built.amountCents / 100, currency: built.currency },
     });
     if (!gateOpen || !deps.createSession) {
-      res.status(202).json({ status: "held", offer, amount: built.amountCents / 100, currency: built.currency, message: `Checkout is not open yet. The request is saved and a person will follow up from ${HANDOFF_EMAIL}. No charge was made.`, stored: friday.status });
+      res.status(202).json({ status: "held", offer, amount: built.amountCents / 100, currency: built.currency, message: `Reserved by inquiry. We'll confirm within 1 business day from ${HANDOFF_EMAIL}. No charge was made.`, stored: friday.status });
       return;
     }
     try {

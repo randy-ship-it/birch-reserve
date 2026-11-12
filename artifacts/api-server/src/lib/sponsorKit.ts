@@ -21,7 +21,7 @@ export function money(amount: number, currency: Currency): string {
   return `$${Math.round(amount).toLocaleString("en-US")} ${currency.toUpperCase()}`;
 }
 
-export type SlotKey = "thank_you" | "member_dashboard" | "hub_hero" | "partner_email" | "partner_site";
+export type SlotKey = "thank_you" | "member_dashboard" | "hub_hero" | "product_services" | "partner_email" | "partner_site";
 
 export type Slot = {
   key: SlotKey;
@@ -63,6 +63,15 @@ export const SLOTS: Slot[] = [
     comp: "Health display $10–$25 CPM; retail onsite display median about $12.50.",
   },
   {
+    key: "product_services",
+    label: "Product / services page unit",
+    where: "In-hub product, service and booking pages",
+    size: "Sponsored card 600×400 · 300×250",
+    cpmUsd: 18,
+    core: true,
+    comp: "In-browse onsite display, priced inside the $7–$22 onsite retail display band.",
+  },
+  {
     key: "partner_email",
     label: "Partner email module",
     where: "Native module in the hub brand's own customer email",
@@ -85,9 +94,11 @@ export const SLOTS: Slot[] = [
 /** Monthly modelled views per slot (100% share of voice). */
 type SlotViews = Record<SlotKey, number>;
 
-const DRHO: SlotViews = { thank_you: 45197, member_dashboard: 38648, hub_hero: 38648, partner_email: 867787, partner_site: 1807890 };
-const MEDIAN_PARTNER: SlotViews = { thank_you: 24900, member_dashboard: 18583, hub_hero: 18583, partner_email: 478087, partner_site: 996014 };
-const CLINIC_NETWORK: SlotViews = { thank_you: 33166, member_dashboard: 5979, hub_hero: 5979, partner_email: 154774, partner_site: 46064 };
+/** Hub-page views (pv_hub) are split evenly between the hub home page and in-hub product / services pages (modelled split). */
+const splitHub = (v: Omit<SlotViews, "product_services">): SlotViews => ({ ...v, hub_hero: Math.round(v.hub_hero / 2), product_services: Math.round(v.hub_hero / 2) });
+const DRHO: SlotViews = splitHub({ thank_you: 45197, member_dashboard: 38648, hub_hero: 38648, partner_email: 867787, partner_site: 1807890 });
+const MEDIAN_PARTNER: SlotViews = splitHub({ thank_you: 24900, member_dashboard: 18583, hub_hero: 18583, partner_email: 478087, partner_site: 996014 });
+const CLINIC_NETWORK: SlotViews = splitHub({ thank_you: 33166, member_dashboard: 5979, hub_hero: 5979, partner_email: 154774, partner_site: 46064 });
 
 export type Hub = {
   key: string;
@@ -101,13 +112,13 @@ export type Hub = {
 };
 
 export const HUBS: Hub[] = [
-  { key: "dr-ho", name: "DR-HO’S", kind: "brand", status: "Live proof hub", url: "https://physio.drhonow.com/dr-ho/portal", category: "Pain relief", basis: "Partner feed row (DR-HO’S)", views: DRHO },
-  { key: "jack-health", name: "Jack Health", kind: "brand", status: "Live hub", url: "https://scalehealth.ca/jack-health", category: "Men’s health", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "jill-health", name: "Jill Health", kind: "brand", status: "Live hub", url: "https://scalehealth.ca/jill-health", category: "Women’s health", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "bird-and-be", name: "Bird & Be", kind: "brand", status: "Launching", url: "https://scalehealth.ca/bird-and-be", category: "Women’s health (postpartum)", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "roll-recovery", name: "Roll Recovery", kind: "brand", status: "Launching", url: "https://scalehealth.ca/roll-recovery", category: "Recovery hardware", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "nutriprocan", name: "NutriProCan", kind: "brand", status: "Launching", url: "https://scalehealth.ca/nutriprocan", category: "Nutrition", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "sole", name: "SOLE", kind: "brand", status: "Launching", url: "https://scalehealth.ca/sole", category: "Footwear and insoles", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "dr-ho", name: "DR-HO’S", kind: "brand", status: "Live inventory", url: "https://physio.drhonow.com/dr-ho/portal", category: "Pain relief", basis: "Partner feed row (DR-HO’S)", views: DRHO },
+  { key: "jack-health", name: "Jack Health", kind: "brand", status: "Live inventory", url: "https://scalehealth.ca/jack-health", category: "Men’s health", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "jill-health", name: "Jill Health", kind: "brand", status: "Live inventory", url: "https://scalehealth.ca/jill-health", category: "Women’s health", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "bird-and-be", name: "Bird & Be", kind: "brand", status: "Live inventory", url: "https://scalehealth.ca/bird-and-be", category: "Women’s health (postpartum)", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "roll-recovery", name: "Roll Recovery", kind: "brand", status: "Live inventory", url: "https://scalehealth.ca/roll-recovery", category: "Recovery hardware", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "nutriprocan", name: "NutriProCan", kind: "brand", status: "Live inventory", url: "https://scalehealth.ca/nutriprocan", category: "Nutrition", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "sole", name: "SOLE", kind: "brand", status: "Live inventory", url: "https://scalehealth.ca/sole", category: "Footwear and insoles", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
   { key: "clinic-network", name: "Clinic hub network (pooled)", kind: "clinic", status: "Onboarding", url: "https://scalehealth.ca/clinichubs", category: "Physio, mobility, gym and studio members", basis: "TAM feed provider-network row", views: CLINIC_NETWORK },
 ];
 
@@ -124,7 +135,7 @@ export function slotPriceUsd(hub: Hub, slot: Slot): number {
   return Math.max(10, Math.round(raw / 10) * 10);
 }
 
-/** Core package = thank-you + dashboard + hero, priced on the existing $190 floor. */
+/** Core package = thank-you + dashboard + hero + product/services, priced on the existing $190 floor. */
 export function corePackageUsd(hub: Hub): number {
   const sum = SLOTS.filter((s) => s.core).reduce((acc, s) => acc + slotPriceUsd(hub, s), 0);
   return Math.max(190, Math.round(sum / 10) * 10);

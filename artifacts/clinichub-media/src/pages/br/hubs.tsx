@@ -70,7 +70,7 @@ function HubDetail({ hub, unlocked }: { hub: BrandHub; unlocked: boolean }) {
 }
 
 export default function BrHubs() {
-  usePageMeta("Brand hubs in queue | Birch Reserve", "Effortless Admin, Jill Health, Jack Health, SOLE, DR-HO'S, Roll Recovery, Bird&Be and NutriProCan: register your email to see audience, surfaces and pricing.");
+  usePageMeta("Live brand hubs | Birch Reserve", "Effortless Admin, Jill Health, Jack Health, SOLE, DR-HO'S, Roll Recovery, Bird&Be and NutriProCan: register your email to see audience, surfaces and pricing.");
   const [unlocked, setUnlocked] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -104,9 +104,9 @@ export default function BrHubs() {
       <Section>
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div>
-            <Eyebrow>Brand hubs in queue</Eyebrow>
+            <Eyebrow>Live brand hubs</Eyebrow>
             <H1>See inside the hubs.</H1>
-            <Lede>Eight co-branded hubs are listed and coming online. Register your email to see each hub's audience, surfaces, modelled views and price.</Lede>
+            <Lede>Eight co-branded hubs are live inventory now, spending down over 6 months from when your deposit lands. 3x more is in queue by year end, and we're taking deposits for it too. Register your email to see each hub's audience, placements, modelled views and price.</Lede>
           </div>
           {unlocked ? (
             <p className="inline-flex items-center gap-2 bg-accent px-4 py-3 text-sm font-semibold" data-testid="hubs-unlocked">
@@ -139,7 +139,7 @@ export default function BrHubs() {
         </div>
       </Section>
       <Section tone="soft">
-        <BrandBanners title="Co-branded hubs in queue" />
+        <BrandBanners title="Live co-branded hubs" />
       </Section>
       <Section>
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">

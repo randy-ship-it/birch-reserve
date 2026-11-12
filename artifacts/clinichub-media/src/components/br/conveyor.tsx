@@ -1,6 +1,6 @@
 /**
  * Hero visual (Randy item 1): co-branded hubs come off a conveyor belt and fan
- * out into display + CPC inventory on three surfaces: Hub Home Page, In-Hub
+ * out into display + CPC inventory on four placements: Post-Purchase, Hub Home Page,
  * Product / Services pages, Post-Purchase. Pure CSS/DOM animation (no video
  * dependency); a recorded MP4 loop of this component ships at
  * /hub-video/conveyor-loop.mp4 for decks and social.
@@ -9,9 +9,10 @@ import { useEffect, useRef, useState } from "react";
 import { BRAND_HUBS } from "../../../../api-server/src/lib/overhaul/model";
 
 const SURFACE_COLS = [
-  { key: "home", label: "Hub Home Page", sub: "banner · native tile" },
-  { key: "inhub", label: "In-Hub Product / Services", sub: "display · sponsored card" },
-  { key: "post", label: "Post-Purchase", sub: "thank-you · confirmation" },
+  { key: "post", label: "Post-Purchase", short: "Post-purchase", sub: "thank-you · confirmation" },
+  { key: "home", label: "Hub Home Page", short: "Hub home", sub: "banner · native tile" },
+  { key: "products", label: "Product / Services", short: "Products", sub: "sponsored card · display" },
+  { key: "dash", label: "Member Dashboard", short: "Dashboard", sub: "behind login" },
 ] as const;
 
 type Layout = {
@@ -27,19 +28,21 @@ type Layout = {
 const DESKTOP: Layout = {
   w: 1200,
   h: 520,
-  belt: { x: 20, y: 330, w: 600 },
+  belt: { x: 20, y: 330, w: 500 },
   drop: [
-    { x: 700, y: 120 },
-    { x: 860, y: 120 },
-    { x: 1020, y: 120 },
+    { x: 600, y: 120 },
+    { x: 750, y: 120 },
+    { x: 900, y: 120 },
+    { x: 1050, y: 120 },
   ],
   cols: [
-    { x: 660, y: 40, w: 160 },
-    { x: 840, y: 40, w: 160 },
-    { x: 1020, y: 40, w: 160 },
+    { x: 580, y: 40, w: 140 },
+    { x: 730, y: 40, w: 140 },
+    { x: 880, y: 40, w: 140 },
+    { x: 1030, y: 40, w: 140 },
   ],
-  card: { w: 168, h: 112 },
-  tile: { w: 74, h: 46, gap: 8, rows: 6 },
+  card: { w: 160, h: 108 },
+  tile: { w: 66, h: 46, gap: 8, rows: 6 },
 };
 
 const MOBILE: Layout = {
@@ -47,17 +50,19 @@ const MOBILE: Layout = {
   h: 700,
   belt: { x: 10, y: 170, w: 580 },
   drop: [
-    { x: 40, y: 420 },
-    { x: 230, y: 420 },
-    { x: 420, y: 420 },
+    { x: 20, y: 420 },
+    { x: 168, y: 420 },
+    { x: 316, y: 420 },
+    { x: 464, y: 420 },
   ],
   cols: [
-    { x: 10, y: 330, w: 186 },
-    { x: 207, y: 330, w: 186 },
-    { x: 404, y: 330, w: 186 },
+    { x: 6, y: 330, w: 140 },
+    { x: 154, y: 330, w: 140 },
+    { x: 302, y: 330, w: 140 },
+    { x: 450, y: 330, w: 140 },
   ],
   card: { w: 176, h: 118 },
-  tile: { w: 88, h: 64, gap: 8, rows: 4 },
+  tile: { w: 66, h: 64, gap: 6, rows: 4 },
 };
 
 const CYCLE_S = 16;
@@ -78,7 +83,7 @@ export function ConveyorHero({ className = "", captionless = false }: { classNam
 
   return (
     <div className={className}>
-      <div ref={ref} className="relative w-full overflow-hidden" style={{ height: L.h * scale }} data-testid="conveyor-hero" aria-label="Animation: co-branded hubs roll off a conveyor belt and become display and CPC ad slots on the hub home page, in-hub product and services pages, and post-purchase pages." role="img">
+      <div ref={ref} className="relative w-full overflow-hidden" style={{ height: L.h * scale }} data-testid="conveyor-hero" aria-label="Animation: co-branded hubs roll off a conveyor belt and become display and CPC ad slots on post-purchase pages, the hub home page, product and services pages, and the member dashboard behind login." role="img">
         <div className="br-stage absolute left-0 top-0 origin-top-left" style={{ width: L.w, height: L.h, transform: `scale(${scale})` }}>
           {/* backdrop grid */}
           <div className="absolute inset-0 opacity-[0.35]" style={{ backgroundImage: "linear-gradient(hsl(var(--foreground)/0.06) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)/0.06) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
@@ -115,8 +120,8 @@ export function ConveyorHero({ className = "", captionless = false }: { classNam
             return (
               <div key={col.key} className="absolute" style={{ left: c.x, top: c.y, width: c.w }}>
                 <div className="flex flex-col justify-end border-b-2 border-foreground pb-1.5" style={{ minHeight: 58 }}>
-                  <div className="font-display leading-tight text-foreground" style={{ fontSize: L === MOBILE ? 22 : 16 }}>{col.label}</div>
-                  <div className="text-foreground/55" style={{ fontSize: L === MOBILE ? 14 : 11 }}>{col.sub}</div>
+                  <div className="font-display leading-tight text-foreground" style={{ fontSize: L === MOBILE ? 20 : 15 }}>{L === MOBILE ? col.short : col.label}</div>
+                  <div className="text-foreground/55" style={{ fontSize: L === MOBILE ? 13 : 11 }}>{L === MOBILE ? (ci === 3 ? "behind login" : "display · CPC") : col.sub}</div>
                 </div>
                 <div className="mt-2 grid grid-cols-2" style={{ gap: L.tile.gap }}>
                   {Array.from({ length: L.tile.rows * 2 }).map((_, ti) => {
@@ -124,7 +129,7 @@ export function ConveyorHero({ className = "", captionless = false }: { classNam
                     const delay = (1.2 + ci * 0.3 + ti * 0.45).toFixed(2);
                     return (
                       <div key={ti} className={`br-tile flex flex-col justify-between border px-1.5 py-1 ${cpc ? "border-foreground bg-foreground text-background" : "border-foreground/30 bg-accent text-accent-foreground"}`} style={{ height: L.tile.h, animationDelay: `${delay}s` }}>
-                        <span className="font-semibold uppercase tracking-wider" style={{ fontSize: L === MOBILE ? 13 : 9 }}>{cpc ? "CPC" : "Display"}</span>
+                        <span className="font-semibold uppercase tracking-wider" style={{ fontSize: L === MOBILE ? 11 : 9 }}>{cpc ? "CPC" : "Display"}</span>
                         <span className="block h-1.5 w-3/4 bg-current opacity-30" />
                         <span className="block h-1.5 w-1/2 bg-current opacity-20" />
                       </div>
@@ -137,7 +142,7 @@ export function ConveyorHero({ className = "", captionless = false }: { classNam
 
           {/* hubs riding the belt then flying into the columns */}
           {hubs.map((hub, i) => {
-            const d = L.drop[i % 3]!;
+            const d = L.drop[i % 4]!;
             const startX = L.belt.x - L.card.w - 20;
             const endX = L.belt.x + L.belt.w - L.card.w;
             const y = L.belt.y - L.card.h - 4;
@@ -185,7 +190,7 @@ export function ConveyorHero({ className = "", captionless = false }: { classNam
       </div>
       {captionless ? null : (
         <p className="mt-3 text-xs leading-relaxed text-muted-foreground" data-testid="conveyor-caption">
-          Each hub adds display and CPC slots on three surfaces. Slots fill based on each hub’s audience and the purchase moment. Illustrative animation; hub logos are listed partners, and listing is not a signed media deal.
+          Each live hub adds display and CPC slots on four placements: post-purchase, hub home, product and services pages, and the member dashboard behind login. Slots fill based on each hub’s audience and the purchase moment. Illustrative animation.
         </p>
       )}
     </div>

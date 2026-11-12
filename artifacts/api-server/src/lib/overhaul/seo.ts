@@ -1,6 +1,6 @@
 /** Per-route head + llms.txt for the overhaul routes (crawlable without JS). */
 import { slotOffers, areaLockOffer } from "./agent";
-import { AREA_LOCK, BRAND_HUBS, PUBLISHER_INCENTIVE, SLOT_LADDER, TAM, areaLockGuaranteedViews } from "./model";
+import { AGENCY, AREA_LOCK, BRAND_HUBS, INVENTORY, PLACEMENT_LABELS, PUBLISHER_INCENTIVE, SLOT_LADDER, TAM, areaLockGuaranteedViews } from "./model";
 
 export const OVERHAUL_OG_IMAGE = "https://birchreserve.net/og-birch-reserve-hubs.png";
 
@@ -16,13 +16,13 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   },
   "/advertise/local": {
     title: "Lock down my area | Birch Reserve",
-    description: `Hold up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of your postal code for 1-6 months. $${AREA_LOCK.priceCad.toLocaleString("en-US")} CAD / $${AREA_LOCK.priceUsd.toLocaleString("en-US")} USD deposit.`,
+    description: `Hold up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of your postal code for 1-6 months. $${AREA_LOCK.priceCad.toLocaleString("en-US")} CAD / $${AREA_LOCK.priceUsd.toLocaleString("en-US")} USD launch rate until ${AREA_LOCK.launchRateUntil}.`,
     jsonld: { "@context": "https://schema.org", "@graph": [areaLockProductJsonLd()] },
   },
   "/publish/brands": { title: "Publish · Brands | Birch Reserve", description: "Brands with a recovery audience can apply for a co-branded hub. Otherwise, inquire about display or CPC-only opportunities outside hubs." },
   "/publish/studios": { title: "Publish · Studios & retail | Birch Reserve", description: `Activate your hub with pre-built monetizations and our marketplace. Earn $${PUBLISHER_INCENTIVE.cashCad} cash or $${PUBLISHER_INCENTIVE.creditCad}+ in ad credit.` },
   "/match": { title: "Match your audience | Birch Reserve", description: "Enter your website and a short note. See how well your audience matches the Scale Activity launch audience profile, as a clean % with three reasons." },
-  "/hubs": { title: "Brand hubs in queue | Birch Reserve", description: `${BRAND_HUBS.map((h) => h.name).join(", ")}: register your email to see audience, surfaces and pricing.` },
+  "/hubs": { title: "Live brand hubs | Birch Reserve", description: `${BRAND_HUBS.map((h) => h.name).join(", ")}: live inventory. Register your email to see audience, placements and pricing.` },
   "/media-kit": { title: "Marketing kit | Birch Reserve", description: "Where ads run, who sees them, what it costs and how to buy. Brands, local businesses, studios and agencies." },
   "/ai-buyers": {
     title: "For AI buying agents | Birch Reserve",
@@ -74,33 +74,34 @@ export function llmsTxt(): string {
   return [
     "# Birch Reserve",
     "",
-    "> Ad space inside co-branded Recovery Brand hubs (recovery, longevity, food; pets in queue) and health & wellness business hubs (physio, mobility, gyms, studios, clinic hubs). Display and CPC on three surfaces: Hub Home Page, In-Hub Product / Services pages, Post-Purchase.",
+    `> Ad space inside co-branded Recovery Brand hubs (recovery, longevity, food; pets in queue) and health & wellness business hubs (physio, mobility, gyms, studios, clinic hubs). Display and CPC on four placements: ${PLACEMENT_LABELS.join(", ")}.`,
     "",
-    `Audience (modelled, ${TAM.source}, read ${TAM.readOn}): ${TAM.ordersLabel} ${TAM.ordersNote}; ${TAM.viewsLabel} ${TAM.viewsNote}; ${TAM.listedPartners} listed partners, ${TAM.signedPartners} signed.`,
+    `Audience (modelled, ${TAM.source}, read ${TAM.readOn}): ${TAM.ordersLabel} ${TAM.ordersNote}; ${TAM.viewsLabel} ${TAM.viewsNote}; ${TAM.listedPartners} listed partners.`,
     "",
     "## Advertise",
     `- Brands, spend commits: https://birchreserve.net/advertise/brands · ${SLOT_LADDER.map((t) => `$${t.usd} USD${t.bonusPct ? ` (+${t.bonusPct}% credit)` : ""}`).join(" · ")}. CAD: ${SLOT_LADDER.map((t) => `$${t.cad}`).join(" · ")}.`,
-    `- Local businesses & studios, Lock down my area: https://birchreserve.net/advertise/local · $${AREA_LOCK.priceCad} CAD / $${AREA_LOCK.priceUsd} USD deposit · up to ${AREA_LOCK.standardSharePct}% of display within ${AREA_LOCK.radiusKm} km (${AREA_LOCK.denseCoreSharePct}% in dense downtown cores) · 1-6 months from display start · credit at ${AREA_LOCK.discountPct}% off rate card · ${g.views.toLocaleString("en-US")} modelled page views across hubs · right to keep pace if traffic grows.`,
+    `- Local businesses & studios, Lock down my area: https://birchreserve.net/advertise/local · $${AREA_LOCK.priceCad} CAD / $${AREA_LOCK.priceUsd} USD (launch rate until ${AREA_LOCK.launchRateUntil}) · up to ${AREA_LOCK.standardSharePct}% of display within ${AREA_LOCK.radiusKm} km (${AREA_LOCK.denseCoreSharePct}% in dense downtown cores) · 1-6 months from display start · credit at ${AREA_LOCK.discountPct}% off rate card · ${g.views.toLocaleString("en-US")} modelled page views across hubs · right to keep pace if traffic grows · ${AREA_LOCK.followOnDiscountPct}% off rate card on follow-on spend up to $${AREA_LOCK.followOnCapUsd.toLocaleString("en-US")} USD per locker over the term · ${AREA_LOCK.unusedCredit}`,
     "- Match your audience (modelled score): https://birchreserve.net/match · POST /v1/match {url, blurb}",
     "",
     "## Publish",
     "- Brands with a recovery audience: co-branded hub by application; otherwise display / CPC-only inquiry: https://birchreserve.net/publish/brands",
-    `- Studios & retail: $${PUBLISHER_INCENTIVE.cashCad} cash or $${PUBLISHER_INCENTIVE.creditCad}+ ad credit, paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after the first unique transaction: https://birchreserve.net/publish/studios · activate at ${PUBLISHER_INCENTIVE.clinicHubsUrl}`,
+    `- Studios & retail: $${PUBLISHER_INCENTIVE.cashCad} cash or $${PUBLISHER_INCENTIVE.creditCad}+ ad credit, for activating your audience (${PUBLISHER_INCENTIVE.activationChannels.join(", ")}); paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases excluded: https://birchreserve.net/publish/studios · activate at ${PUBLISHER_INCENTIVE.clinicHubsUrl}`,
     "",
     "## For AI buying agents",
     "- Start here: https://birchreserve.net/ai-buyers",
-    "- Catalog (inventory, surfaces, offers, modelled views, checkout status): GET https://birchreserve.net/v1/agent/catalog.json",
+    "- Catalog (inventory, placements, offers, modelled views, checkout status): GET https://birchreserve.net/v1/agent/catalog.json",
     "- Quote: GET /v1/agent/quote?offer=sponsor-1500&currency=usd · GET /v1/agent/quote?offer=area-lock&postal=M4E1G3&term=3",
-    "- Checkout: POST /v1/agent/checkout {offer, currency, email, brand | business+category+postal+term, agree:true}. Returns status open + Stripe-hosted checkout_url, or status held (saved, no charge, a person follows up).",
+    "- Checkout: POST /v1/agent/checkout {offer, currency, email, brand | business+category+postal+term, agree:true}. Returns status open + Stripe-hosted checkout_url, or status held (reserved by inquiry, no charge, confirmed within 1 business day).",
     "- OpenAPI: https://birchreserve.net/v1/agent/openapi.json · Agent card: https://birchreserve.net/.well-known/agent.json · UCP: https://birchreserve.net/.well-known/ucp",
     "- Offer keys: " + [...slotOffers().map((o) => `${o.offer_key} ($${o.prices.usd} USD / $${o.prices.cad} CAD, ~${o.modelled_hub_page_views.toLocaleString("en-US")} modelled views)`), "area-lock"].join(" · "),
-    "- Always show the buyer the draft terms before sending agree:true.",
+    "- Always show the buyer the terms and price before sending agree:true.",
     "",
     "## Agencies",
-    "- Prepay a client test budget; UTM + promo-code reporting; agency commission available on request: https://birchreserve.net/agencies",
+    `- Prepay a client test budget; UTM + promo-code reporting; ${AGENCY.commissionPct}% of media spend paid to the agency of record; ${AGENCY.bonusNote} https://birchreserve.net/agencies`,
     "",
-    "## Hubs in queue (listed, not signed)",
+    "## Live inventory",
     `- ${BRAND_HUBS.map((h) => h.name).join(" · ")}`,
+    `- ${INVENTORY.line} ${INVENTORY.queueLine}`,
     "",
     "## Machine endpoints",
     "- Area quote: GET /v1/area/quote?postal=L4C3G5&term=3",

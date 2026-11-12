@@ -7,7 +7,7 @@ import { useCurrency } from "@/lib/currency";
 import { SLOT_LADDER } from "../../../../api-server/src/lib/overhaul/model";
 
 const FAQ = [
-  { q: "What is a spend commit?", a: "You prepay a deposit that becomes open-dated ad credit. You don't pick dates today. When a hub that fits launches, we draft an insertion order naming the hub and surfaces, and your credit draws down only when your ad runs." },
+  { q: "What is a spend commit?", a: "You prepay a deposit that becomes ad credit. The named hubs are live inventory, so we send an insertion order naming the hubs and placements and your credit spends down over 6 months from when it lands. Unused credit can be refunded, or extended month by month at the same rate. 3x more inventory is in queue by year end, and you can put deposits on that too." },
   { q: "How do bigger deposits buy the rate down?", a: "Each tier adds bonus credit: +5% at $1,500 USD, +10% at $3,000 and +15% at $6,000. That is an effective 4.8%, 9.1% and 13.0% off the rate card." },
   { q: "Can I own a category?", a: "Yes. A category lock holds your category across the hubs where it runs. Ask us and we'll quote it against the hubs you want." },
   { q: "How is it reported?", a: "Aggregate only: views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. No patient data and no clinical pixels." },
@@ -57,7 +57,7 @@ export default function BrAdvertiseBrands() {
 
       <Section>
         <Eyebrow>Where it runs</Eyebrow>
-        <H2>Three surfaces, display or CPC.</H2>
+        <H2>Four placements, display or CPC.</H2>
         <div className="mt-10">
           <SurfacesGrid />
         </div>

@@ -5,17 +5,17 @@ import { slotOffers, areaLockOffer } from "../../../../api-server/src/lib/overha
 import { areaLockProductJsonLd, slotProductsJsonLd } from "../../../../api-server/src/lib/overhaul/seo";
 
 const STEPS = [
-  { icon: Search, title: "Read the catalog", code: "GET /v1/agent/catalog.json", body: "Surfaces, rate-card CPMs, modelled monthly views, hubs in queue, every offer with prices in USD and CAD." },
+  { icon: Search, title: "Read the catalog", code: "GET /v1/agent/catalog.json", body: "Surfaces, rate-card CPMs, modelled monthly views, live hubs, every offer with prices in USD and CAD." },
   { icon: Sparkles, title: "Check fit", code: "POST /v1/match", body: "Send the brand's URL and a short note. Get a modelled match %, three reasons and the offer we'd recommend." },
   { icon: Braces, title: "Quote", code: "GET /v1/agent/quote?offer=sponsor-3000", body: "Exact price, media credit, bonus and modelled views. Area locks quote by postal code or ZIP and term." },
-  { icon: CreditCard, title: "Check out", code: "POST /v1/agent/checkout", body: "Returns a Stripe-hosted checkout_url for the buyer, or status held: saved, no charge, a person follows up." },
+  { icon: CreditCard, title: "Check out", code: "POST /v1/agent/checkout", body: "Returns a Stripe-hosted checkout_url for the buyer, or status held: reserved by inquiry, no charge, confirmed within 1 business day." },
 ];
 
 const ENDPOINTS: Array<[string, string]> = [
   ["/llms.txt", "Plain-text map of the site, offers and endpoints"],
   ["/v1/agent/catalog.json", "Inventory, surfaces, offers, modelled views, checkout status"],
   ["/v1/agent/quote", "Quote one offer (slot-490, sponsor-1500, sponsor-3000, sponsor-6000, area-lock)"],
-  ["/v1/agent/checkout", "Stripe-hosted checkout handoff, or held"],
+  ["/v1/agent/checkout", "Stripe-hosted checkout handoff, or held (reserve by inquiry)"],
   ["/v1/agent/openapi.json", "OpenAPI 3.1 spec for the agent endpoints"],
   ["/.well-known/agent.json", "Agent card: skills, endpoints, auth"],
   ["/.well-known/ucp", "Universal Commerce Protocol discovery"],
@@ -110,7 +110,7 @@ export default function BrAiBuyers() {
                 </tbody>
               </table>
             </div>
-            <p className="mt-3 text-xs text-muted-foreground">Spend-commit views are what the credit buys at the blended hub rate card: modelled, not guaranteed. The area-lock view guarantee is modelled and its terms are draft.</p>
+            <p className="mt-3 text-xs text-muted-foreground">Spend-commit views are what the credit buys at the blended hub rate card: modelled, not guaranteed. The area-lock view guarantee is modelled.</p>
           </div>
           <div>
             <Eyebrow>Endpoints</Eyebrow>
@@ -132,9 +132,9 @@ export default function BrAiBuyers() {
         <Faq
           items={[
             { q: "Does an agent need an API key?", a: "No. Catalog, quote and match are public. Checkout returns a Stripe-hosted page for the human buyer to pay; we never take delegated card details from an agent." },
-            { q: "What does status held mean?", a: "Online payment isn't open for that offer yet. The request is saved with the offer, price and buyer email, no charge is made, and a person follows up by email." },
-            { q: "Are the view numbers real?", a: "They are modelled from the Scale Health TAM feed and labelled modelled everywhere. Hubs are listed partners; listing is not a signed media deal." },
-            { q: "What must an agent show the buyer?", a: "The draft terms and the price before sending agree:true. Payment is media credit drawn down under an insertion order that names the hubs." },
+            { q: "What does status held mean?", a: "Online payment isn't open for that offer yet. The request is reserved by inquiry with the offer, price and buyer email. No charge is made, and we confirm within 1 business day." },
+            { q: "Are the view numbers real?", a: "They are modelled from the Scale Health TAM feed and labelled modelled everywhere. Hubs are listed partners; each buy runs under an insertion order that names the hubs." },
+            { q: "What must an agent show the buyer?", a: "The terms and the price before sending agree:true. Payment is media credit drawn down under an insertion order that names the hubs." },
           ]}
         />
       </Section>

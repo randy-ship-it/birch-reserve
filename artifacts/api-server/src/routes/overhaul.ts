@@ -122,7 +122,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     const meta = built.params.metadata as Record<string, string>;
     const friday = await sendIntake({ kind: "area_lock_interest", email: str(body.email, 320), company: meta.business, website: meta.website || undefined, path: "/advertise/local", meta: { ...meta, checkout_open: gate.open, amount: built.amountCents / 100, currency: built.currency } });
     if (!gate.open || !deps.createSession) {
-      res.status(503).json({ error: "Area locks open for payment on launch. We've saved your area and will email you first.", held: true, stored: friday.status });
+      res.status(200).json({ held: true, message: "Reserved by inquiry. We'll confirm your area within 1 business day. No charge today.", stored: friday.status });
       return;
     }
     try {

@@ -3,7 +3,7 @@ import { Lock, MapPin } from "lucide-react";
 import { MetaComparison } from "@/components/br/blocks";
 import { SlotLadder } from "@/components/br/slot-ladder";
 import { Cta, Eyebrow, Faq, Field, H1, H2, JsonLd, Lede, Modelled, Section, inputClass, postJson, useOverhaulStatus, usePageMeta } from "@/components/br/ui";
-import { AREA_LOCK, quoteAreaLock, type AreaQuote, type Currency } from "../../../../api-server/src/lib/overhaul/model";
+import { AREA_LOCK, PLACEMENT_LABELS, quoteAreaLock, type AreaQuote, type Currency } from "../../../../api-server/src/lib/overhaul/model";
 
 const CATEGORIES = ["Physiotherapy / rehab", "Chiropractic", "Massage therapy", "Gym / fitness studio", "Yoga / pilates studio", "Nutrition / dietitian", "Health food / grocery", "Wellness clinic / naturopath", "Recovery studio (sauna, cold plunge)", "Footwear / orthotics retail", "Pet care / pet store", "Other health & wellness"];
 
@@ -11,12 +11,15 @@ const FAQ = [
   { q: "What does “up to 50%” mean?", a: `We hold up to ${AREA_LOCK.standardSharePct}% of the display slots shown to hub members within ${AREA_LOCK.radiusKm} km of your postal code for your category. In dense downtown cores (for example Toronto M5, downtown Montreal, Vancouver V6B/V6C/V6E and major US downtowns) the cap is ${AREA_LOCK.denseCoreSharePct}% because so many businesses share the same blocks.` },
   { q: "When does my term start?", a: "Your 1 to 6 month term starts the day your displays go live, not the day you pay." },
   { q: "What if traffic in my area grows?", a: "Your share grows with it. You keep the right to keep pace: more views in your area are offered to you first, at your locked discount, before anyone else can buy them." },
-  { q: "What do I get for the deposit?", a: `The full deposit becomes media credit at ${AREA_LOCK.discountPct}% off the rate card, plus a guaranteed number of page views across hubs. The view count is modelled from the TAM feed today; final guarantee terms are being confirmed.` },
+  { q: "What do I get for the deposit?", a: `The full deposit becomes media credit at ${AREA_LOCK.discountPct}% off the rate card, plus a guaranteed number of page views across hubs (modelled from the TAM feed).` },
+  { q: "Why is it $4,900 now?", a: `That's the launch rate, held until ${AREA_LOCK.launchRateUntil}. Locking also unlocks ${AREA_LOCK.followOnDiscountPct}% off the rate card on follow-on spend, up to $${AREA_LOCK.followOnCapUsd.toLocaleString()} USD ($${AREA_LOCK.followOnCapCad.toLocaleString()} CAD) over your term.` },
+  { q: "What if I don't use all my credit?", a: "At the end of your term you choose: take a refund of the unused credit, or extend your spend-down month by month at the same discount." },
+  { q: "Which placements can I get?", a: `${PLACEMENT_LABELS.join(", ")}. Display or CPC, on the named live hubs plus the health and wellness business hubs near you.` },
   { q: "Is it exclusive?", a: "Yes, by category in your area: while your lock is active we won't sell another lock in your category within your radius." },
 ];
 
 export default function BrAdvertiseLocal() {
-  usePageMeta("Lock down my area | Birch Reserve", `Hold up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of your postal code for 1–6 months. $${AREA_LOCK.priceCad.toLocaleString()} CAD / $${AREA_LOCK.priceUsd.toLocaleString()} USD deposit.`);
+  usePageMeta("Lock down my area | Birch Reserve", `Hold up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of your postal code for 1–6 months. $${AREA_LOCK.priceCad.toLocaleString()} CAD / $${AREA_LOCK.priceUsd.toLocaleString()} USD launch rate until ${AREA_LOCK.launchRateUntil}.`);
   const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const [postal, setPostal] = useState(params.get("postal") ?? "");
   const [term, setTerm] = useState(3);
@@ -42,12 +45,16 @@ export default function BrAdvertiseLocal() {
     setBusy(true);
     setCheckoutMsg(null);
     try {
-      const r = await postJson<{ url?: string; error?: string }>("/v1/area/checkout", { postal: ok.area.code, term, category: fd.get("category"), business: fd.get("business"), website: fd.get("website"), email: fd.get("email"), agree: fd.get("agree") === "on", currency: ok.currency });
+      const r = await postJson<{ url?: string; error?: string; held?: boolean; message?: string }>("/v1/area/checkout", { postal: ok.area.code, term, category: fd.get("category"), business: fd.get("business"), website: fd.get("website"), email: fd.get("email"), agree: fd.get("agree") === "on", currency: ok.currency });
       if (r.ok && r.data.url) {
         window.location.href = r.data.url;
         return;
       }
-      setCheckoutMsg(r.data.error ?? "Couldn't open checkout.");
+      if (r.data.held) {
+        setCheckoutMsg(r.data.message ?? "Reserved by inquiry. We'll confirm within 1 business day.");
+        return;
+      }
+      setCheckoutMsg(r.data.error ?? "Couldn't open checkout. Email sales@silverbirchgrowth.com and we'll hold your area.");
     } catch {
       setCheckoutMsg("Couldn't open checkout. Email sales@silverbirchgrowth.com.");
     } finally {
@@ -68,9 +75,11 @@ export default function BrAdvertiseLocal() {
             </Lede>
             <ul className="mt-8 space-y-3 text-sm">
               {[
-                `$${AREA_LOCK.priceCad.toLocaleString()} CAD or $${AREA_LOCK.priceUsd.toLocaleString()} USD deposit, exclusive in your category`,
+                `$${AREA_LOCK.priceCad.toLocaleString()} CAD or $${AREA_LOCK.priceUsd.toLocaleString()} USD: launch rate until ${AREA_LOCK.launchRateUntil}, exclusive in your category`,
                 `All of it becomes ad credit at ${AREA_LOCK.discountPct}% off the rate card`,
-                "Guaranteed page views across hubs (modelled today)",
+                `Plus ${AREA_LOCK.followOnDiscountPct}% off follow-on spend up to $${AREA_LOCK.followOnCapUsd.toLocaleString()} USD over your term`,
+                "Guaranteed page views across hubs (modelled)",
+                "Unused credit: refund, or extend month by month at the same discount",
                 "If traffic grows, you keep the right to keep pace with spend",
               ].map((t) => (
                 <li key={t} className="flex gap-2">
@@ -151,11 +160,12 @@ export default function BrAdvertiseLocal() {
                     <input name="email" type="email" required className={inputClass} />
                   </Field>
                   <label className="flex items-start gap-2 text-xs text-muted-foreground md:col-span-2">
-                    <input type="checkbox" name="agree" required className="mt-0.5" /> I agree to the draft area-lock terms (exclusive in my category and radius; term starts at display start; credit refundable before any ad runs). Terms are being finalized.
+                    <input type="checkbox" name="agree" required className="mt-0.5" /> I agree to the area-lock terms: exclusive in my category and radius; launch rate until {AREA_LOCK.launchRateUntil}; term starts at display start; {AREA_LOCK.followOnDiscountPct}% off follow-on spend up to ${AREA_LOCK.followOnCapUsd.toLocaleString()} USD; unused credit can be refunded or extended month by month at the same discount.
                   </label>
                   <button type="submit" disabled={busy} className="h-12 bg-accent text-sm font-semibold text-accent-foreground hover:bg-foreground hover:text-background disabled:opacity-60 md:col-span-2" data-testid="area-lock-submit">
-                    {busy ? "Opening checkout…" : status?.areaLockCheckout ? `Lock ${ok.area.area} for $${ok.price.toLocaleString()} ${ok.currency.toUpperCase()}` : `Hold ${ok.area.area} (checkout opens at launch)`}
+                    {busy ? "Opening checkout…" : status?.areaLockCheckout ? `Lock ${ok.area.area} for $${ok.price.toLocaleString()} ${ok.currency.toUpperCase()}` : `Reserve ${ok.area.area} by inquiry`}
                   </button>
+                  {!status?.areaLockCheckout ? <p className="text-xs text-muted-foreground md:col-span-2">Online payment opens soon. Reserve by inquiry now and we'll confirm within 1 business day. No charge today.</p> : null}
                 </form>
               </div>
             ) : null}
@@ -167,7 +177,7 @@ export default function BrAdvertiseLocal() {
       <Section tone="soft" id="slots">
         <Eyebrow>Smaller, non-exclusive slots</Eyebrow>
         <H2>Not ready to lock an area? Start smaller.</H2>
-        <Lede>Bigger deposits buy the rate down. Credit is open-dated and works on any hub surface.</Lede>
+        <Lede>Bigger deposits buy the rate down. Credit works on any of the four placements.</Lede>
         <div className="mt-10">
           <SlotLadder currency={currency} audience="local" />
         </div>
