@@ -20,6 +20,7 @@ import {
 import { MotionConfig } from 'framer-motion';
 import { Layout } from '@/components/layout';
 import Home from '@/pages/br/home';
+import BrRates from '@/pages/br/rates';
 import BrMatch from '@/pages/br/match';
 import BrAdvertiseBrands from '@/pages/br/advertise-brands';
 import BrAdvertiseLocal from '@/pages/br/advertise-local';
@@ -261,6 +262,9 @@ function Router() {
         </Route>
         <Route path="/publish">
           <Redirect to="/publish/brands" />
+        </Route>
+        <Route path="/rates">
+          <Layout><BrRates /></Layout>
         </Route>
         <Route path="/match">
           <Layout><BrMatch /></Layout>

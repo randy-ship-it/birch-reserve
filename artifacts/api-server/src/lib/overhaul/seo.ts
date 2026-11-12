@@ -29,6 +29,10 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
     description: "Machine catalog, quotes and Stripe-hosted checkout for AI ad-buying agents. Display and CPC inside co-branded health & wellness hubs. Modelled views labelled.",
     jsonld: { "@context": "https://schema.org", "@graph": [...slotProductsJsonLd(), areaLockProductJsonLd(), { "@type": "WebAPI", name: "Birch Reserve agent buying API", documentation: "https://birchreserve.net/v1/agent/openapi.json", url: "https://birchreserve.net/v1/agent/catalog.json", provider: ORG }] },
   },
+  "/rates": {
+    title: "Rates | Birch Reserve",
+    description: "Starting-at CPM and CPC rates for five hub surfaces, view-block packs, a 100k to 1B view scenario calculator, and rates that rise only once a placement is proven. Illustrative estimates.",
+  },
   "/agencies": {
     title: "For agencies | Birch Reserve",
     description: "Prepay a client test budget into health & wellness hubs. UTM and promo-code reporting. Agency commission available.",

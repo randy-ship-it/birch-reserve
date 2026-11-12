@@ -3,9 +3,9 @@
  *
  * Header: Randy · Birch Reserve, online dot, Call pill (tel). Hear Randy = ElevenLabs ConvAI widget (layout, bottom-left).
  * HARD 2026-09-24 3:31–3:33pm ET: birchreserve.net = Birch Reserve only (opener + chips).
- * Full-body Randy (/avatars/randy-fullbody.png, transparent cutout) stands bottom-right
- * on a floating WHITE card (never navy behind him), object-fit: contain, bottom center:
- * head through shoes always visible. Small circles use /avatars/randy-head.png only.
+ * Visual: the Birch Q&A Squirrel (Randy, Nov 12 2026 2:34 PM ET): the same squirrel
+ * character as Friday's pipeline pages, so it stays consistent everywhere. Art and
+ * motion live in components/birch-squirrel.tsx; the Randy cartoon is gone from this widget.
  * HARD 3:42pm ET: never silent on failure (error + Retry + tel). Book a call asks
  * 2–3 qualifying questions; next step is an AI call (tel) or a callback request;
  * No calendar CTA anywhere (HARD 5:28pm): partnerships get a callback intake. Every session is logged
@@ -51,19 +51,12 @@ import {
   type RandyReplyFailure,
 } from "@/lib/randy-model-client";
 import { RichText } from "@/components/randy-rich-text";
+import { SQUIRREL_STYLES, SquirrelBadge, SquirrelFull } from "@/components/birch-squirrel";
+import { BIRCH_SQUIRREL } from "@/lib/birch-squirrel-config";
 
-/** Head + shoulders (on white) for small circles only. */
-const HEAD_SRC = "/avatars/randy-head.png";
 const PANEL_SHADOW =
   "shadow-[0_32px_80px_-24px_rgba(7,26,57,0.45),0_10px_28px_-10px_rgba(7,26,57,0.22)]";
-const FULLBODY_SRC = "/avatars/randy-fullbody.png";
-const FULLBODY_360_SRC = "/avatars/randy-fullbody-360.png";
-/** Natural size of randy-fullbody.png (816x1626). */
-const FULLBODY_W = 816;
-const FULLBODY_H = 1626;
-const FULLBODY_SRCSET = `${FULLBODY_360_SRC} 271w, ${FULLBODY_SRC} 816w`;
-const FULLBODY_ALT =
-  "Randy, full-body cartoon in a BirchReserve.net tee, standing and ready to chat";
+const SQUIRREL_NAME = BIRCH_SQUIRREL.name;
 const DISMISS_KEY = "birch:randy-figure-dismissed";
 const TEASER_DELAY_MS = 4000;
 
@@ -85,45 +78,20 @@ const FIGURE_STYLES = `
 .randy-dot { animation: randy-dot 1.1s ease-in-out infinite; }
 @keyframes randy-ping { 0% { transform: scale(1); opacity: 0.6; } 80%, 100% { transform: scale(2.2); opacity: 0; } }
 .randy-ping { animation: randy-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+/* Mobile dock: squirrel sits just left of the 56px voice button, both at the
+   bottom edge (or above the sticky reserve bar when a page has one), so neither
+   covers hero copy. --birch-dock-bottom is shared with hear-randy-elevenlabs. */
+:root { --birch-dock-bottom: calc(14px + env(safe-area-inset-bottom)); }
+html:has([data-testid="mobile-sticky-reserve-cta"]) { --birch-dock-bottom: calc(7.75rem + env(safe-area-inset-bottom)); }
+@media (max-width: 767px) {
+  .birch-dock-squirrel { bottom: calc(var(--birch-dock-bottom) + 4px); right: calc(12px + 56px + 8px); }
+  body { padding-bottom: 76px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .randy-bob, .randy-teaser, .randy-wave, .randy-chip, .randy-msg, .randy-dot, .randy-ping { animation: none !important; }
   .randy-lift, .randy-lift:hover, .randy-lift:focus-visible { transition: none; transform: none; }
 }
 `;
-
-/**
- * Full-body Randy on a floating white card. The card (not the image) bobs/lifts.
- * object-contain + object-bottom, explicit heights, no overflow clipping → full body visible.
- */
-function FullBodyCard({
-  heightClass,
-  sizes,
-  eager,
-}: {
-  heightClass: string;
-  sizes: string;
-  eager?: boolean;
-}) {
-  return (
-    <span
-      className="flex items-end justify-center rounded-2xl border border-[rgba(0,0,0,0.08)] bg-white px-3 pb-2 pt-3 shadow-[0_12px_32px_-12px_rgba(15,23,42,0.35)]"
-      style={{ backgroundColor: "#fff" }}
-    >
-      <img
-        src={FULLBODY_SRC}
-        srcSet={FULLBODY_SRCSET}
-        sizes={sizes}
-        alt={FULLBODY_ALT}
-        width={FULLBODY_W}
-        height={FULLBODY_H}
-        loading={eager ? "eager" : "lazy"}
-        draggable={false}
-        className={`${heightClass} w-auto max-w-none select-none object-contain object-bottom`}
-        data-testid="randy-fullbody-image"
-      />
-    </span>
-  );
-}
 
 type ChatMessage = {
   id: string;
@@ -614,19 +582,8 @@ export function RandyChat() {
   })();
 
   const headAvatar = (size: "lg" | "sm") => (
-    <span
-      className={`relative inline-flex shrink-0 items-center justify-center rounded-full bg-white ring-1 ring-black/10 ${
-        size === "lg" ? "size-11 p-[3px]" : "size-6 p-[2px]"
-      }`}
-    >
-      <img
-        src={HEAD_SRC}
-        alt={size === "lg" ? "Randy, cartoon head and shoulders" : ""}
-        className="size-full rounded-full object-contain"
-        width={size === "lg" ? 44 : 24}
-        height={size === "lg" ? 44 : 24}
-        {...(size === "lg" ? { "data-testid": "randy-avatar-image" } : {})}
-      />
+    <span className="relative inline-flex shrink-0">
+      <SquirrelBadge size={size === "lg" ? 44 : 24} nod={size === "lg"} {...(size === "lg" ? { testId: "randy-avatar-image" } : {})} />
       {size === "lg" && (
         <span className="absolute -bottom-0.5 -right-0.5 flex size-3.5" aria-label="Online" role="img">
           <span className="randy-ping absolute inline-flex size-full rounded-full bg-emerald-400" aria-hidden />
@@ -801,21 +758,21 @@ export function RandyChat() {
 
   return (
     <>
-      <style>{FIGURE_STYLES}</style>
+      <style>{FIGURE_STYLES + SQUIRREL_STYLES}</style>
 
-      {/* Closed state: full-body Randy on a floating white card, bottom-right */}
+      {/* Closed state: Birch Q&A Squirrel, bottom-right. Mobile: compact, docked beside the voice button, below page content. */}
       {!open && !dismissed && !lingerOpen && (
         <div
-          className="fixed bottom-[calc(7.75rem+env(safe-area-inset-bottom))] right-[5.75rem] z-[45] flex items-end gap-2 md:bottom-6 md:right-6"
+          className="birch-dock-squirrel fixed z-[45] flex items-end gap-2 md:bottom-6 md:right-6"
           data-testid="randy-figure-launcher"
         >
           {teaserVisible && (
             <button
               type="button"
               onClick={() => openWidget({ reason: "launcher", mode: "chat" })}
-              className="randy-teaser relative mb-16 hidden max-w-[150px] rounded-2xl border border-black/5 bg-white px-3 py-2 text-left text-[13px] font-medium leading-snug text-slate-900 shadow-[0_12px_32px_-10px_rgba(15,23,42,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:mb-24 md:block md:max-w-[190px] md:px-4 md:py-3 md:text-sm"
+              className="randy-teaser relative mb-3 hidden max-w-[190px] rounded-2xl border border-black/5 bg-white px-4 py-3 text-left text-sm font-medium leading-snug text-slate-900 shadow-[0_12px_32px_-10px_rgba(15,23,42,0.35)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:block"
               style={{ backgroundColor: "#fff" }}
-              aria-label={`${TEASER_TEXT} Open chat with Randy`}
+              aria-label={`${TEASER_TEXT} Open the ${SQUIRREL_NAME}`}
               data-testid="randy-teaser"
             >
               {TEASER_TEXT}
@@ -829,29 +786,23 @@ export function RandyChat() {
             <button
               type="button"
               onClick={() => openWidget({ reason: "launcher", mode: "chat" })}
-              className="randy-lift block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-              aria-label="Chat with Randy about the Birch Reserve List and early slots"
+              className="bsq-btn randy-lift block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+              aria-label={`${SQUIRREL_NAME}: ask about the Birch Reserve List and early slots`}
+              title={SQUIRREL_NAME}
               data-testid="button-open-randy-chat"
             >
-              <span className="flex size-12 items-center justify-center overflow-hidden rounded-full border border-black/10 bg-white shadow-[0_12px_32px_-12px_rgba(15,23,42,0.45)] md:hidden">
-                <img
-                  src={HEAD_SRC}
-                  alt=""
-                  width={96}
-                  height={96}
-                  draggable={false}
-                  className="size-12 object-cover object-top"
-                />
+              <span className="block md:hidden">
+                <SquirrelBadge size={48} nod className="shadow-[0_4px_14px_rgba(15,34,24,.18)]" testId="birch-squirrel-launcher-mobile" />
               </span>
               <span className="hidden md:block">
-                <FullBodyCard heightClass="md:h-[200px]" sizes="100px" eager />
+                <SquirrelBadge size={72} nod className="shadow-[0_12px_32px_-12px_rgba(15,23,42,0.45)]" testId="birch-squirrel-launcher" />
               </span>
             </button>
             <button
               type="button"
               onClick={dismissFigure}
-              className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full border border-black/10 bg-white text-slate-600 shadow-sm hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              aria-label="Hide Randy for this visit"
+              className="absolute -right-1.5 -top-1.5 hidden size-6 items-center justify-center rounded-full border border-black/10 bg-white text-slate-600 shadow-sm hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent md:flex"
+              aria-label={`Hide the ${SQUIRREL_NAME} for this visit`}
               data-testid="button-dismiss-randy"
             >
               <X className="size-3.5" aria-hidden />
@@ -863,29 +814,20 @@ export function RandyChat() {
       <AnimatePresence>
         {open && (
           <>
-            {/* Desktop stage: full-body Randy on a white panel directly left of the chat, bottom-aligned, head to shoes */}
+            {/* Desktop stage: full-body Birch Q&A Squirrel on a white panel directly left of the chat */}
             <motion.div
               key="randy-stage"
               initial={{ opacity: 0, x: 28, scale: 0.97 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 20, scale: 0.97 }}
               transition={{ type: "spring", stiffness: 380, damping: 30, delay: 0.04 }}
-              className={`pointer-events-none fixed bottom-6 right-[calc(1.5rem+400px+14px)] z-50 hidden flex-col items-center justify-end rounded-3xl border border-black/5 bg-white px-6 pb-5 pt-7 md:flex ${PANEL_SHADOW}`}
+              className={`pointer-events-none fixed bottom-6 right-[calc(1.5rem+400px+14px)] z-50 hidden flex-col items-center justify-end rounded-3xl border border-black/5 bg-white px-5 pb-4 pt-5 md:flex ${PANEL_SHADOW}`}
               style={{ backgroundColor: "#fff" }}
               data-testid="randy-figure-open"
               aria-hidden
             >
-              <img
-                src={FULLBODY_SRC}
-                srcSet={FULLBODY_SRCSET}
-                sizes="230px"
-                alt=""
-                width={FULLBODY_W}
-                height={FULLBODY_H}
-                draggable={false}
-                className="randy-wave h-[min(440px,calc(100dvh-9rem))] w-auto max-w-none select-none object-contain object-bottom"
-                data-testid="randy-fullbody-stage"
-              />
+              <SquirrelFull className="h-[min(300px,calc(100dvh-12rem))] w-auto" testId="birch-squirrel-stage" />
+              <p className="mt-2 text-center text-xs font-semibold text-slate-600">{SQUIRREL_NAME}</p>
             </motion.div>
 
             {/* Chat panel: desktop floating glass card; mobile native bottom sheet */}
@@ -895,31 +837,19 @@ export function RandyChat() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 40, scale: 0.97 }}
               transition={{ type: "spring", stiffness: 420, damping: 32 }}
-              className={`fixed inset-x-0 bottom-0 z-50 flex h-[calc(100dvh-150px)] flex-col rounded-t-3xl border border-black/5 bg-white/95 text-slate-900 backdrop-blur-xl md:inset-x-auto md:bottom-6 md:right-6 md:h-[min(640px,calc(100dvh-3rem))] md:w-[400px] md:rounded-3xl ${PANEL_SHADOW}`}
+              className={`fixed inset-x-0 bottom-0 z-[65] flex h-[calc(100dvh-150px)] flex-col rounded-t-3xl border border-black/5 bg-white/95 text-slate-900 backdrop-blur-xl md:inset-x-auto md:bottom-6 md:right-6 md:h-[min(640px,calc(100dvh-3rem))] md:w-[400px] md:rounded-3xl ${PANEL_SHADOW}`}
               role="dialog"
               aria-modal="false"
-              aria-label="Chat with Randy from Birch Reserve"
+              aria-label={`${SQUIRREL_NAME}, Birch Reserve`}
               data-testid="dialog-randy-chat"
             >
-              {/* Mobile: full-body figure peeking over the sheet's top edge, head fully visible */}
+              {/* Mobile: squirrel peeking over the sheet's top edge */}
               <div
-                className="pointer-events-none absolute -top-[124px] right-5 md:hidden"
+                className="pointer-events-none absolute -top-[64px] right-5 md:hidden"
                 data-testid="randy-figure-peek"
                 aria-hidden
               >
-                <span
-                  className="flex items-end justify-center rounded-2xl border border-black/5 bg-white px-2.5 pb-1.5 pt-2 shadow-[0_12px_28px_-12px_rgba(7,26,57,0.45)]"
-                  style={{ backgroundColor: "#fff" }}
-                >
-                  <img
-                    src={FULLBODY_360_SRC}
-                    alt=""
-                    width={271}
-                    height={540}
-                    draggable={false}
-                    className="randy-wave h-[118px] w-auto max-w-none select-none object-contain object-bottom"
-                  />
-                </span>
+                <SquirrelFull className="h-[76px] w-auto drop-shadow-[0_8px_14px_rgba(7,26,57,0.25)]" />
               </div>
 
               {/* Grab handle (mobile) */}
@@ -932,7 +862,7 @@ export function RandyChat() {
                 <div className="flex min-w-0 items-center gap-3">
                   {headAvatar("lg")}
                   <div className="min-w-0 leading-tight">
-                    <h3 className="truncate font-display text-[17px] font-semibold tracking-tight text-slate-900">Randy</h3>
+                    <h3 className="truncate font-display text-[17px] font-semibold tracking-tight text-slate-900">{SQUIRREL_NAME}</h3>
                     <p className="truncate text-[12px] text-slate-500">Birch Reserve</p>
                   </div>
                 </div>
@@ -1030,7 +960,7 @@ export function RandyChat() {
                   )}
 
                   {typing && (
-                    <div className="flex items-end gap-2" data-testid="randy-typing" aria-label="Randy is typing">
+                    <div className="flex items-end gap-2" data-testid="randy-typing" aria-label={`${SQUIRREL_NAME} is typing`}>
                       <span className="w-6 shrink-0">{headAvatar("sm")}</span>
                       <div className="flex items-center gap-1 rounded-2xl rounded-bl-md bg-slate-100 px-4 py-3">
                         {[0, 1, 2].map((i) => (
@@ -1084,8 +1014,8 @@ export function RandyChat() {
                     value={input}
                     maxLength={1000}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder={qualifyStep !== null ? "Type your answer…" : "Message Randy…"}
-                    aria-label="Message Randy"
+                    placeholder={qualifyStep !== null ? "Type your answer…" : "Ask the squirrel…"}
+                    aria-label={`Message the ${SQUIRREL_NAME}`}
                     className="h-9 min-w-0 flex-1 bg-transparent text-[14px] text-slate-900 placeholder:text-slate-400 focus:outline-none"
                     data-testid="randy-chat-input"
                   />
