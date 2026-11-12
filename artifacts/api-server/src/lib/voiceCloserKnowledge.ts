@@ -11,6 +11,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { siteCheckoutState, type SiteCheckoutState } from "./checkoutState";
 
 /** Practical concat order (README paste order, size-aware). */
 export const VOICE_CLOSER_LOAD_ORDER = [
@@ -135,6 +136,34 @@ export function applyBirchSquirrelPersona(prompt: string): string {
 `;
 }
 
+export const RESERVE_LINKS = {
+  hold190: "https://birchreserve.net/buycalc?sku=hold-190#reserve",
+  reserve490: "https://birchreserve.net/buycalc?sku=reserve-490#reserve",
+} as const;
+
+/** Checkout lines for the runtime lock, from the same flags the site reads (never a stale "OFF"/"LIVE"). */
+export function checkoutLockLines(state: SiteCheckoutState): string {
+  const lines: string[] = [];
+  if (state.reserve) {
+    lines.push(
+      `- Checkout is LIVE for the two public options only: the $490 category prepay (${RESERVE_LINKS.reserve490}, full $490 credited toward placements, insertion order before anything runs) and the $190 7-day look (${RESERVE_LINKS.hold190}). Lead with the Reserve List or the $490 prepay; give the $190 link when the buyer wants a smaller first step or asks for it. Never claim a payment went through unless the buyer confirms they paid.`,
+    );
+  } else {
+    lines.push("- Checkout is OFF right now: do not invent pay links or claim live checkout; take intake for a team callback.");
+  }
+  lines.push(
+    state.areaLock
+      ? "- Area lock (https://birchreserve.net/advertise/local) can be paid online after the postal-code check."
+      : "- Area lock (https://birchreserve.net/advertise/local) is inquiry-only right now: no online payment. Point to the postal-code check and take intake for a team callback; never send a pay link for it.",
+  );
+  lines.push(
+    state.deposits
+      ? "- Sponsor deposits (Starter/Partner/Founding slots) can be paid online."
+      : "- Sponsor deposits (Starter/Partner/Founding slots) are inquiry-only right now: no online payment; take intake for a team callback.",
+  );
+  return lines.join("\n");
+}
+
 export function loadVoiceCloserSystemPrompt(force = false): string {
   if (!force && cachedPrompt) return cachedPrompt;
 
@@ -159,8 +188,8 @@ export function loadVoiceCloserSystemPrompt(force = false): string {
 ---
 ## RUNTIME HARD LOCKS (api-server)
 - Public SKUs only: hold-190 ($190 USD), reserve-490 ($490 USD). Canadian buyers pay in CAD ($270 CAD look, $690 CAD seat); the checkout page shows the buyer's currency and has a USD/CAD toggle. Never hero $899 / reserve-899.
-- Checkout is OFF: do not invent pay links or claim live checkout.
-- Routing: only URLs in the routing table above; one per reply.
+${checkoutLockLines(siteCheckoutState())}
+- Routing: only URLs in the routing table above or in these locks; one per reply.
 - You handle buyers yourself: close early slots on the Reserve List (https://birchreserve.net/inventory) and the $490 category prepay, never hold or lock a category; for partnerships or bigger deals take intake in chat and say the team will call back. Offer the AI call or a callback. Never promote the calendar; https://cal.com/randy-gilling/30min only if the visitor insists on a set time.
 - In-widget voice is not live yet; reply in text.
 `;

@@ -324,7 +324,7 @@ export function renderTranscriptEmail(s: TranscriptSession): RenderedEmail {
     ["Outcome", outcome],
   ];
   const events = s.events.map((e) => `${fmtToronto(new Date(e.at))}: ${EVENT_LABELS[e.type] ?? e.type}`);
-  const lines = s.messages.map((m) => `${m.role === "user" ? "Visitor" : "Randy"}: ${m.content}`);
+  const lines = s.messages.map((m) => `${m.role === "user" ? "Visitor" : "Squirrel"}: ${m.content}`);
 
   const text = [
     "Birch chat transcript",
@@ -355,7 +355,7 @@ export function renderTranscriptEmail(s: TranscriptSession): RenderedEmail {
     `<h3 style="margin:12px 0 4px">Transcript</h3>`,
     ...s.messages.map(
       (m) =>
-        `<p style="margin:0 0 10px"><strong>${m.role === "user" ? "Visitor" : "Randy"}:</strong> ${htmlWithNakedLinks(m.content)}</p>`,
+        `<p style="margin:0 0 10px"><strong>${m.role === "user" ? "Visitor" : "Squirrel"}:</strong> ${htmlWithNakedLinks(m.content)}</p>`,
     ),
     `</body></html>`,
   ].join("\n");
@@ -687,7 +687,7 @@ export async function sendTestTranscript(now: Date = new Date()): Promise<{ sent
     id,
     now,
     messages: [
-      { role: "assistant", content: "Hey, I'm Randy. Want to see how a seat inside the recovery hubs works?" },
+      { role: "assistant", content: "Hey! Birch Q&A Squirrel here. Want to see how a seat inside the recovery hubs works?" },
       { role: "user", content: "Test transcript from the admin endpoint." },
     ],
     qualify: { company: "Transcript test" },
@@ -721,7 +721,7 @@ export function logIntake(s: TranscriptSession, reason: string, error?: string):
       },
       lastHandoff: s.lastHandoff,
       pagePath: s.pagePath,
-      transcript: s.messages.map((m) => `${m.role === "user" ? "Visitor" : "Randy"}: ${m.content}`),
+      transcript: s.messages.map((m) => `${m.role === "user" ? "Visitor" : "Squirrel"}: ${m.content}`),
       ...(error ? { error } : {}),
     },
     "Randy chat intake",
