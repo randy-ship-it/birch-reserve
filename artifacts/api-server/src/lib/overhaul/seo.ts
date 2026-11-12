@@ -31,7 +31,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   },
   "/rates": {
     title: "Rates | Birch Reserve",
-    description: "Starting-at CPM and CPC rates for five hub surfaces, view-block packs, a 100k to 1B view scenario calculator, and rates that rise only once a placement is proven. Illustrative estimates.",
+    description: "Starting-at CPM and CPC rates for five hub surfaces, view-block packs, a 100k to 1B view scenario calculator, and rates that step up only once a placement proves out. Illustrative estimates.",
   },
   "/agencies": {
     title: "For agencies | Birch Reserve",
@@ -80,7 +80,7 @@ export function llmsTxt(): string {
     "",
     `> Ad space inside co-branded Recovery Brand hubs (recovery, longevity, food; pets in queue) and health & wellness business hubs (physio, mobility, gyms, studios, clinic hubs). Display and CPC on four placements: ${PLACEMENT_LABELS.join(", ")}.`,
     "",
-    `Audience (modelled, ${TAM.source}, read ${TAM.readOn}): ${TAM.ordersLabel} ${TAM.ordersNote}; ${TAM.viewsLabel} ${TAM.viewsNote}; ${TAM.listedPartners} listed partners.`,
+    `Audience (modelled, ${TAM.source}, read ${TAM.readOn}): ${TAM.ordersLabel} ${TAM.ordersNote}; ${TAM.listedPartners} listed partners.`,
     "",
     "## Advertise",
     `- Brands, spend commits: https://birchreserve.net/advertise/brands · ${SLOT_LADDER.map((t) => `$${t.usd} USD${t.bonusPct ? ` (+${t.bonusPct}% credit)` : ""}`).join(" · ")}. CAD: ${SLOT_LADDER.map((t) => `$${t.cad}`).join(" · ")}.`,

@@ -19,7 +19,7 @@ Never collect or discuss patient / PHI data. Aggregate reporting only. No clinic
 If asked “how many people will see my ad?” answer: “We do not sell a guaranteed impression count. Reserve List brands get early slots first as each category activates. We name the surface on the insertion order.”
 If asked about Align’s 80 locations: “On-prem clinic and studio surfaces are a separate insertion-order line, available on request. The public product is digital hubs.”
 Big accounts / multi-hub / on-prem → Book a call.
-Providers listing a surface → free opt-in, not a charge. Do not mix with Scale Health $49 ICA.
+Providers listing a surface → free opt-in, not a charge.
 Seller: Silver Birch Growth Inc., Toronto. Stripe descriptor should read SCALE HEALTH*BIRCH or BIRCH RESERVE.`;
 
 export type GuideQuestionIntent =

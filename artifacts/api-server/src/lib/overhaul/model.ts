@@ -4,7 +4,7 @@
  *
  * EVERY audience and view figure is MODELLED from the public TAM feed
  * (birch-inventory /api/tam, mirrored at scalehealth.ca/tam, read 2026-11-12):
- * 20MM+ audience orders being onboarded, ~128MM views a month, 42 listed
+ * 20MM+ audience orders being onboarded (no network views headline in public copy), 42 listed
  * partners, 0 signed. Nothing here is measured delivery.
  *
  * Copy rules: never name the clinic operator; say "clinic hubs". Listed, not
@@ -27,8 +27,6 @@ export const TAM = {
   feed: "https://birch-inventory.vercel.app/inventory/api/tam",
   ordersLabel: "20MM+",
   ordersNote: "audience orders being onboarded now (modelled)",
-  viewsLabel: "~128MM",
-  viewsNote: "monthly views across listed partners (modelled)",
   listedPartners: 42,
   signedPartners: 0,
   /** Monthly modelled views by surface, CA market feed snapshot 2026-11-12. */

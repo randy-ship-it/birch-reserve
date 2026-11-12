@@ -101,7 +101,7 @@ export function MetaHook() {
   );
 }
 
-/** Five-surface rate card: starter "starting at" rates; proven rates framed as where proven placements go. */
+/** Five-surface rate card: starter ranges only (no later-rate numbers in public copy). */
 export function RateCardV2() {
   return (
     <div data-testid="rate-card-v2">
@@ -118,9 +118,9 @@ export function RateCardV2() {
                 <dd className="text-xs text-muted-foreground">${s.cpcStarter[0].toFixed(2)} CPC</dd>
               </div>
               <div>
-                <dt className="text-[10px] font-semibold uppercase tracking-wider text-foreground/55">Proven placements</dt>
-                <dd className="text-foreground/70">{fmtRange(s.cpmProven)} CPM</dd>
-                <dd className="text-xs text-muted-foreground">{fmtRange(s.cpcProven, 2)} CPC</dd>
+                <dt className="text-[10px] font-semibold uppercase tracking-wider text-foreground/55">Starter range</dt>
+                <dd className="text-foreground/70">{fmtRange(s.cpmStarter)} CPM</dd>
+                <dd className="text-xs text-muted-foreground">{fmtRange(s.cpcStarter, 2)} CPC</dd>
               </div>
             </dl>
           </article>
@@ -134,7 +134,6 @@ export function RateCardV2() {
               <th className="py-3 pr-4 font-semibold">Surface</th>
               <th className="py-3 pr-4 font-semibold">Display, starting at</th>
               <th className="py-3 pr-4 font-semibold">CPC, starting at</th>
-              <th className="py-3 pr-4 font-semibold text-foreground/60">Where proven placements go</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -150,16 +149,13 @@ export function RateCardV2() {
                 <td className="py-4 pr-4">
                   <span className="font-semibold">${s.cpcStarter[0].toFixed(2)}</span> <span className="text-xs text-muted-foreground">({fmtRange(s.cpcStarter, 2)})</span>
                 </td>
-                <td className="py-4 pr-4 text-foreground/65">
-                  {fmtRange(s.cpmProven)} CPM · {fmtRange(s.cpcProven, 2)} CPC
-                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
-        USD. <Estimate /> {ESTIMATE_NOTE} Starter rates apply while a placement is new; rates only move toward the proven range after campaign reporting shows the placement performs.
+        USD. <Estimate /> {ESTIMATE_NOTE} Starter rates apply while a placement is new; rates may step up only after campaign reporting shows the placement performs.
       </p>
     </div>
   );
@@ -249,14 +245,14 @@ export function PackPicker() {
           </Cta>
         </div>
         <p className="mt-4 text-[11px] leading-relaxed text-background/50">
-          The $490 prepay holds your category and is all media credit toward the pack. Starter rates hold for your first period; proven-placement rates are on the rate card. <Estimate /> The IO sets the final rate.
+          The $490 prepay holds your category and is all media credit toward the pack. Starter rates hold for your first period; rates may step up later only once a placement proves out. <Estimate /> The IO sets the final rate.
         </p>
       </div>
     </div>
   );
 }
 
-/** Scenario calculator: views slider (100k → 1B), blended starter vs proven vs Meta. */
+/** Scenario calculator: views slider (100k → 1B), blended starter vs Meta (starter only). */
 export function ScenarioCalculator() {
   const [i, setI] = useState(3);
   const views = SCENARIO_STOPS[i]!;
@@ -265,9 +261,8 @@ export function ScenarioCalculator() {
   const bars: Array<{ label: string; lo: number; hi: number; tone: string }> = [
     { label: "Meta, same views", lo: s.metaUsd[0], hi: s.metaUsd[1], tone: "bg-foreground/35" },
     { label: "Birch starter", lo: s.starterUsd, hi: s.starterUsd, tone: "bg-accent" },
-    { label: "Birch, once proven", lo: s.provenUsd[0], hi: s.provenUsd[1], tone: "bg-foreground" },
   ];
-  const scaleMax = Math.max(max, s.provenUsd[1]);
+  const scaleMax = max;
   return (
     <div className="border border-foreground/15 bg-white p-5 md:p-8" data-testid="scenario-calculator">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -314,7 +309,7 @@ export function ScenarioCalculator() {
         ))}
       </div>
       <p className="mt-5 text-[11px] leading-relaxed text-muted-foreground">
-        Straight-line illustration at ~${BLENDED.starterCpm} blended starter CPM, {fmtRange(BLENDED.provenCpm)} once proven, and Meta at {fmtRange(META_CPM)}. <Estimate /> Not a forecast of available inventory or delivery; large volumes are sold on an IO against live hub supply.
+        Straight-line illustration at ~${BLENDED.starterCpm} blended starter CPM and Meta at {fmtRange(META_CPM)}. <Estimate /> Not a forecast of available inventory or delivery; large volumes are sold on an IO against live hub supply.
       </p>
     </div>
   );
@@ -325,7 +320,7 @@ export function ProveItLadder() {
   const steps = [
     { n: "1", t: "Start at starter rates", d: "Your first period runs at the starting-at rates above. Hold your category with the $490 prepay, all of it media credit." },
     { n: "2", t: "We report, you judge", d: "Views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. Aggregate only, no patient data." },
-    { n: "3", t: "Rates rise only when it's proven", d: "A placement steps toward the proven range only after reporting shows it performs. Your locked deposit keeps its rate for its term." },
+    { n: "3", t: "Rates rise only when it's proven", d: "A placement's rate can step up only after reporting shows it performs. Your locked deposit keeps its rate for its term." },
   ];
   return (
     <ol className="grid gap-px border border-foreground/15 bg-foreground/15 md:grid-cols-3" data-testid="prove-it-ladder">

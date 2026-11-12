@@ -7,7 +7,8 @@
  * not sold rates and not measured delivery). Copy must label them that way.
  *
  * Starter = the rate a new placement opens at (fill rate).
- * Proven  = where a placement can go once its reporting proves performance.
+ * Public copy shows starter ranges only (Randy brief, Nov 12 2026): rates may
+ * step up once a placement proves out, but no later-rate numbers are published.
  * The category-seat spine (hold $190 / reserve $490 as media credit) and the
  * Stripe checkout are unchanged; these blocks quote on top of it.
  */
@@ -20,17 +21,15 @@ export type RateSurface = {
   short: string;
   where: string;
   cpmStarter: Range;
-  cpmProven: Range;
   cpcStarter: Range;
-  cpcProven: Range;
 };
 
 export const RATE_SURFACES: readonly RateSurface[] = [
-  { key: "landing", label: "Hub landing page (pre-login)", short: "Landing", where: "Top-of-hub banner and native tiles on the co-branded hub home.", cpmStarter: [4, 8], cpmProven: [12, 20], cpcStarter: [0.4, 0.8], cpcProven: [0.8, 1.5] },
-  { key: "dashboard", label: "Member dashboard (post-login)", short: "Dashboard", where: "Logged-in members tracking orders, plans and bookings.", cpmStarter: [10, 18], cpmProven: [25, 45], cpcStarter: [0.8, 1.4], cpcProven: [1.5, 3.0] },
-  { key: "products", label: "Product pages", short: "Products", where: "Inside product pages while members shop recovery gear.", cpmStarter: [12, 22], cpmProven: [35, 60], cpcStarter: [0.7, 1.4], cpcProven: [1.8, 4.0] },
-  { key: "services", label: "Services & booking pages", short: "Services", where: "On service and booking pages, right before an appointment is made.", cpmStarter: [15, 25], cpmProven: [40, 70], cpcStarter: [0.9, 1.8], cpcProven: [2.5, 5.0] },
-  { key: "post_purchase", label: "Post-purchase", short: "Post-purchase", where: "Thank-you and booking-confirmation pages, right after a paid order.", cpmStarter: [18, 30], cpmProven: [50, 90], cpcStarter: [1.2, 2.5], cpcProven: [3.0, 6.5] },
+  { key: "landing", label: "Hub landing page (pre-login)", short: "Landing", where: "Top-of-hub banner and native tiles on the co-branded hub home.", cpmStarter: [4, 8], cpcStarter: [0.4, 0.8] },
+  { key: "dashboard", label: "Member dashboard (post-login)", short: "Dashboard", where: "Logged-in members tracking orders, plans and bookings.", cpmStarter: [10, 18], cpcStarter: [0.8, 1.4] },
+  { key: "products", label: "Product pages", short: "Products", where: "Inside product pages while members shop recovery gear.", cpmStarter: [12, 22], cpcStarter: [0.7, 1.4] },
+  { key: "services", label: "Services & booking pages", short: "Services", where: "On service and booking pages, right before an appointment is made.", cpmStarter: [15, 25], cpcStarter: [0.9, 1.8] },
+  { key: "post_purchase", label: "Post-purchase", short: "Post-purchase", where: "Thank-you and booking-confirmation pages, right after a paid order.", cpmStarter: [18, 30], cpcStarter: [1.2, 2.5] },
 ] as const;
 
 const starterLow = (k: RateSurface["key"]) => RATE_SURFACES.find((s) => s.key === k)!.cpmStarter[0];
@@ -48,7 +47,7 @@ export const HUB_PLACEMENT_STARTER_CPM = {
 } as const;
 
 /** Blended CPM planning anchors (USD). */
-export const BLENDED = { starterCpm: 12, provenCpm: [40, 80] as Range } as const;
+export const BLENDED = { starterCpm: 12 } as const;
 
 /** Public channel ranges used for the comparison (2026 planning estimates, USD). */
 export const CHANNEL_BENCHMARKS = [
@@ -84,7 +83,6 @@ export type PackQuote = {
   discountPct: number;
   startingUsd: number;
   effectiveCpm: number;
-  provenUsd: Range;
   metaUsd: Range;
   needsIo: boolean;
 };
@@ -96,8 +94,6 @@ export function quotePack(keys: RateSurface["key"][], block: number): PackQuote 
   const discountPct = bundleDiscountPct(chosen.length);
   const starting = Math.round(list * (1 - discountPct / 100));
   const views = block * chosen.length;
-  const provenLo = chosen.reduce((a, s) => a + (block / 1000) * s.cpmProven[0], 0);
-  const provenHi = chosen.reduce((a, s) => a + (block / 1000) * s.cpmProven[1], 0);
   return {
     surfaces: chosen.map((s) => s.key),
     block,
@@ -106,21 +102,19 @@ export function quotePack(keys: RateSurface["key"][], block: number): PackQuote 
     discountPct,
     startingUsd: starting,
     effectiveCpm: views ? Math.round((starting / views) * 1000 * 100) / 100 : 0,
-    provenUsd: [Math.round(provenLo), Math.round(provenHi)],
     metaUsd: [Math.round((views / 1000) * META_CPM[0]), Math.round((views / 1000) * META_CPM[1])],
     needsIo: starting > SELF_SERVE_MAX_USD,
   };
 }
 
-export type Scenario = { views: number; starterUsd: number; provenUsd: Range; metaUsd: Range };
+export type Scenario = { views: number; starterUsd: number; metaUsd: Range };
 
-/** Linear illustration: views × blended CPM. 100k ≈ $1.2k starter / $4-8k proven. */
+/** Linear illustration: views × blended starter CPM. 100k ≈ $1.2k starter. */
 export function scenario(views: number): Scenario {
   const k = Math.max(0, views) / 1000;
   return {
     views,
     starterUsd: Math.round(k * BLENDED.starterCpm),
-    provenUsd: [Math.round(k * BLENDED.provenCpm[0]), Math.round(k * BLENDED.provenCpm[1])],
     metaUsd: [Math.round(k * META_CPM[0]), Math.round(k * META_CPM[1])],
   };
 }
