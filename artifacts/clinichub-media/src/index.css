@@ -122,9 +122,9 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
-  /* Anchor jumps (#reserve, #rate-card, …) land below the fixed nav instead of under it. */
-  html {
-    scroll-padding-top: 5rem;
+  /* Anchor jumps land below the fixed 64px nav (same 5rem as Section scroll-mt-20, so no double offset). */
+  [id] {
+    scroll-margin-top: 5rem;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
