@@ -3,7 +3,9 @@ import {
   editorialArticleSourcesTable,
   editorialArticlesTable,
   editorialSourcesTable,
+  FOLDED_INSIGHT_TARGET_SLUG,
   PUBLIC_INSIGHT_ARTICLES,
+  isFoldedPublicInsight,
   isRetractedPublicInsight,
   rewriteAlignNetworkCopy,
   rewriteExclusiveInsightCopy,
@@ -380,6 +382,11 @@ router.get("/insights/:slug", async (req, res) => {
   const slug = req.params.slug;
   if (!slug || !/^[a-z0-9-]+$/.test(slug)) {
     res.status(404).type("html").send(documentPage("Article not found — Birch Reserve", "That insight is not published.", "<h1>Article not found</h1><p><a href=\"/insights\">Insights</a></p>", "/insights"));
+    return;
+  }
+  if (isFoldedPublicInsight(slug)) {
+    // Near-duplicate filler posts were folded into one article (Nov 12 2026).
+    res.redirect(301, `/insights/${FOLDED_INSIGHT_TARGET_SLUG}`);
     return;
   }
   const articles = await listReadableArticles();

@@ -25,7 +25,7 @@ Hold $190 — seven-day category look. Does not take a category seat. Convert to
 
 Reserve $490 — locks in an early category slot among eight brand categories before the minimum goes up. 100% media credit toward flight. An insertion order names the surface before anything runs. Credit expires at twelve months.
 
-Book a call — multi-hub or on-prem Align surfaces.
+Book a call — multi-hub or custom packages.
 
 Reporting is aggregate only. No patient-level data. No clinical pixels. No open auction.
 
@@ -579,32 +579,49 @@ The $190 look does not burn a seat. It lets you start the card before you lock t
 `,
 } as const;
 
+/**
+ * Published insights. Randy, Nov 12 2026: the short near-duplicate posts ("The $490 is the
+ * stamp", "the square ... already opened") read as filler. They are folded into
+ * "What you send for a seat" (301) and no longer listed, seeded, or in the sitemap. Their
+ * copy stays below, unpublished, so nothing is lost.
+ */
 export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
   WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE,
-  THE_FACE_BEFORE_THE_FLIGHT_ARTICLE,
-  ONE_CARD_NAMES_THE_CATEGORY_ARTICLE,
-  THE_ZONE_HAS_A_PRICE_ARTICLE,
-  THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE,
-  THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE,
-  THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE,
-  THE_CARD_STAYS_ON_THE_PAGE_ARTICLE,
-  THE_ZONE_IS_SOLD_BY_NAME_ARTICLE,
-  THE_LOOK_IS_THE_DRAFT_ARTICLE,
-  THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE,
-  THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE,
-  THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE,
-  THE_PREVIEW_IS_SELF_SERVE_ARTICLE,
-  THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE,
-  THE_ZONE_IS_ONE_NAME_ARTICLE,
-  THE_STILL_IS_THE_PREVIEW_ARTICLE,
-  THE_SHELF_IS_ALREADY_SHOPPED_ARTICLE,
-  THE_SQUARE_IS_ALREADY_IN_THE_LETTER_ARTICLE,
-  THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE,
-  THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE,
-  THE_CARD_IS_THE_ONLY_UNIT_ARTICLE,
 ] as const;
+
+/** Where a folded insight slug now points. */
+export const FOLDED_INSIGHT_TARGET_SLUG = WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.slug;
+
+/** Near-duplicate posts folded into FOLDED_INSIGHT_TARGET_SLUG. Public routes 301 them. */
+export const FOLDED_PUBLIC_INSIGHT_SLUGS = [
+  THE_FACE_BEFORE_THE_FLIGHT_ARTICLE.slug,
+  ONE_CARD_NAMES_THE_CATEGORY_ARTICLE.slug,
+  THE_ZONE_HAS_A_PRICE_ARTICLE.slug,
+  THE_LOOK_ASSEMBLES_ON_THE_BRIEF_ARTICLE.slug,
+  THE_CATEGORY_IS_ALREADY_OPEN_ARTICLE.slug,
+  THE_SQUARE_SITS_INSIDE_THE_HUB_ALREADY_OPEN_ARTICLE.slug,
+  THE_CARD_STAYS_ON_THE_PAGE_ARTICLE.slug,
+  THE_ZONE_IS_SOLD_BY_NAME_ARTICLE.slug,
+  THE_LOOK_IS_THE_DRAFT_ARTICLE.slug,
+  THE_HEADER_SITS_ON_THE_AISLE_ALREADY_OPEN_ARTICLE.slug,
+  THE_FACE_IS_APPROVED_ON_THE_BRIEF_ARTICLE.slug,
+  THE_SQUARE_IS_ENDEMIC_TO_THE_RECOVERY_ALREADY_OPEN_ARTICLE.slug,
+  THE_PREVIEW_IS_SELF_SERVE_ARTICLE.slug,
+  THE_CARD_DOES_NOT_LEAVE_THE_PAGE_ARTICLE.slug,
+  THE_ZONE_IS_ONE_NAME_ARTICLE.slug,
+  THE_STILL_IS_THE_PREVIEW_ARTICLE.slug,
+  THE_SHELF_IS_ALREADY_SHOPPED_ARTICLE.slug,
+  THE_SQUARE_IS_ALREADY_IN_THE_LETTER_ARTICLE.slug,
+  THE_KIT_SITS_INSIDE_THE_RECOVERY_ALREADY_OPEN_ARTICLE.slug,
+  THE_LOOK_STARTS_ON_THE_BRIEF_ARTICLE.slug,
+  THE_CARD_IS_THE_ONLY_UNIT_ARTICLE.slug,
+] as const;
+
+export function isFoldedPublicInsight(slug: string): boolean {
+  return (FOLDED_PUBLIC_INSIGHT_SLUGS as readonly string[]).includes(slug);
+}
 
 /**
  * Randy rejected this post on 10 Nov 2026. PR #106 seeded it as published.
@@ -612,8 +629,9 @@ export const PUBLIC_INSIGHT_ARTICLES = [
  */
 export const RETRACTED_PUBLIC_INSIGHT_SLUGS = ["the-zone-is-locked-by-the-buyer"] as const;
 
+/** Not served publicly: retracted posts, and folded posts (which 301 on /insights/:slug). */
 export function isRetractedPublicInsight(slug: string): boolean {
-  return (RETRACTED_PUBLIC_INSIGHT_SLUGS as readonly string[]).includes(slug);
+  return (RETRACTED_PUBLIC_INSIGHT_SLUGS as readonly string[]).includes(slug) || isFoldedPublicInsight(slug);
 }
 
 const ALIGN_NETWORK_CLINIC_SENTENCE =
@@ -633,6 +651,8 @@ export function rewriteAlignNetworkCopy(text: string): string {
  */
 const EXCLUSIVE_INSIGHT_REWRITES: ReadonlyArray<readonly [string, string]> = [
   ["Book a call — multi-hub, exclusive, or on-prem Align surfaces.", "Book a call — multi-hub or on-prem Align surfaces."],
+  // Nov 12 2026: no Align references in public copy.
+  ["Book a call — multi-hub or on-prem Align surfaces.", "Book a call — multi-hub or custom packages."],
   ["show up in that trusted context with category exclusivity.", "show up in that trusted context with an early category slot."],
   ["Category exclusivity keeps the aisle clean.", "Lock an early slot in your category before the minimum goes up."],
   ["Multi-hub or exclusive work is a call with Silver Birch Growth.", "Multi-hub work is a call with Silver Birch Growth."],

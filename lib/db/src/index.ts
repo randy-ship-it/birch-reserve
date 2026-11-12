@@ -21,8 +21,11 @@ export function databaseForClient(client: PoolClient): WorkspaceDatabase {
 
 export * from "./schema";
 export {
+  FOLDED_INSIGHT_TARGET_SLUG,
+  FOLDED_PUBLIC_INSIGHT_SLUGS,
   PUBLIC_INSIGHT_ARTICLES,
   RETRACTED_PUBLIC_INSIGHT_SLUGS,
+  isFoldedPublicInsight,
   isRetractedPublicInsight,
   rewriteAlignNetworkCopy,
   rewriteExclusiveInsightCopy,
