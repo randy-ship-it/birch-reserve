@@ -12,7 +12,7 @@
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { getStripeClient } from "../lib/stripeClient";
 import { logger } from "../lib/logger";
-import { sendIntake } from "../lib/overhaul/fridayIntake";
+import { sendIntakeAndAlert as sendIntake } from "../lib/overhaul/fridayIntake";
 import {
   CUSTOM_MAX,
   CUSTOM_MIN,
@@ -278,6 +278,12 @@ router.post("/v1/sponsor/deposit", express.json({ limit: "8kb" }), async (req: R
   if (!built.ok) {
     res.status(400).json({ error: built.error });
     return;
+  }
+  // Every attempt reaches Friday + the instant alert, paid or not.
+  {
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const email = typeof b.email === "string" ? b.email.trim().slice(0, 320) : "";
+    await sendIntake({ kind: "deposit_interest", email: email || undefined, company: typeof b.brand === "string" ? b.brand.slice(0, 160) : undefined, path: "/sponsor", meta: { tier: String(b.tier ?? ""), amount: built.amountCents / 100, currency: built.currency, checkout_open: true } }).catch(() => undefined);
   }
   try {
     const session = await getStripeClient().checkout.sessions.create(built.params as never);

@@ -368,7 +368,7 @@ export function ChannelBenchmarks() {
         </tbody>
       </table>
       <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-        USD. <Estimate>Planning ranges</Estimate> Typical 2026 ranges we use for planning, not audited benchmarks. Logged-in, first-party audiences typically price 25–40% above open inventory, and endemic direct deals can run well above open programmatic.
+        USD. <Estimate>Public 2026 benchmark ranges</Estimate> Typical public 2026 ranges for health and wellness, shown for comparison only; not Birch results and not audited. Logged-in, first-party audiences typically price 25–40% above open inventory, and endemic direct deals can run well above open programmatic.
       </p>
     </div>
   );

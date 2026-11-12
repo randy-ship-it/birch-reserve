@@ -1,5 +1,6 @@
 /** Per-route head + llms.txt for the overhaul routes (crawlable without JS). */
 import { slotOffers, areaLockOffer } from "./agent";
+import { BLOCK_NOTE, CONTACT, IMPRESSION_BLOCKS, NETWORK, SEAT_CATEGORIES, SEAT_SKUS } from "../seats/catalog";
 import { AGENCY, AREA_LOCK, BRAND_HUBS, INVENTORY, PLACEMENT_LABELS, PUBLISHER_INCENTIVE, SLOT_LADDER, TAM, areaLockGuaranteedViews } from "./model";
 
 export const OVERHAUL_OG_IMAGE = "https://birchreserve.net/og-birch-reserve-hubs.png";
@@ -82,6 +83,16 @@ export function llmsTxt(): string {
     "",
     `Audience (modelled, ${TAM.source}, read ${TAM.readOn}): ${TAM.ordersLabel} ${TAM.ordersNote}; ${TAM.viewsLabel} ${TAM.viewsNote}; ${TAM.listedPartners} listed partners.`,
     "",
+    "## Category seats (lead offer): endemic recovery ad inventory",
+    `- Eight recovery categories, one brand per category: ${SEAT_CATEGORIES.map((c) => c.label).join(" · ")}.`,
+    ...SEAT_SKUS.map((k) => `- ${k.sku} · $${k.usd} USD ($${k.cad} CAD) · ${k.name} · ${k.line}`),
+    `- Optional impression blocks at starter rates: ${IMPRESSION_BLOCKS.map((b) => `${b.key} (${b.name}, ${b.views.toLocaleString("en-US")} views est., $${b.usd.toLocaleString("en-US")} USD)`).join(" · ")}. ${BLOCK_NOTE}`,
+    "- Live availability (X of 8 open; open is null = call to confirm): GET https://birchreserve.net/v1/seats/availability.json",
+    "- Hold / lock / waitlist / lock request / block request: POST https://birchreserve.net/v1/seats/request {action, category | block, brand, email, phone?}. Saved to the Birch pipeline and sent to sales instantly. While checkout is held: reserved by inquiry, confirmed within 1 business day, no charge.",
+    "- Human page: https://birchreserve.net/buycalc#seats · Rates: https://birchreserve.net/rates",
+    `- Surfaces: ${NETWORK.line} Map: ${NETWORK.mapUrl} (${NETWORK.estimateNote})`,
+    `- Talk to sales: ${CONTACT.phoneDisplay} · ${CONTACT.email}`,
+    "",
     "## Advertise",
     `- Brands, spend commits: https://birchreserve.net/advertise/brands · ${SLOT_LADDER.map((t) => `$${t.usd} USD${t.bonusPct ? ` (+${t.bonusPct}% credit)` : ""}`).join(" · ")}. CAD: ${SLOT_LADDER.map((t) => `$${t.cad}`).join(" · ")}.`,
     `- Local businesses & studios, Lock down my area: https://birchreserve.net/advertise/local · $${AREA_LOCK.priceCad} CAD / $${AREA_LOCK.priceUsd} USD (launch rate until ${AREA_LOCK.launchRateUntil}) · up to ${AREA_LOCK.standardSharePct}% of display within ${AREA_LOCK.radiusKm} km (${AREA_LOCK.denseCoreSharePct}% in dense downtown cores) · 1-6 months from display start · credit at ${AREA_LOCK.discountPct}% off rate card · ${g.views.toLocaleString("en-US")} modelled page views across hubs · right to keep pace if traffic grows · ${AREA_LOCK.followOnDiscountPct}% off rate card on follow-on spend up to $${AREA_LOCK.followOnCapUsd.toLocaleString("en-US")} USD per locker over the term · ${AREA_LOCK.unusedCredit}`,
@@ -94,10 +105,10 @@ export function llmsTxt(): string {
     "## For AI buying agents",
     "- Start here: https://birchreserve.net/ai-buyers",
     "- Catalog (inventory, placements, offers, modelled views, checkout status): GET https://birchreserve.net/v1/agent/catalog.json",
-    "- Quote: GET /v1/agent/quote?offer=sponsor-1500&currency=usd · GET /v1/agent/quote?offer=area-lock&postal=M4E1G3&term=3",
-    "- Checkout: POST /v1/agent/checkout {offer, currency, email, brand | business+category+postal+term, agree:true}. Returns status open + Stripe-hosted checkout_url, or status held (reserved by inquiry, no charge, confirmed within 1 business day).",
+    "- Quote: GET /v1/agent/quote?offer=reserve-490&currency=usd · GET /v1/agent/quote?offer=block-dashboard-250k · GET /v1/agent/quote?offer=sponsor-1500&currency=usd · GET /v1/agent/quote?offer=area-lock&postal=M4E1G3&term=3",
+    "- Checkout: POST /v1/agent/checkout {offer, currency, email, brand (+category for hold-190 / reserve-490) | business+category+postal+term, agree:true}. Returns status open + Stripe-hosted checkout_url, or status held (reserved by inquiry, no charge, confirmed within 1 business day).",
     "- OpenAPI: https://birchreserve.net/v1/agent/openapi.json · Agent card: https://birchreserve.net/.well-known/agent.json · UCP: https://birchreserve.net/.well-known/ucp",
-    "- Offer keys: " + [...slotOffers().map((o) => `${o.offer_key} ($${o.prices.usd} USD / $${o.prices.cad} CAD, ~${o.modelled_hub_page_views.toLocaleString("en-US")} modelled views)`), "area-lock"].join(" · "),
+    "- Offer keys: " + [...SEAT_SKUS.map((k) => `${k.sku} ($${k.usd} USD / $${k.cad} CAD, needs category)`), ...slotOffers().map((o) => `${o.offer_key} ($${o.prices.usd} USD / $${o.prices.cad} CAD, ~${o.modelled_hub_page_views.toLocaleString("en-US")} modelled views)`), "area-lock"].join(" · "),
     "- Always show the buyer the terms and price before sending agree:true.",
     "",
     "## Agencies",

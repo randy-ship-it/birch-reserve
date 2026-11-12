@@ -9,6 +9,7 @@ import publicPagesRouter from "./routes/publicPages";
 import sponsorPageRouter from "./routes/sponsorPage";
 import { createOverhaulRouter } from "./routes/overhaul";
 import { createAgentRouter } from "./routes/agent";
+import { createSeatsRouter } from "./routes/seats";
 import { getStripeClient } from "./lib/stripeClient";
 import publicSeoRouter, { unknownDocument } from "./routes/publicSeo";
 import { indexNowKeyRouter } from "./routes/indexNow";
@@ -88,6 +89,16 @@ app.use(
       const s = await getStripeClient().checkout.sessions.create(params as never);
       return { url: s.url, livemode: s.livemode };
     },
+  }),
+);
+// Category seats (Nov 12 2026): availability, hold/lock/waitlist requests, instant alerts. Gated checkout.
+app.use(
+  createSeatsRouter({
+    createSession: async (params) => {
+      const s = await getStripeClient().checkout.sessions.create(params as never);
+      return { url: s.url, livemode: s.livemode };
+    },
+    log: (msg, extra) => logger.info({ extra }, `seats ${msg}`),
   }),
 );
 app.use(sponsorPageRouter);

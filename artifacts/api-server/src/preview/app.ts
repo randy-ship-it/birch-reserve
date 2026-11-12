@@ -6,6 +6,7 @@
 import express, { type Express } from "express";
 import { createOverhaulRouter } from "../routes/overhaul";
 import { createAgentRouter } from "../routes/agent";
+import { createSeatsRouter } from "../routes/seats";
 import sponsorPageRouter from "../routes/sponsorPage";
 import { getStripeClient } from "../lib/stripeClient";
 import { decideCurrency, currencyCookieHeader } from "../lib/currency";
@@ -38,6 +39,7 @@ export function createPreviewApp(indexHtml: string): Express {
       },
     }),
   );
+  app.use(createSeatsRouter({ log: (msg, extra) => console.log(`seats ${msg}`, extra ?? "") }));
   app.use(sponsorPageRouter);
   app.get("/api/currency", (req, res) => {
     const d = decideCurrency(req);

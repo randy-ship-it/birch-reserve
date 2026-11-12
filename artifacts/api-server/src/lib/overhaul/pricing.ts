@@ -50,9 +50,10 @@ export const HUB_PLACEMENT_STARTER_CPM = {
 /** Blended CPM planning anchors (USD). */
 export const BLENDED = { starterCpm: 12, provenCpm: [40, 80] as Range } as const;
 
-/** Public channel ranges used for the comparison (2026 planning estimates, USD). */
+/** Public 2026 benchmark ranges (health / wellness / recovery, USD) from the Nov 12 pricing model, used only for comparison. */
 export const CHANNEL_BENCHMARKS = [
   { key: "meta", label: "Meta, health & wellness", cpm: [12, 25] as Range, cpc: [0.6, 2.6] as Range },
+  { key: "google_display", label: "Google Display", cpm: [3, 10] as Range, cpc: [0.7, 1.5] as Range },
   { key: "google", label: "Google search, health", cpm: null, cpc: [1.6, 6] as Range, cpcPlus: true },
   { key: "retail", label: "Retail media display", cpm: [6, 22] as Range, cpc: null },
   { key: "sponsored", label: "Retail sponsored products", cpm: null, cpc: [0.65, 1.6] as Range },

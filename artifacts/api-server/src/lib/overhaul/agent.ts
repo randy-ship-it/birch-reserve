@@ -5,7 +5,10 @@
  */
 import { AGENCY, AREA_LOCK, BRAND_HUBS, INVENTORY, PLACEMENT_LABELS, PUBLISHER_INCENTIVE, CPC_FLOOR_USD, SLOT_LADDER, SURFACES, TAM, areaLockGuaranteedViews, blendedHubCpmUsd, quoteAreaLock, type Currency } from "./model";
 
-export const AGENT_CATALOG_VERSION = "2026-11-12";
+import { BLOCK_NOTE, CONTACT, IMPRESSION_BLOCKS, SEAT_CATEGORIES, SEAT_SKUS, blockByKey, seatSku } from "../seats/catalog";
+import type { SeatAvailability } from "../seats/availability";
+
+export const AGENT_CATALOG_VERSION = "2026-11-12.seats";
 export const SITE = "https://birchreserve.net";
 export const HANDOFF_EMAIL = "sales@silverbirchgrowth.com";
 
@@ -63,7 +66,34 @@ export function areaLockOffer() {
   };
 }
 
-export function agentCatalog(status: { slotsCheckout: boolean; areaLockCheckout: boolean }) {
+/** Category seats + impression blocks, with live availability (Friday -> BR ledger -> call to confirm). */
+export function seatOffers(seats?: SeatAvailability, seatsCheckout = false) {
+  return {
+    model: "Eight recovery categories, one brand per category. Lead offers: hold-190 ($190 7-day look) and reserve-490 ($490 named category seat, media credit).",
+    availability: seats
+      ? { source: seats.source, as_of: seats.as_of, open: seats.open, total: seats.total, confirm_by_phone: seats.confirm_by_phone, categories: seats.categories.map((c) => ({ slug: c.slug, label: c.label, status: c.status })), note: seats.note }
+      : { source: "none", open: null, total: SEAT_CATEGORIES.length, confirm_by_phone: true },
+    skus: SEAT_SKUS.map((s) => ({
+      offer_key: s.sku,
+      sku: s.sku,
+      name: s.name,
+      type: s.sku === "hold-190" ? "category_look_7_day" : "named_category_seat",
+      prices: { usd: s.usd, cad: s.cad },
+      media_credit: true,
+      terms: s.line,
+      requires: ["category (slug)", "brand", "email", "agree:true"],
+      checkout: { method: "POST", path: "/v1/agent/checkout", body: { offer: s.sku, category: SEAT_CATEGORIES.map((c) => c.slug).join("|"), brand: "string", email: "string", currency: "usd|cad", agree: true } },
+      human_page: `${SITE}/buycalc#seats`,
+    })),
+    impression_blocks: IMPRESSION_BLOCKS.map((b) => ({ offer_key: b.key, name: `${b.name} · ${b.views.toLocaleString("en-US")} views`, surface: b.surfaceLabel, views_estimated: b.views, starter_cpm_usd: b.starterCpmUsd, prices: { usd: b.usd, cad: b.cad }, guaranteed: false, request: { method: "POST", path: "/v1/seats/request", body: { action: "block_request", block: b.key, brand: "string", email: "string" } } })),
+    block_note: BLOCK_NOTE,
+    waitlist: { method: "POST", path: "/v1/seats/request", body: { action: "waitlist", category: "slug", brand: "string", email: "string" } },
+    checkout: seatsCheckout ? "open" : "held",
+    contact: { phone: CONTACT.phoneDisplay, email: CONTACT.email },
+  };
+}
+
+export function agentCatalog(status: { slotsCheckout: boolean; areaLockCheckout: boolean; seatsCheckout?: boolean }, seats?: SeatAvailability) {
   return {
     catalog_version: AGENT_CATALOG_VERSION,
     seller: { name: "Birch Reserve", legal_name: "Silver Birch Growth Inc.", url: SITE, email: HANDOFF_EMAIL, address: "777-2255B Queen St E, Toronto ON M4E 1G3, Canada" },
@@ -85,8 +115,10 @@ export function agentCatalog(status: { slotsCheckout: boolean; areaLockCheckout:
       spend_down_months_from_deposit: INVENTORY.liveSpendDownMonths,
       queue: { multiple_of_live: INVENTORY.queueMultiple, by: INVENTORY.queueBy, deposits_accepted: true, note: INVENTORY.queueLine },
     },
+    category_seats: seatOffers(seats, status.seatsCheckout ?? false),
     offers: [...slotOffers(), areaLockOffer()],
     checkout_status: {
+      category_seats: status.seatsCheckout ? "open" : "held",
       spend_commits: status.slotsCheckout ? "open" : "held",
       area_lock: status.areaLockCheckout ? "open" : "held",
       held_means: `Checkout returns status "held": reserved by inquiry, confirmed within 1 business day by email from ${HANDOFF_EMAIL}. No charge is made.`,
@@ -109,6 +141,9 @@ export function agentCatalog(status: { slotsCheckout: boolean; areaLockCheckout:
       ucp: "/.well-known/ucp",
       llms: "/llms.txt",
       legacy_catalog: "/v1/catalog.json",
+      seats_availability: "/v1/seats/availability.json",
+      seats_catalog: "/v1/seats/catalog.json",
+      seats_request: "/v1/seats/request",
     },
     rules: [
       "Aggregate reporting only. No patient data, no clinical pixels, no open auction.",
@@ -130,8 +165,18 @@ export function agentQuote(input: AgentQuoteInput) {
     if (!q.ok) return { ok: false as const, error: q.error };
     return { ok: true as const, offer: "area-lock", currency: q.currency, amount: q.price, quote: q, checkout: { method: "POST", path: "/v1/agent/checkout" } };
   }
+  const seat = seatSku(offer);
+  if (seat) {
+    const c: Currency = currency ?? "usd";
+    return { ok: true as const, offer: seat.sku, currency: c, amount: c === "cad" ? seat.cad : seat.usd, media_credit: c === "cad" ? seat.cad : seat.usd, terms: seat.line, requires_category: true, availability: "/v1/seats/availability.json", checkout: { method: "POST", path: "/v1/agent/checkout" } };
+  }
+  const block = blockByKey(offer);
+  if (block) {
+    const c: Currency = currency ?? "usd";
+    return { ok: true as const, offer: block.key, currency: c, amount: c === "cad" ? block.cad : block.usd, views_estimated: block.views, guaranteed: false, note: BLOCK_NOTE, request: { method: "POST", path: "/v1/seats/request" } };
+  }
   const slot = slotOffers().find((s) => s.offer_key === offer);
-  if (!slot) return { ok: false as const, error: `Unknown offer. Use one of: ${[...SLOT_LADDER.map((s) => s.key), "area-lock"].join(", ")}.` };
+  if (!slot) return { ok: false as const, error: `Unknown offer. Use one of: ${[...SEAT_SKUS.map((s) => s.sku), ...IMPRESSION_BLOCKS.map((b) => b.key), ...SLOT_LADDER.map((s) => s.key), "area-lock"].join(", ")}.` };
   const c: Currency = currency ?? "usd";
   return {
     ok: true as const,
@@ -161,6 +206,8 @@ export function agentCard() {
     capabilities: { streaming: false, payments: "stripe_hosted_checkout_handoff" },
     skills: [
       { id: "browse_inventory", name: "Browse inventory and offers", endpoint: "GET /v1/agent/catalog.json" },
+      { id: "seat_availability", name: "Live category seat availability", endpoint: "GET /v1/seats/availability.json" },
+      { id: "seat_request", name: "Hold, lock, waitlist or request an impression block", endpoint: "POST /v1/seats/request" },
       { id: "match_audience", name: "Score a brand's audience fit (modelled)", endpoint: "POST /v1/match" },
       { id: "quote", name: "Quote an offer", endpoint: "GET /v1/agent/quote" },
       { id: "checkout", name: "Open Stripe checkout or hold the request", endpoint: "POST /v1/agent/checkout" },
@@ -169,7 +216,8 @@ export function agentCard() {
 }
 
 export function agentOpenApi() {
-  const offerEnum = [...SLOT_LADDER.map((s) => s.key), "area-lock"];
+  const offerEnum = [...SEAT_SKUS.map((s) => s.sku), ...IMPRESSION_BLOCKS.map((b) => b.key), ...SLOT_LADDER.map((s) => s.key), "area-lock"];
+  const checkoutEnum = [...SEAT_SKUS.map((s) => s.sku), ...SLOT_LADDER.map((s) => s.key), "area-lock"];
   return {
     openapi: "3.1.0",
     info: { title: "Birch Reserve agent buying API", version: AGENT_CATALOG_VERSION, description: "Catalog, quote and checkout for AI buying agents. Audience figures are modelled. Checkout returns a Stripe-hosted URL when open, otherwise status held (saved, no charge).", contact: { email: HANDOFF_EMAIL } },
@@ -201,12 +249,12 @@ export function agentOpenApi() {
                   type: "object",
                   required: ["offer", "email", "agree"],
                   properties: {
-                    offer: { type: "string", enum: offerEnum },
+                    offer: { type: "string", enum: checkoutEnum },
                     currency: { type: "string", enum: ["usd", "cad"] },
                     email: { type: "string", format: "email" },
                     brand: { type: "string", description: "Required for spend commits." },
                     business: { type: "string", description: "Required for area-lock." },
-                    category: { type: "string", description: "Required for area-lock." },
+                    category: { type: "string", description: "Required for area-lock and for hold-190 / reserve-490 (category slug from /v1/seats/availability.json)." },
                     postal: { type: "string" },
                     term: { type: "integer", minimum: 1, maximum: 6 },
                     website: { type: "string" },
@@ -218,6 +266,15 @@ export function agentOpenApi() {
             },
           },
           responses: { "200": { description: "status open with a Stripe checkout url" }, "202": { description: "status held: saved, no charge, a person follows up" }, "400": { description: "Bad input" } },
+        },
+      },
+      "/v1/seats/availability.json": { get: { operationId: "getSeatAvailability", summary: "Live category seat availability. open is null when it must be confirmed by phone.", responses: { "200": { description: "Availability" } } } },
+      "/v1/seats/request": {
+        post: {
+          operationId: "requestSeat",
+          summary: "Hold, lock, waitlist, lock request or impression-block request. Saved to the Birch pipeline and alerted to sales instantly.",
+          requestBody: { required: true, content: { "application/json": { schema: { type: "object", required: ["action", "brand", "email"], properties: { action: { type: "string", enum: ["hold", "lock", "waitlist", "lock_request", "block_request"] }, category: { type: "string", enum: SEAT_CATEGORIES.map((c) => c.slug) }, block: { type: "string", enum: IMPRESSION_BLOCKS.map((b) => b.key) }, brand: { type: "string" }, email: { type: "string", format: "email" }, name: { type: "string" }, phone: { type: "string" }, website: { type: "string" }, timing: { type: "string" }, message: { type: "string" }, currency: { type: "string", enum: ["usd", "cad"] } } } } } },
+          responses: { "200": { description: "held (reserved by inquiry) or checkout_url when seat checkout is open" }, "400": { description: "Bad input" }, "429": { description: "Rate limited" } },
         },
       },
       "/v1/match": { post: { operationId: "matchAudience", summary: "Modelled audience match score for a URL + blurb", requestBody: { content: { "application/json": { schema: { type: "object", required: ["url"], properties: { url: { type: "string" }, blurb: { type: "string" }, email: { type: "string" } } } } } }, responses: { "200": { description: "Score, 3 reasons, recommended offer" } } } },

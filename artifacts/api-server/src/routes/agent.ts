@@ -2,10 +2,13 @@
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { agentCard, agentCatalog, agentOpenApi, agentQuote, HANDOFF_EMAIL } from "../lib/overhaul/agent";
 import { buildAreaLockSession, checkoutGate } from "../lib/overhaul/checkout";
-import { sendIntake } from "../lib/overhaul/fridayIntake";
+import { sendIntakeAndAlert as sendIntake } from "../lib/overhaul/fridayIntake";
 import { SLOT_LADDER } from "../lib/overhaul/model";
 import { buildDepositSession } from "./sponsorPage";
 import type { CreateSession } from "./overhaul";
+import { buildSeatSession, seatsGate } from "../lib/seats/checkout";
+import { seatSku } from "../lib/seats/catalog";
+import { getSeatAvailability } from "../lib/seats/availability";
 
 const str = (v: unknown, max = 300) => String(v ?? "").trim().slice(0, max);
 
@@ -24,10 +27,10 @@ export function createAgentRouter(deps: { createSession?: CreateSession; log?: (
     next();
   };
 
-  router.get("/v1/agent/catalog.json", cors, (_req, res) => {
+  router.get("/v1/agent/catalog.json", cors, async (_req, res) => {
     const g = gates();
-    res.set("Cache-Control", "public, max-age=300");
-    res.json(agentCatalog({ slotsCheckout: g.slots.open && !!deps.createSession, areaLockCheckout: g.area.open && !!deps.createSession }));
+    res.set("Cache-Control", "public, max-age=60");
+    res.json(agentCatalog({ slotsCheckout: g.slots.open && !!deps.createSession, areaLockCheckout: g.area.open && !!deps.createSession, seatsCheckout: seatsGate().open && !!deps.createSession }, await getSeatAvailability()));
   });
 
   router.get("/v1/agent/quote", cors, (req, res) => {
@@ -51,6 +54,12 @@ export function createAgentRouter(deps: { createSession?: CreateSession; log?: (
     if (offer === "area-lock") {
       built = buildAreaLockSession(body, origin);
       gateOpen = g.area.open;
+    } else if (seatSku(offer)) {
+      // Category seats: hold-190 / reserve-490 with a category. Gate: SEATS_ENABLED / SEATS_LIVE.
+      built = buildSeatSession({ sku: offer, category: body.category, brand: body.brand, email: body.email, website: body.website, currency: body.currency }, origin);
+      const seats = await getSeatAvailability();
+      const st = seats.categories.find((c) => c.slug === String((built.ok && (built.params.metadata as Record<string, string>).category) || ""))?.status;
+      gateOpen = seatsGate().open && st === "open";
     } else {
       const slot = SLOT_LADDER.find((s) => s.key === offer);
       if (!slot) {
