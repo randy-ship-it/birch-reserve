@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'wouter';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import birchReserveMark from '@assets/brand/birch-reserve-mark-v2.svg';
 import { SELLER_EMAIL_HREF, SELLER_IDENTITY } from '@/lib/seller-identity';
@@ -42,6 +42,22 @@ const FOOTER_COLS = [
 export function Layout({ children }: { children: ReactNode }) {
   const basePath = import.meta.env.BASE_URL;
   const [location] = useLocation();
+
+  // SPA deep links (/advertise/brands#slots): the target renders after load, so the browser's
+  // own fragment jump misses it. Scroll once it exists; [id] scroll-margin-top clears the fixed nav.
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (!id) return;
+    let tries = 0;
+    const t = window.setInterval(() => {
+      const el = document.getElementById(id);
+      if (el || ++tries > 20) {
+        window.clearInterval(t);
+        el?.scrollIntoView({ block: 'start' });
+      }
+    }, 100);
+    return () => window.clearInterval(t);
+  }, [location]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 
