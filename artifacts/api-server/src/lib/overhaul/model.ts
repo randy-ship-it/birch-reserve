@@ -10,6 +10,7 @@
  * Copy rules: never name the clinic operator; say "clinic hubs". Listed, not
  * signed. Do-not-pitch brands never appear.
  */
+import { HUB_PLACEMENT_STARTER_CPM as STARTER } from "./pricing";
 import { HUBS as KIT_HUBS, SLOTS, DEPOSIT_TIERS, CUSTOM_MIN, CUSTOM_MAX, SMB_LADDER, toCad, type Hub, type Slot } from "../sponsorKit";
 
 export { SLOTS, DEPOSIT_TIERS, CUSTOM_MIN, CUSTOM_MAX, SMB_LADDER, toCad };
@@ -46,12 +47,12 @@ export const TAM = {
   ctrHi: 0.0107,
 } as const;
 
-/** The four hub placements (Randy, Nov 12 1:10 PM), each sold as display or CPC. */
+/** The four hub placements (Randy, Nov 12 1:10 PM), each sold as display or CPC. cpmUsd = starter (starting-at) rate from pricing.ts, an illustrative estimate. */
 export const SURFACES = [
-  { key: "post_purchase", label: "Post-Purchase", cpmUsd: 30, monthly: TAM.monthly.postPurchase, blurb: "On the thank-you and booking-confirmation page, right after a paid order or booking." },
-  { key: "hub_home", label: "Hub Home Page", cpmUsd: 15, monthly: TAM.monthly.hubHome, blurb: "Top-of-hub banner and native tiles on the co-branded hub home." },
-  { key: "product_services", label: "Product / Services pages", cpmUsd: 18, monthly: TAM.monthly.productServices, blurb: "Inside product, service and booking pages while the visitor is browsing." },
-  { key: "member_dashboard", label: "Member Dashboard (behind login)", cpmUsd: 18, monthly: TAM.monthly.memberDashboard, blurb: "On the logged-in member dashboard, where members come back to track orders, plans and bookings." },
+  { key: "post_purchase", label: "Post-Purchase", cpmUsd: STARTER.post_purchase, monthly: TAM.monthly.postPurchase, blurb: "On the thank-you and booking-confirmation page, right after a paid order or booking." },
+  { key: "hub_home", label: "Hub Home Page", cpmUsd: STARTER.hub_home, monthly: TAM.monthly.hubHome, blurb: "Top-of-hub banner and native tiles on the co-branded hub home." },
+  { key: "product_services", label: "Product / Services pages", cpmUsd: STARTER.product_services, monthly: TAM.monthly.productServices, blurb: "Inside product, service and booking pages while the visitor is browsing." },
+  { key: "member_dashboard", label: "Member Dashboard (behind login)", cpmUsd: STARTER.member_dashboard, monthly: TAM.monthly.memberDashboard, blurb: "On the logged-in member dashboard, where members come back to track orders, plans and bookings." },
 ] as const;
 
 export const PLACEMENT_LABELS = SURFACES.map((s) => s.label);
@@ -219,7 +220,7 @@ export function lookupArea(raw: string): AreaLookup {
   return { ok: false, error: "Enter a Canadian postal code (like L4C 3G5) or a US ZIP (like 98052)." };
 }
 
-/** Guaranteed views (modelled) the deposit buys: credit at rate card ÷ blended hub CPM, rounded down to 10k. */
+/** Page views (modelled, illustrative estimate) the deposit buys: credit at the starter rate card ÷ blended hub CPM, rounded down to 10k. The charged price (AREA_LOCK.priceUsd/priceCad) does not depend on this. */
 export function areaLockGuaranteedViews(): { creditUsd: number; blendedCpmUsd: number; views: number; effectiveCpmUsd: number } {
   const creditUsd = AREA_LOCK.priceUsd / (1 - AREA_LOCK.discountPct / 100);
   const blendedCpmUsd = blendedHubCpmUsd();

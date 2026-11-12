@@ -10,7 +10,8 @@
  * 2–3 qualifying questions; next step is an AI call (tel) or a callback request;
  * No calendar CTA anywhere (HARD 5:28pm): partnerships get a callback intake. Every session is logged
  * server-side and emailed to Randy.
- * HARD 3:52pm ET: visitor-facing identity is "Randy from Birch Reserve"; no internal labels.
+ * Visitor-facing identity (Randy, Nov 12 2026 2:58 PM ET): the "Birch Q&A Squirrel"; calls and
+ * callbacks still come from Randy's line and Randy's team. No internal labels.
  * Checkout ON for hold-190 / reserve-490. Enterprise inquire-within only (no Stripe SKU).
  */
 import React, { useCallback, useEffect, useRef, useState } from "react";

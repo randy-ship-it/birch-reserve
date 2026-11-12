@@ -151,7 +151,7 @@ test("randy-chat rejects unknown fields", async () => {
 });
 
 test("randy-chat site scope is Birch Reserve only", () => {
-  assert.match(BIRCH_SITE_SCOPE_PROMPT, /You are Randy from Birch Reserve\. Lead with Birch Reserve/);
+  assert.match(BIRCH_SITE_SCOPE_PROMPT, /You are the Birch Q&A Squirrel, the Birch Reserve site-chat guide[^.]*\. Lead with Birch Reserve/);
   assert.match(BIRCH_SITE_SCOPE_PROMPT, /Never pitch the portfolio/);
   assert.match(BIRCH_SITE_SCOPE_PROMPT, /physio\.drhonow\.com/);
   assert.doesNotMatch(BIRCH_SITE_SCOPE_PROMPT, /899/);
@@ -262,8 +262,8 @@ test("assembled prompt includes verified routing, excludes do-not-route URLs and
     .join("\n");
   assert.doesNotMatch(withoutBanList, /point.?guard|pre-?screen/i);
   assert.match(prompt, /who are you/i);
-  assert.match(prompt, /Randy from Birch Reserve/);
-  assert.match(prompt, /AI version of Randy/);
+  assert.match(prompt, /the Birch Q&A Squirrel/);
+  assert.match(prompt, /an AI guide for Birch Reserve/);
 });
 
 test("mergeMessages keeps earlier turns when the client trims the head", () => {
@@ -419,7 +419,9 @@ test("sales-brain prompt: QA answers present, no phone digits, identity fixed", 
   assert.match(prompt, /What's Scale Health\?/);
   assert.match(prompt, /I want to talk to someone/);
   assert.match(prompt, /https:\/\/birchreserve\.net\/kit/);
-  assert.match(prompt, /I'm Randy from Birch Reserve/);
+  // Nov 12 2026: site chat is the Birch Q&A Squirrel (phone stays Randy).
+  assert.match(prompt, /I'm the Birch Q&A Squirrel/);
+  assert.doesNotMatch(prompt, /You are Randy|I'm Randy from Birch Reserve|AI version of Randy/);
   assert.doesNotMatch(prompt.replace(/Do not call yourself[^.]*\./g, "").replace(/Never “Randy’s assistant”[^\n]*/g, ""), /voice assistant/i);
 });
 
@@ -438,16 +440,16 @@ test("polishReply: no em dashes, no intro on any reply unless asked who / bot", 
   );
   assert.equal(
     polishReply("I'm Randy from Birch Reserve, an AI version of Randy.", [{ role: "user", content: "are you a bot?" }]),
-    "I'm Randy from Birch Reserve, an AI version of Randy.",
+    "I'm the Birch Q&A Squirrel, an AI guide for Birch Reserve.",
   );
   assert.equal(
     polishReply("I'm Randy from Birch Reserve. I help brands.", [{ role: "user", content: "who is this?" }]),
-    "I'm Randy from Birch Reserve. I help brands.",
+    "I'm the Birch Q&A Squirrel. I help brands.",
   );
   assert.equal(polishReply("I'm Randy from Birch Reserve. Sounds like a fit.", later), "Sounds like a fit.");
   assert.equal(
     polishReply("I'm Randy from Birch Reserve. I help brands.", [...later, { role: "user", content: "wait, who are you?" }]),
-    "I'm Randy from Birch Reserve. I help brands.",
+    "I'm the Birch Q&A Squirrel. I help brands.",
   );
   assert.doesNotMatch(loadVoiceCloserSystemPrompt(true).replace(/\(no "\u2014" or "\u2013"\)/, ""), /\u2014/);
   assert.match(loadVoiceCloserSystemPrompt(true), /Want me to text or email that to you\?/);

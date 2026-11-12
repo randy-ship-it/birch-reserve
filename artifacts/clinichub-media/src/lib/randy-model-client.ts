@@ -131,6 +131,13 @@ async function stubRandyReply(
   const lastUser = [...req.messages].reverse().find((m) => m.role === "user");
   const chip = req.chipId;
 
+  if (/\b(who (are|r) (you|u)|who('s| is) this|your name|are (you|u) (a |an )?(ai|bot|human|real))\b/i.test(lastUser?.content ?? "")) {
+    return {
+      text: "I'm the Birch Q&A Squirrel, the AI guide on Birch Reserve. I help brands get early slots on the Reserve List inside recovery hubs. Want a real person? Tap Call for Randy's line or ask for a callback from Randy's team. What are you working on?",
+      source: "stub",
+    };
+  }
+
   if (chip === "talk_human" || /\b(call|human|phone)\b/i.test(lastUser?.content ?? "")) {
     return {
       text: `Happy to connect you live. Tap Call for ${RANDY_TEL_DISPLAY}. Or leave your details here and the team will call you back.`,

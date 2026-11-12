@@ -10,6 +10,8 @@
  * factor the TAM feed uses to reach its 20MM+ order total.
  */
 
+import { HUB_PLACEMENT_STARTER_CPM as STARTER } from "./overhaul/pricing";
+
 export type Currency = "usd" | "cad";
 
 /** CAD list prices follow the existing ladder ($190→$270, $490→$690): ~1.4x, rounded to $10. */
@@ -34,13 +36,14 @@ export type Slot = {
 };
 
 /** Proposed CPMs (USD). Comps are cited on the kit page. */
+/** Core hub slots use the starter (starting-at) CPMs from overhaul/pricing.ts (illustrative estimates, Nov 12 2026). Partner email / site keep their own rates. */
 export const SLOTS: Slot[] = [
   {
     key: "thank_you",
     label: "Thank-you (after buy or book)",
     where: "Order confirmation or booking confirmation on the hub",
     size: "656×280 splash · 360×640 vertical",
-    cpmUsd: 30,
+    cpmUsd: STARTER.post_purchase,
     core: true,
     comp: "Post-purchase pages pay merchants $0.25–$0.80 per order (Rokt Thanks); onsite retail display runs $7–$22 CPM.",
   },
@@ -49,7 +52,7 @@ export const SLOTS: Slot[] = [
     label: "Member dashboard tile",
     where: "Logged-in member home on the hub",
     size: "Native tile 600×400",
-    cpmUsd: 18,
+    cpmUsd: STARTER.member_dashboard,
     core: true,
     comp: "Logged-in, owned inventory; priced inside the $7–$22 onsite retail display band.",
   },
@@ -58,7 +61,7 @@ export const SLOTS: Slot[] = [
     label: "Hub hero banner",
     where: "Top of the hub home page",
     size: "1200×300 desktop · 640×320 phone",
-    cpmUsd: 15,
+    cpmUsd: STARTER.hub_home,
     core: true,
     comp: "Health display $10–$25 CPM; retail onsite display median about $12.50.",
   },
@@ -67,7 +70,7 @@ export const SLOTS: Slot[] = [
     label: "Product / services page unit",
     where: "In-hub product, service and booking pages",
     size: "Sponsored card 600×400 · 300×250",
-    cpmUsd: 18,
+    cpmUsd: STARTER.product_services,
     core: true,
     comp: "In-browse onsite display, priced inside the $7–$22 onsite retail display band.",
   },

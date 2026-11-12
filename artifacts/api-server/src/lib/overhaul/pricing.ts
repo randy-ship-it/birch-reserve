@@ -33,6 +33,20 @@ export const RATE_SURFACES: readonly RateSurface[] = [
   { key: "post_purchase", label: "Post-purchase", short: "Post-purchase", where: "Thank-you and booking-confirmation pages, right after a paid order.", cpmStarter: [18, 30], cpmProven: [50, 90], cpcStarter: [1.2, 2.5], cpcProven: [3.0, 6.5] },
 ] as const;
 
+const starterLow = (k: RateSurface["key"]) => RATE_SURFACES.find((s) => s.key === k)!.cpmStarter[0];
+
+/**
+ * Starter (starting-at) display CPM for the four hub placements used by the
+ * per-hub rate card, /kit, /sponsor and area-lock sizing (Nov 12 2026: one
+ * consistent price set). Product / services uses the product-page starter rate.
+ */
+export const HUB_PLACEMENT_STARTER_CPM = {
+  post_purchase: starterLow("post_purchase"),
+  hub_home: starterLow("landing"),
+  product_services: starterLow("products"),
+  member_dashboard: starterLow("dashboard"),
+} as const;
+
 /** Blended CPM planning anchors (USD). */
 export const BLENDED = { starterCpm: 12, provenCpm: [40, 80] as Range } as const;
 

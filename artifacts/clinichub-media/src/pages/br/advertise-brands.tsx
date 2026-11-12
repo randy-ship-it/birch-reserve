@@ -66,6 +66,7 @@ export default function BrAdvertiseBrands() {
       <Section tone="soft">
         <Eyebrow>Rate card</Eyebrow>
         <H2>Per hub, per month.</H2>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">Starting-at rates, the same ones as the <a href="/rates" className="underline underline-offset-2">five-surface rate card</a>. Illustrative estimates, not a quote.</p>
         <div className="mt-8">
           <RateCard currency={currency} />
         </div>

@@ -11,7 +11,7 @@ export function slotPrice(h: Hub, s: (typeof SLOTS)[number], currency: Currency)
   return currency === "cad" ? toCad(usd) : usd;
 }
 
-/** Per-hub rate card (same model as /kit and /sponsor). One sponsor position = 20% share of voice at 75% availability. */
+/** Per-hub rate card (same model as /kit and /sponsor) at starter CPMs from overhaul/pricing.ts. One sponsor position = 20% share of voice at 75% availability. */
 export function RateCard({ currency }: { currency: Currency }) {
   const hubs: Hub[] = [...BRAND_HUBS, CLINIC_NETWORK];
   const core = SLOTS.filter((s) => s.core);
@@ -24,7 +24,7 @@ export function RateCard({ currency }: { currency: Currency }) {
             {core.map((s) => (
               <th key={s.key} className="py-3 pr-3 font-semibold">
                 {s.label}
-                <span className="block text-[11px] font-normal text-muted-foreground">${s.cpmUsd} CPM USD</span>
+                <span className="block text-[11px] font-normal text-muted-foreground">from ${s.cpmUsd} CPM USD</span>
               </th>
             ))}
             <th className="py-3 font-semibold">Core package / mo</th>
@@ -52,7 +52,7 @@ export function RateCard({ currency }: { currency: Currency }) {
         </tbody>
       </table>
       <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-        Views per month per sponsor position <Modelled />: one of five rotating positions (20% share of voice) at 75% availability. Hubs without their own feed row use the network median partner until their feed lands. Core package floor $190 USD / $270 CAD. Partner email and partner-site display are available on request.
+        Prices are starting-at (starter) rates from the <a href="/rates" className="underline underline-offset-2">rate card</a> <Modelled>Illustrative estimate</Modelled>: not sold rates or a quote; your insertion order sets the final rate. Views per month per sponsor position <Modelled />: one of five rotating positions (20% share of voice) at 75% availability. Hubs without their own feed row use the network median partner until their feed lands. Core package floor $190 USD / $270 CAD. Partner email and partner-site display are available on request.
       </p>
     </div>
   );
