@@ -39,6 +39,7 @@ const API_PATHS = [
   "/advertise/?",
   "/availability\\.json",
   "/kit/?",
+  "/sponsor/?",
   "/terms/?",
   "/privacy/?",
   "/sample-io/?",
