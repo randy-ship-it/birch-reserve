@@ -131,7 +131,7 @@ export default function BrHome() {
             <Eyebrow>Lock down my area</Eyebrow>
             <H2>Own your 5 km.</H2>
             <Lede>
-              One deposit, ${AREA_LOCK.priceCad.toLocaleString()} CAD or ${AREA_LOCK.priceUsd.toLocaleString()} USD (launch rate until {AREA_LOCK.launchRateUntil}), holds up to {AREA_LOCK.standardSharePct}% of hub display around your postal code ({AREA_LOCK.denseCoreSharePct}% in busy downtown cores) for 1 to 6 months. It buys media at {AREA_LOCK.discountPct}% off the rate card and {g.views.toLocaleString()} page views across hubs (modelled), and unlocks {AREA_LOCK.followOnDiscountPct}% off follow-on spend up to ${AREA_LOCK.followOnCapUsd.toLocaleString()} USD.
+              One deposit, ${AREA_LOCK.priceCad.toLocaleString()} CAD or ${AREA_LOCK.priceUsd.toLocaleString()} USD (launch rate until {AREA_LOCK.launchRateUntil}), holds up to {AREA_LOCK.standardSharePct}% of hub display around your postal code ({AREA_LOCK.denseCoreSharePct}% in busy downtown cores) for 1 to 6 months. It buys media at {AREA_LOCK.discountPct}% off the rate card and about {g.views.toLocaleString()} page views across hubs at starter rates (modelled, illustrative estimate), and unlocks {AREA_LOCK.followOnDiscountPct}% off follow-on spend up to ${AREA_LOCK.followOnCapUsd.toLocaleString()} USD.
             </Lede>
             <div className="mt-8">
               <Cta href="/advertise/local">Check my postal code</Cta>

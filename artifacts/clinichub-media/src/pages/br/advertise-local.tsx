@@ -11,7 +11,7 @@ const FAQ = [
   { q: "What does “up to 50%” mean?", a: `We hold up to ${AREA_LOCK.standardSharePct}% of the display slots shown to hub members within ${AREA_LOCK.radiusKm} km of your postal code for your category. In dense downtown cores (for example Toronto M5, downtown Montreal, Vancouver V6B/V6C/V6E and major US downtowns) the cap is ${AREA_LOCK.denseCoreSharePct}% because so many businesses share the same blocks.` },
   { q: "When does my term start?", a: "Your 1 to 6 month term starts the day your displays go live, not the day you pay." },
   { q: "What if traffic in my area grows?", a: "Your share grows with it. You keep the right to keep pace: more views in your area are offered to you first, at your locked discount, before anyone else can buy them." },
-  { q: "What do I get for the deposit?", a: `The full deposit becomes media credit at ${AREA_LOCK.discountPct}% off the rate card, plus a guaranteed number of page views across hubs (modelled from the TAM feed).` },
+  { q: "What do I get for the deposit?", a: `The full deposit becomes media credit at ${AREA_LOCK.discountPct}% off the rate card, plus an estimated number of page views across hubs (modelled from the TAM feed at starter rates; an illustrative estimate, not a guarantee).` },
   { q: "Why is it $4,900 now?", a: `That's the launch rate, held until ${AREA_LOCK.launchRateUntil}. Locking also unlocks ${AREA_LOCK.followOnDiscountPct}% off the rate card on follow-on spend, up to $${AREA_LOCK.followOnCapUsd.toLocaleString()} USD ($${AREA_LOCK.followOnCapCad.toLocaleString()} CAD) over your term.` },
   { q: "What if I don't use all my credit?", a: "At the end of your term you choose: take a refund of the unused credit, or extend your spend-down month by month at the same discount." },
   { q: "Which placements can I get?", a: `${PLACEMENT_LABELS.join(", ")}. Display or CPC, on the named live hubs plus the health and wellness business hubs near you.` },
@@ -78,7 +78,7 @@ export default function BrAdvertiseLocal() {
                 `$${AREA_LOCK.priceCad.toLocaleString()} CAD or $${AREA_LOCK.priceUsd.toLocaleString()} USD: launch rate until ${AREA_LOCK.launchRateUntil}, exclusive in your category`,
                 `All of it becomes ad credit at ${AREA_LOCK.discountPct}% off the rate card`,
                 `Plus ${AREA_LOCK.followOnDiscountPct}% off follow-on spend up to $${AREA_LOCK.followOnCapUsd.toLocaleString()} USD over your term`,
-                "Guaranteed page views across hubs (modelled)",
+                "Estimated page views across hubs at starter rates (illustrative)",
                 "Unused credit: refund, or extend month by month at the same discount",
                 "If traffic grows, you keep the right to keep pace with spend",
               ].map((t) => (
@@ -126,7 +126,7 @@ export default function BrAdvertiseLocal() {
                     <dd className="text-xs text-muted-foreground">{ok.discountPct}% off</dd>
                   </div>
                   <div>
-                    <dt className="text-xs uppercase tracking-wider text-foreground/55">Guaranteed page views <Modelled /></dt>
+                    <dt className="text-xs uppercase tracking-wider text-foreground/55">Estimated page views <Modelled>Illustrative estimate</Modelled></dt>
                     <dd className="font-display text-3xl">{ok.guaranteedViews.toLocaleString()}</dd>
                     <dd className="text-xs text-muted-foreground">across hubs · ${ok.effectiveCpm.toFixed(2)} {ok.currency.toUpperCase()} per 1,000</dd>
                   </div>
@@ -137,7 +137,7 @@ export default function BrAdvertiseLocal() {
                   </div>
                 </dl>
                 <p className="mt-3 text-xs text-muted-foreground">
-                  Over {ok.termMonths} month{ok.termMonths === 1 ? "" : "s"}: about {ok.localOverTerm.toLocaleString()} local views at your share{ok.networkTopUp > 0 ? `; the remaining ${ok.networkTopUp.toLocaleString()} guaranteed views come from matched members across the hub network` : ", more than the guarantee"}.
+                  Over {ok.termMonths} month{ok.termMonths === 1 ? "" : "s"}: about {ok.localOverTerm.toLocaleString()} local views at your share{ok.networkTopUp > 0 ? `; the remaining ${ok.networkTopUp.toLocaleString()} estimated views come from matched members across the hub network` : ", more than the estimate"}.
                 </p>
                 <form onSubmit={onLock} className="mt-6 grid gap-3 border-t border-border pt-5 md:grid-cols-2" data-testid="area-lock-form">
                   <Field label="Business name">

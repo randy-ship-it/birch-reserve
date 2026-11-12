@@ -141,7 +141,7 @@ const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal";
  * /workspace/sales-brain/dist. Only widget-specific rules live here.
  */
 export const BIRCH_SITE_SCOPE_PROMPT = [
-  "WIDGET RULES (birchreserve.net chat): You are Randy from Birch Reserve. Lead with Birch Reserve category slots: lock in your slot before the minimum rises. Never open with a menu of brands.",
+  "WIDGET RULES (birchreserve.net chat): You are the Birch Q&A Squirrel, the Birch Reserve site-chat guide (never Randy; calls and callbacks come from Randy's team). Lead with Birch Reserve category slots: lock in your slot before the minimum rises. Never open with a menu of brands.",
   "Never pitch the portfolio or other companies unprompted.",
   `Live proof hub: ${LIVE_HUB_PROOF_URL} (share when they ask to see a live hub or who sees the ads).`,
   "When the visitor raises Scale Health, Align, clinics, providers, or care, answer properly from the brain (never brush them off) and give the ONE routing URL that fits.",
@@ -223,11 +223,17 @@ type ParseErr = { ok: false; error: string };
 const WHO_ASK =
   /\b(who (are|r) (you|u)|who('s| is) this|who am i (talking|speaking|chatting)( to| with)?|what('s| is) your name|your name|introduce yourself|are (you|u) (a |an )?(ai|bot|robot|human|real|person)|is this (a |an )?(bot|ai|robot|real person|human))\b/i;
 const LINK_ASK = /\b(link|url|website|site|page|send( me)?|where can i|show me|see (it|a|the|an)|kit|portal|calendar|book)\b/i;
-const REINTRO = /^\s*(hi|hey|hello)?[,!.\s]*i'?\s*a?m randy(?: gilling)?(?: from birch reserve)?[.!,:;]?\s*/i;
+const REINTRO = /^\s*(hi|hey|hello)?[,!.\s]*(?:i'?\s*a?m (?:randy(?: gilling)?(?: from birch reserve)?|the birch q&a squirrel(?: from birch reserve)?)|(?:the )?birch q&a squirrel here)[.!,:;]?\s*/i;
+/** If the model slips back into the old phone persona, rename it to the squirrel. */
+function squirrelIdentity(text: string): string {
+  return text
+    .replace(/\b(?:I'm|I am|I’m) Randy(?: Gilling)?(?: from Birch Reserve)?\b/g, "I'm the Birch Q&A Squirrel")
+    .replace(/\ban AI version of Randy(?: from (?:Birch Reserve|the brand|that brand))?\b/gi, "an AI guide for Birch Reserve");
+}
 
 /**
  * Safety net on every Grok reply: no em/en dashes, and never a leading
- * "I'm Randy from Birch Reserve." intro unless the visitor's last message asks
+ * "I'm the Birch Q&A Squirrel." intro unless the visitor's last message asks
  * who he is or whether he's a bot (5:18pm rule; the widget opener already says hi).
  */
 export function polishReply(text: string, history: ReadonlyArray<{ role: string; content: string }>): string {
@@ -235,6 +241,7 @@ export function polishReply(text: string, history: ReadonlyArray<{ role: string;
     .replace(/\s+[\u2014\u2013]\s+/g, ", ")
     .replace(/[\u2014\u2013](?=\s*$)/gm, ".")
     .replace(/[\u2014\u2013]/g, ", ");
+  out = squirrelIdentity(out);
   const lastUser = [...history].reverse().find((m) => m.role === "user")?.content ?? "";
   if (!WHO_ASK.test(lastUser)) {
     const stripped = out.replace(REINTRO, "");

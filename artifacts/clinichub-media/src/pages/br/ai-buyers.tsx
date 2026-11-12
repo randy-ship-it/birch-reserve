@@ -110,7 +110,7 @@ export default function BrAiBuyers() {
                 </tbody>
               </table>
             </div>
-            <p className="mt-3 text-xs text-muted-foreground">Spend-commit views are what the credit buys at the blended hub rate card: modelled, not guaranteed. The area-lock view guarantee is modelled.</p>
+            <p className="mt-3 text-xs text-muted-foreground">Spend-commit and area-lock views are what the credit buys at the blended starter rate card: modelled illustrative estimates, not guarantees.</p>
           </div>
           <div>
             <Eyebrow>Endpoints</Eyebrow>

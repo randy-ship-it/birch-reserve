@@ -76,7 +76,7 @@ export default function BrMediaKit() {
               <li>· Up to {AREA_LOCK.standardSharePct}% of display within {AREA_LOCK.radiusKm} km ({AREA_LOCK.denseCoreSharePct}% downtown)</li>
               <li>· 1 to 6 months from display start</li>
               <li>· Credit at {AREA_LOCK.discountPct}% off rate card</li>
-              <li>· {g.views.toLocaleString()} page views across hubs (modelled)</li>
+              <li>· About {g.views.toLocaleString()} page views across hubs at starter rates (modelled, illustrative estimate)</li>
               <li>· Right to keep pace if traffic grows</li>
             </ul>
             <div className="mt-5 print:hidden">
