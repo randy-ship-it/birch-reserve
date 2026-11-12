@@ -23,7 +23,7 @@ export const CONTACT = {
 
 /** Same eight labels as /kit and /buycalc. One brand per category. */
 export const SEAT_CATEGORIES = [
-  { slug: "pain-relief", label: "Pain relief / topicals" },
+  { slug: "pain-relief-topicals", label: "Pain relief / topicals" },
   { slug: "recovery-hardware", label: "Recovery hardware" },
   { slug: "nutrition", label: "Nutrition" },
   { slug: "sleep", label: "Sleep" },
@@ -38,7 +38,9 @@ export const SEAT_TOTAL = SEAT_CATEGORIES.length;
 
 export function categoryBySlug(slug: unknown): (typeof SEAT_CATEGORIES)[number] | undefined {
   const s = String(slug ?? "").trim().toLowerCase();
-  return SEAT_CATEGORIES.find((c) => c.slug === s || c.label.toLowerCase() === s);
+  // Friday PR #159 slugs; "pain-relief" kept as a legacy alias.
+  const key = s === "pain-relief" ? "pain-relief-topicals" : s;
+  return SEAT_CATEGORIES.find((c) => c.slug === key || c.label.toLowerCase() === s);
 }
 
 /** The two public seat SKUs. Names and terms match the existing hold-190 / reserve-490 copy. */

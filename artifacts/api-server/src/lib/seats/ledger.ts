@@ -26,7 +26,7 @@ export const SEAT_LEDGER: SeatLedger = {
   as_of: "2026-11-12",
   basis: "No paid or confirmed category seats on record (Birch Reserve, Nov 12 2026).",
   seats: {
-    "pain-relief": { status: "open" },
+    "pain-relief-topicals": { status: "open" },
     "recovery-hardware": { status: "open" },
     nutrition: { status: "open" },
     sleep: { status: "open" },

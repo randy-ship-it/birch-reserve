@@ -2,12 +2,14 @@
  * Seat availability: Friday App first, then the BR ledger, then "call to confirm".
  * Never invents a count and never shows a fake "sold": any doubt -> unknown.
  *
- * Friday contract (docs/SEATS-FRIDAY-CONTRACT.md):
- *   GET {FRIDAY_SEATS_URL || FRIDAY_API_URL + "/api/birch/seats"}?org=birchreserve
- *   Authorization: Bearer {FRIDAY_SEATS_KEY || FRIDAY_API_KEY}
- *   200 { org, as_of, categories: [{ slug, status: "open"|"held"|"locked", held_until? }] }
+ * Friday contract (friday-crm PR #159, docs/BIRCH_SEATS.md; ours: docs/SEATS-FRIDAY-CONTRACT.md):
+ *   GET {FRIDAY_SEATS_URL}   e.g. https://fridayapp.org/api/public/birch/seats (no auth, CORS *, cached 15s)
+ *   200 { org, source, as_of, total, open, held, locked,
+ *         categories: [{ slug, name, status: "open"|"held"|"locked", holder, held_until, requests, waitlist }] }
+ * FRIDAY_SEATS_URL set   -> Friday answer, else "call to confirm" (no ledger guess).
+ * FRIDAY_SEATS_URL unset -> BR ledger (14 days), else "call to confirm".
  */
-import { CONTACT, SEAT_CATEGORIES, SEAT_TOTAL, SEATS_VERSION } from "./catalog";
+import { CONTACT, SEAT_CATEGORIES, SEAT_TOTAL, SEATS_VERSION, categoryBySlug } from "./catalog";
 import { LEDGER_MAX_AGE_DAYS, SEAT_LEDGER, type SeatLedger } from "./ledger";
 
 export type SeatStatus = "open" | "held" | "locked" | "unknown";
@@ -53,10 +55,13 @@ export function unknownAvailability(): SeatAvailability {
 }
 
 /** Strict parse of Friday's seat payload. Anything off -> null (fallback). */
-export function parseFridaySeats(body: unknown, now = Date.now()): SeatAvailability | null {
+export function parseFridaySeats(body: unknown, now = Date.now(), opts: { allowFixture?: boolean } = {}): SeatAvailability | null {
   if (!body || typeof body !== "object") return null;
-  const b = body as { as_of?: unknown; categories?: unknown };
+  const b = body as { as_of?: unknown; categories?: unknown; org?: unknown; fixture?: unknown };
   if (!Array.isArray(b.categories)) return null;
+  if (b.org !== undefined && b.org !== "birchreserve") return null;
+  // Friday's ?fixture=1 sample rows are preview-only: never shown as live on production.
+  if (b.fixture === true && opts.allowFixture !== true) return null;
   const asOf = typeof b.as_of === "string" && !Number.isNaN(Date.parse(b.as_of)) ? b.as_of : null;
   if (!asOf) return null;
   // A Friday answer older than a day is stale: do not show it as live.
@@ -65,7 +70,7 @@ export function parseFridaySeats(body: unknown, now = Date.now()): SeatAvailabil
   for (const raw of b.categories as unknown[]) {
     if (!raw || typeof raw !== "object") return null;
     const r = raw as { slug?: unknown; status?: unknown; held_until?: unknown };
-    const slug = String(r.slug ?? "");
+    const slug = categoryBySlug(r.slug)?.slug ?? "";
     const status = String(r.status ?? "");
     if (!SEAT_CATEGORIES.some((c) => c.slug === slug) || !VALID.has(status)) return null;
     let s = status as SeatStatus;
@@ -78,7 +83,7 @@ export function parseFridaySeats(body: unknown, now = Date.now()): SeatAvailabil
     map.set(slug, { status: s, ...(until ? { until } : {}) });
   }
   if (map.size !== SEAT_TOTAL) return null;
-  return build("friday", asOf, map, "Live from the Birch Reserve pipeline in Friday.");
+  return build("friday", asOf, map, b.fixture === true ? "Preview sample data from Friday (fixture), not live seats." : "Live from the Birch Reserve pipeline in Friday.");
 }
 
 /** Ledger -> availability, or null when the ledger is stale or malformed. */
@@ -108,17 +113,19 @@ function ledgerFromEnv(env: NodeJS.ProcessEnv): SeatLedger {
   return { as_of: "1970-01-01", basis: "invalid SEAT_LEDGER_JSON", seats: {} };
 }
 
+/** Seat read URL comes only from env: preview -> Friday preview fixture, prod -> fridayapp.org once PR #159 ships. */
 export function fridaySeatsUrl(env: NodeJS.ProcessEnv): string | null {
   const explicit = env.FRIDAY_SEATS_URL?.trim();
-  if (explicit) return explicit;
-  const base = env.FRIDAY_API_URL?.trim();
-  if (!base) return null;
-  const origin = base.replace(/\/+$/, "").replace(/\/api(\/intake)?$/i, "");
-  return `${origin}/api/birch/seats?org=${encodeURIComponent(env.FRIDAY_WORKSPACE?.trim() || "birchreserve")}`;
+  return explicit && /^https:\/\//i.test(explicit) ? explicit : null;
+}
+
+/** Fixture rows are allowed only off production (Vercel preview / local). */
+export function fixtureAllowed(env: NodeJS.ProcessEnv): boolean {
+  return env.VERCEL_ENV !== "production" && env.SEATS_ALLOW_FIXTURE !== "false";
 }
 
 let cache: { at: number; value: SeatAvailability } | null = null;
-const CACHE_MS = 60_000;
+const CACHE_MS = 15_000; // matches Friday max-age=15
 
 export function clearAvailabilityCacheForTests(): void {
   cache = null;
@@ -132,15 +139,18 @@ export async function getSeatAvailability(
   if (cache && now - cache.at < CACHE_MS) return cache.value;
   let value: SeatAvailability | null = null;
   const url = env.FRIDAY_SEATS_DISABLED === "true" ? null : fridaySeatsUrl(env);
-  const key = env.FRIDAY_SEATS_KEY?.trim() || env.FRIDAY_API_KEY?.trim();
-  if (url && key) {
+  if (url) {
+    // Public endpoint: no auth needed. An optional key is sent only if one is configured.
+    const key = env.FRIDAY_SEATS_KEY?.trim();
     try {
       const f: FetchLike = deps.fetch ?? ((u, init) => fetch(u, init));
-      const res = await f(url, { headers: { authorization: `Bearer ${key}`, accept: "application/json" }, signal: AbortSignal.timeout(2500) });
-      if (res.ok) value = parseFridaySeats(await res.json(), now);
+      const res = await f(url, { headers: { accept: "application/json", ...(key ? { authorization: `Bearer ${key}` } : {}) }, signal: AbortSignal.timeout(2500) });
+      if (res.ok) value = parseFridaySeats(await res.json(), now, { allowFixture: fixtureAllowed(env) });
     } catch {
       value = null;
     }
+    // Friday configured but unreachable or invalid: fail safe to "call to confirm".
+    value ??= unknownAvailability();
   }
   value ??= ledgerAvailability(ledgerFromEnv(env), now) ?? unknownAvailability();
   cache = { at: now, value };

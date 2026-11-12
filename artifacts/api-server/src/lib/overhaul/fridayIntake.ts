@@ -20,6 +20,11 @@ export type IntakeInput = {
   path?: string;
   meta?: Record<string, string | number | boolean | undefined>;
   utm?: Record<string, string | undefined>;
+  /** Fixed Friday externalId (seat paid re-POST reuses the request's id: "birch-<leadId>"). */
+  externalId?: string;
+  /** Top-level deal value (seat SKUs: 190 / 490). */
+  value?: number;
+  currency?: string;
 };
 
 export type IntakeResult = { status: "sent" | "skipped" | "failed"; httpStatus?: number; externalId: string };
@@ -45,6 +50,7 @@ const SOURCE: Record<IntakeKind, string> = {
 };
 
 export function intakeExternalId(input: IntakeInput): string {
+  if (input.externalId && /^birch-[A-Za-z0-9_-]{4,120}$/.test(input.externalId)) return input.externalId;
   // Seat actions key on category + SKU too, so a buyer holding two categories gets two records.
   const seat = input.kind.startsWith("seat_") ? `|${input.meta?.category ?? ""}|${input.meta?.sku ?? ""}` : "";
   const basis = `${input.kind}|${(input.email ?? "").toLowerCase()}|${(input.website ?? "").toLowerCase()}|${input.message ?? ""}${seat}`;
@@ -77,6 +83,8 @@ export function buildIntakePayload(input: IntakeInput, workspace = "birchreserve
     kind: "form",
     ...(input.path ? { path: input.path.slice(0, 200) } : {}),
     stage: "Birch inbound",
+    ...(typeof input.value === "number" ? { value: input.value } : {}),
+    ...(input.currency ? { currency: input.currency.toUpperCase().slice(0, 3) } : {}),
     tags: ["birch-inbound", "stage:birch-inbound", `birch:${input.kind.replace(/_/g, "-")}`],
     meta,
   };
@@ -101,7 +109,8 @@ export async function sendIntake(input: IntakeInput, env: NodeJS.ProcessEnv = pr
   try {
     const res = await fetch(url, {
       method: "POST",
-      headers: { "content-type": "application/json", authorization: `Bearer ${key}` },
+      // Friday accepts either; PR #159 documents X-Intake-Secret.
+      headers: { "content-type": "application/json", authorization: `Bearer ${key}`, "x-intake-secret": key },
       body: JSON.stringify(buildIntakePayload(input, env.FRIDAY_WORKSPACE?.trim() || "birchreserve")),
       signal: AbortSignal.timeout(8000),
     });

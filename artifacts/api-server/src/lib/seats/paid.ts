@@ -28,6 +28,10 @@ export async function recordPaidSeatSafe(session: SessionLike): Promise<void> {
     await sendIntakeAndAlert(
       {
         kind: "seat_paid",
+        // Same externalId as the original request so Friday upgrades that seat unit.
+        externalId: m.intake_external_id || undefined,
+        value: typeof session.amount_total === "number" ? session.amount_total / 100 : undefined,
+        currency: session.currency ?? undefined,
         email: email ?? undefined,
         name: session.customer_details?.name ?? undefined,
         phone: session.customer_details?.phone ?? undefined,
@@ -40,8 +44,10 @@ export async function recordPaidSeatSafe(session: SessionLike): Promise<void> {
           sku: m.sku,
           amount: typeof session.amount_total === "number" ? session.amount_total / 100 : undefined,
           currency: session.currency ?? undefined,
+          seat_action: m.sku === "reserve-490" ? "lock" : "hold",
           paid: true,
           stripe_session_id: session.id,
+          order_id: session.id,
           livemode: session.livemode,
           is_test: m.is_test === "true" || session.livemode === false || undefined,
         },

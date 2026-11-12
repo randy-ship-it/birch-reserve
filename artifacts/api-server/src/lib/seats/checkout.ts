@@ -15,6 +15,7 @@ export type SeatCheckoutInput = {
   website?: unknown;
   currency?: unknown;
   test?: boolean;
+  leadId?: string;
 };
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -46,6 +47,8 @@ export function buildSeatSession(input: SeatCheckoutInput, origin: string):
     website: s(input.website, 200),
     seats_version: SEATS_VERSION,
     is_test: input.test ? "true" : "false",
+    // Friday externalId of the request; the paid webhook re-POSTs with the same id.
+    ...(input.leadId ? { intake_external_id: s(input.leadId, 120) } : {}),
   };
   return {
     ok: true,

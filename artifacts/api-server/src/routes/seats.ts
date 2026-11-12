@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 /**
  * Category seats API (Randy, Nov 12 2026). Standalone (no DB imports).
  *
@@ -136,9 +137,15 @@ export function createSeatsRouter(deps: { createSession?: CreateSession; log?: (
     const wantsCheckout = (action === "hold" || action === "lock") && catStatus === "open";
     const checkoutOpen = wantsCheckout && gate.open && !!deps.createSession;
 
+    // Friday seat contract (PR #159): one lead id per request, reused by the paid re-POST.
+    const leadId = `birch-seat-${randomUUID()}`;
+    const seatAction = action === "hold" ? "hold" : action === "lock" || action === "lock_request" ? "lock" : action === "waitlist" ? "waitlist" : undefined;
+    const fridaySku = action === "waitlist" ? "waitlist" : sku;
     const result = await sendIntakeAndAlert(
       {
         kind: KIND[action],
+        externalId: leadId,
+        ...(seatAction && seatAction !== "waitlist" && amount !== undefined ? { value: amount, currency } : action === "block_request" && amount !== undefined ? { value: amount, currency } : {}),
         email,
         name: str(body.name, 120) || undefined,
         company: brand,
@@ -149,7 +156,9 @@ export function createSeatsRouter(deps: { createSession?: CreateSession; log?: (
         meta: {
           category: cat?.slug,
           category_label: cat?.label,
-          sku,
+          seat_action: seatAction,
+          sku: fridaySku,
+          requested_sku: action === "waitlist" ? sku : undefined,
           amount,
           currency,
           paid: false,
@@ -179,9 +188,9 @@ export function createSeatsRouter(deps: { createSession?: CreateSession; log?: (
     );
     log("seat request", { action, category: cat?.slug, sku, friday: result.status, alert: result.alert.status });
 
-    const base = { ok: true, action, category: cat?.slug ?? null, sku, stored: result.status, alerted: result.alert.status };
+    const base = { ok: true, action, category: cat?.slug ?? null, sku: fridaySku, stored: result.status, alerted: result.alert.status };
     if (checkoutOpen) {
-      const built = buildSeatSession({ sku, category: cat!.slug, brand, email, website, currency, test }, originOf(req));
+      const built = buildSeatSession({ sku: sku ?? "", category: cat!.slug, brand, email, website, currency, test, leadId }, originOf(req));
       if (built.ok) {
         try {
           const session = await deps.createSession!(built.params);

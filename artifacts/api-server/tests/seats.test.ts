@@ -12,12 +12,15 @@ import { agentCatalog, agentQuote } from "../src/lib/overhaul/agent";
 import { llmsTxt } from "../src/lib/overhaul/seo";
 import { renderSeatsSectionHtml, renderSeatsStripHtml } from "../src/lib/seats/buycalcHtml";
 import { recordPaidSeatSafe } from "../src/lib/seats/paid";
+import FRIDAY_FIXTURE from "./fixtures/friday-birch-seats.fixture.json";
 
 const NOV12 = Date.parse("2026-11-12T20:00:00Z");
 const fridayBody = (over: Record<string, string> = {}) => ({
   org: "birchreserve",
+  source: "friday",
   as_of: "2026-11-12T19:55:00Z",
-  categories: SEAT_CATEGORIES.map((c) => ({ slug: c.slug, status: over[c.slug] ?? "open" })),
+  total: 8,
+  categories: SEAT_CATEGORIES.map((c) => ({ slug: c.slug, name: c.label, status: over[c.slug] ?? "open", holder: over[c.slug] === "locked" ? { brand: "Acme" } : null, held_until: null, requests: 0, waitlist: 0 })),
 });
 
 test("packaging: $190 hold-190 look, $490 reserve-490 seat, blocks at starter low CPM", () => {
@@ -43,6 +46,19 @@ test("ledger: fresh -> 8 of 8 open; stale -> null (call to confirm), never a fak
   assert.equal(held.open, null);
 });
 
+test("friday PR #159 fixture parses on preview only (never as live on production)", () => {
+  const at = Date.parse((FRIDAY_FIXTURE as { as_of: string }).as_of) + 60_000;
+  const a = parseFridaySeats(FRIDAY_FIXTURE, at, { allowFixture: true })!;
+  assert.equal(a.source, "friday");
+  assert.equal(a.open, 6);
+  assert.equal(a.categories.find((c) => c.slug === "pain-relief-topicals")!.status, "open");
+  assert.equal(a.categories.find((c) => c.slug === "sleep")!.status, "locked");
+  assert.equal(a.categories.find((c) => c.slug === "nutrition")!.status, "held");
+  assert.match(a.note, /fixture/);
+  assert.equal(parseFridaySeats(FRIDAY_FIXTURE, at), null);
+  assert.equal(JSON.stringify(a).includes("Example Brand"), false, "holder names are not echoed");
+});
+
 test("friday payload: strict parse, stale/malformed rejected", () => {
   const ok = parseFridaySeats(fridayBody({ sleep: "locked", nutrition: "held" }), NOV12)!;
   assert.equal(ok.source, "friday");
@@ -52,18 +68,29 @@ test("friday payload: strict parse, stale/malformed rejected", () => {
   assert.equal(parseFridaySeats({ ...fridayBody(), categories: fridayBody().categories.slice(1) }, NOV12), null);
 });
 
-test("getSeatAvailability: Friday first, ledger on Friday 404, unknown on stale ledger", async () => {
-  const env = { FRIDAY_API_URL: "https://fridayapp.org", FRIDAY_API_KEY: "k" } as NodeJS.ProcessEnv;
-  assert.equal(fridaySeatsUrl(env), "https://fridayapp.org/api/birch/seats?org=birchreserve");
+test("getSeatAvailability: FRIDAY_SEATS_URL -> Friday, else call to confirm; unset -> ledger", async () => {
+  const env = { FRIDAY_SEATS_URL: "https://fridayapp.org/api/public/birch/seats", FRIDAY_API_KEY: "intake-secret" } as NodeJS.ProcessEnv;
+  assert.equal(fridaySeatsUrl(env), "https://fridayapp.org/api/public/birch/seats");
+  assert.equal(fridaySeatsUrl({ FRIDAY_API_URL: "https://fridayapp.org" } as NodeJS.ProcessEnv), null);
   clearAvailabilityCacheForTests();
   let seen = "";
-  const a = await getSeatAvailability(env, { now: () => NOV12, fetch: async (u, init) => ((seen = `${u} ${init.headers.authorization}`), { ok: true, status: 200, json: async () => fridayBody({ sleep: "locked" }) }) });
+  const a = await getSeatAvailability(env, { now: () => NOV12, fetch: async (u, init) => ((seen = `${u} ${init.headers.authorization ?? "no-auth"}`), { ok: true, status: 200, json: async () => fridayBody({ sleep: "locked" }) }) });
   assert.equal(a.source, "friday");
   assert.equal(a.open, 7);
-  assert.equal(seen, "https://fridayapp.org/api/birch/seats?org=birchreserve Bearer k");
+  assert.equal(seen, "https://fridayapp.org/api/public/birch/seats no-auth", "public read: intake secret never sent");
   clearAvailabilityCacheForTests();
-  const b = await getSeatAvailability(env, { now: () => NOV12, fetch: async () => ({ ok: false, status: 404, json: async () => ({}) }) });
-  assert.equal(b.source, "ledger");
+  const b = await getSeatAvailability(env, { now: () => NOV12, fetch: async () => ({ ok: false, status: 503, json: async () => ({}) }) });
+  assert.equal(b.source, "none");
+  assert.equal(b.open, null);
+  clearAvailabilityCacheForTests();
+  const thrown = await getSeatAvailability(env, { now: () => NOV12, fetch: async () => { throw new Error("ECONNREFUSED"); } });
+  assert.equal(thrown.confirm_by_phone, true);
+  clearAvailabilityCacheForTests();
+  const prodFixture = await getSeatAvailability({ ...env, VERCEL_ENV: "production" }, { now: () => Date.parse((FRIDAY_FIXTURE as { as_of: string }).as_of), fetch: async () => ({ ok: true, status: 200, json: async () => FRIDAY_FIXTURE }) });
+  assert.equal(prodFixture.source, "none", "fixture never shown on production");
+  clearAvailabilityCacheForTests();
+  const l = await getSeatAvailability({} as NodeJS.ProcessEnv, { now: () => NOV12 });
+  assert.equal(l.source, "ledger");
   clearAvailabilityCacheForTests();
   const c = await getSeatAvailability({ SEAT_LEDGER_JSON: JSON.stringify({ ...SEAT_LEDGER, as_of: "2026-09-01" }) } as NodeJS.ProcessEnv, { now: () => NOV12 });
   assert.equal(c.source, "none");
@@ -132,6 +159,7 @@ test("POST /v1/seats/request: held -> Friday intake + alert; honeypot silent; op
   const saved = { ...process.env };
   const realFetch = globalThis.fetch;
   const friday: Record<string, unknown>[] = [];
+  const fridayHeaders: Record<string, string>[] = [];
   const alerts: { subject: string; to: string[] }[] = [];
   process.env.FRIDAY_API_URL = "https://friday.test";
   process.env.FRIDAY_API_KEY = "secret";
@@ -141,6 +169,7 @@ test("POST /v1/seats/request: held -> Friday intake + alert; honeypot silent; op
   globalThis.fetch = (async (u: string | URL | Request, init?: RequestInit) => {
     if (String(u).startsWith("https://friday.test")) {
       friday.push(JSON.parse(String(init!.body)));
+      fridayHeaders.push(init!.headers as Record<string, string>);
       return new Response(JSON.stringify({ ok: true }), { status: 201 });
     }
     return realFetch(u, init);
@@ -162,6 +191,11 @@ test("POST /v1/seats/request: held -> Friday intake + alert; honeypot silent; op
       assert.equal(j.alerted, "sent");
       const p = friday.at(-1)!;
       assert.equal(p.org, "birchreserve");
+      assert.match(String(p.externalId), /^birch-seat-[0-9a-f-]{36}$/);
+      assert.equal(p.value, 190);
+      assert.equal(p.currency, "USD");
+      assert.equal((p.meta as Record<string, unknown>).seat_action, "hold");
+      assert.equal(fridayHeaders.at(-1)!["x-intake-secret"], "secret");
       assert.deepEqual((p.meta as Record<string, unknown>).sku, "hold-190");
       assert.deepEqual((p.meta as Record<string, unknown>).category, "sleep");
       assert.equal((p.meta as Record<string, unknown>).paid, false);
@@ -171,6 +205,10 @@ test("POST /v1/seats/request: held -> Friday intake + alert; honeypot silent; op
 
       const w = await (await post({ action: "waitlist", category: "nutrition", brand: "B", email: "b@b.co" })).json();
       assert.match(w.message, /waitlist for Nutrition/);
+      const wp = friday.at(-1)!;
+      assert.equal((wp.meta as Record<string, unknown>).seat_action, "waitlist");
+      assert.equal((wp.meta as Record<string, unknown>).sku, "waitlist");
+      assert.equal(wp.value, undefined);
       const blk = await (await post({ action: "block_request", block: "block-dashboard-250k", brand: "C", email: "c@c.co" })).json();
       assert.equal(blk.sku, "block-dashboard-250k");
       assert.match(alerts.at(-1)!.subject, /IMPRESSION BLOCK REQUEST/);
@@ -190,6 +228,8 @@ test("POST /v1/seats/request: held -> Friday intake + alert; honeypot silent; op
       const open = await (await post({ action: "lock", category: "sleep", brand: "E", email: "e@e.co" })).json();
       assert.equal(open.checkout_url, "https://checkout.stripe.test/s");
       assert.equal((sessions[0]!.metadata as Record<string, string>).sku, "reserve-490");
+      assert.equal((sessions[0]!.metadata as Record<string, string>).intake_external_id, friday.at(-1)!.externalId);
+      assert.equal((friday.at(-1)!.meta as Record<string, unknown>).seat_action, "lock");
     });
   } finally {
     globalThis.fetch = realFetch;
@@ -199,15 +239,28 @@ test("POST /v1/seats/request: held -> Friday intake + alert; honeypot silent; op
   }
 });
 
-test("paid webhook session -> Friday paid=true + RESERVATION alert", async () => {
+test("paid webhook session -> Friday re-POST with the SAME externalId, paid=true + RESERVATION alert", async () => {
+  const saved = { ...process.env };
+  const realFetch = globalThis.fetch;
+  const friday: Record<string, unknown>[] = [];
+  process.env.FRIDAY_API_URL = "https://friday.test";
+  process.env.FRIDAY_API_KEY = "secret";
+  globalThis.fetch = (async (_u: unknown, init?: RequestInit) => (friday.push(JSON.parse(String(init!.body))), new Response("{}", { status: 200 }))) as typeof fetch;
   const alerts: string[] = [];
   setSeatAlertSenderForTests(async (m) => (alerts.push(m.subject + "\n" + m.text), { id: "x" }));
   try {
-    await recordPaidSeatSafe({ id: "cs_test_1", payment_status: "paid", amount_total: 49000, currency: "usd", livemode: false, customer_details: { email: "p@brand.com" }, metadata: { kind: "category_seat", sku: "reserve-490", category: "sleep", category_label: "Sleep", brand: "Brand" } });
+    await recordPaidSeatSafe({ id: "cs_test_1", payment_status: "paid", amount_total: 49000, currency: "usd", livemode: false, customer_details: { email: "p@brand.com" }, metadata: { kind: "category_seat", sku: "reserve-490", category: "sleep", category_label: "Sleep", brand: "Brand", intake_external_id: "birch-seat-11111111-2222-3333-4444-555555555555" } });
     assert.match(alerts[0]!, /\[TEST\] Birch buyer: RESERVATION/);
+    const p = friday[0]!;
+    assert.equal(p.externalId, "birch-seat-11111111-2222-3333-4444-555555555555");
+    assert.equal(p.value, 490);
+    const m = p.meta as Record<string, unknown>;
+    assert.deepEqual([m.sku, m.paid, m.stripe_session_id, m.category], ["reserve-490", true, "cs_test_1", "sleep"]);
     assert.match(alerts[0]!, /PAID \(Stripe test cs_test_1\)/);
   } finally {
     setSeatAlertSenderForTests(null);
+    globalThis.fetch = realFetch;
+    process.env = saved;
   }
 });
 
