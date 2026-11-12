@@ -1,4 +1,5 @@
 import { RANDY_TEL_DISPLAY, RANDY_TEL_HREF, TAP_TO_CALL_HREF, TAP_TO_CALL_LABEL } from "@/lib/randy-chat-knowledge";
+import { useCurrency, usePriceText, priceLabel } from "@/lib/currency";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,7 @@ import { SplashAdReservationDialog } from "@/components/splash-ad-reservation-di
 import {
   DEFAULT_RESERVE_OFFER_KEY,
   formatReserveAmount,
+  reserveOfferAmountCents,
   RESERVE_OFFERS,
   type ReserveOfferKey,
 } from "@/lib/reserve-offers";
@@ -31,6 +33,7 @@ import { CobrandedHubsBanner } from "@/components/cobranded-hubs-banner";
 import { WEPRIZE } from "@/lib/example-exclusive-properties";
 import { useTamFeed } from "@/components/reserve-list-kit";
 import { SignedHubHero, SeatCalculator, HowCalculated } from "@/components/signed-hub-reserve";
+import { BonusTierDraft, isBonusDraftRequested } from "@/components/bonus-tier-draft";
 import {
   PostCheckoutMockup,
   ProtocolMockup,
@@ -141,7 +144,9 @@ export default function Home() {
     seats_paid: number;
     seats_total: number;
   } | null>(null);
-  const reservePriceLabel = "$490 USD";
+  const { currency } = useCurrency();
+  const t = usePriceText();
+  const reservePriceLabel = priceLabel("reserve-490", currency);
 
   useEffect(() => {
     let cancelled = false;
@@ -261,13 +266,14 @@ export default function Home() {
         </div>
       )}
 
-      {/* Signed-hub category seat: hero, calculator, closed method drawer */}
+      {/* Listed-hub category seat: hero, calculator, closed method drawer */}
       <div data-testid="reserve-list-hero"><SignedHubHero eyebrow="Birch Reserve · Canada" reserveHref="/buycalc?sku=reserve-490#reserve" lookHref="/buycalc?sku=hold-190#reserve" /></div>
       <section id="reserve-list-calculator" className="scroll-mt-24 bg-white py-12 md:py-16" data-testid="reserve-list-calculator-section">
         <div className="mx-auto max-w-5xl space-y-5 px-6">
-          <h2 className="text-3xl font-bold tracking-tight text-[#0A1D56] md:text-4xl">Check the math.</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-[#0A1D56] md:text-4xl">Check the reach.</h2>
           <SeatCalculator feed={tamFeed as any} />
           <HowCalculated feed={tamFeed as any} />
+          {isBonusDraftRequested() && <BonusTierDraft />}
         </div>
       </section>
 
@@ -291,7 +297,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="text-4xl md:text-5xl lg:text-6xl font-display text-background leading-[0.98] tracking-tight mb-6"
             >
-              Placements inside signed Scale Health hubs.
+              Placements inside listed Scale Health hubs.
             </motion.h2>
 
             <motion.p
@@ -365,7 +371,7 @@ export default function Home() {
               </a>
             </div>
             <p className="mt-4 max-w-xl text-sm text-background/70">
-              Early slots are open across 8 advertiser categories. Lock in your slot before the minimum goes up.
+              Early slots are open across 8 advertiser categories. Prepay your category's display space. One brand per category.
             </p>
           </div>
 
@@ -394,7 +400,7 @@ export default function Home() {
                 Reserve this placement <ArrowRight className="size-3.5" />
               </span>
               <span className="mt-3 block text-[10px] leading-relaxed text-background/50">
-                Illustrative unit. Your creative is placed beside live catalog products on a signed hub. Nothing runs until an insertion order names the surface.
+                Illustrative unit. Your creative is placed beside live catalog products on a listed hub. Nothing runs until an insertion order names the surface.
               </span>
             </button>
           </motion.div>
@@ -414,7 +420,7 @@ export default function Home() {
           <ol className="grid border border-border md:grid-cols-3">
             {(
               [
-                ["1", "Lock in your slot on the Reserve List before the minimum goes up. Paid reserves are 100% media credit."],
+                ["1", "Prepay your category on the Reserve List. All of it becomes display credit, refundable until 14 days before your launch date."],
                 ["2", "Insertion order names the hub."],
                 ["3", "Unit sits after checkout, on a plan, or at a booking."],
               ] as const
@@ -445,7 +451,7 @@ export default function Home() {
                 Early slots across 8 advertiser categories.
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Every dollar is a 100% media credit. Delivery starts when the insertion order names the hub. Hubs are the rooms. Lock in your slot before the minimum goes up.
+                Every dollar is a 100% media credit. Delivery starts when the insertion order names the hub. Hubs are the rooms. Prepay your category and the credit is yours to use for 12 months.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[620px]">
@@ -480,7 +486,7 @@ export default function Home() {
               </p>
               <p className="mt-4 font-display text-4xl text-accent">Early slots open</p>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-background/75">
-                Log the placements you want and claim an early slot. No commitment. Canada only for now. The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.
+                Log the placements you want and claim an early slot. No commitment. Canada only for now. {t("The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.")}
               </p>
               <p className="mt-5 border-t border-background/15 pt-4 text-xs text-background/60">
                 Use an insider code, or request one on the list.
@@ -502,10 +508,10 @@ export default function Home() {
                   {offer.name}
                 </p>
                 <p className="mt-4 font-display text-4xl text-accent">
-                  {formatReserveAmount(offer.amountCents)}
+                  {formatReserveAmount(reserveOfferAmountCents(offer.key, currency), currency)} {currency.toUpperCase()}
                 </p>
                 <p className="mt-4 flex-1 text-sm leading-relaxed text-muted-foreground">
-                  {offer.description}
+                  {t(offer.description)}
                 </p>
                 <p className="mt-5 border-t border-border pt-4 text-xs text-muted-foreground">
                   {offer.creditLine}
@@ -593,7 +599,7 @@ export default function Home() {
               variant="outline"
               className="h-12 rounded-none px-6"
             >
-              Reserve a placement — $490
+              {t("Reserve a placement — $490")}
             </Button>
             <Button
               asChild
@@ -747,7 +753,7 @@ export default function Home() {
                 <strong className="text-foreground font-medium">For distribution buyers:</strong> lock in a Reserve List slot at today's minimum.
               </p>
               <div className="mt-8">
-                <span className="bg-foreground text-accent px-4 py-2 inline-block font-medium tracking-wide rounded-sm text-sm">Reserve payments act as 100% media credit and lock in your slot at today's minimum.</span>
+                <span className="bg-foreground text-accent px-4 py-2 inline-block font-medium tracking-wide rounded-sm text-sm">Prepayments become 100% display credit in your category and are refundable until 14 days before your launch date.</span>
               </div>
             </div>
           </div>
@@ -910,7 +916,7 @@ export default function Home() {
           <div className="max-w-3xl mb-16 md:mb-20">
             <h3 className="text-4xl md:text-6xl font-display tracking-tight mb-6 italic">Where the ad sits.</h3>
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-              Not on the open web. Birch units appear after a customer has already bought, booked, or started a plan inside a signed Scale Health hub.
+              Not on the open web. Birch units appear after a customer has already bought, booked, or started a plan inside a listed Scale Health hub.
             </p>
             <a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-accent">
               See the live DR-HO'S hub <ArrowUpRight className="size-4" />
@@ -963,7 +969,7 @@ export default function Home() {
                     <h4 className="text-2xl font-display mb-2 text-foreground tracking-wide">{item.title}</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
                     <p className="mt-3 text-xs font-medium text-foreground">
-                      This unit lives on signed hubs like {index === 0 ? (
+                      This unit lives on listed hubs like {index === 0 ? (
                         <span>DR-HO'S.</span>
                       ) : (
                         "DR-HO'S."
@@ -976,7 +982,7 @@ export default function Home() {
                     </p>
                     <Preview />
                     <p className="mt-3 text-[10px] leading-relaxed text-muted-foreground">
-                      Illustrative unit. Your creative is placed beside live catalog products on a signed hub. Nothing runs until an insertion order names the surface.
+                      Illustrative unit. Your creative is placed beside live catalog products on a listed hub. Nothing runs until an insertion order names the surface.
                     </p>
                   </div>
                   <div className="mt-6 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-foreground transition-colors group-hover:text-accent">
@@ -998,12 +1004,12 @@ export default function Home() {
                 Reserve and fulfillment
               </p>
               <h2 className="max-w-xl font-display text-4xl leading-tight tracking-tight md:text-6xl">
-                Lock in your slot before the minimum goes up. We coordinate the rest.
+                Prepay your category. We coordinate the rest.
               </h2>
             </div>
             <div className="grid gap-8 border-l border-background/20 pl-6 sm:grid-cols-2 md:pl-10">
               <div>
-                <p className="font-display text-3xl text-accent">$490 USD</p>
+                <p className="font-display text-3xl text-accent">{reservePriceLabel}</p>
                 <p className="mt-2 text-sm leading-relaxed text-background/80">
                   Paid reserve, applied in full as media credit toward your placements.
                 </p>
@@ -1070,7 +1076,7 @@ export default function Home() {
           <div className="max-w-2xl mx-auto flex flex-col items-center">
             <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">Reserve a slot at today's minimum.</h2>
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
-              The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.
+              {t("The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.")}
             </p>
             <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
               <a

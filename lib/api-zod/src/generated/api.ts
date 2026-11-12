@@ -91,7 +91,7 @@ export const CreateBirchReserveUcpCheckoutResponse = zod.object({
 }),
   "id": zod.string(),
   "status": zod.enum(['incomplete', 'requires_escalation', 'completed', 'canceled']),
-  "currency": zod.enum(['USD']),
+  "currency": zod.enum(['USD', 'CAD']),
   "line_items": zod.array(zod.record(zod.string(), zod.unknown())),
   "totals": zod.array(zod.record(zod.string(), zod.unknown())),
   "links": zod.array(zod.record(zod.string(), zod.unknown())),
@@ -148,7 +148,7 @@ export const GetBirchReserveUcpCheckoutResponse = zod.object({
 }),
   "id": zod.string(),
   "status": zod.enum(['incomplete', 'requires_escalation', 'completed', 'canceled']),
-  "currency": zod.enum(['USD']),
+  "currency": zod.enum(['USD', 'CAD']),
   "line_items": zod.array(zod.record(zod.string(), zod.unknown())),
   "totals": zod.array(zod.record(zod.string(), zod.unknown())),
   "links": zod.array(zod.record(zod.string(), zod.unknown())),
@@ -275,7 +275,7 @@ export const CancelBirchReserveUcpCheckoutResponse = zod.object({
 }),
   "id": zod.string(),
   "status": zod.enum(['incomplete', 'requires_escalation', 'completed', 'canceled']),
-  "currency": zod.enum(['USD']),
+  "currency": zod.enum(['USD', 'CAD']),
   "line_items": zod.array(zod.record(zod.string(), zod.unknown())),
   "totals": zod.array(zod.record(zod.string(), zod.unknown())),
   "links": zod.array(zod.record(zod.string(), zod.unknown())),
@@ -349,7 +349,7 @@ export const RotateBirchReserveUcpCheckoutIdentityResponse = zod.object({
 }),
   "id": zod.string(),
   "status": zod.enum(['incomplete', 'requires_escalation', 'completed', 'canceled']),
-  "currency": zod.enum(['USD']),
+  "currency": zod.enum(['USD', 'CAD']),
   "line_items": zod.array(zod.record(zod.string(), zod.unknown())),
   "totals": zod.array(zod.record(zod.string(), zod.unknown())),
   "links": zod.array(zod.record(zod.string(), zod.unknown())),
@@ -366,11 +366,15 @@ export const GetBirchReserveLlmsTextResponse = zod.string()
 export const getBirchReserveCatalogResponseOffersMin = 2;
 export const getBirchReserveCatalogResponseOffersMax = 2;
 
+export const getBirchReserveCatalogResponseLegacyOffersMax = 1;
+
 
 
 export const GetBirchReserveCatalogResponse = zod.object({
   "catalog_version": zod.string(),
-  "currency": zod.enum(['USD']),
+  "currency": zod.enum(['USD']).describe('Currency of amount_cents and due_today. See each offer\'s prices for CAD.'),
+  "currencies": zod.array(zod.enum(['USD', 'CAD'])).optional(),
+  "currency_note": zod.string().optional(),
   "default_sku": zod.enum(['hold-190', 'reserve-490']),
   "inventory_model": zod.enum(['shared_reserve_pool']),
   "offers": zod.array(zod.object({
@@ -384,17 +388,19 @@ export const GetBirchReserveCatalogResponse = zod.object({
   "scope": zod.string(),
   "best_for": zod.string(),
   "requires_insertion_order": zod.literal(true),
-  "guarantees_impressions": zod.literal(false)
+  "guarantees_impressions": zod.literal(false),
+  "consumes_seat": zod.boolean().optional(),
+  "prices": zod.record(zod.string(), zod.unknown()).optional().describe('Exact due-today price per payable currency (USD')
 })).min(getBirchReserveCatalogResponseOffersMin).max(getBirchReserveCatalogResponseOffersMax),
   "legacy_offers": zod.array(zod.object({
-  "offer_key": zod.literal('reserve-899'),
-  "sku": zod.literal('reserve-899'),
+  "offer_key": zod.enum(['reserve-899']),
+  "sku": zod.enum(['reserve-899']),
   "name": zod.string(),
   "published": zod.literal(false),
   "amount_cents": zod.literal(89900),
   "due_today": zod.literal(899),
   "note": zod.string()
-})).min(1).max(1),
+})).min(1).max(getBirchReserveCatalogResponseLegacyOffersMax).describe('Unpublished legacy SKUs kept so existing Stripe Checkout sessions still match. Not offered for new public checkout.'),
   "discount_vs_published": zod.literal(0.25),
   "formats": zod.array(zod.enum(['post_checkout', 'recovery_plan', 'scheduled_service', 'member_hub', 'motion_15s'])),
   "category_slot": zod.string(),
@@ -419,7 +425,8 @@ export const getBirchReserveAvailabilityResponseSeatsOpenMultipleOf = 1;
 
 
 export const GetBirchReserveAvailabilityResponse = zod.object({
-  "currency": zod.enum(['USD']),
+  "currency": zod.enum(['USD', 'CAD']).describe('Currency for this response: ?currency, then the br_currency cookie, then Canada -> CAD, else USD.'),
+  "prices": zod.record(zod.string(), zod.unknown()).optional().describe('Exact due-today price per SKU in every payable currency.'),
   "default_sku": zod.enum(['hold-190', 'reserve-490']),
   "skus": zod.array(zod.enum(['hold-190', 'reserve-490'])).min(getBirchReserveAvailabilityResponseSkusMin).max(getBirchReserveAvailabilityResponseSkusMax),
   "inventory_model": zod.enum(['shared_reserve_pool']),
@@ -437,7 +444,8 @@ export const GetBirchReserveAvailabilityResponse = zod.object({
 export const GetBirchReserveQuoteQueryParams = zod.object({
   "sku": zod.enum(['hold-190', 'reserve-490']),
   "format": zod.enum(['post_checkout', 'recovery_plan', 'scheduled_service', 'member_hub', 'motion_15s']),
-  "days": zod.union([zod.literal(30),zod.literal(90),zod.literal(180)])
+  "days": zod.union([zod.literal(30),zod.literal(90),zod.literal(180)]),
+  "currency": zod.enum(['usd', 'cad']).optional().describe('Quote currency. Default usd.')
 })
 
 export const GetBirchReserveQuoteResponse = zod.object({
@@ -447,10 +455,11 @@ export const GetBirchReserveQuoteResponse = zod.object({
   "offerType": zod.enum(['category_look', 'category_seat']),
   "format": zod.enum(['post_checkout', 'recovery_plan', 'scheduled_service', 'member_hub', 'motion_15s']),
   "days": zod.union([zod.literal(30),zod.literal(90),zod.literal(180)]),
-  "currency": zod.enum(['USD']),
-  "amountCents": zod.union([zod.literal(19000),zod.literal(49000)]),
-  "dueTodayUsd": zod.union([zod.literal(190),zod.literal(490)]),
-  "mediaCreditCents": zod.union([zod.literal(19000),zod.literal(49000)]),
+  "currency": zod.enum(['USD', 'CAD']),
+  "amountCents": zod.union([zod.literal(19000),zod.literal(49000),zod.literal(27000),zod.literal(69000)]).describe('Exact amount due today in the quote currency.'),
+  "dueTodayUsd": zod.union([zod.literal(190),zod.literal(490)]).describe('The USD list price'),
+  "dueToday": zod.union([zod.literal(190),zod.literal(490),zod.literal(270),zod.literal(690)]).optional().describe('Exact whole-dollar amount due today in the quote currency.'),
+  "mediaCreditCents": zod.union([zod.literal(19000),zod.literal(49000),zod.literal(27000),zod.literal(69000)]),
   "scope": zod.string(),
   "discount": zod.literal(0.25),
   "requiresInsertionOrder": zod.literal(true),
@@ -478,7 +487,8 @@ export const CreateBirchReserveCheckoutBody = zod.object({
   "brand": zod.string().min(1).max(createBirchReserveCheckoutBodyBrandMax),
   "website_url": zod.string().max(createBirchReserveCheckoutBodyWebsiteUrlMax).optional(),
   "format_pref": zod.enum(['post_checkout', 'recovery_plan', 'scheduled_service', 'member_hub', 'motion_15s']).optional(),
-  "idempotency_key": zod.string().min(createBirchReserveCheckoutBodyIdempotencyKeyMin).max(createBirchReserveCheckoutBodyIdempotencyKeyMax)
+  "idempotency_key": zod.string().min(createBirchReserveCheckoutBodyIdempotencyKeyMin).max(createBirchReserveCheckoutBodyIdempotencyKeyMax),
+  "currency": zod.enum(['usd', 'cad']).optional().describe('Payment currency. Optional; default usd. CAD is $270 look \/ $690 seat.')
 })
 
 export const createBirchReserveCheckoutResponseAmountCentsMultipleOf = 1;
@@ -490,7 +500,7 @@ export const CreateBirchReserveCheckoutResponse = zod.object({
   "order_id": zod.string(),
   "reservationId": zod.string(),
   "amountCents": zod.number().multipleOf(createBirchReserveCheckoutResponseAmountCentsMultipleOf),
-  "currency": zod.enum(['usd'])
+  "currency": zod.enum(['usd', 'cad'])
 })
 
 
@@ -733,7 +743,7 @@ export const CreateSplashAdReservationBody = zod.object({
   "websiteUrl": zod.string().max(createSplashAdReservationBodyWebsiteUrlMax).optional().describe('Optional advertiser website.'),
   "buyerPath": zod.enum(['auto_buy', 'private_distribution']).optional().describe('Optional self-selected buying path used to route the inquiry.'),
   "expectedAmountCents": zod.number().min(1).describe('Exact amount displayed to the buyer before submission.'),
-  "expectedCurrency": zod.enum(['usd']).describe('Exact currency displayed to the buyer before submission.'),
+  "expectedCurrency": zod.enum(['usd', 'cad']).describe('Exact currency displayed to the buyer before submission.'),
   "offer": zod.enum(['hold-190', 'reserve-490']).describe('Stable identifier for the selected canonical USD offer.')
 })
 
@@ -742,7 +752,7 @@ export const CreateSplashAdReservationResponse = zod.object({
   "status": zod.enum(['checkout_ready', 'held_pending_payments']),
   "checkoutUrl": zod.string().nullable().describe('Real Stripe Checkout URL when payments are configured; otherwise null.'),
   "amountCents": zod.number(),
-  "currency": zod.enum(['usd']),
+  "currency": zod.enum(['usd', 'cad']),
   "offer": zod.enum(['hold-190', 'reserve-490'])
 })
 
@@ -2270,3 +2280,5 @@ export const ReviewMarketplaceCampaignResponse = zod.object({
   "endsAt": zod.coerce.date(),
   "createdAt": zod.coerce.date()
 })
+
+

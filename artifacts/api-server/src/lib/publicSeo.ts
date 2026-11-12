@@ -6,6 +6,9 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { OVERHAUL_OG_IMAGE, OVERHAUL_ROUTES } from "./overhaul/seo";
+import { PUBLIC_RESERVE_OFFERS, offerAmountCents } from "./reserveOffers";
+import type { ReserveCurrency } from "./reserveOffers";
 
 export const PUBLIC_SITE_ORIGIN = "https://birchreserve.net";
 
@@ -28,6 +31,15 @@ export const PUBLIC_SITEMAP_PATHS = [
   "/marketplace",
   "/insights",
   "/buycalc",
+  "/advertise/brands",
+  "/advertise/local",
+  "/publish/brands",
+  "/publish/studios",
+  "/match",
+  "/hubs",
+  "/media-kit",
+  "/agencies",
+  "/ai-buyers",
 ] as const;
 
 /**
@@ -41,6 +53,15 @@ export const SPA_SHELL_PATHS = [
   "/marketplace",
   "/success",
   "/splash/activation",
+  "/advertise/brands",
+  "/advertise/local",
+  "/publish/brands",
+  "/publish/studios",
+  "/match",
+  "/hubs",
+  "/media-kit",
+  "/agencies",
+  "/ai-buyers",
 ] as const;
 
 /** Client routes that duplicate another URL. The canonical is the target. */
@@ -166,6 +187,20 @@ export function withRouteSeo(html: string, pathname: string): string {
     /<meta\s+name="twitter:image"[^>]*>/i,
     `<meta name="twitter:image" content="${image}" />`,
   );
+  const meta = OVERHAUL_ROUTES[normalizedPath(pathname)];
+  if (meta) {
+    const t = escapeAttr(meta.title);
+    const d = escapeAttr(meta.description);
+    next = replaceTag(next, /<title>[\s\S]*?<\/title>/i, `<title>${t}</title>`);
+    next = replaceTag(next, /<meta\s+name="description"[^>]*>/i, `<meta name="description" content="${d}" />`);
+    next = replaceTag(next, /<meta\s+property="og:title"[^>]*>/i, `<meta property="og:title" content="${t}" />`);
+    next = replaceTag(next, /<meta\s+property="og:description"[^>]*>/i, `<meta property="og:description" content="${d}" />`);
+    next = replaceTag(next, /<meta\s+name="twitter:title"[^>]*>/i, `<meta name="twitter:title" content="${t}" />`);
+    next = replaceTag(next, /<meta\s+name="twitter:description"[^>]*>/i, `<meta name="twitter:description" content="${d}" />`);
+    next = replaceTag(next, /<meta\s+property="og:image"[^>]*>/i, `<meta property="og:image" content="${escapeAttr(OVERHAUL_OG_IMAGE)}" />`);
+    next = replaceTag(next, /<meta\s+name="twitter:image"[^>]*>/i, `<meta name="twitter:image" content="${escapeAttr(OVERHAUL_OG_IMAGE)}" />`);
+    if (meta.jsonld) next = next.replace("</head>", `<script type="application/ld+json">${JSON.stringify(meta.jsonld).replace(/</g, "\\u003c")}</script>\n</head>`);
+  }
   if (NOINDEX_PATHS.has(normalizedPath(pathname))) {
     next = replaceTag(next, /<meta\s+name="robots"[^>]*>/i, `<meta name="robots" content="noindex" />`);
   }
@@ -194,4 +229,51 @@ export function resolveSpaIndexHtmlPath(): string {
 
 export function readSpaIndexHtml(): string {
   return readFileSync(resolveSpaIndexHtmlPath(), "utf8");
+}
+
+
+/**
+ * Home-page structured data in the visitor's currency. The static shell ships a
+ * USD fallback; the function swaps the whole Product/Offer block for the
+ * detected or forced currency (CAD for Canada, USD elsewhere).
+ */
+export function homeOfferJsonLd(currency: ReserveCurrency): string {
+  const offer = PUBLIC_RESERVE_OFFERS.find((o) => o.sku === "reserve-490");
+  if (!offer) throw new Error("reserve-490 offer is missing.");
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Birch Reserve starter slot",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        item: {
+          "@type": "Product",
+          name: "Birch Reserve starter slot",
+          sku: offer.sku,
+          category: "Health and wellness retail media / display and CPC",
+          offers: {
+            "@type": "Offer",
+            price: String(offerAmountCents(offer, currency) / 100),
+            priceCurrency: currency.toUpperCase(),
+            availability: "https://schema.org/LimitedAvailability",
+            url: `${PUBLIC_SITE_ORIGIN}/advertise/brands`,
+          },
+        },
+      },
+    ],
+  };
+  return JSON.stringify(data).replaceAll("<", "\\u003c");
+}
+
+export function withLocalizedOffer(html: string, currency: ReserveCurrency): string {
+  const block = /<script type="application\/ld\+json">[\s\S]*?<\/script>/g;
+  let replaced = false;
+  const next = html.replace(block, (match) => {
+    if (replaced || !match.includes("reserve-490")) return match;
+    replaced = true;
+    return `<script type="application/ld+json">${homeOfferJsonLd(currency)}</script>`;
+  });
+  return next;
 }

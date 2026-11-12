@@ -37,13 +37,15 @@ const fakeReceipts: Record<string, FakeReceipt> = {
   "/api/launch/advertiser-intake": (_req, res) => void res.status(202).json({ intakeId: randomUUID(), status: "received" }),
   "/api/launch/ads-inventory-signup": (_req, res) => void res.status(202).json({ ok: true, leadId: `ads:${randomUUID()}` }),
   "/api/launch/splash/reserve": (req, res) => {
-    const offer = (req.body as Record<string, unknown> | undefined)?.["offer"] === "hold-190" ? "hold-190" : "reserve-490";
+    const body = req.body as Record<string, unknown> | undefined;
+    const offer = body?.["offer"] === "hold-190" ? "hold-190" : "reserve-490";
+    const cad = String(body?.["currency"] ?? "").toLowerCase() === "cad";
     res.status(202).json({
       reservationId: randomUUID(),
       status: "held_pending_payments",
       checkoutUrl: null,
-      amountCents: offer === "hold-190" ? 19000 : 49000,
-      currency: "usd",
+      amountCents: offer === "hold-190" ? (cad ? 27000 : 19000) : cad ? 69000 : 49000,
+      currency: cad ? "cad" : "usd",
       offer,
     });
   },

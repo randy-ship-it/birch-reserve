@@ -14,6 +14,7 @@
  * QA / screenshots: add ?linger=show to force it open.
  */
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { LocalPrice } from "@/components/local-price";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Check, Download, Loader2, X } from "lucide-react";
 import { useLocation } from "wouter";
@@ -331,8 +332,8 @@ export function LingerCapture() {
                     Get the media kit.
                   </h2>
                   <p id={descId} className="mt-2 text-[14px] leading-relaxed text-slate-600">
-                    Placements, formats and how early slots on the Reserve List work inside signed Scale Health hubs, in one PDF. Early
-                    placements are $490, all media credit.
+                    Placements, formats and how early slots on the Reserve List work inside listed Scale Health hubs, in one PDF. Early
+                    placements are <LocalPrice>$490</LocalPrice>, all media credit.
                   </p>
                   <form onSubmit={submit} className="relative mt-4 flex flex-col gap-2.5" noValidate data-testid="linger-form">
                     <HoneypotField inputRef={honeypotRef} idSuffix="linger" />

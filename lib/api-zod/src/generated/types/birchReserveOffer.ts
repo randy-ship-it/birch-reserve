@@ -10,6 +10,7 @@ import type { BirchReserveOfferDueToday } from './birchReserveOfferDueToday';
 import type { BirchReserveOfferMediaCreditCents } from './birchReserveOfferMediaCreditCents';
 import type { BirchReserveOfferOfferKey } from './birchReserveOfferOfferKey';
 import type { BirchReserveOfferOfferType } from './birchReserveOfferOfferType';
+import type { BirchReserveOfferPrices } from './birchReserveOfferPrices';
 import type { BirchReserveSku } from './birchReserveSku';
 
 export interface BirchReserveOffer {
@@ -24,4 +25,7 @@ export interface BirchReserveOffer {
   best_for: string;
   requires_insertion_order: true;
   guarantees_impressions: false;
+  consumes_seat?: boolean;
+  /** Exact due-today price per payable currency (USD */
+  prices?: BirchReserveOfferPrices;
 }

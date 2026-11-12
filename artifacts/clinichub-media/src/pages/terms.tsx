@@ -12,18 +12,23 @@ export default function Terms() {
         <p>
           Birch Reserve is operated by Silver Birch Growth Inc. These terms are
           a draft. They are not in force for a live card until counsel stamps
-          this page. Public prices are $190 USD (
+          this page. Public prices are $190 USD, or $270 CAD for buyers in Canada (
           <span className="text-foreground">hold-190</span>, a 7-day category
-          look that does not lock an exclusive category) and $490 USD (
+          look that does not lock an exclusive category) and $490 USD, or $690 CAD
+          for buyers in Canada (
           <span className="text-foreground">reserve-490</span>, lock your exclusive
-          category).
+          category). The currency you see at checkout is the currency you are
+          charged, and you can switch between USD and CAD on the page before you pay.
         </p>
         <p>
           hold-190 is a 100% credit if the buyer converts within 7 days.
           Otherwise it is a cash refund. It does not lock an exclusive category.
-          reserve-490 is 100% media credit. Credit expires 12 months after
-          payment. A cash refund is available if no approved surface is named
-          within 60 days of payment.
+          reserve-490 is 100% display credit, fully refundable until 14 days
+          before the launch date written in your insertion order. To cancel,
+          reply to your confirmation email. We refund the full amount to the
+          original card. After that date the credit is not refundable but stays
+          usable for 12 months after payment. A cash refund is also available
+          if no approved surface is named within 60 days of payment.
         </p>
         <p>
           Payment is a reservation credit, not a live flight and not an

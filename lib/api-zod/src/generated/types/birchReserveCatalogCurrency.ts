@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * Currency of amount_cents and due_today. See each offer's prices for CAD.
+ */
 export type BirchReserveCatalogCurrency = typeof BirchReserveCatalogCurrency[keyof typeof BirchReserveCatalogCurrency];
 
 

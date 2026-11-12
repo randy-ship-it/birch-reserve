@@ -11,4 +11,5 @@ export type SplashAdReservationReceiptCurrency = typeof SplashAdReservationRecei
 
 export const SplashAdReservationReceiptCurrency = {
   usd: 'usd',
+  cad: 'cad',
 } as const;

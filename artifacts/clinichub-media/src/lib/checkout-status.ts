@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 export type SeatSku = "hold-190" | "reserve-490";
 
 export function reserveIntakeNeed(sku: SeatSku, category?: string): string {
-  const seat = sku === "hold-190" ? "7-day look $190" : "Early placement $490";
+  const seat = sku === "hold-190" ? "7-day look $190" : "Category prepay $490";
   const cat = category?.trim().replace(/_/g, " ");
   return (cat ? `${seat} — ${cat}` : seat).slice(0, 300);
 }

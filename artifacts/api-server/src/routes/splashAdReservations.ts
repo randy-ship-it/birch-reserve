@@ -46,7 +46,10 @@ import {
   getPublicReserveOfferByKey,
   isPayableOfferKey,
   RESERVE_CURRENCY,
+  offerAmountCents,
+  parseReserveCurrency,
   reserveCheckoutLineItem,
+  type ReserveCurrency,
   type ReserveOffer,
 } from "../lib/reserveOffers";
 import {
@@ -56,6 +59,7 @@ import {
 import { hasValidQaHeader } from "../lib/testTraffic";
 import { attributionFrom } from "../lib/publicGuards";
 import { recordPaidCheckoutSafe } from "../lib/checkoutLead";
+import { sendPrepayConfirmationSafe } from "../lib/prepayConfirmationEmail";
 import { markSplashReservationTestIfQa } from "../lib/splashTestTraffic";
 
 const router: IRouter = Router();
@@ -501,8 +505,9 @@ async function findByActivationToken(token: string) {
 
 function offerLineItem(
   offer: ReserveOffer,
+  currency: ReserveCurrency = RESERVE_CURRENCY,
 ): Stripe.Checkout.SessionCreateParams.LineItem {
-  return reserveCheckoutLineItem(offer);
+  return reserveCheckoutLineItem(offer, currency);
 }
 
 async function markPaymentFailedFromSession(
@@ -566,7 +571,11 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
     if (session.payment_status === "paid") {
       const paid = await markSplashReservationPaidFromSession(session);
       // 7:21pm: paid checkout → Friday (never throws; Stripe still gets its 2xx).
-      if (paid === "paid") await recordPaidCheckoutSafe(session);
+      if (paid === "paid") {
+        await recordPaidCheckoutSafe(session);
+        // Buyer prepay confirmation (no URLs; off unless PREPAY_CONFIRMATION_EMAIL=true; never throws).
+        await sendPrepayConfirmationSafe(session);
+      }
     }
     return;
   }
@@ -621,10 +630,12 @@ router.post(
     }
     const capturedAt = new Date();
     const offer = getPublicReserveOfferByKey(parsed.data.offer);
+    const currency: ReserveCurrency =
+      parseReserveCurrency(parsed.data.expectedCurrency) ?? RESERVE_CURRENCY;
     if (
       !offer ||
-      parsed.data.expectedAmountCents !== offer.amountCents ||
-      parsed.data.expectedCurrency !== RESERVE_CURRENCY
+      parsed.data.expectedAmountCents !== offerAmountCents(offer, currency) ||
+      parsed.data.expectedCurrency !== currency
     ) {
       res.status(409).json({
         error: "The offer changed. Review the current price and submit again.",
@@ -640,8 +651,8 @@ router.post(
         promotedOffer: `Birch Reserve ${offer.name}`,
         status: "seat_held",
         offerKey: offer.offerKey,
-        amountCents: offer.amountCents,
-        currency: RESERVE_CURRENCY,
+        amountCents: offerAmountCents(offer, currency),
+        currency,
         source: "birch_reserve_public_checkout",
         followUpBy: capturedAt,
         sheetSyncStatus: "pending",
@@ -713,8 +724,8 @@ router.post(
       reservationId: reservation.id,
       status: "held_pending_payments" as const,
       checkoutUrl: null,
-      amountCents: offer.amountCents,
-      currency: RESERVE_CURRENCY,
+      amountCents: offerAmountCents(offer, currency),
+      currency,
       offer: offer.offerKey,
     };
 
@@ -739,7 +750,7 @@ router.post(
           mode: "payment",
           client_reference_id: reservation.id,
           customer_email: reservation.email,
-          line_items: [offerLineItem(offer)],
+          line_items: [offerLineItem(offer, currency)],
           metadata: {
             reservationId: reservation.id,
             offerKey: offer.offerKey,
@@ -784,8 +795,8 @@ router.post(
       createdSession = session;
       if (
         !session.url ||
-        session.currency !== RESERVE_CURRENCY ||
-        session.amount_total !== offer.amountCents
+        session.currency !== currency ||
+        session.amount_total !== offerAmountCents(offer, currency)
       ) {
         throw new Error("Stripe returned a checkout session that does not match the selected offer.");
       }
@@ -1205,6 +1216,8 @@ router.post("/launch/splash/checkout", async (req, res): Promise<void> => {
     res.status(409).json({ error: "This reservation uses an outdated price." });
     return;
   }
+  const reservationCurrency: ReserveCurrency =
+    parseReserveCurrency(reservation.currency) ?? RESERVE_CURRENCY;
   if (!isStripePaymentConfigured()) {
     res.status(503).json({ error: "Secure payment is not configured." });
     return;
@@ -1307,7 +1320,7 @@ router.post("/launch/splash/checkout", async (req, res): Promise<void> => {
       mode: "payment",
       client_reference_id: checkoutReservation.id,
       customer_email: checkoutReservation.email,
-      line_items: [offerLineItem(checkoutOffer)],
+      line_items: [offerLineItem(checkoutOffer, reservationCurrency)],
       metadata: {
         reservationId: checkoutReservation.id,
         offerKey: checkoutOffer.offerKey,

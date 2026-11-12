@@ -158,6 +158,7 @@ export type BirchReserveUcpCheckoutCurrency = typeof BirchReserveUcpCheckoutCurr
 
 export const BirchReserveUcpCheckoutCurrency = {
   USD: 'USD',
+  CAD: 'CAD',
 } as const;
 
 export type BirchReserveUcpCheckoutLineItemsItem = { [key: string]: unknown };
@@ -278,6 +279,11 @@ export const BirchReserveOfferMediaCreditCents = {
   NUMBER_49000: 49000,
 } as const;
 
+/**
+ * Exact due-today price per payable currency (USD
+ */
+export type BirchReserveOfferPrices = { [key: string]: unknown };
+
 export interface BirchReserveOffer {
   offer_key: BirchReserveOfferOfferKey;
   sku: BirchReserveSku;
@@ -290,13 +296,27 @@ export interface BirchReserveOffer {
   best_for: string;
   requires_insertion_order: true;
   guarantees_impressions: false;
+  consumes_seat?: boolean;
+  /** Exact due-today price per payable currency (USD */
+  prices?: BirchReserveOfferPrices;
 }
 
+/**
+ * Currency of amount_cents and due_today. See each offer's prices for CAD.
+ */
 export type BirchReserveCatalogCurrency = typeof BirchReserveCatalogCurrency[keyof typeof BirchReserveCatalogCurrency];
 
 
 export const BirchReserveCatalogCurrency = {
   USD: 'USD',
+} as const;
+
+export type BirchReserveCatalogCurrenciesItem = typeof BirchReserveCatalogCurrenciesItem[keyof typeof BirchReserveCatalogCurrenciesItem];
+
+
+export const BirchReserveCatalogCurrenciesItem = {
+  USD: 'USD',
+  CAD: 'CAD',
 } as const;
 
 export type BirchReserveCatalogInventoryModel = typeof BirchReserveCatalogInventoryModel[keyof typeof BirchReserveCatalogInventoryModel];
@@ -305,6 +325,44 @@ export type BirchReserveCatalogInventoryModel = typeof BirchReserveCatalogInvent
 export const BirchReserveCatalogInventoryModel = {
   shared_reserve_pool: 'shared_reserve_pool',
 } as const;
+
+export type BirchReserveCatalogLegacyOffersItemOfferKey = typeof BirchReserveCatalogLegacyOffersItemOfferKey[keyof typeof BirchReserveCatalogLegacyOffersItemOfferKey];
+
+
+export const BirchReserveCatalogLegacyOffersItemOfferKey = {
+  'reserve-899': 'reserve-899',
+} as const;
+
+export type BirchReserveCatalogLegacyOffersItemSku = typeof BirchReserveCatalogLegacyOffersItemSku[keyof typeof BirchReserveCatalogLegacyOffersItemSku];
+
+
+export const BirchReserveCatalogLegacyOffersItemSku = {
+  'reserve-899': 'reserve-899',
+} as const;
+
+export type BirchReserveCatalogLegacyOffersItemAmountCents = typeof BirchReserveCatalogLegacyOffersItemAmountCents[keyof typeof BirchReserveCatalogLegacyOffersItemAmountCents];
+
+
+export const BirchReserveCatalogLegacyOffersItemAmountCents = {
+  NUMBER_89900: 89900,
+} as const;
+
+export type BirchReserveCatalogLegacyOffersItemDueToday = typeof BirchReserveCatalogLegacyOffersItemDueToday[keyof typeof BirchReserveCatalogLegacyOffersItemDueToday];
+
+
+export const BirchReserveCatalogLegacyOffersItemDueToday = {
+  NUMBER_899: 899,
+} as const;
+
+export type BirchReserveCatalogLegacyOffersItem = {
+  offer_key: BirchReserveCatalogLegacyOffersItemOfferKey;
+  sku: BirchReserveCatalogLegacyOffersItemSku;
+  name: string;
+  published: false;
+  amount_cents: BirchReserveCatalogLegacyOffersItemAmountCents;
+  due_today: BirchReserveCatalogLegacyOffersItemDueToday;
+  note: string;
+};
 
 export type BirchReserveCatalogDiscountVsPublished = typeof BirchReserveCatalogDiscountVsPublished[keyof typeof BirchReserveCatalogDiscountVsPublished];
 
@@ -326,14 +384,23 @@ export const BirchReserveCatalogFormatsItem = {
 
 export interface BirchReserveCatalog {
   catalog_version: string;
+  /** Currency of amount_cents and due_today. See each offer's prices for CAD. */
   currency: BirchReserveCatalogCurrency;
+  currencies?: BirchReserveCatalogCurrenciesItem[];
+  currency_note?: string;
   default_sku: BirchReserveSku;
   inventory_model: BirchReserveCatalogInventoryModel;
   /**
-     * @minItems 3
-     * @maxItems 3
+     * @minItems 2
+     * @maxItems 2
      */
   offers: BirchReserveOffer[];
+  /**
+     * Unpublished legacy SKUs kept so existing Stripe Checkout sessions still match. Not offered for new public checkout.
+     * @minItems 1
+     * @maxItems 1
+     */
+  legacy_offers: BirchReserveCatalogLegacyOffersItem[];
   discount_vs_published: BirchReserveCatalogDiscountVsPublished;
   formats: BirchReserveCatalogFormatsItem[];
   category_slot: string;
@@ -343,12 +410,21 @@ export interface BirchReserveCatalog {
   human: string;
 }
 
+/**
+ * Currency for this response: ?currency, then the br_currency cookie, then Canada -> CAD, else USD.
+ */
 export type BirchReserveAvailabilityCurrency = typeof BirchReserveAvailabilityCurrency[keyof typeof BirchReserveAvailabilityCurrency];
 
 
 export const BirchReserveAvailabilityCurrency = {
   USD: 'USD',
+  CAD: 'CAD',
 } as const;
+
+/**
+ * Exact due-today price per SKU in every payable currency.
+ */
+export type BirchReserveAvailabilityPrices = { [key: string]: unknown };
 
 export type BirchReserveAvailabilityInventoryModel = typeof BirchReserveAvailabilityInventoryModel[keyof typeof BirchReserveAvailabilityInventoryModel];
 
@@ -358,11 +434,14 @@ export const BirchReserveAvailabilityInventoryModel = {
 } as const;
 
 export interface BirchReserveAvailability {
+  /** Currency for this response: ?currency, then the br_currency cookie, then Canada -> CAD, else USD. */
   currency: BirchReserveAvailabilityCurrency;
+  /** Exact due-today price per SKU in every payable currency. */
+  prices?: BirchReserveAvailabilityPrices;
   default_sku: BirchReserveSku;
   /**
-     * @minItems 3
-     * @maxItems 3
+     * @minItems 2
+     * @maxItems 2
      */
   skus: BirchReserveSku[];
   inventory_model: BirchReserveAvailabilityInventoryModel;
@@ -418,16 +497,25 @@ export type BirchReserveQuoteCurrency = typeof BirchReserveQuoteCurrency[keyof t
 
 export const BirchReserveQuoteCurrency = {
   USD: 'USD',
+  CAD: 'CAD',
 } as const;
 
+/**
+ * Exact amount due today in the quote currency.
+ */
 export type BirchReserveQuoteAmountCents = typeof BirchReserveQuoteAmountCents[keyof typeof BirchReserveQuoteAmountCents];
 
 
 export const BirchReserveQuoteAmountCents = {
   NUMBER_19000: 19000,
   NUMBER_49000: 49000,
+  NUMBER_27000: 27000,
+  NUMBER_69000: 69000,
 } as const;
 
+/**
+ * The USD list price
+ */
 export type BirchReserveQuoteDueTodayUsd = typeof BirchReserveQuoteDueTodayUsd[keyof typeof BirchReserveQuoteDueTodayUsd];
 
 
@@ -436,12 +524,27 @@ export const BirchReserveQuoteDueTodayUsd = {
   NUMBER_490: 490,
 } as const;
 
+/**
+ * Exact whole-dollar amount due today in the quote currency.
+ */
+export type BirchReserveQuoteDueToday = typeof BirchReserveQuoteDueToday[keyof typeof BirchReserveQuoteDueToday];
+
+
+export const BirchReserveQuoteDueToday = {
+  NUMBER_190: 190,
+  NUMBER_490: 490,
+  NUMBER_270: 270,
+  NUMBER_690: 690,
+} as const;
+
 export type BirchReserveQuoteMediaCreditCents = typeof BirchReserveQuoteMediaCreditCents[keyof typeof BirchReserveQuoteMediaCreditCents];
 
 
 export const BirchReserveQuoteMediaCreditCents = {
   NUMBER_19000: 19000,
   NUMBER_49000: 49000,
+  NUMBER_27000: 27000,
+  NUMBER_69000: 69000,
 } as const;
 
 export type BirchReserveQuoteDiscount = typeof BirchReserveQuoteDiscount[keyof typeof BirchReserveQuoteDiscount];
@@ -459,8 +562,12 @@ export interface BirchReserveQuote {
   format: BirchReserveQuoteFormat;
   days: BirchReserveQuoteDays;
   currency: BirchReserveQuoteCurrency;
+  /** Exact amount due today in the quote currency. */
   amountCents: BirchReserveQuoteAmountCents;
+  /** The USD list price */
   dueTodayUsd: BirchReserveQuoteDueTodayUsd;
+  /** Exact whole-dollar amount due today in the quote currency. */
+  dueToday?: BirchReserveQuoteDueToday;
   mediaCreditCents: BirchReserveQuoteMediaCreditCents;
   scope: string;
   discount: BirchReserveQuoteDiscount;
@@ -480,6 +587,17 @@ export const BirchReserveCheckoutInputFormatPref = {
   scheduled_service: 'scheduled_service',
   member_hub: 'member_hub',
   motion_15s: 'motion_15s',
+} as const;
+
+/**
+ * Payment currency. Optional; default usd. CAD is $270 look / $690 seat.
+ */
+export type BirchReserveCheckoutInputCurrency = typeof BirchReserveCheckoutInputCurrency[keyof typeof BirchReserveCheckoutInputCurrency];
+
+
+export const BirchReserveCheckoutInputCurrency = {
+  usd: 'usd',
+  cad: 'cad',
 } as const;
 
 export interface BirchReserveCheckoutInput {
@@ -502,6 +620,8 @@ export interface BirchReserveCheckoutInput {
      * @maxLength 200
      */
   idempotency_key: string;
+  /** Payment currency. Optional; default usd. CAD is $270 look / $690 seat. */
+  currency?: BirchReserveCheckoutInputCurrency;
 }
 
 export interface BirchReserveOrderConfirmation {
@@ -1266,6 +1386,7 @@ export type SplashAdReservationInputExpectedCurrency = typeof SplashAdReservatio
 
 export const SplashAdReservationInputExpectedCurrency = {
   usd: 'usd',
+  cad: 'cad',
 } as const;
 
 /**
@@ -1323,6 +1444,7 @@ export type SplashAdReservationReceiptCurrency = typeof SplashAdReservationRecei
 
 export const SplashAdReservationReceiptCurrency = {
   usd: 'usd',
+  cad: 'cad',
 } as const;
 
 export type SplashAdReservationReceiptOffer = typeof SplashAdReservationReceiptOffer[keyof typeof SplashAdReservationReceiptOffer];
@@ -2389,6 +2511,10 @@ export type GetBirchReserveQuoteParams = {
 sku: BirchReserveSku;
 format: GetBirchReserveQuoteFormat;
 days: GetBirchReserveQuoteDays;
+/**
+ * Quote currency. Default usd.
+ */
+currency?: GetBirchReserveQuoteCurrency;
 };
 
 export type GetBirchReserveQuoteFormat = typeof GetBirchReserveQuoteFormat[keyof typeof GetBirchReserveQuoteFormat];
@@ -2411,11 +2537,20 @@ export const GetBirchReserveQuoteDays = {
   NUMBER_180: 180,
 } as const;
 
+export type GetBirchReserveQuoteCurrency = typeof GetBirchReserveQuoteCurrency[keyof typeof GetBirchReserveQuoteCurrency];
+
+
+export const GetBirchReserveQuoteCurrency = {
+  usd: 'usd',
+  cad: 'cad',
+} as const;
+
 export type CreateBirchReserveCheckout200Currency = typeof CreateBirchReserveCheckout200Currency[keyof typeof CreateBirchReserveCheckout200Currency];
 
 
 export const CreateBirchReserveCheckout200Currency = {
   usd: 'usd',
+  cad: 'cad',
 } as const;
 
 export type CreateBirchReserveCheckout200 = {
@@ -2431,6 +2566,7 @@ export type CreateBirchReserveCheckout503Currency = typeof CreateBirchReserveChe
 
 export const CreateBirchReserveCheckout503Currency = {
   usd: 'usd',
+  cad: 'cad',
 } as const;
 
 export type CreateBirchReserveCheckout503 = {
@@ -2507,3 +2643,4 @@ export type ListMarketplaceCampaignsParams = {
  */
 advertiserId: string;
 };
+

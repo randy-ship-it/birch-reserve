@@ -9,6 +9,7 @@ import type { BirchReserveQuoteAmountCents } from './birchReserveQuoteAmountCent
 import type { BirchReserveQuoteCurrency } from './birchReserveQuoteCurrency';
 import type { BirchReserveQuoteDays } from './birchReserveQuoteDays';
 import type { BirchReserveQuoteDiscount } from './birchReserveQuoteDiscount';
+import type { BirchReserveQuoteDueToday } from './birchReserveQuoteDueToday';
 import type { BirchReserveQuoteDueTodayUsd } from './birchReserveQuoteDueTodayUsd';
 import type { BirchReserveQuoteFormat } from './birchReserveQuoteFormat';
 import type { BirchReserveQuoteMediaCreditCents } from './birchReserveQuoteMediaCreditCents';
@@ -24,8 +25,12 @@ export interface BirchReserveQuote {
   format: BirchReserveQuoteFormat;
   days: BirchReserveQuoteDays;
   currency: BirchReserveQuoteCurrency;
+  /** Exact amount due today in the quote currency. */
   amountCents: BirchReserveQuoteAmountCents;
+  /** The USD list price */
   dueTodayUsd: BirchReserveQuoteDueTodayUsd;
+  /** Exact whole-dollar amount due today in the quote currency. */
+  dueToday?: BirchReserveQuoteDueToday;
   mediaCreditCents: BirchReserveQuoteMediaCreditCents;
   scope: string;
   discount: BirchReserveQuoteDiscount;

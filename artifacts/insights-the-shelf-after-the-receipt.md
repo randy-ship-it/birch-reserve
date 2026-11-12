@@ -8,7 +8,7 @@
 
 ---
 
-Most ad products sell you a start date. Birch sells you a shelf that only appears after someone already finished a real step inside a signed Scale Health hub.
+Most ad products sell you a start date. Birch sells you a shelf that only appears after someone already finished a real step inside a listed Scale Health hub.
 
 That is the whole point.
 

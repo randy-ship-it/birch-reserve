@@ -37,6 +37,8 @@ export type LeadMeta = {
   category?: string;
   hubs?: string;
   sku?: string;
+  /** Lowercase ISO currency of `value` (usd | cad). Absent means usd. */
+  currency?: string;
   value?: number;
   paid?: boolean;
   stripe_session_id?: string;
@@ -45,7 +47,7 @@ export type LeadMeta = {
   /** QA only (X-Birch-QA + /api/launch/qa/friday-test-lead): push this is_test lead to Friday once. */
   friday_qa_ok?: boolean;
 };
-const META_STRING_KEYS = ["category", "hubs", "sku", "stripe_session_id", "friday_external_id"] as const;
+const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id"] as const;
 
 /** Keep only well-typed, non-empty keys (never empty strings). */
 export function cleanLeadMeta(raw: unknown): LeadMeta {

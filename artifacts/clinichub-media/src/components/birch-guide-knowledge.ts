@@ -8,10 +8,10 @@ export interface ConciergeQuestionSignals {
   sensitiveContentDetected: boolean;
 }
 
-export const BIRCH_GUIDE_SYSTEM_PROMPT = `You are Birch Guide on birchreserve.net. You help brands reserve display inventory on signed Scale Health hubs.
+export const BIRCH_GUIDE_SYSTEM_PROMPT = `You are Birch Guide on birchreserve.net. You help brands reserve display inventory on listed Scale Health hubs.
 Product: a reservation credit, not a live flight. Live proof = https://physio.drhonow.com/dr-ho/portal.
-Prices: $190 = 7-day look (100% credit if you convert). $490 = early placement + 100% media credit. Lead with the Reserve List (https://birchreserve.net/inventory): see the list, claim an early slot. Do not quote order counts, monthly views, a queue size, or a 2027 projection. The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs. Do not bring up the $190 option. $899 is a legacy SKU still in checkout — do not hero it. Nothing runs until an insertion order names the surface.
-8 advertiser categories inside signed Scale Health hubs, not eight websites. Early slots go to Reserve List brands first; categories stay open to more than one brand and no brand gets more than 20% of a category. Never offer to hold or lock a category or promise exclusivity.
+Prices: $190 = 7-day look (100% credit if you convert). $490 = category prepay: all of it becomes display credit in your category, fully refundable until 14 days before your launch date. Lead with the Reserve List (https://birchreserve.net/inventory): see the list, claim an early slot. Do not quote order counts, monthly views, a queue size, or a 2027 projection. The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs. Do not bring up the $190 option. $899 is a legacy SKU still in checkout — do not hero it. Nothing runs until an insertion order names the surface.
+8 advertiser categories inside listed Scale Health hubs, not eight websites. Early slots go to Reserve List brands first; categories stay open to more than one brand and no brand gets more than 20% of a category. Never offer to hold or lock a category or promise exclusivity.
 Also (placement example, not hero): https://weprize.net — live SBG/Birch display example. Placement only; not a Scale hub seat; no reach/impression claims. WePrize points brands to birchreserve.net; Birch reciprocates as quiet proof.
 Never state 50MM, 1MM, CTR, LTV dollars, or impression guarantees.
 Never quote Align CIM financials, partner payouts, or rdgdh investor targets as current Birch traffic.
@@ -69,7 +69,7 @@ export const DISPLAY_FORMATS = {
   confirmation: {
     label: "After checkout",
     message:
-      "A confirmation placement is shown after a customer buys from a signed Scale Health brand hub, beside products already trusted in that environment. The public mock shows the context, not a reserved placement.",
+      "A confirmation placement is shown after a customer buys from a listed Scale Health brand hub, beside products already trusted in that environment. The public mock shows the context, not a reserved placement.",
   },
   plan: {
     label: "Inside a plan",
@@ -84,7 +84,7 @@ export const DISPLAY_FORMATS = {
   hub: {
     label: "Inside a member hub",
     message:
-      "A native hub module sits on a signed brand hub home beside member offers and the private Scale Health supplier catalog. The public page illustrates the environment; availability begins only under a final insertion order.",
+      "A native hub module sits on a listed brand hub home beside member offers and the private Scale Health supplier catalog. The public page illustrates the environment; availability begins only under a final insertion order.",
   },
 } as const;
 

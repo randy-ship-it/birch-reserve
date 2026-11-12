@@ -12,4 +12,6 @@ export type BirchReserveQuoteMediaCreditCents = typeof BirchReserveQuoteMediaCre
 export const BirchReserveQuoteMediaCreditCents = {
   NUMBER_19000: 19000,
   NUMBER_49000: 49000,
+  NUMBER_27000: 27000,
+  NUMBER_69000: 69000,
 } as const;

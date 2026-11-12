@@ -85,7 +85,7 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
   assert.equal(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.publishedAt.toISOString(), "2026-10-15T16:00:00.000Z");
   assert.equal(
     WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.summary,
-    "Birch Reserve sells the aisle, not the auction. Eight category seats sit inside signed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.",
+    "Birch Reserve sells the aisle, not the auction. Eight category seats sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.",
   );
   assert.match(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.body, /^# What you send for a seat\n\nMost ad networks ask for a banner and a bid\.\n/);
   assert.match(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.body, /Send four things\./);
@@ -205,7 +205,7 @@ The $190 look does not burn a seat. It lets you assemble the square before you d
 
 Amazon, Instacart, and Walmart place the brand on the aisle the shopper already opened. The header sits where the category is already shopped.
 
-Birch Reserve sells the same shape inside a signed hub. You do not build a new page. The insertion order names the hub and the category the member already has open.
+Birch Reserve sells the same shape inside a listed hub. You do not build a new page. The insertion order names the hub and the category the member already has open.
 
 RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
 
@@ -232,7 +232,7 @@ The $190 look does not burn a seat. It lets you see the open aisle before you de
 
 LiveIntent places the unit inside the newsletter the reader already opened. You do not open a new tab.
 
-Birch Reserve sells the same shape inside a signed hub. The square sits on the page the member already has open. After the booking. On the plan. In the category.
+Birch Reserve sells the same shape inside a listed hub. The square sits on the page the member already has open. After the booking. On the plan. In the category.
 
 RDG Digital Holdings Inc. builds Scale Health Network Inc. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers.
 
@@ -911,13 +911,11 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.match(home, /cta_book_call/);
   // cta_custom_onprem CTA was removed from home in #25 (Book a call CTAs dropped).
   assert.match(concierge, /cta_book_call/);
-  assert.match(layout, /nav_insights/);
-  assert.match(layout, /label: 'Ad Examples'/);
-  assert.match(layout, /#placements/);
+  // Nov 12 overhaul: the public site moved to the /br layout; legacy nav events stay in the helper.
   assert.match(home, /id="placements"/);
   assert.match(home, /data-testid="three-steps"/);
   assert.match(home, /Nothing runs before step 2/);
-  assert.match(home, /Lock in your slot on the Reserve List before the minimum goes up\. Paid reserves are 100% media credit\./);
+  assert.match(home, /Prepay your category on the Reserve List\. All of it becomes display credit, refundable until 14 days before your launch date\./);
   assert.match(home, /data-testid="reserve-list-hero"/);
   assert.match(home, /href=\{RESERVE_LIST_HREF\}/);
   assert.match(home, /See the Reserve List/);
@@ -943,9 +941,9 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.doesNotMatch(analytics, /data-domain=["']birchreserve/);
 });
 
-const BRAND_TITLE = "Birch Reserve | The Reserve List · Scale Health demand, Canada";
+const BRAND_TITLE = "Birch Reserve | Ads inside co-branded health &amp; wellness hubs";
 const BRAND_DESCRIPTION =
-  "The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.";
+  "Display and CPC inside co-branded Recovery Brand hubs and health &amp; wellness business hubs: post-purchase, hub home, product and services pages, and the member dashboard. Brands lock in spend, local businesses lock down their area, studios earn by publishing.";
 
 test("public marketing title and description match the brand strings", async () => {
   const indexHtml = await readFile(
@@ -964,14 +962,14 @@ test("public marketing title and description match the brand strings", async () 
   assert.ok(indexHtml.includes(`name="twitter:title" content="${BRAND_TITLE}"`));
   assert.match(indexHtml, /<link rel="canonical" href="https:\/\/birchreserve\.net\/" \/>/);
   assert.match(indexHtml, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-birch-reserve\.png" \/>/);
-  assert.match(indexHtml, /The \$190 look does not burn a seat/);
+  assert.match(indexHtml, /four placements: post-purchase, hub home, product and services pages, and the member dashboard behind login/);
   assert.doesNotMatch(indexHtml, /8\.7M|56M monthly views|20M\+|100M\+ orders/);
-  assert.doesNotMatch(indexHtml, /Eight category seats inside signed Scale Health hubs\./);
+  assert.doesNotMatch(indexHtml, /Eight category seats inside listed Scale Health hubs\./);
   assert.doesNotMatch(indexHtml, /\$899|payments paused/i);
 
   const buying = await readFile(resolve(process.cwd(), "src/routes/publicBuying.ts"), "utf8");
-  assert.match(buying, /const PUBLIC_BRAND_DESCRIPTION =\s*\n\s*"\$190 holds a category 7 days\./);
-  assert.doesNotMatch(buying, /\$490 holds a category seat inside signed Scale Health hubs/);
+  assert.match(buying, /const PUBLIC_BRAND_DESCRIPTION =\s*\n\s*"Prepay your category(?:'|&#39;)s display space across listed Scale Health hubs\./);
+  assert.doesNotMatch(buying, /\$490 holds a category seat inside listed Scale Health hubs/);
 });
 
 test("GET /oatmeal is a permanent redirect to /buycalc and keeps the query string", async () => {
@@ -1044,11 +1042,11 @@ test("GET /availability.json aliases /v1/availability.json (same handler, not SP
   assert.match(buying, /async function sendAvailabilityJson/);
   assert.match(
     buying,
-    /router\.get\("\/availability\.json"[\s\S]*?await sendAvailabilityJson\(res\)/,
+    /router\.get\("\/availability\.json"[\s\S]*?await sendAvailabilityJson\(req, res\)/,
   );
   assert.match(
     buying,
-    /router\.get\("\/v1\/availability\.json"[\s\S]*?await sendAvailabilityJson\(res\)/,
+    /router\.get\("\/v1\/availability\.json"[\s\S]*?await sendAvailabilityJson\(req, res\)/,
   );
 
   const server = app.listen(0);
@@ -1271,7 +1269,7 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(category, /<h1>The category is already open\.<\/h1>/);
     assert.equal(category.match(/<h1>/g)?.length, 1);
     assert.match(category, /Amazon, Instacart, and Walmart place the brand on the aisle the shopper already opened\. The header sits where the category is already shopped\./);
-    assert.match(category, /Birch Reserve sells the same shape inside a signed hub\. You do not build a new page\. The insertion order names the hub and the category the member already has open\./);
+    assert.match(category, /Birch Reserve sells the same shape inside a listed hub\. You do not build a new page\. The insertion order names the hub and the category the member already has open\./);
     assert.match(category, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
     assert.match(category, /The \$190 look does not burn a seat\. It lets you see the open aisle before you decide\./);
     assert.doesNotMatch(category, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);
@@ -1283,7 +1281,7 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(square, /<h1>The square sits inside the hub already open\.<\/h1>/);
     assert.equal(square.match(/<h1>/g)?.length, 1);
     assert.match(square, /LiveIntent places the unit inside the newsletter the reader already opened\. You do not open a new tab\./);
-    assert.match(square, /Birch Reserve sells the same shape inside a signed hub\. The square sits on the page the member already has open\. After the booking\. On the plan\. In the category\./);
+    assert.match(square, /Birch Reserve sells the same shape inside a listed hub\. The square sits on the page the member already has open\. After the booking\. On the plan\. In the category\./);
     assert.match(square, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
     assert.match(square, /The \$190 look does not burn a seat\. It lets you see the open hub before you decide\./);
     assert.doesNotMatch(square, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899|Align/);

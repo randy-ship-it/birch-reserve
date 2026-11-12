@@ -25,6 +25,8 @@ export type CheckoutReservation = {
   brandName: string | null;
   offerKey: string;
   isTest: boolean;
+  amountCents?: number;
+  currency?: string;
 };
 
 export type CheckoutLeadDeps = {
@@ -43,6 +45,8 @@ const defaultDeps: CheckoutLeadDeps = {
         brandName: splashAdReservationsTable.brandName,
         offerKey: splashAdReservationsTable.offerKey,
         isTest: splashAdReservationsTable.isTest,
+        amountCents: splashAdReservationsTable.amountCents,
+        currency: splashAdReservationsTable.currency,
       })
       .from(splashAdReservationsTable)
       .where(eq(splashAdReservationsTable.id, id));
@@ -93,7 +97,17 @@ export async function recordPaidCheckoutSafe(session: Stripe.Checkout.Session): 
         paid: true,
         stripe_session_id: session.id,
         friday_external_id: externalId,
-        ...(sku ? { sku, value: SKU_VALUE[sku] } : {}),
+        ...(sku
+          ? {
+              sku,
+              // Actual amount charged, in the currency charged (Friday gets both).
+              value:
+                (reservation.amountCents ?? 0) > 0
+                  ? (reservation.amountCents ?? 0) / 100
+                  : SKU_VALUE[sku],
+              currency: (reservation.currency || "usd").toLowerCase(),
+            }
+          : {}),
         ...(prior?.meta.category ? { category: prior.meta.category } : {}),
         ...(prior?.meta.hubs ? { hubs: prior.meta.hubs } : {}),
       },

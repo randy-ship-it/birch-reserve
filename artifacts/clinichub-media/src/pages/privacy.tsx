@@ -11,7 +11,7 @@ export default function Privacy() {
       <div className="mt-10 space-y-6 text-base leading-relaxed text-muted-foreground">
         <p>
           This draft describes what Birch Reserve collects to sell the public
-          $190 and $490 reservations. This page is not in force until counsel
+          $190 USD ($270 CAD) and $490 USD ($690 CAD) reservations. This page is not in force until counsel
           stamps it.
         </p>
         <p>

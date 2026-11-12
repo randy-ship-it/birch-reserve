@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { BirchReserveSku } from './birchReserveSku';
+import type { GetBirchReserveQuoteCurrency } from './getBirchReserveQuoteCurrency';
 import type { GetBirchReserveQuoteDays } from './getBirchReserveQuoteDays';
 import type { GetBirchReserveQuoteFormat } from './getBirchReserveQuoteFormat';
 
@@ -13,4 +14,8 @@ export type GetBirchReserveQuoteParams = {
 sku: BirchReserveSku;
 format: GetBirchReserveQuoteFormat;
 days: GetBirchReserveQuoteDays;
+/**
+ * Quote currency. Default usd.
+ */
+currency?: GetBirchReserveQuoteCurrency;
 };

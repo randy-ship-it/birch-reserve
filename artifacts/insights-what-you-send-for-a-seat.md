@@ -4,7 +4,7 @@
 **Path:** `/insights/what-you-send-for-a-seat`  
 **Author:** Birch Reserve Editorial  
 **Topic:** Closed-hub advertising  
-**Summary:** Birch Reserve sells the aisle, not the auction. Eight category seats sit inside signed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
+**Summary:** Birch Reserve sells the aisle, not the auction. Eight category seats sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
 
 ---
 
@@ -12,7 +12,7 @@ Most ad networks ask for a banner and a bid.
 
 That is the wrong first file for a room a brand already paid to fill. The customer already checked out, booked, or opened a plan. The next unit has to look like it belongs on that shelf, not like it escaped a feed.
 
-Birch Reserve sells the aisle, not the auction. Eight category seats sit inside signed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
+Birch Reserve sells the aisle, not the auction. Eight category seats sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
 
 Here is the actual handoff after you look or lock.
 

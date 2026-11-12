@@ -1,0 +1,72 @@
+[
+ {
+  "url": "https://www.rollrecovery.com",
+  "blurb": "Recovery tools for athletes",
+  "expect": "health"
+ },
+ {
+  "url": "https://drhonow.com",
+  "blurb": "",
+  "expect": "health"
+ },
+ {
+  "url": "https://yoursole.com",
+  "blurb": "Custom-moldable insoles and footbeds",
+  "expect": "health"
+ },
+ {
+  "url": "https://www.orangetheory.com",
+  "blurb": "",
+  "expect": "health"
+ },
+ {
+  "url": "https://www.freshprep.ca",
+  "blurb": "Meal kits delivered in BC and Alberta",
+  "expect": "health"
+ },
+ {
+  "url": "https://birdandbe.com",
+  "blurb": "",
+  "expect": "health"
+ },
+ {
+  "url": "https://www.yogaworks.com",
+  "blurb": "Yoga studio classes",
+  "expect": "health"
+ },
+ {
+  "url": "https://www.petvalu.ca",
+  "blurb": "Pet food and supplies",
+  "expect": "health"
+ },
+ {
+  "url": "https://www.genuinehealth.com",
+  "blurb": "",
+  "expect": "health"
+ },
+ {
+  "url": "https://www.lifemark.ca",
+  "blurb": "",
+  "expect": "health"
+ },
+ {
+  "url": "https://www.goodlifefitness.com",
+  "blurb": "",
+  "expect": "health"
+ },
+ {
+  "url": "https://www.autotrader.ca",
+  "blurb": "",
+  "expect": "unrelated"
+ },
+ {
+  "url": "https://github.com",
+  "blurb": "",
+  "expect": "unrelated"
+ },
+ {
+  "url": "https://www.mcmillan.ca",
+  "blurb": "Business law firm",
+  "expect": "unrelated"
+ }
+]

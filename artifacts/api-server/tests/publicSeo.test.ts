@@ -54,7 +54,7 @@ test("GET /sitemap.xml is XML and lists public pages without API, inventory, or 
   assert.doesNotMatch(xml, /\/success/);
   assert.doesNotMatch(xml, /\/splash\/activation/);
   assert.doesNotMatch(xml, /\/oatmeal/);
-  assert.doesNotMatch(xml, /\/advertise/);
+  assert.doesNotMatch(xml, /\/advertise<\/loc>/);
   assert.doesNotMatch(xml, /\/ad-examples/);
   assert.doesNotMatch(xml, /\/api\//);
   assert.doesNotMatch(xml, /\/v1\//);
@@ -100,8 +100,8 @@ test("server HTML and SPA shells expose canonical, og:url, og:image, and twitter
       assert.match(html, /<meta name="robots" content="noindex"\s*\/>/);
     }
     if (path === "/about") {
-      assert.match(html, /The \$190 look does not burn a seat/);
-      assert.match(html, /The \$490 seat is the named category/);
+      assert.match(html, /The look does not burn a seat/);
+      assert.match(html, /The seat is the named category/);
       assert.match(html, /The insertion order names the hub before anything runs/);
       assert.match(html, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-birch-reserve\.png"\s*\/>/);
       assert.doesNotMatch(html, /8\.7M|56M monthly views|20M\+|100M\+ orders/);
@@ -215,7 +215,7 @@ test("GET /insights/one-card-names-the-category publishes the supplied copy and 
   assert.equal(html.match(/<h1>/g)?.length, 1);
   assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/insights\/one-card-names-the-category"\s*\/>/);
   assert.match(html, /Carbon places one native card on the page the reader already opened\. One image\. One short line\. Not a feed\./);
-  assert.match(html, /Birch places one card inside a signed hub\. The category names the card\. It sits after checkout, on a plan, or at a booking\./);
+  assert.match(html, /Birch places one card inside a listed hub\. The category names the card\. It sits after checkout, on a plan, or at a booking\./);
   assert.match(html, /The \$190 look is that card for 7 days\. It does not burn a seat\. It does not start a flight\. You see the card before the insertion order names the hub\./);
   assert.match(html, /Nothing runs on the look alone\./);
   assert.match(html, /RDG Digital Holdings builds Scale Health\. Birch Reserve is the media seat on that network\./);
@@ -293,7 +293,7 @@ test("GET /insights/the-category-is-already-open publishes the supplied copy and
   assert.equal(html.match(/<h1>/g)?.length, 1);
   assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/insights\/the-category-is-already-open"\s*\/>/);
   assert.match(html, /Amazon, Instacart, and Walmart place the brand on the aisle the shopper already opened\. The header sits where the category is already shopped\./);
-  assert.match(html, /Birch Reserve sells the same shape inside a signed hub\. You do not build a new page\. The insertion order names the hub and the category the member already has open\./);
+  assert.match(html, /Birch Reserve sells the same shape inside a listed hub\. You do not build a new page\. The insertion order names the hub and the category the member already has open\./);
   assert.match(html, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
   assert.match(html, /The \$190 look does not burn a seat\. It lets you see the open aisle before you decide\./);
   assert.doesNotMatch(html, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899/);
@@ -326,7 +326,7 @@ test("GET /insights/the-square-sits-inside-the-hub-already-open publishes the su
   assert.equal(html.match(/<h1>/g)?.length, 1);
   assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/insights\/the-square-sits-inside-the-hub-already-open"\s*\/>/);
   assert.match(html, /LiveIntent places the unit inside the newsletter the reader already opened\. You do not open a new tab\./);
-  assert.match(html, /Birch Reserve sells the same shape inside a signed hub\. The square sits on the page the member already has open\. After the booking\. On the plan\. In the category\./);
+  assert.match(html, /Birch Reserve sells the same shape inside a listed hub\. The square sits on the page the member already has open\. After the booking\. On the plan\. In the category\./);
   assert.match(html, /RDG Digital Holdings Inc\. builds Scale Health Network Inc\. Birch Reserve is the prepaid seat on the hubs Scale brands open for their customers\./);
   assert.match(html, /The \$190 look does not burn a seat\. It lets you see the open hub before you decide\./);
   assert.doesNotMatch(html, /the-look-starts-itself|the-unit-belongs-to-the-protocol|reserve-899/);
@@ -1010,7 +1010,7 @@ test("buycalc HTML keeps the category facts and drops the price-rise line", () =
   assert.match(html, /\$490 USD/);
   assert.match(html, /\$190 USD/);
   assert.match(html, /One unit inside the hub\. Not a stack of banners\. The category names the card\./);
-  assert.match(html, /The zone is the category\. You can open a signed hub before the look\. The look does not serve\./);
+  assert.match(html, /The zone is the category\. You can open a listed hub before the look\. The look does not serve\./);
   assert.match(html, /The \$190 look is a draft you build\. It does not serve until the insertion order names the hub\./);
   assert.match(html, /One brand header on the category the customer already opened\. Not a second page\./);
   assert.match(html, /The unit matches the page the customer already opened\. It is not a banner beside the letter\./);
@@ -1020,7 +1020,7 @@ test("buycalc HTML keeps the category facts and drops the price-rise line", () =
   assert.match(html, /This is the place\. Not a view chart\. Illustrative until the insertion order names the hub\./);
   assert.match(html, /The unit is one card on a page the visitor already opened\. You do not send them to a new feed\. The card stays small enough that the hub page remains the page\.<\/p>\s*<p class="sh-proof">The category is the named zone\. You do not buy an open slot\. The insertion order names the hub and the category before anything runs\.<\/p>\s*<p class="sh-proof">The look is the preview\. You assemble the square still on the creative brief\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">The header is the placement\. You sit in the category the visitor already opened\. You do not create a new search\.<\/p>\s*<p class="sh-proof">You see the face before the flight\. The square still is the preview\. Nothing on the hub changes until the insertion order names the hub\.<\/p>\s*<p class="sh-proof">One card names the category\. The card sits on the hub page the visitor already opened\.<\/p>\s*<p class="sh-proof">The zone has a price\. You do not bid for the category\. The \$490 is the named seat\.<\/p>\s*<p class="sh-proof">The look assembles on the brief\. You do not wait for the \$490 to start the square\.<\/p>\s*<p class="sh-proof">The category is already open\. You sit where the member is already shopping\. The \$490 is the header on that aisle\.<\/p>\s*<p class="sh-proof">The square sits inside the hub already open\. You approve the still on the brief\. The \$490 names the category\.<\/p>\s*<p class="sh-proof">The card stays on the page the visitor already opened\. One square\. Not a feed\. The \$490 names the category\.<\/p>\s*<p class="sh-proof">The zone is sold by name\. You do not buy a remnant\. The \$490 is the zone\.<\/p>\s*<p class="sh-proof">The look is the draft\. You build the square on the brief\. The \$490 is the stamp\.<\/p>\s*<p class="sh-proof">The header sits on the aisle already open\. You do not open a new search\. The \$490 is the named category\.<\/p>\s*<p class="sh-proof">The face is approved on the brief\. You see the still before anything flies\. The \$490 is the stamp\.<\/p>\s*<p class="sh-proof">The square is endemic to the recovery already open\. You do not open a new protocol\. The \$490 is the named category\.<\/p>\s*<p class="sh-proof">The preview is self-serve\. You start the square on the brief\. The \$490 is the stamp\.<\/p>\s*<p class="sh-proof">The card does not leave the page\. You stay where the member already is\. The \$490 is the named category\.<\/p>\s*<p class="sh-proof">The zone is one name\. You do not share the seat\. The \$490 is that name\.<\/p>\s*<p class="sh-proof">The still is the preview\. You assemble the square on the brief\. The \$490 is the stamp\.<\/p>\s*<p class="sh-proof">The shelf is already shopped\. You place the square on the aisle the member already opened\. The \$490 is the header\.<\/p>\s*<p class="sh-proof">The square is already in the letter\. You place the unit inside the page the member already opened\. The \$490 is the stamp\.<\/p>\s*<p class="sh-proof">The kit sits inside the recovery already open\. You place the square on the protocol the member already started\. The \$490 is the named category\.<\/p>\s*<p class="sh-proof">The look starts on the brief\. You start the square yourself\. The \$490 is the stamp\.<\/p>\s*<p class="sh-proof">The card is the only unit\. You place one square on the page the member already opened\. The \$490 is the named category\.<\/p>/);
   assert.doesNotMatch(html, /The zone is locked by the buyer/);
-  assert.match(html, /Lock one category inside signed health hubs\. Not an open auction\./);
+  assert.match(html, /Prepay your category(?:'|&#39;)s display space\. One brand\. No bidding\./);
   assert.match(html, /No impression guarantee/);
   assert.doesNotMatch(html, /exclusiv/i);
   assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/buycalc"\s*\/>/);
@@ -1047,7 +1047,7 @@ test("catalog and llms.txt use plain lock language", async () => {
   const llms = await (await fetch(`${origin}/llms.txt`)).text();
   const catalog = JSON.stringify(await (await fetch(`${origin}/v1/catalog.json`)).json());
   for (const body of [llms, catalog]) {
-    assert.match(body, /Lock in your slot\./);
+    assert.match(body, /Prepay your category\./);
     assert.doesNotMatch(body, /the-zone-is-locked-by-the-buyer/);
     assert.doesNotMatch(body, /minimum goes up/);
     assert.doesNotMatch(body, /today's minimum/);
@@ -1155,4 +1155,62 @@ test("unknown paths return 404 with the SPA shell", async () => {
   }
   const kit = await fetch(`${origin}/kit`);
   assert.equal(kit.status, 200);
+});
+
+function homeOffer(html: string): { price: string; priceCurrency: string } {
+  const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => m[1] ?? "");
+  const block = blocks.find((b) => b.includes("reserve-490"));
+  assert.ok(block, "home JSON-LD with the reserve-490 offer");
+  const data = JSON.parse(block!);
+  return data.itemListElement[0].item.offers;
+}
+
+test("GET / serves the Offer JSON-LD in the visitor's currency (CA -> CAD, else USD, ?currency wins)", async () => {
+  const cases: Array<[string, Record<string, string>, string, string]> = [
+    ["/", { "x-vercel-ip-country": "CA" }, "690", "CAD"],
+    ["/", { "x-vercel-ip-country": "US" }, "490", "USD"],
+    ["/", {}, "490", "USD"],
+    ["/?currency=cad", { "x-vercel-ip-country": "US" }, "690", "CAD"],
+    ["/?currency=usd", { "x-vercel-ip-country": "CA" }, "490", "USD"],
+  ];
+  for (const [path, headers, price, cur] of cases) {
+    const res = await fetch(`${origin}${path}`, { headers });
+    assert.equal(res.status, 200);
+    assert.match(res.headers.get("vary") ?? "", /x-vercel-ip-country/i);
+    const html = await res.text();
+    const offer = homeOffer(html);
+    assert.equal(offer.price, price, `${path} ${JSON.stringify(headers)}`);
+    assert.equal(offer.priceCurrency, cur);
+    assert.doesNotMatch(html, /early placement/i);
+  }
+});
+
+test("/buycalc calculator shows modelled reach only: no CTR, click or order assumptions, no 'signed' hubs", () => {
+  for (const currency of ["usd", "cad"] as const) {
+    const html = renderBuycalcHtml({ seatsOpen: 8, seatsTotal: 8, currency });
+    assert.match(html, /id="seat-calc"/);
+    assert.match(html, /Modelled monthly views in your category surface/);
+    assert.doesNotMatch(html, /CTR|click-to-order|Click-to-order|Scenario clicks|Scenario orders|sc-surf|sc-band/);
+    assert.doesNotMatch(html, /0\.08|0\.25 \/ 0\.45|4\.00%/);
+    assert.doesNotMatch(html, /\bsigned (?:Scale Health|hubs?|partner)/i);
+    assert.doesNotMatch(html, /bonus-tier-draft/);
+    assert.match(html, /refundable until 14 days before|14 days before your launch date/i);
+  }
+});
+
+test("the volume-bonus draft renders only with the draft flag, in the page currency, and keeps the base price", () => {
+  const off = renderBuycalcHtml({ seatsOpen: 8, seatsTotal: 8, currency: "cad" });
+  assert.doesNotMatch(off, /Volume prepay bonus/);
+  const cad = renderBuycalcHtml({ seatsOpen: 8, seatsTotal: 8, currency: "cad", draftBonus: true });
+  assert.match(cad, /Draft · not for sale/);
+  assert.match(cad, /\$2,100 CAD/);
+  assert.match(cad, /\$2,205 CAD/);
+  assert.match(cad, /\$9,660 CAD/);
+  assert.match(cad, /\$690 CAD/);
+  assert.match(cad, /<meta name="robots" content="noindex">/);
+  const usd = renderBuycalcHtml({ seatsOpen: 8, seatsTotal: 8, currency: "usd", draftBonus: true });
+  assert.match(usd, /\$1,575 USD/);
+  assert.match(usd, /\$6,900 USD/);
+  assert.match(usd, /13\.0%/);
+  assert.match(usd, /\$490 USD/);
 });

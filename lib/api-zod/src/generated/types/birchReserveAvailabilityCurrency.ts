@@ -6,9 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
+/**
+ * Currency for this response: ?currency, then the br_currency cookie, then Canada -> CAD, else USD.
+ */
 export type BirchReserveAvailabilityCurrency = typeof BirchReserveAvailabilityCurrency[keyof typeof BirchReserveAvailabilityCurrency];
 
 
 export const BirchReserveAvailabilityCurrency = {
   USD: 'USD',
+  CAD: 'CAD',
 } as const;

@@ -32,6 +32,7 @@ const API_PATHS = [
   "/v1(?:/.*)?",
   "/ucp(?:/.*)?",
   "/\\.well-known/ucp",
+  "/\\.well-known/agent\\.json",
   "/llms\\.txt",
   "/openapi\\.yaml",
   "/buycalc/?",
@@ -39,6 +40,15 @@ const API_PATHS = [
   "/advertise/?",
   "/availability\\.json",
   "/kit/?",
+  "/sponsor/?",
+  // Overhaul routes: the function serves the SPA shell with per-route head + JSON-LD.
+  "/advertise/(?:brands|local)/?",
+  "/publish(?:/(?:brands|studios))?/?",
+  "/match/?",
+  "/hubs/?",
+  "/media-kit/?",
+  "/agencies/?",
+  "/ai-buyers/?",
   "/terms/?",
   "/privacy/?",
   "/sample-io/?",
@@ -164,6 +174,8 @@ await writeFile(
 );
 
 const routes = [
+  // The home page is served by the function so its Offer JSON-LD matches the visitor's currency.
+  { src: "^/$", dest: "/api" },
   { handle: "filesystem" },
   ...API_PATHS.map((src) => ({ src, dest: "/api" })),
   ...SPA_INDEX_PATHS.map((src) => ({ src, dest: "/index.html" })),

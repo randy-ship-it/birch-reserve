@@ -1,3 +1,4 @@
+import { llmsTxt } from "../lib/overhaul/seo";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
@@ -37,9 +38,18 @@ import {
   getPublicReserveOfferBySku,
   PUBLIC_RESERVE_OFFERS,
   RESERVE_CURRENCY,
+  RESERVE_CURRENCIES,
+  localizeReservePriceCopy,
+  offerAmountCents,
+  offerPriceLabel,
+  offerScope,
+  parseReserveCurrency,
   reserveCheckoutLineItem,
   type PublicReserveOffer,
+  type ReserveCurrency,
 } from "../lib/reserveOffers";
+import { currencyCookieHeader, decideCurrency } from "../lib/currency";
+import { isBonusDraftRequested, renderBonusTierDraftHtml } from "../lib/bonusTierDraft";
 import {
   admitUcpProfileResolution,
   authenticateUcpAgentRequest,
@@ -69,6 +79,7 @@ import {
 } from "./splashAdReservations";
 import { logger, recordUcpProxyForwardingShape } from "../lib/logger";
 import { publicSeoTags } from "../lib/publicSeo";
+import { PREPAY_REFUND_CUTOFF_DAYS } from "../lib/reserveOffers";
 import { handleUiEvent } from "../lib/uiEvents";
 
 const router: IRouter = Router();
@@ -138,8 +149,11 @@ function validWebsite(value: string | undefined): boolean {
   }
 }
 
-function lineItem(offer: PublicReserveOffer): Stripe.Checkout.SessionCreateParams.LineItem {
-  return reserveCheckoutLineItem(offer);
+function lineItem(
+  offer: PublicReserveOffer,
+  currency: ReserveCurrency = RESERVE_CURRENCY,
+): Stripe.Checkout.SessionCreateParams.LineItem {
+  return reserveCheckoutLineItem(offer, currency);
 }
 
 function mappedStatus(row: typeof splashAdReservationsTable.$inferSelect):
@@ -310,7 +324,7 @@ export function buildUcpCheckoutView(
     ucp: ucpMetadata(),
     id: row.id,
     status,
-    currency: "USD",
+    currency: row.currency.toUpperCase(),
     line_items: [
       {
         id: `li_${row.id}`,
@@ -460,7 +474,7 @@ async function reserveCounts() {
 }
 
 const PUBLIC_BRAND_DESCRIPTION =
-  "$190 holds a category 7 days. $490 locks in your slot inside signed Scale Health hubs. Live hub: physio.drhonow.com. Your payment is media credit, not airfare.";
+  "Prepay your category's display space across listed Scale Health hubs. One brand per category, no bidding. Fully refundable until 14 days before launch. Live hub: physio.drhonow.com. Your payment is display credit, not airfare.";
 
 /** Price-rise line stays off /buycalc until a change is locked in writing. */
 const BUYCALC_PRICE_RISE = "Lock in your slot before the minimum goes up";
@@ -474,7 +488,7 @@ function buycalcPublicScope(scope: string): string {
 
 const BUYCALC_SKU_LINES = [
   "One unit inside the hub. Not a stack of banners. The category names the card.",
-  "The zone is the category. You can open a signed hub before the look. The look does not serve.",
+  "The zone is the category. You can open a listed hub before the look. The look does not serve.",
   "The $190 look is a draft you build. It does not serve until the insertion order names the hub.",
   "One brand header on the category the customer already opened. Not a second page.",
   "The unit matches the page the customer already opened. It is not a banner beside the letter.",
@@ -533,34 +547,21 @@ router.post("/v1/ui-events", (req, res) => {
 });
 
 router.get("/llms.txt", (_req, res) => {
+  // Overhaul (Nov 12 2026): one plain-text map of the four paths, prices and machine endpoints.
   res.type("text/plain").send(
     [
-      "# Birch Reserve",
+      llmsTxt(),
       "",
-      "8 brand categories inside signed Scale Health clinic hubs. Lock in your slot. Not an open auction. Not a guaranteed impression buy.",
-      "Live proof: https://physio.drhonow.com/dr-ho/portal",
-      "Also (placement example, not hero): https://weprize.net — live SBG/Birch display example. Placement only; not a Scale hub category; no reach/impression claims.",
-      "Public SKUs:",
-      "- hold-190 · $190 USD · 7-day category look · 100% credit if you convert within 7 days, else cash refund · does not lock in a slot",
-      "- reserve-490 · $490 USD · lock in your slot · 100% media credit · insertion order before flight · credit expires 12 months",
-      "- custom · Get a call back · multi-hub / on-prem Align",
-      "8 brand categories across hubs — not eight websites. Lock in your slot.",
-      "Categories: pain relief / topicals, recovery hardware, nutrition, sleep, meal prep, women’s health, men’s health, diagnostics / services.",
-      "Launching cohort (logos, not reach): DR-HO’S · Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery.",
-      `Formats: ${FORMATS.join(", ")}.`,
-      "Every published dollar is a 100% media credit. Delivery starts when the insertion order names the hub.",
-      PUBLIC_BRAND_DESCRIPTION,
-      "Quoted public prices are exact, one-time, and USD. Only reserve-490 locks in a slot. hold-190 does not.",
-      "Exclusions: no PHI, no clinical pixels, no open auction, no impression guarantee.",
-      "Seller: Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · sales@silverbirchgrowth.com",
-      "Draft terms: /terms · Draft privacy: /privacy · Sample insertion order: /sample-io · Kit: /kit",
+      "## Legacy machine checkout (category seat)",
+      "Prepay your category. Not an open auction.",
+      "- hold-190 · $190 USD ($270 CAD for Canadian buyers) · 7-day category look · does not lock in a slot",
+      "- reserve-490 · $490 USD ($690 CAD for Canadian buyers) · prepay your category · 100% display credit · fully refundable until 14 days before your launch date",
       `Machine catalog: /v1/catalog.json`,
       `Availability: /v1/availability.json`,
       `Quote: /v1/quote?sku=reserve-490&format=post_checkout&days=30`,
       `Checkout: POST /v1/checkout`,
       `UCP discovery: /.well-known/ucp`,
-      "UCP checkout uses Stripe-hosted buyer handoff. Delegated Stripe Agentic Commerce/ACP payment is not advertised.",
-      "Poll: GET /v1/orders/:id and /v1/orders/:id/io.json",
+      `Formats: ${FORMATS.join(", ")}.`,
       `Human calculator: /buycalc`,
       "Contact: sales@silverbirchgrowth.com",
     ].join("\n"),
@@ -571,6 +572,8 @@ router.get("/v1/catalog.json", (_req, res) => {
   res.json({
     catalog_version: "2026-09-24",
     currency: "USD",
+    currencies: RESERVE_CURRENCIES.map((c) => c.toUpperCase()),
+    currency_note: "amount_cents and due_today are USD. See prices for CAD. Pass currency=cad to /v1/quote and /v1/checkout to pay in CAD.",
     default_sku: DEFAULT_RESERVE_OFFER.sku,
     inventory_model: "shared_reserve_pool",
     offers: PUBLIC_RESERVE_OFFERS.map((offer) => ({
@@ -580,6 +583,7 @@ router.get("/v1/catalog.json", (_req, res) => {
       offer_type: offer.offerType,
       amount_cents: offer.amountCents,
       due_today: offer.dueTodayUsd,
+      prices: priceTable(offer),
       media_credit_cents: offer.amountCents,
       scope: offer.scope,
       best_for: offer.bestFor,
@@ -606,9 +610,34 @@ router.get("/v1/catalog.json", (_req, res) => {
   });
 });
 
-async function sendAvailabilityJson(res: { json: (body: unknown) => void }): Promise<void> {
+/** Exact due-today price in every payable currency for one public SKU. */
+function priceTable(offer: PublicReserveOffer) {
+  return Object.fromEntries(
+    RESERVE_CURRENCIES.map((c) => [
+      c.toUpperCase(),
+      {
+        amount_cents: offerAmountCents(offer, c),
+        due_today: offerAmountCents(offer, c) / 100,
+        label: offerPriceLabel(offer, c),
+      },
+    ]),
+  );
+}
+
+async function sendAvailabilityJson(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const decision = decideCurrency(req);
+  res.setHeader("Cache-Control", "private, no-store");
+  res.setHeader("Vary", "Cookie, x-vercel-ip-country");
   res.json({
-    currency: "USD",
+    currency: decision.currency.toUpperCase(),
+    currency_source: decision.source,
+    currencies: RESERVE_CURRENCIES.map((c) => c.toUpperCase()),
+    prices: Object.fromEntries(
+      PUBLIC_RESERVE_OFFERS.map((offer) => [offer.sku, priceTable(offer)]),
+    ),
     default_sku: DEFAULT_RESERVE_OFFER.sku,
     skus: PUBLIC_RESERVE_OFFERS.map((offer) => offer.sku),
     inventory_model: "shared_reserve_pool",
@@ -623,22 +652,55 @@ async function sendAvailabilityJson(res: { json: (body: unknown) => void }): Pro
 }
 
 // Public alias so /availability.json is JSON (not the SPA shell). Same payload as /v1.
-router.get("/availability.json", async (_req, res): Promise<void> => {
-  await sendAvailabilityJson(res);
+router.get("/availability.json", async (req, res): Promise<void> => {
+  await sendAvailabilityJson(req, res);
 });
 
-router.get("/v1/availability.json", async (_req, res): Promise<void> => {
-  await sendAvailabilityJson(res);
+router.get("/v1/availability.json", async (req, res): Promise<void> => {
+  await sendAvailabilityJson(req, res);
+});
+
+// Which currency this visitor sees. The site calls this once on load.
+// Order: ?currency, then the br_currency cookie, then Canada -> CAD, else USD.
+router.get("/api/currency", (req, res): void => {
+  const decision = decideCurrency(req);
+  res.setHeader("Cache-Control", "private, no-store");
+  res.setHeader("Vary", "Cookie, x-vercel-ip-country");
+  res.json({
+    currency: decision.currency,
+    country: decision.country,
+    source: decision.source,
+    prices: Object.fromEntries(
+      PUBLIC_RESERVE_OFFERS.map((offer) => [
+        offer.sku,
+        Object.fromEntries(
+          RESERVE_CURRENCIES.map((c) => [
+            c,
+            {
+              amountCents: offerAmountCents(offer, c),
+              dueToday: offerAmountCents(offer, c) / 100,
+              label: offerPriceLabel(offer, c),
+            },
+          ]),
+        ),
+      ]),
+    ),
+  });
 });
 
 router.get("/v1/quote", async (req, res): Promise<void> => {
   const format = req.query.format;
   const days = req.query.days;
   const offer = getPublicReserveOfferBySku(req.query.sku);
-  if (!offer || !isFormat(format) || !isWindow(days)) {
-    res.status(400).json({ error: "A supported SKU, format, and 30, 90, or 180 day window are required." });
+  const quoteCurrency =
+    req.query.currency === undefined
+      ? decideCurrency(req).currency
+      : parseReserveCurrency(req.query.currency);
+  if (!offer || !isFormat(format) || !isWindow(days) || quoteCurrency === null) {
+    res.status(400).json({ error: "A supported SKU, format, 30, 90, or 180 day window, and usd or cad currency are required." });
     return;
   }
+  const quoteAmountCents = offerAmountCents(offer, quoteCurrency);
   res.json({
     sku: offer.sku,
     offerKey: offer.offerKey,
@@ -646,11 +708,12 @@ router.get("/v1/quote", async (req, res): Promise<void> => {
     offerType: offer.offerType,
     format,
     days: Number(days),
-    currency: "USD",
-    amountCents: offer.amountCents,
+    currency: quoteCurrency.toUpperCase(),
+    amountCents: quoteAmountCents,
     dueTodayUsd: offer.dueTodayUsd,
-    mediaCreditCents: offer.amountCents,
-    scope: offer.scope,
+    dueToday: quoteAmountCents / 100,
+    mediaCreditCents: quoteAmountCents,
+    scope: offerScope(offer, quoteCurrency),
     discount: 0.25,
     categoryLock: true,
     coordinated72h: true,
@@ -686,8 +749,16 @@ async function handleMachineCheckout(
     "website_url",
     "format_pref",
     "idempotency_key",
+    "currency",
   ]);
   const offer = getPublicReserveOfferBySku(body.sku);
+  // Omitted currency: geo default (x-vercel-ip-country CA -> CAD, else USD). An explicit
+  // currency always wins; an unsupported explicit value still falls back to USD (and is
+  // rejected below as invalid input).
+  const requestedCurrency =
+    body.currency === undefined ? decideCurrency(req).currency : parseReserveCurrency(body.currency);
+  const currency: ReserveCurrency = requestedCurrency ?? RESERVE_CURRENCY;
+  const amountCents = offer ? offerAmountCents(offer, currency) : 0;
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const brand = typeof body.brand === "string" ? body.brand.trim() : "";
   const website = typeof body.website_url === "string" ? body.website_url.trim() : undefined;
@@ -700,6 +771,7 @@ async function handleMachineCheckout(
       : null;
   if (
     !offer ||
+    requestedCurrency === null ||
     !validEmail(email) ||
     brand.length < 1 ||
     brand.length > 160 ||
@@ -715,8 +787,8 @@ async function handleMachineCheckout(
       checkout_url: null,
       order_id: null,
       reservationId: null,
-      amountCents: offer?.amountCents ?? 0,
-      currency: RESERVE_CURRENCY,
+      amountCents,
+      currency,
     }, database);
     return;
   }
@@ -746,8 +818,8 @@ async function handleMachineCheckout(
       promotedOffer: `Birch Reserve ${offer.name}`,
       status: "seat_held",
       offerKey: offer.offerKey,
-      amountCents: offer.amountCents,
-      currency: RESERVE_CURRENCY,
+      amountCents,
+      currency,
       source: "birch_reserve_v1_checkout",
       followUpBy: new Date(),
       sheetSyncStatus: "pending",
@@ -789,8 +861,8 @@ async function handleMachineCheckout(
       checkout_url: null,
       order_id: null,
       reservationId: null,
-      amountCents: offer.amountCents,
-      currency: RESERVE_CURRENCY,
+      amountCents,
+      currency,
     }, database);
     return;
   }
@@ -809,8 +881,8 @@ async function handleMachineCheckout(
         checkout_url: null,
         order_id: null,
         reservationId: null,
-        amountCents: offer.amountCents,
-        currency: RESERVE_CURRENCY,
+        amountCents,
+        currency,
       }, database);
     }
     return;
@@ -878,16 +950,16 @@ async function handleMachineCheckout(
       reservation.websiteUrl !== (website || null) ||
       reservation.adInterest !== (isFormat(format) ? format : "post_checkout") ||
       reservation.offerKey !== offer.offerKey ||
-      reservation.amountCents !== offer.amountCents ||
-      reservation.currency !== RESERVE_CURRENCY;
+      reservation.amountCents !== amountCents ||
+      reservation.currency !== currency;
   if (mismatchedRequest) {
     await sendCheckoutReceipt(res, 409, {
       error: "This idempotency key was used for a different checkout request.",
       checkout_url: null,
       order_id: null,
       reservationId: null,
-      amountCents: offer.amountCents,
-      currency: RESERVE_CURRENCY,
+      amountCents,
+      currency,
     }, database);
     return;
   }
@@ -909,8 +981,8 @@ async function handleMachineCheckout(
     checkout_url: null,
     order_id: reservation.id,
     reservationId: reservation.id,
-    amountCents: offer.amountCents,
-    currency: RESERVE_CURRENCY,
+    amountCents,
+    currency,
   };
   if (reservation.paymentStatus === "paid") {
     await sendCheckoutReceipt(res, 200, receipt, database);
@@ -952,7 +1024,7 @@ async function handleMachineCheckout(
     client_reference_id: reservation.id,
     customer_email:
       res.locals.ucpAnonymousBuyer === true ? undefined : reservation.email,
-    line_items: [lineItem(offer)],
+    line_items: [lineItem(offer, currency)],
     metadata: {
       reservationId: reservation.id,
       offerKey: offer.offerKey,
@@ -2062,7 +2134,8 @@ router.get("/v1/orders/:id/io.json", async (req, res): Promise<void> => {
   }
   res.json({
     ...view,
-    dueTodayUsd: row.amountCents / 100,
+    dueTodayUsd: row.currency === RESERVE_CURRENCY ? row.amountCents / 100 : undefined,
+    dueToday: row.amountCents / 100,
     mediaCreditCents: row.amountCents,
     discount: 0.25,
     categoryLock: true,
@@ -2126,29 +2199,62 @@ router.get("/openapi.yaml", async (_req, res): Promise<void> => {
 });
 
 
-// Signed-hub seat calculator for /buycalc. Same engine as the Reserve List: reached views x surface CTR x click-to-order.
+// Listed-hub reach calculator for /buycalc. Modelled monthly category views x activation only: no CTR or conversion inputs.
 const BUYCALC_SEAT_CALC_HTML = `<section class="sc" id="seat-calc"><div class="sc-in"><label for="sc-cat">Category</label><select id="sc-cat"></select>
-<span class="lab">Surface</span><div id="sc-surf"><button type="button" class="sc-opt" data-s="hub" aria-checked="true">Confirmation, plan, booking, member hub · 0.25 / 0.45 / 0.70% CTR</button><button type="button" class="sc-opt" data-s="brand" aria-checked="false">Brand-site display · 0.08 / 0.14 / 0.20% CTR</button><button type="button" class="sc-opt" data-s="post" aria-checked="false">Post-purchase module only · 1.50 / 2.50 / 4.00% CTR</button></div>
-<span class="lab">Band</span><div class="sc-band" id="sc-band"><button type="button" class="sc-opt" data-b="0" aria-checked="false">Low</button><button type="button" class="sc-opt" data-b="1" aria-checked="true">Mid</button><button type="button" class="sc-opt" data-b="2" aria-checked="false">High</button></div>
-<p style="font-size:12px;margin:6px 0">Click-to-order 1.2 / 2.2 / 3.5%. Click-to-order, not view-to-order.</p><label style="font-weight:400"><input type="checkbox" id="sc-27"> Illustrative 2027</label></div>
-<div class="sc-out" aria-live="polite"><small style="letter-spacing:.16em;text-transform:uppercase;opacity:.7">Your category surface</small><div class="sc-seat">1 seat</div><p id="sc-catname" style="font-weight:600;font-size:18px;margin:.3em 0 1em"></p><p id="sc-clicks" style="margin:0"></p><p id="sc-orders" class="sc-grey"></p><p id="sc-f" class="sc-f"></p></div>
-<p class="sc-foot">Views modeled at 6.4 monthly views per annual order from partner category data. Not audited served impressions. Bands are industry scenarios (healthcare display 0.10–0.25%, native floor above 0.4%). Email CTR is not used.</p></section>
-<details class="sc-drawer"><summary>How this is calculated<small>Scenario, not a guarantee, not Scale measured performance.</small></summary><ul id="sc-how"><li>"Illustrative 2027" scales views by the partner pipeline projection (est.). Off by default.</li><li>Views are modeled at 6.4 monthly views per annual order. They are not served impressions.</li><li>Surface CTR bands come from industry ranges. They are not Scale measured results.</li><li>Orders use click-to-order, not view-to-order. Email CTR is not used.</li></ul></details>
-<script>(function(){var S={hub:[.0025,.0045,.007],brand:[.0008,.0014,.002],post:[.015,.025,.04]},C=[.012,.022,.035],s="hub",b=1,F=null;function f(n){return n>=1e6?(n/1e6).toFixed(1)+"M":n>=1e4?Math.round(n/1e3)+"K":n>=100?(Math.round(n/10)*10).toLocaleString():String(Math.round(n))}function p(x){return(x*100).toFixed(2)+"%"}var sel=document.getElementById("sc-cat");function run(){if(!F)return;var c=F.categories.find(function(x){return x.category===sel.value})||F.categories[0],k=document.getElementById("sc-27").checked?F.pipeline.y2027_orders/(F.pipeline.live_orders||1):1,r=c.pv_total*.8*1*k,t=S[s][b],cl=r*t,o=cl*C[b];document.getElementById("sc-catname").textContent=c.category+". One brand in the category.";document.getElementById("sc-clicks").textContent="Scenario clicks: about "+f(cl)+" a month";document.getElementById("sc-orders").textContent="Scenario orders: about "+f(o)+" a month"+(k>1?" (illustrative 2027)":"");document.getElementById("sc-f").textContent="Reached views × surface CTR × click-to-order: "+f(r)+" × "+p(t)+" × "+p(C[b])+". Reached views = category monthly views × 80% activation × seat. Activation is the share of signed partner surfaces switched on to carry your module."}
-function grp(id,attr,set){document.querySelectorAll("#"+id+" .sc-opt").forEach(function(btn){btn.onclick=function(){document.querySelectorAll("#"+id+" .sc-opt").forEach(function(x){x.setAttribute("aria-checked","false")});btn.setAttribute("aria-checked","true");set(btn.getAttribute(attr));run()}})}grp("sc-surf","data-s",function(v){s=v});grp("sc-band","data-b",function(v){b=+v});sel.onchange=run;document.getElementById("sc-27").onchange=run;
-fetch("/inventory/api/tam").then(function(r){return r.json()}).then(function(j){F=j;sel.innerHTML=j.categories.map(function(c){return"<option>"+c.category+"</option>"}).join("");run()}).catch(function(){document.getElementById("sc-catname").textContent="Live feed unavailable."})})();</script>`;
+<label style="font-weight:400;margin-top:12px"><input type="checkbox" id="sc-27"> Illustrative 2027 (modelled)</label>
+<p style="font-size:12px;margin:8px 0 0">Assumption: 80% of listed partner surfaces in the category are switched on to carry your module. One brand per category.</p></div>
+<div class="sc-out" aria-live="polite"><small style="letter-spacing:.16em;text-transform:uppercase;opacity:.7">Your category surface</small><div class="sc-seat">1 seat</div><p id="sc-catname" style="font-weight:600;font-size:18px;margin:.3em 0 1em"></p><p id="sc-reach" style="margin:0"></p><p id="sc-f" class="sc-f"></p></div>
+<p class="sc-foot">Modelled estimate. Views are modelled at 6.4 monthly views per annual order from partner category data. Not audited served impressions, not a delivery or impression guarantee, and not a performance or click forecast.</p></section>
+<details class="sc-drawer"><summary>How this is calculated<small>Modelled estimate, not a guarantee, not Scale measured performance.</small></summary><ul id="sc-how"><li>"Illustrative 2027" scales views by the partner pipeline projection (est.). Off by default.</li><li>Views are modelled at 6.4 monthly views per annual order. They are not served impressions.</li><li>This calculator shows modelled reach only. It makes no click, conversion or order forecast.</li></ul></details>
+<script>(function(){var F=null;function f(n){return n>=1e6?(n/1e6).toFixed(1)+"M":n>=1e4?Math.round(n/1e3)+"K":n>=100?(Math.round(n/10)*10).toLocaleString():String(Math.round(n))}var sel=document.getElementById("sc-cat");function run(){if(!F)return;var c=F.categories.find(function(x){return x.category===sel.value})||F.categories[0],y=document.getElementById("sc-27").checked,k=y?F.pipeline.y2027_orders/(F.pipeline.live_orders||1):1,r=c.pv_total*.8*1*k;document.getElementById("sc-catname").textContent=c.category+". One brand in the category.";document.getElementById("sc-reach").textContent="Modelled monthly views in your category surface: about "+f(r)+(y?" (illustrative 2027)":"");document.getElementById("sc-f").textContent="Modelled category monthly views × 80% activation × 1 seat. Activation is the share of listed partner surfaces switched on to carry your module."}
+sel.onchange=run;document.getElementById("sc-27").onchange=run;
+fetch("/inventory/api/tam").then(function(r){return r.json()}).then(function(j){F=j;sel.innerHTML=j.categories.map(function(c){return"<option>"+c.category+"</option>"}).join("");run()}).catch(function(){document.getElementById("sc-catname").textContent="Modelled feed unavailable."})})();</script>`;
 
 export function renderBuycalcHtml(input: {
   seatsOpen: number;
   seatsTotal: number;
   sku?: unknown;
   format?: unknown;
+  currency?: ReserveCurrency;
+  draftBonus?: boolean;
 }): string {
+  const currency: ReserveCurrency = input.currency ?? RESERVE_CURRENCY;
+  const html = renderBuycalcHtmlUsd(input, currency);
+  const localized = localizeReservePriceCopy(html, currency);
+  // Draft bonus tiers are added after localizing so their explicit amounts are never rewritten.
+  if (!input.draftBonus) return localized.replace("<!--BONUS_TIER_DRAFT-->", "");
+  const section = renderBonusTierDraftHtml(currency);
+  return localized
+    .replace("<!--BONUS_TIER_DRAFT-->", () => section)
+    .replace('<meta charset="utf-8">', () => '<meta charset="utf-8"><meta name="robots" content="noindex">');
+}
+
+function currencyToggleHtml(
+  currency: ReserveCurrency,
+  query: { sku?: unknown; format?: unknown },
+): string {
+  const link = (target: ReserveCurrency) => {
+    const params = new URLSearchParams();
+    if (typeof query.sku === "string") params.set("sku", query.sku);
+    if (typeof query.format === "string") params.set("format", query.format);
+    params.set("currency", target);
+    const active = target === currency;
+    return `<a href="/buycalc?${params.toString()}#reserve" data-currency="${target}" rel="nofollow" aria-pressed="${active}" style="padding:4px 10px;border:1px solid #071A39;text-decoration:none;${active ? "background:#071A39;color:#fff;" : "color:#071A39;"}">${target.toUpperCase()}</a>`;
+  };
+  return `<nav class="currency-toggle" aria-label="Currency" data-testid="currency-toggle" style="display:flex;gap:6px;align-items:center;font-size:14px"><span>Prices in</span>${link("usd")}${link("cad")}</nav>`;
+}
+
+function renderBuycalcHtmlUsd(input: {
+  seatsOpen: number;
+  seatsTotal: number;
+  sku?: unknown;
+  format?: unknown;
+}, currency: ReserveCurrency): string {
   const availability = { seats_open: input.seatsOpen, seats_total: input.seatsTotal };
   const req = { query: { sku: input.sku, format: input.format } };
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Lock one category — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | The $490 seat is the named category"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | The $490 seat is the named category"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">${publicSeoTags("/buycalc")}
+<title>Prepay your category — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | The $490 seat is the named category"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | The $490 seat is the named category"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">${publicSeoTags("/buycalc")}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <script type="application/ld+json">${JSON.stringify({
   "@context": "https://schema.org",
@@ -2164,8 +2270,8 @@ export function renderBuycalcHtml(input: {
       category: "Private health and wellness media inventory",
       offers: {
         "@type": "Offer",
-        price: String(offer.dueTodayUsd),
-        priceCurrency: "USD",
+        price: String(offerAmountCents(offer, currency) / 100),
+        priceCurrency: currency.toUpperCase(),
         availability: "https://schema.org/LimitedAvailability",
         url: `/buycalc?sku=${offer.sku}`,
       },
@@ -2176,11 +2282,12 @@ export function renderBuycalcHtml(input: {
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f8f6ef;color:#071A39;font:16px/1.55 "IBM Plex Sans",sans-serif}header,main,footer{max-width:1100px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;border-bottom:1px solid #ccd2d8}h1,h2{font-family:Fraunces,serif;font-weight:400}h1{font-size:clamp(2.7rem,7vw,5.8rem);line-height:.95;margin:.5em 0}.accent{background:#C8F55A;padding:.08em .18em}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:36px}.card{border:1px solid #071A39;padding:24px;margin:18px 0}.figures{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#071A39}.figure{background:#fff;padding:18px}.figure strong{display:block;font:600 1.7rem Fraunces,serif}.offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.offer{border:1px solid #071A39;padding:16px;background:#fff}.offer strong{display:block;font:600 1.35rem Fraunces,serif}.offer small{display:block;margin-top:8px}label{display:block;font-weight:600;margin-top:14px}input,select,button{width:100%;padding:12px;border:1px solid #071A39;background:white;font:inherit}button{margin-top:18px;background:#C8F55A;font-weight:600;cursor:pointer}.fine{font-size:.9rem}#message{padding-top:12px;font-weight:600}@media(max-width:760px){.grid,.figures,.offer-grid{grid-template-columns:1fr}}
-.sh-hero{background:#0A1D56;color:#fff;margin:0 -24px;padding:48px 24px}.sh-eyebrow{color:#9D4EDD;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:12px}.sh-hero h1{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:clamp(2.1rem,5vw,3.6rem);line-height:1.05;margin:.3em 0 .6em;max-width:850px}.sh-prices{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sh-price{border-radius:8px;padding:20px;color:#0A1D56}.sh-white{background:#fff}.sh-card{background:#F0F4F8}.sh-price p{margin:.3em 0 1em;font-size:14px}.sh-btn{display:block;text-align:center;background:#0A1D56;color:#fff;padding:13px;border-radius:6px;font-weight:600;text-decoration:none}.sh-ghost{background:transparent;color:#0A1D56;border:2px solid #0A1D56}.sh-proof{margin-top:22px;font-size:14px}.sh-proof a{color:#fff;font-weight:600;text-decoration-color:#9D4EDD}.sh-excl{font-size:12px;opacity:.7}.sc{display:grid;grid-template-columns:1fr 1fr;border:1px solid #0A1D5626;border-radius:8px;overflow:hidden;margin:28px 0;background:#fff}.sc-in{padding:22px}.sc-in label,.sc-in .lab{display:block;font-weight:600;font-size:14px;margin:12px 0 6px}.sc select{width:100%;min-height:44px}.sc-opt{display:block;width:100%;text-align:left;border:0;border-radius:6px;background:#F0F4F8;padding:11px;margin:3px 0;font:600 14px "IBM Plex Sans";color:#0A1D56;cursor:pointer}.sc-opt[aria-checked=true]{background:#0A1D56;color:#fff}.sc-band{display:flex;gap:4px}.sc-band .sc-opt{text-align:center}.sc-out{background:#0A1D56;color:#fff;padding:26px;display:flex;flex-direction:column;justify-content:center}.sc-seat{color:#00FF88;font-size:64px;font-weight:700;line-height:1}.sc-grey{color:#ffffff8c;font-size:14px}.sc-f{font-size:12px;color:#ffffff99}.sc-foot{grid-column:1/-1;font-size:12px;color:#0A1D56a6;padding:16px 22px;border-top:1px solid #0A1D561a}.sc-drawer{background:#F0F4F8;border-radius:8px;padding:18px;margin:0 0 28px}.sc-drawer summary{font-weight:600;cursor:pointer}.sc-drawer summary small{font-weight:400;opacity:.7;margin-left:8px}.cat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0;padding:0;list-style:none}.cat-strip li{border:1px solid #071A39;background:#fff}.cat-strip a,.cat-strip span{display:flex;align-items:center;justify-content:center;min-height:72px;padding:12px;text-align:center;color:inherit;text-decoration:none;font-size:14px;font-weight:600}@media(max-width:760px){.sh-prices,.sc{grid-template-columns:1fr}.cat-strip{grid-template-columns:1fr 1fr}}
-</style></head><body><header><strong>BIRCH RESERVE</strong><a href="/v1/catalog.json">Machine catalog</a></header><main>
-<section class="sh-hero"><p class="sh-eyebrow">Birch Reserve · Canada</p><h1>Lock one category inside signed health hubs. Not an open auction.</h1>
-<div class="sh-prices"><div class="sh-price sh-white"><strong>$490 USD locks the category.</strong><p>100% media credit. Nothing runs until the insertion order names the hub. Credit expires 12 months.</p><a class="sh-btn" href="/buycalc?sku=reserve-490#reserve">Lock the category · $490 USD</a></div><div class="sh-price sh-card"><strong>$190 USD is a 7-day look.</strong><p>It does not lock a seat. Converts in full to the $490 within 7 days, else refunded.</p><a class="sh-btn sh-ghost" href="/buycalc?sku=hold-190#reserve">Take a 7-day look · $190 USD</a></div></div>
-<p class="sh-proof">Live placement: <a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>. A signed physio hub. Your module sits at the booking and the plan, in the category.</p>
+.sh-hero{background:#0A1D56;color:#fff;margin:0 -24px;padding:48px 24px}.sh-eyebrow{color:#9D4EDD;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:12px}.sh-hero h1{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:clamp(2.1rem,5vw,3.6rem);line-height:1.05;margin:.3em 0 .6em;max-width:850px}.sh-prices{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sh-price{border-radius:8px;padding:20px;color:#0A1D56}.sh-white{background:#fff}.sh-card{background:#F0F4F8}.sh-price p{margin:.3em 0 1em;font-size:14px}.sh-btn{display:block;text-align:center;background:#0A1D56;color:#fff;padding:13px;border-radius:6px;font-weight:600;text-decoration:none}.sh-ghost{background:transparent;color:#0A1D56;border:2px solid #0A1D56}.sh-proof{margin-top:22px;font-size:14px}.sh-proof a{color:#fff;font-weight:600;text-decoration-color:#9D4EDD}.sh-excl{font-size:12px;opacity:.7}.sc{display:grid;grid-template-columns:1fr 1fr;border:1px solid #0A1D5626;border-radius:8px;overflow:hidden;margin:28px 0;background:#fff}.sc-in{padding:22px}.sc-in label,.sc-in .lab{display:block;font-weight:600;font-size:14px;margin:12px 0 6px}.sc select{width:100%;min-height:44px}.sc-opt{display:block;width:100%;text-align:left;border:0;border-radius:6px;background:#F0F4F8;padding:11px;margin:3px 0;font:600 14px "IBM Plex Sans";color:#0A1D56;cursor:pointer}.sc-opt[aria-checked=true]{background:#0A1D56;color:#fff}.sc-out{background:#0A1D56;color:#fff;padding:26px;display:flex;flex-direction:column;justify-content:center}.sc-seat{color:#00FF88;font-size:64px;font-weight:700;line-height:1}.sc-grey{color:#ffffff8c;font-size:14px}.sc-f{font-size:12px;color:#ffffff99}.sc-foot{grid-column:1/-1;font-size:12px;color:#0A1D56a6;padding:16px 22px;border-top:1px solid #0A1D561a}.sc-drawer{background:#F0F4F8;border-radius:8px;padding:18px;margin:0 0 28px}.sc-drawer summary{font-weight:600;cursor:pointer}.sc-drawer summary small{font-weight:400;opacity:.7;margin-left:8px}.cat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0;padding:0;list-style:none}.cat-strip li{border:1px solid #071A39;background:#fff}.cat-strip a,.cat-strip span{display:flex;align-items:center;justify-content:center;min-height:72px;padding:12px;text-align:center;color:inherit;text-decoration:none;font-size:14px;font-weight:600}@media(max-width:760px){.sh-prices,.sc{grid-template-columns:1fr}.cat-strip{grid-template-columns:1fr 1fr}}
+</style></head><body><header><strong>BIRCH RESERVE</strong>${currencyToggleHtml(currency, { sku: input.sku, format: input.format })}<a href="/v1/catalog.json">Machine catalog</a></header><main>
+<section class="sh-hero"><p class="sh-eyebrow">Birch Reserve · Canada</p><h1>Prepay your category's display space. One brand. No bidding.</h1>
+<div class="sh-prices"><div class="sh-price sh-white"><strong style="font-size:2rem">$490 USD</strong><p><b>Prepay once. All of it becomes display credit in your category.</b></p><p>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p><p>Why it beats Meta: Meta sells you a cold click in an auction. Here you pay once, own the category, and your offer meets customers right after they have bought.</p><a class="sh-btn" href="/buycalc?sku=reserve-490#reserve">Prepay your category · $490 USD</a><p>Not ready? <a href="/buycalc?sku=hold-190#reserve">Take a 7-day look for $190 USD</a>. It converts in full to the prepay, or it is refunded.</p></div></div>
+<p class="sh-proof">Live placement: <a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>. A listed physio hub. Your module sits at the booking and the plan, in the category.</p>
+<p class="sh-proof">Public benchmark, not a Birch result: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p>
 <p class="sh-proof">This is the place. Not a view chart. Illustrative until the insertion order names the hub.</p>
 <p class="sh-proof">The unit is one card on a page the visitor already opened. You do not send them to a new feed. The card stays small enough that the hub page remains the page.</p>
 <p class="sh-proof">The category is the named zone. You do not buy an open slot. The insertion order names the hub and the category before anything runs.</p>
@@ -2209,6 +2316,7 @@ export function renderBuycalcHtml(input: {
 <p class="sh-proof">The card is the only unit. You place one square on the page the member already opened. The $490 is the named category.</p>
 <p class="sh-excl">One brand per category · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only · Canada only</p></section>
 ${BUYCALC_SEAT_CALC_HTML}
+<!--BONUS_TIER_DRAFT-->
 <div class="grid"><section><h2>What a reserved slot includes</h2><p><strong>${availability.seats_open} categories open</strong> of ${availability.seats_total}. Availability is rolling and subtracts paid and currently held locks.</p>
 ${buycalcCategoryStrip(availability.seats_open)}
 <div class="offer-grid">${PUBLIC_RESERVE_OFFERS.map((offer) => {
@@ -2219,29 +2327,38 @@ ${buycalcCategoryStrip(availability.seats_open)}
       : offer.sku === "hold-190"
         ? `<p><a href="/kit">What you send is on the creative brief</a></p>`
         : "";
-    return `<article class="offer" data-sku="${offer.sku}"><small>${eyebrow}</small><strong>$${offer.dueTodayUsd.toLocaleString("en-US")} · ${offer.name}</strong><small>${buycalcPublicScope(offer.scope)}</small>${beside}</article>`;
+    return `<article class="offer" data-sku="${offer.sku}"><small>${eyebrow}</small><strong>$${(offerAmountCents(offer, currency) / 100).toLocaleString("en-US")} ${currency.toUpperCase()} · ${offer.name}</strong><small>${buycalcPublicScope(offerScope(offer, currency))}</small>${beside}</article>`;
   }).join("")}</div>
 <div class="card"><h2>Your planning choices</h2><p><strong>Format:</strong> post-checkout, recovery plan, scheduled service, member hub, or motion 15s.</p><p><strong>Window:</strong> 30, 90, or 180 days.</p><p><strong>Placement:</strong> your category.</p><p><strong>Creative:</strong> static, native, or motion.</p></div>
 <p>Reporting is aggregate only. Payment is not considered received until Stripe webhook confirmation.</p></section>
-<aside><form id="reserve"><h2>Reserve without a login</h2><label>Offer<select name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${req.query.sku === offer.sku ? " selected" : ""}>$${offer.dueTodayUsd.toLocaleString("en-US")} · ${offer.name}</option>`).join("")}</select></label><div class="fine">${BUYCALC_SKU_LINES.map((line) => `<p>${line}</p>`).join("")}</div><label>Brand<input name="brand" required maxlength="160"></label><label>Work email<input name="email" type="email" required></label><label>Website (optional)<input name="website_url" type="url"></label><label>Format<select name="format_pref">${FORMATS.map((f) => `<option value="${f}"${req.query.format === f ? " selected" : ""}>${f.replaceAll("_", " ")}</option>`).join("")}</select></label><label>Window<select id="days"><option>30</option><option>90</option><option>180</option></select></label><label>Placement<select><option>Category</option><option>RON</option></select></label><label>Creative<select><option>Static</option><option>Native</option><option>Motion</option></select></label><label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the draft <a href="/terms">terms</a> before any charge. Draft until counsel stamps.</label><button id="submit" type="submit">Lock in your slot — $490 USD</button><button id="copy" type="button">Copy quote JSON</button><p class="fine"><a href="tel:+16479316278">Get a call back</a> · <a href="/buycalc?sku=hold-190">Hold a category for 7 days — $190</a> · <a href="/kit">What you send is on the creative brief</a></p><p id="message" role="status"></p><noscript><p class="fine">JavaScript is required to submit this no-login reservation. Complete prices and terms remain available above; <a href="mailto:sales@silverbirchgrowth.com">Email sales</a> to reserve manually.</p></noscript></form></aside></div></main>
+<aside><form id="reserve"><h2>Reserve without a login</h2><label>Offer<select name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${req.query.sku === offer.sku ? " selected" : ""}>$${(offerAmountCents(offer, currency) / 100).toLocaleString("en-US")} ${currency.toUpperCase()} · ${offer.name}</option>`).join("")}</select></label><div class="fine">${BUYCALC_SKU_LINES.map((line) => `<p>${line}</p>`).join("")}</div><label>Brand<input name="brand" required maxlength="160"></label><label>Work email<input name="email" type="email" required></label><label>Website (optional)<input name="website_url" type="url"></label><label>Format<select name="format_pref">${FORMATS.map((f) => `<option value="${f}"${req.query.format === f ? " selected" : ""}>${f.replaceAll("_", " ")}</option>`).join("")}</select></label><label>Window<select id="days"><option>30</option><option>90</option><option>180</option></select></label><label>Placement<select><option>Category</option><option>RON</option></select></label><label>Creative<select><option>Static</option><option>Native</option><option>Motion</option></select></label><label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the draft <a href="/terms">terms</a> before any charge. Draft until counsel stamps.</label><button id="submit" type="submit">Lock in your slot — $490 USD</button><button id="copy" type="button">Copy quote JSON</button><p class="fine"><a href="tel:+16479316278">Get a call back</a> · <a href="/buycalc?sku=hold-190">Hold a category for 7 days — $190</a> · <a href="/kit">What you send is on the creative brief</a></p><p id="message" role="status"></p><noscript><p class="fine">JavaScript is required to submit this no-login reservation. Complete prices and terms remain available above; <a href="mailto:sales@silverbirchgrowth.com">Email sales</a> to reserve manually.</p></noscript></form></aside></div></main>
 <footer class="fine">Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · <a href="mailto:sales@silverbirchgrowth.com">Email sales</a><p id="selectedSummary"></p></footer>
 <script>
-const form=document.querySelector("#reserve"),message=document.querySelector("#message"),idempotencyKey=crypto.randomUUID(),offers=${JSON.stringify(Object.fromEntries(PUBLIC_RESERVE_OFFERS.map((offer) => [offer.sku, { ...offer, scope: buycalcPublicScope(offer.scope) }])))};
-function selected(){return offers[form.elements.sku.value]}function refresh(){const offer=selected();document.querySelector("#submit").textContent="Continue — $"+offer.dueTodayUsd.toLocaleString("en-US")+" USD";document.querySelector("#selectedSummary").textContent="SKU "+offer.sku+" · Offer "+offer.offerKey+" · Exactly $"+offer.dueTodayUsd.toLocaleString("en-US")+" USD due today and applied as media credit."}form.elements.sku.onchange=refresh;refresh();
-async function quote(){const sku=form.elements.sku.value,format=form.elements.format_pref.value,days=document.querySelector("#days").value;const r=await fetch("/v1/quote?sku="+encodeURIComponent(sku)+"&format="+encodeURIComponent(format)+"&days="+days);return r.json()}
+const form=document.querySelector("#reserve"),message=document.querySelector("#message"),idempotencyKey=crypto.randomUUID(),currency=${JSON.stringify(currency)},offers=${JSON.stringify(Object.fromEntries(PUBLIC_RESERVE_OFFERS.map((offer) => [offer.sku, { ...offer, dueToday: offerAmountCents(offer, currency) / 100, scope: buycalcPublicScope(offerScope(offer, currency)) }])))};
+function selected(){return offers[form.elements.sku.value]}function refresh(){const offer=selected();document.querySelector("#submit").textContent="Continue — $"+offer.dueToday.toLocaleString("en-US")+" "+currency.toUpperCase();document.querySelector("#selectedSummary").textContent="SKU "+offer.sku+" · Offer "+offer.offerKey+" · Exactly $"+offer.dueToday.toLocaleString("en-US")+" "+currency.toUpperCase()+" due today and applied as media credit."}form.elements.sku.onchange=refresh;refresh();
+async function quote(){const sku=form.elements.sku.value,format=form.elements.format_pref.value,days=document.querySelector("#days").value;const r=await fetch("/v1/quote?currency="+currency+"&sku="+encodeURIComponent(sku)+"&format="+encodeURIComponent(format)+"&days="+days);return r.json()}
 document.querySelector("#copy").onclick=async()=>{try{await navigator.clipboard.writeText(JSON.stringify(await quote(),null,2));message.textContent="Quote JSON copied."}catch{message.textContent="Unable to copy automatically. Open the machine catalog link to copy the contract."}};
-form.onsubmit=async(e)=>{e.preventDefault();if(!document.querySelector("#terms").checked){message.textContent="Accept the draft terms before any charge.";return}message.textContent="Saving your reservation…";const data=Object.fromEntries(new FormData(form));delete data.terms;data.idempotency_key=idempotencyKey;if(!data.website_url)delete data.website_url;try{const r=await fetch("/v1/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)});const out=await r.json();if(out.checkout_url){location.assign(out.checkout_url);return}message.textContent=(out.error||"Your hold was saved, but checkout is unavailable.")+(out.order_id?" Order: "+out.order_id:"")}catch{message.textContent="The reservation could not be submitted. No payment was claimed."}};
+form.onsubmit=async(e)=>{e.preventDefault();if(!document.querySelector("#terms").checked){message.textContent="Accept the draft terms before any charge.";return}message.textContent="Saving your reservation…";const data=Object.fromEntries(new FormData(form));delete data.terms;data.idempotency_key=idempotencyKey;data.currency=currency;if(!data.website_url)delete data.website_url;try{const r=await fetch("/v1/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)});const out=await r.json();if(out.checkout_url){location.assign(out.checkout_url);return}message.textContent=(out.error||"Your hold was saved, but checkout is unavailable.")+(out.order_id?" Order: "+out.order_id:"")}catch{message.textContent="The reservation could not be submitted. No payment was claimed."}};
 </script></body></html>`;
 }
 
 router.get("/buycalc", async (req, res): Promise<void> => {
   const availability = await reserveCounts();
+  const decision = decideCurrency(req);
+  // A visible choice (?currency=) is remembered so nobody is stuck.
+  if (decision.source === "query") {
+    res.append("Set-Cookie", currencyCookieHeader(decision.currency));
+  }
+  res.setHeader("Cache-Control", "private, no-store");
+  res.setHeader("Vary", "Cookie, x-vercel-ip-country");
   res.type("html").send(
     renderBuycalcHtml({
+      currency: decision.currency,
       seatsOpen: availability.seats_open,
       seatsTotal: availability.seats_total,
       sku: req.query.sku,
       format: req.query.format,
+      draftBonus: isBonusDraftRequested(req.query),
     }),
   );
 });

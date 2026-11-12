@@ -153,7 +153,7 @@ test("public reserve stores the canonical $490 offer and holds the seat without 
   assert.equal(row.adInterest, "display");
   assert.equal(
     row.promotedOffer,
-    "Birch Reserve Category seat",
+    "Birch Reserve Category prepay",
   );
   assert.equal(row.launchWindow, null);
   assert.equal(row.status, "seat_held");
@@ -298,6 +298,141 @@ test("human reserve checkout uses the exact selected tier and Stripe line item",
     else process.env.SPLASH_AD_PUBLIC_URL = previousPublicUrl;
     if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
     else process.env.SEATS_TOTAL = previousTotal;
+  }
+});
+
+test("CAD checkout creates a CAD Stripe session at the exact CAD price and stores currency + amount", async () => {
+  const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
+  const previousSecret = process.env.STRIPE_SECRET_KEY;
+  const previousPublicUrl = process.env.SPLASH_AD_PUBLIC_URL;
+  const previousTotal = process.env.SEATS_TOTAL;
+  process.env.STRIPE_CHECKOUT_DISABLED = "false";
+  process.env.SPLASH_AD_PUBLIC_URL = "https://reserve.example.com";
+  process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
+  const expected = [
+    ["hold-190", 27000],
+    ["reserve-490", 69000],
+  ] as const;
+  const captured: Array<{ amount: number | undefined; currency: string | undefined; offer: unknown }> = [];
+  setStripeCheckoutFunctionsForTests({
+    create: async (params) => {
+      const item = params.line_items?.[0]?.price_data;
+      captured.push({ amount: item?.unit_amount, currency: item?.currency, offer: params.metadata?.offerKey });
+      return {
+        id: `cs_test_cad_${captured.length}`,
+        url: `https://checkout.stripe.test/cad-${captured.length}`,
+        currency: item?.currency,
+        amount_total: item?.unit_amount,
+      } as never;
+    },
+  });
+  try {
+    for (const [offer, amount] of expected) {
+      const response = await fetch(`${baseUrl}/launch/splash/reserve`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          brandName: `CAD ${offer}`,
+          email: `cad-${offer}-${randomUUID()}@example.com`,
+          expectedAmountCents: amount,
+          expectedCurrency: "cad",
+          offer,
+        }),
+      });
+      assert.equal(response.status, 200);
+      const receipt = (await response.json()) as { reservationId: string; amountCents: number; currency: string };
+      createdReservationIds.push(receipt.reservationId);
+      assert.equal(receipt.currency, "cad");
+      assert.equal(receipt.amountCents, amount);
+      const [row] = await db
+        .select()
+        .from(splashAdReservationsTable)
+        .where(eq(splashAdReservationsTable.id, receipt.reservationId));
+      assert.equal(row?.currency, "cad");
+      assert.equal(row?.amountCents, amount);
+    }
+    assert.deepEqual(
+      captured.map((session) => [session.offer, session.amount, session.currency]),
+      expected.map(([offer, amount]) => [offer, amount, "cad"]),
+    );
+
+    // A CAD buyer cannot be charged the USD number (and vice versa): page and Stripe must agree.
+    for (const [expectedCurrency, expectedAmountCents] of [
+      ["cad", 49000],
+      ["usd", 69000],
+    ] as const) {
+      const mismatch = await fetch(`${baseUrl}/launch/splash/reserve`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          brandName: "Mismatch",
+          email: `mismatch-${randomUUID()}@example.com`,
+          expectedAmountCents,
+          expectedCurrency,
+          offer: "reserve-490",
+        }),
+      });
+      assert.equal(mismatch.status, 409);
+    }
+    assert.equal(captured.length, 2, "mismatches never reach Stripe");
+  } finally {
+    setStripeCheckoutFunctionsForTests();
+    if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
+    else process.env.STRIPE_CHECKOUT_DISABLED = previousDisabled;
+    if (previousSecret === undefined) delete process.env.STRIPE_SECRET_KEY;
+    else process.env.STRIPE_SECRET_KEY = previousSecret;
+    if (previousPublicUrl === undefined) delete process.env.SPLASH_AD_PUBLIC_URL;
+    else process.env.SPLASH_AD_PUBLIC_URL = previousPublicUrl;
+    if (previousTotal === undefined) delete process.env.SEATS_TOTAL;
+    else process.env.SEATS_TOTAL = previousTotal;
+  }
+});
+
+test("webhook records a CAD payment only when Stripe reports the same currency and amount", async () => {
+  const make = async (label: string) => {
+    const [row] = await db
+      .insert(splashAdReservationsTable)
+      .values({
+        email: `cad-webhook-${label}-${randomUUID()}@example.com`,
+        status: "payment_pending",
+        paymentStatus: "checkout_created",
+        creativeStatus: "locked",
+        offerKey: "reserve-490",
+        amountCents: 69000,
+        currency: "cad",
+        activationToken: randomUUID(),
+        stripeCheckoutSessionId: `cs_test_${randomUUID().replaceAll("-", "")}`,
+        followUpBy: new Date(Date.now() + 48 * 60 * 60 * 1000),
+      })
+      .returning();
+    assert.ok(row);
+    createdReservationIds.push(row.id);
+    return row;
+  };
+  const sessionFor = (row: Awaited<ReturnType<typeof make>>, currency: string, amount: number) => ({
+    id: row.stripeCheckoutSessionId,
+    metadata: { reservationId: row.id, offerKey: "reserve-490" },
+    currency,
+    amount_total: amount,
+    payment_status: "paid",
+    payment_intent: `pi_test_${randomUUID().slice(0, 8)}`,
+  });
+  const read = async (id: string) =>
+    (await db.select().from(splashAdReservationsTable).where(eq(splashAdReservationsTable.id, id)))[0];
+
+  const good = await make("good");
+  await processStripeEvent({ type: "checkout.session.completed", data: { object: sessionFor(good, "cad", 69000) } } as never);
+  const paid = await read(good.id);
+  assert.equal(paid?.paymentStatus, "paid");
+  assert.equal(paid?.currency, "cad");
+  assert.equal(paid?.amountCents, 69000);
+
+  for (const [currency, amount] of [["usd", 69000], ["cad", 49000]] as const) {
+    const bad = await make(`bad-${currency}`);
+    await processStripeEvent({ type: "checkout.session.completed", data: { object: sessionFor(bad, currency, amount) } } as never);
+    const after = await read(bad.id);
+    assert.notEqual(after?.paymentStatus, "paid", `${currency} ${amount} must not mark a CAD seat paid`);
   }
 });
 
