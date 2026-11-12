@@ -149,7 +149,7 @@ test("agent quote: slots, area lock, unknown offer", () => {
   assert.equal(a.ok && a.amount, 4900);
   assert.equal(agentQuote({ offer: "nope" }).ok, false);
   assert.ok(agentOpenApi().paths["/v1/agent/checkout"]);
-  assert.equal(agentCard().skills.length, 4);
+  assert.equal(agentCard().skills.length, 6);
   assert.match(llmsTxt(), /\/v1\/agent\/catalog\.json/);
 });
 

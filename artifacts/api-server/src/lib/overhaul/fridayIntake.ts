@@ -5,8 +5,9 @@
  * Unset env -> { status: "skipped" } and the caller still answers the visitor.
  */
 import { createHash } from "node:crypto";
+import { alertWithin, type AlertAction, type AlertResult, type SeatAlert } from "../seats/alerts";
 
-export type IntakeKind = "match_tool" | "hub_access" | "cobranded_hub_inquiry" | "display_cpc_inquiry" | "publisher_studio" | "area_lock_interest" | "agency_inquiry" | "deposit_interest" | "agent_checkout";
+export type IntakeKind = "match_tool" | "hub_access" | "cobranded_hub_inquiry" | "display_cpc_inquiry" | "publisher_studio" | "area_lock_interest" | "agency_inquiry" | "deposit_interest" | "agent_checkout" | "seat_hold" | "seat_lock" | "seat_lock_request" | "seat_waitlist" | "seat_block_request" | "seat_paid";
 
 export type IntakeInput = {
   kind: IntakeKind;
@@ -35,10 +36,18 @@ const SOURCE: Record<IntakeKind, string> = {
   agency_inquiry: "Birch agency inquiry",
   deposit_interest: "Birch deposit interest",
   agent_checkout: "Birch AI buying agent checkout",
+  seat_hold: "Birch category seat: hold ($190 7-day look)",
+  seat_lock: "Birch category seat: lock ($490 named seat)",
+  seat_lock_request: "Birch category seat: lock request form",
+  seat_waitlist: "Birch category seat: waitlist",
+  seat_block_request: "Birch impression block request",
+  seat_paid: "Birch category seat: paid checkout",
 };
 
 export function intakeExternalId(input: IntakeInput): string {
-  const basis = `${input.kind}|${(input.email ?? "").toLowerCase()}|${(input.website ?? "").toLowerCase()}|${input.message ?? ""}`;
+  // Seat actions key on category + SKU too, so a buyer holding two categories gets two records.
+  const seat = input.kind.startsWith("seat_") ? `|${input.meta?.category ?? ""}|${input.meta?.sku ?? ""}` : "";
+  const basis = `${input.kind}|${(input.email ?? "").toLowerCase()}|${(input.website ?? "").toLowerCase()}|${input.message ?? ""}${seat}`;
   return `birch-ovh-${input.kind}-${createHash("sha256").update(basis).digest("hex").slice(0, 16)}`;
 }
 
@@ -100,4 +109,53 @@ export async function sendIntake(input: IntakeInput, env: NodeJS.ProcessEnv = pr
   } catch {
     return { status: "failed", externalId };
   }
+}
+
+/**
+ * Every meaningful action: Friday intake AND the instant email alert, in parallel.
+ * Neither can block the other; both statuses come back for the response/logs.
+ */
+
+const KIND_ACTION: Partial<Record<IntakeKind, AlertAction>> = {
+  seat_hold: "hold",
+  seat_lock: "lock",
+  seat_lock_request: "lock_request",
+  seat_waitlist: "waitlist",
+  seat_block_request: "block_request",
+  seat_paid: "reservation",
+  agent_checkout: "reservation",
+  area_lock_interest: "reservation",
+  deposit_interest: "reservation",
+};
+
+export async function sendIntakeAndAlert(
+  input: IntakeInput,
+  alert: Partial<SeatAlert> = {},
+  env: NodeJS.ProcessEnv = process.env,
+): Promise<IntakeResult & { alert: AlertResult }> {
+  const m = input.meta ?? {};
+  const [friday, alertRes] = await Promise.all([
+    sendIntake(input, env),
+    alertWithin(
+      {
+        action: KIND_ACTION[input.kind] ?? "form_submit",
+        form: input.kind,
+        brand: input.company,
+        name: input.name,
+        email: input.email,
+        phone: input.phone,
+        website: input.website,
+        category: typeof m.category_label === "string" ? m.category_label : typeof m.category === "string" ? m.category : undefined,
+        sku: typeof m.sku === "string" ? m.sku : typeof m.offer === "string" ? m.offer : undefined,
+        amount: m.amount !== undefined ? `${m.amount}${m.currency ? ` ${String(m.currency).toUpperCase()}` : ""}` : undefined,
+        message: input.message,
+        page: input.path,
+        test: m.is_test === true || m.is_test === "true",
+        ...alert,
+      },
+      6000,
+      env,
+    ),
+  ]);
+  return { ...friday, alert: alertRes };
 }

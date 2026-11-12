@@ -941,9 +941,9 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.doesNotMatch(analytics, /data-domain=["']birchreserve/);
 });
 
-const BRAND_TITLE = "Birch Reserve | Ads inside co-branded health &amp; wellness hubs";
+const BRAND_TITLE = "Birch Reserve | Endemic recovery ad inventory: category seats in health &amp; wellness hubs";
 const BRAND_DESCRIPTION =
-  "Display and CPC inside co-branded Recovery Brand hubs and health &amp; wellness business hubs: post-purchase, hub home, product and services pages, and the member dashboard. Brands lock in spend, local businesses lock down their area, studios earn by publishing.";
+  "Endemic recovery ad inventory inside co-branded Recovery Brand hubs and health &amp; wellness business hubs. Hold a category for 7 days or lock the named seat as media credit, one brand per category, plus impression blocks at starter rates on four placements: post-purchase, hub home, product and services pages, and the member dashboard behind login.";
 
 test("public marketing title and description match the brand strings", async () => {
   const indexHtml = await readFile(

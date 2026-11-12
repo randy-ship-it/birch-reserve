@@ -13,7 +13,7 @@ import { fetchSiteSignals } from "../lib/overhaul/fetchSite";
 import { emptySignals, normalizeUrl, scoreMatch } from "../lib/overhaul/audienceMatch";
 import { quoteAreaLock, type Currency } from "../lib/overhaul/model";
 import { buildAreaLockSession, checkoutGate } from "../lib/overhaul/checkout";
-import { sendIntake, type IntakeKind } from "../lib/overhaul/fridayIntake";
+import { sendIntakeAndAlert as sendIntake, type IntakeKind } from "../lib/overhaul/fridayIntake";
 
 export type CreateSession = (params: Record<string, unknown>) => Promise<{ url: string | null; livemode: boolean }>;
 

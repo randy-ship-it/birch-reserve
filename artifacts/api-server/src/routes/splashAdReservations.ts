@@ -1,4 +1,5 @@
 import { randomBytes, timingSafeEqual } from "node:crypto";
+import { isSeatSession, recordPaidSeatSafe } from "../lib/seats/paid";
 import { ReplitConnectors } from "@replit/connectors-sdk";
 import {
   db,
@@ -565,6 +566,11 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
     event.type === "checkout.session.async_payment_succeeded"
   ) {
     const session = event.data.object as Stripe.Checkout.Session;
+    // Category seat checkouts (price_data, metadata.kind=category_seat) carry no splash reservation.
+    if (isSeatSession(session as never)) {
+      await recordPaidSeatSafe(session as never);
+      return;
+    }
     if (session.payment_status === "paid") {
       const paid = await markSplashReservationPaidFromSession(session);
       // 7:21pm: paid checkout → Friday (never throws; Stripe still gets its 2xx).
