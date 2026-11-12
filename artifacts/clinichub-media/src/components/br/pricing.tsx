@@ -23,6 +23,7 @@ import {
   type RateSurface,
 } from "../../../../api-server/src/lib/overhaul/pricing";
 import { Cta } from "./ui";
+import { PlacementDialog, PlacementTrigger, type PlacementKey } from "./placement-example";
 
 export const RESERVE_HREF = "/buycalc?sku=reserve-490#reserve";
 export const LOOK_HREF = "/buycalc?sku=hold-190#reserve";
@@ -103,13 +104,15 @@ export function MetaHook() {
 
 /** Five-surface rate card: starter ranges only (no later-rate numbers in public copy). */
 export function RateCardV2() {
+  const [ex, setEx] = useState<PlacementKey | null>(null);
   return (
     <div data-testid="rate-card-v2">
+      <p className="mb-3 text-xs text-muted-foreground">Tap or hover a surface to see an example placement inside a hub.</p>
       {/* Mobile: one card per surface */}
       <div className="grid gap-3 md:hidden">
         {RATE_SURFACES.map((s) => (
-          <article key={s.key} className="border border-foreground/15 bg-white p-4">
-            <h3 className="font-display text-xl">{s.label}</h3>
+          <article key={s.key} onClick={() => setEx(s.key)} className="cursor-pointer border border-foreground/15 bg-white p-4 transition-colors active:bg-muted/60">
+            <h3 className="font-display text-xl"><PlacementTrigger k={s.key} onOpen={setEx}>{s.label}</PlacementTrigger></h3>
             <p className="mt-1 text-xs text-muted-foreground">{s.where}</p>
             <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
               <div>
@@ -138,9 +141,9 @@ export function RateCardV2() {
           </thead>
           <tbody className="divide-y divide-border">
             {RATE_SURFACES.map((s) => (
-              <tr key={s.key}>
+              <tr key={s.key} onClick={() => setEx(s.key)} className="cursor-pointer transition-colors hover:bg-muted/50">
                 <td className="py-4 pr-4">
-                  <span className="font-medium">{s.label}</span>
+                  <PlacementTrigger k={s.key} onOpen={setEx} className="font-medium">{s.label}</PlacementTrigger>
                   <span className="block text-xs text-muted-foreground">{s.where}</span>
                 </td>
                 <td className="py-4 pr-4">
@@ -157,6 +160,7 @@ export function RateCardV2() {
       <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
         USD. <Estimate /> {ESTIMATE_NOTE} Starter rates apply while a placement is new; rates may step up only after campaign reporting shows the placement performs.
       </p>
+      <PlacementDialog open={ex} onClose={() => setEx(null)} />
     </div>
   );
 }
