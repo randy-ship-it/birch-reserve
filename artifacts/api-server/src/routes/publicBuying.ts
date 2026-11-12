@@ -2201,7 +2201,7 @@ router.get("/openapi.yaml", async (_req, res): Promise<void> => {
 
 // Listed-hub category seat picker for /buycalc. No public reach figure (Randy brief Nov 12 2026); no CTR or conversion inputs.
 const BUYCALC_SEAT_CALC_HTML = `<section class="sc" id="seat-calc"><div class="sc-in"><label for="sc-cat">Category</label><select id="sc-cat"></select>
-<p style="font-size:12px;margin:8px 0 0">Assumption: 80% of listed partner surfaces in the category are switched on to carry your module. One brand per category.</p></div>
+<p style="font-size:12px;margin:8px 0 0">One brand per category. The insertion order names the hub before anything runs.</p></div>
 <div class="sc-out" aria-live="polite"><small style="letter-spacing:.16em;text-transform:uppercase;opacity:.7">Your category surface</small><div class="sc-seat">1 seat</div><p id="sc-catname" style="font-weight:600;font-size:18px;margin:.3em 0 1em"></p><p id="sc-reach" style="margin:0"></p><p id="sc-f" class="sc-f"></p></div>
 <p class="sc-foot">No public reach figure: views are sized on your insertion order against live hub supply. Not a delivery or impression guarantee, and not a performance or click forecast.</p></section>
 <details class="sc-drawer"><summary>How this is calculated<small>Modelled estimate, not a guarantee, not Scale measured performance.</small></summary><ul id="sc-how"><li>Pick a category to see the seat: one brand per category.</li><li>Views are sized on your insertion order against live hub supply. No click, conversion or order forecast.</li></ul></details>
