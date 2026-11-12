@@ -476,45 +476,17 @@ async function reserveCounts() {
 const PUBLIC_BRAND_DESCRIPTION =
   "Prepay your category's display space across listed Scale Health hubs. One brand per category, no bidding. Fully refundable until 14 days before launch. Live hub: physio.drhonow.com. Your payment is display credit, not airfare.";
 
-/** Price-rise line stays off /buycalc until a change is locked in writing. */
-const BUYCALC_PRICE_RISE = "Lock in your slot before the minimum goes up";
-
-function buycalcPublicScope(scope: string): string {
-  return scope
-    .replaceAll(`${BUYCALC_PRICE_RISE}. `, "")
-    .replaceAll(BUYCALC_PRICE_RISE, "")
-    .trim();
-}
-
-const BUYCALC_SKU_LINES = [
-  "One unit inside the hub. Not a stack of banners. The category names the card.",
-  "The zone is the category. You can open a listed hub before the look. The look does not serve.",
-  "The $190 look is a draft you build. It does not serve until the insertion order names the hub.",
-  "One brand header on the category the customer already opened. Not a second page.",
-  "The unit matches the page the customer already opened. It is not a banner beside the letter.",
+/** The eight site category slugs (same as Friday's seat feed and /kit). One brand per category. */
+export const BUYCALC_CATEGORIES = [
+  { slug: "pain-relief-topicals", label: "Pain relief / topicals" },
+  { slug: "recovery-hardware", label: "Recovery hardware" },
+  { slug: "nutrition", label: "Nutrition" },
+  { slug: "sleep", label: "Sleep" },
+  { slug: "meal-prep", label: "Meal prep" },
+  { slug: "womens-health", label: "Women’s health" },
+  { slug: "mens-health", label: "Men’s health" },
+  { slug: "diagnostics-services", label: "Diagnostics / services" },
 ] as const;
-
-/** Same eight labels as /kit. Cells link only while availability.json seats_open is above zero. */
-const BUYCALC_CATEGORY_LABELS = [
-  "Pain relief / topicals",
-  "Recovery hardware",
-  "Nutrition",
-  "Sleep",
-  "Meal prep",
-  "Women’s health",
-  "Men’s health",
-  "Diagnostics / services",
-] as const;
-
-function buycalcCategoryStrip(seatsOpen: number): string {
-  const poolOpen = seatsOpen > 0;
-  const cells = BUYCALC_CATEGORY_LABELS.map((label) =>
-    poolOpen
-      ? `<li><a href="/buycalc?sku=hold-190">${label}</a></li>`
-      : `<li><span>${label}</span></li>`,
-  ).join("");
-  return `<ul class="cat-strip" data-source="/availability.json" data-seats-open="${seatsOpen}">${cells}</ul>`;
-}
 
 // Registered on the API service (ahead of the static SPA rewrite) so Autoscale
 // answers /oatmeal with a real 301 instead of index.html.
@@ -750,8 +722,14 @@ async function handleMachineCheckout(
     "format_pref",
     "idempotency_key",
     "currency",
+    "category",
   ]);
   const offer = getPublicReserveOfferBySku(body.sku);
+  // Optional category slug from the /buycalc form. It rides on the promoted offer name.
+  const category =
+    body.category === undefined
+      ? undefined
+      : BUYCALC_CATEGORIES.find((c) => c.slug === body.category);
   // Omitted currency: geo default (x-vercel-ip-country CA -> CAD, else USD). An explicit
   // currency always wins; an unsupported explicit value still falls back to USD (and is
   // rejected below as invalid input).
@@ -777,6 +755,7 @@ async function handleMachineCheckout(
     brand.length > 160 ||
     !validWebsite(website) ||
     (format !== undefined && !isFormat(format)) ||
+    (body.category !== undefined && !category) ||
     idempotencyKey.length < 8 ||
     idempotencyKey.length > 200 ||
     (!ucpAgentIdentityHash && idempotencyKey.toLowerCase().startsWith("ucp:")) ||
@@ -815,7 +794,7 @@ async function handleMachineCheckout(
       email,
       websiteUrl: website || null,
       adInterest: isFormat(format) ? format : "post_checkout",
-      promotedOffer: `Birch Reserve ${offer.name}`,
+      promotedOffer: `Birch Reserve ${offer.name}${category ? ` · ${category.label}` : ""}`,
       status: "seat_held",
       offerKey: offer.offerKey,
       amountCents,
@@ -2199,23 +2178,55 @@ router.get("/openapi.yaml", async (_req, res): Promise<void> => {
 });
 
 
-// Listed-hub category seat picker for /buycalc. No public reach figure (Randy brief Nov 12 2026); no CTR or conversion inputs.
-const BUYCALC_SEAT_CALC_HTML = `<section class="sc" id="seat-calc"><div class="sc-in"><label for="sc-cat">Category</label><select id="sc-cat"></select>
-<p style="font-size:12px;margin:8px 0 0">One brand per category. The insertion order names the hub before anything runs.</p></div>
-<div class="sc-out" aria-live="polite"><small style="letter-spacing:.16em;text-transform:uppercase;opacity:.7">Your category surface</small><div class="sc-seat">1 seat</div><p id="sc-catname" style="font-weight:600;font-size:18px;margin:.3em 0 1em"></p><p id="sc-reach" style="margin:0"></p><p id="sc-f" class="sc-f"></p></div>
-<p class="sc-foot">No public reach figure: views are sized on your insertion order against live hub supply. Not a delivery or impression guarantee, and not a performance or click forecast.</p></section>
-<details class="sc-drawer"><summary>How this is calculated<small>Modelled estimate, not a guarantee, not Scale measured performance.</small></summary><ul id="sc-how"><li>Pick a category to see the seat: one brand per category.</li><li>Views are sized on your insertion order against live hub supply. No click, conversion or order forecast.</li></ul></details>
-<script>(function(){var F=null;function f(n){return n>=1e6?(n/1e6).toFixed(1)+"M":n>=1e4?Math.round(n/1e3)+"K":n>=100?(Math.round(n/10)*10).toLocaleString():String(Math.round(n))}var sel=document.getElementById("sc-cat");function run(){if(!F)return;var c=F.categories.find(function(x){return x.category===sel.value})||F.categories[0];document.getElementById("sc-catname").textContent=c.category+". One brand in the category.";document.getElementById("sc-reach").textContent="Your insertion order sizes views against live hub supply in this category before anything runs.";document.getElementById("sc-f").textContent=""}
-sel.onchange=run;
-fetch("/inventory/api/tam").then(function(r){return r.json()}).then(function(j){F=j;sel.innerHTML=j.categories.map(function(c){return"<option>"+c.category+"</option>"}).join("");run()}).catch(function(){document.getElementById("sc-catname").textContent="Modelled feed unavailable."})})();</script>`;
+/**
+ * /buycalc is the one public buy page (server-rendered for browsers, crawlers and
+ * no-JS visitors alike; the SPA links here for checkout). Randy, Nov 12 2026: keep
+ * it short. One hero line, two offers, one "what you get" list, one live proof line,
+ * one benchmark line, the eight category cards, one form, phone and email.
+ * Agents use /v1/catalog.json and /v1/quote, not the human form.
+ */
+const BUYCALC_FORMAT_LABELS: Record<(typeof FORMATS)[number], string> = {
+  post_checkout: "After checkout",
+  recovery_plan: "Recovery plan",
+  scheduled_service: "Scheduled service",
+  member_hub: "Member hub",
+  motion_15s: "Motion 15s",
+};
+
+const BUYCALC_CSS = `*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f8f6ef;color:#071A39;font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif;-webkit-text-size-adjust:100%}a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.top{border-bottom:1px solid #d5d9df;background:#f8f6ef}.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px}.logo{font-weight:600;letter-spacing:.14em;text-decoration:none;font-size:14px}.top nav{display:flex;align-items:center;gap:14px;font-size:14px}.top nav a.tl{text-decoration:none;opacity:.8}.currency-toggle a{padding:4px 9px;border:1px solid #071A39;text-decoration:none;font-size:13px}.currency-toggle a[aria-pressed=true]{background:#071A39;color:#fff}.currency-toggle span{opacity:.7;margin-right:2px}
+.hero{background:#071A39;color:#f8f6ef;padding:56px 0 48px}.eyebrow{font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#C8F55A;margin:0 0 14px}h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:400;letter-spacing:-.01em;margin:0}.hero h1{font-size:clamp(2.1rem,6vw,3.9rem);line-height:1.04;max-width:820px}.hero .lede{font-size:clamp(1.02rem,2.2vw,1.2rem);max-width:640px;opacity:.82;margin:18px 0 28px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 22px;font-weight:600;text-decoration:none;border:2px solid #C8F55A;background:#C8F55A;color:#071A39;cursor:pointer;font:600 16px "IBM Plex Sans",system-ui,sans-serif}.btn.line{background:transparent;color:inherit;border-color:currentColor}.ctas{display:flex;flex-wrap:wrap;gap:12px}
+section.band{padding:52px 0}section.band+section.band{border-top:1px solid #d5d9df}.kicker{font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;opacity:.65;margin:0 0 10px}h2{font-size:clamp(1.7rem,4vw,2.5rem);line-height:1.1;margin-bottom:22px}
+.offers{display:grid;grid-template-columns:1fr 1fr;gap:16px}.offer{background:#fff;border:1px solid #071A39;padding:24px;display:flex;flex-direction:column;gap:10px;position:relative}.offer.is-selected{box-shadow:6px 6px 0 #C8F55A}.offer small{font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;opacity:.7}.offer .price{font:400 2.6rem/1 Fraunces,Georgia,serif}.offer .name{font-weight:600;font-size:1.05rem}.offer p{margin:0;font-size:15px;opacity:.85}.offer .btn{margin-top:auto}.offer .badge{position:absolute;top:14px;right:14px;background:#C8F55A;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:0 36px;padding:0;margin:0;list-style:none}.facts li{padding:12px 0 12px 28px;border-bottom:1px solid #d5d9df;position:relative}.facts li:before{content:"";position:absolute;left:0;top:19px;width:12px;height:12px;background:#C8F55A;border:1px solid #071A39}
+.proof{display:grid;gap:12px;margin-top:28px}.proof p{margin:0;padding:16px 18px;background:#fff;border-left:4px solid #C8F55A;font-size:15px}.proof .tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;border:1px solid currentColor;padding:1px 6px;margin-right:8px;vertical-align:1px}
+.open-count{font-size:15px;margin:-8px 0 18px}.open-count strong{background:#C8F55A;padding:1px 6px}
+.cat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0;padding:0;list-style:none}.cat-strip li{background:#fff;border:1px solid #071A39}.cat-strip a,.cat-strip span{display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-height:96px;padding:14px;text-decoration:none;font-weight:600;font-size:15px}.cat-strip em{font-style:normal;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}.cat-strip a em{color:#3b6b00}.cat-strip a:hover,.cat-strip a:focus-visible{background:#071A39;color:#fff}.cat-strip a:hover em,.cat-strip a:focus-visible em{color:#C8F55A}.cat-strip span em{opacity:.6}
+.buy{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:start}form#reserve{background:#fff;border:1px solid #071A39;padding:24px}form label{display:block;font-weight:600;font-size:14px;margin:14px 0 6px}form input,form select{width:100%;min-height:48px;padding:10px 12px;border:1px solid #071A39;background:#fff;font:16px "IBM Plex Sans",system-ui,sans-serif;color:#071A39;border-radius:0}form .check{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:14px}form .check input{width:20px;min-height:20px;margin-top:2px;flex:none}form .btn{width:100%;margin-top:18px}.fine{font-size:13px;opacity:.75}#message{font-weight:600;margin:14px 0 0;min-height:1em}.row2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.talk{background:#071A39;color:#f8f6ef;padding:24px}.talk h3{font-size:1.5rem;margin-bottom:10px}.talk p{margin:0 0 16px;opacity:.82}.talk .btn{width:100%;margin-top:10px}
+footer{padding:28px 0 40px;font-size:13px;opacity:.75}footer p{margin:6px 0}
+@media(max-width:820px){.offers,.facts,.buy{grid-template-columns:1fr}.cat-strip{grid-template-columns:1fr 1fr}.hero{padding:40px 0 36px}section.band{padding:40px 0}.top nav a.tl{display:none}.ctas .btn{flex:1 1 100%}}
+@media(max-width:380px){.row2{grid-template-columns:1fr}}`;
+
+function buycalcSelectedOffer(sku: unknown) {
+  return PUBLIC_RESERVE_OFFERS.find((offer) => offer.sku === sku) ?? DEFAULT_RESERVE_OFFER;
+}
+
+function buycalcCategorySlug(value: unknown): string | null {
+  return typeof value === "string" && BUYCALC_CATEGORIES.some((c) => c.slug === value) ? value : null;
+}
 
 export function renderBuycalcHtml(input: {
   seatsOpen: number;
   seatsTotal: number;
   sku?: unknown;
   format?: unknown;
+  category?: unknown;
   currency?: ReserveCurrency;
   draftBonus?: boolean;
+  checkoutLive?: boolean;
 }): string {
   const currency: ReserveCurrency = input.currency ?? RESERVE_CURRENCY;
   const html = renderBuycalcHtmlUsd(input, currency);
@@ -2230,17 +2241,19 @@ export function renderBuycalcHtml(input: {
 
 function currencyToggleHtml(
   currency: ReserveCurrency,
-  query: { sku?: unknown; format?: unknown },
+  query: { sku?: unknown; format?: unknown; category?: unknown },
 ): string {
   const link = (target: ReserveCurrency) => {
     const params = new URLSearchParams();
     if (typeof query.sku === "string") params.set("sku", query.sku);
     if (typeof query.format === "string") params.set("format", query.format);
+    const category = buycalcCategorySlug(query.category);
+    if (category) params.set("category", category);
     params.set("currency", target);
     const active = target === currency;
-    return `<a href="/buycalc?${params.toString()}#reserve" data-currency="${target}" rel="nofollow" aria-pressed="${active}" style="padding:4px 10px;border:1px solid #071A39;text-decoration:none;${active ? "background:#071A39;color:#fff;" : "color:#071A39;"}">${target.toUpperCase()}</a>`;
+    return `<a href="/buycalc?${params.toString()}#reserve" data-currency="${target}" rel="nofollow" aria-pressed="${active}">${target.toUpperCase()}</a>`;
   };
-  return `<nav class="currency-toggle" aria-label="Currency" data-testid="currency-toggle" style="display:flex;gap:6px;align-items:center;font-size:14px"><span>Prices in</span>${link("usd")}${link("cad")}</nav>`;
+  return `<span class="currency-toggle" data-testid="currency-toggle" role="group" aria-label="Currency"><span>Prices in</span> ${link("usd")} ${link("cad")}</span>`;
 }
 
 function renderBuycalcHtmlUsd(input: {
@@ -2248,13 +2261,33 @@ function renderBuycalcHtmlUsd(input: {
   seatsTotal: number;
   sku?: unknown;
   format?: unknown;
+  category?: unknown;
+  checkoutLive?: boolean;
 }, currency: ReserveCurrency): string {
-  const availability = { seats_open: input.seatsOpen, seats_total: input.seatsTotal };
-  const req = { query: { sku: input.sku, format: input.format } };
+  const selected = buycalcSelectedOffer(input.sku);
+  const category = buycalcCategorySlug(input.category);
+  const checkoutLive = input.checkoutLive === true;
+  const look = PUBLIC_RESERVE_OFFERS.find((offer) => offer.sku === "hold-190") ?? PUBLIC_RESERVE_OFFERS[0];
+  const seat = PUBLIC_RESERVE_OFFERS.find((offer) => offer.sku === "reserve-490") ?? DEFAULT_RESERVE_OFFER;
+  const price = (offer: (typeof PUBLIC_RESERVE_OFFERS)[number]) => offerPriceLabel(offer, currency);
+  const offerCard = (offer: (typeof PUBLIC_RESERVE_OFFERS)[number], body: { eyebrow: string; name: string; lines: string[]; cta: string }) => {
+    const isSelected = offer.sku === selected.sku;
+    return `<article class="offer${isSelected ? " is-selected" : ""}" data-sku="${offer.sku}">${isSelected ? `<span class="badge">Selected</span>` : ""}<small>${body.eyebrow}</small><div class="price">${price(offer)}</div><div class="name">${body.name}</div>${body.lines.map((line) => `<p>${line}</p>`).join("")}<a class="btn${offer.sku === "reserve-490" ? "" : " line"}" href="/buycalc?sku=${offer.sku}${category ? `&amp;category=${category}` : ""}#reserve" data-pick-sku="${offer.sku}">${body.cta}</a></article>`;
+  };
+  const poolOpen = input.seatsOpen > 0;
+  const categoryCells = BUYCALC_CATEGORIES.map((c) =>
+    poolOpen
+      ? `<li data-slug="${c.slug}"><a href="/buycalc?sku=${selected.sku}&amp;category=${c.slug}#reserve" data-pick-category="${c.slug}">${c.label}<em>Open · pick</em></a></li>`
+      : `<li data-slug="${c.slug}"><span>${c.label}<em>Waitlist</em></span></li>`,
+  ).join("");
+  const submitLabel = checkoutLive
+    ? `Continue to secure checkout · ${price(selected)}`
+    : `Reserve my seat · no charge today`;
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prepay your category — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | The $490 seat is the named category"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | The $490 seat is the named category"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">${publicSeoTags("/buycalc")}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
+<link rel="alternate" type="application/json" href="/v1/catalog.json" title="Birch Reserve machine catalog">
 <script type="application/ld+json">${JSON.stringify({
   "@context": "https://schema.org",
   "@type": "ItemList",
@@ -2279,65 +2312,55 @@ function renderBuycalcHtmlUsd(input: {
 })}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box}body{margin:0;background:#f8f6ef;color:#071A39;font:16px/1.55 "IBM Plex Sans",sans-serif}header,main,footer{max-width:1100px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;border-bottom:1px solid #ccd2d8}h1,h2{font-family:Fraunces,serif;font-weight:400}h1{font-size:clamp(2.7rem,7vw,5.8rem);line-height:.95;margin:.5em 0}.accent{background:#C8F55A;padding:.08em .18em}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:36px}.card{border:1px solid #071A39;padding:24px;margin:18px 0}.figures{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#071A39}.figure{background:#fff;padding:18px}.figure strong{display:block;font:600 1.7rem Fraunces,serif}.offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.offer{border:1px solid #071A39;padding:16px;background:#fff}.offer strong{display:block;font:600 1.35rem Fraunces,serif}.offer small{display:block;margin-top:8px}label{display:block;font-weight:600;margin-top:14px}input,select,button{width:100%;padding:12px;border:1px solid #071A39;background:white;font:inherit}button{margin-top:18px;background:#C8F55A;font-weight:600;cursor:pointer}.fine{font-size:.9rem}#message{padding-top:12px;font-weight:600}@media(max-width:760px){.grid,.figures,.offer-grid{grid-template-columns:1fr}}
-.sh-hero{background:#0A1D56;color:#fff;margin:0 -24px;padding:48px 24px}.sh-eyebrow{color:#9D4EDD;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:12px}.sh-hero h1{font-family:"IBM Plex Sans",sans-serif;font-weight:600;font-size:clamp(2.1rem,5vw,3.6rem);line-height:1.05;margin:.3em 0 .6em;max-width:850px}.sh-prices{display:grid;grid-template-columns:1fr 1fr;gap:16px}.sh-price{border-radius:8px;padding:20px;color:#0A1D56}.sh-white{background:#fff}.sh-card{background:#F0F4F8}.sh-price p{margin:.3em 0 1em;font-size:14px}.sh-btn{display:block;text-align:center;background:#0A1D56;color:#fff;padding:13px;border-radius:6px;font-weight:600;text-decoration:none}.sh-ghost{background:transparent;color:#0A1D56;border:2px solid #0A1D56}.sh-proof{margin-top:22px;font-size:14px}.sh-proof a{color:#fff;font-weight:600;text-decoration-color:#9D4EDD}.sh-excl{font-size:12px;opacity:.7}.sc{display:grid;grid-template-columns:1fr 1fr;border:1px solid #0A1D5626;border-radius:8px;overflow:hidden;margin:28px 0;background:#fff}.sc-in{padding:22px}.sc-in label,.sc-in .lab{display:block;font-weight:600;font-size:14px;margin:12px 0 6px}.sc select{width:100%;min-height:44px}.sc-opt{display:block;width:100%;text-align:left;border:0;border-radius:6px;background:#F0F4F8;padding:11px;margin:3px 0;font:600 14px "IBM Plex Sans";color:#0A1D56;cursor:pointer}.sc-opt[aria-checked=true]{background:#0A1D56;color:#fff}.sc-out{background:#0A1D56;color:#fff;padding:26px;display:flex;flex-direction:column;justify-content:center}.sc-seat{color:#00FF88;font-size:64px;font-weight:700;line-height:1}.sc-grey{color:#ffffff8c;font-size:14px}.sc-f{font-size:12px;color:#ffffff99}.sc-foot{grid-column:1/-1;font-size:12px;color:#0A1D56a6;padding:16px 22px;border-top:1px solid #0A1D561a}.sc-drawer{background:#F0F4F8;border-radius:8px;padding:18px;margin:0 0 28px}.sc-drawer summary{font-weight:600;cursor:pointer}.sc-drawer summary small{font-weight:400;opacity:.7;margin-left:8px}.cat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0;padding:0;list-style:none}.cat-strip li{border:1px solid #071A39;background:#fff}.cat-strip a,.cat-strip span{display:flex;align-items:center;justify-content:center;min-height:72px;padding:12px;text-align:center;color:inherit;text-decoration:none;font-size:14px;font-weight:600}@media(max-width:760px){.sh-prices,.sc{grid-template-columns:1fr}.cat-strip{grid-template-columns:1fr 1fr}}
-</style></head><body><header><strong>BIRCH RESERVE</strong>${currencyToggleHtml(currency, { sku: input.sku, format: input.format })}<a href="/v1/catalog.json">Machine catalog</a></header><main>
-<section class="sh-hero"><p class="sh-eyebrow">Birch Reserve · Canada</p><h1>Prepay your category's display space. One brand. No bidding.</h1>
-<div class="sh-prices"><div class="sh-price sh-white"><strong style="font-size:2rem">$490 USD</strong><p><b>Prepay once. All of it becomes display credit in your category.</b></p><p>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p><p>Why it beats Meta: Meta sells you a cold click in an auction. Here you pay once, own the category, and your offer meets customers right after they have bought.</p><a class="sh-btn" href="/buycalc?sku=reserve-490#reserve">Prepay your category · $490 USD</a><p>Not ready? <a href="/buycalc?sku=hold-190#reserve">Take a 7-day look for $190 USD</a>. It converts in full to the prepay, or it is refunded.</p></div></div>
-<p class="sh-proof">Live placement: <a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>. A listed physio hub. Your module sits at the booking and the plan, in the category.</p>
-<p class="sh-proof">Public benchmark, not a Birch result: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p>
-<p class="sh-proof">This is the place. Not a view chart. Illustrative until the insertion order names the hub.</p>
-<p class="sh-proof">The unit is one card on a page the visitor already opened. You do not send them to a new feed. The card stays small enough that the hub page remains the page.</p>
-<p class="sh-proof">The category is the named zone. You do not buy an open slot. The insertion order names the hub and the category before anything runs.</p>
-<p class="sh-proof">The look is the preview. You assemble the square still on the creative brief. Nothing on the hub changes until the insertion order names the hub.</p>
-<p class="sh-proof">The header is the placement. You sit in the category the visitor already opened. You do not create a new search.</p>
-<p class="sh-proof">You see the face before the flight. The square still is the preview. Nothing on the hub changes until the insertion order names the hub.</p>
-<p class="sh-proof">One card names the category. The card sits on the hub page the visitor already opened.</p>
-<p class="sh-proof">The zone has a price. You do not bid for the category. The $490 is the named seat.</p>
-<p class="sh-proof">The look assembles on the brief. You do not wait for the $490 to start the square.</p>
-<p class="sh-proof">The category is already open. You sit where the member is already shopping. The $490 is the header on that aisle.</p>
-<p class="sh-proof">The square sits inside the hub already open. You approve the still on the brief. The $490 names the category.</p>
-<p class="sh-proof">The card stays on the page the visitor already opened. One square. Not a feed. The $490 names the category.</p>
-<p class="sh-proof">The zone is sold by name. You do not buy a remnant. The $490 is the zone.</p>
-<p class="sh-proof">The look is the draft. You build the square on the brief. The $490 is the stamp.</p>
-<p class="sh-proof">The header sits on the aisle already open. You do not open a new search. The $490 is the named category.</p>
-<p class="sh-proof">The face is approved on the brief. You see the still before anything flies. The $490 is the stamp.</p>
-<p class="sh-proof">The square is endemic to the recovery already open. You do not open a new protocol. The $490 is the named category.</p>
-<p class="sh-proof">The preview is self-serve. You start the square on the brief. The $490 is the stamp.</p>
-<p class="sh-proof">The card does not leave the page. You stay where the member already is. The $490 is the named category.</p>
-<p class="sh-proof">The zone is one name. You do not share the seat. The $490 is that name.</p>
-<p class="sh-proof">The still is the preview. You assemble the square on the brief. The $490 is the stamp.</p>
-<p class="sh-proof">The shelf is already shopped. You place the square on the aisle the member already opened. The $490 is the header.</p>
-<p class="sh-proof">The square is already in the letter. You place the unit inside the page the member already opened. The $490 is the stamp.</p>
-<p class="sh-proof">The kit sits inside the recovery already open. You place the square on the protocol the member already started. The $490 is the named category.</p>
-<p class="sh-proof">The look starts on the brief. You start the square yourself. The $490 is the stamp.</p>
-<p class="sh-proof">The card is the only unit. You place one square on the page the member already opened. The $490 is the named category.</p>
-<p class="sh-excl">One brand per category · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only · Canada only</p></section>
-${BUYCALC_SEAT_CALC_HTML}
+<style>${BUYCALC_CSS}</style></head><body>
+<header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav aria-label="Buy page"><a class="tl" href="/rates">Rates</a><a class="tl" href="/kit">Creative brief</a>${currencyToggleHtml(currency, { sku: input.sku, format: input.format, category })}</nav></div></header>
+<main>
+<section class="hero"><div class="wrap"><p class="eyebrow">Birch Reserve · Prepaid category seats</p><h1>Prepay your category's display space. One brand. No bidding.</h1>
+<p class="lede">Your offer sits inside listed recovery hubs, right after a customer books or buys. All of it is media credit, fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
+<div class="ctas"><a class="btn" href="/buycalc?sku=reserve-490#reserve" data-pick-sku="reserve-490">Reserve my category · ${price(seat)}</a><a class="btn line" href="/buycalc?sku=hold-190#reserve" data-pick-sku="hold-190">7-day look · ${price(look)}</a></div></div></section>
+
+<section class="band" id="offers"><div class="wrap"><p class="kicker">Two ways in</p><h2>Pick your start.</h2>
+<div class="offers">${offerCard(look, { eyebrow: "7-day look", name: look.name, lines: ["Hold your category for 7 days while you decide.", "Converts in full to the seat within 7 days, otherwise refunded. Does not lock the seat."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Named category seat", name: "Your category, one brand", lines: [`All ${price(seat)} becomes display credit in your category. Credit lasts 12 months.`, "No other brand takes your category while the seat is yours."], cta: `Reserve my category · ${price(seat)}` })}</div>
 <!--BONUS_TIER_DRAFT-->
-<div class="grid"><section><h2>What a reserved slot includes</h2><p><strong>${availability.seats_open} categories open</strong> of ${availability.seats_total}. Availability is rolling and subtracts paid and currently held locks.</p>
-${buycalcCategoryStrip(availability.seats_open)}
-<div class="offer-grid">${PUBLIC_RESERVE_OFFERS.map((offer) => {
-    const offerType = String(offer.offerType);
-    const eyebrow = offerType === "category_seat" ? "RESERVE YOUR SLOT" : offerType === "category_look" ? "7-DAY LOOK" : offerType.replaceAll("_", " ").toUpperCase();
-    const beside = offer.sku === "reserve-490"
-      ? `<p>You buy the category header. You do not bid on a search.</p>`
-      : offer.sku === "hold-190"
-        ? `<p><a href="/kit">What you send is on the creative brief</a></p>`
-        : "";
-    return `<article class="offer" data-sku="${offer.sku}"><small>${eyebrow}</small><strong>$${(offerAmountCents(offer, currency) / 100).toLocaleString("en-US")} ${currency.toUpperCase()} · ${offer.name}</strong><small>${buycalcPublicScope(offerScope(offer, currency))}</small>${beside}</article>`;
-  }).join("")}</div>
-<div class="card"><h2>Your planning choices</h2><p><strong>Format:</strong> post-checkout, recovery plan, scheduled service, member hub, or motion 15s.</p><p><strong>Window:</strong> 30, 90, or 180 days.</p><p><strong>Placement:</strong> your category.</p><p><strong>Creative:</strong> static, native, or motion.</p></div>
-<p>Reporting is aggregate only. Payment is not considered received until Stripe webhook confirmation.</p></section>
-<aside><form id="reserve"><h2>Reserve without a login</h2><label>Offer<select name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${req.query.sku === offer.sku ? " selected" : ""}>$${(offerAmountCents(offer, currency) / 100).toLocaleString("en-US")} ${currency.toUpperCase()} · ${offer.name}</option>`).join("")}</select></label><div class="fine">${BUYCALC_SKU_LINES.map((line) => `<p>${line}</p>`).join("")}</div><label>Brand<input name="brand" required maxlength="160"></label><label>Work email<input name="email" type="email" required></label><label>Website (optional)<input name="website_url" type="url"></label><label>Format<select name="format_pref">${FORMATS.map((f) => `<option value="${f}"${req.query.format === f ? " selected" : ""}>${f.replaceAll("_", " ")}</option>`).join("")}</select></label><label>Window<select id="days"><option>30</option><option>90</option><option>180</option></select></label><label>Placement<select><option>Category</option><option>RON</option></select></label><label>Creative<select><option>Static</option><option>Native</option><option>Motion</option></select></label><label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the draft <a href="/terms">terms</a> before any charge. Draft until counsel stamps.</label><button id="submit" type="submit">Lock in your slot — $490 USD</button><button id="copy" type="button">Copy quote JSON</button><p class="fine"><a href="tel:+16479316278">Get a call back</a> · <a href="/buycalc?sku=hold-190">Hold a category for 7 days — $190</a> · <a href="/kit">What you send is on the creative brief</a></p><p id="message" role="status"></p><noscript><p class="fine">JavaScript is required to submit this no-login reservation. Complete prices and terms remain available above; <a href="mailto:sales@silverbirchgrowth.com">Email sales</a> to reserve manually.</p></noscript></form></aside></div></main>
-<footer class="fine">Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · <a href="mailto:sales@silverbirchgrowth.com">Email sales</a><p id="selectedSummary"></p></footer>
+</div></section>
+
+<section class="band" id="included"><div class="wrap"><p class="kicker">What you get</p><h2>Plain terms.</h2>
+<ul class="facts"><li>One brand per category. No auction, no shared seat.</li><li>100% of what you pay is media credit in your category.</li><li>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</li><li>The insertion order names the hub and the category before anything runs.</li><li>Aggregate reporting only. No PHI, no clinical pixels.</li><li>No impression guarantee, and no reach or click forecast.</li></ul>
+<div class="proof"><p><span class="tag">Live placement</span><a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>, a listed physio hub. Your card sits at the booking and the plan, in your category. Illustrative until your insertion order names the hub.</p>
+<p><span class="tag">Public benchmark</span>Not a Birch result: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p></div>
+</div></section>
+
+<section class="band" id="categories"><div class="wrap"><p class="kicker">Categories</p><h2>Eight categories. One brand each.</h2>
+<p class="open-count"><strong>${input.seatsOpen} of ${input.seatsTotal} open</strong> · Availability is rolling and subtracts paid and currently held seats.</p>
+<ul class="cat-strip" data-source="/availability.json" data-seats-open="${input.seatsOpen}">${categoryCells}</ul>
+</div></section>
+
+<section class="band" id="buy"><div class="wrap"><div class="buy">
+<form id="reserve" novalidate><p class="kicker">Reserve without a login</p><h2 style="margin-bottom:6px">Lock it in.</h2>
+<label for="f-sku">Offer</label><select id="f-sku" name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${offer.sku === selected.sku ? " selected" : ""}>${price(offer)} · ${offer.sku === "reserve-490" ? "Named category seat" : offer.name}</option>`).join("")}</select>
+<label for="f-cat">Category</label><select id="f-cat" name="category"><option value="">Not sure yet</option>${BUYCALC_CATEGORIES.map((c) => `<option value="${c.slug}"${c.slug === category ? " selected" : ""}>${c.label}</option>`).join("")}</select>
+<label for="f-brand">Brand</label><input id="f-brand" name="brand" required maxlength="160" autocomplete="organization">
+<label for="f-email">Work email</label><input id="f-email" name="email" type="email" required autocomplete="email">
+<div class="row2"><div><label for="f-web">Website <span class="fine">(optional)</span></label><input id="f-web" name="website_url" type="url" inputmode="url" placeholder="https://"></div><div><label for="f-format">Where it shows</label><select id="f-format" name="format_pref">${FORMATS.map((f) => `<option value="${f}"${input.format === f ? " selected" : ""}>${BUYCALC_FORMAT_LABELS[f]}</option>`).join("")}</select></div></div>
+<label class="check"><input id="terms" type="checkbox" required><span>I agree to the draft <a href="/terms">terms</a> before any charge.</span></label>
+<button id="submit" class="btn" type="submit">${submitLabel}</button>
+<p class="fine" id="checkout-note">${checkoutLive ? "Secure card checkout by Stripe. Payment counts once Stripe confirms it." : "Card checkout is not open yet. Submitting saves your seat request and alerts our sales team. No card is charged."}</p>
+<p id="message" role="status" aria-live="polite"></p>
+<noscript><p class="fine">This form needs JavaScript. To reserve without it, <a href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">email sales@silverbirchgrowth.com</a> or call <a href="tel:+16479316278">(647) 931-6278</a>.</p></noscript>
+</form>
+<aside class="talk"><h3>Rather talk first?</h3><p>We'll walk you through the hubs, your category and the brief.</p><a class="btn" href="tel:+16479316278">Call (647) 931-6278</a><a class="btn line" href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">sales@silverbirchgrowth.com</a><a class="btn line" href="/kit">See the creative brief</a></aside>
+</div></div></section>
+</main>
+<footer><div class="wrap"><p>One brand per category · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only</p><p>Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · <a href="tel:+16479316278">(647) 931-6278</a></p><p>For AI buyers: <a href="/v1/catalog.json">/v1/catalog.json</a> · <a href="/v1/quote?sku=reserve-490">/v1/quote</a> · <a href="/llms.txt">/llms.txt</a></p></div></footer>
 <script>
-const form=document.querySelector("#reserve"),message=document.querySelector("#message"),idempotencyKey=crypto.randomUUID(),currency=${JSON.stringify(currency)},offers=${JSON.stringify(Object.fromEntries(PUBLIC_RESERVE_OFFERS.map((offer) => [offer.sku, { ...offer, dueToday: offerAmountCents(offer, currency) / 100, scope: buycalcPublicScope(offerScope(offer, currency)) }])))};
-function selected(){return offers[form.elements.sku.value]}function refresh(){const offer=selected();document.querySelector("#submit").textContent="Continue — $"+offer.dueToday.toLocaleString("en-US")+" "+currency.toUpperCase();document.querySelector("#selectedSummary").textContent="SKU "+offer.sku+" · Offer "+offer.offerKey+" · Exactly $"+offer.dueToday.toLocaleString("en-US")+" "+currency.toUpperCase()+" due today and applied as media credit."}form.elements.sku.onchange=refresh;refresh();
-async function quote(){const sku=form.elements.sku.value,format=form.elements.format_pref.value,days=document.querySelector("#days").value;const r=await fetch("/v1/quote?currency="+currency+"&sku="+encodeURIComponent(sku)+"&format="+encodeURIComponent(format)+"&days="+days);return r.json()}
-document.querySelector("#copy").onclick=async()=>{try{await navigator.clipboard.writeText(JSON.stringify(await quote(),null,2));message.textContent="Quote JSON copied."}catch{message.textContent="Unable to copy automatically. Open the machine catalog link to copy the contract."}};
-form.onsubmit=async(e)=>{e.preventDefault();if(!document.querySelector("#terms").checked){message.textContent="Accept the draft terms before any charge.";return}message.textContent="Saving your reservation…";const data=Object.fromEntries(new FormData(form));delete data.terms;data.idempotency_key=idempotencyKey;data.currency=currency;if(!data.website_url)delete data.website_url;try{const r=await fetch("/v1/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)});const out=await r.json();if(out.checkout_url){location.assign(out.checkout_url);return}message.textContent=(out.error||"Your hold was saved, but checkout is unavailable.")+(out.order_id?" Order: "+out.order_id:"")}catch{message.textContent="The reservation could not be submitted. No payment was claimed."}};
+(function(){var form=document.getElementById("reserve"),message=document.getElementById("message"),submit=document.getElementById("submit"),idempotencyKey=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2),currency=${JSON.stringify(currency)},live=${checkoutLive ? "true" : "false"},labels=${JSON.stringify(Object.fromEntries(PUBLIC_RESERVE_OFFERS.map((offer) => [offer.sku, price(offer)])))};
+function refresh(){if(live)submit.textContent="Continue to secure checkout · "+labels[form.elements.sku.value];document.querySelectorAll(".offer").forEach(function(el){var on=el.getAttribute("data-sku")===form.elements.sku.value;el.classList.toggle("is-selected",on);var b=el.querySelector(".badge");if(on&&!b){b=document.createElement("span");b.className="badge";b.textContent="Selected";el.prepend(b)}else if(!on&&b){b.remove()}})}
+form.elements.sku.addEventListener("change",refresh);
+function go(){document.getElementById("buy").scrollIntoView({behavior:"smooth",block:"start"});setTimeout(function(){document.getElementById("f-brand").focus({preventScroll:true})},400)}
+document.querySelectorAll("[data-pick-sku]").forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();form.elements.sku.value=a.getAttribute("data-pick-sku");refresh();go()})});
+document.querySelectorAll("[data-pick-category]").forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();form.elements.category.value=a.getAttribute("data-pick-category");go()})});
+form.addEventListener("submit",async function(e){e.preventDefault();if(!form.reportValidity())return;if(!document.getElementById("terms").checked){message.textContent="Please accept the draft terms first.";return}submit.disabled=true;message.textContent="Saving your request…";var data=Object.fromEntries(new FormData(form));data.idempotency_key=idempotencyKey;data.currency=currency;if(!data.website_url)delete data.website_url;if(!data.category)delete data.category;try{var r=await fetch("/v1/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)});var out=await r.json();if(out.checkout_url){location.assign(out.checkout_url);return}if(out.order_id){message.textContent="Saved. Your seat request is in (ref "+out.order_id+"). No card was charged. Our sales team will reach you at "+data.email+", or call (647) 931-6278.";form.querySelectorAll("input,select,button").forEach(function(el){el.disabled=true});return}message.textContent=out.error||"We could not save that. Please call (647) 931-6278 or email sales@silverbirchgrowth.com.";submit.disabled=false}catch(err){message.textContent="We could not submit that. No payment was taken. Please call (647) 931-6278 or email sales@silverbirchgrowth.com.";submit.disabled=false}});
+refresh();})();
 </script></body></html>`;
 }
 
@@ -2357,7 +2380,9 @@ router.get("/buycalc", async (req, res): Promise<void> => {
       seatsTotal: availability.seats_total,
       sku: req.query.sku,
       format: req.query.format,
+      category: req.query.category,
       draftBonus: isBonusDraftRequested(req.query),
+      checkoutLive: checkoutConfigured(),
     }),
   );
 });
