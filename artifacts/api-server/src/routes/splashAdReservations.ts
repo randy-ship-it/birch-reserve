@@ -33,6 +33,7 @@ import {
   retrieveStripeCheckoutSession,
 } from "../lib/stripeClient";
 import { defaultSlackProxy } from "../lib/slackPost";
+import { isReserveCheckoutConfigured as reserveCheckoutLive } from "../lib/checkoutState";
 import {
   approveSplashReservationWithCapacity,
   claimSplashReserveSeat,
@@ -131,11 +132,7 @@ function isStripePaymentConfigured(): boolean {
 }
 
 function isReserveCheckoutConfigured(): boolean {
-  return Boolean(
-    process.env.STRIPE_CHECKOUT_DISABLED !== "true" &&
-      configuredPublicAppUrl() &&
-      isStripeSecretConfigured(),
-  );
+  return reserveCheckoutLive(process.env);
 }
 
 function isPaidOfferKey(value: string): boolean {

@@ -386,7 +386,7 @@ test("transcript email: plain text + simple HTML with naked URLs, escaped", () =
     email.html,
     /<a href="https:\/\/physio\.drhonow\.com\/dr-ho\/portal">https:\/\/physio\.drhonow\.com\/dr-ho\/portal<\/a>\./,
   );
-  assert.match(email.text, /Randy: Live hub: https:\/\/physio\.drhonow\.com\/dr-ho\/portal\./);
+  assert.match(email.text, /Squirrel: Live hub: https:\/\/physio\.drhonow\.com\/dr-ho\/portal\./);
   assert.doesNotMatch(email.text + email.html, /899/);
 });
 
@@ -763,7 +763,8 @@ test("5:47pm brain: studios get the ad pitch first; never hang up right after ta
   assert.match(prompt, /lead with ADVERTISING/);
   assert.match(prompt, /Never end the call right after taking an email/);
   assert.match(prompt, /Never hero \$899/);
-  assert.match(prompt, /Checkout is OFF/);
+  assert.match(prompt, process.env.STRIPE_SECRET_KEY ? /Checkout is LIVE/ : /Checkout is OFF/);
+  assert.match(prompt, /inquiry-only/);
   assert.match(prompt, /Never promote the calendar/);
 });
 
@@ -795,4 +796,17 @@ test("5:53pm: the site has no in-browser voice session; every voice CTA is a tel
     assert.doesNotMatch(src, /new WebSocket|RTCPeerConnection|getUserMedia|client_secret|end_call/);
   }
   assert.match(files[2]!, /RANDY_TEL_HREF = `tel:\$\{RANDY_TEL_E164\}`/);
+});
+
+test("runtime checkout lock follows live flags: $190/$490 links when live, area lock + deposits inquiry-only when held", async () => {
+  const { checkoutLockLines, RESERVE_LINKS } = await import("../src/lib/voiceCloserKnowledge");
+  const live = checkoutLockLines({ reserve: true, areaLock: false, deposits: false });
+  assert.match(live, /Checkout is LIVE/);
+  assert.ok(live.includes(RESERVE_LINKS.hold190) && live.includes(RESERVE_LINKS.reserve490));
+  assert.match(live, /Area lock[^\n]*inquiry-only/);
+  assert.match(live, /Sponsor deposits[^\n]*inquiry-only/);
+  assert.doesNotMatch(live, /Checkout is OFF/);
+  const off = checkoutLockLines({ reserve: false, areaLock: false, deposits: false });
+  assert.match(off, /Checkout is OFF/);
+  assert.ok(!off.includes(RESERVE_LINKS.hold190));
 });
