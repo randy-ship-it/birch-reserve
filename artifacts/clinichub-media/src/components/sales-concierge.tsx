@@ -318,7 +318,7 @@ export function SalesConcierge({
         };
       case "join_provider_network":
         return {
-          text: "Providers listing a surface can opt in free. That is not a charge, and it is not the Scale Health $49 ICA.",
+          text: "Providers listing a surface can opt in free. That is not a charge.",
           options: [
             {
               label: "Open Scale Health for providers",

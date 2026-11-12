@@ -3,7 +3,7 @@
  *
  * Every impression figure here is MODELLED, not measured. Inputs come from the
  * public aggregate feed https://birchreserve.net/inventory/api/tam (read
- * 2026-11-12): ~128MM monthly views, 20MM+ orders being onboarded, 42 listed
+ * 2026-11-12): 20MM+ orders being onboarded, 42 listed
  * partners, 0 signed. Per-hub rows use the partner feed row where one exists
  * (DR-HO's) and the network median partner where the hub has no feed row yet.
  * Monthly views per channel are scaled from the partner feed by the same 2.34x
@@ -158,8 +158,6 @@ export const CUSTOM_MAX = { usd: 50000, cad: 70000 };
 export const TAM_FACTS = {
   ordersLabel: "20MM+",
   ordersNote: "orders being onboarded now (modelled)",
-  viewsLabel: "~128MM",
-  viewsNote: "monthly views across the listed partners (modelled)",
   listedPartners: 42,
   signedPartners: 0,
   source: "https://scalehealth.ca/tam",

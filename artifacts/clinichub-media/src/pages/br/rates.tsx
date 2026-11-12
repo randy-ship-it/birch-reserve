@@ -4,7 +4,7 @@ import { RATE_SURFACES } from "../../../../api-server/src/lib/overhaul/pricing";
 
 const FAQ = [
   { q: "Are these the prices I'll pay?", a: "They are starting-at planning estimates, not a quote. Your insertion order names the hubs, surfaces and final rate before anything runs." },
-  { q: "Why do rates go up later?", a: "New placements open at starter rates. A placement only steps toward the proven range once campaign reporting (views, clicks, UTM visits, promo-code redemptions) shows it performs. Your locked deposit keeps its rate for its term." },
+  { q: "Why do rates go up later?", a: "New placements open at starter rates. A placement's rate can step up only once campaign reporting (views, clicks, UTM visits, promo-code redemptions) shows it performs. Your locked deposit keeps its rate for its term." },
   { q: "What does the $490 category prepay do?", a: "It holds your recovery category (one brand per category) and all $490 is media credit toward any pack. Fully refundable until 14 days before your launch date. The $190 7-day look is 100% credit if you move to a category prepay within 7 days, else refunded." },
   { q: "How big can a buy get?", a: "Self-serve packs run up to $25k at starter rates. Larger or category-exclusive buys go on an insertion order sized to live hub supply. 20mm+ orders are being onboarded across the network." },
 ];
@@ -12,7 +12,7 @@ const FAQ = [
 export default function BrRates() {
   usePageMeta(
     "Rates | Birch Reserve",
-    "Starting-at CPM and CPC rates for five hub surfaces, view-block packs, a scenario calculator and how rates rise only once placements are proven. Illustrative estimates.",
+    "Starting-at CPM and CPC rates for five hub surfaces, view-block packs, a scenario calculator and how rates step up only once a placement proves out. Illustrative estimates.",
   );
   return (
     <div className="w-full overflow-x-hidden" data-testid="br-rates">
@@ -50,7 +50,7 @@ export default function BrRates() {
       <Section id="scenario">
         <Eyebrow>Scenario calculator</Eyebrow>
         <H2>From 100k views to 1B.</H2>
-        <Lede>Slide to see what a volume costs at starter rates, the same views on Meta, and where proven placements land.</Lede>
+        <Lede>Slide to see what a volume costs at starter rates next to the same views on Meta.</Lede>
         <div className="mt-8">
           <ScenarioCalculator />
         </div>

@@ -72,11 +72,7 @@ export function SurfacesGrid() {
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/50">Surface {i + 1}</p>
           <h3 className="mt-2 font-display text-2xl">{s.label}</h3>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.blurb}</p>
-          <dl className="mt-5 grid grid-cols-3 gap-3 border-t border-border pt-4 text-sm">
-            <div>
-              <dt className="text-[11px] uppercase tracking-wider text-foreground/50">Views / mo</dt>
-              <dd className="font-semibold">{(s.monthly / 1e6).toFixed(1)}MM</dd>
-            </div>
+          <dl className="mt-5 grid grid-cols-2 gap-3 border-t border-border pt-4 text-sm">
             <div>
               <dt className="text-[11px] uppercase tracking-wider text-foreground/50">Display</dt>
               <dd className="font-semibold">from ${STARTER_BY_SURFACE[s.key]?.cpm ?? s.cpmUsd} CPM</dd>
@@ -87,7 +83,7 @@ export function SurfacesGrid() {
             </div>
           </dl>
           <p className="mt-3 text-[11px] text-muted-foreground">
-            Views <Modelled /> USD starting-at rates, illustrative estimates.
+            USD starting-at rates <Modelled>Illustrative estimate</Modelled>
           </p>
         </article>
       ))}
@@ -101,7 +97,6 @@ export function TamStrip({ tone = "light", compact = false }: { tone?: "light" |
     <div className={`grid grid-cols-2 gap-6 ${compact ? "" : "md:grid-cols-4"}`} data-testid="tam-strip">
       {[
         { v: TAM.ordersLabel, l: TAM.ordersNote },
-        { v: TAM.viewsLabel, l: TAM.viewsNote },
         { v: String(TAM.listedPartners), l: "listed partners" },
         { v: "4", l: "hub placements, display + CPC" },
       ].map((x) => (

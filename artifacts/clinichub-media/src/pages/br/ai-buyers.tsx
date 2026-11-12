@@ -5,7 +5,7 @@ import { slotOffers, areaLockOffer } from "../../../../api-server/src/lib/overha
 import { areaLockProductJsonLd, slotProductsJsonLd } from "../../../../api-server/src/lib/overhaul/seo";
 
 const STEPS = [
-  { icon: Search, title: "Read the catalog", code: "GET /v1/agent/catalog.json", body: "Surfaces, rate-card CPMs, modelled monthly views, live hubs, every offer with prices in USD and CAD." },
+  { icon: Search, title: "Read the catalog", code: "GET /v1/agent/catalog.json", body: "Surfaces, starting-at CPMs, live hubs, every offer with prices in USD and CAD." },
   { icon: Sparkles, title: "Check fit", code: "POST /v1/match", body: "Send the brand's URL and a short note. Get a modelled match %, three reasons and the offer we'd recommend." },
   { icon: Braces, title: "Quote", code: "GET /v1/agent/quote?offer=sponsor-3000", body: "Exact price, media credit, bonus and modelled views. Area locks quote by postal code or ZIP and term." },
   { icon: CreditCard, title: "Check out", code: "POST /v1/agent/checkout", body: "Returns a Stripe-hosted checkout_url for the buyer, or status held: reserved by inquiry, no charge, confirmed within 1 business day." },
