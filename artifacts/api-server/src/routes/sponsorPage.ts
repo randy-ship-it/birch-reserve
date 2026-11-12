@@ -56,7 +56,10 @@ function shell(title: string, description: string, path: string, currency: Curre
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(description)}"><meta name="robots" content="noindex,nofollow">
-<link rel="canonical" href="https://birchreserve.net${path}">
+<link rel="canonical" href="https://birchreserve.net${path}" />
+<meta property="og:url" content="https://birchreserve.net${path}" /><meta property="og:type" content="website" />
+<meta property="og:title" content="${esc(title)}" /><meta property="og:description" content="${esc(description)}" />
+<meta property="og:image" content="https://birchreserve.net/og-birch-reserve.png" /><meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">

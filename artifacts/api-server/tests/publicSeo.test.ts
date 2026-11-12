@@ -54,7 +54,7 @@ test("GET /sitemap.xml is XML and lists public pages without API, inventory, or 
   assert.doesNotMatch(xml, /\/success/);
   assert.doesNotMatch(xml, /\/splash\/activation/);
   assert.doesNotMatch(xml, /\/oatmeal/);
-  assert.doesNotMatch(xml, /\/advertise/);
+  assert.doesNotMatch(xml, /\/advertise<\/loc>/);
   assert.doesNotMatch(xml, /\/ad-examples/);
   assert.doesNotMatch(xml, /\/api\//);
   assert.doesNotMatch(xml, /\/v1\//);

@@ -1,3 +1,4 @@
+import { llmsTxt } from "../lib/overhaul/seo";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { createHash, randomUUID } from "node:crypto";
@@ -546,34 +547,21 @@ router.post("/v1/ui-events", (req, res) => {
 });
 
 router.get("/llms.txt", (_req, res) => {
+  // Overhaul (Nov 12 2026): one plain-text map of the four paths, prices and machine endpoints.
   res.type("text/plain").send(
     [
-      "# Birch Reserve",
+      llmsTxt(),
       "",
-      "8 brand categories inside listed Scale Health clinic hubs. Prepay your category. Not an open auction. Not a guaranteed impression buy.",
-      "Live proof: https://physio.drhonow.com/dr-ho/portal",
-      "Also (placement example, not hero): https://weprize.net — live SBG/Birch display example. Placement only; not a Scale hub category; no reach/impression claims.",
-      "Public SKUs:",
-      "- hold-190 · $190 USD ($270 CAD for Canadian buyers) · 7-day category look · 100% credit if you convert within 7 days, else cash refund · does not lock in a slot",
-      "- reserve-490 · $490 USD ($690 CAD for Canadian buyers) · prepay your category · 100% display credit · fully refundable until 14 days before your launch date · insertion order before flight · credit expires 12 months",
-      "- custom · Get a call back · multi-hub / on-prem Align",
-      "8 brand categories across hubs — not eight websites. Prepay your category.",
-      "Categories: pain relief / topicals, recovery hardware, nutrition, sleep, meal prep, women’s health, men’s health, diagnostics / services.",
-      "Launching cohort (logos, not reach): DR-HO’S · Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery.",
-      `Formats: ${FORMATS.join(", ")}.`,
-      "Every published dollar is a 100% media credit. Delivery starts when the insertion order names the hub.",
-      PUBLIC_BRAND_DESCRIPTION,
-      "Quoted public prices are exact and one-time, in USD or CAD. Canadian buyers pay in CAD, everyone else pays in USD, and the page shows a USD/CAD toggle. Only reserve-490 locks in a slot. hold-190 does not.",
-      "Exclusions: no PHI, no clinical pixels, no open auction, no impression guarantee.",
-      "Seller: Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · sales@silverbirchgrowth.com",
-      "Draft terms: /terms · Draft privacy: /privacy · Sample insertion order: /sample-io · Kit: /kit",
+      "## Legacy machine checkout (category seat)",
+      "Prepay your category. Not an open auction.",
+      "- hold-190 · $190 USD ($270 CAD for Canadian buyers) · 7-day category look · does not lock in a slot",
+      "- reserve-490 · $490 USD ($690 CAD for Canadian buyers) · prepay your category · 100% display credit · fully refundable until 14 days before your launch date",
       `Machine catalog: /v1/catalog.json`,
       `Availability: /v1/availability.json`,
       `Quote: /v1/quote?sku=reserve-490&format=post_checkout&days=30`,
       `Checkout: POST /v1/checkout`,
       `UCP discovery: /.well-known/ucp`,
-      "UCP checkout uses Stripe-hosted buyer handoff. Delegated Stripe Agentic Commerce/ACP payment is not advertised.",
-      "Poll: GET /v1/orders/:id and /v1/orders/:id/io.json",
+      `Formats: ${FORMATS.join(", ")}.`,
       `Human calculator: /buycalc`,
       "Contact: sales@silverbirchgrowth.com",
     ].join("\n"),

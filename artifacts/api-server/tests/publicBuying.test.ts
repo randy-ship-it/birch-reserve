@@ -650,7 +650,8 @@ test("machine surfaces expose text, JSON, YAML, and fixed USD contracts", async 
   assert.doesNotMatch(llmsText, /\$4,900/);
   assert.doesNotMatch(llmsText, /\$9,900/);
   assert.doesNotMatch(llmsText, /reserve-990/);
-  assert.match(llmsText, /weprize\.net/);
+  // Overhaul 2026-11-12: llms.txt maps the four paths; WePrize placement line retired.
+  assert.match(llmsText, /advertise\/local/);
   assert.match(llmsText, /Prepay your category\./);
   assert.doesNotMatch(llmsText, /minimum goes up/);
   assert.doesNotMatch(llmsText, /today's minimum/);

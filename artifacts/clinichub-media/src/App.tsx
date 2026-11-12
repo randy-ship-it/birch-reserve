@@ -19,7 +19,16 @@ import {
 } from 'wouter';
 import { MotionConfig } from 'framer-motion';
 import { Layout } from '@/components/layout';
-import Home from '@/pages/home';
+import Home from '@/pages/br/home';
+import BrMatch from '@/pages/br/match';
+import BrAdvertiseBrands from '@/pages/br/advertise-brands';
+import BrAdvertiseLocal from '@/pages/br/advertise-local';
+import BrPublishBrands from '@/pages/br/publish-brands';
+import BrPublishStudios from '@/pages/br/publish-studios';
+import BrHubs from '@/pages/br/hubs';
+import BrMediaKit from '@/pages/br/media-kit';
+import BrAgencies from '@/pages/br/agencies';
+import BrAiBuyers from '@/pages/br/ai-buyers';
 import Kit from '@/pages/kit';
 import SellAdsPage from '@/pages/sell-ads';
 import Terms from '@/pages/terms';
@@ -236,6 +245,37 @@ function Router() {
         {/* Public Routes with Layout */}
         <Route path="/">
           <Layout><HomeRedirect /></Layout>
+        </Route>
+        {/* Overhaul (Nov 12 2026): four paths + tools */}
+        <Route path="/advertise/brands">
+          <Layout><BrAdvertiseBrands /></Layout>
+        </Route>
+        <Route path="/advertise/local">
+          <Layout><BrAdvertiseLocal /></Layout>
+        </Route>
+        <Route path="/publish/brands">
+          <Layout><BrPublishBrands /></Layout>
+        </Route>
+        <Route path="/publish/studios">
+          <Layout><BrPublishStudios /></Layout>
+        </Route>
+        <Route path="/publish">
+          <Redirect to="/publish/brands" />
+        </Route>
+        <Route path="/match">
+          <Layout><BrMatch /></Layout>
+        </Route>
+        <Route path="/hubs">
+          <Layout><BrHubs /></Layout>
+        </Route>
+        <Route path="/media-kit">
+          <Layout><BrMediaKit /></Layout>
+        </Route>
+        <Route path="/agencies">
+          <Layout><BrAgencies /></Layout>
+        </Route>
+        <Route path="/ai-buyers">
+          <Layout><BrAiBuyers /></Layout>
         </Route>
         <Route path="/about">
           <Layout><About /></Layout>

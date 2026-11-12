@@ -313,3 +313,47 @@
     display: none !important;
   }
 }
+
+/* ---- Birch Reserve overhaul: conveyor hero (Nov 12 2026) ---- */
+.br-belt {
+  background-image: repeating-linear-gradient(90deg, hsl(var(--foreground)) 0 22px, hsl(217 40% 24%) 22px 44px);
+  background-size: 44px 100%;
+  animation: br-belt-move 0.9s linear infinite;
+}
+@keyframes br-belt-move { to { background-position: 44px 0; } }
+.br-roller { animation: br-spin 1.2s linear infinite; }
+@keyframes br-spin { to { transform: translateY(-50%) rotate(360deg); } }
+.br-beam { animation: br-dash 1.4s linear infinite; }
+@keyframes br-dash { to { stroke-dashoffset: -28; } }
+.br-hub {
+  opacity: 0;
+  animation-name: br-hub-travel;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+@keyframes br-hub-travel {
+  0% { transform: translate(var(--sx), var(--by)) scale(1); opacity: 0; }
+  4% { opacity: 1; }
+  30% { transform: translate(var(--ex), var(--by)) scale(1); opacity: 1; animation-timing-function: cubic-bezier(.4,0,.2,1); }
+  40% { transform: translate(var(--dx), var(--dy)) scale(.62) rotate(-3deg); opacity: 1; }
+  46% { transform: translate(var(--dx), var(--dy)) scale(.25); opacity: 0; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(.25); opacity: 0; }
+}
+.br-tile {
+  transform-origin: center;
+  animation: br-tile-pop 16s cubic-bezier(.2,.9,.3,1.3) infinite both;
+}
+@keyframes br-tile-pop {
+  0% { transform: scale(0); opacity: 0; }
+  4% { transform: scale(1.08); opacity: 1; }
+  7% { transform: scale(1); opacity: 1; }
+  88% { transform: scale(1); opacity: 1; }
+  96% { transform: scale(.6); opacity: 0; }
+  100% { transform: scale(0); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .br-hub { display: none; }
+  .br-static { display: flex !important; }
+  .br-tile { animation: none !important; opacity: 1; transform: none; }
+}

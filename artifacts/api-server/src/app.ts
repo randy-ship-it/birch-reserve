@@ -7,6 +7,9 @@ import { randyChatJsonParser } from "./routes/randyChat";
 import publicBuyingRouter from "./routes/publicBuying";
 import publicPagesRouter from "./routes/publicPages";
 import sponsorPageRouter from "./routes/sponsorPage";
+import { createOverhaulRouter } from "./routes/overhaul";
+import { createAgentRouter } from "./routes/agent";
+import { getStripeClient } from "./lib/stripeClient";
 import publicSeoRouter, { unknownDocument } from "./routes/publicSeo";
 import { indexNowKeyRouter } from "./routes/indexNow";
 import { opsBulletinRouter } from "./routes/opsBulletin";
@@ -66,6 +69,24 @@ app.use(
           ucpRawBody?: Buffer;
         }
       ).ucpRawBody = Buffer.from(body);
+    },
+  }),
+);
+// Overhaul API (match tool, area lock, leads). Own JSON parser + limiter; checkout gated by env.
+app.use(
+  createOverhaulRouter({
+    createSession: async (params) => {
+      const session = await getStripeClient().checkout.sessions.create(params as never);
+      return { url: session.url, livemode: session.livemode };
+    },
+    log: (msg, extra) => logger.info({ extra }, `overhaul ${msg}`),
+  }),
+);
+app.use(
+  createAgentRouter({
+    createSession: async (params) => {
+      const s = await getStripeClient().checkout.sessions.create(params as never);
+      return { url: s.url, livemode: s.livemode };
     },
   }),
 );
