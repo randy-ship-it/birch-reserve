@@ -1,5 +1,7 @@
 import { BRAND_HUBS, CLINIC_NETWORK, SLOTS, toCad, type Currency, type Hub } from "../../../../api-server/src/lib/overhaul/model";
+import { useState } from "react";
 import { Modelled } from "./ui";
+import { PlacementDialog, PlacementTrigger, SLOT_TO_PLACEMENT, type PlacementKey } from "./placement-example";
 
 const SOV = 0.2;
 const AVAIL = 0.75;
@@ -16,8 +18,14 @@ export function RateCard({ currency }: { currency: Currency }) {
   const hubs: Hub[] = [...BRAND_HUBS, CLINIC_NETWORK];
   const core = SLOTS.filter((s) => s.core);
   const corePackage = (h: Hub) => Math.max(currency === "cad" ? toCad(190) : 190, core.reduce((a, s) => a + slotPrice(h, s, currency), 0));
+  const [ex, setEx] = useState<PlacementKey | null>(null);
+  const label = (s: (typeof SLOTS)[number], cls = "") => {
+    const k = SLOT_TO_PLACEMENT[s.key];
+    return k ? <PlacementTrigger k={k} onOpen={setEx} className={cls}>{s.label}</PlacementTrigger> : s.label;
+  };
   return (
     <div data-testid="rate-card">
+      <p className="mb-3 text-xs text-muted-foreground">Tap or hover a placement to see an example inside a hub.</p>
       {/* Mobile: one card per hub (no sideways scroll) */}
       <div className="grid gap-3 md:hidden" data-testid="rate-card-mobile">
         {hubs.map((h) => (
@@ -35,7 +43,7 @@ export function RateCard({ currency }: { currency: Currency }) {
             <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-3 text-sm">
               {core.map((s) => (
                 <div key={s.key}>
-                  <dt className="text-[11px] font-semibold leading-snug text-foreground/70">{s.label}</dt>
+                  <dt className="text-[11px] font-semibold leading-snug text-foreground/70">{label(s)}</dt>
                   <dd>{sponsorImps(h, s.key).toLocaleString()} views</dd>
                   <dd className="text-xs text-muted-foreground">${slotPrice(h, s, currency).toLocaleString()} · from ${s.cpmUsd} CPM USD</dd>
                 </div>
@@ -52,7 +60,7 @@ export function RateCard({ currency }: { currency: Currency }) {
             <th className="py-3 pr-3 font-semibold">Hub</th>
             {core.map((s) => (
               <th key={s.key} className="py-3 pr-3 font-semibold">
-                {s.label}
+                {label(s)}
                 <span className="block text-[11px] font-normal text-muted-foreground">from ${s.cpmUsd} CPM USD</span>
               </th>
             ))}
@@ -84,6 +92,7 @@ export function RateCard({ currency }: { currency: Currency }) {
       <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
         Prices are starting-at (starter) rates from the <a href="/rates" className="underline underline-offset-2">rate card</a> <Modelled>Illustrative estimate</Modelled>: not sold rates or a quote; your insertion order sets the final rate. Views per month per sponsor position <Modelled />: one of five rotating positions (20% share of voice) at 75% availability. Hubs without their own feed row use the network median partner until their feed lands. Core package floor $190 USD / $270 CAD. Partner email and partner-site display are available on request.
       </p>
+      <PlacementDialog open={ex} onClose={() => setEx(null)} />
     </div>
   );
 }
