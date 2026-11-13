@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Download, Mail } from "lucide-react";
 
 /** Optional static print of this page (headless Chromium print-to-PDF). */
-const MEDIA_KIT_PDF_HREF = "/birch-reserve-media-kit.pdf" as const;
+const MEDIA_KIT_PDF_HREF = "/birch-reserve-one-pager.pdf" as const;
 
 const PAGE_TITLE = "Creative brief — Birch Reserve placements";
 

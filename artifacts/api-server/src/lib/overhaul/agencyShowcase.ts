@@ -33,10 +33,10 @@ export const AGENCY_SHARE = {
  */
 export const BRAND_BONUS_LINE = `Brand bonus credit (the client's, separate from your ${AGENCY_CASH_PCT}% cash): ${DEPOSIT_TIERS.map((t) => `+${t.bonusPct}% from $${t.usd.toLocaleString("en-US")}`).join(", ")} USD prepay.`;
 
-/** Worked examples on prices already on the site ($490 seat, $10,000 Test Rail on /media-kit). */
+/** Worked examples on the public tiers: $490 seat (card) and the $25K premium floor (inquire). */
 export const AGENCY_EXAMPLES = [
   { label: "$490 category seat (card)", spend: 490 },
-  { label: `${MEDIA_KIT_OFFERS.testRail.name} (media kit)`, spend: MEDIA_KIT_OFFERS.testRail.spend },
+  { label: `Premium slot from $${MEDIA_KIT_OFFERS.premium.spendLo / 1000}K (inquire)`, spend: MEDIA_KIT_OFFERS.premium.spendLo },
 ].map((e) => ({ ...e, cash: agencyCash(e.spend) }));
 
 const CPC_BY_SURFACE: Record<(typeof SURFACES)[number]["key"], number> = {

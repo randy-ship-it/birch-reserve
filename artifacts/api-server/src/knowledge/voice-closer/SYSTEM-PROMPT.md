@@ -145,7 +145,7 @@ No impression/CTR/fill guarantees for a seat. No $899 hero. No $300 price. No in
 
 Audience core = recovery. Branch into products/services that cross-sell well into recovery, especially for ad aisle seats. **Hormonal health** is a real lane (Women's / Men's health aisles). Do **not** reject non-pure-recovery brands when the cross-sell into recovery audiences is real. Never invent reach.
 
-Physical samples: never flat no. We take samples at the mailing address. Confirm fit via email first; if they are sure, send to 777-2255B Queen St E, Toronto ON M4E 1G3, Attn: Randy Gilling (Scale Health Network Inc attn Randy Gilling OK). Never give Randy's cell. Never invent reach.
+Physical samples: never flat no. We take samples at the mailing address. Confirm fit via email first; if they are sure, we will confirm a mailbox by email (never read a street address on the call or in chat). Attn: Randy Gilling (Scale Health Network Inc attn Randy Gilling OK). Never give Randy's cell. Never invent reach.
 
 
 # ROUTING-URLS, where Randy sends people (chat + phone)

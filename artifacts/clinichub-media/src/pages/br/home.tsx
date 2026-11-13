@@ -2,11 +2,12 @@ import { ConveyorHero } from "@/components/br/conveyor";
 import { BrandBanners } from "@/components/br/brand-banners";
 import { FourPaths, MetaComparison, PositioningBand, SurfacesGrid, TamStrip } from "@/components/br/blocks";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
+import { MEDIA_KIT_OFFERS, UPGRADE_PATH_LINE } from "../../../../api-server/src/lib/overhaul/mediaKit";
 import { MediaKitPdfLink, ProofStrip, SalesContact, TrustBand, TrustFaq } from "@/components/br/trust";
 import { QuickBuy } from "@/components/br/quick-buy";
 import { AgencyHero, AgencyPayouts, InsiderGrid, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
-import { MetaHook, PackPicker, ProveItLadder, RateCardV2 } from "@/components/br/pricing";
+import { LOOK_HREF, RESERVE_HREF, MetaHook, PackPicker, ProveItLadder, RateCardV2 } from "@/components/br/pricing";
 import { AREA_LOCK, INVENTORY, PUBLISHER_INCENTIVE, areaLockGuaranteedViews } from "../../../../api-server/src/lib/overhaul/model";
 
 const FAQ = [
@@ -34,10 +35,38 @@ export default function BrHome() {
           parentOrganization: { "@type": "Organization", name: "Silver Birch Growth Inc." },
           email: "sales@silverbirchgrowth.com",
           description: "Ad space inside co-branded Recovery Brand hubs and health & wellness business hubs. Display and CPC on post-purchase, hub home, product and services, and member dashboard pages.",
-          address: { "@type": "PostalAddress", streetAddress: "777-2255B Queen St E", addressLocality: "Toronto", addressRegion: "ON", postalCode: "M4E 1G3", addressCountry: "CA" },
+          address: { "@type": "PostalAddress", addressLocality: "Toronto", addressRegion: "ON", addressCountry: "CA" },
         }}
       />
       <AgencyHero />
+
+      <Section id="packages">
+        <Eyebrow>Two packages</Eyebrow>
+        <H2>Start with a seat. Then lock the category.</H2>
+        <p className="mt-4 max-w-2xl text-muted-foreground" data-testid="home-upgrade">{UPGRADE_PATH_LINE} The small-business package is the easy way to start. Premium slots are the main event.</p>
+        <div className="mt-8 grid gap-4 md:grid-cols-2" data-testid="home-packages">
+          <article className="flex flex-col border border-foreground/20 bg-white p-5 md:p-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Small business package</p>
+            <h3 className="mt-1 font-display text-2xl">${MEDIA_KIT_OFFERS.look.spendUsd} look · ${MEDIA_KIT_OFFERS.seat.spendUsd} seat</h3>
+            <p className="mt-3 text-sm text-foreground/80">Self-serve card checkout. A category seat open to more than one brand. Credit spends down over 6 months; unused credit can be refunded or extended.</p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Cta href={RESERVE_HREF} testId="home-cta-seat">Take a $490 seat</Cta>
+              <Cta href={LOOK_HREF} variant="line" testId="home-cta-look">7-day look · $190</Cta>
+            </div>
+          </article>
+          <article className="flex flex-col border-2 border-foreground bg-foreground p-5 text-background md:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-background/60">Premium slots · the main event</p>
+              <span className="border border-[#C8F55A] bg-[#C8F55A] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#071A39]">Inquire only</span>
+            </div>
+            <h3 className="mt-1 font-display text-2xl">From $25K, $25K–$50K</h3>
+            <p className="mt-3 text-sm text-background/80">Category exclusivity, a larger display share and priority placement. No card purchase — we write the insertion order.</p>
+            <div className="mt-6">
+              <Cta href="/media-kit#premium" variant="lime" testId="home-cta-premium">Inquire about a premium slot</Cta>
+            </div>
+          </article>
+        </div>
+      </Section>
 
       <Section id="proof" tone="soft">
         <Eyebrow>What we can show today</Eyebrow>

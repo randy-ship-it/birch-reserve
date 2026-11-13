@@ -3,7 +3,7 @@
 
 **Holdco:** RDG Digital Holdings Inc. (RDGDH) · https://rdgdh.com  
 **Founder:** Randy Gilling  
-**Mailing:** 777-2255B Queen St E, Toronto ON M4E 1G3  
+**Mailing:** Toronto, Ontario. Confirm a mailbox by email; never read a street address.  
 
 No invented metrics. If a number is only on an investor CIM or diligence pack, do **not** recite it on Birch/Scale sales voice unless it is also on the approved public site and still not on NEVER-SAY.
 

@@ -28,7 +28,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/media-kit": {
     title: "Media kit | Birch Reserve",
     image: MEDIA_KIT_OG_IMAGE,
-    description: "Prepaid media credit for category seats, open to more than one brand, inside co-branded Scale Health Network hubs. $10K Test Rail or $35K–$75K Category Lock. Modelled volumes, no guarantees.",
+    description: "Prepaid media credit inside co-branded Scale Health Network hubs. Start with the small-business package ($190 look or $490 seat, self-serve) or inquire about a premium slot from $25K–$50K. Modelled volumes, no guarantees.",
     jsonld: {
       "@context": "https://schema.org",
       "@type": "WebPage",
@@ -142,6 +142,6 @@ export function llmsTxt(): string {
     "- Catalog: /v1/catalog.json · Sitemap: /sitemap.xml",
     "",
     "Rules: aggregate reporting only, no patient data, no clinical pixels. Modelled figures are labelled.",
-    "Seller: Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · sales@silverbirchgrowth.com",
+    "Seller: Silver Birch Growth Inc. · Toronto, Ontario · sales@silverbirchgrowth.com",
   ].join("\n");
 }

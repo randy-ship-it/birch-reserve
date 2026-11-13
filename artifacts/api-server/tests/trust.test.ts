@@ -66,16 +66,35 @@ test("operator line, founder contact, and one-page media kit are present", () =>
   assert.ok(existsSync(pdf), "one-pager PDF is in public/");
 });
 
-test("copy rules: 20mm+ allowed, no 8.7mm, no gross profit, no new street in trust blocks", () => {
+test("copy rules: 20mm+ allowed, no 8.7mm, no gross profit, no street address on public surfaces", () => {
   assert.doesNotMatch(publicPages, /8\.7\s*mm/i);
   assert.doesNotMatch(publicPages, /gross profit/i);
+  assert.match(identity, /export const SELLER_IDENTITY = "Silver Birch Growth Inc\. · Toronto, Ontario"/);
+  assert.doesNotMatch(identity, /777-2255|Queen St|M4E 1G3/i);
   assert.doesNotMatch(trust, /777-2255|Queen St|M4E 1G3/i);
-  assert.doesNotMatch(identity.split("SELLER_IDENTITY")[1] ?? "", /TODO/);
+  assert.doesNotMatch(home, /777-2255|Queen St|M4E 1G3|streetAddress/i);
+  assert.doesNotMatch(mediaKit, /777-2255|Queen St|M4E 1G3/i);
+  assert.doesNotMatch(llms, /777-2255|Queen St|M4E 1G3/i);
+  assert.doesNotMatch(publicBuying, /777-2255|Queen St|M4E 1G3/i);
+  assert.doesNotMatch(JSON.stringify(agentCard()), /777-2255|Queen St|M4E 1G3/i);
   const pdfText = read("../clinichub-media/public/birch-reserve-one-pager.pdf");
   // PDF is binary; still catch raw strings if present
   assert.doesNotMatch(pdfText, /8\.7\s*mm/i);
   assert.doesNotMatch(pdfText, /777-2255/);
   assert.doesNotMatch(pdfText, /Queen St/);
+});
+
+test("two-tier offers: SMB $190/$490 to start, premium $25K–$50K is the main event", () => {
+  assert.match(home, /Start with a seat[.,] [Tt]hen lock the category/);
+  assert.match(home, /UPGRADE_PATH_LINE/);
+  assert.match(home, /Small business package/);
+  assert.match(home, /Premium slots · the main event/);
+  assert.match(home, /From \$25K, \$25K–\$50K/);
+  assert.match(home, /Inquire only/);
+  assert.match(mediaKit, /Start with a seat, then lock the category/);
+  assert.match(mediaKit, /Small business package/);
+  assert.match(mediaKit, /Premium slots · the main event/);
+  assert.doesNotMatch(home + "\n" + mediaKit, /Test Rail|Category Lock|\$35K[–-]\$75K/);
 });
 
 test("sample report is labelled Sample and privacy note is aggregate-only", () => {

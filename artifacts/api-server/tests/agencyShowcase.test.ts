@@ -14,8 +14,9 @@ test("agency cut: 10% of media spend, paid in cash to the agency of record (Rand
   assert.match(AGENCY_SHARE.line, /10% of media spend, paid in cash/);
   assert.match(AGENCY_SHARE.line, /agency of record/);
   assert.equal(AGENCY_SHARE.timing, "Paid to the agency of record per the IO.");
-  assert.deepEqual(AGENCY_EXAMPLES.map((e) => [e.spend, e.cash]), [[490, 49], [10000, 1000]]);
-  assert.equal(agencyCash(35000), 3500);
+  assert.deepEqual(AGENCY_EXAMPLES.map((e) => [e.spend, e.cash]), [[490, 49], [25000, 2500]]);
+  assert.equal(agencyCash(25000), 2500);
+  assert.equal(agencyCash(50000), 5000);
 });
 
 test("/agencies: 10% paid in cash; brand bonus credit is the client's, separate from the agency cash", () => {

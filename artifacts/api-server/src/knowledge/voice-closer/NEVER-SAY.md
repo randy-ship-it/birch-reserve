@@ -71,7 +71,7 @@ Never push Randy's calendar link. Don't put it in greetings, closes, option list
 - Never say we do not take physical samples. Never flat-reject a sample offer.
 - Never give Randy's cell / personal mobile number. Business line and email only.
 - Never invent reach, impressions, CTR, or sample-distribution promises.
-- Never invent a mailing address. Only the locked mailbox: 777-2255B Queen St E, Toronto ON M4E 1G3, Attn: Randy Gilling (Scale Health Network Inc attn Randy Gilling OK as mail name). Confirm fit by email before they ship.
+- Never invent a mailing address. Never read a street or mailbox address aloud or in chat. Confirm a mailbox by email, Attn: Randy Gilling (Scale Health Network Inc attn Randy Gilling OK as mail name), after they confirm fit.
 - Never reject a brand solely for not being "pure recovery" when it cross-sells into recovery audiences (hormonal health is a real lane).
 
 ## WePrize placement example (Randy HARD 2026-09-25 ~4:12pm ET)

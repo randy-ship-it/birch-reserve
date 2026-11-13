@@ -190,24 +190,28 @@ import { MEDIA_KIT_EXAMPLES, MEDIA_KIT_NETWORK_FALLBACK, agencyCash, kitExample,
 import { createOverhaulRouter } from "../src/routes/overhaul";
 import { OVERHAUL_ROUTES } from "../src/lib/overhaul/seo";
 
-test("media kit math: spend + bonus = credit, credit / CPM x 1000 = modelled impressions", () => {
-  const [rail, lo, hi] = MEDIA_KIT_EXAMPLES;
-  assert.deepEqual(rail, { spend: 10000, bonusPct: 10, credit: 11000, imprLo: 916667, imprHi: 1375000 });
-  assert.deepEqual(lo, { spend: 35000, bonusPct: 15, credit: 40250, imprLo: 3354167, imprHi: 5031250 });
-  assert.deepEqual(hi, { spend: 75000, bonusPct: 15, credit: 86250, imprLo: 7187500, imprHi: 10781250 });
+test("media kit math: $490 seat and $25K–$50K premium, no assumed bonus; credit / CPM x 1000 = modelled impressions", () => {
+  const [seat, lo, hi] = MEDIA_KIT_EXAMPLES;
+  assert.deepEqual(seat, kitExample(490, 0));
+  assert.deepEqual(lo, kitExample(25_000, 0));
+  assert.deepEqual(hi, kitExample(50_000, 0));
+  assert.equal(seat.spend, 490);
+  assert.equal(lo.spend, 25_000);
+  assert.equal(hi.spend, 50_000);
   for (const e of MEDIA_KIT_EXAMPLES) {
+    assert.equal(e.bonusPct, 0);
     assert.ok(Math.abs(e.credit - e.spend * (1 + e.bonusPct / 100)) < 0.01);
     assert.ok(Math.abs(e.imprLo - (e.credit / 12) * 1000) <= 0.5);
     assert.ok(Math.abs(e.imprHi - (e.credit / 8) * 1000) <= 0.5);
   }
-  assert.equal(millions(rail.imprLo), "0.92M");
-  assert.equal(millions(rail.imprHi), "1.375M");
-  assert.equal(millions(lo.imprLo), "3.35M");
-  assert.equal(millions(hi.imprHi), "10.8M");
-  assert.equal(usd(lo.credit), "$40,250");
-  assert.equal(usd(hi.credit), "$86,250");
-  assert.equal(agencyCash(35000), 3500);
+  assert.equal(usd(seat.credit), "$490");
+  assert.equal(usd(lo.credit), "$25,000");
+  assert.equal(usd(hi.credit), "$50,000");
+  assert.equal(agencyCash(490), 49);
+  assert.equal(agencyCash(25_000), 2500);
+  assert.equal(agencyCash(50_000), 5000);
   assert.equal(kitExample(1000, 0).imprHi, 125000);
+  assert.equal(kitExample(10_000, 10).credit, 11000);
 });
 
 test("media kit network: live cockpit values, static fallback on bad data", () => {
@@ -256,10 +260,10 @@ test("media kit page copy: required language in, banned words out", () => {
   const path = candidates.find((p) => { try { readFileSync(p); return true; } catch { return false; } });
   assert.ok(path, "media-kit.tsx not found");
   const src = readFileSync(path!, "utf8");
-  for (const must of [/Prepaid credit/, /Modelled volumes/, /Refundable until IO activation/, /Aggregate UTM reporting only/, /No personal data/, /Category seats, open to more than one brand/, /No guarantees of reach, clicks or sales/, /Estimates are modelled; terms on IO/, /Randy Gilling, Founder/, /sales@silverbirchgrowth\.com/, /\(647\) 931-6278/, /one brand each/, /first come/]) {
+  for (const must of [/Prepaid credit/, /Modelled volumes/, /Refundable until IO activation/, /Aggregate UTM reporting only/, /No personal data/, /Category seats, open to more than one brand/, /No guarantees of reach, clicks or sales/, /Estimates are modelled; terms on IO/, /Randy Gilling, Founder/, /sales@silverbirchgrowth\.com/, /\(647\) 931-6278/, /one brand each/, /first come/, /Small business package/, /Premium slots/, /from \$25K/i, /\$25K–\$50K/, /Inquire only/, /Start with a seat, then lock the category/, /category exclusivity/i, /larger display share/, /priority placement/]) {
     assert.match(src, must);
   }
-  for (const banned of [/Align/, /Clairvoyant/i, /80 locations/i, /Kalaya/i, /we sell them customers/i, /signed partner/i, /\bCTR\b/, /guarantee(d)? (reach|delivery|results)/i]) {
+  for (const banned of [/Align/, /Clairvoyant/i, /80 locations/i, /Kalaya/i, /we sell them customers/i, /signed partner/i, /\bCTR\b/, /guarantee(d)? (reach|delivery|results)/i, /Test Rail/, /Category Lock/, /\$10K Test Rail/, /\$35K[–-]\$75K/]) {
     assert.doesNotMatch(src, banned);
   }
 });

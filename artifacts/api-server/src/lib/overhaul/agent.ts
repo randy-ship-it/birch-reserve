@@ -66,7 +66,7 @@ export function areaLockOffer() {
 export function agentCatalog(status: { slotsCheckout: boolean; areaLockCheckout: boolean }) {
   return {
     catalog_version: AGENT_CATALOG_VERSION,
-    seller: { name: "Birch Reserve", legal_name: "Silver Birch Growth Inc.", url: SITE, email: HANDOFF_EMAIL, address: "777-2255B Queen St E, Toronto ON M4E 1G3, Canada" },
+    seller: { name: "Birch Reserve", legal_name: "Silver Birch Growth Inc.", url: SITE, email: HANDOFF_EMAIL, address: "Toronto, Ontario, Canada" },
     what_you_buy: `Display and CPC placements inside co-branded Recovery Brand hubs and health & wellness business hubs, on four placements: ${PLACEMENT_LABELS.join(", ")}.`,
     currencies: ["USD", "CAD"],
     currency_rule: "Canadian buyers pay CAD; everyone else USD. Pass currency explicitly to override.",
