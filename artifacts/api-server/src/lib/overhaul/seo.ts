@@ -4,7 +4,9 @@ import { AGENCY, AREA_LOCK, BRAND_HUBS, INVENTORY, PLACEMENT_LABELS, PUBLISHER_I
 
 export const OVERHAUL_OG_IMAGE = "https://birchreserve.net/og-birch-reserve-hubs.png";
 
-export type RouteMeta = { title: string; description: string; jsonld?: Record<string, unknown> };
+export type RouteMeta = { title: string; description: string; jsonld?: Record<string, unknown>; /** Per-route share image; defaults to OVERHAUL_OG_IMAGE. */ image?: string };
+
+export const MEDIA_KIT_OG_IMAGE = "https://birchreserve.net/og-media-kit.png";
 
 const ORG = { "@type": "Organization", name: "Birch Reserve", url: "https://birchreserve.net/" };
 
@@ -25,6 +27,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/hubs": { title: "Live brand hubs | Birch Reserve", description: `${BRAND_HUBS.map((h) => h.name).join(", ")}: live inventory. Register your email to see audience, placements and pricing.` },
   "/media-kit": {
     title: "Media kit | Birch Reserve",
+    image: MEDIA_KIT_OG_IMAGE,
     description: "Prepaid media credit for one exclusive category seat inside co-branded Scale Health Network hubs. $10K Test Rail or $35K–$75K Category Lock. Modelled volumes, no guarantees.",
     jsonld: {
       "@context": "https://schema.org",

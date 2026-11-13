@@ -199,8 +199,9 @@ export function withRouteSeo(html: string, pathname: string): string {
     next = replaceTag(next, /<meta\s+property="og:description"[^>]*>/i, `<meta property="og:description" content="${d}" />`);
     next = replaceTag(next, /<meta\s+name="twitter:title"[^>]*>/i, `<meta name="twitter:title" content="${t}" />`);
     next = replaceTag(next, /<meta\s+name="twitter:description"[^>]*>/i, `<meta name="twitter:description" content="${d}" />`);
-    next = replaceTag(next, /<meta\s+property="og:image"[^>]*>/i, `<meta property="og:image" content="${escapeAttr(OVERHAUL_OG_IMAGE)}" />`);
-    next = replaceTag(next, /<meta\s+name="twitter:image"[^>]*>/i, `<meta name="twitter:image" content="${escapeAttr(OVERHAUL_OG_IMAGE)}" />`);
+    const routeImage = escapeAttr(meta.image ?? OVERHAUL_OG_IMAGE);
+    next = replaceTag(next, /<meta\s+property="og:image"[^>]*>/i, `<meta property="og:image" content="${routeImage}" />`);
+    next = replaceTag(next, /<meta\s+name="twitter:image"[^>]*>/i, `<meta name="twitter:image" content="${routeImage}" />`);
     if (meta.jsonld) next = next.replace("</head>", `<script type="application/ld+json">${JSON.stringify(meta.jsonld).replace(/</g, "\\u003c")}</script>\n</head>`);
   }
   if (NOINDEX_PATHS.has(normalizedPath(pathname))) {
