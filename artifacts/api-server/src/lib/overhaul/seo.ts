@@ -23,7 +23,18 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/publish/studios": { title: "Publish · Studios & retail | Birch Reserve", description: `Activate your hub with pre-built monetizations and our marketplace. Earn $${PUBLISHER_INCENTIVE.cashCad} cash or $${PUBLISHER_INCENTIVE.creditCad}+ in ad credit.` },
   "/match": { title: "Match your audience | Birch Reserve", description: "Enter your website and a short note. See how well your audience matches the Scale Activity launch audience profile, as a clean % with three reasons." },
   "/hubs": { title: "Live brand hubs | Birch Reserve", description: `${BRAND_HUBS.map((h) => h.name).join(", ")}: live inventory. Register your email to see audience, placements and pricing.` },
-  "/media-kit": { title: "Marketing kit | Birch Reserve", description: "Where ads run, who sees them, what it costs and how to buy. Brands, local businesses, studios and agencies." },
+  "/media-kit": {
+    title: "Media kit | Birch Reserve",
+    description: "Prepaid media credit for one exclusive category seat inside co-branded Scale Health Network hubs. $10K Test Rail or $35K–$75K Category Lock. Modelled volumes, no guarantees.",
+    jsonld: {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: "Birch Reserve media kit",
+      url: "https://birchreserve.net/media-kit",
+      publisher: ORG,
+      mainEntity: { "@type": "Service", name: "Birch Reserve category seats", provider: ORG, areaServed: ["CA", "US"], serviceType: "Prepaid media credit, exclusive category placement in health and wellness hubs" },
+    },
+  },
   "/ai-buyers": {
     title: "For AI buying agents | Birch Reserve",
     description: "Machine catalog, quotes and Stripe-hosted checkout for AI ad-buying agents. Display and CPC inside co-branded health & wellness hubs. Modelled views labelled.",
@@ -109,7 +120,7 @@ export function llmsTxt(): string {
     "",
     "## Machine endpoints",
     "- Area quote: GET /v1/area/quote?postal=L4C3G5&term=3",
-    "- Marketing kit: https://birchreserve.net/media-kit · Rate card: https://birchreserve.net/kit",
+    "- Media kit (one link): https://birchreserve.net/media-kit · Rate card: https://birchreserve.net/kit",
     "- Catalog: /v1/catalog.json · Sitemap: /sitemap.xml",
     "",
     "Rules: aggregate reporting only, no patient data, no clinical pixels. Modelled figures are labelled.",
