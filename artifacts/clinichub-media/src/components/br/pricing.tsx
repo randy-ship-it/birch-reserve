@@ -23,6 +23,8 @@ import {
   type RateSurface,
 } from "../../../../api-server/src/lib/overhaul/pricing";
 import { Cta } from "./ui";
+import { isPremiumViewBlock } from "../../../../api-server/src/lib/premiumInquireOnly";
+import { InquireBadge } from "./quick-buy";
 import { PlacementDialog, PlacementTrigger, type PlacementKey } from "./placement-example";
 
 export const RESERVE_HREF = "/buycalc?sku=reserve-490#reserve";
@@ -209,6 +211,7 @@ export function PackPicker() {
               data-testid={`pack-block-${b}`}
             >
               {fmtViews(b)}
+              {isPremiumViewBlock(b) ? <InquireBadge /> : null}
             </button>
           ))}
         </div>
@@ -241,11 +244,18 @@ export function PackPicker() {
           <p className="mt-2 text-sm text-background/70">Pick at least one surface.</p>
         )}
         <div className="mt-6 flex flex-col gap-2">
-          <Cta href={RESERVE_HREF} testId="pack-reserve" onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })}>
+          {/* View blocks are in PREMIUM_INQUIRE_ONLY: the pack itself is never paid by card. */}
+          {isPremiumViewBlock(block) ? (
+            <Cta href={`/?inquire=pack&block=${block}&surfaces=${encodeURIComponent(keys.join(","))}#quick-buy`} testId="pack-inquire">
+              Send inquiry
+            </Cta>
+          ) : (
+            <Cta href={ioHref} testId="pack-io">
+              {q.needsIo ? "Request an IO for this pack" : "Get this pack on an IO"}
+            </Cta>
+          )}
+          <Cta href={RESERVE_HREF} variant="lineDark" testId="pack-reserve" onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })}>
             Start with a $490 category prepay
-          </Cta>
-          <Cta href={ioHref} variant="lineDark" testId="pack-io">
-            {q.needsIo ? "Request an IO for this pack" : "Get this pack on an IO"}
           </Cta>
         </div>
         <p className="mt-4 text-[11px] leading-relaxed text-background/50">

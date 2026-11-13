@@ -6,7 +6,7 @@
  */
 import { createHash } from "node:crypto";
 
-export type IntakeKind = "match_tool" | "hub_access" | "cobranded_hub_inquiry" | "display_cpc_inquiry" | "publisher_studio" | "area_lock_interest" | "agency_inquiry" | "deposit_interest" | "agent_checkout";
+export type IntakeKind = "match_tool" | "hub_access" | "cobranded_hub_inquiry" | "display_cpc_inquiry" | "publisher_studio" | "area_lock_interest" | "agency_inquiry" | "deposit_interest" | "agent_checkout" | "premium_inquiry";
 
 export type IntakeInput = {
   kind: IntakeKind;
@@ -35,6 +35,7 @@ const SOURCE: Record<IntakeKind, string> = {
   agency_inquiry: "Birch agency inquiry",
   deposit_interest: "Birch deposit interest",
   agent_checkout: "Birch AI buying agent checkout",
+  premium_inquiry: "Birch premium slot inquiry (inquire-only, IO)",
 };
 
 export function intakeExternalId(input: IntakeInput): string {

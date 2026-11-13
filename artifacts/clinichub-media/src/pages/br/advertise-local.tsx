@@ -2,6 +2,8 @@ import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { Lock, MapPin } from "lucide-react";
 import { MetaComparison } from "@/components/br/blocks";
 import { SlotLadder } from "@/components/br/slot-ladder";
+import { InquireBadge } from "@/components/br/quick-buy";
+import { PREMIUM_INQUIRY_MESSAGE, isPremiumOffer } from "../../../../api-server/src/lib/premiumInquireOnly";
 import { Cta, Eyebrow, Faq, Field, H1, H2, JsonLd, Lede, Modelled, Section, inputClass, postJson, useOverhaulStatus, usePageMeta } from "@/components/br/ui";
 import { AREA_LOCK, PLACEMENT_LABELS, quoteAreaLock, type AreaQuote, type Currency } from "../../../../api-server/src/lib/overhaul/model";
 
@@ -27,6 +29,8 @@ export default function BrAdvertiseLocal() {
   const [checkoutMsg, setCheckoutMsg] = useState<string | null>(params.get("lock") === "success" ? "Payment received. Your area is locked; we'll email your launch checklist." : params.get("lock") === "cancelled" ? "Checkout cancelled. Your quote is still here." : null);
   const [busy, setBusy] = useState(false);
   const status = useOverhaulStatus();
+  // Area lock is in PREMIUM_INQUIRE_ONLY: the form always sends an inquiry (the server never opens card checkout for it).
+  const areaInquireOnly = isPremiumOffer("area-lock");
   const quote = useMemo(() => (submitted ? quoteAreaLock(submitted, term) : null), [submitted, term]);
   const ok = quote && quote.ok ? (quote as AreaQuote) : null;
   const currency: Currency = ok?.currency ?? "cad";
@@ -70,6 +74,7 @@ export default function BrAdvertiseLocal() {
           <div>
             <Eyebrow>Advertise · Local businesses &amp; studios</Eyebrow>
             <H1>Lock down my area.</H1>
+            {areaInquireOnly ? <p className="mt-3"><InquireBadge /> <span className="text-sm text-muted-foreground">Premium slot: by inquiry, not card.</span></p> : null}
             <Lede>
               Put your postal code in. Hold up to <strong>{AREA_LOCK.standardSharePct}%</strong> of hub display within <strong>{AREA_LOCK.radiusKm} km</strong> of you ({AREA_LOCK.denseCoreSharePct}% in busy city centres), for <strong>1 to 6 months</strong> from when your displays start.
             </Lede>
@@ -163,9 +168,13 @@ export default function BrAdvertiseLocal() {
                     <input type="checkbox" name="agree" required className="mt-0.5" /> I agree to the area-lock terms: exclusive in my category and radius; launch rate until {AREA_LOCK.launchRateUntil}; term starts at display start; {AREA_LOCK.followOnDiscountPct}% off follow-on spend up to ${AREA_LOCK.followOnCapUsd.toLocaleString()} USD; unused credit can be refunded or extended month by month at the same discount.
                   </label>
                   <button type="submit" disabled={busy} className="h-12 bg-accent text-sm font-semibold text-accent-foreground hover:bg-foreground hover:text-background disabled:opacity-60 md:col-span-2" data-testid="area-lock-submit">
-                    {busy ? "Opening checkout…" : status?.areaLockCheckout ? `Lock ${ok.area.area} for $${ok.price.toLocaleString()} ${ok.currency.toUpperCase()}` : `Reserve ${ok.area.area} by inquiry`}
+                    {busy ? (areaInquireOnly ? "Sending…" : "Opening checkout…") : areaInquireOnly ? "Send inquiry" : status?.areaLockCheckout ? `Lock ${ok.area.area} for $${ok.price.toLocaleString()} ${ok.currency.toUpperCase()}` : `Reserve ${ok.area.area} by inquiry`}
                   </button>
-                  {!status?.areaLockCheckout ? <p className="text-xs text-muted-foreground md:col-span-2">Online payment opens soon. Reserve by inquiry now and we'll confirm within 1 business day. No charge today.</p> : null}
+                  {areaInquireOnly ? (
+                    <p className="text-xs text-muted-foreground md:col-span-2" data-testid="area-inquire-note">
+                      <InquireBadge /> {PREMIUM_INQUIRY_MESSAGE} Your postal code, term and picks go with the inquiry. No charge today.
+                    </p>
+                  ) : !status?.areaLockCheckout ? <p className="text-xs text-muted-foreground md:col-span-2">Online payment opens soon. Reserve by inquiry now and we'll confirm within 1 business day. No charge today.</p> : null}
                 </form>
               </div>
             ) : null}

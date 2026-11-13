@@ -14,6 +14,7 @@ import { emptySignals, normalizeUrl, scoreMatch } from "../lib/overhaul/audience
 import { quoteAreaLock, type Currency } from "../lib/overhaul/model";
 import { buildAreaLockSession, checkoutGate } from "../lib/overhaul/checkout";
 import { sendIntake, type IntakeKind } from "../lib/overhaul/fridayIntake";
+import { PREMIUM_INQUIRY_MESSAGE, isPremiumOffer } from "../lib/premiumInquireOnly";
 
 export type CreateSession = (params: Record<string, unknown>) => Promise<{ url: string | null; livemode: boolean }>;
 
@@ -30,7 +31,7 @@ function limited(req: Request, max: number, windowMs = 60_000): boolean {
 
 const str = (v: unknown, max = 500) => String(v ?? "").trim().slice(0, max);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const LEAD_KINDS: IntakeKind[] = ["hub_access", "cobranded_hub_inquiry", "display_cpc_inquiry", "publisher_studio", "area_lock_interest", "agency_inquiry", "deposit_interest"];
+const LEAD_KINDS: IntakeKind[] = ["hub_access", "cobranded_hub_inquiry", "display_cpc_inquiry", "publisher_studio", "area_lock_interest", "agency_inquiry", "deposit_interest", "premium_inquiry"];
 
 function originOf(req: Request): string {
   const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "birchreserve.net");
@@ -53,7 +54,8 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     const area = checkoutGate(process.env, "AREA_LOCK_ENABLED", "AREA_LOCK_LIVE");
     const deposits = checkoutGate(process.env, "SPONSOR_DEPOSITS_ENABLED", "SPONSOR_DEPOSITS_LIVE");
     res.set("Cache-Control", "no-store");
-    res.json({ areaLockCheckout: area.open, depositCheckout: deposits.open, stripeMode: area.mode, friday: Boolean(process.env.FRIDAY_API_URL && process.env.FRIDAY_API_KEY) });
+    // Area lock is in PREMIUM_INQUIRE_ONLY: never advertise card checkout for it.
+    res.json({ areaLockCheckout: area.open && !isPremiumOffer("area-lock"), areaLockInquireOnly: isPremiumOffer("area-lock"), depositCheckout: deposits.open, stripeMode: area.mode, friday: Boolean(process.env.FRIDAY_API_URL && process.env.FRIDAY_API_KEY) });
   });
 
   router.post("/v1/match", json, async (req: Request, res: Response) => {
@@ -121,6 +123,11 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     // Every attempt reaches Friday, paid or not.
     const meta = built.params.metadata as Record<string, string>;
     const friday = await sendIntake({ kind: "area_lock_interest", email: str(body.email, 320), company: meta.business, website: meta.website || undefined, path: "/advertise/local", meta: { ...meta, checkout_open: gate.open, amount: built.amountCents / 100, currency: built.currency } });
+    // PREMIUM_INQUIRE_ONLY: an area lock is never paid by card. The intake above is the inquiry.
+    if (isPremiumOffer("area-lock")) {
+      res.status(200).json({ held: true, inquire_only: true, message: `Inquiry sent. ${PREMIUM_INQUIRY_MESSAGE} We'll confirm your area within 1 business day. No charge was made.`, stored: friday.status });
+      return;
+    }
     if (!gate.open || !deps.createSession) {
       res.status(200).json({ held: true, message: "Reserved by inquiry. We'll confirm your area within 1 business day. No charge today.", stored: friday.status });
       return;

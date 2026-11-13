@@ -2,7 +2,7 @@ import { type FormEvent, type ReactNode, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { Field, inputClass, postJson, textareaClass } from "./ui";
 
-export type LeadField = { name: string; label: string; type?: "text" | "email" | "url" | "tel" | "textarea" | "select"; required?: boolean; options?: string[]; placeholder?: string; hint?: string };
+export type LeadField = { name: string; label: string; type?: "text" | "email" | "url" | "tel" | "textarea" | "select" | "hidden"; required?: boolean; options?: string[]; placeholder?: string; hint?: string; defaultValue?: string };
 
 /** Generic Friday-bound form (POST /v1/leads). Core fields map to Friday contact fields; the rest go in meta. */
 export function LeadForm({ kind, fields, submitLabel, done, testId }: { kind: string; fields: LeadField[]; submitLabel: string; done: ReactNode; testId?: string }) {
@@ -36,13 +36,16 @@ export function LeadForm({ kind, fields, submitLabel, done, testId }: { kind: st
     );
   return (
     <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2" data-testid={testId}>
-      {fields.map((f) => (
+      {fields.filter((f) => f.type === "hidden").map((f) => (
+        <input key={f.name} type="hidden" name={f.name} value={f.defaultValue ?? ""} />
+      ))}
+      {fields.filter((f) => f.type !== "hidden").map((f) => (
         <div key={f.name} className={f.type === "textarea" ? "md:col-span-2" : ""}>
           <Field label={`${f.label}${f.required ? "" : " (optional)"}`} hint={f.hint}>
             {f.type === "textarea" ? (
-              <textarea name={f.name} required={f.required} placeholder={f.placeholder} className={textareaClass} />
+              <textarea name={f.name} required={f.required} placeholder={f.placeholder} defaultValue={f.defaultValue} className={textareaClass} />
             ) : f.type === "select" ? (
-              <select name={f.name} required={f.required} className={inputClass} defaultValue="">
+              <select name={f.name} required={f.required} className={inputClass} defaultValue={f.defaultValue ?? ""}>
                 <option value="" disabled>
                   Choose…
                 </option>
@@ -51,7 +54,7 @@ export function LeadForm({ kind, fields, submitLabel, done, testId }: { kind: st
                 ))}
               </select>
             ) : (
-              <input name={f.name} type={f.type ?? "text"} required={f.required} placeholder={f.placeholder} className={inputClass} />
+              <input name={f.name} type={f.type ?? "text"} required={f.required} placeholder={f.placeholder} defaultValue={f.defaultValue} className={inputClass} />
             )}
           </Field>
         </div>

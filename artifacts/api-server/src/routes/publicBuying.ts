@@ -81,6 +81,7 @@ import { logger, recordUcpProxyForwardingShape } from "../lib/logger";
 import { publicSeoTags } from "../lib/publicSeo";
 import { PREPAY_REFUND_CUTOFF_DAYS } from "../lib/reserveOffers";
 import { handleUiEvent } from "../lib/uiEvents";
+import { PREMIUM_INQUIRE_ONLY, PREMIUM_INQUIRY_KIND, PREMIUM_INQUIRY_MESSAGE, PREMIUM_INQUIRY_PATH, isPremiumFormat } from "../lib/premiumInquireOnly";
 
 const router: IRouter = Router();
 
@@ -92,10 +93,15 @@ const FORMATS = [
   "motion_15s",
 ] as const;
 const WINDOWS = [30, 90, 180] as const;
+/** Omitted format_pref used to default to post_checkout, which is now inquire-only; default to the first self-serve format. */
+const DEFAULT_SELF_SERVE_FORMAT: (typeof FORMATS)[number] =
+  FORMATS.find((f) => !isPremiumFormat(f)) ?? "recovery_plan";
 const EXCLUSIONS = ["no_phi", "no_clinical_pixels", "no_open_auction"] as const;
 
 type CheckoutReceipt = {
   error?: string;
+  inquire_only?: boolean;
+  inquiry_url?: string;
   checkout_url: string | null;
   order_id: string | null;
   reservationId: string | null;
@@ -772,6 +778,21 @@ async function handleMachineCheckout(
     return;
   }
 
+  // PREMIUM_INQUIRE_ONLY: premium placements are never sold by card (also covers UCP, which reuses this handler).
+  if (isPremiumFormat(format)) {
+    await sendCheckoutReceipt(res, 409, {
+      error: PREMIUM_INQUIRY_MESSAGE,
+      inquire_only: true,
+      inquiry_url: PREMIUM_INQUIRY_PATH,
+      checkout_url: null,
+      order_id: null,
+      reservationId: null,
+      amountCents,
+      currency,
+    }, database);
+    return;
+  }
+
   const authorizedAgentIdentityHashes = Array.isArray(
     res.locals.ucpAuthorizedAgentIdentityHashes,
   )
@@ -793,7 +814,7 @@ async function handleMachineCheckout(
       brandName: brand,
       email,
       websiteUrl: website || null,
-      adInterest: isFormat(format) ? format : "post_checkout",
+      adInterest: isFormat(format) ? format : DEFAULT_SELF_SERVE_FORMAT,
       promotedOffer: `Birch Reserve ${offer.name}${category ? ` · ${category.label}` : ""}`,
       status: "seat_held",
       offerKey: offer.offerKey,
@@ -2341,10 +2362,11 @@ function renderBuycalcHtmlUsd(input: {
 <label for="f-cat">Category</label><select id="f-cat" name="category"><option value="">Not sure yet</option>${BUYCALC_CATEGORIES.map((c) => `<option value="${c.slug}"${c.slug === category ? " selected" : ""}>${c.label}</option>`).join("")}</select>
 <label for="f-brand">Brand</label><input id="f-brand" name="brand" required maxlength="160" autocomplete="organization">
 <label for="f-email">Work email</label><input id="f-email" name="email" type="email" required autocomplete="email">
-<div class="row2"><div><label for="f-web">Website <span class="fine">(optional)</span></label><input id="f-web" name="website_url" type="url" inputmode="url" placeholder="https://"></div><div><label for="f-format">Where it shows</label><select id="f-format" name="format_pref">${FORMATS.map((f) => `<option value="${f}"${input.format === f ? " selected" : ""}>${BUYCALC_FORMAT_LABELS[f]}</option>`).join("")}</select></div></div>
+<div class="row2"><div><label for="f-web">Website <span class="fine">(optional)</span></label><input id="f-web" name="website_url" type="url" inputmode="url" placeholder="https://"></div><div><label for="f-format">Where it shows</label><select id="f-format" name="format_pref">${FORMATS.map((f) => `<option value="${f}"${(isFormat(input.format) ? input.format : DEFAULT_SELF_SERVE_FORMAT) === f ? " selected" : ""}${isPremiumFormat(f) ? ' data-inquire="1"' : ""}>${BUYCALC_FORMAT_LABELS[f]}${isPremiumFormat(f) ? " · Inquire" : ""}</option>`).join("")}</select></div></div>
 <label class="check"><input id="terms" type="checkbox" required><span>I agree to the draft <a href="/terms">terms</a> before any charge.</span></label>
 <button id="submit" class="btn" type="submit">${submitLabel}</button>
 <p class="fine" id="checkout-note">${checkoutLive ? "Secure card checkout by Stripe. Payment counts once Stripe confirms it." : "Card checkout is not open yet. Submitting saves your seat request and alerts our sales team. No card is charged."}</p>
+<p class="fine" id="inquire-note" hidden>${PREMIUM_INQUIRY_MESSAGE}</p>
 <p id="message" role="status" aria-live="polite"></p>
 <noscript><p class="fine">This form needs JavaScript. To reserve without it, <a href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">email sales@silverbirchgrowth.com</a> or call <a href="tel:+16479316278">(647) 931-6278</a>.</p></noscript>
 </form>
@@ -2353,13 +2375,14 @@ function renderBuycalcHtmlUsd(input: {
 </main>
 <footer><div class="wrap"><p>One brand per category · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only</p><p>Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · <a href="tel:+16479316278">(647) 931-6278</a></p><p>For AI buyers: <a href="/v1/catalog.json">/v1/catalog.json</a> · <a href="/v1/quote?sku=reserve-490&amp;format=post_checkout&amp;days=30">/v1/quote</a> · <a href="/llms.txt">/llms.txt</a></p></div></footer>
 <script>
-(function(){var form=document.getElementById("reserve"),message=document.getElementById("message"),submit=document.getElementById("submit"),idempotencyKey=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2),currency=${JSON.stringify(currency)},live=${checkoutLive ? "true" : "false"},labels=${JSON.stringify(Object.fromEntries(PUBLIC_RESERVE_OFFERS.map((offer) => [offer.sku, price(offer)])))};
-function refresh(){if(live)submit.textContent="Continue to secure checkout · "+labels[form.elements.sku.value];document.querySelectorAll(".offer").forEach(function(el){var on=el.getAttribute("data-sku")===form.elements.sku.value;el.classList.toggle("is-selected",on);var b=el.querySelector(".badge");if(on&&!b){b=document.createElement("span");b.className="badge";b.textContent="Selected";el.prepend(b)}else if(!on&&b){b.remove()}})}
-form.elements.sku.addEventListener("change",refresh);
+(function(){var form=document.getElementById("reserve"),message=document.getElementById("message"),submit=document.getElementById("submit"),idempotencyKey=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2),currency=${JSON.stringify(currency)},live=${checkoutLive ? "true" : "false"},labels=${JSON.stringify(Object.fromEntries(PUBLIC_RESERVE_OFFERS.map((offer) => [offer.sku, price(offer)])))},premiumFormats=${JSON.stringify(PREMIUM_INQUIRE_ONLY.formats)},inquiryKind=${JSON.stringify(PREMIUM_INQUIRY_KIND)};
+function premium(){return premiumFormats.indexOf(form.elements.format_pref.value)>=0}
+function refresh(){var pr=premium();document.getElementById("inquire-note").hidden=!pr;document.getElementById("checkout-note").hidden=pr;if(pr)submit.textContent="Send inquiry";else if(live)submit.textContent="Continue to secure checkout · "+labels[form.elements.sku.value];else submit.textContent=${JSON.stringify("Reserve my seat · no charge today")};document.querySelectorAll(".offer").forEach(function(el){var on=el.getAttribute("data-sku")===form.elements.sku.value;el.classList.toggle("is-selected",on);var b=el.querySelector(".badge");if(on&&!b){b=document.createElement("span");b.className="badge";b.textContent="Selected";el.prepend(b)}else if(!on&&b){b.remove()}})}
+form.elements.sku.addEventListener("change",refresh);form.elements.format_pref.addEventListener("change",refresh);
 function go(){document.getElementById("buy").scrollIntoView({behavior:"smooth",block:"start"});setTimeout(function(){document.getElementById("f-brand").focus({preventScroll:true})},400)}
 document.querySelectorAll("[data-pick-sku]").forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();form.elements.sku.value=a.getAttribute("data-pick-sku");refresh();go()})});
 document.querySelectorAll("[data-pick-category]").forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();form.elements.category.value=a.getAttribute("data-pick-category");go()})});
-form.addEventListener("submit",async function(e){e.preventDefault();if(!form.reportValidity())return;if(!document.getElementById("terms").checked){message.textContent="Please accept the draft terms first.";return}submit.disabled=true;message.textContent="Saving your request…";var data=Object.fromEntries(new FormData(form));data.idempotency_key=idempotencyKey;data.currency=currency;if(!data.website_url)delete data.website_url;if(!data.category)delete data.category;try{var r=await fetch("/v1/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)});var out=await r.json();if(out.checkout_url){location.assign(out.checkout_url);return}if(out.order_id){message.textContent="Saved. Your seat request is in (ref "+out.order_id+"). No card was charged. Our sales team will reach you at "+data.email+", or call (647) 931-6278.";form.querySelectorAll("input,select,button").forEach(function(el){el.disabled=true});return}message.textContent=out.error||"We could not save that. Please call (647) 931-6278 or email sales@silverbirchgrowth.com.";submit.disabled=false}catch(err){message.textContent="We could not submit that. No payment was taken. Please call (647) 931-6278 or email sales@silverbirchgrowth.com.";submit.disabled=false}});
+form.addEventListener("submit",async function(e){e.preventDefault();if(!form.reportValidity())return;if(!document.getElementById("terms").checked){message.textContent="Please accept the draft terms first.";return}submit.disabled=true;var data=Object.fromEntries(new FormData(form));if(premium()){message.textContent="Sending your inquiry…";try{var lr=await fetch("/v1/leads",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({kind:inquiryKind,email:data.email,company:data.brand,website:data.website_url||"",message:"Premium slot inquiry from /buycalc",fields:{sku:data.sku,format_pref:data.format_pref,category:data.category||"",currency:currency,path:"/buycalc"}})});var lo=await lr.json().catch(function(){return{}});if(lr.ok&&lo.ok!==false){message.textContent="Inquiry sent. No card was charged. We'll reply with an insertion order at "+data.email+".";form.querySelectorAll("input,select,button").forEach(function(el){el.disabled=true});return}message.textContent=lo.error||"We could not send that. Email sales@silverbirchgrowth.com.";submit.disabled=false}catch(err){message.textContent="We could not send that. Email sales@silverbirchgrowth.com.";submit.disabled=false}return}message.textContent="Saving your request…";data.idempotency_key=idempotencyKey;data.currency=currency;if(!data.website_url)delete data.website_url;if(!data.category)delete data.category;try{var r=await fetch("/v1/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)});var out=await r.json();if(out.checkout_url){location.assign(out.checkout_url);return}if(out.order_id){message.textContent="Saved. Your seat request is in (ref "+out.order_id+"). No card was charged. Our sales team will reach you at "+data.email+", or call (647) 931-6278.";form.querySelectorAll("input,select,button").forEach(function(el){el.disabled=true});return}message.textContent=out.error||"We could not save that. Please call (647) 931-6278 or email sales@silverbirchgrowth.com.";submit.disabled=false}catch(err){message.textContent="We could not submit that. No payment was taken. Please call (647) 931-6278 or email sales@silverbirchgrowth.com.";submit.disabled=false}});
 refresh();if(location.hash==="#reserve"&&/[?&]format=/.test(location.search)){setTimeout(function(){document.getElementById("f-brand").focus({preventScroll:true})},350)}})();
 </script></body></html>`;
 }

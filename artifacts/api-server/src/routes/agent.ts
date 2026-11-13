@@ -4,6 +4,7 @@ import { agentCard, agentCatalog, agentOpenApi, agentQuote, HANDOFF_EMAIL } from
 import { buildAreaLockSession, checkoutGate } from "../lib/overhaul/checkout";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
 import { SLOT_LADDER } from "../lib/overhaul/model";
+import { PREMIUM_INQUIRY_MESSAGE, isPremiumOffer } from "../lib/premiumInquireOnly";
 import { buildDepositSession } from "./sponsorPage";
 import type { CreateSession } from "./overhaul";
 
@@ -27,7 +28,7 @@ export function createAgentRouter(deps: { createSession?: CreateSession; log?: (
   router.get("/v1/agent/catalog.json", cors, (_req, res) => {
     const g = gates();
     res.set("Cache-Control", "public, max-age=300");
-    res.json(agentCatalog({ slotsCheckout: g.slots.open && !!deps.createSession, areaLockCheckout: g.area.open && !!deps.createSession }));
+    res.json(agentCatalog({ slotsCheckout: g.slots.open && !!deps.createSession, areaLockCheckout: g.area.open && !!deps.createSession && !isPremiumOffer("area-lock") }));
   });
 
   router.get("/v1/agent/quote", cors, (req, res) => {
@@ -78,6 +79,11 @@ export function createAgentRouter(deps: { createSession?: CreateSession; log?: (
       path: "/v1/agent/checkout",
       meta: { ...meta, offer, agent: str(body.agent, 120) || undefined, checkout_open: gateOpen, amount: built.amountCents / 100, currency: built.currency },
     });
+    // PREMIUM_INQUIRE_ONLY: premium offers (area lock, category lock, view blocks) are never paid by card.
+    if (isPremiumOffer(offer)) {
+      res.status(202).json({ status: "held", inquire_only: true, offer, amount: built.amountCents / 100, currency: built.currency, message: `${PREMIUM_INQUIRY_MESSAGE} Inquiry recorded; we'll reply from ${HANDOFF_EMAIL}. No charge was made.`, stored: friday.status });
+      return;
+    }
     if (!gateOpen || !deps.createSession) {
       res.status(202).json({ status: "held", offer, amount: built.amountCents / 100, currency: built.currency, message: `Reserved by inquiry. We'll confirm within 1 business day from ${HANDOFF_EMAIL}. No charge was made.`, stored: friday.status });
       return;
