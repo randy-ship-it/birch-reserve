@@ -28,7 +28,7 @@ function BasisTag({ basis, tone = "light" }: { basis: Basis; tone?: "light" | "d
   const dark = tone === "dark" ? "border-background/40 bg-transparent text-background/80" : cls;
   return (
     <span
-      className={`inline-flex items-center whitespace-nowrap border px-1.5 py-0.5 align-middle text-[10px] font-semibold uppercase tracking-wider ${dark}`}
+      className={`inline-flex max-w-full items-center border px-1.5 py-0.5 leading-tight sm:whitespace-nowrap align-middle text-[10px] font-semibold uppercase tracking-wider ${dark}`}
       title={BASIS_NOTE[basis]}
       data-basis={basis}
     >
@@ -106,7 +106,7 @@ export default function BrAudiences() {
             </div>
           </div>
           <div className="border border-foreground/15 bg-white p-6 md:p-8">
-            <div className="grid grid-cols-2 gap-x-6 gap-y-7">
+            <div className="grid grid-cols-2 gap-x-5 gap-y-7 [&>div]:min-w-0">
               <div>
                 <div className="font-display text-4xl md:text-5xl">20mm+</div>
                 <div className="mt-1 text-sm text-muted-foreground">orders are being onboarded now</div>
@@ -311,7 +311,7 @@ export default function BrAudiences() {
                     <p className={`font-semibold ${i === INTENT_LADDER.length - 1 ? "text-background/60" : "text-background"}`}>{r.moment}</p>
                     <p className="text-xs text-background/60">{r.where}</p>
                   </div>
-                  <p className="font-display text-2xl tabular-nums text-background">{fmtPctBand(r.lo, r.hi)}</p>
+                  <p className="shrink-0 whitespace-nowrap font-display text-xl tabular-nums text-background md:text-2xl">{fmtPctBand(r.lo, r.hi)}</p>
                 </div>
                 <div className="h-2.5 w-full bg-background/15" aria-hidden>
                   <div className={`h-full ${i === INTENT_LADDER.length - 1 ? "bg-background/40" : "bg-accent"}`} style={{ width: `${(r.hi / maxBand) * 100}%` }} />
@@ -326,28 +326,22 @@ export default function BrAudiences() {
       {/* Sources + privacy */}
       <Section>
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-          <div>
+          <div className="min-w-0">
             <Eyebrow>How we know</Eyebrow>
             <H2>Every number has a source.</H2>
-            <div className="mt-8 overflow-x-auto border border-foreground/15 bg-white">
-              <table className="w-full min-w-[520px] text-left text-sm" data-testid="sources-table">
-                <thead className="bg-secondary/60 text-[11px] uppercase tracking-wider text-foreground/60">
-                  <tr>
-                    <th className="px-4 py-3 font-semibold">Label</th>
-                    <th className="px-4 py-3 font-semibold">Source</th>
-                    <th className="px-4 py-3 font-semibold">What it covers</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {SOURCES.map((s) => (
-                    <tr key={s.source} className="border-t border-border align-top">
-                      <td className="px-4 py-3"><BasisTag basis={s.basis} /></td>
-                      <td className="px-4 py-3 font-semibold">{s.source}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{s.what}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="mt-8 border border-foreground/15 bg-white" data-testid="sources-table" role="table" aria-label="Sources">
+              <div className="hidden grid-cols-[210px_1fr_1.5fr] gap-4 bg-secondary/60 px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-foreground/60 md:grid" role="row">
+                <span role="columnheader">Label</span>
+                <span role="columnheader">Source</span>
+                <span role="columnheader">What it covers</span>
+              </div>
+              {SOURCES.map((s) => (
+                <div key={s.source} className="grid gap-2 border-t border-border px-4 py-4 text-sm first:border-t-0 md:grid-cols-[210px_1fr_1.5fr] md:gap-4 md:first:border-t" role="row">
+                  <span role="cell"><BasisTag basis={s.basis} /></span>
+                  <span role="cell" className="font-semibold">{s.source}</span>
+                  <span role="cell" className="text-muted-foreground">{s.what}</span>
+                </div>
+              ))}
             </div>
           </div>
           <div className="space-y-4 self-end">
