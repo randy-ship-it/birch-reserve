@@ -215,7 +215,10 @@ test("buycalc HTML is one short, clean buy path with the category facts and no p
   assert.match(html, /<article class="offer is-selected" data-sku="hold-190">/);
   assert.match(html, /<article class="offer" data-sku="reserve-490">/);
   assert.match(html, /<option value="sleep" selected>Sleep<\/option>/);
-  assert.match(html, /<option value="post_checkout" selected>/);
+  // PREMIUM_INQUIRE_ONLY (Nov 12 2026): Post-Purchase stays selectable but is marked inquire-only.
+  assert.match(html, /<option value="post_checkout" selected data-inquire="1">After checkout · Inquire<\/option>/);
+  assert.match(html, /id="inquire-note" hidden>This is a premium slot and is inquire-only/);
+  assert.match(renderBuycalcHtml({ seatsOpen: 3, seatsTotal: 8 }), /<option value="recovery_plan" selected>/);
   assert.match(html, /<a href="https:\/\/physio\.drhonow\.com"/);
   assert.match(html, /Public benchmark<\/span>Not a Birch result/);
   // Randy, Nov 12 2026: the repeated filler lines and the raw quote JSON button are gone.

@@ -62,6 +62,7 @@ import { attributionFrom } from "../lib/publicGuards";
 import { recordPaidCheckoutSafe } from "../lib/checkoutLead";
 import { sendPrepayConfirmationSafe } from "../lib/prepayConfirmationEmail";
 import { markSplashReservationTestIfQa } from "../lib/splashTestTraffic";
+import { PREMIUM_INQUIRY_MESSAGE, PREMIUM_INQUIRY_PATH, isPremiumFormat } from "../lib/premiumInquireOnly";
 
 const router: IRouter = Router();
 
@@ -1211,6 +1212,11 @@ router.post("/launch/splash/checkout", async (req, res): Promise<void> => {
   );
   if (!checkoutOffer) {
     res.status(409).json({ error: "This reservation uses an outdated price." });
+    return;
+  }
+  // PREMIUM_INQUIRE_ONLY: a premium placement (e.g. post_checkout) is never paid by card, even when approved.
+  if (isPremiumFormat(reservation.adInterest)) {
+    res.status(409).json({ error: PREMIUM_INQUIRY_MESSAGE, inquire_only: true, inquiry_url: PREMIUM_INQUIRY_PATH });
     return;
   }
   const reservationCurrency: ReserveCurrency =

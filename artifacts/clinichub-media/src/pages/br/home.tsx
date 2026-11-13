@@ -50,7 +50,7 @@ export default function BrHome() {
               <div className="mt-6 flex flex-wrap gap-3">
                 <Cta href="#quick-buy" testId="hero-buy">Buy ad space now</Cta>
                 <Cta href="/match" variant="ink" testId="hero-match">Match your audience</Cta>
-                <Cta href="/advertise/local" variant="line" testId="hero-lock">Lock down my area</Cta>
+                <Cta href="/advertise/local" variant="line" testId="hero-lock">Lock down my area · Inquire</Cta>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
                 Brands: <a className="underline underline-offset-2" href="/advertise/brands">lock in spend</a> · Agencies: <a className="underline underline-offset-2" href="/agencies">prepay a client test</a> · <a className="underline underline-offset-2" href="#rates">See rates</a>
