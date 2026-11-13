@@ -3,8 +3,10 @@ import { BrandBanners } from "@/components/br/brand-banners";
 import { FourPaths, MetaComparison, PositioningBand, SurfacesGrid, TamStrip } from "@/components/br/blocks";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
 import { QuickBuy } from "@/components/br/quick-buy";
+import { AgencyHero, AgencyPayouts, InsiderGrid, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
+import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { MetaHook, PackPicker, ProveItLadder, RateCardV2 } from "@/components/br/pricing";
-import { AGENCY, AREA_LOCK, INVENTORY, PUBLISHER_INCENTIVE, areaLockGuaranteedViews } from "../../../../api-server/src/lib/overhaul/model";
+import { AREA_LOCK, INVENTORY, PUBLISHER_INCENTIVE, areaLockGuaranteedViews } from "../../../../api-server/src/lib/overhaul/model";
 
 const FAQ = [
   { q: "Where exactly do the ads run?", a: "Only inside co-branded hubs from Recovery Brands (recovery, longevity and food today; pets in queue) and inside health and wellness business hubs such as physio, gym, studio and clinic hubs. Each hub has four placements: post-purchase, the hub home page, product and services pages, and the member dashboard behind login." },
@@ -13,11 +15,11 @@ const FAQ = [
   { q: "Are the audience numbers measured?", a: "Not yet. Audience and view numbers are modelled from the TAM feed at scalehealth.ca/tam: 20MM+ orders being onboarded across 42 listed partners. We don't publish a network views figure; your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
   { q: "Can a local business or studio buy?", a: `Yes. Lock down your area holds up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of your postal code (${AREA_LOCK.denseCoreSharePct}% in dense downtown cores) for 1 to 6 months from when displays start.` },
   { q: "How do I become a publisher?", a: `Studios and retailers activate a hub at scalehealth.ca/clinichubs and earn $${PUBLISHER_INCENTIVE.cashCad} cash or $${PUBLISHER_INCENTIVE.creditCad}+ in ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded hub.` },
-  { q: "Do agencies get anything?", a: `Yes. Agencies can prepay a client test budget, get UTM and promo-code reporting, and the agency of record earns ${AGENCY.commissionPct}% of media spend.` },
+  { q: "Do agencies get anything?", a: `Yes. ${AGENCY_SHARE.line} Agencies can also prepay a client test budget and get UTM and promo-code reporting per hub and surface.` },
 ];
 
 export default function BrHome() {
-  usePageMeta("Birch Reserve | Ads inside co-branded health & wellness hubs", "Advertise inside co-branded Recovery Brand hubs and health & wellness business hubs: post-purchase, hub home, product and services pages, and the member dashboard. Lock in spend, lock down your area, or publish your own hub.");
+  usePageMeta("Birch Reserve | First-party health hub ad inventory for agencies and brands", "Agencies keep a share of every client they place. Advertise inside co-branded Recovery Brand hubs and health & wellness business hubs: post-purchase, hub home, product and services pages, and the member dashboard. Lock in spend, lock down your area, or publish your own hub.");
   const g = areaLockGuaranteedViews();
   return (
     <div className="w-full overflow-x-hidden" data-testid="br-home">
@@ -34,32 +36,18 @@ export default function BrHome() {
           address: { "@type": "PostalAddress", streetAddress: "777-2255B Queen St E", addressLocality: "Toronto", addressRegion: "ON", postalCode: "M4E 1G3", addressCountry: "CA" },
         }}
       />
-      <section className="border-b border-border/70">
-        <div className="container mx-auto px-6 pb-12 pt-12 md:pt-16">
-          <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
-            <div>
-              <Eyebrow>Ads inside health &amp; wellness hubs</Eyebrow>
-              <H1>
-                Every new hub is new ad space. <em className="text-foreground/70">Reserve yours.</em>
-              </H1>
-            </div>
-            <div>
-              <Lede>
-                Co-branded Recovery Brand hubs and health &amp; wellness business hubs keep coming online. Each one opens display and CPC slots right after purchase, on its home page, inside its product and services pages, and on the member dashboard behind login.
-              </Lede>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Cta href="#quick-buy" testId="hero-buy">Buy ad space now</Cta>
-                <Cta href="/match" variant="ink" testId="hero-match">Match your audience</Cta>
-                <Cta href="/advertise/local" variant="line" testId="hero-lock">Lock down my area · Inquire</Cta>
-              </div>
-              <p className="mt-4 text-sm text-muted-foreground">
-                Brands: <a className="underline underline-offset-2" href="/advertise/brands">lock in spend</a> · Agencies: <a className="underline underline-offset-2" href="/agencies">prepay a client test</a> · <a className="underline underline-offset-2" href="#rates">See rates</a>
-              </p>
-            </div>
+      <AgencyHero />
+
+      <Section id="inventory">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <Eyebrow>Inventory &amp; placements</Eyebrow>
+            <H2>The spec sheet.</H2>
           </div>
-          <ConveyorHero className="mt-10" />
+          <p className="max-w-md text-sm text-muted-foreground">Four placements in every hub, each sold as display or CPC. Starting rates are public; the IO names the hub and surface.</p>
         </div>
-      </section>
+        <InventorySpec />
+      </Section>
 
       <Section tone="soft" id="quick-buy">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
@@ -72,10 +60,6 @@ export default function BrHome() {
         <QuickBuy />
       </Section>
 
-      <Section tone="ink">
-        <MetaHook />
-      </Section>
-
       <Section id="rates">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -85,6 +69,38 @@ export default function BrHome() {
           <p className="max-w-md text-sm text-muted-foreground">New placements open at starter rates. They only move up once your reporting proves they work.</p>
         </div>
         <RateCardV2 />
+      </Section>
+
+      <Section tone="soft" id="insider">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <Eyebrow>Audience · measurement · brand safety</Eyebrow>
+            <H2>What a media buyer checks first.</H2>
+          </div>
+          <p className="max-w-md text-sm text-muted-foreground">Who you reach, how it is reported, and what keeps the environment clean.</p>
+        </div>
+        <InsiderGrid />
+      </Section>
+
+      <Section id="io">
+        <Eyebrow>Insertion process</Eyebrow>
+        <H2>Brief to flight in six steps.</H2>
+        <Lede>Nothing runs until an insertion order names the hub and surface.</Lede>
+        <div className="mt-10">
+          <IoProcess />
+        </div>
+      </Section>
+
+      <Section tone="soft" id="agency-payouts">
+        <Eyebrow>How agency payouts work</Eyebrow>
+        <H2>Your cut of every client you place.</H2>
+        <div className="mt-10">
+          <AgencyPayouts />
+        </div>
+      </Section>
+
+      <Section tone="ink">
+        <MetaHook />
       </Section>
 
       <Section tone="soft" id="packs">
@@ -126,6 +142,7 @@ export default function BrHome() {
         <Eyebrow>Where your ad shows</Eyebrow>
         <H2>Four placements in every hub.</H2>
         <Lede>Display or CPC, on the pages where members buy, browse, book and log back in.</Lede>
+        <ConveyorHero className="mt-10" />
         <div className="mt-10">
           <SurfacesGrid />
         </div>

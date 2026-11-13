@@ -173,7 +173,7 @@ const SAMPLE_IO_HTML = documentPage(
 <p>Nothing runs until an approved insertion order names the surface. This page is a blank sample, not a flight and not a receipt.</p>
 <dl>
 <div><dt><strong>Advertiser</strong></dt><dd>[Brand legal name]</dd></div>
-<div><dt><strong>SKU</strong></dt><dd>reserve-490 · $490 USD ($690 CAD) exclusive category, or hold-190 · $190 USD ($270 CAD) 7-day look</dd></div>
+<div><dt><strong>SKU</strong></dt><dd>reserve-490 · $490 USD ($690 CAD) category seat, open to more than one brand, or hold-190 · $190 USD ($270 CAD) 7-day look</dd></div>
 <div><dt><strong>Named surface</strong></dt><dd>[Hub URL, for example a listed Scale Health hub]</dd></div>
 <div><dt><strong>Format</strong></dt><dd>post-checkout, recovery plan, booking confirmation, native hub module, or motion :15</dd></div>
 <div><dt><strong>Category</strong></dt><dd>One of eight: pain relief / topicals, recovery hardware, nutrition, sleep, meal prep, women’s health, men’s health, diagnostics / services</dd></div>

@@ -45,8 +45,8 @@ export function quickBuyHref(placement: PlacementKey, sku: Sku, currency: string
   return `/buycalc?${q.toString()}#reserve`;
 }
 
-/** Self-serve default (Post-Purchase is inquire-only). */
-export const QUICK_BUY_DEFAULT_PLACEMENT: PlacementKey = "product_services";
+/** Self-serve default: Hub Home, matching the server and /buycalc (Post-Purchase is inquire-only). */
+export const QUICK_BUY_DEFAULT_PLACEMENT: PlacementKey = "hub_home";
 
 export function InquireBadge({ dark = false }: { dark?: boolean }) {
   return (

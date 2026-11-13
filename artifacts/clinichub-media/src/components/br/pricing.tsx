@@ -23,7 +23,7 @@ import {
   type RateSurface,
 } from "../../../../api-server/src/lib/overhaul/pricing";
 import { Cta } from "./ui";
-import { isPremiumViewBlock } from "../../../../api-server/src/lib/premiumInquireOnly";
+import { isPremiumPlacement, isPremiumViewBlock } from "../../../../api-server/src/lib/premiumInquireOnly";
 import { InquireBadge } from "./quick-buy";
 import { PlacementDialog, PlacementTrigger, type PlacementKey } from "./placement-example";
 
@@ -46,7 +46,7 @@ export function SeatCtas({ tone = "light", className = "" }: { tone?: "light" | 
   return (
     <div className={`flex flex-col gap-3 sm:flex-row sm:flex-wrap ${className}`}>
       <Cta href={RESERVE_HREF} testId="cta-reserve-490" onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })}>
-        Reserve my category · $490 credit
+        Take a category seat · $490 credit
       </Cta>
       <Cta
         href={LOOK_HREF}
@@ -72,7 +72,7 @@ export function MetaHook() {
           You&apos;re already paying Meta {fmtRange(META_CPM)} CPM for cold recovery audiences.
         </h2>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-background/75">
-          Reach the same people already inside the recovery hub, one brand per category, starting at roughly half the price.
+          Reach the same people already inside the recovery hub with a category seat, starting at roughly half the price.
         </p>
         <SeatCtas tone="dark" className="mt-8" />
         <a href="#rates" className="mt-4 inline-block text-sm text-background/70 underline underline-offset-4 hover:text-background">
@@ -94,7 +94,7 @@ export function MetaHook() {
         </div>
         <div className="mt-6 space-y-2 border-t border-background/15 pt-4 text-sm text-background/80">
           <p>Landing pages from <b className="text-background">${landing.cpmStarter[0]} CPM</b>. Post-purchase from <b className="text-background">${post.cpmStarter[0]} CPM</b>.</p>
-          <p>Category exclusive: one brand per recovery category, fixed price, no auction.</p>
+          <p>Category seat: fixed price, no auction, open to more than one brand. Sole-brand category deals are by inquiry.</p>
         </div>
         <p className="mt-4 text-[11px] leading-relaxed text-background/50">
           <Estimate /> {ESTIMATE_NOTE}
@@ -114,7 +114,7 @@ export function RateCardV2() {
       <div className="grid gap-3 md:hidden">
         {RATE_SURFACES.map((s) => (
           <article key={s.key} onClick={() => setEx(s.key)} className="cursor-pointer border border-foreground/15 bg-white p-4 transition-colors active:bg-muted/60">
-            <h3 className="font-display text-xl"><PlacementTrigger k={s.key} onOpen={setEx}>{s.label}</PlacementTrigger></h3>
+            <h3 className="font-display text-xl"><PlacementTrigger k={s.key} onOpen={setEx}>{s.label}</PlacementTrigger>{isPremiumPlacement(s.key) ? <InquireBadge /> : null}</h3>
             <p className="mt-1 text-xs text-muted-foreground">{s.where}</p>
             <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
               <div>
@@ -146,6 +146,7 @@ export function RateCardV2() {
               <tr key={s.key} onClick={() => setEx(s.key)} className="cursor-pointer transition-colors hover:bg-muted/50">
                 <td className="py-4 pr-4">
                   <PlacementTrigger k={s.key} onOpen={setEx} className="font-medium">{s.label}</PlacementTrigger>
+                  {isPremiumPlacement(s.key) ? <InquireBadge /> : null}
                   <span className="block text-xs text-muted-foreground">{s.where}</span>
                 </td>
                 <td className="py-4 pr-4">
@@ -255,11 +256,11 @@ export function PackPicker() {
             </Cta>
           )}
           <Cta href={RESERVE_HREF} variant="lineDark" testId="pack-reserve" onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })}>
-            Start with a $490 category prepay
+            Start with a $490 category seat
           </Cta>
         </div>
         <p className="mt-4 text-[11px] leading-relaxed text-background/50">
-          The $490 prepay holds your category and is all media credit toward the pack. Starter rates hold for your first period; rates may step up later only once a placement proves out. <Estimate /> The IO sets the final rate.
+          The $490 category seat is open to more than one brand and is all media credit toward the pack. Starter rates hold for your first period; rates may step up later only once a placement proves out. <Estimate /> The IO sets the final rate.
         </p>
       </div>
     </div>
@@ -332,9 +333,9 @@ export function ScenarioCalculator() {
 /** Prove-it-then-raise explainer. */
 export function ProveItLadder() {
   const steps = [
-    { n: "1", t: "Start at starter rates", d: "Your first period runs at the starting-at rates above. Hold your category with the $490 prepay, all of it media credit." },
+    { n: "1", t: "Start at starter rates", d: "Your first period runs at the starting-at rates above. Take a $490 category seat, all of it media credit." },
     { n: "2", t: "We report, you judge", d: "Views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. Aggregate only, no patient data." },
-    { n: "3", t: "Rates rise only when it's proven", d: "A placement's rate can step up only after reporting shows it performs. Your locked deposit keeps its rate for its term." },
+    { n: "3", t: "Rates rise only when it's proven", d: "A placement's rate can step up only after reporting shows it performs. Your deposit keeps its rate for its term." },
   ];
   return (
     <ol className="grid gap-px border border-foreground/15 bg-foreground/15 md:grid-cols-3" data-testid="prove-it-ladder">

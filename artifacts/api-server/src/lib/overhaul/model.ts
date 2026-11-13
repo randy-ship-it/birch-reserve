@@ -298,11 +298,11 @@ export const PUBLISHER_INCENTIVE = {
 
 // ---------------------------------------------------------------- agencies
 
-/** Market-friendly agency deal (Randy: "10% of spend"). Bonus tiers already apply to agency prepay, so no extra stacking. */
+/** Market-friendly agency deal (Randy, Nov 12 2026 8:14 PM ET: 10% of media spend, paid in cash). Brand bonus credit is the client's, separate from the agency cash. */
 export const AGENCY = {
   commissionPct: 10,
-  line: "10% of media spend, paid to the agency of record.",
-  bonusNote: "Agency prepay earns the same bonus credit as brands: +5% from $1,500, +10% from $3,000, +15% from $6,000 USD.",
+  line: "10% of media spend, paid in cash to the agency of record.",
+  bonusNote: "Brand bonus credit is the client's (the brand's), separate from the agency's 10% cash: +5% from $1,500, +10% from $3,000, +15% from $6,000 USD prepay.",
 } as const;
 
 // ---------------------------------------------------------------- benchmarks

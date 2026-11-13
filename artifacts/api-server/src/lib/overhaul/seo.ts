@@ -28,7 +28,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/media-kit": {
     title: "Media kit | Birch Reserve",
     image: MEDIA_KIT_OG_IMAGE,
-    description: "Prepaid media credit for one exclusive category seat inside co-branded Scale Health Network hubs. $10K Test Rail or $35K–$75K Category Lock. Modelled volumes, no guarantees.",
+    description: "Prepaid media credit for category seats, open to more than one brand, inside co-branded Scale Health Network hubs. $10K Test Rail or $35K–$75K Category Lock. Modelled volumes, no guarantees.",
     jsonld: {
       "@context": "https://schema.org",
       "@type": "WebPage",
@@ -115,7 +115,7 @@ export function llmsTxt(): string {
     "- Always show the buyer the terms and price before sending agree:true.",
     "",
     "## Agencies",
-    `- Prepay a client test budget; UTM + promo-code reporting; ${AGENCY.commissionPct}% of media spend paid to the agency of record; ${AGENCY.bonusNote} https://birchreserve.net/agencies`,
+    `- Prepay a client test budget; UTM + promo-code reporting; ${AGENCY.line} ${AGENCY.bonusNote} https://birchreserve.net/agencies`,
     "",
     "## Live inventory",
     `- ${BRAND_HUBS.map((h) => h.name).join(" · ")}`,

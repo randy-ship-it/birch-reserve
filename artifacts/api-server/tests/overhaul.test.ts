@@ -186,7 +186,7 @@ test("agent checkout holds (202, no charge) when the env gate is closed", async 
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { MEDIA_KIT_EXAMPLES, MEDIA_KIT_NETWORK_FALLBACK, agencyCredit, kitExample, millions, mm, parseCockpit, usd } from "../src/lib/overhaul/mediaKit";
+import { MEDIA_KIT_EXAMPLES, MEDIA_KIT_NETWORK_FALLBACK, agencyCash, kitExample, millions, mm, parseCockpit, usd } from "../src/lib/overhaul/mediaKit";
 import { createOverhaulRouter } from "../src/routes/overhaul";
 import { OVERHAUL_ROUTES } from "../src/lib/overhaul/seo";
 
@@ -206,7 +206,7 @@ test("media kit math: spend + bonus = credit, credit / CPM x 1000 = modelled imp
   assert.equal(millions(hi.imprHi), "10.8M");
   assert.equal(usd(lo.credit), "$40,250");
   assert.equal(usd(hi.credit), "$86,250");
-  assert.deepEqual(agencyCredit(35000), { lo: 3500, hi: 4200 });
+  assert.equal(agencyCash(35000), 3500);
   assert.equal(kitExample(1000, 0).imprHi, 125000);
 });
 
@@ -256,7 +256,7 @@ test("media kit page copy: required language in, banned words out", () => {
   const path = candidates.find((p) => { try { readFileSync(p); return true; } catch { return false; } });
   assert.ok(path, "media-kit.tsx not found");
   const src = readFileSync(path!, "utf8");
-  for (const must of [/Prepaid credit/, /Modelled volumes/, /Refundable until IO activation/, /Aggregate UTM reporting only/, /No personal data/, /One exclusive seat per category/, /No guarantees of reach, clicks or sales/, /Estimates are modelled; terms on IO/, /Randy Gilling, Founder/, /sales@silverbirchgrowth\.com/, /\(647\) 931-6278/, /one brand each/, /first come/]) {
+  for (const must of [/Prepaid credit/, /Modelled volumes/, /Refundable until IO activation/, /Aggregate UTM reporting only/, /No personal data/, /Category seats, open to more than one brand/, /No guarantees of reach, clicks or sales/, /Estimates are modelled; terms on IO/, /Randy Gilling, Founder/, /sales@silverbirchgrowth\.com/, /\(647\) 931-6278/, /one brand each/, /first come/]) {
     assert.match(src, must);
   }
   for (const banned of [/Align/, /Clairvoyant/i, /80 locations/i, /Kalaya/i, /we sell them customers/i, /signed partner/i, /\bCTR\b/, /guarantee(d)? (reach|delivery|results)/i]) {
