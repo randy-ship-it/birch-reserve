@@ -8,8 +8,8 @@ import { Cta } from "./ui";
 import { InquireBadge } from "./quick-buy";
 import {
   AGENCY_EXAMPLES,
-  AGENCY_PLACEHOLDERS,
   AGENCY_SHARE,
+  BRAND_BONUS_LINE,
   INVENTORY_LINE,
   SELL_ASSUMPTION_LINE,
   SELL_ASSUMPTION_PCT,
@@ -29,14 +29,6 @@ function Tag({ children, tone = "line" }: { children: ReactNode; tone?: "line" |
   return <span className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${t}`}>{children}</span>;
 }
 
-export function Placeholder({ children }: { children: ReactNode }) {
-  return (
-    <span className="inline-flex items-center border border-dashed border-current px-1.5 py-0.5 text-[11px] font-medium italic opacity-80" data-testid="placeholder">
-      {children}
-    </span>
-  );
-}
-
 /** Hero: what the inventory is, plus the agency economics card. */
 export function AgencyHero() {
   const ex = AGENCY_EXAMPLES[1]!;
@@ -49,7 +41,7 @@ export function AgencyHero() {
               For agencies &amp; media buyers <span aria-hidden className="h-px w-6 bg-foreground/30" /> First-party health inventory
             </p>
             <h1 className="font-display text-[2.5rem] leading-[1.02] tracking-tight md:text-[4.25rem]">
-              Place a client inside the health hubs. <em className="not-italic text-foreground/55">Keep <span className="whitespace-nowrap">{AGENCY_SHARE.lo}–{AGENCY_SHARE.hi}%</span> of the spend.</em>
+              Place a client inside the health hubs. <em className="not-italic text-foreground/55">Keep {AGENCY_SHARE.pct}% of the spend.</em>
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground" data-testid="agency-inventory-line">
               {INVENTORY_LINE} Fixed starting rates, the surface named on the IO, and UTM and promo-code reporting per hub.
@@ -83,7 +75,7 @@ export function AgencyHero() {
           <aside className="border border-foreground bg-foreground p-6 text-background md:p-8" data-testid="agency-economics">
             <Kicker dark>Agency economics</Kicker>
             <p className="mt-3 font-display text-6xl leading-none text-accent tabular-nums md:text-7xl">
-              {AGENCY_SHARE.lo}–{AGENCY_SHARE.hi}%
+              {AGENCY_SHARE.pct}%
             </p>
             <p className="mt-3 text-base leading-relaxed text-background/80">{AGENCY_SHARE.line}</p>
             <div className="mt-6 border-t border-background/15 pt-5">
@@ -91,16 +83,14 @@ export function AgencyHero() {
               <div className="mt-2 grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 text-sm tabular-nums">
                 <span className="text-background/70">Client prepays: {ex.label}</span>
                 <span className="text-right">{usd(ex.spend)}</span>
-                <span className="text-background/70">Agency keeps, as media credit</span>
-                <span className="text-right font-semibold text-accent">{usd(ex.lo)}–{usd(ex.hi)}</span>
+                <span className="text-background/70">Agency of record earns, in cash</span>
+                <span className="text-right font-semibold text-accent">{usd(ex.cash)}</span>
               </div>
             </div>
             <ul className="mt-6 space-y-2 border-t border-background/15 pt-5 text-sm text-background/80">
-              <li>{AGENCY_SHARE.bonusNote}</li>
+              <li>{AGENCY_SHARE.timing}</li>
               <li>One prepay can be split across clients; each client gets its own IO and reporting.</li>
-              <li className="flex flex-wrap items-center gap-2">
-                <span>{AGENCY_PLACEHOLDERS[0]!.label}:</span> <Placeholder>{AGENCY_PLACEHOLDERS[0]!.value}</Placeholder>
-              </li>
+              <li className="text-background/60">{BRAND_BONUS_LINE}</li>
             </ul>
             <a href="#agency-payouts" className="mt-6 inline-block text-sm text-background/70 underline underline-offset-4 hover:text-background">
               How agency payouts work
@@ -287,10 +277,10 @@ export function AgencyPayouts() {
     <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]" data-testid="agency-payouts">
       <div>
         <p className="font-display text-7xl leading-none tabular-nums md:text-8xl">
-          {AGENCY_SHARE.lo}–{AGENCY_SHARE.hi}%
+          {AGENCY_SHARE.pct}%
         </p>
         <p className="mt-4 max-w-md text-base leading-relaxed text-foreground/80">{AGENCY_SHARE.line}</p>
-        <p className="mt-3 max-w-md text-sm text-muted-foreground">{AGENCY_SHARE.bonusNote}</p>
+        <p className="mt-3 max-w-md text-sm text-muted-foreground">{BRAND_BONUS_LINE}</p>
       </div>
       <div className="border border-foreground/15 bg-white">
         <table className="w-full border-collapse text-left text-sm tabular-nums">
@@ -298,7 +288,7 @@ export function AgencyPayouts() {
             <tr className="border-b border-foreground/80 text-[11px] uppercase tracking-wider text-foreground/60">
               <th className="px-4 py-3 font-semibold md:px-5">Client buy</th>
               <th className="px-4 py-3 text-right font-semibold md:px-5">Prepaid</th>
-              <th className="px-4 py-3 text-right font-semibold md:px-5">Agency keeps</th>
+              <th className="px-4 py-3 text-right font-semibold md:px-5">Agency cash</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -307,23 +297,23 @@ export function AgencyPayouts() {
                 <td className="px-4 py-3 md:px-5">{e.label}</td>
                 <td className="px-4 py-3 text-right md:px-5">{usd(e.spend)}</td>
                 <td className="px-4 py-3 text-right font-semibold md:px-5">
-                  {usd(e.lo)}–{usd(e.hi)}
+                  {usd(e.cash)}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        <dl className="divide-y divide-border border-t border-foreground/15 text-sm" data-testid="agency-placeholders">
-          {AGENCY_PLACEHOLDERS.map((p) => (
-            <div key={p.key} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
-              <dt className="text-foreground/75">{p.label}</dt>
-              <dd>
-                <Placeholder>{p.value}</Placeholder>
-              </dd>
-            </div>
-          ))}
+        <dl className="divide-y divide-border border-t border-foreground/15 text-sm" data-testid="agency-payout-terms">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
+            <dt className="text-foreground/75">Paid in</dt>
+            <dd className="font-semibold">Cash</dd>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
+            <dt className="text-foreground/75">When</dt>
+            <dd className="font-semibold">{AGENCY_SHARE.timing}</dd>
+          </div>
         </dl>
-        <p className="border-t border-border px-4 py-3 text-[11px] text-muted-foreground md:px-5">Examples use prices already on the site. Share shown as media credit, per the media kit.</p>
+        <p className="border-t border-border px-4 py-3 text-[11px] text-muted-foreground md:px-5">{AGENCY_SHARE.pct}% of media spend, paid in cash to the agency of record. Examples use prices already on the site.</p>
       </div>
     </div>
   );

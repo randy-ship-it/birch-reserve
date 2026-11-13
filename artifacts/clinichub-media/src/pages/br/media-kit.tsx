@@ -4,14 +4,14 @@ import { Cta, usePageMeta } from "@/components/br/ui";
 import { PlacementVisual, type PlacementKey } from "@/components/br/placement-example";
 import { BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
 import {
-  AGENCY_CREDIT_PCT,
+  AGENCY_CASH_PCT,
   FRIDAY_COCKPIT_URL,
   MEDIA_KIT_CATEGORIES,
   MEDIA_KIT_CPM,
   MEDIA_KIT_EXAMPLES,
   MEDIA_KIT_NETWORK_FALLBACK,
   MEDIA_KIT_OFFERS,
-  agencyCredit,
+  agencyCash,
   kitExample,
   millions,
   mm,
@@ -57,7 +57,7 @@ const RULES = [
   "Modelled volumes. Views and impressions are estimates, not measured delivery.",
   "Refundable until IO activation.",
   "Aggregate UTM reporting only. No personal data is shared.",
-  "One exclusive seat per category.",
+  "Category seats, open to more than one brand.",
   "No guarantees of reach, clicks or sales.",
 ];
 
@@ -119,12 +119,12 @@ function BookCall({ variant = "ink", testId }: { variant?: "ink" | "lime" | "lin
 export default function BrMediaKit() {
   usePageMeta(
     "Media kit | Birch Reserve",
-    "Prepaid media credit for one exclusive category seat inside co-branded Scale Health Network hubs. $10K Test Rail or $35K–$75K Category Lock. Modelled volumes, no guarantees.",
+    "Prepaid media credit for category seats, open to more than one brand, inside co-branded Scale Health Network hubs. $10K Test Rail or $35K–$75K Category Lock. Modelled volumes, no guarantees.",
   );
   const net = useNetwork();
   const [rail, lockLo, lockHi] = MEDIA_KIT_EXAMPLES as [ReturnType<typeof kitExample>, ReturnType<typeof kitExample>, ReturnType<typeof kitExample>];
   const lockOffer = MEDIA_KIT_OFFERS.categoryLock;
-  const agencyEx = agencyCredit(lockOffer.spendLo);
+  const agencyEx = agencyCash(lockOffer.spendLo);
   const cpm = `~$${MEDIA_KIT_CPM.lo}–${MEDIA_KIT_CPM.hi} CPM`;
 
   return (
@@ -135,7 +135,7 @@ export default function BrMediaKit() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Media kit · Nov 2026</p>
           <h1 className="mt-3 font-display text-[2.15rem] leading-[1.05] tracking-tight md:text-6xl">One category. One brand. Inside the hubs.</h1>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-foreground/80" data-testid="mk-what">
-            Birch Reserve is prepaid media credit for one exclusive category seat inside co-branded Scale Health Network hubs: recovery, longevity, nutrition, women’s and men’s health, and more.
+            Birch Reserve is prepaid media credit for category seats, open to more than one brand, inside co-branded Scale Health Network hubs: recovery, longevity, nutrition, women’s and men’s health, and more.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Cta href="/buycalc" variant="lime" testId="mk-reserve-hero" className="w-full sm:w-auto">Reserve a category</Cta>
@@ -245,12 +245,12 @@ export default function BrMediaKit() {
       </Block>
 
       {/* Agency + rules */}
-      <Block id="agencies" eyebrow="For agencies" title={`Place a client, keep ${AGENCY_CREDIT_PCT.lo}–${AGENCY_CREDIT_PCT.hi}% as credit`}>
+      <Block id="agencies" eyebrow="For agencies" title={`Place a client, earn ${AGENCY_CASH_PCT}% in cash`}>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="border border-foreground/20 bg-white p-5" data-testid="mk-agency">
-            <p className="text-sm text-foreground/80">Bring a brand into an open category. You keep {AGENCY_CREDIT_PCT.lo}–{AGENCY_CREDIT_PCT.hi}% of their prepaid spend as media credit.</p>
+            <p className="text-sm text-foreground/80">Bring a brand into an open category. The agency of record earns {AGENCY_CASH_PCT}% of media spend, paid in cash per the IO.</p>
             <p className="mt-3 text-sm">
-              <span className="text-muted-foreground">Example:</span> client takes a {usdK(lockOffer.spendLo)} Category Lock → you keep <strong>{usd(agencyEx.lo)}–{usd(agencyEx.hi)}</strong> in credit.
+              <span className="text-muted-foreground">Example:</span> client takes a {usdK(lockOffer.spendLo)} Category Lock → you earn <strong>{usd(agencyEx)}</strong> in cash.
             </p>
           </div>
           <div data-testid="mk-rules">

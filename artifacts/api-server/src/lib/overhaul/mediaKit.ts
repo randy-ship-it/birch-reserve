@@ -31,10 +31,10 @@ export const MEDIA_KIT_EXAMPLES: KitExample[] = [
   kitExample(MEDIA_KIT_OFFERS.categoryLock.spendHi, MEDIA_KIT_OFFERS.categoryLock.bonusPct),
 ];
 
-/** Agency: place a client, keep 10-12% of the client's spend as media credit. */
-export const AGENCY_CREDIT_PCT = { lo: 10, hi: 12 } as const;
-export function agencyCredit(clientSpend: number): { lo: number; hi: number } {
-  return { lo: Math.round(clientSpend * AGENCY_CREDIT_PCT.lo) / 100, hi: Math.round(clientSpend * AGENCY_CREDIT_PCT.hi) / 100 };
+/** Agency (Randy, Nov 12 2026 8:14 PM ET): 10% of media spend, paid in cash to the agency of record. */
+export const AGENCY_CASH_PCT = 10;
+export function agencyCash(clientSpend: number): number {
+  return Math.round(clientSpend * AGENCY_CASH_PCT) / 100;
 }
 
 /** Static fallback if Friday's cockpit feed can't be read. */
