@@ -48,6 +48,11 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
   const json = express.json({ limit: "16kb" });
 
   router.get(["/publish", "/publish/"], (_req, res) => res.redirect(301, "/publish/brands"));
+  // Short alias for the one-link media kit (keeps any query, e.g. UTM tags).
+  router.get(["/mediakit", "/mediakit/"], (req, res) => {
+    const q = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
+    res.redirect(301, `/media-kit${q}`);
+  });
 
   router.get("/v1/overhaul/status", (_req, res) => {
     const area = checkoutGate(process.env, "AREA_LOCK_ENABLED", "AREA_LOCK_LIVE");

@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useState } from "react";
+import { type MouseEvent, type ReactNode, useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { getAttribution } from "@/lib/attribution";
 
@@ -37,7 +37,7 @@ export function Modelled({ children = "Modelled" }: { children?: ReactNode }) {
   );
 }
 
-export function Cta({ href, children, variant = "lime", className = "", onClick, testId }: { href: string; children: ReactNode; variant?: "lime" | "ink" | "line" | "lineDark"; className?: string; onClick?: () => void; testId?: string }) {
+export function Cta({ href, children, variant = "lime", className = "", onClick, testId }: { href: string; children: ReactNode; variant?: "lime" | "ink" | "line" | "lineDark"; className?: string; onClick?: (e: MouseEvent<HTMLAnchorElement>) => void; testId?: string }) {
   const v =
     variant === "lime"
       ? "bg-accent text-accent-foreground hover:bg-foreground hover:text-background"

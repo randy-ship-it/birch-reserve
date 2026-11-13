@@ -181,3 +181,85 @@ test("agent checkout holds (202, no charge) when the env gate is closed", async 
     server.close();
   }
 });
+
+// ── Media kit (/media-kit), Randy Nov 12 2026 7:12 PM ET ─────────────────────
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
+import { MEDIA_KIT_EXAMPLES, MEDIA_KIT_NETWORK_FALLBACK, agencyCredit, kitExample, millions, mm, parseCockpit, usd } from "../src/lib/overhaul/mediaKit";
+import { createOverhaulRouter } from "../src/routes/overhaul";
+import { OVERHAUL_ROUTES } from "../src/lib/overhaul/seo";
+
+test("media kit math: spend + bonus = credit, credit / CPM x 1000 = modelled impressions", () => {
+  const [rail, lo, hi] = MEDIA_KIT_EXAMPLES;
+  assert.deepEqual(rail, { spend: 10000, bonusPct: 10, credit: 11000, imprLo: 916667, imprHi: 1375000 });
+  assert.deepEqual(lo, { spend: 35000, bonusPct: 15, credit: 40250, imprLo: 3354167, imprHi: 5031250 });
+  assert.deepEqual(hi, { spend: 75000, bonusPct: 15, credit: 86250, imprLo: 7187500, imprHi: 10781250 });
+  for (const e of MEDIA_KIT_EXAMPLES) {
+    assert.ok(Math.abs(e.credit - e.spend * (1 + e.bonusPct / 100)) < 0.01);
+    assert.ok(Math.abs(e.imprLo - (e.credit / 12) * 1000) <= 0.5);
+    assert.ok(Math.abs(e.imprHi - (e.credit / 8) * 1000) <= 0.5);
+  }
+  assert.equal(millions(rail.imprLo), "0.92M");
+  assert.equal(millions(rail.imprHi), "1.375M");
+  assert.equal(millions(lo.imprLo), "3.35M");
+  assert.equal(millions(hi.imprHi), "10.8M");
+  assert.equal(usd(lo.credit), "$40,250");
+  assert.equal(usd(hi.credit), "$86,250");
+  assert.deepEqual(agencyCredit(35000), { lo: 3500, hi: 4200 });
+  assert.equal(kitExample(1000, 0).imprHi, 125000);
+});
+
+test("media kit network: live cockpit values, static fallback on bad data", () => {
+  const live = parseCockpit({ orders_yr: 20000000, monthly_views: 127890000, listed_partners: 42, as_of: "2026-11-12" });
+  assert.equal(live.live, true);
+  assert.equal(mm(live.ordersYr), "20MM");
+  assert.equal(mm(live.monthlyViews), "128MM");
+  assert.equal(live.listedPartners, 42);
+  assert.equal(parseCockpit({ orders_yr: 20000000, monthly_views: 127890000, signed: { value: 0, listed: 42 } }).listedPartners, 42);
+  for (const bad of [null, {}, { orders_yr: "x" }, { orders_yr: 0, monthly_views: 1, listed_partners: 1 }]) {
+    const f = parseCockpit(bad);
+    assert.equal(f.live, false);
+    assert.equal(f.ordersYr, MEDIA_KIT_NETWORK_FALLBACK.ordersYr);
+    assert.equal(mm(f.monthlyViews), "128MM");
+    assert.equal(f.listedPartners, 42);
+  }
+});
+
+test("media kit: /mediakit 301s to /media-kit (query kept), head meta set", async () => {
+  const app = express();
+  app.use(createOverhaulRouter());
+  const server = app.listen(0);
+  const port = (server.address() as { port: number }).port;
+  try {
+    const r = await fetch(`http://127.0.0.1:${port}/mediakit?utm_source=email`, { redirect: "manual" });
+    assert.equal(r.status, 301);
+    assert.equal(r.headers.get("location"), "/media-kit?utm_source=email");
+    const r2 = await fetch(`http://127.0.0.1:${port}/mediakit/`, { redirect: "manual" });
+    assert.equal(r2.headers.get("location"), "/media-kit");
+  } finally {
+    server.close();
+  }
+  const meta = OVERHAUL_ROUTES["/media-kit"]!;
+  assert.match(meta.title, /Media kit/);
+  assert.match(meta.description, /prepaid media credit/i);
+  assert.match(meta.description, /no guarantees/i);
+});
+
+test("media kit page copy: required language in, banned words out", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const candidates = [
+    resolve(here, "../../clinichub-media/src/pages/br/media-kit.tsx"),
+    resolve(process.cwd(), "../clinichub-media/src/pages/br/media-kit.tsx"),
+    resolve(process.cwd(), "artifacts/clinichub-media/src/pages/br/media-kit.tsx"),
+  ];
+  const path = candidates.find((p) => { try { readFileSync(p); return true; } catch { return false; } });
+  assert.ok(path, "media-kit.tsx not found");
+  const src = readFileSync(path!, "utf8");
+  for (const must of [/Prepaid credit/, /Modelled volumes/, /Refundable until IO activation/, /Aggregate UTM reporting only/, /No personal data/, /One exclusive seat per category/, /No guarantees of reach, clicks or sales/, /Estimates are modelled; terms on IO/, /Randy Gilling, Founder/, /sales@silverbirchgrowth\.com/, /\(647\) 931-6278/, /one brand each/, /first come/]) {
+    assert.match(src, must);
+  }
+  for (const banned of [/Align/, /Clairvoyant/i, /80 locations/i, /Kalaya/i, /we sell them customers/i, /signed partner/i, /\bCTR\b/, /guarantee(d)? (reach|delivery|results)/i]) {
+    assert.doesNotMatch(src, banned);
+  }
+});
