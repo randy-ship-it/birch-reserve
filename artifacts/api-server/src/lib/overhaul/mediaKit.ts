@@ -20,15 +20,25 @@ export function kitExample(spend: number, bonusPct: number, cpm = MEDIA_KIT_CPM)
   };
 }
 
+/**
+ * Two public tiers (Randy, Nov 13 2026 11:57 AM ET).
+ * SMB: $190 look / $490 seat, self-serve card checkout.
+ * Premium: $25,000–$50,000 inquire-only (reconciles the former $10K Test Rail
+ * and $35K–$75K Category Lock into this band). No card purchase. No invented bonus.
+ */
 export const MEDIA_KIT_OFFERS = {
-  testRail: { name: "Test Rail", spend: 10_000, bonusPct: 10 },
-  categoryLock: { name: "Category Lock", spendLo: 35_000, spendHi: 75_000, bonusPct: 15, months: 3 },
+  look: { name: "7-day look", spendUsd: 190, spendCad: 270, sku: "hold-190" },
+  seat: { name: "Category seat", spendUsd: 490, spendCad: 690, sku: "reserve-490" },
+  premium: { name: "Premium slot", spendLo: 25_000, spendHi: 50_000, inquireOnly: true as const },
 } as const;
 
+export const UPGRADE_PATH_LINE = "Start with a seat, then lock the category." as const;
+
+/** Modelled impression bands for the $490 seat and the premium spend band (no bonus assumed). */
 export const MEDIA_KIT_EXAMPLES: KitExample[] = [
-  kitExample(MEDIA_KIT_OFFERS.testRail.spend, MEDIA_KIT_OFFERS.testRail.bonusPct),
-  kitExample(MEDIA_KIT_OFFERS.categoryLock.spendLo, MEDIA_KIT_OFFERS.categoryLock.bonusPct),
-  kitExample(MEDIA_KIT_OFFERS.categoryLock.spendHi, MEDIA_KIT_OFFERS.categoryLock.bonusPct),
+  kitExample(MEDIA_KIT_OFFERS.seat.spendUsd, 0),
+  kitExample(MEDIA_KIT_OFFERS.premium.spendLo, 0),
+  kitExample(MEDIA_KIT_OFFERS.premium.spendHi, 0),
 ];
 
 /** Agency (Randy, Nov 12 2026 8:14 PM ET): 10% of media spend, paid in cash to the agency of record. */

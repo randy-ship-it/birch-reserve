@@ -34,7 +34,7 @@ const SOURCE: Record<IntakeKind, string> = {
   area_lock_interest: "Birch lock-down-my-area",
   agency_inquiry: "Birch agency inquiry",
   deposit_interest: "Birch deposit interest",
-  agent_checkout: "Birch AI buying agent checkout",
+  agent_checkout: "Birch buying-agent checkout",
   premium_inquiry: "Birch premium slot inquiry (inquire-only, IO)",
 };
 

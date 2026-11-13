@@ -1,5 +1,5 @@
 /**
- * Item 9 (Randy 11:55 AM ET): make Birch Reserve a magnet for AI ad buying.
+ * Item 9 (Randy 11:55 AM ET): machine-readable catalog, quotes and checkout for media buyers.
  * Pure builders for the agent catalog, quote, OpenAPI spec and agent card.
  * Every audience number here is modelled from the TAM feed and labelled as such.
  */
@@ -66,7 +66,7 @@ export function areaLockOffer() {
 export function agentCatalog(status: { slotsCheckout: boolean; areaLockCheckout: boolean }) {
   return {
     catalog_version: AGENT_CATALOG_VERSION,
-    seller: { name: "Birch Reserve", legal_name: "Silver Birch Growth Inc.", url: SITE, email: HANDOFF_EMAIL, address: "777-2255B Queen St E, Toronto ON M4E 1G3, Canada" },
+    seller: { name: "Birch Reserve", legal_name: "Silver Birch Growth Inc.", url: SITE, email: HANDOFF_EMAIL, address: "Toronto, Ontario, Canada" },
     what_you_buy: `Display and CPC placements inside co-branded Recovery Brand hubs and health & wellness business hubs, on four placements: ${PLACEMENT_LABELS.join(", ")}.`,
     currencies: ["USD", "CAD"],
     currency_rule: "Canadian buyers pay CAD; everyone else USD. Pass currency explicitly to override.",
@@ -149,10 +149,10 @@ export function agentCard() {
   return {
     schema_version: "agent-card/0.1",
     name: "Birch Reserve ad buying",
-    description: "Buy display and CPC inside co-branded health & wellness hubs. Machine catalog, quotes and Stripe-hosted checkout for AI buying agents.",
+    description: "Buy display and CPC inside co-branded health & wellness hubs. Machine-readable catalog, quotes and Stripe-hosted checkout.",
     url: SITE,
     provider: { organization: "Silver Birch Growth Inc.", url: SITE, email: HANDOFF_EMAIL },
-    documentation: `${SITE}/ai-buyers`,
+    documentation: `${SITE}/buyers`,
     openapi: `${SITE}/v1/agent/openapi.json`,
     llms: `${SITE}/llms.txt`,
     ucp: `${SITE}/.well-known/ucp`,
@@ -171,7 +171,7 @@ export function agentOpenApi() {
   const offerEnum = [...SLOT_LADDER.map((s) => s.key), "area-lock"];
   return {
     openapi: "3.1.0",
-    info: { title: "Birch Reserve agent buying API", version: AGENT_CATALOG_VERSION, description: "Catalog, quote and checkout for AI buying agents. Audience figures are modelled. Checkout returns a Stripe-hosted URL when open, otherwise status held (saved, no charge).", contact: { email: HANDOFF_EMAIL } },
+    info: { title: "Birch Reserve buying API", version: AGENT_CATALOG_VERSION, description: "Catalog, quote and checkout for media buyers. Audience figures are modelled. Checkout returns a Stripe-hosted URL when open, otherwise status held (saved, no charge).", contact: { email: HANDOFF_EMAIL } },
     servers: [{ url: SITE }],
     paths: {
       "/v1/agent/catalog.json": { get: { operationId: "getCatalog", summary: "Inventory, surfaces, offers and checkout status", responses: { "200": { description: "Catalog" } } } },

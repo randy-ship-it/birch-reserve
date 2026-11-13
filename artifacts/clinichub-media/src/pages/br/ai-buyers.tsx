@@ -30,7 +30,7 @@ curl -s -X POST https://birchreserve.net/v1/agent/checkout \\
        "email":"buyer@acme.com","agent":"your-agent-name","agree":true}'`;
 
 export default function BrAiBuyers() {
-  usePageMeta("For AI buying agents | Birch Reserve", "Machine catalog, quotes and Stripe-hosted checkout for AI ad-buying agents. Display and CPC inside co-branded health & wellness hubs.");
+  usePageMeta("For media buyers | Birch Reserve", "Machine-readable catalog, quotes and Stripe-hosted checkout for media buyers. Display and CPC inside co-branded health & wellness hubs.");
   const [quote, setQuote] = useState<string>("");
   useEffect(() => {
     fetch("/v1/agent/quote?offer=sponsor-3000&currency=usd")
@@ -41,15 +41,15 @@ export default function BrAiBuyers() {
   const offers = slotOffers();
   const area = areaLockOffer();
   return (
-    <div data-testid="br-ai-buyers">
+    <div data-testid="br-buyers">
       <JsonLd data={{ "@context": "https://schema.org", "@graph": [...slotProductsJsonLd(), areaLockProductJsonLd()] }} />
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
-            <Eyebrow>For AI buying agents</Eyebrow>
-            <H1>Point your AI buyer here. It can read, quote and check out.</H1>
+            <Eyebrow>For media buyers</Eyebrow>
+            <H1>Read the catalog, get a quote, and check out.</H1>
             <Lede>
-              Brands using AI to buy media can send their agent straight to Birch Reserve. Every slot, price and modelled view count is machine-readable, quotes are exact, and checkout hands the buyer a Stripe-hosted page. No forms, no sales call needed to get a number.
+              Every slot, price and modelled view count is machine-readable. Quotes are exact, and checkout hands the buyer a Stripe-hosted page. No forms, no sales call needed to get a number.
             </Lede>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta href="/v1/agent/catalog.json" testId="ai-catalog">Open the catalog</Cta>
@@ -86,7 +86,7 @@ export default function BrAiBuyers() {
         <div className="grid gap-10 lg:grid-cols-2">
           <div>
             <Eyebrow>Offer keys</Eyebrow>
-            <H2>What an agent can buy.</H2>
+            <H2>What a buyer can purchase.</H2>
             <div className="mt-6 overflow-x-auto border border-foreground/15 bg-white">
               <table className="w-full text-sm">
                 <thead className="bg-secondary text-left">
@@ -131,10 +131,10 @@ export default function BrAiBuyers() {
       <Section tone="soft">
         <Faq
           items={[
-            { q: "Does an agent need an API key?", a: "No. Catalog, quote and match are public. Checkout returns a Stripe-hosted page for the human buyer to pay; we never take delegated card details from an agent." },
+            { q: "Does a buyer need an API key?", a: "No. Catalog, quote and match are public. Checkout returns a Stripe-hosted page for the buyer to pay; we never take delegated card details." },
             { q: "What does status held mean?", a: "Online payment isn't open for that offer yet. The request is reserved by inquiry with the offer, price and buyer email. No charge is made, and we confirm within 1 business day." },
             { q: "Are the view numbers real?", a: "They are modelled from the Scale Health TAM feed and labelled modelled everywhere. Hubs are listed partners; each buy runs under an insertion order that names the hubs." },
-            { q: "What must an agent show the buyer?", a: "The terms and the price before sending agree:true. Payment is media credit drawn down under an insertion order that names the hubs." },
+            { q: "What must be shown before checkout?", a: "The terms and the price before sending agree:true. Payment is media credit drawn down under an insertion order that names the hubs." },
           ]}
         />
       </Section>

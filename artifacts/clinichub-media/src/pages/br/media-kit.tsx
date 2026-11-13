@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { Check, Mail, Phone } from "lucide-react";
 import { Cta, usePageMeta } from "@/components/br/ui";
+import { MediaKitPdfLink } from "@/components/br/trust";
+import { SALES_REPLY_LINE } from "@/lib/seller-identity";
 import { PlacementVisual, type PlacementKey } from "@/components/br/placement-example";
 import { BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
+import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import {
   AGENCY_CASH_PCT,
   FRIDAY_COCKPIT_URL,
@@ -11,6 +14,7 @@ import {
   MEDIA_KIT_EXAMPLES,
   MEDIA_KIT_NETWORK_FALLBACK,
   MEDIA_KIT_OFFERS,
+  UPGRADE_PATH_LINE,
   agencyCash,
   kitExample,
   millions,
@@ -55,9 +59,9 @@ function ZoomFit({ children }: { children: ReactNode }) {
 const RULES = [
   "Prepaid credit. Your payment becomes media credit that draws down as your ads run.",
   "Modelled volumes. Views and impressions are estimates, not measured delivery.",
-  "Refundable until IO activation.",
+  "Refundable until IO activation. The $190 look and $490 seat spend down over 6 months; unused credit can be refunded or extended.",
   "Aggregate UTM reporting only. No personal data is shared.",
-  "Category seats, open to more than one brand.",
+  "Category seats, open to more than one brand. Premium slots lock one brand per category.",
   "No guarantees of reach, clicks or sales.",
 ];
 
@@ -119,12 +123,13 @@ function BookCall({ variant = "ink", testId }: { variant?: "ink" | "lime" | "lin
 export default function BrMediaKit() {
   usePageMeta(
     "Media kit | Birch Reserve",
-    "Prepaid media credit for category seats, open to more than one brand, inside co-branded Scale Health Network hubs. $10K Test Rail or $35K–$75K Category Lock. Modelled volumes, no guarantees.",
+    "Prepaid media credit inside co-branded Scale Health Network hubs. Start with the small-business package ($190 look or $490 seat, self-serve) or inquire about a premium slot from $25K–$50K. Modelled volumes, no guarantees.",
   );
   const net = useNetwork();
-  const [rail, lockLo, lockHi] = MEDIA_KIT_EXAMPLES as [ReturnType<typeof kitExample>, ReturnType<typeof kitExample>, ReturnType<typeof kitExample>];
-  const lockOffer = MEDIA_KIT_OFFERS.categoryLock;
-  const agencyEx = agencyCash(lockOffer.spendLo);
+  const [seatEx, premLo, premHi] = MEDIA_KIT_EXAMPLES as [ReturnType<typeof kitExample>, ReturnType<typeof kitExample>, ReturnType<typeof kitExample>];
+  const prem = MEDIA_KIT_OFFERS.premium;
+  const agencySeat = agencyCash(MEDIA_KIT_OFFERS.seat.spendUsd);
+  const agencyPrem = agencyCash(prem.spendLo);
   const cpm = `~$${MEDIA_KIT_CPM.lo}–${MEDIA_KIT_CPM.hi} CPM`;
 
   return (
@@ -133,13 +138,15 @@ export default function BrMediaKit() {
       <section className="border-b border-border/70 bg-background">
         <div className="container mx-auto max-w-5xl px-5 pb-10 pt-10 md:px-6 md:pb-14 md:pt-16">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Media kit · Nov 2026</p>
-          <h1 className="mt-3 font-display text-[2.15rem] leading-[1.05] tracking-tight md:text-6xl">One category. One brand. Inside the hubs.</h1>
+          <h1 className="mt-3 font-display text-[2.15rem] leading-[1.05] tracking-tight md:text-6xl">Start with a seat. Then lock the category.</h1>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-foreground/80" data-testid="mk-what">
-            Birch Reserve is prepaid media credit for category seats, open to more than one brand, inside co-branded Scale Health Network hubs: recovery, longevity, nutrition, women’s and men’s health, and more.
+            Birch Reserve is prepaid media credit inside co-branded Scale Health Network hubs. Start self-serve on the small-business package, then step up to a premium slot — the main event — with category exclusivity, a larger display share and priority placement.
           </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Cta href="/buycalc" variant="lime" testId="mk-reserve-hero" className="w-full sm:w-auto">Reserve a category</Cta>
-            <BookCall variant="line" testId="mk-call-hero" />
+          <p className="mt-3 text-sm font-semibold" data-testid="mk-upgrade">Start with a seat, then lock the category.</p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row" id="download">
+            <Cta href={RESERVE_HREF} variant="lime" testId="mk-reserve-hero" className="w-full sm:w-auto">Start with a $490 seat</Cta>
+            <Cta href="#premium" variant="ink" testId="mk-premium-hero" className="w-full sm:w-auto">See premium slots, from $25K</Cta>
+            <MediaKitPdfLink variant="line" testId="mk-pdf-hero" className="w-full sm:w-auto" />
           </div>
 
           <dl className="mt-10 grid grid-cols-3 gap-3 border-t border-border pt-6 md:gap-8" data-testid="mk-network">
@@ -189,31 +196,45 @@ export default function BrMediaKit() {
         <p className="mt-3 text-xs text-muted-foreground">Example placements, drawn on hub pages. Exact position and creative are set in your IO.</p>
       </Block>
 
-      {/* Rate cards */}
-      <Block id="rates" eyebrow="Entry rates · non-partner brands" title="Two ways in">
-        <div className="grid gap-4 md:grid-cols-2" data-testid="mk-rate-cards">
-          <article className="flex flex-col border border-foreground/20 bg-white p-5 md:p-6" data-testid="mk-card-rail">
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Try it</p>
-            <h3 className="mt-1 font-display text-2xl">{MEDIA_KIT_OFFERS.testRail.name}</h3>
-            <p className="mt-3 font-display text-5xl leading-none">{usdK(rail.spend)}</p>
-            <p className="mt-2 text-sm font-semibold">+{rail.bonusPct}% bonus credit = {usd(rail.credit)} of credit</p>
-            <ul className="mt-4 space-y-2 text-sm text-foreground/80">
-              <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />Prove your category before you lock it</li>
-              <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden /><span>About {millions(rail.imprLo)}–{millions(rail.imprHi)} impressions at {cpm} <Tag>Modelled</Tag></span></li>
-            </ul>
-          </article>
-          <article className="flex flex-col border-2 border-foreground bg-white p-5 md:p-6" data-testid="mk-card-lock">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Own it</p>
-              <Tag tone="lime">{lockOffer.months}-month exclusive</Tag>
+      {/* Two tiers */}
+      <Block id="rates" eyebrow="Two tiers" title="A small-business package to start. Premium slots are the main event.">
+        <div className="grid gap-4 lg:grid-cols-2" data-testid="mk-rate-cards">
+          <article className="flex flex-col border border-foreground/20 bg-white p-5 md:p-6" data-testid="mk-card-smb">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Small business package</p>
+            <h3 className="mt-1 font-display text-2xl">The easy way to start</h3>
+            <p className="mt-3 text-sm text-foreground/80">Self-serve, paid by card. Category seats, open to more than one brand. Credit spends down over 6 months.</p>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-foreground/55">{MEDIA_KIT_OFFERS.look.name}</p>
+                <p className="mt-1 font-display text-4xl leading-none">{usd(MEDIA_KIT_OFFERS.look.spendUsd)}</p>
+                <p className="mt-1 text-xs text-muted-foreground">${MEDIA_KIT_OFFERS.look.spendCad} CAD. 100% credit if you take the $490 seat within 7 days; otherwise a cash refund.</p>
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-foreground/55">{MEDIA_KIT_OFFERS.seat.name}</p>
+                <p className="mt-1 font-display text-4xl leading-none">{usd(MEDIA_KIT_OFFERS.seat.spendUsd)}</p>
+                <p className="mt-1 text-xs text-muted-foreground">${MEDIA_KIT_OFFERS.seat.spendCad} CAD. 100% media credit. About {millions(seatEx.imprLo)}–{millions(seatEx.imprHi)} impressions at {cpm} <Tag>Modelled</Tag></p>
+              </div>
             </div>
-            <h3 className="mt-1 font-display text-2xl">{lockOffer.name}</h3>
-            <p className="mt-3 font-display text-5xl leading-none">{usdK(lockLo.spend)}–{usdK(lockHi.spend)}</p>
-            <p className="mt-2 text-sm font-semibold">+{lockLo.bonusPct}% bonus credit = {usd(lockLo.credit)}–{usd(lockHi.credit)} of credit</p>
-            <ul className="mt-4 space-y-2 text-sm text-foreground/80">
-              <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />Your category is yours alone for {lockOffer.months} months</li>
-              <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden /><span>About {millions(lockLo.imprLo)}–{millions(lockHi.imprHi)} impressions at {cpm} <Tag>Modelled</Tag></span></li>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Cta href={RESERVE_HREF} testId="mk-cta-seat" className="w-full sm:w-auto">Take a $490 seat</Cta>
+              <Cta href={LOOK_HREF} variant="line" testId="mk-cta-look" className="w-full sm:w-auto">7-day look · $190</Cta>
+            </div>
+          </article>
+          <article id="premium" className="flex flex-col border-2 border-foreground bg-foreground p-5 text-background md:p-6" data-testid="mk-card-premium">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-background/60">Premium slots · the main event</p>
+              <Tag tone="lime">Inquire only</Tag>
+            </div>
+            <h3 className="mt-1 font-display text-2xl">From $25K, $25K–$50K</h3>
+            <p className="mt-3 text-sm text-background/80">Category exclusivity, a larger display share and priority placement. No card purchase — we reply with an insertion order. Term is set on the IO.</p>
+            <ul className="mt-4 space-y-2 text-sm text-background/85">
+              <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />One brand per category for the term</li>
+              <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden /><span>About {millions(premLo.imprLo)}–{millions(premHi.imprHi)} impressions at {cpm} <Tag>Modelled</Tag></span></li>
+              <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />{UPGRADE_PATH_LINE}</li>
             </ul>
+            <div className="mt-6">
+              <BookCall variant="lime" testId="mk-premium-inquire" />
+            </div>
           </article>
         </div>
 
@@ -222,7 +243,7 @@ export default function BrMediaKit() {
           {MEDIA_KIT_EXAMPLES.map((e) => (
             <div key={e.spend} className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-0.5 py-3 sm:grid-cols-[9rem_1fr_auto]">
               <span className="font-semibold">You prepay {usdK(e.spend)}</span>
-              <span className="text-right text-foreground/80 sm:text-left">+{e.bonusPct}% → <strong>{usd(e.credit)}</strong> credit</span>
+              <span className="text-right text-foreground/80 sm:text-left"><strong>{usd(e.credit)}</strong> media credit</span>
               <span className="col-span-2 text-muted-foreground sm:col-span-1 sm:text-right">
                 at ${MEDIA_KIT_CPM.lo}–{MEDIA_KIT_CPM.hi} CPM ≈ {millions(e.imprLo)}–{millions(e.imprHi)} impressions
               </span>
@@ -230,18 +251,18 @@ export default function BrMediaKit() {
           ))}
         </div>
         <p className="mt-3 text-xs text-muted-foreground">
-          Effective {cpm} is a modelled estimate. Impressions = credit ÷ CPM × 1,000. Final rate, currency and term are set on your IO.
+          Effective {cpm} is a modelled estimate. Impressions = credit ÷ CPM × 1,000. Final rate, currency and term are set on your IO. Premium is inquire-only.
         </p>
       </Block>
 
       {/* Categories */}
-      <Block id="categories" eyebrow="Open categories" title="Categories open now, one brand each" tone="soft">
+      <Block id="categories" eyebrow="Open categories" title="Categories open now" tone="soft">
         <ul className="flex flex-wrap gap-2" data-testid="mk-categories">
           {MEDIA_KIT_CATEGORIES.map((c) => (
             <li key={c} className="border border-foreground/20 bg-white px-3 py-2 text-sm font-medium">{c}</li>
           ))}
         </ul>
-        <p className="mt-4 text-sm text-foreground/80">One brand per category, first come. When a category is locked, it’s closed to competitors for the term.</p>
+        <p className="mt-4 text-sm text-foreground/80">The $490 seat is a category seat, open to more than one brand. A premium slot is one brand each, first come: when a category is locked, it is closed to competitors for the term on the IO.</p>
       </Block>
 
       {/* Agency + rules */}
@@ -250,7 +271,7 @@ export default function BrMediaKit() {
           <div className="border border-foreground/20 bg-white p-5" data-testid="mk-agency">
             <p className="text-sm text-foreground/80">Bring a brand into an open category. The agency of record earns {AGENCY_CASH_PCT}% of media spend, paid in cash per the IO.</p>
             <p className="mt-3 text-sm">
-              <span className="text-muted-foreground">Example:</span> client takes a {usdK(lockOffer.spendLo)} Category Lock → you earn <strong>{usd(agencyEx)}</strong> in cash.
+              <span className="text-muted-foreground">Example:</span> a ${MEDIA_KIT_OFFERS.seat.spendUsd} seat pays you <strong>{usd(agencySeat)}</strong>; a {usdK(prem.spendLo)} premium slot pays you <strong>{usd(agencyPrem)}</strong> in cash.
             </p>
           </div>
           <div data-testid="mk-rules">
@@ -273,13 +294,14 @@ export default function BrMediaKit() {
             <a className="inline-flex min-h-11 items-center gap-2 underline-offset-4 hover:underline" href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20media%20kit" data-testid="mk-email">
               <Mail className="size-4" aria-hidden /> sales@silverbirchgrowth.com
             </a>
+            <p className="text-sm text-background/75">{SALES_REPLY_LINE}</p>
             <a className="inline-flex min-h-11 items-center gap-2 underline-offset-4 hover:underline" href="tel:+16479316278" data-testid="mk-phone">
               <Phone className="size-4" aria-hidden /> (647) 931-6278
             </a>
           </div>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Cta href="/buycalc" variant="lime" testId="mk-reserve-foot" className="w-full sm:w-auto">Reserve a category</Cta>
-            <Cta href={BOOK_CALL_MAILTO_HREF} variant="lineDark" testId="mk-call-foot" className="w-full sm:w-auto" onClick={bookCall}>Book a call</Cta>
+            <Cta href={RESERVE_HREF} variant="lime" testId="mk-reserve-foot" className="w-full sm:w-auto">Start with a $490 seat</Cta>
+            <Cta href="#premium" variant="lineDark" testId="mk-premium-foot" className="w-full sm:w-auto">Inquire about premium, from $25K</Cta>
           </div>
           <p className="mt-8 border-t border-background/20 pt-4 text-xs text-background/65" data-testid="mk-footnote">
             Estimates are modelled; terms on IO. Volumes come from partner-provided data and stated assumptions, not audited delivery.

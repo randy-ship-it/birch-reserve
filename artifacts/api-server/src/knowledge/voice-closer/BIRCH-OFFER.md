@@ -11,7 +11,7 @@ EARLY SLOTS AND THE RESERVE LIST (Randy HARD 2026-10-08; overrides anything belo
 
 **SoT:** BIRCH-RESERVE-BOT-LOCK + AD-SALES-LOCK + companion (2026-09-24).  
 **Door:** https://birchreserve.net  
-**Seller:** Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3 · sales@silverbirchgrowth.com (Birch Reserve contact email, Randy 2026-09-24 7:27pm)
+**Seller:** Silver Birch Growth Inc. · Toronto, Ontario · sales@silverbirchgrowth.com (Birch Reserve contact email, Randy 2026-09-24 7:27pm)
 
 ## Purpose of this closer
 
@@ -177,11 +177,7 @@ When a brand offers or asks about sending physical samples:
 Flow (say this shape, not a script dump):
 1. Yes, we can take samples at our mailing address.
 2. Confirm via email first that the fit makes sense (category / recovery cross-sell). Capture their email and confirm we will reply to lock fit before they ship.
-3. If they are sure and fit is clear, give the mailbox exactly:
-
-777-2255B Queen St E
-Toronto ON M4E 1G3
-Attn: Randy Gilling
+3. If they are sure and fit is clear, tell them we will confirm a mailbox by email. Never read a street or mailbox address on the call or in chat.
 
 Mail name is also OK as: **Scale Health Network Inc attn Randy Gilling**.
 
@@ -189,5 +185,5 @@ Hard nos on samples:
 - Never say we do not take samples.
 - Never give Randy's cell / personal mobile. The Birch phone line is the business line only; for follow-up use email (sales@silverbirchgrowth.com) or a team callback.
 - Never invent reach, impressions, or "we'll put your sample in front of X people" as a sample promise.
-- On the phone: offer to text or email the address; read it slowly if they want it live. Do not invent a different address.
+- Never read a street or mailbox address aloud or in chat; confirm the mailbox by email only. Do not invent a different address.
 

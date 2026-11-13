@@ -17,7 +17,7 @@ import { autolinkPlainUrl, publicSeoTags } from "../lib/publicSeo";
 
 const router: IRouter = Router();
 
-const SELLER = "Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3";
+const SELLER = "Silver Birch Growth Inc. · Toronto, Ontario";
 
 type PublicCitation = {
   label: string;

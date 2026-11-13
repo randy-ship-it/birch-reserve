@@ -2,7 +2,8 @@ import { Link, useLocation } from 'wouter';
 import { ReactNode, useEffect, useState } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import birchReserveMark from '@assets/brand/birch-reserve-mark-v2.svg';
-import { SELLER_EMAIL_HREF, SELLER_IDENTITY } from '@/lib/seller-identity';
+import { MEDIA_KIT_ONE_PAGER_HREF, SELLER_EMAIL_HREF, SELLER_IDENTITY } from '@/lib/seller-identity';
+import { OperatorLine, PrivacyNote, SalesContact } from '@/components/br/trust';
 import { RandyChat } from '@/components/randy-chat';
 import { HearRandyElevenLabs } from '@/components/hear-randy-elevenlabs';
 import { LingerCapture } from '@/components/linger-capture';
@@ -14,6 +15,7 @@ const NAV_GROUPS = [
     items: [
       { href: '/advertise/brands', label: 'Brands', sub: 'Lock in spend across co-branded hubs' },
       { href: '/advertise/local', label: 'Local businesses & studios', sub: 'Lock down your 5 km area' },
+      { href: '/audiences', label: 'Audience insights', sub: 'Who the launch brands bring' },
     ],
   },
   {
@@ -30,13 +32,13 @@ const NAV_LINKS = [
   { href: '/hubs', label: 'Hubs' },
   { href: '/media-kit', label: 'Media kit' },
   { href: '/agencies', label: 'Agencies' },
-  { href: '/ai-buyers', label: 'AI buyers' },
+  { href: '/buyers', label: 'Buyers' },
 ] as const;
 
 const FOOTER_COLS = [
-  { label: 'Advertise', items: [{ href: '/advertise/brands', label: 'Brands' }, { href: '/advertise/local', label: 'Lock down my area' }, { href: '/rates', label: 'Rates' }, { href: '/match', label: 'Match your audience' }, { href: '/media-kit', label: 'Media kit' }] },
+  { label: 'Advertise', items: [{ href: '/advertise/brands', label: 'Brands' }, { href: '/advertise/local', label: 'Lock down my area' }, { href: '/rates', label: 'Rates' }, { href: '/match', label: 'Match your audience' }, { href: '/audiences', label: 'Audience insights' }, { href: '/media-kit', label: 'Media kit' }, { href: MEDIA_KIT_ONE_PAGER_HREF, label: 'Media kit PDF' }] },
   { label: 'Publish', items: [{ href: '/publish/brands', label: 'Brands' }, { href: '/publish/studios', label: 'Studios & retail' }, { href: 'https://www.scalehealth.ca/clinichubs', label: 'scalehealth.ca/clinichubs' }] },
-  { label: 'More', items: [{ href: '/hubs', label: 'Hubs in queue' }, { href: '/agencies', label: 'Agencies' }, { href: '/ai-buyers', label: 'For AI buying agents' }, { href: '/llms.txt', label: 'llms.txt' }, { href: '/inventory', label: 'Live inventory' }, { href: '/insights', label: 'Insights' }, { href: '/about', label: 'About' }, { href: '/terms', label: 'Terms' }, { href: '/privacy', label: 'Privacy' }] },
+  { label: 'More', items: [{ href: '/hubs', label: 'Hubs in queue' }, { href: '/agencies', label: 'Agencies' }, { href: '/buyers', label: 'Buyers' }, { href: '/llms.txt', label: 'llms.txt' }, { href: '/inventory', label: 'Live inventory' }, { href: '/insights', label: 'Insights' }, { href: '/about', label: 'About' }, { href: '/terms', label: 'Terms' }, { href: '/privacy', label: 'Privacy' }] },
 ] as const;
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -171,11 +173,16 @@ export function Layout({ children }: { children: ReactNode }) {
             </p>
             <p className="mb-4 text-sm">
               <a href="tel:+16479316278" className="font-medium text-accent hover:underline" data-testid="footer-call-birch">Call Birch: (647) 931-6278</a>
-              <span className="block text-[11px] text-muted-foreground">Birch is our AI voice line, 24/7.</span>
+              <span className="block text-[11px] text-muted-foreground">Call our sales line.</span>
             </p>
-            <p className="text-xs leading-relaxed text-foreground">
+            <div className="mb-4">
+              <SalesContact />
+            </div>
+            <OperatorLine className="text-xs leading-relaxed text-foreground" />
+            <p className="mt-2 text-xs leading-relaxed text-foreground">
               {SELLER_IDENTITY} · <a href={SELLER_EMAIL_HREF} className="underline underline-offset-2 hover:text-accent">Email sales</a>
             </p>
+            <PrivacyNote className="mt-3 text-xs leading-relaxed text-muted-foreground" />
             <p className="text-xs text-muted-foreground uppercase tracking-widest mt-6">
               In Partnership With<br/>
               <span className="text-foreground mt-1 block mb-1"><a href="https://scalehealth.ca" className="hover:text-accent" target="_blank" rel="noopener noreferrer">Scale Health Network Inc.</a></span>
@@ -196,7 +203,7 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
         <div className="container mx-auto px-6 mt-16 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Silver Birch Growth Inc. All rights reserved.
+            &copy; {new Date().getFullYear()} Silver Birch Growth Inc. All rights reserved. Birch Reserve is operated by Silver Birch Growth Inc., Toronto, Ontario.
           </div>
         </div>
       </footer>

@@ -30,7 +30,7 @@ import {
 } from "../lib/sponsorKit";
 
 const router: IRouter = Router();
-const SELLER = "Silver Birch Growth Inc. · 777-2255B Queen St E, Toronto ON M4E 1G3";
+const SELLER = "Silver Birch Growth Inc. · Toronto, Ontario";
 
 function esc(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
