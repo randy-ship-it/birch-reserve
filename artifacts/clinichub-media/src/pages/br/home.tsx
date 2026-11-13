@@ -2,6 +2,7 @@ import { ConveyorHero } from "@/components/br/conveyor";
 import { BrandBanners } from "@/components/br/brand-banners";
 import { FourPaths, MetaComparison, PositioningBand, SurfacesGrid, TamStrip } from "@/components/br/blocks";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
+import { QuickBuy } from "@/components/br/quick-buy";
 import { MetaHook, PackPicker, ProveItLadder, RateCardV2 } from "@/components/br/pricing";
 import { AGENCY, AREA_LOCK, INVENTORY, PUBLISHER_INCENTIVE, areaLockGuaranteedViews } from "../../../../api-server/src/lib/overhaul/model";
 
@@ -47,8 +48,9 @@ export default function BrHome() {
                 Co-branded Recovery Brand hubs and health &amp; wellness business hubs keep coming online. Each one opens display and CPC slots right after purchase, on its home page, inside its product and services pages, and on the member dashboard behind login.
               </Lede>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Cta href="/match" testId="hero-match">Match your audience</Cta>
-                <Cta href="/advertise/local" variant="ink" testId="hero-lock">Lock down my area</Cta>
+                <Cta href="#quick-buy" testId="hero-buy">Buy ad space now</Cta>
+                <Cta href="/match" variant="ink" testId="hero-match">Match your audience</Cta>
+                <Cta href="/advertise/local" variant="line" testId="hero-lock">Lock down my area</Cta>
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
                 Brands: <a className="underline underline-offset-2" href="/advertise/brands">lock in spend</a> · Agencies: <a className="underline underline-offset-2" href="/agencies">prepay a client test</a> · <a className="underline underline-offset-2" href="#rates">See rates</a>
@@ -58,6 +60,17 @@ export default function BrHome() {
           <ConveyorHero className="mt-10" />
         </div>
       </section>
+
+      <Section tone="soft" id="quick-buy">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <Eyebrow>Self-serve</Eyebrow>
+            <H2>Buy ad space in three taps.</H2>
+          </div>
+          <p className="max-w-md text-sm text-muted-foreground">Pick a placement, pick your start, see the modelled views and CPM, then pay by card on the secure checkout. No login.</p>
+        </div>
+        <QuickBuy />
+      </Section>
 
       <Section tone="ink">
         <MetaHook />
