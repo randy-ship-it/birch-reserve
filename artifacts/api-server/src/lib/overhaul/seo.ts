@@ -38,10 +38,15 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
       mainEntity: { "@type": "Service", name: "Birch Reserve category seats", provider: ORG, areaServed: ["CA", "US"], serviceType: "Prepaid media credit, exclusive category placement in health and wellness hubs" },
     },
   },
+  "/buyers": {
+    title: "For media buyers | Birch Reserve",
+    description: "Machine-readable catalog, quotes and Stripe-hosted checkout for media buyers. Display and CPC inside co-branded health & wellness hubs. Modelled views labelled.",
+    jsonld: { "@context": "https://schema.org", "@graph": [...slotProductsJsonLd(), areaLockProductJsonLd(), { "@type": "WebAPI", name: "Birch Reserve buying API", documentation: "https://birchreserve.net/v1/agent/openapi.json", url: "https://birchreserve.net/v1/agent/catalog.json", provider: ORG }] },
+  },
   "/ai-buyers": {
-    title: "For AI buying agents | Birch Reserve",
-    description: "Machine catalog, quotes and Stripe-hosted checkout for AI ad-buying agents. Display and CPC inside co-branded health & wellness hubs. Modelled views labelled.",
-    jsonld: { "@context": "https://schema.org", "@graph": [...slotProductsJsonLd(), areaLockProductJsonLd(), { "@type": "WebAPI", name: "Birch Reserve agent buying API", documentation: "https://birchreserve.net/v1/agent/openapi.json", url: "https://birchreserve.net/v1/agent/catalog.json", provider: ORG }] },
+    title: "For media buyers | Birch Reserve",
+    description: "Machine-readable catalog, quotes and Stripe-hosted checkout for media buyers. Display and CPC inside co-branded health & wellness hubs. Modelled views labelled.",
+    jsonld: { "@context": "https://schema.org", "@graph": [...slotProductsJsonLd(), areaLockProductJsonLd(), { "@type": "WebAPI", name: "Birch Reserve buying API", documentation: "https://birchreserve.net/v1/agent/openapi.json", url: "https://birchreserve.net/v1/agent/catalog.json", provider: ORG }] },
   },
   "/rates": {
     title: "Rates | Birch Reserve",
@@ -51,6 +56,10 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
     title: "Audience insights | Birch Reserve",
     description: "What we know about the audiences behind the brand launches on Scale Health hubs and Calm Joints: recovery, longevity, sleep, physio patients, racquet players and MD-referral cohorts. Measured, modelled and estimated figures, labelled.",
     jsonld: { "@context": "https://schema.org", "@type": "WebPage", name: "Birch Reserve audience insights", url: "https://birchreserve.net/audiences", publisher: ORG },
+  },
+  "/audiences/sample-profile": {
+    title: "Sample partner audience profile | Birch Reserve",
+    description: "An illustrative, aggregated sample of the anonymized fields a benefits administrator typically already has. Sample ranges only, not a real book of business.",
   },
   "/agencies": {
     title: "For agencies | Birch Reserve",
@@ -110,8 +119,9 @@ export function llmsTxt(): string {
     "- Brands with a recovery audience: co-branded hub by application; otherwise display / CPC-only inquiry: https://birchreserve.net/publish/brands",
     `- Studios & retail: $${PUBLISHER_INCENTIVE.cashCad} cash or $${PUBLISHER_INCENTIVE.creditCad}+ ad credit, for activating your audience (${PUBLISHER_INCENTIVE.activationChannels.join(", ")}); paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases excluded: https://birchreserve.net/publish/studios · activate at ${PUBLISHER_INCENTIVE.clinicHubsUrl}`,
     "",
-    "## For AI buying agents",
-    "- Start here: https://birchreserve.net/ai-buyers",
+    "## For media buyers",
+    "- Start here: https://birchreserve.net/buyers",
+    "- Legacy URL (same page): https://birchreserve.net/ai-buyers",
     "- Catalog (inventory, placements, offers, modelled views, checkout status): GET https://birchreserve.net/v1/agent/catalog.json",
     "- Quote: GET /v1/agent/quote?offer=sponsor-1500&currency=usd · GET /v1/agent/quote?offer=area-lock&postal=M4E1G3&term=3",
     "- Checkout: POST /v1/agent/checkout {offer, currency, email, brand | business+category+postal+term, agree:true}. Returns status open + Stripe-hosted checkout_url, or status held (reserved by inquiry, no charge, confirmed within 1 business day).",

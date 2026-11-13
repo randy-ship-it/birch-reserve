@@ -1,6 +1,8 @@
 import { Lock, ShieldCheck, Sparkles } from "lucide-react";
 import { LOOK_HREF, SeatCtas } from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
+import { TRUST_FAQ } from "@/components/br/trust";
+import { SampleBenefitsProfile } from "@/components/br/sample-benefits-profile";
 import { trackCta } from "@/lib/track-cta";
 import { BRAND_HUBS } from "../../../../api-server/src/lib/overhaul/model";
 import {
@@ -100,6 +102,7 @@ export default function BrAudiences() {
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta href="#segments">See the segments</Cta>
+              <Cta href="#sample-profile" variant="line">See a sample partner profile</Cta>
               <Cta href={LOOK_HREF} variant="line" testId="audiences-hero-hold-190" onClick={() => trackCta("cta_hold_190", { offer: "hold-190" })}>
                 Start with a $190 look
               </Cta>
@@ -362,6 +365,11 @@ export default function BrAudiences() {
         </div>
       </Section>
 
+      {/* Sample partner profile — illustrative only */}
+      <Section tone="soft" id="sample-profile">
+        <SampleBenefitsProfile />
+      </Section>
+
       {/* CTA */}
       <Section tone="soft" id="start">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
@@ -382,7 +390,7 @@ export default function BrAudiences() {
             </div>
           </div>
           <div>
-            <Faq items={FAQ} />
+            <Faq items={[...FAQ, ...TRUST_FAQ]} />
           </div>
         </div>
       </Section>

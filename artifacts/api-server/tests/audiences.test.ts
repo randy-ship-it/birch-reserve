@@ -37,3 +37,20 @@ test("formatters", () => {
   assert.equal(A.fmtPctBand(0.015, 0.04), "1.5%–4%");
   assert.equal(A.fmtPctBand(0.0025, 0.006), "0.25%–0.6%");
 });
+
+test("sample benefits profile is labelled sample, has no named partners, and stays aggregated", () => {
+  const profile = readFileSync(resolve(process.cwd(), "src/lib/overhaul/sampleBenefitsProfile.ts"), "utf8");
+  const component = readFileSync(resolve(process.cwd(), "../clinichub-media/src/components/br/sample-benefits-profile.tsx"), "utf8");
+  const subpage = readFileSync(resolve(process.cwd(), "../clinichub-media/src/pages/br/sample-profile.tsx"), "utf8");
+  const all = page + profile + component + subpage;
+  assert.match(component, /SAMPLE_PROFILE_BADGE/);
+  assert.match(profile, /Sample profile, illustrative/);
+  assert.match(profile, /Benefits partner \(sample\)/);
+  assert.match(profile, /No customer-level data is ever shared with brands/);
+  assert.doesNotMatch(all, /effortless|\bmint\b/i);
+  assert.doesNotMatch(all, /8\.7\s*mm/i);
+  assert.doesNotMatch(profile, /\bAI\b|ad-matching/);
+  assert.ok((SPA_SHELL_PATHS as readonly string[]).includes("/audiences/sample-profile"));
+  assert.ok(OVERHAUL_ROUTES["/audiences/sample-profile"]);
+  assert.ok(page.includes("SampleBenefitsProfile"));
+});

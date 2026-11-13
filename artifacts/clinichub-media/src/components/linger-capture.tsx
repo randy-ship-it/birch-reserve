@@ -6,7 +6,7 @@
  * Once per visitor (localStorage, 30 days; also set on submit / close). Never while
  * the chat is open, and the chat launcher hides while this is showing (overlay-bus).
  * Hook (Randy 7:03pm): "Get the media kit". After the email saves, the success
- * state offers the PDF (/birch-reserve-media-kit.pdf) plus a link to /kit; if the PDF
+ * state offers the PDF (/birch-reserve-one-pager.pdf) plus a link to /kit; if the PDF
  * isn't deployed yet, the download button falls back to /kit. Email required, company
  * optional, honeypot. Saves via POST /api/launch/email-capture (source email_capture:
  * Birch DB leads row, Friday push, Randy + Jon email; skipped for QA traffic).
@@ -26,7 +26,7 @@ import { OPEN_RANDY_CHAT_EVENT } from "@/lib/book-call";
 const SEEN_KEY = "birch_linger_seen_v1";
 const SEEN_TTL_MS = 30 * 24 * 60 * 60_000;
 const DESKTOP_MIN_DWELL_MS = 4_000;
-const MEDIA_KIT_PDF = "/birch-reserve-media-kit.pdf";
+const MEDIA_KIT_PDF = "/birch-reserve-one-pager.pdf";
 const MEDIA_KIT_PAGE = "/kit";
 const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[A-Za-z]{2,24}$/;
 const HIDDEN_PREFIXES = ["/kit", "/marketplace", "/sales", "/editorial", "/success", "/splash", "/sign-in", "/sign-up"];
@@ -309,7 +309,7 @@ export function LingerCapture() {
                   </p>
                   <a
                     href={kitHref}
-                    {...(kitHref === MEDIA_KIT_PDF ? { download: "birch-reserve-media-kit.pdf" } : {})}
+                    {...(kitHref === MEDIA_KIT_PDF ? { download: "birch-reserve-one-pager.pdf" } : {})}
                     onClick={() => track("media_kit_download", { via: kitHref === MEDIA_KIT_PDF ? "pdf" : "kit_page" })}
                     className="mt-1 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-5 text-[15px] font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
                     data-testid="linger-download"

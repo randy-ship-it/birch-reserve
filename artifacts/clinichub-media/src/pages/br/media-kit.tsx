@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { Check, Mail, Phone } from "lucide-react";
 import { Cta, usePageMeta } from "@/components/br/ui";
+import { MediaKitPdfLink } from "@/components/br/trust";
+import { SALES_REPLY_LINE } from "@/lib/seller-identity";
 import { PlacementVisual, type PlacementKey } from "@/components/br/placement-example";
 import { BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
 import {
@@ -137,8 +139,9 @@ export default function BrMediaKit() {
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-foreground/80" data-testid="mk-what">
             Birch Reserve is prepaid media credit for category seats, open to more than one brand, inside co-branded Scale Health Network hubs: recovery, longevity, nutrition, women’s and men’s health, and more.
           </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row" id="download">
             <Cta href="/buycalc" variant="lime" testId="mk-reserve-hero" className="w-full sm:w-auto">Reserve a category</Cta>
+            <MediaKitPdfLink variant="lime" testId="mk-pdf-hero" className="w-full sm:w-auto" />
             <BookCall variant="line" testId="mk-call-hero" />
           </div>
 
@@ -273,6 +276,7 @@ export default function BrMediaKit() {
             <a className="inline-flex min-h-11 items-center gap-2 underline-offset-4 hover:underline" href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20media%20kit" data-testid="mk-email">
               <Mail className="size-4" aria-hidden /> sales@silverbirchgrowth.com
             </a>
+            <p className="text-sm text-background/75">{SALES_REPLY_LINE}</p>
             <a className="inline-flex min-h-11 items-center gap-2 underline-offset-4 hover:underline" href="tel:+16479316278" data-testid="mk-phone">
               <Phone className="size-4" aria-hidden /> (647) 931-6278
             </a>

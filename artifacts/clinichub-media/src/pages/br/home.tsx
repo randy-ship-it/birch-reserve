@@ -2,6 +2,7 @@ import { ConveyorHero } from "@/components/br/conveyor";
 import { BrandBanners } from "@/components/br/brand-banners";
 import { FourPaths, MetaComparison, PositioningBand, SurfacesGrid, TamStrip } from "@/components/br/blocks";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
+import { MediaKitPdfLink, ProofStrip, SalesContact, TrustBand, TrustFaq } from "@/components/br/trust";
 import { QuickBuy } from "@/components/br/quick-buy";
 import { AgencyHero, AgencyPayouts, InsiderGrid, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
@@ -37,6 +38,15 @@ export default function BrHome() {
         }}
       />
       <AgencyHero />
+
+      <Section id="proof" tone="soft">
+        <Eyebrow>What we can show today</Eyebrow>
+        <H2>Measured proof from the live hubs.</H2>
+        <p className="mt-4 max-w-2xl text-muted-foreground">Launch brand logos already listed on Scale Health hubs, plus first-party session shares. Every figure is tagged Measured. No case study yet, so we are not inventing one.</p>
+        <div className="mt-8">
+          <ProofStrip />
+        </div>
+      </Section>
 
       <Section id="inventory">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -183,15 +193,15 @@ export default function BrHome() {
       </Section>
 
       <Section tone="ink">
-        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center" data-testid="home-ai-buyers">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center" data-testid="home-buyers">
           <div>
-            <Eyebrow className="text-accent">For AI buying agents</Eyebrow>
-            <H2 className="text-background">Buying media with AI? Send your agent here.</H2>
+            <Eyebrow className="text-accent">For media buyers</Eyebrow>
+            <H2 className="text-background">A machine-readable catalog, quotes and checkout.</H2>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-background/75">
-              Every slot, price and modelled view count is machine-readable. Agents can read the catalog, quote any offer and hand the buyer a Stripe-hosted checkout, with no forms in the way.
+              Every slot, price and modelled view count is machine-readable. Read the catalog, quote any offer and hand off to a Stripe-hosted checkout, with no forms in the way.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Cta href="/ai-buyers">How agents buy</Cta>
+              <Cta href="/buyers">How buyers purchase</Cta>
               <Cta href="/llms.txt" variant="line" className="border-background/40 text-background">llms.txt</Cta>
             </div>
           </div>
@@ -203,6 +213,8 @@ GET  /.well-known/agent.json`}</pre>
         </div>
       </Section>
 
+      <TrustBand />
+
       <Section>
         <div className="grid gap-10 lg:grid-cols-[1fr_1.2fr]">
           <div>
@@ -210,9 +222,19 @@ GET  /.well-known/agent.json`}</pre>
             <H2>Plain answers.</H2>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta href="/media-kit" variant="line">Read the marketing kit</Cta>
+              <MediaKitPdfLink variant="line" testId="home-media-kit-pdf" />
+            </div>
+            <div className="mt-8 border border-foreground/15 bg-white p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/55">Talk to the founder</p>
+              <div className="mt-3">
+                <SalesContact />
+              </div>
             </div>
           </div>
-          <Faq items={FAQ} />
+          <div className="space-y-8">
+            <TrustFaq />
+            <Faq items={FAQ} />
+          </div>
         </div>
       </Section>
     </div>
