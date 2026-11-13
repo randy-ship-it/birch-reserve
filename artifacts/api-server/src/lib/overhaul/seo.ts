@@ -115,7 +115,7 @@ export function llmsTxt(): string {
     "- Always show the buyer the terms and price before sending agree:true.",
     "",
     "## Agencies",
-    `- Prepay a client test budget; UTM + promo-code reporting; ${AGENCY.commissionPct}% of media spend paid to the agency of record; ${AGENCY.bonusNote} https://birchreserve.net/agencies`,
+    `- Prepay a client test budget; UTM + promo-code reporting; ${AGENCY.line} ${AGENCY.bonusNote} https://birchreserve.net/agencies`,
     "",
     "## Live inventory",
     `- ${BRAND_HUBS.map((h) => h.name).join(" · ")}`,

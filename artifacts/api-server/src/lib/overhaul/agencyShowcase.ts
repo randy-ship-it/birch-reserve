@@ -4,7 +4,7 @@
  *
  * Every figure here is re-used from an existing source, never invented:
  *   - agency cut: AGENCY_CASH_PCT in ./mediaKit = AGENCY.commissionPct in ./model (live
- *     /agencies: "10% of media spend, paid to the agency of record"); Randy 8:14 PM ET: paid in cash.
+ *     /agencies + AGENCY.line: "10% of media spend, paid in cash to the agency of record" (Randy 8:14 PM ET).
  *   - starting CPMs: SURFACES (./model) / RATE_SURFACES (./pricing), illustrative estimates.
  *   - 20MM+ orders: TAM.ordersLabel (./model), modelled.
  *   - sell assumption: Randy 7:33 PM ET, "20% of available display space". An ASSUMPTION.

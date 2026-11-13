@@ -26,7 +26,7 @@ export default function BrAgencies() {
                 "Prepay a client test budget, any amount from $490 USD; tiers add up to 15% bonus credit",
                 "Credit spends down on live hubs under an insertion order naming the hubs; unused credit can be refunded or extended",
                 "Reporting per hub and surface: views, clicks, UTM visits, promo-code redemptions",
-                "Agency commission: 10% of media spend, paid to the agency of record",
+                "Agency commission: 10% of media spend, paid in cash to the agency of record",
                 "Display and CPC on post-purchase, hub home, product / services and member dashboard pages",
               ].map((t) => (
                 <li key={t} className="flex gap-2">
@@ -81,7 +81,7 @@ export default function BrAgencies() {
         <Faq
           items={[
             { q: "Can we prepay for several clients?", a: "Yes. One prepay can be split across clients; each client gets its own insertion order and reporting." },
-            { q: "Is there a commission?", a: "Yes: 10% of media spend, paid to the agency of record. Agency prepay also earns the same bonus credit tiers as brands (+5% from $1,500, +10% from $3,000, +15% from $6,000 USD)." },
+            { q: "Is there a commission?", a: "Yes: 10% of media spend, paid in cash to the agency of record. Brand bonus credit is the client's (the brand's), separate from the agency's 10% cash: +5% from $1,500, +10% from $3,000, +15% from $6,000 USD prepay." },
             { q: "How is performance tracked?", a: "Every placement carries your UTM parameters and, if you want, a promo code. We report views and clicks per hub and surface. Aggregate only." },
             { q: "Can our bots read this site?", a: "Yes: see /llms.txt, /sitemap.xml and the structured data on each page." },
           ]}

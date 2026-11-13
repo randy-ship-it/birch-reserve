@@ -63,7 +63,7 @@ Placements: post-purchase, hub home page, product / services pages, and the memb
 Inventory: the eight named hubs are live inventory, spending down over the 6 months after a deposit lands. 3x more inventory is in queue by year end, and deposits are taken for queued inventory too.
 Brands and agencies: spend commits at https://birchreserve.net/advertise/brands: $490 USD starter slot (rate card), $1,500 (+5% credit), $3,000 (+10%), $6,000 (+15%). Canadian buyers pay CAD.
 Local businesses and studios: Lock down my area at https://birchreserve.net/advertise/local: $4,900 CAD / $3,500 USD, a launch rate until Dec 31, 2026; up to 50% of hub display within 5 km (25% in dense downtown cores) for 1 to 6 months from display start; credit at 25% off rate card; 25% off follow-on spend up to $100,000 USD per locker over the term. Unused credit: refund, or extend the spend-down month by month at the same discount.
-Agencies: 10% of media spend, paid to the agency of record, plus the same bonus credit tiers as brands.
+Agencies: 10% of media spend, paid in cash to the agency of record. Brand bonus credit is the client's (the brand's), separate from the agency's 10% cash.
 Publishers (studios, retailers): $500 CAD cash or $700+ CAD ad credit for activating their audience (email, text, a link on their site, at checkout, social). Paid 90 days after real traffic or transactions are seen. Self-purchases are excluded.
 If online checkout is not open, say: reserve by inquiry; we'll confirm within 1 business day.
 All audience and view numbers are modelled; say so. Partners are listed, never call them signed. Do not invent stats.

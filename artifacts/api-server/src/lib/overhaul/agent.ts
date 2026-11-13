@@ -90,7 +90,7 @@ export function agentCatalog(status: { slotsCheckout: boolean; areaLockCheckout:
       area_lock: status.areaLockCheckout ? "open" : "held",
       held_means: `Checkout returns status "held": reserved by inquiry, confirmed within 1 business day by email from ${HANDOFF_EMAIL}. No charge is made.`,
     },
-    agency: { commission_pct_of_media_spend: AGENCY.commissionPct, paid_to: "agency of record", bonus_credit: AGENCY.bonusNote },
+    agency: { commission_pct_of_media_spend: AGENCY.commissionPct, paid_to: "agency of record", paid_in: "cash", bonus_credit: AGENCY.bonusNote },
     publisher_payout: {
       cash_cad: PUBLISHER_INCENTIVE.cashCad,
       ad_credit_cad: PUBLISHER_INCENTIVE.creditCad,

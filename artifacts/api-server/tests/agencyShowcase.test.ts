@@ -18,6 +18,15 @@ test("agency cut: 10% of media spend, paid in cash to the agency of record (Rand
   assert.equal(agencyCash(35000), 3500);
 });
 
+test("/agencies: 10% paid in cash; brand bonus credit is the client's, separate from the agency cash", () => {
+  const page = read("../clinichub-media/src/pages/br/agencies.tsx");
+  assert.match(page, /10% of media spend, paid in cash to the agency of record/);
+  assert.match(page, /Brand bonus credit is the client's \(the brand's\), separate from the agency's 10% cash/);
+  assert.doesNotMatch(page, /Agency prepay also earns the same bonus credit tiers as brands/);
+  assert.equal(AGENCY.line, "10% of media spend, paid in cash to the agency of record.");
+  assert.match(AGENCY.bonusNote, /Brand bonus credit is the client's \(the brand's\), separate from the agency's 10% cash/);
+});
+
 test("brand bonus credit is labelled as the brand's and kept separate from the 10% cash", () => {
   assert.match(BRAND_BONUS_LINE, /^Brand bonus credit/);
   assert.match(BRAND_BONUS_LINE, /separate from your 10% cash/);
@@ -47,6 +56,7 @@ test("copy scan: agency sections, home and media kit carry no banned or retired 
     "../clinichub-media/src/components/br/agency-showcase.tsx",
     "../clinichub-media/src/pages/br/home.tsx",
     "../clinichub-media/src/pages/br/media-kit.tsx",
+    "../clinichub-media/src/pages/br/agencies.tsx",
     "./src/lib/overhaul/agencyShowcase.ts",
     "./src/lib/overhaul/mediaKit.ts",
     "./src/lib/overhaul/seo.ts",
