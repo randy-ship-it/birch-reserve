@@ -47,6 +47,11 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
     title: "Rates | Birch Reserve",
     description: "Starting-at CPM and CPC rates for five hub surfaces, view-block packs, a 100k to 1B view scenario calculator, and rates that step up only once a placement proves out. Illustrative estimates.",
   },
+  "/audiences": {
+    title: "Audience insights | Birch Reserve",
+    description: "What we know about the audiences behind the brand launches on Scale Health hubs and Calm Joints: recovery, longevity, sleep, physio patients, racquet players and MD-referral cohorts. Measured, modelled and estimated figures, labelled.",
+    jsonld: { "@context": "https://schema.org", "@type": "WebPage", name: "Birch Reserve audience insights", url: "https://birchreserve.net/audiences", publisher: ORG },
+  },
   "/agencies": {
     title: "For agencies | Birch Reserve",
     description: "Prepay a client test budget into health & wellness hubs. UTM and promo-code reporting. Agency commission available.",

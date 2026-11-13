@@ -30,6 +30,7 @@ import BrHubs from '@/pages/br/hubs';
 import BrMediaKit from '@/pages/br/media-kit';
 import BrAgencies from '@/pages/br/agencies';
 import BrAiBuyers from '@/pages/br/ai-buyers';
+import BrAudiences from '@/pages/br/audiences';
 import Kit from '@/pages/kit';
 import SellAdsPage from '@/pages/sell-ads';
 import Terms from '@/pages/terms';
@@ -277,6 +278,9 @@ function Router() {
         </Route>
         <Route path="/agencies">
           <Layout><BrAgencies /></Layout>
+        </Route>
+        <Route path="/audiences">
+          <Layout><BrAudiences /></Layout>
         </Route>
         <Route path="/ai-buyers">
           <Layout><BrAiBuyers /></Layout>

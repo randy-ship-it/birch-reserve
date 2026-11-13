@@ -41,6 +41,7 @@ export const PUBLIC_SITEMAP_PATHS = [
   "/agencies",
   "/ai-buyers",
   "/rates",
+  "/audiences",
 ] as const;
 
 /**
@@ -64,6 +65,7 @@ export const SPA_SHELL_PATHS = [
   "/agencies",
   "/ai-buyers",
   "/rates",
+  "/audiences",
 ] as const;
 
 /** Client routes that duplicate another URL. The canonical is the target. */
