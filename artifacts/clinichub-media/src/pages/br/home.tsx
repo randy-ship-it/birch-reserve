@@ -5,6 +5,7 @@ import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@
 import { MEDIA_KIT_OFFERS, UPGRADE_PATH_LINE } from "../../../../api-server/src/lib/overhaul/mediaKit";
 import { MediaKitPdfLink, ProofStrip, SalesContact, TrustBand, TrustFaq } from "@/components/br/trust";
 import { QuickBuy } from "@/components/br/quick-buy";
+import { CategoryRequestForm, FaceBeforeFlight, FounderNote, PrimeHero, SALES_EMAIL, SALES_PHONE_DISPLAY, SALES_PHONE_HREF } from "@/components/br/prime-hero";
 import { AgencyHero, AgencyPayouts, InsiderGrid, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { LOOK_HREF, RESERVE_HREF, MetaHook, PackPicker, ProveItLadder, RateCardV2 } from "@/components/br/pricing";
@@ -21,7 +22,7 @@ const FAQ = [
 ];
 
 export default function BrHome() {
-  usePageMeta("Birch Reserve | First-party health hub ad inventory for agencies and brands", "Agencies keep a share of every client they place. Advertise inside co-branded Recovery Brand hubs and health & wellness business hubs: post-purchase, hub home, product and services pages, and the member dashboard. Lock in spend, lock down your area, or publish your own hub.");
+  usePageMeta("Birch Reserve | Lock a category seat inside Scale Health hubs", "8 categories, 8 self-serve seats. Lock a $490 category seat or take a $190 7-day look inside private, members-only Scale Health hubs. Media credit until IO, aggregate reporting, no impression guarantees.");
   const g = areaLockGuaranteedViews();
   return (
     <div className="w-full overflow-x-hidden" data-testid="br-home">
@@ -38,20 +39,39 @@ export default function BrHome() {
           address: { "@type": "PostalAddress", addressLocality: "Toronto", addressRegion: "ON", addressCountry: "CA" },
         }}
       />
-      <AgencyHero />
+      <PrimeHero />
+
+      <Section id="proof-live">
+        <FaceBeforeFlight />
+      </Section>
+
+      <Section id="request" tone="soft">
+        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+          <CategoryRequestForm path="/" />
+          <div className="space-y-4">
+            <div className="border border-foreground bg-foreground p-5 text-background md:p-6" data-testid="home-contact">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-background/60">Talk to sales</p>
+              <a href={SALES_PHONE_HREF} className="mt-2 block font-display text-3xl underline-offset-4 hover:underline">{SALES_PHONE_DISPLAY}</a>
+              <a href={`mailto:${SALES_EMAIL}?subject=Birch%20Reserve%20seat`} className="mt-1 block text-base underline-offset-4 hover:underline">{SALES_EMAIL}</a>
+              <p className="mt-3 text-sm text-background/70">Prefer a one-pager? <a href="/media-kit" className="font-semibold text-accent underline underline-offset-4">Read the media kit</a>.</p>
+            </div>
+            <FounderNote />
+          </div>
+        </div>
+      </Section>
 
       <Section id="packages">
         <Eyebrow>Two packages</Eyebrow>
-        <H2>Start with a seat. Then lock the category.</H2>
+        <H2>Start with a seat. Then go premium.</H2>
         <p className="mt-4 max-w-2xl text-muted-foreground" data-testid="home-upgrade">{UPGRADE_PATH_LINE} The small-business package is the easy way to start. Premium slots are the main event.</p>
         <div className="mt-8 grid gap-4 md:grid-cols-2" data-testid="home-packages">
           <article className="flex flex-col border border-foreground/20 bg-white p-5 md:p-6">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Small business package</p>
             <h3 className="mt-1 font-display text-2xl">${MEDIA_KIT_OFFERS.look.spendUsd} look · ${MEDIA_KIT_OFFERS.seat.spendUsd} seat</h3>
-            <p className="mt-3 text-sm text-foreground/80">Self-serve card checkout. A category seat open to more than one brand. Credit spends down over 6 months; unused credit can be refunded or extended.</p>
+            <p className="mt-3 text-sm text-foreground/80">Self-serve card checkout. A category seat open to more than one brand. 100% media credit until the IO, usable 12 months; fully refundable until 14 days before launch. The $190 look converts in full to the seat within 7 days, or is refunded.</p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Cta href={RESERVE_HREF} testId="home-cta-seat">Take a $490 seat</Cta>
-              <Cta href={LOOK_HREF} variant="line" testId="home-cta-look">7-day look · $190</Cta>
+              <Cta href={RESERVE_HREF} testId="home-cta-seat">Lock a seat — $490</Cta>
+              <Cta href={LOOK_HREF} variant="line" testId="home-cta-look">Take a 7-day look — $190</Cta>
             </div>
           </article>
           <article className="flex flex-col border-2 border-foreground bg-foreground p-5 text-background md:p-6">
@@ -67,6 +87,8 @@ export default function BrHome() {
           </article>
         </div>
       </Section>
+
+      <AgencyHero />
 
       <Section id="proof" tone="soft">
         <Eyebrow>What we can show today</Eyebrow>

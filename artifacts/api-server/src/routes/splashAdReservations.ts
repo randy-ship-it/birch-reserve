@@ -61,6 +61,8 @@ import { hasValidQaHeader } from "../lib/testTraffic";
 import { attributionFrom } from "../lib/publicGuards";
 import { recordPaidCheckoutSafe } from "../lib/checkoutLead";
 import { sendPrepayConfirmationSafe } from "../lib/prepayConfirmationEmail";
+import { sendSalesAlert } from "../lib/salesAlert";
+import { logger } from "../lib/logger";
 import { markSplashReservationTestIfQa } from "../lib/splashTestTraffic";
 import { PREMIUM_INQUIRY_MESSAGE, PREMIUM_INQUIRY_PATH, isPremiumFormat } from "../lib/premiumInquireOnly";
 
@@ -573,6 +575,8 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
         await recordPaidCheckoutSafe(session);
         // Buyer prepay confirmation (no URLs; off unless PREPAY_CONFIRMATION_EMAIL=true; never throws).
         await sendPrepayConfirmationSafe(session);
+        // Randy 9:41pm Nov 13: every paid seat emails randy@scalehealth.ca + randy@silverbirchgrowth.com.
+        await sendPaidSalesAlertSafe(session);
       }
     }
     return;
@@ -580,6 +584,37 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
 
   if (event.type === "checkout.session.async_payment_failed") {
     await markPaymentFailedFromSession(event.data.object as Stripe.Checkout.Session);
+  }
+}
+
+async function sendPaidSalesAlertSafe(session: Stripe.Checkout.Session): Promise<void> {
+  try {
+    const reservationId = session.client_reference_id ?? session.metadata?.reservationId ?? null;
+    const [reservation] = reservationId
+      ? await db
+          .select()
+          .from(splashAdReservationsTable)
+          .where(eq(splashAdReservationsTable.id, reservationId))
+          .limit(1)
+      : [];
+    if (reservation?.isTest === true) return;
+    const email = reservation?.email ?? session.customer_details?.email ?? undefined;
+    const amount = typeof session.amount_total === "number" ? `${(session.amount_total / 100).toFixed(2)} ${String(session.currency ?? "").toUpperCase()}` : undefined;
+    await sendSalesAlert({
+      event: "paid_checkout",
+      title: `PAID: ${reservation?.brandName ?? email ?? "buyer"} · ${reservation?.promotedOffer ?? session.metadata?.sku ?? "Birch seat"}`,
+      rows: [
+        ["Brand", reservation?.brandName],
+        ["Email", email],
+        ["Offer", reservation?.promotedOffer ?? session.metadata?.sku],
+        ["Amount paid", amount],
+        ["Stripe session", session.id],
+        ["Reservation id", reservationId],
+      ],
+      replyTo: email,
+    });
+  } catch (error) {
+    logger.warn({ err: error instanceof Error ? error.message : String(error) }, "Paid sales alert failed");
   }
 }
 

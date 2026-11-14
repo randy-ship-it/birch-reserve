@@ -26,6 +26,9 @@ import { captureChatLead } from "../lib/leadCapture";
 import { hasValidQaHeader } from "../lib/testTraffic";
 import { FRIENDLY_429, LIMITS, limiter } from "../lib/rateLimit";
 import { attributionFrom } from "../lib/publicGuards";
+import { BIRCH_SALES_PHONE, birchCanonicalFacts } from "../lib/birchFacts";
+import { sendSalesAlert } from "../lib/salesAlert";
+import { isTestIdentity } from "../lib/testTraffic";
 
 type ChatRole = "user" | "assistant";
 
@@ -141,20 +144,23 @@ const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal";
  * /workspace/sales-brain/dist. Only widget-specific rules live here.
  */
 export const BIRCH_SITE_SCOPE_PROMPT = [
-  "WIDGET RULES (birchreserve.net chat): You are the Birch Q&A Squirrel, the Birch Reserve site-chat guide (never Randy; calls and callbacks come from Randy's team). Lead with Birch Reserve category slots: lock in your slot before the minimum rises. Never open with a menu of brands.",
-  "Never pitch the portfolio or other companies unprompted.",
-  `Live proof hub: ${LIVE_HUB_PROOF_URL} (share when they ask to see a live hub or who sees the ads).`,
-  "When the visitor raises Scale Health, Align, clinics, providers, or care, answer properly from the brain (never brush them off) and give the ONE routing URL that fits.",
-  "Links: write each as a full https:// URL on its own; the widget makes it clickable. Only URLs from the routing table.",
-  "Never type a phone number: the chat's Call button and callback form carry it. You handle buyers yourself: close early slots on the Reserve List (https://birchreserve.net/inventory) and the $490 category prepay, and for partnerships or bigger deals take intake in chat (name, company, role, phone, email, need, size, timing) and say the team will call back. Do not promote Randy's calendar; only if the visitor insists on a set time may you give https://cal.com/randy-gilling/30min.",
-  "Public price: the $490 category prepay (the $190 look is not advertised; never offer to hold or lock a category, and never call Birch Reserve or its slots \"exclusive\"). Checkout is off: never invent payment links. Never promise per-seat impressions, CTR, or view guarantees (the Scale network growth story in the brain is fine to tell).",
+  "WIDGET RULES (birchreserve.net chat, Randy Nov 13 2026; these and the CANONICAL OFFER FACTS override anything older): You are the Birch Q&A Squirrel, the Birch Reserve site-chat guide (an AI guide, never Randy himself; calls and callbacks come from Randy's team). Lead with Birch Reserve category seats; never open with a menu of brands.",
+  `Live proof hubs: https://www.scalehealth.ca/integrity and ${LIVE_HUB_PROOF_URL} (share when they ask to see a live hub or who sees the ads).`,
+  "Do not promote Randy's calendar; only if the visitor insists on a set time may you give https://cal.com/randy-gilling/30min.",
+  "Answer the visitor's actual question first, in 2 to 5 short sentences, using only the CANONICAL OFFER FACTS for prices, terms, seats, categories and routing. Never pitch the portfolio or other companies unprompted.",
+  "When the visitor raises Scale Health, Align, clinics, providers, or care, answer properly from the brain and give the ONE routing URL that fits.",
+  "Links: write each as a full https:// URL on its own line; the widget makes it clickable. At most one link per reply.",
+  `Buying under $10,000 ($190 look, $490 seat): walk them to https://birchreserve.net/buycalc step by step (pick offer, category, brand and work email, tick terms, pay on Stripe). Checkout is live. Never claim a payment went through unless they say they paid. If they are not ready, offer the request form https://birchreserve.net/buycalc#request.`,
+  `$10,000+ / premium ($25K to $50K, inquire only) / partnership / serious prospects: offer a call-back. Ask one question at a time for name, company, phone, email and best time to call (plus what they want and rough budget). Read the details back and ask them to confirm. You may give the direct line ${BIRCH_SALES_PHONE}.`,
+  'CALL-BACK SUBMIT: only after they confirm the details, end that reply with ONE final line exactly like: [[CALLBACK]]{"name":"...","company":"...","phone":"...","email":"...","best_time":"...","interest":"...","budget":"..."} (JSON on the same line, use "" for anything unknown; phone or email is required). The line is hidden from the visitor and alerts the team instantly. Tell them the call-back request is in. Never emit it twice in a conversation, and never for under-$10K buys.',
+  "Never promise per-seat impressions, CTR, or view guarantees (no reach or click promises either). Modelled numbers must be called modelled. Never call the $490 seat exclusive; only a premium slot locks one brand per category.",
 ].join(" ");
 
 const CHIP_INTENT_NOTES: Record<string, string> = {
   how_seats:
-    "Visitor tapped \"How early slots work\": explain the Reserve List and early slots inside the recovery hubs in plain words (categories open to more than one brand, no brand over 20%), give https://birchreserve.net/inventory, then ask their category.",
+    "Visitor tapped \"How early slots work\": explain the 8 self-serve seats across 8 categories (open to more than one brand; a premium slot locks one brand per category), the $490 seat and $190 look, give https://birchreserve.net/buycalc, then ask their category.",
   hold_190:
-    "Visitor tapped \"See the Reserve List\": explain the Reserve List and early slots, give https://birchreserve.net/inventory, and ask which category they want an early slot in. Do not offer to hold a category.",
+    "Visitor tapped \"See the Reserve List\": explain the open seats and categories, give https://birchreserve.net/buycalc (live seat count), and ask which category they want.",
   live_hub: `Visitor tapped \"See a live hub\": share ${LIVE_HUB_PROOF_URL} as the live proof, then ask what category they would want there.`,
   talk_human:
     "Visitor tapped \"Talk to a human\": say you can set that up, ask the first quick question (company or brand), and mention the AI call or a callback come right after.",
@@ -509,6 +515,7 @@ async function callGrok(
         messages: [
           { role: "system", content: systemPrompt },
           { role: "system", content: BIRCH_SITE_SCOPE_PROMPT },
+          { role: "system", content: birchCanonicalFacts() },
           {
             role: "system",
             content: `${modeNote} ${chipNote} Keep replies short (2–5 sentences). Never invent checkout URLs. Birch Reserve only unless the visitor raises another company. At most one URL per reply, from the verified routing table only.`.trim(),
@@ -538,6 +545,46 @@ async function callGrok(
   } finally {
     clearTimeout(timeout);
   }
+}
+
+/** Pull the hidden [[CALLBACK]]{json} line the model adds once a call-back is confirmed. */
+export function extractCallbackMarker(raw: string): { text: string; callback: Record<string, string> | null } {
+  const m = raw.match(/\[\[CALLBACK\]\]\s*(\{[^\n]*\})/);
+  if (!m) return { text: raw.replace(/\[\[CALLBACK\]\][^\n]*/g, "").trim(), callback: null };
+  let callback: Record<string, string> | null = null;
+  try {
+    const o = JSON.parse(m[1]!) as Record<string, unknown>;
+    callback = Object.fromEntries(Object.entries(o).slice(0, 12).map(([k, v]) => [k.slice(0, 40), String(v ?? "").slice(0, 500)]));
+  } catch {
+    callback = null;
+  }
+  const text = raw.replace(m[0], "").replace(/\[\[CALLBACK\]\][^\n]*/g, "").trim();
+  if (callback && !callback.phone && !callback.email) callback = null;
+  return { text, callback };
+}
+
+async function sendChatCallbackAlert(c: Record<string, string>, body: RandyChatBody, qa: boolean) {
+  const label = c.company || c.name || c.email || c.phone || "visitor";
+  const isTest = qa || /\bTEST\b/.test(`${c.name ?? ""} ${c.company ?? ""}`) || isTestIdentity({ email: c.email, name: c.name });
+  const transcript = body.messages.slice(-8).map((m) => `${m.role === "assistant" ? "Bot" : "Visitor"}: ${m.content}`).join("\n");
+  return sendSalesAlert({
+    event: "inquiry",
+    title: `CALL-BACK: ${label} (site chat)${c.budget ? ` · ${c.budget}` : ""}`,
+    rows: [
+      ["Name", c.name],
+      ["Company", c.company],
+      ["Phone", c.phone],
+      ["Email", c.email],
+      ["Best time", c.best_time],
+      ["Interest", c.interest],
+      ["Budget", c.budget],
+      ["Channel", "site chat"],
+      ["Page", body.pagePath],
+      ["Recent chat", transcript.slice(0, 1800)],
+    ],
+    replyTo: c.email,
+    isTest,
+  });
 }
 
 function disabledPayload(reason: DisabledReason, error: string): RandyChatDisabled {
@@ -605,7 +652,14 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
 
   const startedAt = Date.now();
   try {
-    const text = polishReply(await callGrok(systemPrompt, body, apiKey), body.messages);
+    const raw = await callGrok(systemPrompt, body, apiKey);
+    const { text: withoutMarker, callback } = extractCallbackMarker(raw);
+    let text = polishReply(withoutMarker, body.messages);
+    if (callback) {
+      const alert = await sendChatCallbackAlert(callback, body, qa);
+      req.log?.info({ kind: "chat_callback", alert: alert.status }, "Randy chat call-back submitted");
+      if (alert.status !== "sent") text = `${text}\n\nIf the request didn't go through, call ${BIRCH_SALES_PHONE}.`;
+    }
     const offerHandoff = inferOfferHandoff(body);
     const success: RandyChatSuccess = {
       text,
@@ -690,6 +744,23 @@ router.post("/launch/randy-chat/event", async (req, res): Promise<void> => {
   if (b.type === "callback_request") {
     // Logged even if email is not configured; response below never echoes contact info.
     await logIntakeForSession(b.sessionId, "callback_request");
+  }
+  if (b.type === "callback_request" && b.contact && (b.contact.phone || b.contact.email)) {
+    // Randy 9:52pm Nov 13: call-backs alert randy@scalehealth.ca + randy@silverbirchgrowth.com too.
+    await sendSalesAlert({
+      event: "inquiry",
+      title: `CALL-BACK: ${b.contact.name || b.contact.email || b.contact.phone} (chat callback form)`,
+      rows: [
+        ["Name", b.contact.name],
+        ["Role", b.contact.role],
+        ["Phone", b.contact.phone],
+        ["Email", b.contact.email],
+        ["Page", b.pagePath],
+        ["Recent chat", b.messages.slice(-6).map((m) => `${m.role === "assistant" ? "Bot" : "Visitor"}: ${m.content}`).join("\n").slice(0, 1500)],
+      ],
+      replyTo: b.contact.email,
+      isTest: hasValidQaHeader(req) || isTestIdentity({ email: b.contact.email, name: b.contact.name }),
+    });
   }
   // Single system of record (HARD 5:46pm): intake/callback → leads row + Friday push (non-blocking).
   await captureChatLead(b.sessionId, b.type, attributionFrom(res));

@@ -15,6 +15,9 @@ import { quoteAreaLock, type Currency } from "../lib/overhaul/model";
 import { buildAreaLockSession, checkoutGate } from "../lib/overhaul/checkout";
 import { sendIntake, type IntakeKind } from "../lib/overhaul/fridayIntake";
 import { PREMIUM_INQUIRY_MESSAGE, isPremiumOffer } from "../lib/premiumInquireOnly";
+import { sendSalesAlert } from "../lib/salesAlert";
+import { isTestIdentity } from "../lib/testTraffic";
+import { MEDIA_KIT_CATEGORIES } from "../lib/overhaul/mediaKit";
 
 export type CreateSession = (params: Record<string, unknown>) => Promise<{ url: string | null; livemode: boolean }>;
 
@@ -50,6 +53,11 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
 
   router.get(["/publish", "/publish/"], (_req, res) => res.redirect(301, "/publish/brands"));
   // Short alias for the one-link media kit (keeps any query, e.g. UTM tags).
+  // /kit is an alias of the one-link media kit (Randy, Nov 13 2026 9:41 PM ET): one clean link, no conflicting packages.
+  router.get(["/kit", "/kit/"], (req, res) => {
+    const q = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
+    res.redirect(302, `/media-kit${q}`);
+  });
   router.get(["/mediakit", "/mediakit/"], (req, res) => {
     const q = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
     res.redirect(301, `/media-kit${q}`);
@@ -128,6 +136,13 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     // Every attempt reaches Friday, paid or not.
     const meta = built.params.metadata as Record<string, string>;
     const friday = await sendIntake({ kind: "area_lock_interest", email: str(body.email, 320), company: meta.business, website: meta.website || undefined, path: "/advertise/local", meta: { ...meta, checkout_open: gate.open, amount: built.amountCents / 100, currency: built.currency } });
+    await sendSalesAlert({
+      event: "seat_hold",
+      title: `Area lock: ${meta.business || str(body.email, 320) || "local business"}`,
+      rows: [["Business", meta.business], ["Email", str(body.email, 320)], ["Website", meta.website], ["Amount", `${built.amountCents / 100} ${String(built.currency).toUpperCase()}`], ["Checkout open", String(gate.open)], ["Page", "/advertise/local"]],
+      replyTo: str(body.email, 320),
+      isTest: isTestIdentity({ email: str(body.email, 320), name: meta.business }),
+    });
     // PREMIUM_INQUIRE_ONLY: an area lock is never paid by card. The intake above is the inquiry.
     if (isPremiumOffer("area-lock")) {
       res.status(200).json({ held: true, inquire_only: true, message: `Inquiry sent. ${PREMIUM_INQUIRY_MESSAGE} We'll confirm your area within 1 business day. No charge was made.`, stored: friday.status });
@@ -178,7 +193,147 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
       utm: utmOf(body),
     });
     log("lead", { kind, friday: friday.status });
-    res.json({ ok: true, stored: friday.status });
+    // Randy 9:41pm Nov 13: every request emails randy@scalehealth.ca + randy@silverbirchgrowth.com.
+    const alert = await sendSalesAlert({
+      event: "inquiry",
+      title: `${kind.replace(/_/g, " ")}: ${str(body.company, 160) || email}`,
+      rows: [
+        ["Form", kind],
+        ["Company", str(body.company, 160)],
+        ["Name", str(body.name, 120)],
+        ["Email", email],
+        ["Phone", str(body.phone, 40)],
+        ["Website", str(body.website, 400)],
+        ["Message", str(body.message, 2000)],
+        ["Page", str(body.path, 200)],
+        ...Object.entries(meta).map(([k, v]) => [k, v] as [string, string]),
+      ],
+      replyTo: email,
+      isTest: isTestIdentity({ email, name: str(body.name, 120) || str(body.company, 160) }),
+    });
+    res.json({ ok: true, stored: friday.status, alert: alert.status });
+  });
+
+  /**
+   * Request this category (Randy, Nov 13 2026 9:41 PM ET). Brand, category, email, notes.
+   * Emails randy@scalehealth.ca + randy@silverbirchgrowth.com right away and pushes to Friday.
+   * Succeeds when either the alert or Friday took it; otherwise asks the buyer to call or email.
+   */
+  /**
+   * Call-back request (Randy, Nov 13 2026 9:52 PM ET): serious prospects and $10K+ / premium
+   * inquiries from the site chat, Hear Randy voice agent or the phone agent. Emails
+   * randy@scalehealth.ca + randy@silverbirchgrowth.com right away. Phone or email required.
+   */
+  router.post("/v1/callback-request", json, async (req: Request, res: Response) => {
+    if (limited(req, 8)) {
+      res.status(429).json({ ok: false, error: "Too many requests. Call (647) 931-6278." });
+      return;
+    }
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    if (str(body.company_website, 200)) {
+      res.json({ ok: true });
+      return;
+    }
+    const name = str(body.name, 120);
+    const company = str(body.company, 160);
+    const phone = str(body.phone, 40);
+    const email = str(body.email, 320).toLowerCase();
+    const bestTime = str(body.best_time ?? body.bestTime, 120);
+    const interest = str(body.interest, 300);
+    const budget = str(body.budget, 120);
+    const notes = str(body.notes, 1500);
+    const channel = str(body.channel, 40) || "site";
+    const phoneOk = phone.replace(/\D/g, "").length >= 7;
+    if (!phoneOk && !EMAIL_RE.test(email)) {
+      res.status(400).json({ ok: false, error: "Need a phone number or an email for the call-back." });
+      return;
+    }
+    const isTest = body.test === true || /\bTEST\b/.test(`${name} ${company} ${notes}`) || isTestIdentity({ email, name });
+    const alert = await sendSalesAlert({
+      event: "inquiry",
+      title: `CALL-BACK: ${company || name || email || phone} (${channel})${budget ? ` · ${budget}` : ""}`,
+      rows: [
+        ["Name", name],
+        ["Company", company],
+        ["Phone", phone],
+        ["Email", email],
+        ["Best time", bestTime],
+        ["Interest", interest],
+        ["Budget", budget],
+        ["Notes", notes],
+        ["Channel", channel],
+      ],
+      replyTo: EMAIL_RE.test(email) ? email : undefined,
+      isTest,
+    });
+    if (!isTest) {
+      void sendIntake({ kind: "premium_inquiry", email: EMAIL_RE.test(email) ? email : undefined, name: name || undefined, company: company || undefined, phone: phone || undefined, message: [interest, budget, bestTime && `Best time: ${bestTime}`, notes].filter(Boolean).join(" | ") || undefined, path: `callback:${channel}`, meta: { channel } }).catch(() => undefined);
+    }
+    log("callback_request", { alert: alert.status, channel, test: isTest });
+    if (alert.status !== "sent") {
+      res.status(502).json({ ok: false, error: "Could not send. Please call (647) 931-6278." });
+      return;
+    }
+    res.json({ ok: true, message: "Call-back request sent. The team will call back at the time given. Direct line: (647) 931-6278." });
+  });
+
+  router.post("/v1/category-request", json, async (req: Request, res: Response) => {
+    if (limited(req, 8)) {
+      res.status(429).json({ error: "Too many requests. Try again shortly, or call (647) 931-6278." });
+      return;
+    }
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    if (str(body.company_website, 200)) {
+      // Honeypot: look successful, send nothing.
+      res.json({ ok: true });
+      return;
+    }
+    const brand = str(body.brand, 160);
+    const email = str(body.email, 320).toLowerCase();
+    const notes = str(body.notes, 1000);
+    const rawCat = str(body.category, 80);
+    const slugOf = (label: string) => label.toLowerCase().replace(/[’']/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const label = MEDIA_KIT_CATEGORIES.find((c) => c === rawCat || slugOf(c) === rawCat || slugOf(c) === slugOf(rawCat))
+      ?? (rawCat.toLowerCase() === "other" || rawCat.toLowerCase() === "not-sure" ? "Other / not sure" : null);
+    if (!brand) {
+      res.status(400).json({ error: "Add your brand name." });
+      return;
+    }
+    if (!label) {
+      res.status(400).json({ error: "Pick a category." });
+      return;
+    }
+    if (!EMAIL_RE.test(email)) {
+      res.status(400).json({ error: "Add a work email." });
+      return;
+    }
+    const page = str(body.path, 200) || "/";
+    const isTest = body.test === true || /\bTEST\b/.test(brand) || isTestIdentity({ email, name: brand });
+    const [alert, friday] = await Promise.all([
+      sendSalesAlert({
+        event: "category_request",
+        title: `Category request: ${brand} · ${label}`,
+        rows: [
+          ["Brand", brand],
+          ["Category", label],
+          ["Email", email],
+          ["Notes", notes],
+          ["Page", page],
+          ["UTM", Object.values(utmOf(body)).filter(Boolean).join(" / ")],
+        ],
+        replyTo: email,
+        isTest,
+      }),
+      isTest
+        ? Promise.resolve({ status: "skipped" as const })
+        : sendIntake({ kind: "category_request", email, company: brand, message: notes || undefined, path: page, meta: { category: label }, utm: utmOf(body) }),
+    ]);
+    log("category_request", { alert: alert.status, friday: friday.status, test: isTest });
+    if (alert.status !== "sent" && friday.status !== "sent") {
+      res.status(502).json({ error: "We could not send that. Call (647) 931-6278 or email sales@silverbirchgrowth.com." });
+      return;
+    }
+    res.json({ ok: true, alert: alert.status, category: label });
   });
 
   return router;
