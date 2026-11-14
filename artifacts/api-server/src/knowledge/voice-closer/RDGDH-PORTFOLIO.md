@@ -1,9 +1,9 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-25 16:17 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-11-13 22:19 EST. Edit sales-brain, not this file. -->
 # RDGDH-PORTFOLIO.md, factual overview only
 
 **Holdco:** RDG Digital Holdings Inc. (RDGDH) · https://rdgdh.com  
 **Founder:** Randy Gilling  
-**Mailing:** Toronto, Ontario. Confirm a mailbox by email; never read a street address.  
+**Mailing:** Toronto, Ontario (mailbox confirmed by email only)  
 
 No invented metrics. If a number is only on an investor CIM or diligence pack, do **not** recite it on Birch/Scale sales voice unless it is also on the approved public site and still not on NEVER-SAY.
 

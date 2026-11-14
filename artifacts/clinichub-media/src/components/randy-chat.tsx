@@ -788,7 +788,7 @@ export function RandyChat() {
               type="button"
               onClick={() => openWidget({ reason: "launcher", mode: "chat" })}
               className="bsq-btn randy-lift block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-              aria-label={`${SQUIRREL_NAME}: ask about the Birch Reserve List and early slots`}
+              aria-label={`${SQUIRREL_NAME}: ask about Birch Reserve category seats and pricing`}
               title={SQUIRREL_NAME}
               data-testid="button-open-randy-chat"
             >
