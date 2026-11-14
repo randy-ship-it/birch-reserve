@@ -32,7 +32,6 @@ import BrAgencies from '@/pages/br/agencies';
 import BrAiBuyers from '@/pages/br/ai-buyers';
 import BrAudiences from '@/pages/br/audiences';
 import BrSampleProfile from '@/pages/br/sample-profile';
-import Kit from '@/pages/kit';
 import SellAdsPage from '@/pages/sell-ads';
 import Terms from '@/pages/terms';
 import Privacy from '@/pages/privacy';
@@ -296,7 +295,7 @@ function Router() {
           <Layout><About /></Layout>
         </Route>
         <Route path="/kit">
-          <Layout><Kit /></Layout>
+          <Redirect to="/media-kit" />
         </Route>
         <Route path="/sell-ads">
           <Layout><SellAdsPage /></Layout>

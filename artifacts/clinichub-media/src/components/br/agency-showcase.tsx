@@ -40,9 +40,9 @@ export function AgencyHero() {
             <p className="mb-4 flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground/60">
               For agencies &amp; media buyers <span aria-hidden className="h-px w-6 bg-foreground/30" /> First-party health inventory
             </p>
-            <h1 className="font-display text-[2.5rem] leading-[1.02] tracking-tight md:text-[4.25rem]">
-              Place a client inside the health hubs. <em className="not-italic text-foreground/55">Keep {AGENCY_SHARE.pct}% of the spend.</em>
-            </h1>
+            <h2 className="font-display text-[2.1rem] leading-[1.04] tracking-tight md:text-[3.5rem]">
+              Agencies: place a client inside the health hubs. <em className="not-italic text-foreground/55">Keep {AGENCY_SHARE.pct}% of the spend.</em>
+            </h2>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground" data-testid="agency-inventory-line">
               {INVENTORY_LINE} Fixed starting rates, the surface named on the IO, and UTM and promo-code reporting per hub.
             </p>
@@ -222,7 +222,6 @@ export function InsiderGrid() {
             <>Views, clicks, UTM-tagged visits and promo-code redemptions, per hub and per surface.</>,
             <>Your UTM parameters on every placement; a promo code if you want one.</>,
             <>Pre-flight views are modelled from the TAM feed (scalehealth.ca/tam) and labelled that way. Campaign results come from your UTMs and codes.</>,
-            <>Modelled display CTR band {(TAM.ctrLo * 100).toFixed(2)}%–{(TAM.ctrHi * 100).toFixed(2)}% <Tag>Modelled</Tag></>,
             <>Aggregate reporting only.</>,
           ]}
         />

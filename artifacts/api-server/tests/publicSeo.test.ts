@@ -70,7 +70,6 @@ test("GET /sitemap.xml is XML and lists public pages without API, inventory, or 
 
 test("server HTML and SPA shells expose canonical, og:url, og:image, and twitter:card", async () => {
   const pages: Array<[string, string]> = [
-    ["/kit", "https://birchreserve.net/kit"],
     ["/terms", "https://birchreserve.net/terms"],
     ["/privacy", "https://birchreserve.net/privacy"],
     ["/sample-io", "https://birchreserve.net/sample-io"],
@@ -81,6 +80,10 @@ test("server HTML and SPA shells expose canonical, og:url, og:image, and twitter
     ["/success", "https://birchreserve.net/success"],
     ["/splash/activation", "https://birchreserve.net/splash/activation"],
   ];
+  // /kit is an alias of the one-link media kit (Randy, Nov 13 2026 9:41 PM ET).
+  const kitRedirect = await fetch(`${origin}/kit?utm_source=email`, { redirect: "manual" });
+  assert.equal(kitRedirect.status, 302);
+  assert.equal(kitRedirect.headers.get("location"), "/media-kit?utm_source=email");
   for (const [path, canonical] of pages) {
     const res = await fetch(`${origin}${path}`);
     assert.equal(res.status, 200, path);
@@ -225,7 +228,10 @@ test("buycalc HTML is one short, clean buy path with the category facts and no p
   assert.doesNotMatch(html, /sh-proof|is the stamp|names the category\.|the square|already opened|Copy quote JSON|id="seat-calc"/);
   assert.equal((html.match(/fully refundable until 14 days before your launch date/gi) ?? []).length, 2);
   assert.doesNotMatch(html, /The zone is locked by the buyer/);
-  assert.match(html, /Prepay your category(?:'|&#39;)s display space\. One brand\. No bidding\./);
+  assert.match(html, /Lock a seat inside Scale Health hubs\. No bidding\./);
+  assert.match(html, /3 of 8 seats open/);
+  assert.match(html, /id="catreq"/);
+  assert.match(html, /href="tel:\+16479316278"/);
   assert.match(html, /No impression guarantee/);
   assert.doesNotMatch(html, /exclusiv/i);
   assert.doesNotMatch(html, /Align|Clairvoyant|Kalaya|80 locations/);
@@ -240,7 +246,9 @@ test("buycalc HTML is one short, clean buy path with the category facts and no p
   const closedStrip = closed.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
   assert.match(closedStrip, /data-seats-open="0"/);
   assert.equal((closedStrip.match(/<li /g) ?? []).length, 8);
-  assert.doesNotMatch(closedStrip, /href=/);
+  // Sold out: every category links to the request form, never to checkout.
+  assert.doesNotMatch(closedStrip, /#reserve/);
+  assert.equal((closedStrip.match(/#request"/g) ?? []).length, 8);
   assert.match(closed, /<article class="offer is-selected" data-sku="reserve-490">/);
   assert.doesNotMatch(html, /8\.7M|56M monthly views|20M\+|100M\+ orders/);
   assert.doesNotMatch(html, /reserve-899/);
@@ -303,7 +311,7 @@ test("availability and buycalc stay up when Postgres cannot answer the seat quer
   assert.equal(buy.status, 200);
   assert.match(buy.headers.get("content-type") ?? "", /^text\/html/);
   const html = await buy.text();
-  assert.match(html, /8 of 8 open/);
+  assert.match(html, /8 of 8 seats open/);
   assert.match(html, /The insertion order names the hub and the category before anything runs\./);
   assert.doesNotMatch(html, /sh-proof|is the stamp|Copy quote JSON/);
   assert.doesNotMatch(html, /The zone is locked by the buyer/);
