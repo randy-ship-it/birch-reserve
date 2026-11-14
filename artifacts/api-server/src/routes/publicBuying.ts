@@ -493,7 +493,7 @@ export async function categoryStatuses(seatsOpen?: number): Promise<Array<{ slug
 }
 
 const PUBLIC_BRAND_DESCRIPTION =
-  "Prepay your category's display space across listed Scale Health hubs. One of 8 category seats, no bidding. Fully refundable until 14 days before launch. Live hub: physio.drhonow.com. Your payment is display credit, not airfare.";
+  "Reserve a share of display space across a growing network of private health and wellness hubs: Scale Health, Calm Joints and more. Placements curated as hubs launch, no bidding. Fully refundable until 14 days before launch. Your payment is display credit.";
 
 /** The eight site category slugs (same as Friday's seat feed and /kit). One brand per category. */
 export const BUYCALC_CATEGORIES = [
@@ -2332,28 +2332,18 @@ function renderBuycalcHtmlUsd(input: {
     const isSelected = offer.sku === selected.sku;
     return `<article class="offer${isSelected ? " is-selected" : ""}" data-sku="${offer.sku}">${isSelected ? `<span class="badge">Selected</span>` : ""}<small>${body.eyebrow}</small><div class="price">${price(offer)}</div><div class="name">${body.name}</div>${body.lines.map((line) => `<p>${line}</p>`).join("")}<a class="btn${offer.sku === "reserve-490" ? "" : " line"}" href="/buycalc?sku=${offer.sku}${category ? `&amp;category=${category}` : ""}#reserve" data-pick-sku="${offer.sku}">${body.cta}</a></article>`;
   };
-  const poolOpen = input.seatsOpen > 0;
-  const statusOf = (slug: string): BuycalcCategoryStatus =>
-    input.categories?.find((x) => x.slug === slug)?.status ?? (poolOpen ? "open" : "waitlist");
-  const categoryCells = BUYCALC_CATEGORIES.map((c) => {
-    const st = statusOf(c.slug);
-    return st === "open"
-      ? `<li data-slug="${c.slug}" data-status="open"><a href="/buycalc?sku=${selected.sku}&amp;category=${c.slug}#reserve" data-pick-category="${c.slug}">${c.label}<em>Open · pick</em></a></li>`
-      : `<li data-slug="${c.slug}" data-status="${st}"><a class="req" href="/buycalc?category=${c.slug}#request" data-request-category="${c.slug}">${c.label}<em>Waitlist · request it</em></a></li>`;
-  }).join("");
-  const openNow = input.seatsOpen;
   const submitLabel = checkoutLive
     ? `Continue to secure checkout · ${price(selected)}`
     : `Reserve my seat · no charge today`;
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Prepay your category — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | The $490 seat is the named category"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | The $490 seat is the named category"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">${publicSeoTags("/buycalc")}
+<title>Reserve display space — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | Display space across private health and wellness hubs"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | Display space across private health and wellness hubs"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">${publicSeoTags("/buycalc")}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <link rel="alternate" type="application/json" href="/v1/catalog.json" title="Birch Reserve machine catalog">
 <script type="application/ld+json">${JSON.stringify({
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: "Birch Reserve brand category slots",
+  name: "Birch Reserve hub network display space",
   itemListElement: PUBLIC_RESERVE_OFFERS.map((offer, index) => ({
     "@type": "ListItem",
     position: index + 1,
@@ -2375,34 +2365,34 @@ function renderBuycalcHtmlUsd(input: {
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>${BUYCALC_CSS}</style></head><body>
-<header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav aria-label="Buy page"><a class="tl" href="/media-kit">Media kit</a><a class="tl" href="#request">Request a category</a><a class="tl tel" href="tel:+16479316278">(647) 931-6278</a>${currencyToggleHtml(currency, { sku: input.sku, format: input.format, category })}</nav></div></header>
+<header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav aria-label="Buy page"><a class="tl" href="/media-kit">Media kit</a><a class="tl" href="#request">Ask about a placement</a><a class="tl tel" href="tel:+16479316278">(647) 931-6278</a>${currencyToggleHtml(currency, { sku: input.sku, format: input.format, category })}</nav></div></header>
 <main>
-<section class="hero"><div class="wrap"><p class="eyebrow">Birch Reserve · Category seats inside Scale Health hubs</p><h1>Lock a seat inside Scale Health hubs. No bidding.</h1>
-<p class="avail" data-testid="buycalc-avail"><span class="dot" aria-hidden="true"></span><strong>${openNow} of ${input.seatsTotal} seats open</strong> · live from current holds · open seats move</p>
-<p class="lede">Your brand sits inside listed Scale Health hubs, right after a member books or buys. All of it is media credit until the insertion order (IO), fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
-<div class="ctas"><a class="btn" href="/buycalc?sku=reserve-490#reserve" data-pick-sku="reserve-490">Lock a seat · ${price(seat)}</a><a class="btn line" href="/buycalc?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · ${price(look)}</a></div>
-<p class="hero-contact">Questions? <a href="tel:+16479316278">(647) 931-6278</a> · <a href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">sales@silverbirchgrowth.com</a> · <a href="#request">Request a category</a></p></div></section>
+<section class="hero"><div class="wrap"><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
+<p class="avail" data-testid="buycalc-avail"><span class="dot" aria-hidden="true"></span><strong>Limited early placements</strong> · curated as hubs launch</p>
+<p class="lede">Reserve a share of display space across our growing network of private, members-only hubs: Scale Health and Calm Joints, with more launching. Your brand shows right after a member books or buys. All of it is media credit until the insertion order (IO), fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
+<div class="ctas"><a class="btn" href="/buycalc?sku=reserve-490#reserve" data-pick-sku="reserve-490">Reserve your space · ${price(seat)}</a><a class="btn line" href="/buycalc?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · ${price(look)}</a></div>
+<p class="hero-contact">Questions? <a href="tel:+16479316278">(647) 931-6278</a> · <a href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">sales@silverbirchgrowth.com</a> · <a href="#request">Ask about a placement</a></p></div></section>
 
 <section class="band" id="offers"><div class="wrap"><p class="kicker">Two ways in</p><h2>Pick your start.</h2>
-<div class="offers">${offerCard(look, { eyebrow: "7-day look", name: look.name, lines: ["See your category placement for 7 days while you decide.", "Converts in full to the seat within 7 days, otherwise refunded. Does not take a seat."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Category seat", name: "One of 8 seats", lines: [`All ${price(seat)} becomes display credit in your category. Credit lasts 12 months.`, "Takes one of the 8 self-serve seats. A premium slot (inquire only) locks one brand per category."], cta: `Lock a seat · ${price(seat)}` })}</div>
+<div class="offers">${offerCard(look, { eyebrow: "7-day look", name: look.name, lines: ["See your placement for 7 days while you decide.", "Converts in full to the reserve within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Reserve", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the hub network. Credit lasts 12 months.`, "Placements are curated as hubs launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Reserve your space · ${price(seat)}` })}</div>
 <!--BONUS_TIER_DRAFT-->
 </div></section>
 
 <section class="band" id="included"><div class="wrap"><p class="kicker">What you get</p><h2>Plain terms.</h2>
-<ul class="facts"><li>8 self-serve seats across 8 categories. No auction.</li><li>100% of what you pay is media credit in your category.</li><li>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</li><li>The insertion order names the hub and the category before anything runs.</li><li>Aggregate reporting only. No PHI, no clinical pixels.</li><li>No impression guarantee, and no reach or click forecast.</li></ul>
-<div class="proof"><p><span class="tag">Live placement</span><a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>, a listed physio hub. Your card sits at the booking and the plan, in your category. Illustrative until your insertion order names the hub.</p>
+<ul class="facts"><li>A share of display space across the hub network. No auction.</li><li>100% of what you pay is media credit.</li><li>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</li><li>The insertion order names the hub and placement before anything runs.</li><li>Aggregate reporting only. No PHI, no clinical pixels.</li><li>No impression guarantee, and no reach or click forecast.</li></ul>
+<div class="proof"><p><span class="tag">Live placement</span><a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>, a listed physio hub. Your card sits at the booking and the plan. Illustrative until your insertion order names the hub.</p>
 <p><span class="tag">Public benchmark</span>Not a Birch result: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p></div>
 </div></section>
 
-<section class="band" id="categories"><div class="wrap"><p class="kicker">Categories</p><h2>Eight categories. Pick yours.</h2>
-<p class="open-count"><strong>${openNow} of ${input.seatsTotal} seats open</strong> · Live: subtracts paid and currently held seats. Want a category we haven't listed, or a premium slot? Request it below.</p>
-<ul class="cat-strip" data-source="/availability.json" data-seats-open="${input.seatsOpen}">${categoryCells}</ul>
+<section class="band" id="categories"><div class="wrap"><p class="kicker">The network</p><h2>A growing network of private hubs.</h2>
+<p class="open-count"><strong>Limited early placements</strong> · We curate placements as each hub launches. Want a premium slot or something custom? Ask below.</p>
+<ul class="cat-strip" data-testid="network-hubs"><li><span>Scale Health</span></li><li><span>Calm Joints</span></li><li><span>More hubs launching</span></li></ul>
 </div></section>
 
 <section class="band" id="buy"><div class="wrap"><div class="buy">
 <form id="reserve" novalidate><p class="kicker">Reserve without a login</p><h2 style="margin-bottom:6px">Lock it in.</h2>
-<label for="f-sku">Offer</label><select id="f-sku" name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${offer.sku === selected.sku ? " selected" : ""}>${price(offer)} · ${offer.sku === "reserve-490" ? "Named category seat" : offer.name}</option>`).join("")}</select>
-<label for="f-cat">Category</label><select id="f-cat" name="category"><option value="">Not sure yet</option>${BUYCALC_CATEGORIES.map((c) => `<option value="${c.slug}"${c.slug === category ? " selected" : ""}>${c.label}</option>`).join("")}</select>
+<label for="f-sku">Offer</label><select id="f-sku" name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${offer.sku === selected.sku ? " selected" : ""}>${price(offer)} · ${offer.sku === "reserve-490" ? "Reserve your space" : "7-day look"}</option>`).join("")}</select>
+${category ? `<input type="hidden" name="category" value="${category}">` : ""}
 <label for="f-brand">Brand</label><input id="f-brand" name="brand" required maxlength="160" autocomplete="organization">
 <label for="f-email">Work email</label><input id="f-email" name="email" type="email" required autocomplete="email">
 <div class="row2"><div><label for="f-web">Website <span class="fine">(optional)</span></label><input id="f-web" name="website_url" type="url" inputmode="url" placeholder="https://"></div><div><label for="f-format">Where it shows</label><select id="f-format" name="format_pref">${FORMATS.map((f) => `<option value="${f}"${(isFormat(input.format) ? input.format : DEFAULT_SELF_SERVE_FORMAT) === f ? " selected" : ""}${isPremiumFormat(f) ? ' data-inquire="1"' : ""}>${BUYCALC_FORMAT_LABELS[f]}${isPremiumFormat(f) ? " · Inquire" : ""}</option>`).join("")}</select></div></div>
@@ -2413,21 +2403,21 @@ function renderBuycalcHtmlUsd(input: {
 <p id="message" role="status" aria-live="polite"></p>
 <noscript><p class="fine">This form needs JavaScript. To reserve without it, <a href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">email sales@silverbirchgrowth.com</a> or call <a href="tel:+16479316278">(647) 931-6278</a>.</p></noscript>
 </form>
-<aside class="talk"><h3>Rather talk first?</h3><p>We'll walk you through the hubs, your category and the brief.</p><a class="btn" href="tel:+16479316278">Call (647) 931-6278</a><a class="btn line" href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">sales@silverbirchgrowth.com</a><a class="btn line" href="/media-kit">See the media kit</a></aside>
+<aside class="talk"><h3>Rather talk first?</h3><p>We'll walk you through the hubs, placements and the brief.</p><a class="btn" href="tel:+16479316278">Call (647) 931-6278</a><a class="btn line" href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">sales@silverbirchgrowth.com</a><a class="btn line" href="/media-kit">See the media kit</a></aside>
 </div></div></section>
 
 <section class="band" id="request"><div class="wrap"><div class="buy">
-<form id="catreq" novalidate data-testid="category-request-form"><p class="kicker">No card needed</p><h2 style="margin-bottom:6px">Request this category.</h2>
-<p class="fine" style="margin:0 0 4px">Tell us the brand and category. Our sales team gets it right away and replies by email.</p>
+<form id="catreq" novalidate data-testid="category-request-form"><p class="kicker">No card needed</p><h2 style="margin-bottom:6px">Ask about a placement.</h2>
+<p class="fine" style="margin:0 0 4px">Tell us your brand and what you sell. Our sales team gets it right away and replies by email.</p>
 <label for="r-brand">Brand name</label><input id="r-brand" name="brand" required maxlength="160" autocomplete="organization">
-<label for="r-cat">Category</label><select id="r-cat" name="category" required><option value="">Pick a category</option>${BUYCALC_CATEGORIES.map((c) => `<option value="${c.slug}"${c.slug === category ? " selected" : ""}>${c.label}</option>`).join("")}<option value="other">Other / not sure</option></select>
+<input type="hidden" name="category" value="${category ?? "other"}">
 <label for="r-email">Work email</label><input id="r-email" name="email" type="email" required autocomplete="email">
-<label for="r-notes">Notes <span class="fine">(optional)</span></label><textarea id="r-notes" name="notes" rows="3" maxlength="1000"></textarea>
+<label for="r-notes">What you sell, timing or questions <span class="fine">(optional)</span></label><textarea id="r-notes" name="notes" rows="3" maxlength="1000"></textarea>
 <div style="position:absolute;left:-9999px" aria-hidden="true"><label for="r-hp">Company website</label><input id="r-hp" name="company_website" tabindex="-1" autocomplete="off"></div>
-<button id="r-submit" class="btn" type="submit">Request this category</button>
+<button id="r-submit" class="btn" type="submit">Send request</button>
 <p id="r-message" role="status" aria-live="polite"></p>
 </form>
-<aside class="talk"><h3>Talk to a person</h3><p>Same-day replies on weekdays.</p><a class="btn" href="tel:+16479316278">Call (647) 931-6278</a><a class="btn line" href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20category%20request">sales@silverbirchgrowth.com</a></aside>
+<aside class="talk"><h3>Talk to a person</h3><p>Same-day replies on weekdays.</p><a class="btn" href="tel:+16479316278">Call (647) 931-6278</a><a class="btn line" href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20placement%20request">sales@silverbirchgrowth.com</a></aside>
 </div></div></section>
 </main>
 <footer><div class="wrap"><p>Media credit until IO · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only</p><p>Silver Birch Growth Inc. · Toronto, Ontario · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · <a href="tel:+16479316278">(647) 931-6278</a></p><p>Machine-readable catalog: <a href="/v1/catalog.json">/v1/catalog.json</a> · <a href="/v1/quote?sku=reserve-490&amp;format=post_checkout&amp;days=30">/v1/quote</a> · <a href="/llms.txt">/llms.txt</a></p></div></footer>
@@ -2442,7 +2432,7 @@ document.querySelectorAll("[data-pick-category]").forEach(function(a){a.addEvent
 form.addEventListener("submit",async function(e){e.preventDefault();if(!form.reportValidity())return;if(!document.getElementById("terms").checked){message.textContent="Please accept the draft terms first.";return}submit.disabled=true;var data=Object.fromEntries(new FormData(form));if(premium()){message.textContent="Sending your inquiry…";try{var lr=await fetch("/v1/leads",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({kind:inquiryKind,email:data.email,company:data.brand,website:data.website_url||"",message:"Premium slot inquiry from /buycalc",fields:{sku:data.sku,format_pref:data.format_pref,category:data.category||"",currency:currency,path:"/buycalc"}})});var lo=await lr.json().catch(function(){return{}});if(lr.ok&&lo.ok!==false){message.textContent="Inquiry sent. No card was charged. We'll reply with an insertion order at "+data.email+".";form.querySelectorAll("input,select,button").forEach(function(el){el.disabled=true});return}message.textContent=lo.error||"We could not send that. Email sales@silverbirchgrowth.com.";submit.disabled=false}catch(err){message.textContent="We could not send that. Email sales@silverbirchgrowth.com.";submit.disabled=false}return}message.textContent="Saving your request…";data.idempotency_key=idempotencyKey;data.currency=currency;if(!data.website_url)delete data.website_url;if(!data.category)delete data.category;try{var r=await fetch("/v1/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)});var out=await r.json();if(out.checkout_url){location.assign(out.checkout_url);return}if(out.order_id){message.textContent="Saved. Your seat request is in (ref "+out.order_id+"). No card was charged. Our sales team will reach you at "+data.email+", or call (647) 931-6278.";form.querySelectorAll("input,select,button").forEach(function(el){el.disabled=true});return}message.textContent=out.error||"We could not save that. Please call (647) 931-6278 or email sales@silverbirchgrowth.com.";submit.disabled=false}catch(err){message.textContent="We could not submit that. No payment was taken. Please call (647) 931-6278 or email sales@silverbirchgrowth.com.";submit.disabled=false}});
 var rq=document.getElementById("catreq"),rm=document.getElementById("r-message"),rs=document.getElementById("r-submit");
 document.querySelectorAll("[data-request-category]").forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();rq.elements.category.value=a.getAttribute("data-request-category");document.getElementById("request").scrollIntoView({behavior:"smooth",block:"start"});setTimeout(function(){document.getElementById("r-brand").focus({preventScroll:true})},400)})});
-rq.addEventListener("submit",async function(e){e.preventDefault();if(!rq.reportValidity())return;rs.disabled=true;rm.textContent="Sending…";var d=Object.fromEntries(new FormData(rq));d.path="/buycalc";try{var q=new URLSearchParams(location.search);d.utm={utm_source:q.get("utm_source")||"",utm_medium:q.get("utm_medium")||"",utm_campaign:q.get("utm_campaign")||""}}catch(_){}try{var r=await fetch("/v1/category-request",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(d)});var o=await r.json().catch(function(){return{}});if(r.ok&&o.ok){rm.textContent="Got it. Your request for "+(o.category||"this category")+" is in. We'll reply to "+d.email+" shortly. No card was charged.";rq.querySelectorAll("input,select,textarea,button").forEach(function(el){el.disabled=true});return}rm.textContent=o.error||"We could not send that. Call (647) 931-6278 or email sales@silverbirchgrowth.com.";rs.disabled=false}catch(err){rm.textContent="We could not send that. Call (647) 931-6278 or email sales@silverbirchgrowth.com.";rs.disabled=false}});
+rq.addEventListener("submit",async function(e){e.preventDefault();if(!rq.reportValidity())return;rs.disabled=true;rm.textContent="Sending…";var d=Object.fromEntries(new FormData(rq));d.path="/buycalc";try{var q=new URLSearchParams(location.search);d.utm={utm_source:q.get("utm_source")||"",utm_medium:q.get("utm_medium")||"",utm_campaign:q.get("utm_campaign")||""}}catch(_){}try{var r=await fetch("/v1/category-request",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(d)});var o=await r.json().catch(function(){return{}});if(r.ok&&o.ok){rm.textContent="Got it. Your request is in. We'll reply to "+d.email+" shortly. No card was charged.";rq.querySelectorAll("input,select,textarea,button").forEach(function(el){el.disabled=true});return}rm.textContent=o.error||"We could not send that. Call (647) 931-6278 or email sales@silverbirchgrowth.com.";rs.disabled=false}catch(err){rm.textContent="We could not send that. Call (647) 931-6278 or email sales@silverbirchgrowth.com.";rs.disabled=false}});
 refresh();if(location.hash==="#reserve"&&/[?&]format=/.test(location.search)){setTimeout(function(){document.getElementById("f-brand").focus({preventScroll:true})},350)}})();
 </script></body></html>`;
 }

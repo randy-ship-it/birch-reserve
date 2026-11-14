@@ -948,7 +948,7 @@ test("public marketing title and description match the brand strings", async () 
   assert.doesNotMatch(indexHtml, /\$899|payments paused/i);
 
   const buying = await readFile(resolve(process.cwd(), "src/routes/publicBuying.ts"), "utf8");
-  assert.match(buying, /const PUBLIC_BRAND_DESCRIPTION =\s*\n\s*"Prepay your category(?:'|&#39;)s display space across listed Scale Health hubs\./);
+  assert.match(buying, /const PUBLIC_BRAND_DESCRIPTION =\s*\n\s*"Reserve a share of display space across a growing network of private health and wellness hubs/);
   assert.doesNotMatch(buying, /\$490 holds a category seat inside listed Scale Health hubs/);
 });
 

@@ -154,15 +154,15 @@ export const BIRCH_SITE_SCOPE_PROMPT = [
   `Buying under $10,000 ($190 look, $490 seat): walk them to https://birchreserve.net/buycalc step by step (pick offer, category, brand and work email, tick terms, pay on Stripe). Checkout is live. Never claim a payment went through unless they say they paid. If they are not ready, offer the request form https://birchreserve.net/buycalc#request.`,
   `$10,000+ / premium ($25K to $50K, inquire only) / partnership / serious prospects: offer a call-back. Ask one question at a time for name, company, phone, email and best time to call (plus what they want and rough budget). Read the details back and ask them to confirm. You may give the direct line ${BIRCH_SALES_PHONE}.`,
   'CALL-BACK SUBMIT: only after they confirm the details, end that reply with ONE final line exactly like: [[CALLBACK]]{"name":"...","company":"...","phone":"...","email":"...","best_time":"...","interest":"...","budget":"..."} (JSON on the same line, use "" for anything unknown; phone or email is required). The line is hidden from the visitor and alerts the team instantly. Tell them the call-back request is in. Never emit it twice in a conversation, and never for under-$10K buys.',
-  "Never promise per-seat impressions, CTR, or view guarantees (no reach or click promises either). Modelled numbers must be called modelled. Never call the $490 seat exclusive; only a premium slot locks one brand per category.",
+  "Never promise per-seat impressions, CTR, or view guarantees (no reach or click promises either). Modelled numbers must be called modelled. Never call the $490 reserve exclusive; only a premium slot adds exclusivity. Never quote category lists or seat counts.",
 ].join(" ");
 
 const CHIP_INTENT_NOTES: Record<string, string> = {
   how_seats:
-    "Visitor tapped \"How early slots work\": explain the 8 self-serve seats across 8 categories (open to more than one brand; a premium slot locks one brand per category), the $490 seat and $190 look, give https://birchreserve.net/buycalc, then ask their category.",
+    "Visitor tapped \"How it works\": explain that a $490 reserve buys a share of display space across the growing hub network (Scale Health, Calm Joints and more), curated as hubs launch, plus the $190 look; premium slots add exclusivity. Give https://birchreserve.net/buycalc, then ask what they sell.",
   hold_190:
-    "Visitor tapped \"See the Reserve List\": explain the open seats and categories, give https://birchreserve.net/buycalc (live seat count), and ask which category they want.",
-  live_hub: `Visitor tapped \"See a live hub\": share ${LIVE_HUB_PROOF_URL} as the live proof, then ask what category they would want there.`,
+    "Visitor tapped \"Reserve space\": walk them through reserving at https://birchreserve.net/buycalc ($490 reserve or $190 look), and ask what they sell.",
+  live_hub: `Visitor tapped \"See a live hub\": share ${LIVE_HUB_PROOF_URL} as the live proof, then ask what they would want to show there.`,
   talk_human:
     "Visitor tapped \"Talk to a human\": say you can set that up, ask the first quick question (company or brand), and mention the AI call or a callback come right after.",
 };

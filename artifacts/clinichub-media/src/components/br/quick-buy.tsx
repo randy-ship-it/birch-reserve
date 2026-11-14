@@ -114,7 +114,7 @@ export function QuickBuy() {
         <p className="mt-6 text-xs font-semibold uppercase tracking-wider text-foreground/60">2. Pick your start</p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2" role="group" aria-label="Budget">
           <Chip on={sku === "reserve-490"} onClick={() => setSku("reserve-490")} testId="qb-sku-reserve-490">
-            {priceLabel("reserve-490", currency)} · Category seat
+            {priceLabel("reserve-490", currency)} · Reserve
             <span className="block text-xs font-normal opacity-70">All of it is media credit</span>
           </Chip>
           <Chip on={sku === "hold-190"} onClick={() => setSku("hold-190")} testId="qb-sku-hold-190">
@@ -194,7 +194,7 @@ function PremiumInquiry({ picks, currency, ref }: { picks: InquiryPicks; currenc
   const surfaces = (picks.surfaces ?? "").split(",").filter(Boolean);
   const summary = [
     picks.placement ? `Placement: ${placementLabel(picks.placement)}` : "",
-    picks.sku ? `Start: ${priceLabel(picks.sku, currency as never)} ${picks.sku === "hold-190" ? "7-day look" : "category seat"}` : "",
+    picks.sku ? `Start: ${priceLabel(picks.sku, currency as never)} ${picks.sku === "hold-190" ? "7-day look" : "reserve"}` : "",
     picks.block ? `View block: ${fmtViews(Number(picks.block))} views per surface` : "",
     surfaces.length ? `Surfaces: ${surfaces.map((k) => RATE_SURFACES.find((s) => s.key === k)?.short ?? k).join(", ")}` : "",
   ].filter(Boolean);

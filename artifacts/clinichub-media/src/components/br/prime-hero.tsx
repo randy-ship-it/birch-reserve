@@ -1,13 +1,14 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowRight, Mail, Phone } from "lucide-react";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
-import { MEDIA_KIT_CATEGORIES } from "../../../../api-server/src/lib/overhaul/mediaKit";
 
 /**
  * Prime-time path (Randy, Nov 13 2026 9:41 PM ET): someone fresh from an ad-sales
- * email understands the offer, sees open inventory and locks a seat or requests a
- * category in under 60 seconds. Availability is read live from /availability.json
- * (paid + held seats subtracted); nothing here is a hardcoded seat count.
+ * email understands the offer and reserves space in under 60 seconds.
+ * Broad positioning (Randy, Nov 14 2026 8:38 AM ET): buyers get a share of display
+ * space across our growing hub network, curated as hubs launch. No public category
+ * grid and no seat counts. Prices come from /availability.json so the label is in
+ * the buyer's checkout currency (CAD in Canada, USD elsewhere).
  */
 
 export const SALES_PHONE_DISPLAY = "(647) 931-6278";
@@ -25,8 +26,8 @@ export type Availability = {
   lookLabel: string;
 };
 
-const slugOf = (label: string) => label.toLowerCase().replace(/[’']/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const FALLBACK_CATEGORIES = MEDIA_KIT_CATEGORIES.map((label) => ({ slug: slugOf(label), label }));
+/** Hub brands in the network today; more launch over time. */
+export const NETWORK_HUBS = ["Scale Health", "Calm Joints"] as const;
 
 export function useAvailability(): Availability | null {
   const [a, setA] = useState<Availability | null>(null);
@@ -52,44 +53,27 @@ export function useAvailability(): Availability | null {
   return a;
 }
 
-function openCount(a: Availability): number {
-  return a.seatsOpen;
+/** Price labels in the buyer's checkout currency; bare USD figures until /availability.json answers. */
+export function priceLabels(a: Availability | null): { seat: string; look: string } {
+  return { seat: a?.seatLabel ?? "$490", look: a?.lookLabel ?? "$190" };
 }
 
-export function AvailabilityStrip({ a, dark = false }: { a: Availability | null; dark?: boolean }) {
-  const cats = a?.categories.length ? a.categories : FALLBACK_CATEGORIES.map((c) => ({ ...c, status: "open" as CategoryStatus }));
+/** The network strip: hub names and limited early access. No category grid, no seat counts. */
+export function AvailabilityStrip({ dark = false }: { a?: Availability | null; dark?: boolean }) {
   return (
     <div data-testid="avail-strip">
-      <p className={`inline-flex items-center gap-2 border px-3 py-1.5 text-sm font-semibold ${dark ? "border-accent text-background" : "border-foreground bg-white"}`} aria-live="polite">
+      <p className={`inline-flex items-center gap-2 border px-3 py-1.5 text-sm font-semibold ${dark ? "border-accent text-background" : "border-foreground bg-white"}`}>
         <span className="relative inline-flex size-2.5">
           <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#3b9b00] opacity-60" />
           <span className="relative inline-flex size-2.5 rounded-full bg-[#3b9b00]" />
         </span>
-        {a ? (
-          <span data-testid="avail-count"><strong className={dark ? "text-accent" : ""}>{openCount(a)} of {a.seatsTotal} seats open</strong> · live from current holds</span>
-        ) : (
-          <span data-testid="avail-count">Checking open seats…</span>
-        )}
+        <span data-testid="avail-count"><strong className={dark ? "text-accent" : ""}>Limited early placements</strong> · curated as hubs launch</span>
       </p>
-      <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4" data-testid="avail-cats">
-        {cats.map((c) => {
-          const open = !a || (c.status === "open" && a.seatsOpen > 0);
-          const href = open ? `/buycalc?sku=reserve-490&category=${c.slug}#reserve` : `/buycalc?category=${c.slug}#request`;
-          return (
-            <li key={c.slug}>
-              <a
-                href={href}
-                className={`flex min-h-12 flex-col justify-center border px-3 py-2 text-[13px] font-semibold leading-tight transition-colors ${dark ? "border-background/25 hover:bg-background hover:text-foreground" : "border-foreground/20 bg-white hover:border-foreground hover:bg-foreground hover:text-background"}`}
-                data-status={a ? c.status : "loading"}
-              >
-                {c.label}
-                <span className={`mt-0.5 text-[10px] font-bold uppercase tracking-wider ${open ? (dark ? "text-accent" : "text-[#3b6b00]") : "text-[#a06a00]"}`}>
-                  {open ? "Open · pick" : "Waitlist · request"}
-                </span>
-              </a>
-            </li>
-          );
-        })}
+      <ul className="mt-3 flex flex-wrap gap-2" data-testid="network-hubs">
+        {NETWORK_HUBS.map((h) => (
+          <li key={h} className={`border px-3 py-2 text-[13px] font-semibold leading-tight ${dark ? "border-background/25" : "border-foreground/20 bg-white"}`}>{h}</li>
+        ))}
+        <li className={`border border-dashed px-3 py-2 text-[13px] font-semibold leading-tight ${dark ? "border-background/30 text-background/70" : "border-foreground/25 text-foreground/60"}`}>+ more hubs launching</li>
       </ul>
     </div>
   );
@@ -97,33 +81,37 @@ export function AvailabilityStrip({ a, dark = false }: { a: Availability | null;
 
 export function PrimeHero() {
   const a = useAvailability();
+  const p = priceLabels(a);
   return (
     <section className="border-b border-border/70 bg-foreground text-background" data-testid="prime-hero">
       <div className="container mx-auto px-5 pb-10 pt-8 md:px-6 md:pb-16 md:pt-14">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Birch Reserve · Category seats inside Scale Health hubs</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Birch Reserve · Display space across private health &amp; wellness hubs</p>
         <h1 className="mt-3 max-w-4xl font-display text-[2.2rem] leading-[1.03] tracking-tight md:text-[4rem]" data-testid="prime-h1">
-          Lock a seat inside Scale Health hubs.
+          Put your brand inside private health and wellness hubs.
         </h1>
-        <p className="mt-3 font-display text-xl text-background/80 md:text-3xl" data-testid="prime-scarcity">8 categories. 8 self-serve seats. Open seats move.</p>
+        <p className="mt-3 font-display text-xl text-background/80 md:text-3xl" data-testid="prime-scarcity">A growing network. Limited early placements. No bidding.</p>
+        <p className="mt-4 max-w-3xl text-base leading-relaxed text-background/80" data-testid="prime-what">
+          Reserve a share of display space across our growing network of private, members-only hubs: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, with more on the way. Placements are curated as each hub launches.
+        </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <a href={RESERVE_HREF} data-testid="prime-cta-seat" className="inline-flex h-14 items-center justify-center gap-2 bg-accent px-6 text-base font-semibold text-accent-foreground transition-colors hover:bg-background hover:text-foreground">
-            Lock a seat — {a?.seatLabel ?? "$490"} <ArrowRight className="size-4" aria-hidden />
+            Reserve your space — {p.seat} <ArrowRight className="size-4" aria-hidden />
           </a>
           <a href={LOOK_HREF} data-testid="prime-cta-look" className="inline-flex h-14 items-center justify-center gap-2 border border-background/50 px-6 text-base font-semibold text-background transition-colors hover:bg-background hover:text-foreground">
-            Take a 7-day look — {a?.lookLabel ?? "$190"} <ArrowRight className="size-4" aria-hidden />
+            Take a 7-day look — {p.look} <ArrowRight className="size-4" aria-hidden />
           </a>
         </div>
         <div className="mt-6">
-          <AvailabilityStrip a={a} dark />
+          <AvailabilityStrip dark />
         </div>
         <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-background/80">
-          <a href="/buycalc#categories" className="font-semibold text-accent underline underline-offset-4" data-testid="prime-see-seats">See open seats</a>
-          <a href="#request" className="underline underline-offset-4" data-testid="prime-request-link">Request a category</a>
+          <a href="/media-kit" className="font-semibold text-accent underline underline-offset-4" data-testid="prime-see-seats">See the media kit</a>
+          <a href="#request" className="underline underline-offset-4" data-testid="prime-request-link">Ask about a placement</a>
           <a href={SALES_PHONE_HREF} className="inline-flex items-center gap-1.5 underline-offset-4 hover:underline" data-testid="prime-phone"><Phone className="size-3.5" aria-hidden />{SALES_PHONE_DISPLAY}</a>
           <a href={`mailto:${SALES_EMAIL}?subject=Birch%20Reserve%20seat`} className="inline-flex items-center gap-1.5 underline-offset-4 hover:underline" data-testid="prime-email"><Mail className="size-3.5" aria-hidden />{SALES_EMAIL}</a>
         </p>
         <p className="mt-4 max-w-3xl text-xs leading-relaxed text-background/60">
-          $490 takes one of 8 self-serve seats: 100% media credit in your category until the insertion order (IO), fully refundable until 14 days before launch. The $190 look lets you see your placement for 7 days and converts in full to the seat, or is refunded. Seats are open to more than one brand per category; a premium slot ($25K–$50K, inquire only) locks one brand per category. No impression guarantees. Aggregate reporting only.
+          {p.seat} reserves your share of display space across the network: 100% media credit until the insertion order (IO), fully refundable until 14 days before launch. The {p.look} look gives you 7 days to see your placement and converts in full to the reserve, or is refunded. Premium slots ($25K–$50K, inquire only) add a larger share, priority placement and exclusivity. No impression guarantees. Aggregate reporting only.
         </p>
       </div>
     </section>
@@ -137,7 +125,7 @@ export function FaceBeforeFlight({ compact = false }: { compact?: boolean }) {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Proof</p>
         <h2 className="mt-2 font-display text-[1.9rem] leading-tight tracking-tight md:text-5xl">See the face before the flight.</h2>
         <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-          Open a live hub right now. This is the private, members-only experience your brand sits inside: hand-picked by category, next to the brand members already trust. No feed, no auction.
+          Open a live hub right now. This is the private, members-only experience your brand sits inside: placements curated hub by hub, next to the brand members already trust. No feed, no auction.
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <a href={LIVE_HUB_URL} target="_blank" rel="noopener" data-testid="face-live-hub" className="inline-flex h-12 items-center justify-center gap-2 bg-foreground px-6 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground">
@@ -191,9 +179,9 @@ export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path
     }
     try {
       const r = await fetch("/v1/category-request", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...data, path, utm }) });
-      const o = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string; category?: string };
+      const o = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (r.ok && o.ok) {
-        setState({ status: "done", msg: `Got it. Your request for ${o.category ?? "this category"} is in. We'll reply to ${data.email} shortly. No card was charged.` });
+        setState({ status: "done", msg: `Got it. Your request is in. We'll reply to ${data.email} shortly. No card was charged.` });
         return;
       }
       setState({ status: "error", msg: o.error ?? `We could not send that. Call ${SALES_PHONE_DISPLAY} or email ${SALES_EMAIL}.` });
@@ -206,29 +194,20 @@ export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path
   return (
     <form onSubmit={submit} noValidate className="relative border border-foreground bg-white p-5 md:p-6" data-testid="category-request-form">
       <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">No card needed</p>
-      <h3 className="mt-1 font-display text-2xl md:text-3xl">Request this category</h3>
-      <p className="mt-1 text-sm text-muted-foreground">Category full, need something custom, or want to talk first? Tell us the brand and category. Our sales team gets it right away.</p>
+      <h3 className="mt-1 font-display text-2xl md:text-3xl">Ask about a placement</h3>
+      <p className="mt-1 text-sm text-muted-foreground">Want to talk first, need something custom, or interested in a premium slot? Tell us your brand and what you sell. Our sales team gets it right away.</p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <label className="block text-sm">
           <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-foreground/70">Brand name</span>
           <input name="brand" required maxLength={160} autoComplete="organization" className={input} disabled={done} data-testid="cr-brand" />
         </label>
+        <input type="hidden" name="category" value={defaultCategory || "other"} data-testid="cr-category" />
         <label className="block text-sm">
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-foreground/70">Category</span>
-          <select name="category" required defaultValue={defaultCategory} className={input} disabled={done} data-testid="cr-category">
-            <option value="">Pick a category</option>
-            {FALLBACK_CATEGORIES.map((c) => (
-              <option key={c.slug} value={c.slug}>{c.label}</option>
-            ))}
-            <option value="other">Other / not sure</option>
-          </select>
-        </label>
-        <label className="block text-sm sm:col-span-2">
           <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-foreground/70">Work email</span>
           <input name="email" type="email" required autoComplete="email" className={input} disabled={done} data-testid="cr-email" />
         </label>
         <label className="block text-sm sm:col-span-2">
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-foreground/70">Notes <span className="normal-case tracking-normal text-foreground/50">(optional)</span></span>
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-foreground/70">What you sell, timing or questions <span className="normal-case tracking-normal text-foreground/50">(optional)</span></span>
           <textarea name="notes" maxLength={1000} rows={3} className="w-full border border-foreground/25 bg-white p-3 text-base outline-none focus:border-foreground focus:ring-2 focus:ring-accent disabled:opacity-60" disabled={done} data-testid="cr-notes" />
         </label>
       </div>
@@ -236,7 +215,7 @@ export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path
         <label>Company website<input name="company_website" tabIndex={-1} autoComplete="off" /></label>
       </div>
       <button type="submit" disabled={done || state.status === "sending"} className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 bg-foreground px-6 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-70" data-testid="cr-submit">
-        {state.status === "sending" ? "Sending…" : done ? "Request sent" : "Request this category"} {done ? null : <ArrowRight className="size-4" aria-hidden />}
+        {state.status === "sending" ? "Sending…" : done ? "Request sent" : "Send request"} {done ? null : <ArrowRight className="size-4" aria-hidden />}
       </button>
       <p role="status" aria-live="polite" className={`mt-3 min-h-5 text-sm font-semibold ${state.status === "error" ? "text-[#b42318]" : "text-[#2f6b00]"}`} data-testid="cr-message">{state.msg ?? ""}</p>
       <p className="mt-1 text-xs text-muted-foreground">

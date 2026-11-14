@@ -69,7 +69,8 @@ test("copy scan: agency sections, home and media kit carry no banned or retired 
   assert.doesNotMatch(agencyOnly, /\(\d{3}\)\s?\d{3}-\d{4}|\b\d{3}-\d{3}-\d{4}\b/);
   assert.doesNotMatch(agencyOnly, /fridayapp|cockpit/i);
   assert.doesNotMatch(agencyOnly, /keeps?[^.\n]{0,30}as media credit/i);
-  // Nov 13 2026: "Lock a seat — $490" locks one of 8 shared seats, never the category.
-  assert.match(files, /Lock a seat — \$490/);
+  // Nov 14 2026: broad network positioning; the reserve CTA shows the buyer-currency price.
+  assert.match(files, /Reserve your space — \{price\.seat\}/);
+  assert.doesNotMatch(files, /8 categories|8 self-serve seats|Eight categories/);
   assert.doesNotMatch(files, /\$490[^.\n]{0,40}(lock(s|ed)? (the|your) category|exclusive)/i);
 });

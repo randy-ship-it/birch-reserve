@@ -35,7 +35,7 @@ export const BRAND_BONUS_LINE = `Brand bonus credit (the client's, separate from
 
 /** Worked examples on the public tiers: $490 seat (card) and the $25K premium floor (inquire). */
 export const AGENCY_EXAMPLES = [
-  { label: "$490 category seat (card)", spend: 490 },
+  { label: "$490 reserve (card)", spend: 490 },
   { label: `Premium slot from $${MEDIA_KIT_OFFERS.premium.spendLo / 1000}K (inquire)`, spend: MEDIA_KIT_OFFERS.premium.spendLo },
 ].map((e) => ({ ...e, cash: agencyCash(e.spend) }));
 

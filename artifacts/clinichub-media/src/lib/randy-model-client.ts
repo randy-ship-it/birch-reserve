@@ -133,7 +133,7 @@ async function stubRandyReply(
 
   if (/\b(who (are|r) (you|u)|who('s| is) this|your name|are (you|u) (a |an )?(ai|bot|human|real))\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "I'm the Birch Q&A Squirrel, the AI guide on Birch Reserve. I help brands lock category seats inside Scale Health hubs. Want a real person? Tap Call for Randy's line or ask for a callback from Randy's team. What are you working on?",
+      text: "I'm the Birch Q&A Squirrel, the AI guide on Birch Reserve. I help brands reserve display space across our private health and wellness hubs. Want a real person? Tap Call for Randy's line or ask for a callback from Randy's team. What are you working on?",
       source: "stub",
     };
   }
@@ -148,14 +148,14 @@ async function stubRandyReply(
 
   if (chip === "how_seats") {
     return {
-      text: "There are 8 categories and 8 self-serve seats, open to more than one brand. A seat is $490 (100% media credit until the IO), or take a 7-day look for $190. Premium slots ($25K to $50K, inquire only) lock one brand per category. Open seats are live at https://birchreserve.net/buycalc. What category are you in?",
+      text: "You reserve a share of display space across our growing network of private hubs (Scale Health, Calm Joints and more), curated as hubs launch. Reserving is $490 (100% media credit until the IO), or take a 7-day look for $190. Premium slots ($25K to $50K, inquire only) add exclusivity. Start at https://birchreserve.net/buycalc. What do you sell?",
       source: "stub",
     };
   }
 
   if (chip === "hold_190") {
     return {
-      text: "Lock a seat at https://birchreserve.net/buycalc: pick the $490 seat or the $190 look, pick your category, add your brand and work email, then pay on the secure Stripe checkout. Which category are you in?",
+      text: "Reserve at https://birchreserve.net/buycalc: pick the $490 reserve or the $190 look, add your brand and work email, then pay on the secure Stripe checkout. What do you sell?",
       source: "stub",
     };
   }
@@ -163,14 +163,14 @@ async function stubRandyReply(
   if (chip === "live_hub") {
     return {
       // Emma HARD: never spell raw hub URLs as visible prose — label / markdown href only.
-      text: `Tap See a live hub — or open [See a live hub](${LIVE_HUB_PROOF_URL}). That’s the kind of surface a seat shows up on. What category would you want in front of those patients?`,
+      text: `Tap See a live hub — or open [See a live hub](${LIVE_HUB_PROOF_URL}). That’s the kind of surface your brand shows up on. What would you want in front of those members?`,
       source: "stub",
     };
   }
 
   if (/\b(190|490|hold|reserve|seat|price|pricing|buy|checkout)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "Lock a $490 category seat (100% media credit until the IO) or take a $190 7-day look at https://birchreserve.net/buycalc. Want to pay there, call, or keep going here?",
+      text: "Reserve for $490 (100% media credit until the IO) or take a $190 7-day look at https://birchreserve.net/buycalc. Want to pay there, call, or keep going here?",
       source: "stub",
       offerHandoff: true,
     };

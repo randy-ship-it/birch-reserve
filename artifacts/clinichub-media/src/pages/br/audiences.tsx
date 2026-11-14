@@ -377,7 +377,7 @@ export default function BrAudiences() {
             <Eyebrow>Start now</Eyebrow>
             <H2>Put your brand in front of the segment that fits.</H2>
             <p className="mt-4 max-w-2xl text-muted-foreground">
-              Start with a $190 refundable 7-day look and see your placement first, or take a $490 category seat. Credit spends down over 6 months and unused credit is refundable. Want a category to yourself, or a premium slot? Send an inquiry and we'll quote it.
+              Start with a $190 refundable 7-day look and see your placement first, or reserve for $490. Credit spends down over 6 months and unused credit is refundable. Want a category to yourself, or a premium slot? Send an inquiry and we'll quote it.
             </p>
             <SeatCtas className="mt-8" />
             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
