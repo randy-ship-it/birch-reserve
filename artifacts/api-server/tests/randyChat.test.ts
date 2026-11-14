@@ -810,3 +810,20 @@ test("runtime checkout lock follows live flags: $190/$490 links when live, area 
   assert.match(off, /Checkout is OFF/);
   assert.ok(!off.includes(RESERVE_LINKS.hold190));
 });
+
+test("faq fallback: answers core Birch questions and submits a premium call-back (Randy Nov 13 2026)", async () => {
+  const { birchFaqAnswer } = await import("../src/lib/birchFaq");
+  assert.equal(birchFaqAnswer([{ role: "user", content: "If I buy the $490 seat, is my category exclusive?" }]).intent, "exclusive");
+  assert.equal(birchFaqAnswer([{ role: "user", content: "How do I buy the $490 seat?" }]).intent, "buy");
+  assert.match(birchFaqAnswer([{ role: "user", content: "Do you guarantee a CTR?" }]).text, /^No\./);
+  const first = birchFaqAnswer([{ role: "user", content: "We want a premium slot, budget $30K" }]);
+  assert.equal(first.intent, "premium");
+  const second = birchFaqAnswer([
+    { role: "user", content: "We want a premium slot, budget $30K" },
+    { role: "assistant", content: first.text },
+    { role: "user", content: "Jane Doe, company Acme, phone 416-555-0100, email jane@example.com, best time Monday 10am" },
+  ]);
+  assert.equal(second.intent, "callback_submit");
+  assert.equal(second.callback?.phone, "416-555-0100");
+  for (const r of [first, second]) assert.doesNotMatch(r.text, /\u2014|8\.7/);
+});

@@ -230,7 +230,7 @@ async function fetchGrokReply(req: RandyModelRequest, payload: string): Promise<
       console.warn("[randy-chat] unavailable", response.status, data.reason ?? data.error);
       return { ok: false, kind: "unavailable", status: response.status, detail: data.reason };
     }
-    if (data.source !== "grok" || typeof data.text !== "string" || !data.text.trim()) {
+    if ((data.source !== "grok" && data.source !== "faq") || typeof data.text !== "string" || !data.text.trim()) {
       return { ok: false, kind: "unavailable", status: response.status, detail: "empty_reply" };
     }
 

@@ -26,6 +26,7 @@ import { captureChatLead } from "../lib/leadCapture";
 import { hasValidQaHeader } from "../lib/testTraffic";
 import { FRIENDLY_429, LIMITS, limiter } from "../lib/rateLimit";
 import { attributionFrom } from "../lib/publicGuards";
+import { birchFaqAnswer } from "../lib/birchFaq";
 import { BIRCH_SALES_PHONE, birchCanonicalFacts } from "../lib/birchFacts";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { isTestIdentity } from "../lib/testTraffic";
@@ -55,7 +56,7 @@ type RandyChatBody = {
 
 type RandyChatSuccess = {
   text: string;
-  source: "grok";
+  source: "grok" | "faq";
   offerHandoff?: boolean;
 };
 
@@ -705,10 +706,18 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
       },
       "Randy chat Grok call failed",
     );
-    if (body.sessionId) {
-      void recordTranscript({ id: body.sessionId, messages: body.messages, ...testFlag });
+    // Randy Nov 13 2026: chat must always answer. Fall back to the canonical FAQ.
+    const faq = birchFaqAnswer(body.messages);
+    let text = faq.text;
+    if (faq.callback) {
+      const alert = await sendChatCallbackAlert(faq.callback, body, qa);
+      req.log?.info({ kind: "chat_callback", alert: alert.status, source: "faq" }, "Randy chat call-back submitted");
+      if (alert.status !== "sent") text = `Sorry, that didn't go through. Please call ${BIRCH_SALES_PHONE} or email sales@silverbirchgrowth.com.`;
     }
-    res.status(503).json(disabledPayload("provider_error", "Randy chat AI temporarily unavailable."));
+    if (body.sessionId) {
+      void recordTranscript({ id: body.sessionId, messages: [...body.messages, { role: "assistant", content: text }], ...testFlag, ...(body.pagePath ? { pagePath: body.pagePath } : {}) });
+    }
+    res.status(200).json({ text, source: "faq" } satisfies RandyChatSuccess);
   }
 });
 
