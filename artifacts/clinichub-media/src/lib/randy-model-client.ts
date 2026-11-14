@@ -133,7 +133,7 @@ async function stubRandyReply(
 
   if (/\b(who (are|r) (you|u)|who('s| is) this|your name|are (you|u) (a |an )?(ai|bot|human|real))\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "I'm the Birch Q&A Squirrel, the AI guide on Birch Reserve. I help brands get early slots on the Reserve List inside recovery hubs. Want a real person? Tap Call for Randy's line or ask for a callback from Randy's team. What are you working on?",
+      text: "I'm the Birch Q&A Squirrel, the AI guide on Birch Reserve. I help brands lock category seats inside Scale Health hubs. Want a real person? Tap Call for Randy's line or ask for a callback from Randy's team. What are you working on?",
       source: "stub",
     };
   }
@@ -148,14 +148,14 @@ async function stubRandyReply(
 
   if (chip === "how_seats") {
     return {
-      text: "The Reserve List shows high-value Canadian health and wellness demand by category. Reserve List brands get early slots first as each category activates; categories stay open to more than one brand, and no brand gets more than 20%. See it at https://birchreserve.net/inventory. What category are you in?",
+      text: "There are 8 categories and 8 self-serve seats, open to more than one brand. A seat is $490 (100% media credit until the IO), or take a 7-day look for $190. Premium slots ($25K to $50K, inquire only) lock one brand per category. Open seats are live at https://birchreserve.net/buycalc. What category are you in?",
       source: "stub",
     };
   }
 
   if (chip === "hold_190") {
     return {
-      text: "The Reserve List is at https://birchreserve.net/inventory: see what’s available, log the placements you want and claim an early slot. Which category do you want an early slot in?",
+      text: "Lock a seat at https://birchreserve.net/buycalc: pick the $490 seat or the $190 look, pick your category, add your brand and work email, then pay on the secure Stripe checkout. Which category are you in?",
       source: "stub",
     };
   }
@@ -163,14 +163,14 @@ async function stubRandyReply(
   if (chip === "live_hub") {
     return {
       // Emma HARD: never spell raw hub URLs as visible prose — label / markdown href only.
-      text: `Tap See a live hub — or open [See a live hub](${LIVE_HUB_PROOF_URL}). That’s the kind of surface an early slot shows up on. What category would you want in front of those patients?`,
+      text: `Tap See a live hub — or open [See a live hub](${LIVE_HUB_PROOF_URL}). That’s the kind of surface a seat shows up on. What category would you want in front of those patients?`,
       source: "stub",
     };
   }
 
   if (/\b(190|490|hold|reserve|seat|price|pricing|buy|checkout)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot, or take the $490 category prepay (100% media credit) with online checkout on birchreserve.net. Want to pay there, call, or keep going here?",
+      text: "Lock a $490 category seat (100% media credit until the IO) or take a $190 7-day look at https://birchreserve.net/buycalc. Want to pay there, call, or keep going here?",
       source: "stub",
       offerHandoff: true,
     };

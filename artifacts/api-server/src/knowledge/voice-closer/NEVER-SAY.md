@@ -1,4 +1,4 @@
-<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-09-25 16:17 EDT. Edit sales-brain, not this file. -->
+<!-- GENERATED from /workspace/sales-brain by build.sh at 2026-11-13 22:19 EST. Edit sales-brain, not this file. -->
 # NEVER-SAY, hard bans for the Randy-voice closer
 
 **Owner:** Birch Reserve knowledge pack (SoT).  
@@ -12,7 +12,7 @@ If a claim is not in this pack’s approved files → treat as **UNKNOWN**. Offe
 - Guaranteed impressions, CTR, fill rate, or “your ad will get X views.”
 - Lead fee, bounty, guaranteed patients, “we send you patients,” gold listing, cut of care, pay-for-referral.
 - Claiming a card was charged or a payment went through unless the buyer confirms they paid. (Birch checkout is LIVE as of Randy 2026-09-24 6:22pm ET; before that it was OFF pending Gordon.)
-- Telling a buyer their seat is "reserved pending invoice" or that checkout is paused as the default close. Default is: claim an early slot at https://birchreserve.net/inventory, or pay online at https://birchreserve.net; invoice only if they ask.
+- Telling a buyer their seat is "reserved pending invoice" or that checkout is paused as the default close. Default is: lock the $490 seat or take the $190 look online at https://birchreserve.net/buycalc; invoice only if they ask.
 - Hero-ing **$899** / `reserve-899` (legacy unpublished only).
 - Any **$300** price, SKU, or "three hundred" offer. Not a public SKU. Never invent mid-ladder prices between $190 and $490.
 - Third homepage ladder ($4,900 / $9,900) as current public SKUs.
@@ -71,7 +71,7 @@ Never push Randy's calendar link. Don't put it in greetings, closes, option list
 - Never say we do not take physical samples. Never flat-reject a sample offer.
 - Never give Randy's cell / personal mobile number. Business line and email only.
 - Never invent reach, impressions, CTR, or sample-distribution promises.
-- Never invent a mailing address. Never read a street or mailbox address aloud or in chat. Confirm a mailbox by email, Attn: Randy Gilling (Scale Health Network Inc attn Randy Gilling OK as mail name), after they confirm fit.
+- Never invent a mailing address. Never read or type a street or mailbox address; the team confirms a mailbox by email after fit is confirmed.
 - Never reject a brand solely for not being "pure recovery" when it cross-sells into recovery audiences (hormonal health is a real lane).
 
 ## WePrize placement example (Randy HARD 2026-09-25 ~4:12pm ET)

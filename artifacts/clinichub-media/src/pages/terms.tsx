@@ -14,15 +14,15 @@ export default function Terms() {
           a draft. They are not in force for a live card until counsel stamps
           this page. Public prices are $190 USD, or $270 CAD for buyers in Canada (
           <span className="text-foreground">hold-190</span>, a 7-day category
-          look that does not lock an exclusive category) and $490 USD, or $690 CAD
+          look that does not lock a category) and $490 USD, or $690 CAD
           for buyers in Canada (
-          <span className="text-foreground">reserve-490</span>, lock your exclusive
-          category). The currency you see at checkout is the currency you are
+          <span className="text-foreground">reserve-490</span>, one of 8 shared
+          self-serve category seats; it does not lock the category). The currency you see at checkout is the currency you are
           charged, and you can switch between USD and CAD on the page before you pay.
         </p>
         <p>
           hold-190 is a 100% credit if the buyer converts within 7 days.
-          Otherwise it is a cash refund. It does not lock an exclusive category.
+          Otherwise it is a cash refund. It does not lock a category.
           reserve-490 is 100% display credit, fully refundable until 14 days
           before the launch date written in your insertion order. To cancel,
           reply to your confirmation email. We refund the full amount to the
@@ -37,7 +37,7 @@ export default function Terms() {
           public sample is <Link href="/sample-io" className="text-foreground underline">/sample-io</Link>.
         </p>
         <p>
-          8 exclusive brand categories across hubs — not eight websites. One brand per category. Reporting is aggregate only. No PHI. No clinical pixels.
+          8 brand categories across hubs, not eight websites. Self-serve seats are a shared pool of 8 seats, open to more than one brand per category, and do not give category exclusivity. Only a premium slot ($25,000 to $50,000 USD, inquire only, set on an insertion order) locks one brand per category for its term. Reporting is aggregate only. No PHI. No clinical pixels.
         </p>
         <p>
           Checkout is Stripe-hosted. Silver Birch Growth Inc. does not store
