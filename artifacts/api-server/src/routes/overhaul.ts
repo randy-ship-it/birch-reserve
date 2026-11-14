@@ -8,6 +8,7 @@
  *  POST /v1/leads            email gate + publisher / agency inquiries -> Friday
  *  GET  /v1/overhaul/status  which checkouts are open (no secrets)
  */
+import { CALLBACK_KEY_HEADER, callbackKeyOk } from "../lib/callbackKey";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { fetchSiteSignals } from "../lib/overhaul/fetchSite";
 import { emptySignals, normalizeUrl, scoreMatch } from "../lib/overhaul/audienceMatch";
@@ -227,6 +228,11 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
   router.post("/v1/callback-request", json, async (req: Request, res: Response) => {
     if (limited(req, 8)) {
       res.status(429).json({ ok: false, error: "Too many requests. Call (647) 931-6278." });
+      return;
+    }
+    // Voice agent only, keyed (Randy 10:34 PM ET). Site chat alerts server-side, not via this route.
+    if (!callbackKeyOk(req.headers[CALLBACK_KEY_HEADER])) {
+      res.status(401).json({ ok: false, error: "Not authorized. Call (647) 931-6278." });
       return;
     }
     const body = (req.body ?? {}) as Record<string, unknown>;

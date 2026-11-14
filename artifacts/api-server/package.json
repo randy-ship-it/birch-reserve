@@ -39,7 +39,8 @@
     "test:agency-showcase": "esbuild ./tests/agencyShowcase.test.ts --bundle --platform=node --format=esm --outfile=/tmp/agency-showcase.test.mjs --external:pg-native && node --test /tmp/agency-showcase.test.mjs",
     "test:premium-inquire-only": "esbuild ./tests/premiumInquireOnly.test.ts --bundle --platform=node --format=esm --outfile=/tmp/premium-inquire-only.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && DATABASE_URL=postgres://127.0.0.1:9/premium_inquire_only_test NODE_ENV=test RANDY_CHAT_AI_DISABLED=true node --test-concurrency=1 /tmp/premium-inquire-only.test.mjs",
     "test:audiences": "esbuild ./tests/audiences.test.ts --bundle --platform=node --format=esm --outfile=/tmp/audiences.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test node --test /tmp/audiences.test.mjs",
-    "test:trust": "esbuild ./tests/trust.test.ts --bundle --platform=node --format=esm --outfile=/tmp/trust.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test node --test /tmp/trust.test.mjs"
+    "test:trust": "esbuild ./tests/trust.test.ts --bundle --platform=node --format=esm --outfile=/tmp/trust.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test node --test /tmp/trust.test.mjs",
+    "test:callback-key": "esbuild ./tests/callbackKey.test.ts --bundle --platform=node --format=esm --outfile=/tmp/callbackKey.test.mjs --external:pg-native --banner:js='import { createRequire } from \"node:module\"; const require = createRequire(import.meta.url);' && NODE_ENV=test node --test /tmp/callbackKey.test.mjs"
   },
   "dependencies": {
     "@clerk/express": "^2.1.61",
