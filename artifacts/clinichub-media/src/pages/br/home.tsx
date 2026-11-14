@@ -2,10 +2,10 @@ import { ConveyorHero } from "@/components/br/conveyor";
 import { BrandBanners } from "@/components/br/brand-banners";
 import { FourPaths, MetaComparison, PositioningBand, SurfacesGrid, TamStrip } from "@/components/br/blocks";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
-import { MEDIA_KIT_OFFERS, UPGRADE_PATH_LINE } from "../../../../api-server/src/lib/overhaul/mediaKit";
+import { UPGRADE_PATH_LINE } from "../../../../api-server/src/lib/overhaul/mediaKit";
 import { MediaKitPdfLink, ProofStrip, SalesContact, TrustBand, TrustFaq } from "@/components/br/trust";
 import { QuickBuy } from "@/components/br/quick-buy";
-import { CategoryRequestForm, FaceBeforeFlight, FounderNote, PrimeHero, SALES_EMAIL, SALES_PHONE_DISPLAY, SALES_PHONE_HREF } from "@/components/br/prime-hero";
+import { CategoryRequestForm, FaceBeforeFlight, FounderNote, PrimeHero, SALES_EMAIL, SALES_PHONE_DISPLAY, SALES_PHONE_HREF, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import { AgencyHero, AgencyPayouts, InsiderGrid, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { LOOK_HREF, RESERVE_HREF, MetaHook, PackPicker, ProveItLadder, RateCardV2 } from "@/components/br/pricing";
@@ -22,8 +22,9 @@ const FAQ = [
 ];
 
 export default function BrHome() {
-  usePageMeta("Birch Reserve | Lock a category seat inside Scale Health hubs", "8 categories, 8 self-serve seats. Lock a $490 category seat or take a $190 7-day look inside private, members-only Scale Health hubs. Media credit until IO, aggregate reporting, no impression guarantees.");
+  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Reserve a share of display space across a growing network of private, members-only health and wellness hubs: Scale Health, Calm Joints and more. $490 to reserve or a $190 7-day look. Media credit until IO, aggregate reporting, no impression guarantees.");
   const g = areaLockGuaranteedViews();
+  const price = priceLabels(useAvailability());
   return (
     <div className="w-full overflow-x-hidden" data-testid="br-home">
       <JsonLd
@@ -62,16 +63,16 @@ export default function BrHome() {
 
       <Section id="packages">
         <Eyebrow>Two packages</Eyebrow>
-        <H2>Start with a seat. Then go premium.</H2>
+        <H2>Start with a reserve. Then go premium.</H2>
         <p className="mt-4 max-w-2xl text-muted-foreground" data-testid="home-upgrade">{UPGRADE_PATH_LINE} The small-business package is the easy way to start. Premium slots are the main event.</p>
         <div className="mt-8 grid gap-4 md:grid-cols-2" data-testid="home-packages">
           <article className="flex flex-col border border-foreground/20 bg-white p-5 md:p-6">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Small business package</p>
-            <h3 className="mt-1 font-display text-2xl">${MEDIA_KIT_OFFERS.look.spendUsd} look · ${MEDIA_KIT_OFFERS.seat.spendUsd} seat</h3>
-            <p className="mt-3 text-sm text-foreground/80">Self-serve card checkout. A category seat open to more than one brand. 100% media credit until the IO, usable 12 months; fully refundable until 14 days before launch. The $190 look converts in full to the seat within 7 days, or is refunded.</p>
+            <h3 className="mt-1 font-display text-2xl">{price.look} look · {price.seat} reserve</h3>
+            <p className="mt-3 text-sm text-foreground/80">Self-serve card checkout. A share of display space across the hub network, with placements curated as hubs launch. 100% media credit until the IO, usable 12 months; fully refundable until 14 days before launch. The {price.look} look converts in full to the reserve within 7 days, or is refunded.</p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Cta href={RESERVE_HREF} testId="home-cta-seat">Lock a seat — $490</Cta>
-              <Cta href={LOOK_HREF} variant="line" testId="home-cta-look">Take a 7-day look — $190</Cta>
+              <Cta href={RESERVE_HREF} testId="home-cta-seat">Reserve your space — {price.seat}</Cta>
+              <Cta href={LOOK_HREF} variant="line" testId="home-cta-look">Take a 7-day look — {price.look}</Cta>
             </div>
           </article>
           <article className="flex flex-col border-2 border-foreground bg-foreground p-5 text-background md:p-6">
@@ -80,7 +81,7 @@ export default function BrHome() {
               <span className="border border-[#C8F55A] bg-[#C8F55A] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#071A39]">Inquire only</span>
             </div>
             <h3 className="mt-1 font-display text-2xl">From $25K, $25K–$50K</h3>
-            <p className="mt-3 text-sm text-background/80">Category exclusivity, a larger display share and priority placement. No card purchase — we write the insertion order.</p>
+            <p className="mt-3 text-sm text-background/80">Exclusivity, a larger display share and priority placement. No card purchase — we write the insertion order.</p>
             <div className="mt-6">
               <Cta href="/media-kit#premium" variant="lime" testId="home-cta-premium">Inquire about a premium slot</Cta>
             </div>
@@ -167,7 +168,7 @@ export default function BrHome() {
       <Section tone="soft" id="packs">
         <Eyebrow>View blocks</Eyebrow>
         <H2>Build a pack in 10 seconds.</H2>
-        <Lede>Pick surfaces and a block size. Bundles get a modest discount. Start self-serve with a category prepay, or take it to an IO for large or exclusive deals.</Lede>
+        <Lede>Pick surfaces and a block size. Bundles get a modest discount. Start self-serve with a reserve, or take it to an IO for large or exclusive deals.</Lede>
         <div className="mt-10">
           <PackPicker />
         </div>

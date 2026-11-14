@@ -84,10 +84,10 @@ export const LIVE_HUB_PROOF_DISPLAY = "the live DR-HO hub" as const;
 export const WEPRIZE_EXAMPLE_URL = "https://weprize.net" as const;
 
 export const SMART_OPENER =
-  "Hey! Birch Q&A Squirrel here. Want to see what a $490 category seat gets you, or check which seats are open?" as const;
+  "Hey! Birch Q&A Squirrel here. Want to see what a $490 reserve gets you across our hub network?" as const;
 
 /** Teaser bubble shown beside the full-body figure (closed state). */
-export const TEASER_TEXT = "Got a category in mind? Ask me." as const;
+export const TEASER_TEXT = "Got a brand to place? Ask me." as const;
 
 export const SUGGESTION_CHIPS: ReadonlyArray<{
   id: DiscoveryChipId;
@@ -97,13 +97,13 @@ export const SUGGESTION_CHIPS: ReadonlyArray<{
 }> = [
   {
     id: "how_seats",
-    label: "How seats work",
-    message: "How do Birch Reserve category seats work?",
+    label: "How it works",
+    message: "How does reserving display space with Birch Reserve work?",
   },
   {
     id: "hold_190",
-    label: "Lock a seat",
-    message: "I want to lock a seat. How do I buy one?",
+    label: "Reserve space",
+    message: "I want to reserve display space. How do I buy?",
   },
   {
     id: "live_hub",
@@ -158,12 +158,12 @@ export const QUALIFY_QUESTIONS: ReadonlyArray<{ key: QualifyKey; prompt: string 
   },
   {
     key: "category",
-    prompt: "Thanks. What category are you in, and who do you want to reach?",
+    prompt: "Thanks. What do you sell, and who do you want to reach?",
   },
   {
     key: "timing",
     prompt:
-      "Last one: what's your timing, and a rough budget range? (For reference, a category seat is $490 and a 7-day look is $190; premium slots are $25K to $50K, inquire only.)",
+      "Last one: what's your timing, and a rough budget range? (For reference, reserving is $490 and a 7-day look is $190; premium slots are $25K to $50K, inquire only.)",
   },
 ] as const;
 

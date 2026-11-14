@@ -85,7 +85,7 @@ test("copy rules: 20mm+ allowed, no 8.7mm, no gross profit, no street address on
 });
 
 test("two-tier offers: SMB $190/$490 to start, premium $25K–$50K is the main event", () => {
-  assert.match(home, /Start with a seat[.,] [Tt]hen go premium/);
+  assert.match(home, /Start with a reserve[.,] [Tt]hen go premium/);
   assert.match(home, /UPGRADE_PATH_LINE/);
   assert.match(home, /Small business package/);
   assert.match(home, /Premium slots · the main event/);

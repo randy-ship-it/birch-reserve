@@ -4543,29 +4543,11 @@ test("availability is integer-valued and buycalc remains useful without JavaScri
   assert.doesNotMatch(html, /The zone is locked by the buyer/);
   assert.doesNotMatch(html, /minimum goes up/);
   assert.doesNotMatch(html, /today's minimum/);
-  const categoryStrip = html.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
-  assert.match(categoryStrip, /data-source="\/availability\.json"/);
-  const seatsOpen = Number(categoryStrip.match(/data-seats-open="(\d+)"/)?.[1]);
-  assert.equal(Number.isInteger(seatsOpen), true);
-  const categoryLabels = [
-    "Pain relief / topicals",
-    "Recovery hardware",
-    "Nutrition",
-    "Sleep",
-    "Meal prep",
-    "Women’s health",
-    "Men’s health",
-    "Diagnostics / services",
-  ];
-  for (const label of categoryLabels) assert.match(categoryStrip, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
-  assert.equal((categoryStrip.match(/<li /g) ?? []).length, 8);
-  assert.equal(
-    (categoryStrip.match(/href="\/buycalc\?sku=reserve-490&amp;category=[a-z-]+#reserve"/g) ?? []).length,
-    seatsOpen > 0 ? 8 : 0,
-  );
-  for (const slug of ["pain-relief-topicals", "recovery-hardware", "nutrition", "sleep", "meal-prep", "womens-health", "mens-health", "diagnostics-services"]) {
-    assert.match(categoryStrip, new RegExp(`data-slug="${slug}"`));
-  }
+  // Randy, Nov 14 2026: broad network positioning, no public category grid or seat count.
+  const networkStrip = html.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
+  assert.match(networkStrip, /Scale Health/);
+  assert.match(networkStrip, /Calm Joints/);
+  assert.doesNotMatch(html, /seats open|Recovery hardware|Pain relief \/ topicals|Eight categories/);
   // Randy, Nov 12 2026: one clean buy path. No repeated filler, no raw quote JSON button, no old supplier category picker.
   assert.doesNotMatch(html, /sh-proof|is the stamp|The \$490 names the category|Copy quote JSON|id="seat-calc"|Provider Network|Supplements/);
   assert.match(html, /<a href="https:\/\/physio\.drhonow\.com" target="_blank" rel="noopener">physio\.drhonow\.com<\/a>/);
@@ -4573,7 +4555,7 @@ test("availability is integer-valued and buycalc remains useful without JavaScri
   assert.match(html, /href="tel:\+16479316278"/);
   assert.match(html, /mailto:sales@silverbirchgrowth\.com/);
   assert.match(html, /Fully refundable until 14 days before your launch date\./);
-  assert.match(html, /The insertion order names the hub and the category before anything runs\./);
+  assert.match(html, /The insertion order names the hub and placement before anything runs\./);
   assert.match(html, /No impression guarantee/);
   assert.match(html, /href="\/v1\/catalog\.json"/);
   assert.match(html, /application\/ld\+json/);

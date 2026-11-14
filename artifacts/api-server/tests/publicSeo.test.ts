@@ -211,13 +211,15 @@ test("near-duplicate filler insights are folded: 301 to one article, off the ind
   assert.equal(rejectedZone.status, 404);
 });
 
-test("buycalc HTML is one short, clean buy path with the category facts and no price-rise line", () => {
+test("buycalc HTML is one short, clean buy path with broad network copy and no price-rise line", () => {
   const html = renderBuycalcHtml({ seatsOpen: 3, seatsTotal: 8, sku: "hold-190", format: "post_checkout", category: "sleep" });
   assert.match(html, /\$490 USD/);
   assert.match(html, /\$190 USD/);
   assert.match(html, /<article class="offer is-selected" data-sku="hold-190">/);
   assert.match(html, /<article class="offer" data-sku="reserve-490">/);
-  assert.match(html, /<option value="sleep" selected>Sleep<\/option>/);
+  // Randy, Nov 14 2026: no public category picker; a ?category= deep link rides along as a hidden field.
+  assert.match(html, /<input type="hidden" name="category" value="sleep">/);
+  assert.doesNotMatch(html, /id="f-cat"|id="r-cat"|Pick a category|Request a category/);
   // PREMIUM_INQUIRE_ONLY (Nov 12 2026): Post-Purchase stays selectable but is marked inquire-only.
   assert.match(html, /<option value="post_checkout" selected data-inquire="1">After checkout · Inquire<\/option>/);
   assert.match(html, /id="inquire-note" hidden>This is a premium slot and is inquire-only/);
@@ -228,8 +230,9 @@ test("buycalc HTML is one short, clean buy path with the category facts and no p
   assert.doesNotMatch(html, /sh-proof|is the stamp|names the category\.|the square|already opened|Copy quote JSON|id="seat-calc"/);
   assert.equal((html.match(/fully refundable until 14 days before your launch date/gi) ?? []).length, 2);
   assert.doesNotMatch(html, /The zone is locked by the buyer/);
-  assert.match(html, /Lock a seat inside Scale Health hubs\. No bidding\./);
-  assert.match(html, /3 of 8 seats open/);
+  assert.match(html, /Put your brand inside private health and wellness hubs\. No bidding\./);
+  assert.match(html, /Limited early placements/);
+  assert.doesNotMatch(html, /seats open|8 categories|Eight categories|Recovery hardware|One of 8/i);
   assert.match(html, /id="catreq"/);
   assert.match(html, /href="tel:\+16479316278"/);
   assert.match(html, /No impression guarantee/);
@@ -239,16 +242,11 @@ test("buycalc HTML is one short, clean buy path with the category facts and no p
   assert.match(html, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-birch-reserve\.png"\s*\/>/);
   assert.doesNotMatch(html, /minimum goes up/);
   assert.doesNotMatch(html, /today's minimum/);
-  const openStrip = html.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
-  assert.match(openStrip, /data-source="\/availability\.json" data-seats-open="3"/);
-  assert.equal((openStrip.match(/href="\/buycalc\?sku=hold-190&amp;category=[a-z-]+#reserve"/g) ?? []).length, 8);
+  const strip = html.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
+  assert.match(strip, /Scale Health/);
+  assert.match(strip, /More hubs launching/);
   const closed = renderBuycalcHtml({ seatsOpen: 0, seatsTotal: 8 });
-  const closedStrip = closed.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
-  assert.match(closedStrip, /data-seats-open="0"/);
-  assert.equal((closedStrip.match(/<li /g) ?? []).length, 8);
-  // Sold out: every category links to the request form, never to checkout.
-  assert.doesNotMatch(closedStrip, /#reserve/);
-  assert.equal((closedStrip.match(/#request"/g) ?? []).length, 8);
+  assert.doesNotMatch(closed, /0 of 8|seats open/);
   assert.match(closed, /<article class="offer is-selected" data-sku="reserve-490">/);
   assert.doesNotMatch(html, /8\.7M|56M monthly views|20M\+|100M\+ orders/);
   assert.doesNotMatch(html, /reserve-899/);
@@ -311,8 +309,8 @@ test("availability and buycalc stay up when Postgres cannot answer the seat quer
   assert.equal(buy.status, 200);
   assert.match(buy.headers.get("content-type") ?? "", /^text\/html/);
   const html = await buy.text();
-  assert.match(html, /8 of 8 seats open/);
-  assert.match(html, /The insertion order names the hub and the category before anything runs\./);
+  assert.match(html, /Limited early placements/);
+  assert.match(html, /The insertion order names the hub and placement before anything runs\./);
   assert.doesNotMatch(html, /sh-proof|is the stamp|Copy quote JSON/);
   assert.doesNotMatch(html, /The zone is locked by the buyer/);
   assert.doesNotMatch(html, /reserve-899/);

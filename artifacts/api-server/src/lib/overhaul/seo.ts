@@ -28,14 +28,14 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/media-kit": {
     title: "Media kit | Birch Reserve",
     image: MEDIA_KIT_OG_IMAGE,
-    description: "Prepaid media credit inside co-branded Scale Health Network hubs. Start with the small-business package ($190 look or $490 seat, self-serve) or inquire about a premium slot from $25K–$50K. Modelled volumes, no guarantees.",
+    description: "Prepaid media credit across a growing network of private health and wellness hubs. Start with the small-business package ($190 look or $490 reserve, self-serve) or inquire about a premium slot from $25K–$50K. Modelled volumes, no guarantees.",
     jsonld: {
       "@context": "https://schema.org",
       "@type": "WebPage",
       name: "Birch Reserve media kit",
       url: "https://birchreserve.net/media-kit",
       publisher: ORG,
-      mainEntity: { "@type": "Service", name: "Birch Reserve category seats", provider: ORG, areaServed: ["CA", "US"], serviceType: "Prepaid media credit, exclusive category placement in health and wellness hubs" },
+      mainEntity: { "@type": "Service", name: "Birch Reserve hub network display space", provider: ORG, areaServed: ["CA", "US"], serviceType: "Prepaid media credit for display placements in private health and wellness hubs" },
     },
   },
   "/buyers": {

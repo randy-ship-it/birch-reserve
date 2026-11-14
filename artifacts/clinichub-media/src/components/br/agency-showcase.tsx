@@ -242,7 +242,7 @@ export function InsiderGrid() {
 }
 
 const IO_STEPS = [
-  { t: "Brief", d: "Send the client, category and picks through the agency form or a quick-buy inquiry. Small tests can start self-serve on the $190 look or the $490 category seat." },
+  { t: "Brief", d: "Send the client and picks through the agency form or a quick-buy inquiry. Small tests can start self-serve on the $190 look or the $490 reserve." },
   { t: "Draft IO", d: "We reply with hub fit and a draft insertion order naming the hub, surface, format, category and dates." },
   { t: "Sign & prepay", d: "Seats pay by card. Post-Purchase, 100K+ view blocks and exclusive locks go on the IO by inquiry." },
   { t: "Traffic", d: "Creative, UTMs and an optional promo code. Exact position is confirmed on the IO." },

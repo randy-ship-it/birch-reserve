@@ -260,10 +260,10 @@ test("media kit page copy: required language in, banned words out", () => {
   const path = candidates.find((p) => { try { readFileSync(p); return true; } catch { return false; } });
   assert.ok(path, "media-kit.tsx not found");
   const src = readFileSync(path!, "utf8");
-  for (const must of [/Media credit until IO/, /Modelled volumes/, /fully refundable until 14 days before your launch date/, /Aggregate UTM reporting only/, /No personal data/, /Category seats, open to more than one brand/, /No impression guarantees/, /guarantees of reach, clicks or sales/, /Estimates are modelled; terms on IO/, /Randy Gilling, Founder/, /sales@silverbirchgrowth\.com/, /\(647\) 931-6278/, /one brand each/, /first come/, /FaceBeforeFlight/, /CategoryRequestForm/, /AvailabilityStrip/, /Small business package/, /Premium slots/, /from \$25K/i, /\$25K–\$50K/, /Inquire only/, /UPGRADE_PATH_LINE/, /category exclusivity/i, /larger display share/, /priority placement/]) {
+  for (const must of [/Media credit until IO/, /Modelled volumes/, /fully refundable until 14 days before your launch date/, /Aggregate UTM reporting only/, /No personal data/, /share of display space across the hub network/, /No impression guarantees/, /guarantees of reach, clicks or sales/, /Estimates are modelled; terms on IO/, /Randy Gilling, Founder/, /sales@silverbirchgrowth\.com/, /\(647\) 931-6278/, /curated as hubs launch/, /FaceBeforeFlight/, /CategoryRequestForm/, /AvailabilityStrip/, /Small business package/, /Premium slots/, /from \$25K/i, /\$25K–\$50K/, /Inquire only/, /UPGRADE_PATH_LINE/, /Exclusivity/, /larger display share/, /priority placement/]) {
     assert.match(src, must);
   }
-  for (const banned of [/Align/, /Clairvoyant/i, /80 locations/i, /Kalaya/i, /we sell them customers/i, /signed partner/i, /\bCTR\b/, /guarantee(d)? (reach|delivery|results)/i, /Test Rail/, /Category Lock/, /\$10K Test Rail/, /\$35K[–-]\$75K/]) {
+  for (const banned of [/Align/, /Clairvoyant/i, /80 locations/i, /Kalaya/i, /we sell them customers/i, /signed partner/i, /\bCTR\b/, /guarantee(d)? (reach|delivery|results)/i, /Test Rail/, /Category Lock/, /\$10K Test Rail/, /\$35K[–-]\$75K/, /8 self-serve seats/, /Eight categories/, /seats open/]) {
     assert.doesNotMatch(src, banned);
   }
 });

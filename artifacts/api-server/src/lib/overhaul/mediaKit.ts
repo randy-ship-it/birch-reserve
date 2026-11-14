@@ -28,11 +28,11 @@ export function kitExample(spend: number, bonusPct: number, cpm = MEDIA_KIT_CPM)
  */
 export const MEDIA_KIT_OFFERS = {
   look: { name: "7-day look", spendUsd: 190, spendCad: 270, sku: "hold-190" },
-  seat: { name: "Category seat", spendUsd: 490, spendCad: 690, sku: "reserve-490" },
+  seat: { name: "Reserve", spendUsd: 490, spendCad: 690, sku: "reserve-490" },
   premium: { name: "Premium slot", spendLo: 25_000, spendHi: 50_000, inquireOnly: true as const },
 } as const;
 
-export const UPGRADE_PATH_LINE = "Start with a seat, then go premium." as const;
+export const UPGRADE_PATH_LINE = "Start with a reserve, then go premium." as const;
 
 /** Modelled impression bands for the $490 seat and the premium spend band (no bonus assumed). */
 export const MEDIA_KIT_EXAMPLES: KitExample[] = [

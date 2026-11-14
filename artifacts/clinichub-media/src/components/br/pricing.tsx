@@ -46,7 +46,7 @@ export function SeatCtas({ tone = "light", className = "" }: { tone?: "light" | 
   return (
     <div className={`flex flex-col gap-3 sm:flex-row sm:flex-wrap ${className}`}>
       <Cta href={RESERVE_HREF} testId="cta-reserve-490" onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })}>
-        Take a category seat · $490 credit
+        Reserve your space · $490 credit
       </Cta>
       <Cta
         href={LOOK_HREF}
@@ -72,7 +72,7 @@ export function MetaHook() {
           You&apos;re already paying Meta {fmtRange(META_CPM)} CPM for cold recovery audiences.
         </h2>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-background/75">
-          Reach the same people already inside the recovery hub with a category seat, starting at roughly half the price.
+          Reach the same people already inside the recovery hub with a $490 reserve, starting at roughly half the price.
         </p>
         <SeatCtas tone="dark" className="mt-8" />
         <a href="#rates" className="mt-4 inline-block text-sm text-background/70 underline underline-offset-4 hover:text-background">
@@ -94,7 +94,7 @@ export function MetaHook() {
         </div>
         <div className="mt-6 space-y-2 border-t border-background/15 pt-4 text-sm text-background/80">
           <p>Landing pages from <b className="text-background">${landing.cpmStarter[0]} CPM</b>. Post-purchase from <b className="text-background">${post.cpmStarter[0]} CPM</b>.</p>
-          <p>Category seat: fixed price, no auction, open to more than one brand. Sole-brand category deals are by inquiry.</p>
+          <p>Reserve: fixed price, no auction, a share of display space across the hub network. Exclusive deals are by inquiry.</p>
         </div>
         <p className="mt-4 text-[11px] leading-relaxed text-background/50">
           <Estimate /> {ESTIMATE_NOTE}
@@ -256,11 +256,11 @@ export function PackPicker() {
             </Cta>
           )}
           <Cta href={RESERVE_HREF} variant="lineDark" testId="pack-reserve" onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })}>
-            Start with a $490 category seat
+            Start with a $490 reserve
           </Cta>
         </div>
         <p className="mt-4 text-[11px] leading-relaxed text-background/50">
-          The $490 category seat is open to more than one brand and is all media credit toward the pack. Starter rates hold for your first period; rates may step up later only once a placement proves out. <Estimate /> The IO sets the final rate.
+          The $490 reserve is all media credit toward the pack. Starter rates hold for your first period; rates may step up later only once a placement proves out. <Estimate /> The IO sets the final rate.
         </p>
       </div>
     </div>
@@ -333,7 +333,7 @@ export function ScenarioCalculator() {
 /** Prove-it-then-raise explainer. */
 export function ProveItLadder() {
   const steps = [
-    { n: "1", t: "Start at starter rates", d: "Your first period runs at the starting-at rates above. Take a $490 category seat, all of it media credit." },
+    { n: "1", t: "Start at starter rates", d: "Your first period runs at the starting-at rates above. Reserve for $490, all of it media credit." },
     { n: "2", t: "We report, you judge", d: "Views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. Aggregate only, no patient data." },
     { n: "3", t: "Rates rise only when it's proven", d: "A placement's rate can step up only after reporting shows it performs. Your deposit keeps its rate for its term." },
   ];

@@ -21,7 +21,7 @@ import { Eyebrow, Faq, H2, Section } from "./ui";
 export const TRUST_FAQ: Array<{ q: string; a: string }> = [
   {
     q: "What are the refund terms?",
-    a: "The $190 7-day look is a 100% credit if you take the $490 seat within 7 days; otherwise it is a cash refund, and it does not lock an exclusive category. The $490 category seat is 100% media credit that spends down over 6 months on live hubs after your deposit lands. Unused credit can be refunded or extended month by month. The $490 seat is also fully refundable until 14 days before the launch date on your insertion order; after that date the credit stays usable for 12 months. A cash refund is also available if no approved surface is named within 60 days of payment. These terms are draft until counsel stamps the terms page.",
+    a: "The $190 7-day look is a 100% credit if you reserve for $490 within 7 days; otherwise it is a cash refund. The $490 reserve is 100% media credit that spends down over 6 months on live hubs after your deposit lands. Unused credit can be refunded or extended month by month. The $490 reserve is also fully refundable until 14 days before the launch date on your insertion order; after that date the credit stays usable for 12 months. A cash refund is also available if no approved surface is named within 60 days of payment. These terms are draft until counsel stamps the terms page.",
   },
   {
     q: "How is privacy handled?",
@@ -39,7 +39,7 @@ export const TRUST_FAQ: Array<{ q: string; a: string }> = [
 
 const HOW_STEPS = [
   { n: "1", t: "Choose a placement", d: "Four surfaces in every hub: post-purchase (inquire-only), the hub home page, product and services pages, and the member dashboard behind login. Display or CPC." },
-  { n: "2", t: "Pick how to start", d: "A $190 7-day look, a $490 category seat, or an inquiry for premium slots (including post-purchase and larger commitments)." },
+  { n: "2", t: "Pick how to start", d: "A $190 7-day look, a $490 reserve, or an inquiry for premium slots (including post-purchase and larger commitments)." },
   { n: "3", t: "The insertion order names the hub", d: "Nothing runs until an insertion order names the hub and surface. Your payment is media credit, not a live flight and not an impression guarantee." },
   { n: "4", t: "Credit spends down over 6 months", d: "Credit draws down on live hubs after your deposit lands. Unused credit can be refunded or extended month by month." },
   { n: "5", t: "We report what ran", d: "Views, clicks, UTM-tagged visits and promo-code redemptions, per hub and surface. Aggregate only. A self-serve dashboard is coming soon." },
