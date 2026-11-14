@@ -2374,7 +2374,7 @@ function renderBuycalcHtmlUsd(input: {
 <p class="hero-contact">Questions? <a href="tel:+16479316278">(647) 931-6278</a> · <a href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">sales@silverbirchgrowth.com</a> · <a href="#request">Ask about a placement</a></p></div></section>
 
 <section class="band" id="offers"><div class="wrap"><p class="kicker">Two ways in</p><h2>Pick your start.</h2>
-<div class="offers">${offerCard(look, { eyebrow: "7-day look", name: look.name, lines: ["See your placement for 7 days while you decide.", "Converts in full to the reserve within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Reserve", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the hub network. Credit lasts 12 months.`, "Placements are curated as hubs launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Reserve your space · ${price(seat)}` })}</div>
+<div class="offers">${offerCard(look, { eyebrow: "7-day look", name: "See it before you commit", lines: ["See your placement for 7 days while you decide.", "Converts in full to the reserve within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Reserve", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the hub network. Credit lasts 12 months.`, "Placements are curated as hubs launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Reserve your space · ${price(seat)}` })}</div>
 <!--BONUS_TIER_DRAFT-->
 </div></section>
 
@@ -2386,7 +2386,7 @@ function renderBuycalcHtmlUsd(input: {
 
 <section class="band" id="categories"><div class="wrap"><p class="kicker">The network</p><h2>A growing network of private hubs.</h2>
 <p class="open-count"><strong>Limited early placements</strong> · We curate placements as each hub launches. Want a premium slot or something custom? Ask below.</p>
-<ul class="cat-strip" data-testid="network-hubs"><li><span>Scale Health</span></li><li><span>Calm Joints</span></li><li><span>More hubs launching</span></li></ul>
+<ul class="cat-strip" data-testid="network-hubs"><li><span style="min-height:0">Scale Health</span></li><li><span style="min-height:0">Calm Joints</span></li><li><span style="min-height:0">More hubs launching</span></li></ul>
 </div></section>
 
 <section class="band" id="buy"><div class="wrap"><div class="buy">
