@@ -66,6 +66,13 @@ const API_PATHS = [
   "/success/?",
   "/splash/activation/?",
   "/ad-examples/?",
+  // Advertiser guides (server-rendered).
+  "/advertiser-guides/?",
+  "/glp-1-brand-advertising/?",
+  "/advertise-supplements-canada/?",
+  "/recovery-device-advertising/?",
+  "/post-purchase-ads-health-brands/?",
+  "/health-wellness-retail-media-canada/?",
 ];
 
 // Real client routes that stay on the static shell. Anything else that misses

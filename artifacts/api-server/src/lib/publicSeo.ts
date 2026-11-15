@@ -43,6 +43,13 @@ export const PUBLIC_SITEMAP_PATHS = [
   "/buyers",
   "/rates",
   "/audiences",
+  // Advertiser guides (server-rendered, Nov 15 2026).
+  "/advertiser-guides",
+  "/glp-1-brand-advertising",
+  "/advertise-supplements-canada",
+  "/recovery-device-advertising",
+  "/post-purchase-ads-health-brands",
+  "/health-wellness-retail-media-canada",
 ] as const;
 
 /**

@@ -6,6 +6,7 @@ import router from "./routes/index";
 import { randyChatJsonParser } from "./routes/randyChat";
 import publicBuyingRouter from "./routes/publicBuying";
 import publicPagesRouter from "./routes/publicPages";
+import advertiserGuidesRouter from "./routes/advertiserGuides";
 import sponsorPageRouter from "./routes/sponsorPage";
 import { createOverhaulRouter } from "./routes/overhaul";
 import { createAgentRouter } from "./routes/agent";
@@ -92,6 +93,7 @@ app.use(
 );
 app.use(sponsorPageRouter);
 app.use(publicPagesRouter);
+app.use(advertiserGuidesRouter);
 app.use(publicSeoRouter);
 app.use(indexNowKeyRouter);
 app.use(opsBulletinRouter);
