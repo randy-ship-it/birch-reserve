@@ -42,6 +42,12 @@ export default function BrHome() {
       />
       <PrimeHero />
 
+      <section id="placements" className="scroll-mt-20 border-b border-border/70 bg-background lg:hidden" data-testid="home-placements-mobile">
+        <div className="container mx-auto px-5 py-8">
+          <ConveyorHero />
+        </div>
+      </section>
+
       <Section id="proof-live">
         <FaceBeforeFlight />
       </Section>
@@ -200,12 +206,14 @@ export default function BrHome() {
         <PositioningBand />
       </Section>
 
-      <Section>
-        <Eyebrow>Where your ad shows</Eyebrow>
-        <H2>Four placements in every hub.</H2>
-        <Lede>Display or CPC, on the pages where members buy, browse, book and log back in.</Lede>
-        <ConveyorHero className="mt-10" />
-        <div className="mt-10">
+      <Section id="placements-detail">
+        <div className="hidden lg:block">
+          <Eyebrow>Where your ad shows</Eyebrow>
+          <H2>Four placements in every hub.</H2>
+          <Lede>Display or CPC, on the pages where members buy, browse, book and log back in.</Lede>
+          <ConveyorHero className="mt-10" />
+        </div>
+        <div className="mt-10 max-lg:mt-0">
           <SurfacesGrid />
         </div>
       </Section>

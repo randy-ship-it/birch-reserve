@@ -300,8 +300,17 @@ function Router() {
         <Route path="/sell-ads">
           <Layout><SellAdsPage /></Layout>
         </Route>
+        <Route path="/sellads">
+          <Redirect to="/sell-ads" />
+        </Route>
         <Route path="/list-inventory">
           <Redirect to="/sell-ads" />
+        </Route>
+        <Route path="/buy-ads">
+          <Redirect to="/advertise/brands" />
+        </Route>
+        <Route path="/buyads">
+          <Redirect to="/advertise/brands" />
         </Route>
         <Route path="/terms">
           <Layout><Terms /></Layout>
