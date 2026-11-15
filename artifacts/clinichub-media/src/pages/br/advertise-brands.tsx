@@ -91,6 +91,7 @@ export default function BrAdvertiseBrands() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Cta href="/media-kit" variant="line">Marketing kit</Cta>
               <Cta href="/agencies" variant="line">For agencies</Cta>
+              <Cta href="/advertiser-guides" variant="line">Advertiser guides</Cta>
             </div>
           </div>
           <Faq items={FAQ} />
