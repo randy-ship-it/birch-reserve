@@ -45,7 +45,7 @@ export function ConveyorHero({ className = "", captionless = false }: { classNam
               key={hub.key}
               className="inline-flex items-center gap-2 border border-foreground/15 bg-white px-3 py-2"
             >
-              <img src={hub.logo} alt="" className="h-6 w-auto object-contain" />
+              <img src={hub.logo} alt="" className="h-5 w-auto max-w-[4.75rem] object-contain object-left" />
               <span className="text-sm font-medium text-foreground">{hubLabel(hub.key, hub.name)} × Scale</span>
             </div>
           ))}
@@ -53,12 +53,12 @@ export function ConveyorHero({ className = "", captionless = false }: { classNam
 
         <div className="mt-5 grid grid-cols-4 gap-1.5 sm:gap-3">
           {PLACEMENTS.map((col) => (
-            <div key={col.key} className="min-w-0">
-              <div className="border-b border-foreground/20 pb-1.5">
+            <div key={col.key} className="flex min-w-0 flex-col">
+              <div className="flex min-h-[3.4rem] flex-col justify-end border-b border-foreground/20 pb-1.5 sm:min-h-0">
                 <div className="font-display text-[13px] leading-tight text-foreground sm:text-base">{col.label}</div>
                 <div className="text-[10px] leading-tight text-foreground/50 sm:text-xs">{col.sub}</div>
               </div>
-              <div className="mt-2 flex flex-col gap-1.5">
+              <div className="mt-2 flex w-full max-w-[10rem] flex-col gap-1.5">
                 <div className="border border-foreground/20 bg-accent px-1.5 py-1.5 text-[9px] font-semibold uppercase tracking-wider text-accent-foreground sm:px-2 sm:text-[11px]">
                   Display
                 </div>
