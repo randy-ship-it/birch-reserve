@@ -250,6 +250,30 @@ test("media kit: /mediakit 301s to /media-kit (query kept), head meta set", asyn
   assert.match(meta.description, /no guarantees/i);
 });
 
+test("path aliases: /sellads -> /sell-ads; /buy-ads and /buyads -> /advertise/brands", async () => {
+  const app = express();
+  app.use(createOverhaulRouter());
+  const server = app.listen(0);
+  const port = (server.address() as { port: number }).port;
+  try {
+    const cases: Array<[string, string]> = [
+      ["/sellads?utm_source=sms", "/sell-ads?utm_source=sms"],
+      ["/sellads/", "/sell-ads"],
+      ["/buy-ads?utm_source=sms", "/advertise/brands?utm_source=sms"],
+      ["/buy-ads/", "/advertise/brands"],
+      ["/buyads?utm_source=sms", "/advertise/brands?utm_source=sms"],
+      ["/buyads/", "/advertise/brands"],
+    ];
+    for (const [path, location] of cases) {
+      const r = await fetch(`http://127.0.0.1:${port}${path}`, { redirect: "manual" });
+      assert.equal(r.status, 301, path);
+      assert.equal(r.headers.get("location"), location, path);
+    }
+  } finally {
+    server.close();
+  }
+});
+
 test("media kit page copy: required language in, banned words out", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const candidates = [

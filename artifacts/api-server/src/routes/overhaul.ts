@@ -63,6 +63,17 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     const q = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
     res.redirect(301, `/media-kit${q}`);
   });
+  // Typo / shorthand aliases (Randy, Nov 15 2026). /sell-ads is the inventory-host
+  // signup. /sellads is the same path without the hyphen. /buy-ads and /buyads
+  // are ad-buyer paths and go to the live brand advertiser page.
+  router.get(["/sellads", "/sellads/"], (req, res) => {
+    const q = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
+    res.redirect(301, `/sell-ads${q}`);
+  });
+  router.get(["/buy-ads", "/buy-ads/", "/buyads", "/buyads/"], (req, res) => {
+    const q = req.originalUrl.includes("?") ? req.originalUrl.slice(req.originalUrl.indexOf("?")) : "";
+    res.redirect(301, `/advertise/brands${q}`);
+  });
 
   router.get("/v1/overhaul/status", (_req, res) => {
     const area = checkoutGate(process.env, "AREA_LOCK_ENABLED", "AREA_LOCK_LIVE");
