@@ -40,7 +40,7 @@ function HubFrame({ children, tabs }: { children: ReactNode; tabs?: string }) {
   return (
     <div className="overflow-hidden rounded-md border border-foreground/15 bg-white text-left">
       <div className="flex items-center justify-between border-b border-foreground/10 px-3 py-2">
-        <span className="text-[10px] font-semibold text-foreground/70">Partner brand × Scale Health</span>
+        <span className="text-[10px] font-semibold text-foreground/70">Partner brand · member hub</span>
         <span className="h-4 w-12 rounded-sm bg-foreground/10" />
       </div>
       {tabs ? <div className="flex gap-3 border-b border-foreground/10 px-3 py-1.5 text-[9px] text-foreground/55">{tabs.split("|").map((t, i) => <span key={t} className={i === 0 ? "font-semibold text-foreground" : ""}>{t}</span>)}</div> : null}
