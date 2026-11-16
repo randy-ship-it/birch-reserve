@@ -62,8 +62,8 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
     description: "An illustrative, aggregated sample of the anonymized fields a benefits administrator typically already has. Sample ranges only, not a real book of business.",
   },
   "/agencies": {
-    title: "For agencies | Birch Reserve",
-    description: "Prepay a client test budget into health & wellness hubs. UTM and promo-code reporting. Agency commission available.",
+    title: "For agencies & brokers | Birch Reserve",
+    description: "Agencies, brokers and media resellers: prepay a client test into private health & wellness hubs from $490 USD. Spec sheet, sample IO, UTM and promo-code reporting, 10% of media spend paid in cash to the agency of record.",
     jsonld: { "@context": "https://schema.org", "@type": "Service", name: "Agency test budgets", provider: ORG, areaServed: ["CA", "US"], serviceType: "Retail media / post-purchase advertising" },
   },
 };
@@ -128,7 +128,7 @@ export function llmsTxt(): string {
     "- Always show the buyer the terms and price before sending agree:true.",
     "",
     "## Agencies",
-    `- Prepay a client test budget; UTM + promo-code reporting; ${AGENCY.line} ${AGENCY.bonusNote} https://birchreserve.net/agencies`,
+    `- Agencies, brokers and media resellers: prepay a client test budget; spec sheet, sample IO, UTM + promo-code reporting; ${AGENCY.line} ${AGENCY.bonusNote} https://birchreserve.net/agencies`,
     "",
     "## Live inventory",
     `- ${BRAND_HUBS.map((h) => h.name).join(" · ")}`,
