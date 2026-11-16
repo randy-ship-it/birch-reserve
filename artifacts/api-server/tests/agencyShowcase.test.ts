@@ -73,3 +73,24 @@ test("copy scan: agency sections, home and media kit carry no banned or retired 
   assert.doesNotMatch(files, /8 categories|8 self-serve seats|Eight categories/);
   assert.doesNotMatch(files, /\$490[^.\n]{0,40}(lock(s|ed)? (the|your) category|exclusive)/i);
 });
+
+test("/agencies (Nov 16 2026): fast lock path, broker block, honest urgency only, USD-only tiers", () => {
+  const page = read("../clinichub-media/src/pages/br/agencies.tsx");
+  // Fast paths: draft IO + self-serve reserve/look on the existing checkout links.
+  assert.match(page, /RESERVE_HREF/);
+  assert.match(page, /LOOK_HREF/);
+  assert.match(page, /Request a draft IO/);
+  // Brokers & resellers: same agency-of-record terms, no new commission number.
+  assert.match(page, /data-testid="agency-brokers"/);
+  assert.match(page, /agency of record on the IO, the same terms apply: 10% of media spend, paid in cash/);
+  assert.doesNotMatch(page, /\b(5|8|12|15|20)% (broker|referral|finder)/i);
+  // Honest urgency: restates published terms; no invented deadlines, countdowns or seat counts.
+  assert.match(page, /Rates step up only once reporting proves a placement/);
+  assert.match(page, /fully refundable until 14 days before the launch date/);
+  assert.doesNotMatch(page, /\d+ (seats?|spots?|placements?) (left|remaining|open)/i);
+  assert.doesNotMatch(page, /only \d+ left|countdown|ends (today|tonight)|Dec(ember)? 31/i);
+  // USD only until the CAD checkout is tested (Randy, Nov 16 2026).
+  assert.doesNotMatch(page, /\bCAD\b|t\.cad/);
+  // Reuses the shared spec sheet, IO steps and payout table.
+  for (const c of ["<InventorySpec />", "<IoProcess />", "<AgencyPayouts />"]) assert.ok(page.includes(c), c);
+});
