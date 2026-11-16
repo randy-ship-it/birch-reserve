@@ -239,8 +239,8 @@ export default function BrMediaKit() {
         <div className="mt-3 divide-y divide-border border-y border-border text-sm" data-testid="mk-math">
           {MEDIA_KIT_EXAMPLES.map((e) => (
             <div key={e.spend} className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-0.5 py-3 sm:grid-cols-[9rem_1fr_auto]">
-              <span className="font-semibold">You prepay {usdK(e.spend)}</span>
-              <span className="text-right text-foreground/80 sm:text-left"><strong>{usd(e.credit)}</strong> media credit</span>
+              <span className="font-semibold">You prepay {usdK(e.spend)} USD</span>
+              <span className="text-right text-foreground/80 sm:text-left"><strong>{usd(e.credit)} USD</strong> media credit</span>
               <span className="col-span-2 text-muted-foreground sm:col-span-1 sm:text-right">
                 at ${MEDIA_KIT_CPM.lo}–{MEDIA_KIT_CPM.hi} CPM ≈ {impr(e.imprLo)}–{impr(e.imprHi)} impressions (modelled)
               </span>

@@ -284,8 +284,8 @@ export function AgencyPayouts() {
           <thead>
             <tr className="border-b border-foreground/80 text-[11px] uppercase tracking-wider text-foreground/60">
               <th className="px-4 py-3 font-semibold md:px-5">Client buy</th>
-              <th className="px-4 py-3 text-right font-semibold md:px-5">Prepaid</th>
-              <th className="px-4 py-3 text-right font-semibold md:px-5">Agency cash</th>
+              <th className="px-4 py-3 text-right font-semibold md:px-5">Prepaid (USD)</th>
+              <th className="px-4 py-3 text-right font-semibold md:px-5">Agency cash (USD)</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
