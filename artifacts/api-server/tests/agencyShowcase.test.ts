@@ -41,11 +41,10 @@ test("spec sheet: four placements at the published starting CPMs, Post-Purchase 
   assert.deepEqual(SPEC_ROWS.filter((r) => r.inquire).map((r) => r.key), ["post_purchase"]);
 });
 
-test("20% sell assumption is labelled an assumption; orders say 20MM+, never 8.7", () => {
+test("20% sell assumption is labelled an assumption; no unverified order or partner counts (Nov 16 2026)", () => {
   assert.equal(SELL_ASSUMPTION_PCT, 20);
   assert.match(SELL_ASSUMPTION_LINE, /assumption/i);
-  assert.match(INVENTORY_LINE, /20MM\+ orders/);
-  assert.match(INVENTORY_LINE, /modelled/);
+  assert.doesNotMatch(INVENTORY_LINE, /20MM|8\.7|listed partners|Scale Health hubs/);
 });
 
 test("quick-buy preselects Hub Home, matching the server and /buycalc default", () => {

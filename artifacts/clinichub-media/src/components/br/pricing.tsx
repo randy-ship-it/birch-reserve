@@ -46,7 +46,7 @@ export function SeatCtas({ tone = "light", className = "" }: { tone?: "light" | 
   return (
     <div className={`flex flex-col gap-3 sm:flex-row sm:flex-wrap ${className}`}>
       <Cta href={RESERVE_HREF} testId="cta-reserve-490" onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })}>
-        Reserve your space · $490 credit
+        Reserve your space · $490 USD credit
       </Cta>
       <Cta
         href={LOOK_HREF}
@@ -54,7 +54,7 @@ export function SeatCtas({ tone = "light", className = "" }: { tone?: "light" | 
         testId="cta-hold-190"
         onClick={() => trackCta("cta_hold_190", { offer: "hold-190" })}
       >
-        7-day look · $190
+        7-day look · $190 USD
       </Cta>
     </div>
   );
@@ -67,12 +67,12 @@ export function MetaHook() {
   return (
     <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center" data-testid="meta-hook">
       <div>
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-accent">Same people. Half the price.</p>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-accent">Fixed starting rates. No auction.</p>
         <h2 className="font-display text-3xl leading-tight tracking-tight text-background md:text-5xl">
           You&apos;re already paying Meta {fmtRange(META_CPM)} CPM for cold recovery audiences.
         </h2>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-background/75">
-          Reach the same people already inside the recovery hub with a $490 reserve, starting at roughly half the price.
+          Reach people already inside the recovery hub with a $490 USD reserve, at fixed starting-at rates instead of an auction.
         </p>
         <SeatCtas tone="dark" className="mt-8" />
         <a href="#rates" className="mt-4 inline-block text-sm text-background/70 underline underline-offset-4 hover:text-background">
@@ -173,8 +173,6 @@ export function PackPicker() {
   const [keys, setKeys] = useState<RateSurface["key"][]>(["landing", "products"]);
   const [block, setBlock] = useState<number>(250_000);
   const q = useMemo(() => quotePack(keys, block), [keys, block]);
-  const metaMid = (q.metaUsd[0] + q.metaUsd[1]) / 2;
-  const savePct = metaMid > 0 ? Math.round((1 - q.startingUsd / metaMid) * 100) : 0;
   const toggle = (k: RateSurface["key"]) => setKeys((cur) => (cur.includes(k) ? cur.filter((x) => x !== k) : [...cur, k]));
   const ioHref = `mailto:sales@silverbirchgrowth.com?subject=${encodeURIComponent("Birch Reserve IO request")}&body=${encodeURIComponent(
     `Pack: ${fmtViews(block)} views on ${keys.length} surface(s) (${RATE_SURFACES.filter((s) => keys.includes(s.key)).map((s) => s.short).join(", ")}).\nStarting estimate: ${fmtUsd(q.startingUsd)} USD.\nBrand / category:\nTiming:\n`,
@@ -230,15 +228,9 @@ export function PackPicker() {
             </p>
             <dl className="mt-5 space-y-2 border-t border-background/15 pt-4 text-sm">
               <div className="flex justify-between gap-4">
-                <dt className="text-background/60">Same views on Meta</dt>
-                <dd>{fmtUsd(q.metaUsd[0])}–{fmtUsd(q.metaUsd[1])}</dd>
+                <dt className="text-background/60">Views</dt>
+                <dd>{fmtViews(q.views)} (modelled estimate)</dd>
               </div>
-              {savePct > 0 ? (
-                <div className="flex justify-between gap-4">
-                  <dt className="text-background/60">Vs Meta midpoint</dt>
-                  <dd className="font-semibold text-accent">~{savePct}% less</dd>
-                </div>
-              ) : null}
             </dl>
           </>
         ) : (
@@ -256,11 +248,11 @@ export function PackPicker() {
             </Cta>
           )}
           <Cta href={RESERVE_HREF} variant="lineDark" testId="pack-reserve" onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })}>
-            Start with a $490 reserve
+            Start with a $490 USD reserve
           </Cta>
         </div>
         <p className="mt-4 text-[11px] leading-relaxed text-background/50">
-          The $490 reserve is all media credit toward the pack. Starter rates hold for your first period; rates may step up later only once a placement proves out. <Estimate /> The IO sets the final rate.
+          The $490 USD reserve is all media credit toward the pack. Starter rates hold for your first period; rates may step up later only once a placement proves out. <Estimate /> The IO sets the final rate.
         </p>
       </div>
     </div>
@@ -333,7 +325,7 @@ export function ScenarioCalculator() {
 /** Prove-it-then-raise explainer. */
 export function ProveItLadder() {
   const steps = [
-    { n: "1", t: "Start at starter rates", d: "Your first period runs at the starting-at rates above. Reserve for $490, all of it media credit." },
+    { n: "1", t: "Start at starter rates", d: "Your first period runs at the starting-at rates above. Reserve for $490 USD, all of it media credit." },
     { n: "2", t: "We report, you judge", d: "Views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. Aggregate only, no patient data." },
     { n: "3", t: "Rates rise only when it's proven", d: "A placement's rate can step up only after reporting shows it performs. Your deposit keeps its rate for its term." },
   ];

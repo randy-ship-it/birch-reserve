@@ -48,7 +48,7 @@ import {
   type PublicReserveOffer,
   type ReserveCurrency,
 } from "../lib/reserveOffers";
-import { currencyCookieHeader, decideCurrency } from "../lib/currency";
+import { PUBLIC_CAD_ENABLED, currencyCookieHeader, decideCurrency } from "../lib/currency";
 import { isBonusDraftRequested, renderBonusTierDraftHtml } from "../lib/bonusTierDraft";
 import {
   admitUcpProfileResolution,
@@ -493,7 +493,7 @@ export async function categoryStatuses(seatsOpen?: number): Promise<Array<{ slug
 }
 
 const PUBLIC_BRAND_DESCRIPTION =
-  "Reserve a share of display space across a growing network of private health and wellness hubs: Scale Health, Calm Joints and more. Placements curated as hubs launch, no bidding. Fully refundable until 14 days before launch. Your payment is display credit.";
+  "Reserve a share of display space across a growing network of private health and wellness hubs. Placements curated as hubs launch, no bidding. Fully refundable until 14 days before launch. Your payment is display credit.";
 
 /** The eight site category slugs (same as Friday's seat feed and /kit). One brand per category. */
 export const BUYCALC_CATEGORIES = [
@@ -2310,6 +2310,8 @@ function currencyToggleHtml(
     const active = target === currency;
     return `<a href="/buycalc?${params.toString()}#reserve" data-currency="${target}" rel="nofollow" aria-pressed="${active}">${target.toUpperCase()}</a>`;
   };
+  // USD only until the CAD checkout is tested (Randy, Nov 16 2026): label, no toggle.
+  if (!PUBLIC_CAD_ENABLED) return `<span class="currency-toggle" data-testid="currency-note">Prices in USD</span>`;
   return `<span class="currency-toggle" data-testid="currency-toggle" role="group" aria-label="Currency"><span>Prices in</span> ${link("usd")} ${link("cad")}</span>`;
 }
 
@@ -2369,7 +2371,7 @@ function renderBuycalcHtmlUsd(input: {
 <main>
 <section class="hero"><div class="wrap"><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
 <p class="avail" data-testid="buycalc-avail"><span class="dot" aria-hidden="true"></span><span><strong>Limited early placements</strong> · curated as hubs launch</span></p>
-<p class="lede">Reserve a share of display space across our growing network of private, members-only hubs: Scale Health and Calm Joints, with more launching. Your brand shows right after a member books or buys. All of it is media credit until the insertion order (IO), fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
+<p class="lede">Reserve a share of display space across our growing network of private, members-only health and wellness hubs (physio, fitness and recovery today), with more launching. Your brand shows right after a member books or buys. All of it is media credit until the insertion order (IO), fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
 <div class="ctas"><a class="btn" href="/buycalc?sku=reserve-490#reserve" data-pick-sku="reserve-490">Reserve your space · ${price(seat)}</a><a class="btn line" href="/buycalc?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · ${price(look)}</a></div>
 <p class="hero-contact">Questions? <a href="tel:+16479316278">(647) 931-6278</a> · <a href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">sales@silverbirchgrowth.com</a> · <a href="#request">Ask about a placement</a></p></div></section>
 
@@ -2386,7 +2388,7 @@ function renderBuycalcHtmlUsd(input: {
 
 <section class="band" id="categories"><div class="wrap"><p class="kicker">The network</p><h2>A growing network of private hubs.</h2>
 <p class="open-count"><strong>Limited early placements</strong> · We curate placements as each hub launches. Want a premium slot or something custom? Ask below.</p>
-<ul class="cat-strip" data-testid="network-hubs"><li><span style="min-height:0">Scale Health</span></li><li><span style="min-height:0">Calm Joints</span></li><li><span style="min-height:0">More hubs launching</span></li></ul>
+<ul class="cat-strip" data-testid="network-hubs"><li><span style="min-height:0">Integrity Fitness</span></li><li><span style="min-height:0">DR-HO'S physio</span></li><li><span style="min-height:0">More hubs launching</span></li></ul>
 </div></section>
 
 <section class="band" id="buy"><div class="wrap"><div class="buy">

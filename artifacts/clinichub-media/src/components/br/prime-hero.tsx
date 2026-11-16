@@ -27,7 +27,8 @@ export type Availability = {
 };
 
 /** Hub brands in the network today; more launch over time. */
-export const NETWORK_HUBS = ["Scale Health", "Calm Joints"] as const;
+/** Live hubs anyone can open today (shown on the same pages); more launch over time. Scale Health is the business, not a hub. */
+export const NETWORK_HUBS = ["Integrity Fitness", "DR-HO'S physio"] as const;
 
 export function useAvailability(): Availability | null {
   const [a, setA] = useState<Availability | null>(null);
@@ -55,7 +56,7 @@ export function useAvailability(): Availability | null {
 
 /** Price labels in the buyer's checkout currency; bare USD figures until /availability.json answers. */
 export function priceLabels(a: Availability | null): { seat: string; look: string } {
-  return { seat: a?.seatLabel ?? "$490", look: a?.lookLabel ?? "$190" };
+  return { seat: a?.seatLabel ?? "$490 USD", look: a?.lookLabel ?? "$190 USD" };
 }
 
 /** The network strip: hub names and limited early access. No category grid, no seat counts. */
@@ -137,7 +138,7 @@ export function FaceBeforeFlight({ compact = false }: { compact?: boolean }) {
         </div>
         <p className="mt-3 text-xs text-muted-foreground">Live hubs, shown as they are today. Your placement and hub are named on your IO before anything runs.</p>
       </div>
-      <a href={LIVE_HUB_URL} target="_blank" rel="noopener" className="group block border border-foreground/15 bg-white p-2 shadow-sm" aria-label="Open the live Integrity Fitness × Scale Health hub">
+      <a href={LIVE_HUB_URL} target="_blank" rel="noopener" className="group block border border-foreground/15 bg-white p-2 shadow-sm" aria-label="Open the live Integrity Fitness hub">
         <img src={LIVE_HUB_IMAGE} alt="Integrity Fitness × Scale Health members-only hub, live" width={1440} height={900} loading="lazy" decoding="async" className="block h-auto w-full" />
         <span className="mt-2 flex items-center justify-between px-1 pb-1 text-xs text-muted-foreground">
           <span>scalehealth.ca/integrity · live</span>

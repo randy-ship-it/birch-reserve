@@ -159,9 +159,9 @@ export const BIRCH_SITE_SCOPE_PROMPT = [
 
 const CHIP_INTENT_NOTES: Record<string, string> = {
   how_seats:
-    "Visitor tapped \"How it works\": explain that a $490 reserve buys a share of display space across the growing hub network (Scale Health, Calm Joints and more), curated as hubs launch, plus the $190 look; premium slots add exclusivity. Give https://birchreserve.net/buycalc, then ask what they sell.",
+    "Visitor tapped \"How it works\": explain that a $490 reserve buys a share of display space across the growing hub network, curated as hubs launch, plus the $190 USD look; premium slots add exclusivity. Give https://birchreserve.net/buycalc, then ask what they sell.",
   hold_190:
-    "Visitor tapped \"Reserve space\": walk them through reserving at https://birchreserve.net/buycalc ($490 reserve or $190 look), and ask what they sell.",
+    "Visitor tapped \"Reserve space\": walk them through reserving at https://birchreserve.net/buycalc ($490 USD reserve or $190 USD look), and ask what they sell.",
   live_hub: `Visitor tapped \"See a live hub\": share ${LIVE_HUB_PROOF_URL} as the live proof, then ask what they would want to show there.`,
   talk_human:
     "Visitor tapped \"Talk to a human\": say you can set that up, ask the first quick question (company or brand), and mention the AI call or a callback come right after.",

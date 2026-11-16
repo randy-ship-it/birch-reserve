@@ -96,9 +96,8 @@ export function TamStrip({ tone = "light", compact = false }: { tone?: "light" |
   return (
     <div className={`grid grid-cols-2 gap-6 ${compact ? "" : "md:grid-cols-4"}`} data-testid="tam-strip">
       {[
-        { v: TAM.ordersLabel, l: TAM.ordersNote },
-        { v: String(TAM.listedPartners), l: "listed partners" },
         { v: "4", l: "hub placements, display + CPC" },
+        { v: "IO", l: "media credit until the insertion order" },
       ].map((x) => (
         <div key={x.l}>
           <div className={`font-display ${compact ? "text-4xl" : "text-4xl md:text-5xl"}`}>{x.v}</div>
@@ -106,11 +105,7 @@ export function TamStrip({ tone = "light", compact = false }: { tone?: "light" |
         </div>
       ))}
       <p className={`col-span-2 text-xs ${compact ? "" : "md:col-span-4"} ${muted}`}>
-        Modelled from the TAM feed, read {TAM.readOn}:{" "}
-        <a href={TAM.source} className="underline underline-offset-2" target="_blank" rel="noopener noreferrer">
-          scalehealth.ca/tam
-        </a>
-        . Partners are listed; views are modelled, not measured.
+        Aggregate reporting only. Any view figure is a modelled estimate, not measured delivery or a guarantee.
       </p>
     </div>
   );
@@ -174,7 +169,7 @@ export function MetaComparison() {
             </a>
           </li>
         ))}
-        <li>Our CPMs are illustrative starting-at estimates, not sold rates, and our views are modelled from the TAM feed. Hub ads are expected to work better because of trust and timing; we will prove it with pilot reporting, not claim it.</li>
+        <li>Our CPMs are illustrative starting-at estimates, not sold rates, and any view figures are modelled estimates. Hub ads are expected to work better because of trust and timing; we will prove it with pilot reporting, not claim it.</li>
       </ol>
     </div>
   );
