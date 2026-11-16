@@ -55,3 +55,15 @@ test("sample benefits profile is labelled sample, has no named partners, and sta
   assert.ok(OVERHAUL_ROUTES["/audiences/sample-profile"]);
   assert.ok(page.includes("SampleBenefitsProfile"));
 });
+
+test("market context (Nov 16 2026): every public-research figure is cited, dated and framed as population context, not Birch reach", () => {
+  assert.ok(A.MARKET_CONTEXT.length >= 3);
+  for (const m of A.MARKET_CONTEXT) {
+    assert.match(m.url, /^https:\/\//);
+    assert.ok(m.source.length > 10 && /\d{4}/.test(m.year), m.key);
+    assert.doesNotMatch(m.line + m.stat, /Birch|our (audience|reach|network)|guarantee|reach(es)? \d/i, m.key);
+  }
+  assert.match(page, /data-testid="market-context"/);
+  assert.match(page, /not the size of our audience, our reach or what a campaign will deliver/);
+  assert.ok(A.SOURCES.some((s) => /Public research/.test(s.source)));
+});

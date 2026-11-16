@@ -15,6 +15,7 @@ import {
   REGION_MIX,
   SEGMENTS,
   SOURCES,
+  MARKET_CONTEXT,
   fmtOrdersShort,
   fmtPctBand,
   type Basis,
@@ -288,6 +289,39 @@ export default function BrAudiences() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </Section>
+
+      {/* Market context: public research, cited (Nov 16 2026) */}
+      <Section tone="soft">
+        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]" data-testid="market-context">
+          <div>
+            <Eyebrow>Market context</Eyebrow>
+            <H2>Why these audiences are big.</H2>
+            <p className="mt-4 text-muted-foreground">
+              Public research on the population behind each pillar. These are national figures from the cited source, not the size of our audience, our reach or what a campaign will deliver.
+            </p>
+            <div className="mt-4">
+              <BasisTag basis="estimated" />
+            </div>
+          </div>
+          <div className="border border-foreground/15 bg-white">
+            {MARKET_CONTEXT.map((m) => (
+              <div key={m.key} className="border-b border-border p-4 last:border-b-0 md:p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-foreground/55">{m.pillar}</p>
+                <p className="mt-1 text-sm leading-relaxed">
+                  <span className="font-display text-2xl tabular-nums">{m.stat}</span> {m.line}
+                </p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Source:{" "}
+                  <a href={m.url} className="underline underline-offset-2" target="_blank" rel="noopener noreferrer">
+                    {m.source}
+                  </a>{" "}
+                  ({m.year})
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </Section>

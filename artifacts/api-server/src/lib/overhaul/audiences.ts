@@ -161,11 +161,65 @@ export const SEGMENTS: Segment[] = [
   },
 ];
 
+/**
+ * Market context (daily scan, Nov 16 2026): third-party public research behind each audience pillar.
+ * Population-level figures from the cited source, NOT Birch audience sizes, reach or delivery.
+ * Every entry is a direct restatement of the linked source. Labelled "estimated" in the UI.
+ */
+export const MARKET_CONTEXT: Array<{ key: string; pillar: string; stat: string; line: string; source: string; url: string; year: string }> = [
+  {
+    key: "chronic-pain",
+    pillar: "Recovery & physio",
+    stat: "About 1 in 5",
+    line: "Canadians live with chronic pain (about 7.6 million people), one of the most common reasons for seeking health care.",
+    source: "Health Canada, Canadian Pain Task Force / Best Brains Exchange report",
+    url: "https://www.canada.ca/en/health-canada/services/publications/healthy-living/best-brains-exchange-report-2023.html",
+    year: "2023",
+  },
+  {
+    key: "sleep",
+    pillar: "Sleep",
+    stat: "25%",
+    line: "of Canadian adults reported trouble going to sleep or staying asleep most or all of the time; half reported it at least sometimes.",
+    source: "Statistics Canada, Health Reports (Canadian Health Measures Survey 2014–2015)",
+    url: "https://www150.statcan.gc.ca/n1/pub/82-003-x/2022003/article/00001-eng.htm",
+    year: "2022",
+  },
+  {
+    key: "sleep-women",
+    pillar: "Sleep",
+    stat: "55% vs 43%",
+    line: "of women vs men aged 18 to 64 reported trouble going to sleep or staying asleep at least sometimes.",
+    source: "Statistics Canada, Health Reports (Canadian Health Measures Survey 2007–2013)",
+    url: "https://www150.statcan.gc.ca/n1/pub/82-003-x/2017009/article/54857-eng.pdf",
+    year: "2017",
+  },
+  {
+    key: "nhp-canada",
+    pillar: "Supplements & longevity",
+    stat: "73%",
+    line: "of Canadian adults used natural health products, including vitamins and minerals, in the past 12 months; 57% of users take them daily, and use is slightly higher among women.",
+    source: "Health Canada public opinion research (EKOS, n=2,575, December 2023)",
+    url: "https://publications.gc.ca/collections/collection_2024/sc-hc/H14-599-2024-eng.pdf",
+    year: "2024",
+  },
+  {
+    key: "supplements-us",
+    pillar: "Supplements & longevity",
+    stat: "75%",
+    line: "of American adults use dietary supplements.",
+    source: "Council for Responsible Nutrition, 2024 Consumer Survey on Dietary Supplements (via NutraIngredients)",
+    url: "https://www.nutraingredients.com/Article/2024/11/07/2024-CRN-Consumer-Survey-75-of-Americans-use-supplements/",
+    year: "2024",
+  },
+];
+
 export const SOURCES: Array<{ basis: Basis; source: string; what: string }> = [
   { basis: "measured", source: "Scale hub analytics", what: "Sessions by region and how members arrive, 30-day window. Shown as shares." },
   { basis: "measured", source: "Live hub inventory", what: "The launch brands and Calm Joints racquet pages listed on this page." },
   { basis: "modelled", source: "TAM feed (scalehealth.ca/tam)", what: "Orders a year, age band, gender skew, mobile share and stated intents by category, modelled from launch-partner customers." },
   { basis: "estimated", source: "Channel benchmarks", what: "Click-through bands by moment. Ranges, not promises." },
+  { basis: "estimated", source: "Public research (Health Canada, Statistics Canada, CRN)", what: "Population-level market context per pillar, linked to each source. Not Birch audience sizes or delivery." },
 ];
 
 export function fmtOrdersShort(n: number): string {
