@@ -20,7 +20,6 @@ import {
   HUBS,
   SLOTS,
   SMB_LADDER,
-  TAM_FACTS,
   corePackageUsd,
   money,
   slotPriceUsd,
@@ -92,11 +91,10 @@ form.dep input,form.dep select{width:100%;padding:10px;border:1px solid #b9c1c9;
 
 function statsStrip(): string {
   return `<div class="stats">
-<div class="stat"><b>${TAM_FACTS.ordersLabel}</b>${esc(TAM_FACTS.ordersNote)}</div>
-
-<div class="stat"><b>${TAM_FACTS.listedPartners}</b>listed partner brands and our clinic hub network</div>
+<div class="stat"><b>Private hubs</b>members-only health and wellness hubs, with more launching</div>
+<div class="stat"><b>Media credit</b>until an insertion order names the hub and surface</div>
 </div>
-<p class="fine">Modelled from the network feed at <a href="${TAM_FACTS.source}">scalehealth.ca/tam</a>, read ${TAM_FACTS.readOn}. Listed partners are not yet signed for display. Not audited, not a delivery promise. Nothing runs until an insertion order names the hub.</p>`;
+<p class="fine">Aggregate reporting only. No impression guarantees. Any view figure is a modelled estimate, not a delivery promise. Nothing runs until an insertion order names the hub.</p>`;
 }
 
 function hubPackageTable(currency: Currency): string {
