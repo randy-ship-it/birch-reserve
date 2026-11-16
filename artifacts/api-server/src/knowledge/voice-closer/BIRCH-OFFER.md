@@ -21,8 +21,8 @@ CURRENT OFFER (Randy HARD 2026-11-13; overrides anything below that conflicts):
 
 | SKU | Price | What it is |
 |-----|-------|------------|
-| `hold-190` | **$190 USD** ($270 CAD) | 7-day look at your category placement. Converts 100% to the seat within 7 days, otherwise a cash refund. Does not take a seat or lock a category. |
-| `reserve-490` | **$490 USD** ($690 CAD) | Category seat: one of 8 shared self-serve seats, open to more than one brand per category (not exclusive). 100% media credit until the IO. Refundable until 14 days before launch; then usable for 12 months. |
+| `hold-190` | **$190 USD** | 7-day look at your category placement. Converts 100% to the seat within 7 days, otherwise a cash refund. Does not take a seat or lock a category. |
+| `reserve-490` | **$490 USD** | Category seat: one of 8 shared self-serve seats, open to more than one brand per category (not exclusive). 100% media credit until the IO. Refundable until 14 days before launch; then usable for 12 months. |
 | Premium slot | **$25,000 to $50,000 USD** | Inquire only, set on an IO. Category exclusivity (one brand per category for the term), larger display share, priority placement. Team call-back. |
 | Book a call | Custom | Multi-hub / on-prem Align / custom package. Take intake (name, company, role, phone, email, need, size, timing) for a team callback. Cal only if they insist on a set time. |
 
