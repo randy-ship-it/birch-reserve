@@ -148,7 +148,7 @@ async function stubRandyReply(
 
   if (chip === "how_seats") {
     return {
-      text: "You reserve a share of display space across our growing network of private hubs (Scale Health, Calm Joints and more), curated as hubs launch. Reserving is $490 (100% media credit until the IO), or take a 7-day look for $190. Premium slots ($25K to $50K, inquire only) add exclusivity. Start at https://birchreserve.net/buycalc. What do you sell?",
+      text: "You reserve a share of display space across our growing network of private health and wellness hubs, curated as hubs launch. Reserving is $490 USD (100% media credit until the IO), or take a 7-day look for $190 USD. Premium slots ($25K to $50K, inquire only) add exclusivity. Start at https://birchreserve.net/buycalc. What do you sell?",
       source: "stub",
     };
   }

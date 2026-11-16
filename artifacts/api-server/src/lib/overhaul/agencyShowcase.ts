@@ -71,5 +71,5 @@ export const SPEC_ROWS = SURFACES.map((s) => ({
   inquire: isPremiumPlacement(s.key),
 }));
 
-export const INVENTORY_LINE = `First-party post-purchase and member-hub placements across co-branded Scale Health hubs, with ${TAM.ordersLabel} orders being onboarded (modelled).`;
+export const INVENTORY_LINE = `First-party post-purchase and member-hub placements across private, co-branded health and wellness hubs.`;
 export const SPEND_DOWN_MONTHS = INVENTORY.liveSpendDownMonths;

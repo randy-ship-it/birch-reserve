@@ -28,7 +28,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/media-kit": {
     title: "Media kit | Birch Reserve",
     image: MEDIA_KIT_OG_IMAGE,
-    description: "Prepaid media credit across a growing network of private health and wellness hubs. Start with the small-business package ($190 look or $490 reserve, self-serve) or inquire about a premium slot from $25K–$50K. Modelled volumes, no guarantees.",
+    description: "Prepaid media credit across a growing network of private health and wellness hubs. Start with the small-business package ($190 USD look or $490 USD reserve, self-serve) or inquire about a premium slot from $25K–$50K. Modelled volumes, no guarantees.",
     jsonld: {
       "@context": "https://schema.org",
       "@type": "WebPage",
@@ -107,8 +107,6 @@ export function llmsTxt(): string {
     "# Birch Reserve",
     "",
     `> Ad space inside co-branded Recovery Brand hubs (recovery, longevity, food; pets in queue) and health & wellness business hubs (physio, mobility, gyms, studios, clinic hubs). Display and CPC on four placements: ${PLACEMENT_LABELS.join(", ")}.`,
-    "",
-    `Audience (modelled, ${TAM.source}, read ${TAM.readOn}): ${TAM.ordersLabel} ${TAM.ordersNote}; ${TAM.listedPartners} listed partners.`,
     "",
     "## Advertise",
     `- Brands, spend commits: https://birchreserve.net/advertise/brands · ${SLOT_LADDER.map((t) => `$${t.usd} USD${t.bonusPct ? ` (+${t.bonusPct}% credit)` : ""}`).join(" · ")}. CAD: ${SLOT_LADDER.map((t) => `$${t.cad}`).join(" · ")}.`,

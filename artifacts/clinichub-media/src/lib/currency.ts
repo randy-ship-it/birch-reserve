@@ -10,7 +10,13 @@
 import { useSyncExternalStore } from "react";
 
 export type Currency = "usd" | "cad";
-export const CURRENCIES: readonly Currency[] = ["usd", "cad"] as const;
+/**
+ * Randy, Mon Nov 16 2026 8:48 AM ET: USD for everyone until the CAD checkout is
+ * tested. Mirrors PUBLIC_CAD_ENABLED in api-server/src/lib/currency.ts. While
+ * false, the page always shows and sends the existing USD price (no toggle).
+ */
+export const PUBLIC_CAD_ENABLED = false;
+export const CURRENCIES: readonly Currency[] = PUBLIC_CAD_ENABLED ? (["usd", "cad"] as const) : (["usd"] as const);
 export const CURRENCY_COOKIE = "br_currency";
 
 type Prices = Record<string, Record<Currency, number>>;
@@ -23,7 +29,10 @@ const DEFAULT_PRICES: Prices = {
 
 export function parseCurrency(value: unknown): Currency | null {
   const v = typeof value === "string" ? value.trim().toLowerCase() : "";
-  return v === "usd" || v === "cad" ? v : null;
+  if (v === "usd") return "usd";
+  // Old ?currency=cad links and saved CAD choices fall back to USD while CAD is off.
+  if (v === "cad") return PUBLIC_CAD_ENABLED ? "cad" : "usd";
+  return null;
 }
 
 function readStored(): Currency | null {
@@ -87,7 +96,8 @@ function start(): void {
     .catch(() => undefined);
 }
 
-export function setCurrency(currency: Currency): void {
+export function setCurrency(requested: Currency): void {
+  const currency: Currency = PUBLIC_CAD_ENABLED ? requested : "usd";
   persist(currency);
   emit({ ...state, currency });
 }
@@ -117,7 +127,8 @@ export function priceLabel(sku: string, currency: Currency, prices?: Prices): st
  * bare "$490" become the CAD seat price; "$190" likewise. USD copy is unchanged.
  */
 export function localizePrices(text: string, currency: Currency, prices: Prices = state.prices): string {
-  if (currency === "usd") return text;
+  // USD: label any bare "$190" / "$490" so every price names its currency.
+  if (currency === "usd") return text.replace(/\$(190|490)(?![0-9,.]| USD| CAD)/g, "$$$1 USD");
   let out = text;
   for (const [sku, usd] of [["hold-190", 190], ["reserve-490", 490]] as const) {
     const label = priceLabel(sku, currency, prices);

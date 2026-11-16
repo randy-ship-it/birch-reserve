@@ -123,7 +123,7 @@ const flush = () => new Promise((r) => setTimeout(r, 20));
 const FLAT = {
   call_id: "call_flat_001",
   from: "+14165550142",
-  to: "+15045046526",
+  to: "+16479316278",
   started_at: "2026-09-24T21:00:00Z",
   ended_at: "2026-09-24T21:04:30Z",
   end_reason: "caller_hangup",
@@ -235,7 +235,7 @@ test("tolerant: Standard Webhooks envelope + SIP headers + OpenAI-style content 
       call_id: "00000000-0000-0000-0000-000000000abc",
       sip_headers: [
         { name: "From", value: "\"Caller\" <sip:+16475550111@pstn.example>;tag=1" },
-        { name: "To", value: "<sip:+15045046526@sip.x.ai>" },
+        { name: "To", value: "<sip:+16479316278@sip.x.ai>" },
       ],
       start_time: 1790000000,
       end_time: 1790000125,
@@ -258,7 +258,7 @@ test("tolerant: Standard Webhooks envelope + SIP headers + OpenAI-style content 
   const c = parsed.call;
   assert.equal(c.callId, "00000000-0000-0000-0000-000000000abc");
   assert.equal(c.callerNumber, "+16475550111");
-  assert.equal(c.calledNumber, "+15045046526");
+  assert.equal(c.calledNumber, "+16479316278");
   assert.equal(c.durationSeconds, 125);
   assert.equal(c.endReason, "agent_ended");
   assert.deepEqual(c.turns.map((t) => t.role), ["agent", "caller"]);

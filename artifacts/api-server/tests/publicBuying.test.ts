@@ -3977,7 +3977,7 @@ test("CAD checkout is stored and charged in CAD, USD stays the default", async (
   }
 });
 
-test("/v1/checkout with no currency defaults by x-vercel-ip-country: CA -> CAD, else USD; explicit currency wins", async () => {
+test("/v1/checkout with no currency is USD everywhere while CAD is paused (Canada too); explicit currency still wins", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
   const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.PUBLIC_BASE_URL;
@@ -4003,8 +4003,8 @@ test("/v1/checkout with no currency defaults by x-vercel-ip-country: CA -> CAD, 
   });
   try {
     const cases: Array<[string, Record<string, string>, string | undefined, string, number]> = [
-      ["reserve-490", { "x-vercel-ip-country": "CA" }, undefined, "cad", 69000],
-      ["hold-190", { "x-vercel-ip-country": "CA" }, undefined, "cad", 27000],
+      ["reserve-490", { "x-vercel-ip-country": "CA" }, undefined, "usd", 49000],
+      ["hold-190", { "x-vercel-ip-country": "CA" }, undefined, "usd", 19000],
       ["reserve-490", { "x-vercel-ip-country": "US" }, undefined, "usd", 49000],
       ["reserve-490", { "x-vercel-ip-country": "GB" }, undefined, "usd", 49000],
       ["hold-190", {}, undefined, "usd", 19000],
@@ -4035,7 +4035,7 @@ test("/v1/checkout with no currency defaults by x-vercel-ip-country: CA -> CAD, 
         headers: { "x-vercel-ip-country": "CA" },
       })
     ).json()) as { currency?: string };
-    assert.equal(caQuote.currency, "CAD");
+    assert.equal(caQuote.currency, "USD");
   } finally {
     setStripeCheckoutFunctionsForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
@@ -4049,21 +4049,21 @@ test("/v1/checkout with no currency defaults by x-vercel-ip-country: CA -> CAD, 
   }
 });
 
-test("visitor currency: Canada defaults to CAD, everyone else USD, the toggle and cookie always win", async () => {
+test("visitor currency: USD for everyone while CAD is paused (Nov 16 2026), even for Canada, a CAD cookie or ?currency=cad", async () => {
   const currencyFor = async (headers: Record<string, string>, query = "") =>
     (await (await fetch(`${origin}/api/currency${query}`, { headers })).json()) as {
       currency: string;
       source: string;
       prices: Record<string, Record<string, { dueToday: number }>>;
     };
-  assert.equal((await currencyFor({ "x-vercel-ip-country": "CA" })).currency, "cad");
-  assert.equal((await currencyFor({ "cf-ipcountry": "CA" })).currency, "cad");
+  assert.equal((await currencyFor({ "x-vercel-ip-country": "CA" })).currency, "usd");
+  assert.equal((await currencyFor({ "cf-ipcountry": "CA" })).currency, "usd");
   assert.equal((await currencyFor({ "x-vercel-ip-country": "US" })).currency, "usd");
   assert.equal((await currencyFor({ "x-vercel-ip-country": "GB" })).currency, "usd");
   assert.equal((await currencyFor({})).currency, "usd");
   assert.equal((await currencyFor({ "x-vercel-ip-country": "CA", cookie: "br_currency=usd" })).currency, "usd");
-  assert.equal((await currencyFor({ "x-vercel-ip-country": "US", cookie: "br_currency=cad" })).currency, "cad");
-  assert.equal((await currencyFor({ "x-vercel-ip-country": "CA", cookie: "br_currency=usd" }, "?currency=cad")).currency, "cad");
+  assert.equal((await currencyFor({ "x-vercel-ip-country": "US", cookie: "br_currency=cad" })).currency, "usd");
+  assert.equal((await currencyFor({ "x-vercel-ip-country": "CA", cookie: "br_currency=usd" }, "?currency=cad")).currency, "usd");
   const data = await currencyFor({});
   assert.equal(data.prices["hold-190"]?.["cad"]?.dueToday, 270);
   assert.equal(data.prices["reserve-490"]?.["cad"]?.dueToday, 690);
@@ -4074,7 +4074,7 @@ test("visitor currency: Canada defaults to CAD, everyone else USD, the toggle an
     currency: string;
     prices: Record<string, Record<string, { amount_cents: number }>>;
   };
-  assert.equal(avail.currency, "CAD");
+  assert.equal(avail.currency, "USD");
   assert.equal(avail.prices["reserve-490"]?.["CAD"]?.amount_cents, 69000);
   assert.equal(avail.prices["reserve-490"]?.["USD"]?.amount_cents, 49000);
 
@@ -4087,15 +4087,16 @@ test("visitor currency: Canada defaults to CAD, everyone else USD, the toggle an
   assert.equal(usdQuote.amountCents, 19000);
 });
 
-test("buycalc shows CAD to Canadian visitors and USD to everyone else, with a visible toggle that sets a cookie", async () => {
+test("buycalc shows USD to everyone (Canada included) while CAD is paused, labelled, with no CAD toggle", async () => {
   const ca = await fetch(`${origin}/buycalc`, { headers: { "x-vercel-ip-country": "CA" } });
   const caHtml = await ca.text();
-  assert.match(caHtml, /\$690 CAD/);
-  assert.match(caHtml, /\$270 CAD/);
-  assert.doesNotMatch(caHtml, /\$490/);
-  assert.doesNotMatch(caHtml, /\$190/);
-  assert.match(caHtml, /data-testid="currency-toggle"/);
-  assert.match(caHtml, /currency=\"cad\"|currency="cad"|currency=\\?"cad/);
+  assert.match(caHtml, /\$490 USD/);
+  assert.match(caHtml, /\$190 USD/);
+  assert.doesNotMatch(caHtml, /\$690|\$270|CAD/);
+  assert.match(caHtml, /data-testid="currency-note"/);
+  assert.doesNotMatch(caHtml, /data-currency="cad"/);
+  const caCookie = await fetch(`${origin}/buycalc?currency=cad`, { headers: { "x-vercel-ip-country": "CA", cookie: "br_currency=cad" } });
+  assert.doesNotMatch(await caCookie.text(), /\$690|\$270/);
 
   const us = await fetch(`${origin}/buycalc`, { headers: { "x-vercel-ip-country": "US" } });
   const usHtml = await us.text();
@@ -4103,7 +4104,7 @@ test("buycalc shows CAD to Canadian visitors and USD to everyone else, with a vi
   assert.match(usHtml, /\$190 USD/);
   assert.doesNotMatch(usHtml, /\$690/);
   assert.doesNotMatch(usHtml, /\$270/);
-  assert.match(usHtml, /data-testid="currency-toggle"/);
+  assert.match(usHtml, /Prices in USD/);
 
   // A Canadian visitor can switch to USD, and the choice sticks.
   const toggled = await fetch(`${origin}/buycalc?currency=usd`, { headers: { "x-vercel-ip-country": "CA" } });
@@ -4545,8 +4546,9 @@ test("availability is integer-valued and buycalc remains useful without JavaScri
   assert.doesNotMatch(html, /today's minimum/);
   // Randy, Nov 14 2026: broad network positioning, no public category grid or seat count.
   const networkStrip = html.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
-  assert.match(networkStrip, /Scale Health/);
-  assert.match(networkStrip, /Calm Joints/);
+  assert.match(networkStrip, /Integrity Fitness/);
+  assert.doesNotMatch(networkStrip, /Scale Health/);
+  assert.match(networkStrip, /DR-HO/);
   assert.doesNotMatch(html, /seats open|Recovery hardware|Pain relief \/ topicals|Eight categories/);
   // Randy, Nov 12 2026: one clean buy path. No repeated filler, no raw quote JSON button, no old supplier category picker.
   assert.doesNotMatch(html, /sh-proof|is the stamp|The \$490 names the category|Copy quote JSON|id="seat-calc"|Provider Network|Supplements/);

@@ -243,7 +243,8 @@ test("buycalc HTML is one short, clean buy path with broad network copy and no p
   assert.doesNotMatch(html, /minimum goes up/);
   assert.doesNotMatch(html, /today's minimum/);
   const strip = html.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
-  assert.match(strip, /Scale Health/);
+  assert.match(strip, /Integrity Fitness/);
+  assert.doesNotMatch(html, /Scale Health/);
   assert.match(strip, /More hubs launching/);
   const closed = renderBuycalcHtml({ seatsOpen: 0, seatsTotal: 8 });
   assert.doesNotMatch(closed, /0 of 8|seats open/);
@@ -385,12 +386,13 @@ function homeOffer(html: string): { price: string; priceCurrency: string } {
   return data.itemListElement[0].item.offers;
 }
 
-test("GET / serves the Offer JSON-LD in the visitor's currency (CA -> CAD, else USD, ?currency wins)", async () => {
+test("GET / serves the Offer JSON-LD in USD for every visitor while CAD is paused (Canada, CAD cookie and ?currency=cad too)", async () => {
   const cases: Array<[string, Record<string, string>, string, string]> = [
-    ["/", { "x-vercel-ip-country": "CA" }, "690", "CAD"],
+    ["/", { "x-vercel-ip-country": "CA" }, "490", "USD"],
     ["/", { "x-vercel-ip-country": "US" }, "490", "USD"],
     ["/", {}, "490", "USD"],
-    ["/?currency=cad", { "x-vercel-ip-country": "US" }, "690", "CAD"],
+    ["/?currency=cad", { "x-vercel-ip-country": "US" }, "490", "USD"],
+    ["/", { "x-vercel-ip-country": "CA", cookie: "br_currency=cad" }, "490", "USD"],
     ["/?currency=usd", { "x-vercel-ip-country": "CA" }, "490", "USD"],
   ];
   for (const [path, headers, price, cur] of cases) {

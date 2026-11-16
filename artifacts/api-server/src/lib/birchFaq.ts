@@ -77,7 +77,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return { intent: "buy", callback: null, text: `Here's how: open ${BUY}, pick the $490 reserve (or the $190 7-day look), add your brand name and work email, tick the terms box, then pay on the secure Stripe checkout. Prices show in USD or CAD. Not ready, or want something custom? Use the request form at ${REQ}. No card needed.` };
   }
   if (/categor|open|available|left|inventory|spots|slots/.test(t)) {
-    return { intent: "categories", callback: null, text: `You get a share of display space across our growing network of private health and wellness hubs: Scale Health and Calm Joints, with more launching. Placements are curated as each hub launches, and early spots are limited. Reserve at ${BUY}.` };
+    return { intent: "categories", callback: null, text: `You get a share of display space across our growing network of private, members-only health and wellness hubs, with more launching. Placements are curated as each hub launches, and early spots are limited. Reserve at ${BUY}.` };
   }
   if (/proof|see|example|hub|where|show|who sees/.test(t)) {
     return { intent: "proof", callback: null, text: `See the face before the flight: live hubs anyone can open now are https://www.scalehealth.ca/integrity (Integrity Fitness x Scale Health) and https://physio.drhonow.com (DR-HO'S). Ads sit on the thank-you page, the hub home page, product and services pages, and the member dashboard. The media kit is ${KIT}.` };

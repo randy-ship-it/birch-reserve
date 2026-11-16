@@ -58,7 +58,6 @@ export function AgencyHero() {
             </p>
             <dl className="mt-10 grid grid-cols-2 gap-px border border-foreground/15 bg-foreground/15 md:grid-cols-4" data-testid="agency-kpis">
               {[
-                { v: TAM.ordersLabel, l: "orders being onboarded", t: "Modelled" },
                 { v: "4", l: "hub placements, display + CPC", t: "Spec" },
                 { v: `$${Math.min(...SPEC_ROWS.map((r) => r.cpmFloorUsd))}`, l: "CPM, starting at", t: "Estimate" },
                 { v: `${SELL_ASSUMPTION_PCT}%`, l: "of display space sold", t: "Assumption" },
@@ -159,7 +158,7 @@ export function InventorySpec() {
                 <td className="whitespace-nowrap px-5 py-4 text-muted-foreground">Display · CPC</td>
                 <td className="px-5 py-4 text-right font-display text-xl tabular-nums">${r.cpmFloorUsd}</td>
                 <td className="px-5 py-4 text-right tabular-nums">${r.cpcFloorUsd.toFixed(2)}</td>
-                <td className="px-5 py-4">{r.inquire ? "Inquiry → IO" : <>Card <span className="whitespace-nowrap">($190 / $490)</span> or IO</>}</td>
+                <td className="px-5 py-4">{r.inquire ? "Inquiry → IO" : <>Card <span className="whitespace-nowrap">($190 / $490 USD)</span> or IO</>}</td>
               </tr>
             ))}
           </tbody>
@@ -210,7 +209,6 @@ export function InsiderGrid() {
           items={[
             <>Co-branded Recovery Brand hubs: {verticals}.</>,
             <>{POSITIONING.businessHubs}.</>,
-            <>{TAM.ordersLabel} orders being onboarded <Tag>Modelled</Tag></>,
             <>Target by hub, by advertiser category, by placement, and by moment: after checkout, while browsing, or behind login.</>,
             <>Local reach: a 5 km area around a postal code, by inquiry.</>,
           ]}
@@ -221,7 +219,7 @@ export function InsiderGrid() {
           items={[
             <>Views, clicks, UTM-tagged visits and promo-code redemptions, per hub and per surface.</>,
             <>Your UTM parameters on every placement; a promo code if you want one.</>,
-            <>Pre-flight views are modelled from the TAM feed (scalehealth.ca/tam) and labelled that way. Campaign results come from your UTMs and codes.</>,
+            <>Pre-flight view estimates are modelled and labelled that way. Campaign results come from your UTMs and codes.</>,
             <>Aggregate reporting only.</>,
           ]}
         />
@@ -242,12 +240,12 @@ export function InsiderGrid() {
 }
 
 const IO_STEPS = [
-  { t: "Brief", d: "Send the client and picks through the agency form or a quick-buy inquiry. Small tests can start self-serve on the $190 look or the $490 reserve." },
+  { t: "Brief", d: "Send the client and picks through the agency form or a quick-buy inquiry. Small tests can start self-serve on the $190 USD look or the $490 USD reserve." },
   { t: "Draft IO", d: "We reply with hub fit and a draft insertion order naming the hub, surface, format, category and dates." },
   { t: "Sign & prepay", d: "Seats pay by card. Post-Purchase, 100K+ view blocks and exclusive locks go on the IO by inquiry." },
   { t: "Traffic", d: "Creative, UTMs and an optional promo code. Exact position is confirmed on the IO." },
   { t: "Flight", d: `Credit spends down on live hubs over the ${SPEND_DOWN_MONTHS} months after the deposit lands.` },
-  { t: "Report", d: "Per-hub, per-surface reporting. The $490 seat is fully refundable until 14 days before the launch date on the IO." },
+  { t: "Report", d: "Per-hub, per-surface reporting. The $490 USD seat is fully refundable until 14 days before the launch date on the IO." },
 ];
 
 export function IoProcess() {

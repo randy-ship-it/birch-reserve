@@ -7,6 +7,16 @@ import {
 
 export const CURRENCY_COOKIE = "br_currency";
 
+/**
+ * Randy, Mon Nov 16 2026 8:48 AM ET: quote everyone in USD until the CAD checkout
+ * is tested. While this is false every visitor (Canada included, any old
+ * br_currency=cad cookie or ?currency=cad link) is shown and checked out on the
+ * existing USD price. No Stripe price, webhook or env change: this only picks
+ * which of the two existing prices the page shows and sends to checkout.
+ * Flip to true once a CAD checkout has been verified end to end.
+ */
+export const PUBLIC_CAD_ENABLED = false;
+
 /** Edge/CDN headers that carry the visitor's ISO country. First match wins. */
 const COUNTRY_HEADERS = [
   "x-vercel-ip-country",
@@ -54,13 +64,16 @@ export function readCurrencyCookie(req: Pick<Request, "headers">): ReserveCurren
 
 /**
  * Visible choice wins (query, then cookie), then Canada -> CAD, everyone else
- * (and unknown country) -> USD.
+ * (and unknown country) -> USD. While PUBLIC_CAD_ENABLED is false, always USD.
  */
 export function decideCurrency(req: Pick<Request, "headers" | "query">): CurrencyDecision {
   const country = visitorCountry(req);
   const query = parseReserveCurrency(
     typeof req.query?.["currency"] === "string" ? req.query["currency"] : undefined,
   );
+  if (!PUBLIC_CAD_ENABLED) {
+    return { currency: RESERVE_CURRENCY, country, source: query === "usd" ? "query" : "default" };
+  }
   if (query) return { currency: query, country, source: "query" };
   const cookie = readCurrencyCookie(req);
   if (cookie) return { currency: cookie, country, source: "cookie" };
