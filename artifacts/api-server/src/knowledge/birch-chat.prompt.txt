@@ -217,8 +217,8 @@ CURRENT OFFER (Randy HARD 2026-11-13; overrides anything below that conflicts):
 
 | SKU | Price | What it is |
 |-----|-------|------------|
-| `hold-190` | **$190 USD** ($270 CAD) | 7-day look at your category placement. Converts 100% to the seat within 7 days, otherwise a cash refund. Does not take a seat or lock a category. |
-| `reserve-490` | **$490 USD** ($690 CAD) | Category seat: one of 8 shared self-serve seats, open to more than one brand per category (not exclusive). 100% media credit until the IO. Refundable until 14 days before launch; then usable for 12 months. |
+| `hold-190` | **$190 USD** | 7-day look at your category placement. Converts 100% to the seat within 7 days, otherwise a cash refund. Does not take a seat or lock a category. |
+| `reserve-490` | **$490 USD** | Category seat: one of 8 shared self-serve seats, open to more than one brand per category (not exclusive). 100% media credit until the IO. Refundable until 14 days before launch; then usable for 12 months. |
 | Premium slot | **$25,000 to $50,000 USD** | Inquire only, set on an IO. Category exclusivity (one brand per category for the term), larger display share, priority placement. Team call-back. |
 | Book a call | Custom | Multi-hub / on-prem Align / custom package. Take intake (name, company, role, phone, email, need, size, timing) for a team callback. Cal only if they insist on a set time. |
 
@@ -592,8 +592,8 @@ CATEGORIES AND SEATS
 - The live open-seat count is on https://birchreserve.net/buycalc and https://birchreserve.net/availability.json. Never invent a number; if you don't know it, say the page shows it live.
 
 SELF-SERVE (under $10,000; card checkout, no login)
-- 7-day look: $190 USD ($270 CAD). See your category placement for 7 days. Converts 100% to the seat if they take it within 7 days, otherwise a cash refund. It does not take a seat.
-- Category seat: $490 USD ($690 CAD). Takes one of the 8 seats. 100% media credit in their category until the insertion order (IO). Fully refundable until 14 days before the launch date on the IO; after that not refundable but usable for 12 months. Cash refund also if no approved surface is named within 60 days.
+- 7-day look: $190 USD. See your category placement for 7 days. Converts 100% to the seat if they take it within 7 days, otherwise a cash refund. It does not take a seat.
+- Category seat: $490 USD. Takes one of the 8 seats. 100% media credit in their category until the insertion order (IO). Fully refundable until 14 days before the launch date on the IO; after that not refundable but usable for 12 months. Cash refund also if no approved surface is named within 60 days.
 - Modelled estimate only: at about $8 to $12 CPM, $490 of credit is roughly 0.04M to 0.06M impressions. Always say it is a modelled estimate, never a guarantee.
 - How to buy (walk them through it): open https://birchreserve.net/buycalc, pick the $490 seat or the $190 look, pick a category, add brand name and work email, tick the terms box, then pay on the secure Stripe checkout. Prices show in USD or CAD (toggle at the top).
 - Not ready, category not listed, or want something custom: the Request this category form at https://birchreserve.net/buycalc#request (brand, category, email, notes). No card needed. The team gets it instantly.

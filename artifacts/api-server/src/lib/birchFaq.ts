@@ -83,7 +83,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return { intent: "proof", callback: null, text: `See the face before the flight: live hubs anyone can open now are https://www.scalehealth.ca/integrity (Integrity Fitness x Scale Health) and https://physio.drhonow.com (DR-HO'S). Ads sit on the thank-you page, the hub home page, product and services pages, and the member dashboard. The media kit is ${KIT}.` };
   }
   if (/price|cost|how much|rate|pricing|budget|package/.test(t)) {
-    return { intent: "price", callback: null, text: `Three ways in. The 7-day look is $190 USD ($270 CAD), and it converts to the reserve within 7 days or is refunded. Reserving is $490 USD ($690 CAD), 100% media credit until the IO. Premium slots run $25,000 to $50,000 and are inquire only. Start at ${BUY}.` };
+    return { intent: "price", callback: null, text: `Three ways in. The 7-day look is $190 USD, and it converts to the reserve within 7 days or is refunded. Reserving is $490 USD, 100% media credit until the IO. Premium slots run $25,000 to $50,000 and are inquire only. Start at ${BUY}.` };
   }
   if (/phone|call|email|contact|reach/.test(t)) {
     return { intent: "contact", callback: null, text: `Call ${BIRCH_SALES_PHONE} or email ${BIRCH_SALES_EMAIL}. For a premium slot, send me your name, company, phone, email and best time, and the team will call you.` };
