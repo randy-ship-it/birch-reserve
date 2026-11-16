@@ -10,8 +10,9 @@ const page = readFileSync(resolve(process.cwd(), "../clinichub-media/src/pages/b
 const data = readFileSync(resolve(process.cwd(), "src/lib/overhaul/audiences.ts"), "utf8");
 const all = page + data;
 
-test("copy rules: 20mm+ wording, no 8.7mm, no AI matching, no gross profit, no phone numbers", () => {
-  assert.match(A.AUDIENCE_SNAPSHOT.ordersLine, /^20mm\+ orders are being onboarded now$/);
+test("copy rules: no order or partner counts (Nov 16 2026), no 8.7mm, no AI matching, no gross profit, no phone numbers", () => {
+  assert.doesNotMatch(A.AUDIENCE_SNAPSHOT.ordersLine, /\d/);
+  assert.doesNotMatch(page, /20\s*mm|listed partner/i);
   assert.doesNotMatch(all, /8\.7\s*mm/i);
   assert.doesNotMatch(page, /\bAI\b|machine learning|algorithm/i);
   assert.doesNotMatch(all, /gross profit/i);

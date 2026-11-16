@@ -111,9 +111,8 @@ export default function BrAudiences() {
           <div className="border border-foreground/15 bg-white p-6 md:p-8">
             <div className="grid grid-cols-2 gap-x-5 gap-y-7 [&>div]:min-w-0">
               <div>
-                <div className="font-display text-4xl md:text-5xl">20mm+</div>
-                <div className="mt-1 text-sm text-muted-foreground">orders are being onboarded now</div>
-                <div className="mt-2"><BasisTag basis="modelled" /></div>
+                <div className="font-display text-4xl md:text-5xl">Private</div>
+                <div className="mt-1 text-sm text-muted-foreground">members-only hubs, reached right after they buy or book</div>
               </div>
               <div>
                 <div className="font-display text-4xl md:text-5xl">{AUDIENCE_SNAPSHOT.launchBrands}</div>

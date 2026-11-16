@@ -92,7 +92,7 @@ export function HowCalculated({ feed, showAudience = false }: { feed: Feed | nul
       <summary className="cursor-pointer text-base font-semibold">How this is calculated <span className="ml-2 text-xs font-normal opacity-70">Modelled estimate, not a guarantee, not Scale measured performance.</span></summary>
       <ul className="mt-4 list-disc space-y-2 pl-5 text-sm">
         {showAudience ? (<>
-          <li>Audience: 20mm+ orders being onboarded across listed partner categories (modelled).</li>
+          <li>Audience: members of private health and wellness hubs, reached right after they buy or book.</li>
         </>) : null}
         <li>Pick a category to see the seat: one brand per category.</li>
         <li>Views are sized on your insertion order against live hub supply. No click, conversion or order forecast.</li>

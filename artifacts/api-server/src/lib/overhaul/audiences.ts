@@ -11,7 +11,7 @@
  *                 snapshot read 2026-11-13). Partner order volumes x typical channel rates. Not audited.
  *  - "estimated": benchmark ranges or editorial judgement, not measured delivery.
  *
- * Copy rules: "20mm+ orders are being onboarded now"; no people, addresses or patient data;
+ * Copy rules (Randy, Nov 16 2026): no order or partner counts in public copy; no people, addresses or patient data;
  * cohort-level aggregates only; hand-picked curation in a private member experience.
  */
 
@@ -33,7 +33,7 @@ export const AUDIENCE_SNAPSHOT = {
   modelledReadOn: "2026-11-13",
   measuredWindow: "30 days to Nov 2, 2026",
   tamSource: "https://scalehealth.ca/tam",
-  ordersLine: "20mm+ orders are being onboarded now",
+  ordersLine: "more brand launches are being onboarded now",
   launchBrands: 8,
   racquetPages: ["Squash", "Tennis", "Pickleball", "Padel"],
   pillars: ["Recovery", "Longevity", "Sleep"],
