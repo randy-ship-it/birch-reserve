@@ -8,7 +8,7 @@ import { AGENCY_CASH_PCT, MEDIA_KIT_CPM, MEDIA_KIT_OFFERS, agencyCash, kitExampl
 import { AREA_LOCK } from "./overhaul/model";
 import { PREPAY_REFUND_CUTOFF_DAYS } from "./reserveOffers";
 
-export const BIRCH_FACTS_VERSION = "2026-11-14-broad-network" as const;
+export const BIRCH_FACTS_VERSION = "2026-11-17-usd-only" as const;
 export const BIRCH_SALES_PHONE = "(647) 931-6278" as const;
 export const BIRCH_SALES_EMAIL = "sales@silverbirchgrowth.com" as const;
 export const SELF_SERVE_LIMIT_USD = 10_000 as const;
@@ -31,10 +31,10 @@ export function birchCanonicalFacts(): string {
     "- Early placements are limited. Do not quote category lists, seat counts or 'seats open' numbers.",
     "",
     `SELF-SERVE (under $${SELF_SERVE_LIMIT_USD.toLocaleString("en-US")}; card checkout, no login)`,
-    `- 7-day look: $${look.spendUsd} USD ($${look.spendCad} CAD). See your placement for 7 days. Converts 100% to the reserve if they take it within 7 days, otherwise a cash refund.`,
-    `- Reserve: $${seat.spendUsd} USD ($${seat.spendCad} CAD). Reserves a share of display space across the network. 100% media credit until the insertion order (IO). Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before the launch date on the IO; after that not refundable but usable for 12 months. Cash refund also if no approved surface is named within 60 days.`,
+    `- 7-day look: $${look.spendUsd} USD. See your placement for 7 days. Converts 100% to the reserve if they take it within 7 days, otherwise a cash refund.`,
+    `- Reserve: $${seat.spendUsd} USD. Reserves a share of display space across the network. 100% media credit until the insertion order (IO). Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before the launch date on the IO; after that not refundable but usable for 12 months. Cash refund also if no approved surface is named within 60 days.`,
     `- Modelled estimate only: at about $${MEDIA_KIT_CPM.lo} to $${MEDIA_KIT_CPM.hi} CPM, $${seat.spendUsd} of credit is roughly ${millions(seatEx.imprLo)} to ${millions(seatEx.imprHi)} impressions. Always say it is a modelled estimate, never a guarantee.`,
-    "- How to buy (walk them through it): open https://birchreserve.net/buycalc, pick the $490 reserve or the $190 look, add brand name and work email, tick the terms box, then pay on the secure Stripe checkout. Prices show in USD or CAD (toggle at the top).",
+    "- How to buy (walk them through it): open https://birchreserve.net/buycalc, pick the $490 reserve or the $190 look, add brand name and work email, tick the terms box, then pay on the secure Stripe checkout. Prices are in USD.",
     "- Not ready, want something custom, or want to talk first: the Ask about a placement form at https://birchreserve.net/buycalc#request (brand, email, what they sell). No card needed. The team gets it instantly.",
     "",
     `PREMIUM ($${SELF_SERVE_LIMIT_USD.toLocaleString("en-US")} and up)`,
@@ -44,7 +44,7 @@ export function birchCanonicalFacts(): string {
     `- The agency of record earns ${AGENCY_CASH_PCT}% of media spend, paid in cash per the IO. Example: a $${seat.spendUsd} reserve pays the agency $${agencyCash(seat.spendUsd)}; a $25,000 premium slot pays $${agencyCash(25_000).toLocaleString("en-US")}.`,
     "",
     "LOCAL BUSINESSES",
-    `- Lock down my area: a deposit of $${AREA_LOCK.priceCad.toLocaleString("en-US")} CAD or $${AREA_LOCK.priceUsd.toLocaleString("en-US")} USD (launch rate until ${AREA_LOCK.launchRateUntil}) holds up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of their postal code for 1 to 6 months. Details at https://birchreserve.net/advertise/local.`,
+    `- Lock down my area: a deposit of $${AREA_LOCK.priceUsd.toLocaleString("en-US")} USD (launch rate until ${AREA_LOCK.launchRateUntil}) holds up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of their postal code for 1 to 6 months. Details at https://birchreserve.net/advertise/local.`,
     "",
     "NETWORK",
     "- Do not quote audience size, order counts, partner counts or savings versus Meta. Any view or impression figure is a modelled estimate and must be called modelled. Never say 8.7MM.",

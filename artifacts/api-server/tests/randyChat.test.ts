@@ -814,7 +814,10 @@ test("runtime checkout lock follows live flags: $190/$490 links when live, area 
 test("faq fallback: answers core Birch questions and submits a premium call-back (Randy Nov 13 2026)", async () => {
   const { birchFaqAnswer } = await import("../src/lib/birchFaq");
   assert.equal(birchFaqAnswer([{ role: "user", content: "If I buy the $490 seat, is my category exclusive?" }]).intent, "exclusive");
-  assert.equal(birchFaqAnswer([{ role: "user", content: "How do I buy the $490 seat?" }]).intent, "buy");
+  const buy = birchFaqAnswer([{ role: "user", content: "How do I buy the $490 seat?" }]);
+  assert.equal(buy.intent, "buy");
+  assert.match(buy.text, /Prices are in USD/);
+  assert.doesNotMatch(buy.text, /CAD|USD or CAD/);
   assert.match(birchFaqAnswer([{ role: "user", content: "Do you guarantee a CTR?" }]).text, /^No\./);
   const first = birchFaqAnswer([{ role: "user", content: "We want a premium slot, budget $30K" }]);
   assert.equal(first.intent, "premium");

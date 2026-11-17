@@ -157,7 +157,7 @@ const PRIVACY_HTML = documentPage(
   "Draft privacy note for Birch Reserve reservations. Not in force until counsel stamps this page.",
   `<h1>Privacy</h1>
 <p class="fine">${escapeHtml(SELLER)}</p>
-<p>This draft describes what Birch Reserve collects to sell the public $190 USD ($270 CAD) and $490 USD ($690 CAD) reservations. This page is not in force until counsel stamps it.</p>
+<p>This draft describes what Birch Reserve collects to sell the public $190 USD and $490 USD reservations. This page is not in force until counsel stamps it.</p>
 <p>Reservation checkout collects the brand legal name, work email, optional website, format preference, and an idempotency key so a repeated request does not open a second hold. Stripe hosts the card form. Silver Birch Growth Inc. receives payment status from Stripe and does not store full card numbers on Birch Reserve servers.</p>
 <p>Birch Reserve does not collect protected health information, clinical pixels, or patient-level reporting. Birch Guide does not collect patient or PHI data. Placement reporting, when an insertion order later authorizes a flight, is aggregate only.</p>
 <p>The Stripe descriptor should read SCALE HEALTH*BIRCH or BIRCH RESERVE. Contact <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> to ask for a copy of reservation details or to correct a brand name or email on an unpaid hold.</p>
@@ -173,7 +173,7 @@ const SAMPLE_IO_HTML = documentPage(
 <p>Nothing runs until an approved insertion order names the surface. This page is a blank sample, not a flight and not a receipt.</p>
 <dl>
 <div><dt><strong>Advertiser</strong></dt><dd>[Brand legal name]</dd></div>
-<div><dt><strong>SKU</strong></dt><dd>reserve-490 · $490 USD ($690 CAD) category seat, open to more than one brand, or hold-190 · $190 USD ($270 CAD) 7-day look</dd></div>
+<div><dt><strong>SKU</strong></dt><dd>reserve-490 · $490 USD category seat, open to more than one brand, or hold-190 · $190 USD 7-day look</dd></div>
 <div><dt><strong>Named surface</strong></dt><dd>[Hub URL, for example a listed Scale Health hub]</dd></div>
 <div><dt><strong>Format</strong></dt><dd>post-checkout, recovery plan, booking confirmation, native hub module, or motion :15</dd></div>
 <div><dt><strong>Category</strong></dt><dd>One of eight: pain relief / topicals, recovery hardware, nutrition, sleep, meal prep, women’s health, men’s health, diagnostics / services</dd></div>

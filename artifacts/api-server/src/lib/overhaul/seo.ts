@@ -96,7 +96,6 @@ export function slotProductsJsonLd(): Record<string, unknown>[] {
     brand: { "@type": "Brand", name: "Birch Reserve" },
     offers: [
       { "@type": "Offer", price: o.prices.usd, priceCurrency: "USD", availability: "https://schema.org/PreOrder", url: "https://birchreserve.net/advertise/brands", seller: ORG },
-      { "@type": "Offer", price: o.prices.cad, priceCurrency: "CAD", availability: "https://schema.org/PreOrder", url: "https://birchreserve.net/advertise/brands", seller: ORG },
     ],
   }));
 }
@@ -112,7 +111,6 @@ export function areaLockProductJsonLd(): Record<string, unknown> {
     description: `Up to ${o.display_share_pct.standard}% of hub display within ${o.radius_km} km for 1-6 months. ${o.guaranteed_hub_page_views_modelled.toLocaleString("en-US")} modelled hub page views. Draft terms.`,
     brand: { "@type": "Brand", name: "Birch Reserve" },
     offers: [
-      { "@type": "Offer", price: o.prices.cad, priceCurrency: "CAD", availability: "https://schema.org/PreOrder", url: "https://birchreserve.net/advertise/local", seller: ORG },
       { "@type": "Offer", price: o.prices.usd, priceCurrency: "USD", availability: "https://schema.org/PreOrder", url: "https://birchreserve.net/advertise/local", seller: ORG },
     ],
   };

@@ -1,5 +1,5 @@
 /**
- * Visitor currency for the two public SKUs (USD or CAD).
+ * Visitor currency for the two public SKUs (USD; CAD stays off while PUBLIC_CAD_ENABLED is false).
  *
  * The server decides (GET /api/currency: ?currency, then the br_currency
  * cookie, then Canada -> CAD, else USD). A visible toggle lets anyone switch;
@@ -87,7 +87,7 @@ function start(): void {
       for (const [sku, byCurrency] of Object.entries(d.prices ?? {})) {
         const usd = byCurrency?.["usd"]?.dueToday;
         const cad = byCurrency?.["cad"]?.dueToday;
-        if (typeof usd === "number" && typeof cad === "number") prices[sku] = { usd, cad };
+        if (typeof usd === "number") prices[sku] = { usd, cad: typeof cad === "number" ? cad : usd };
       }
       // A saved choice wins over geography; otherwise take the server's decision.
       const next = readStored() ?? parseCurrency(d.currency) ?? state.currency;

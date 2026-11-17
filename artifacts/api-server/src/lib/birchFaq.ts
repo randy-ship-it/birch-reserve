@@ -74,7 +74,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return { intent: "refund", callback: null, text: `The $490 reserve is 100% media credit until the insertion order. It's fully refundable until 14 days before the launch date on the IO, then usable for 12 months. If no approved surface is named within 60 days, it's a cash refund. The $190 look converts in full to the reserve within 7 days, otherwise it's refunded.` };
   }
   if (/buy|checkout|purchase|sign up|get started|how do i|pay|490|190|seat|look|book/.test(t)) {
-    return { intent: "buy", callback: null, text: `Here's how: open ${BUY}, pick the $490 reserve (or the $190 7-day look), add your brand name and work email, tick the terms box, then pay on the secure Stripe checkout. Prices show in USD or CAD. Not ready, or want something custom? Use the request form at ${REQ}. No card needed.` };
+    return { intent: "buy", callback: null, text: `Here's how: open ${BUY}, pick the $490 reserve (or the $190 7-day look), add your brand name and work email, tick the terms box, then pay on the secure Stripe checkout. Prices are in USD. Not ready, or want something custom? Use the request form at ${REQ}. No card needed.` };
   }
   if (/categor|open|available|left|inventory|spots|slots/.test(t)) {
     return { intent: "categories", callback: null, text: `You get a share of display space across our growing network of private, members-only health and wellness hubs, with more launching. Placements are curated as each hub launches, and early spots are limited. Reserve at ${BUY}.` };
