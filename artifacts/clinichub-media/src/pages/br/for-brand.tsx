@@ -1,4 +1,5 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useId, type ReactNode } from "react";
+import "./for-brand.css";
 import { useRoute } from "wouter";
 import { ShoppingBag, Trophy, Stethoscope, Users } from "lucide-react";
 import { Cta, H1, usePageMeta } from "@/components/br/ui";
@@ -59,12 +60,22 @@ const ICONS: Record<BestFitIcon, typeof ShoppingBag> = {
   street: Users,
 };
 
-function StrengthChip({ strength }: { strength: FitStrength }) {
+function StrengthChip({
+  strength,
+  onAccent = false,
+}: {
+  strength: FitStrength;
+  onAccent?: boolean;
+}) {
   const strong = strength === "strong";
   return (
     <span
       className={`inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] ${
-        strong ? "bg-accent text-accent-foreground" : "border border-current/30"
+        onAccent
+          ? "bg-foreground text-accent"
+          : strong
+            ? "bg-accent text-accent-foreground"
+            : "border border-current/30"
       }`}
     >
       {strengthLabel(strength)}
@@ -80,8 +91,94 @@ function Eyebrow({ children, dark = false }: { children: ReactNode; dark?: boole
   );
 }
 
+function useForBrandChrome() {
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.add("birch-for-brand-page");
+    return () => root.classList.remove("birch-for-brand-page");
+  }, []);
+}
+
+function OverlapVenn({ fit }: { fit: BrandFit }) {
+  const rawId = useId().replace(/:/g, "");
+  const clipMobile = `for-venn-clip-m-${rawId}`;
+  const clipDesktop = `for-venn-clip-d-${rawId}`;
+  const profile = fit.profile.slice(0, 3);
+  const strong = fit.overlap.filter((o) => o.strength === "strong");
+  const good = fit.overlap.filter((o) => o.strength === "good");
+  const aria = [
+    `${fit.name}'s customer versus our hubs and rooms.`,
+    strong.length ? `Strong fit: ${strong.map((o) => o.title).join("; ")}.` : "",
+    good.length ? `Good fit: ${good.map((o) => o.title).join("; ")}.` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <div className="for-venn" role="img" aria-label={aria}>
+      <div className="for-venn-stage">
+        <svg className="for-venn-art for-venn-art-mobile" viewBox="0 0 360 570" aria-hidden="true">
+          <defs>
+            <clipPath id={clipMobile}>
+              <circle cx="180" cy="380" r="175" />
+            </clipPath>
+          </defs>
+          <circle className="for-venn-fill-left" cx="180" cy="190" r="175" />
+          <circle className="for-venn-fill-right" cx="180" cy="380" r="175" />
+          <circle className="for-venn-fill-lens" cx="180" cy="190" r="175" clipPath={`url(#${clipMobile})`} />
+          <circle className="for-venn-stroke" cx="180" cy="190" r="175" />
+          <circle className="for-venn-stroke" cx="180" cy="380" r="175" />
+        </svg>
+        <svg className="for-venn-art for-venn-art-desktop" viewBox="0 0 560 380" aria-hidden="true">
+          <defs>
+            <clipPath id={clipDesktop}>
+              <circle cx="375" cy="190" r="175" />
+            </clipPath>
+          </defs>
+          <circle className="for-venn-fill-left" cx="185" cy="190" r="175" />
+          <circle className="for-venn-fill-right" cx="375" cy="190" r="175" />
+          <circle className="for-venn-fill-lens" cx="185" cy="190" r="175" clipPath={`url(#${clipDesktop})`} />
+          <circle className="for-venn-stroke" cx="185" cy="190" r="175" />
+          <circle className="for-venn-stroke" cx="375" cy="190" r="175" />
+        </svg>
+        <div className="for-venn-copy for-venn-left-copy">
+          <p className="for-venn-kicker">{fit.name}'s customer</p>
+          <ul>
+            {profile.map((p) => (
+              <li key={p.label}>{p.label}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="for-venn-copy for-venn-lens-copy">
+          <p className="for-venn-kicker">The overlap</p>
+          <ul>
+            {strong.map((o) => (
+              <li key={o.title}>
+                <span>{o.title}</span>
+                {o.strength ? <StrengthChip strength={o.strength} onAccent /> : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="for-venn-copy for-venn-right-copy">
+          <p className="for-venn-kicker">Our hubs and rooms</p>
+          <ul>
+            {good.map((o) => (
+              <li key={o.title}>
+                <span>{o.title}</span>
+                {o.strength ? <StrengthChip strength={o.strength} /> : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BrandFitPage({ fit }: { fit: BrandFit }) {
   useNoIndex();
+  useForBrandChrome();
   usePageMeta(`${fit.name} customer fit | Birch Reserve`, fit.lede);
   const products = fit.products ?? [];
   const tiles = fit.hubTiles ?? [];
@@ -91,8 +188,8 @@ function BrandFitPage({ fit }: { fit: BrandFit }) {
   return (
     <div className="for-brand overflow-x-hidden" data-testid="br-for-brand" data-brand={fit.slug}>
       {/* Hero: brand products + headline */}
-      <section className="border-b border-background/15 bg-foreground text-background">
-        <div className="container mx-auto max-w-6xl px-5 pb-10 pt-8 md:px-6 md:pb-14 md:pt-12">
+      <section className="for-brand-hero border-b border-background/15 bg-foreground text-background">
+        <div className="container mx-auto max-w-6xl px-5 pb-10 pt-10 md:px-6 md:pb-14 md:pt-14">
           <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-12">
             <div>
               {fit.logoSrc ? (
@@ -203,34 +300,7 @@ function BrandFitPage({ fit }: { fit: BrandFit }) {
         <div className="container mx-auto max-w-6xl px-5 py-10 md:px-6 md:py-12">
           <Eyebrow>Audience overlap</Eyebrow>
           <h2 className="mt-2 font-display text-[1.75rem] leading-tight tracking-tight md:text-4xl">Same person, already in the room.</h2>
-          <div className="mt-8 grid items-stretch gap-4 md:grid-cols-[1fr_auto_1fr] md:gap-0">
-            <div className="border border-foreground/15 bg-white p-5 md:rounded-none">
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">{fit.name}'s customer</p>
-              <ul className="mt-3 space-y-2 text-sm leading-snug">
-                {fit.profile.slice(0, 3).map((p) => (
-                  <li key={p.label} className="border-l-2 border-accent pl-3">
-                    {p.label}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="flex items-center justify-center bg-foreground px-5 py-6 text-center text-background md:min-w-44 md:px-6">
-              <p className="font-display text-xl leading-tight md:text-2xl">The overlap</p>
-            </div>
-            <div className="border border-foreground/15 bg-white p-5">
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Our hubs and rooms</p>
-              <ul className="mt-3 space-y-2">
-                {fit.overlap
-                  .filter((o) => o.strength)
-                  .map((o) => (
-                    <li key={o.title} className="flex flex-wrap items-center justify-between gap-2 text-sm leading-snug">
-                      <span>{o.title}</span>
-                      {o.strength ? <StrengthChip strength={o.strength} /> : null}
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          </div>
+          <OverlapVenn fit={fit} />
           <p className="mt-3 text-[11px] text-muted-foreground">Fit is qualitative — Strong or Good — not a measured share or invented percentage.</p>
           <details className="group mt-5 border border-foreground/15 bg-white">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 font-display text-lg">
