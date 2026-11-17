@@ -1,142 +1,145 @@
-import { useEffect, useState } from "react";
-import { Bot, Braces, CreditCard, Search, Sparkles } from "lucide-react";
-import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Modelled, Section, usePageMeta } from "@/components/br/ui";
-import { slotOffers, areaLockOffer } from "../../../../api-server/src/lib/overhaul/agent";
-import { areaLockProductJsonLd, slotProductsJsonLd } from "../../../../api-server/src/lib/overhaul/seo";
+import { Check } from "lucide-react";
+import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
+import { MediaKitPdfLink } from "@/components/br/trust";
+import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
+import { AvailabilityStrip, NETWORK_HUBS, priceLabels, useAvailability } from "@/components/br/prime-hero";
+import { buyersOffersJsonLd } from "../../../../api-server/src/lib/overhaul/seo";
 
-const STEPS = [
-  { icon: Search, title: "Read the catalog", code: "GET /v1/agent/catalog.json", body: "Surfaces, starting-at CPMs, live hubs, every offer with prices in USD and CAD." },
-  { icon: Sparkles, title: "Check fit", code: "POST /v1/match", body: "Send the brand's URL and a short note. Get a modelled match %, three reasons and the offer we'd recommend." },
-  { icon: Braces, title: "Quote", code: "GET /v1/agent/quote?offer=sponsor-3000", body: "Exact price, media credit, bonus and modelled views. Area locks quote by postal code or ZIP and term." },
-  { icon: CreditCard, title: "Check out", code: "POST /v1/agent/checkout", body: "Returns a Stripe-hosted checkout_url for the buyer, or status held: reserved by inquiry, no charge, confirmed within 1 business day." },
+/**
+ * /buyers (and legacy /ai-buyers): for human media buyers and agencies first
+ * (Randy, Nov 17 2026). Same offer as the media kit: a $190 USD 7-day look or a
+ * $490 USD category reserve, paid on a Stripe-hosted page. USD only.
+ * Agent/API material is a small secondary section at the bottom.
+ */
+
+const PLACEMENTS = [
+  { t: "Post-purchase", d: "The thank-you page right after an order or booking. Highest intent." },
+  { t: "Member dashboard", d: "The logged-in home where members track orders and plans." },
+  { t: "Hub home", d: "Banner and tiles on the co-branded hub home page." },
+  { t: "Product & services pages", d: "Inside product, service and booking pages." },
 ];
 
-const ENDPOINTS: Array<[string, string]> = [
-  ["/llms.txt", "Plain-text map of the site, offers and endpoints"],
-  ["/v1/agent/catalog.json", "Inventory, surfaces, offers, modelled views, checkout status"],
-  ["/v1/agent/quote", "Quote one offer (slot-490, sponsor-1500, sponsor-3000, sponsor-6000, area-lock)"],
-  ["/v1/agent/checkout", "Stripe-hosted checkout handoff, or held (reserve by inquiry)"],
-  ["/v1/agent/openapi.json", "OpenAPI 3.1 spec for the agent endpoints"],
-  ["/.well-known/agent.json", "Agent card: skills, endpoints, auth"],
-  ["/.well-known/ucp", "Universal Commerce Protocol discovery"],
-  ["/v1/match", "Modelled audience match for a URL + blurb"],
+const AGENT_LINKS: Array<[string, string, string]> = [
+  ["llms.txt", "/llms.txt", "Plain-text map of the site and the two offers"],
+  ["Agent catalog", "/v1/agent/catalog.json", "Placements, live hubs and the two offers, in USD"],
+  ["OpenAPI spec", "/v1/agent/openapi.json", "OpenAPI 3.1 for the catalog and quote endpoints"],
+  ["Agent card", "/.well-known/agent.json", "Skills, endpoints and auth (none needed to read)"],
 ];
-
-const EXAMPLE = `curl -s https://birchreserve.net/v1/agent/quote?offer=sponsor-3000&currency=usd
-
-curl -s -X POST https://birchreserve.net/v1/agent/checkout \\
-  -H 'content-type: application/json' \\
-  -d '{"offer":"sponsor-3000","currency":"usd","brand":"Acme Recovery",
-       "email":"buyer@acme.com","agent":"your-agent-name","agree":true}'`;
 
 export default function BrAiBuyers() {
-  usePageMeta("For media buyers | Birch Reserve", "Machine-readable catalog, quotes and Stripe-hosted checkout for media buyers. Display and CPC inside co-branded health & wellness hubs.");
-  const [quote, setQuote] = useState<string>("");
-  useEffect(() => {
-    fetch("/v1/agent/quote?offer=sponsor-3000&currency=usd")
-      .then((r) => r.json())
-      .then((j) => setQuote(JSON.stringify(j, null, 2)))
-      .catch(() => setQuote(""));
-  }, []);
-  const offers = slotOffers();
-  const area = areaLockOffer();
+  usePageMeta(
+    "For media buyers & agencies | Birch Reserve",
+    "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. Live hubs: Integrity Fitness and DR-HO'S physio.",
+  );
+  const price = priceLabels(useAvailability());
+  const hubs = NETWORK_HUBS.join(" and ");
   return (
     <div data-testid="br-buyers">
-      <JsonLd data={{ "@context": "https://schema.org", "@graph": [...slotProductsJsonLd(), areaLockProductJsonLd()] }} />
+      <JsonLd data={{ "@context": "https://schema.org", "@graph": buyersOffersJsonLd() }} />
+
+      {/* Hero */}
       <Section>
-        <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div>
-            <Eyebrow>For media buyers</Eyebrow>
-            <H1>Read the catalog, get a quote, and check out.</H1>
-            <Lede>
-              Every slot, price and modelled view count is machine-readable. Quotes are exact, and checkout hands the buyer a Stripe-hosted page. No forms, no sales call needed to get a number.
-            </Lede>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Cta href="/v1/agent/catalog.json" testId="ai-catalog">Open the catalog</Cta>
-              <Cta href="/llms.txt" variant="ink">llms.txt</Cta>
-              <Cta href="/v1/agent/openapi.json" variant="line">OpenAPI</Cta>
-            </div>
-          </div>
-          <div className="border border-foreground/15 bg-foreground p-5 text-background">
-            <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-background/60">
-              <Bot className="size-4" /> Live quote from this site
-            </div>
-            <pre className="max-h-80 overflow-auto whitespace-pre-wrap break-words font-mono text-[12px] leading-relaxed text-accent" data-testid="ai-live-quote">{quote || "Loading /v1/agent/quote …"}</pre>
-          </div>
+        <Eyebrow>For media buyers &amp; agencies</Eyebrow>
+        <H1>Put your brand where people are already buying care.</H1>
+        <Lede>
+          Birch Reserve sells display space inside private health and wellness hubs: the pages members use right after they buy or book, and when they log back in. Live today: {hubs}, with more hubs launching. Start self-serve for {price.look} or {price.seat}, priced in USD.
+        </Lede>
+        <div className="mt-6">
+          <AvailabilityStrip />
+        </div>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <Cta href="/media-kit" variant="lime" testId="buyers-media-kit" className="w-full sm:w-auto">See the media kit</Cta>
+          <Cta href="/match" variant="ink" testId="buyers-match" className="w-full sm:w-auto">Match your audience</Cta>
+          <MediaKitPdfLink variant="line" testId="buyers-pdf" className="w-full sm:w-auto" />
         </div>
       </Section>
 
-      <Section tone="soft">
-        <Eyebrow>Four calls</Eyebrow>
-        <H2>Catalog, fit, quote, checkout.</H2>
-        <div className="mt-8 grid gap-px border border-foreground/15 bg-foreground/15 md:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map((s, i) => (
-            <div key={s.title} className="bg-background p-6">
-              <s.icon className="size-5" />
-              <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Step {i + 1}</p>
-              <p className="mt-1 font-display text-2xl">{s.title}</p>
-              <code className="mt-2 block break-all bg-secondary px-2 py-1 font-mono text-xs">{s.code}</code>
-              <p className="mt-3 text-sm text-muted-foreground">{s.body}</p>
+      {/* Offer */}
+      <Section tone="soft" id="offer">
+        <Eyebrow>The offer</Eyebrow>
+        <H2>Two ways to start. Both USD, both self-serve.</H2>
+        <div className="mt-8 grid gap-4 md:grid-cols-2" data-testid="buyers-offers">
+          <article className="flex flex-col border border-foreground/20 bg-white p-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">7-day category look</p>
+            <p className="mt-2 font-display text-5xl leading-none">{price.look}</p>
+            <p className="mt-4 text-sm text-foreground/80">Hold your category for 7 days. It converts in full to the {price.seat} reserve within 7 days, or it's refunded. It does not lock in a slot.</p>
+            <div className="mt-6 sm:mt-auto sm:pt-6">
+              <Cta href={LOOK_HREF} variant="ink" testId="buyers-look" className="w-full sm:w-auto">Take a 7-day look — {price.look}</Cta>
             </div>
+          </article>
+          <article className="flex flex-col border-2 border-foreground bg-white p-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Category reserve</p>
+            <p className="mt-2 font-display text-5xl leading-none">{price.seat}</p>
+            <p className="mt-4 text-sm text-foreground/80">Reserve your space across the hub network. Your payment is media credit, fully refundable until 14 days before your launch date and usable for 12 months.</p>
+            <div className="mt-6 sm:mt-auto sm:pt-6">
+              <Cta href={RESERVE_HREF} variant="lime" testId="buyers-reserve" className="w-full sm:w-auto">Reserve your space — {price.seat}</Cta>
+            </div>
+          </article>
+        </div>
+        <p className="mt-4 text-sm text-muted-foreground">Pay by card on a Stripe-hosted page, no login. Nothing runs until you approve an insertion order naming the hub and placement. Premium slots are inquire-only; see the <a className="underline underline-offset-2" href="/media-kit#premium">media kit</a>.</p>
+      </Section>
+
+      {/* Where it shows */}
+      <Section>
+        <Eyebrow>Where your ad shows</Eyebrow>
+        <H2>Four placements in every hub.</H2>
+        <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" data-testid="buyers-placements">
+          {PLACEMENTS.map((p) => (
+            <li key={p.t} className="border border-foreground/15 bg-white p-5">
+              <p className="font-display text-xl">{p.t}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{p.d}</p>
+            </li>
           ))}
-        </div>
+        </ul>
+        <p className="mt-4 text-sm">See the live hubs on the <a className="underline underline-offset-2" href="/hubs">hubs page</a>.</p>
       </Section>
 
-      <Section>
+      {/* Match + agencies */}
+      <Section tone="soft">
         <div className="grid gap-10 lg:grid-cols-2">
           <div>
-            <Eyebrow>Offer keys</Eyebrow>
-            <H2>What a buyer can purchase.</H2>
-            <div className="mt-6 overflow-x-auto border border-foreground/15 bg-white">
-              <table className="w-full text-sm">
-                <thead className="bg-secondary text-left">
-                  <tr><th className="p-3">offer</th><th className="p-3 text-right">USD</th><th className="p-3 text-right">CAD</th><th className="p-3 text-right">Views <Modelled /></th></tr>
-                </thead>
-                <tbody>
-                  {offers.map((o) => (
-                    <tr key={o.offer_key} className="border-t border-foreground/10">
-                      <td className="p-3 font-mono text-xs">{o.offer_key}{o.bonus_credit_pct ? <span className="ml-2 font-sans text-muted-foreground">+{o.bonus_credit_pct}% credit</span> : null}</td>
-                      <td className="p-3 text-right">${o.prices.usd.toLocaleString()}</td>
-                      <td className="p-3 text-right">${o.prices.cad.toLocaleString()}</td>
-                      <td className="p-3 text-right">~{o.modelled_hub_page_views.toLocaleString()}</td>
-                    </tr>
-                  ))}
-                  <tr className="border-t border-foreground/10">
-                    <td className="p-3 font-mono text-xs">area-lock<span className="ml-2 font-sans text-muted-foreground">{area.radius_km} km, 1-6 mo</span></td>
-                    <td className="p-3 text-right">${area.prices.usd.toLocaleString()}</td>
-                    <td className="p-3 text-right">${area.prices.cad.toLocaleString()}</td>
-                    <td className="p-3 text-right">{area.guaranteed_hub_page_views_modelled.toLocaleString()}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p className="mt-3 text-xs text-muted-foreground">Spend-commit and area-lock views are what the credit buys at the blended starter rate card: modelled illustrative estimates, not guarantees.</p>
+            <Eyebrow>Check the fit first</Eyebrow>
+            <H2>Match your audience.</H2>
+            <p className="mt-4 text-foreground/80">Enter your website and a short note about your customer. You get a match score with three reasons, so you know whether the hubs fit before you spend.</p>
+            <div className="mt-6"><Cta href="/match" variant="ink" testId="buyers-match-2" className="w-full sm:w-auto">Match your audience</Cta></div>
           </div>
           <div>
-            <Eyebrow>Endpoints</Eyebrow>
-            <H2>Everything is public.</H2>
-            <ul className="mt-6 divide-y divide-foreground/10 border border-foreground/15 bg-white text-sm">
-              {ENDPOINTS.map(([p, d]) => (
-                <li key={p} className="flex flex-col gap-1 p-3 sm:flex-row sm:items-baseline sm:justify-between">
-                  <a className="font-mono text-xs underline underline-offset-2" href={p}>{p}</a>
-                  <span className="text-muted-foreground sm:text-right">{d}</span>
-                </li>
+            <Eyebrow>Agencies</Eyebrow>
+            <H2>Place a client, earn 10% in cash.</H2>
+            <ul className="mt-4 space-y-2 text-sm">
+              {["The agency of record earns 10% of media spend, paid in cash per the IO.", "Aggregate UTM reporting only. No personal data is shared.", "Modelled volumes, labelled as estimates. No impression guarantees."].map((r) => (
+                <li key={r} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />{r}</li>
               ))}
             </ul>
-            <pre className="mt-6 overflow-x-auto bg-foreground p-4 font-mono text-[11px] leading-relaxed text-background">{EXAMPLE}</pre>
+            <div className="mt-6"><Cta href="/agencies" variant="line" testId="buyers-agencies" className="w-full sm:w-auto">Agency details</Cta></div>
           </div>
         </div>
       </Section>
 
-      <Section tone="soft">
+      <Section>
         <Faq
           items={[
-            { q: "Does a buyer need an API key?", a: "No. Catalog, quote and match are public. Checkout returns a Stripe-hosted page for the buyer to pay; we never take delegated card details." },
-            { q: "What does status held mean?", a: "Online payment isn't open for that offer yet. The request is reserved by inquiry with the offer, price and buyer email. No charge is made, and we confirm within 1 business day." },
-            { q: "Are the view numbers real?", a: "They are modelled from the Scale Health TAM feed and labelled modelled everywhere. Hubs are listed partners; each buy runs under an insertion order that names the hubs." },
-            { q: "What must be shown before checkout?", a: "The terms and the price before sending agree:true. Payment is media credit drawn down under an insertion order that names the hubs." },
+            { q: "What currency do you charge in?", a: "USD for every buyer, including Canadian brands: $190 USD for the 7-day look and $490 USD for the category reserve." },
+            { q: "Which hubs are live?", a: `${hubs}. More hubs launch over time, and placements are curated as each one goes live.` },
+            { q: "Are the view numbers real?", a: "Volumes in the media kit are modelled estimates, labelled as such. There are no impression, reach, click or sales guarantees." },
+            { q: "What happens after I pay?", a: "Your payment is media credit. We send an insertion order naming the hub and placement, and nothing runs until you approve it." },
           ]}
         />
+      </Section>
+
+      {/* Secondary: AI agents */}
+      <Section tone="soft" id="ai-agents">
+        <div className="max-w-3xl" data-testid="buyers-ai-agents">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">For AI agents</p>
+          <p className="mt-2 text-sm text-foreground/80">
+            Buying agents can read the same two offers ($190 USD look, $490 USD reserve) and the live hubs in machine-readable form. Agent checkout is on hold: a request sent to the checkout endpoint is recorded and answered by email, with no charge. To pay, send the buyer to the media kit and the Stripe-hosted page.
+          </p>
+          <ul className="mt-3 flex flex-col gap-1 text-sm">
+            {AGENT_LINKS.map(([label, href, d]) => (
+              <li key={href}><a className="underline underline-offset-2" href={href}>{label}</a> <span className="text-muted-foreground">— {d}</span></li>
+            ))}
+          </ul>
+        </div>
       </Section>
     </div>
   );

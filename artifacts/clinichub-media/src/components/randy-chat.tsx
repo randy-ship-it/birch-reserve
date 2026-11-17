@@ -52,14 +52,13 @@ import {
   type RandyReplyFailure,
 } from "@/lib/randy-model-client";
 import { RichText } from "@/components/randy-rich-text";
-import { SQUIRREL_STYLES, SquirrelBadge, SquirrelFull } from "@/components/birch-squirrel";
+import { SQUIRREL_STYLES, SquirrelBadge } from "@/components/birch-squirrel";
 import { BIRCH_SQUIRREL } from "@/lib/birch-squirrel-config";
 
 const PANEL_SHADOW =
   "shadow-[0_32px_80px_-24px_rgba(7,26,57,0.45),0_10px_28px_-10px_rgba(7,26,57,0.22)]";
 const SQUIRREL_NAME = BIRCH_SQUIRREL.name;
 const DISMISS_KEY = "birch:randy-figure-dismissed";
-const TEASER_DELAY_MS = 4000;
 
 const FIGURE_STYLES = `
 @keyframes randy-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
@@ -312,12 +311,7 @@ export function RandyChat() {
     return () => window.removeEventListener(LINGER_STATE_EVENT, onLinger);
   }, []);
 
-  // Teaser bubble after ~4s (closed state only; once per page view).
-  useEffect(() => {
-    if (open || dismissed || teaserDone) return;
-    const t = window.setTimeout(() => setTeaserVisible(true), TEASER_DELAY_MS);
-    return () => window.clearTimeout(t);
-  }, [open, dismissed, teaserDone]);
+  // No auto-pop teaser (Randy, Nov 17 2026): the launcher icon is the only closed-state UI.
 
   const dismissFigure = useCallback(() => {
     setDismissed(true);
@@ -783,7 +777,7 @@ export function RandyChat() {
               />
             </button>
           )}
-          <div className="randy-bob relative">
+          <div className="relative">
             <button
               type="button"
               onClick={() => openWidget({ reason: "launcher", mode: "chat" })}
@@ -793,10 +787,10 @@ export function RandyChat() {
               data-testid="button-open-randy-chat"
             >
               <span className="block md:hidden">
-                <SquirrelBadge size={48} nod className="shadow-[0_4px_14px_rgba(15,34,24,.18)]" testId="birch-squirrel-launcher-mobile" />
+                <SquirrelBadge size={48} className="shadow-[0_4px_14px_rgba(15,34,24,.18)]" testId="birch-squirrel-launcher-mobile" />
               </span>
               <span className="hidden md:block">
-                <SquirrelBadge size={72} nod className="shadow-[0_12px_32px_-12px_rgba(15,23,42,0.45)]" testId="birch-squirrel-launcher" />
+                <SquirrelBadge size={56} className="shadow-[0_12px_32px_-12px_rgba(15,23,42,0.45)]" testId="birch-squirrel-launcher" />
               </span>
             </button>
             <button
@@ -815,22 +809,6 @@ export function RandyChat() {
       <AnimatePresence>
         {open && (
           <>
-            {/* Desktop stage: full-body Birch Q&A Squirrel on a white panel directly left of the chat */}
-            <motion.div
-              key="randy-stage"
-              initial={{ opacity: 0, x: 28, scale: 0.97 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: 20, scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 380, damping: 30, delay: 0.04 }}
-              className={`pointer-events-none fixed bottom-6 right-[calc(1.5rem+400px+14px)] z-50 hidden flex-col items-center justify-end rounded-3xl border border-black/5 bg-white px-5 pb-4 pt-5 md:flex ${PANEL_SHADOW}`}
-              style={{ backgroundColor: "#fff" }}
-              data-testid="randy-figure-open"
-              aria-hidden
-            >
-              <SquirrelFull className="h-[min(300px,calc(100dvh-12rem))] w-auto" testId="birch-squirrel-stage" />
-              <p className="mt-2 text-center text-xs font-semibold text-slate-600">{SQUIRREL_NAME}</p>
-            </motion.div>
-
             {/* Chat panel: desktop floating glass card; mobile native bottom sheet */}
             <motion.div
               key="randy-panel"
@@ -844,15 +822,6 @@ export function RandyChat() {
               aria-label={`${SQUIRREL_NAME}, Birch Reserve`}
               data-testid="dialog-randy-chat"
             >
-              {/* Mobile: squirrel peeking over the sheet's top edge */}
-              <div
-                className="pointer-events-none absolute -top-[64px] right-5 md:hidden"
-                data-testid="randy-figure-peek"
-                aria-hidden
-              >
-                <SquirrelFull className="h-[76px] w-auto drop-shadow-[0_8px_14px_rgba(7,26,57,0.25)]" />
-              </div>
-
               {/* Grab handle (mobile) */}
               <div className="flex justify-center pt-2 md:hidden" aria-hidden>
                 <span className="h-1 w-10 rounded-full bg-slate-300" />

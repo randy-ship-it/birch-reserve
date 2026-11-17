@@ -257,7 +257,7 @@ export function readSpaIndexHtml(): string {
 /**
  * Home-page structured data in the visitor's currency. The static shell ships a
  * USD fallback; the function swaps the whole Product/Offer block for the
- * detected or forced currency (CAD for Canada, USD elsewhere).
+ * detected or forced currency (USD for everyone while PUBLIC_CAD_ENABLED is false).
  */
 export function homeOfferJsonLd(currency: ReserveCurrency): string {
   const offer = PUBLIC_RESERVE_OFFERS.find((o) => o.sku === "reserve-490");
@@ -280,7 +280,7 @@ export function homeOfferJsonLd(currency: ReserveCurrency): string {
             price: String(offerAmountCents(offer, currency) / 100),
             priceCurrency: currency.toUpperCase(),
             availability: "https://schema.org/LimitedAvailability",
-            url: `${PUBLIC_SITE_ORIGIN}/advertise/brands`,
+            url: `${PUBLIC_SITE_ORIGIN}/media-kit`,
           },
         },
       },
