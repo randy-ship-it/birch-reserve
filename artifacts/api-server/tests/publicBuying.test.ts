@@ -4065,18 +4065,32 @@ test("visitor currency: USD for everyone while CAD is paused (Nov 16 2026), even
   assert.equal((await currencyFor({ "x-vercel-ip-country": "US", cookie: "br_currency=cad" })).currency, "usd");
   assert.equal((await currencyFor({ "x-vercel-ip-country": "CA", cookie: "br_currency=usd" }, "?currency=cad")).currency, "usd");
   const data = await currencyFor({});
-  assert.equal(data.prices["hold-190"]?.["cad"]?.dueToday, 270);
-  assert.equal(data.prices["reserve-490"]?.["cad"]?.dueToday, 690);
   assert.equal(data.prices["hold-190"]?.["usd"]?.dueToday, 190);
   assert.equal(data.prices["reserve-490"]?.["usd"]?.dueToday, 490);
+  assert.equal(data.prices["hold-190"]?.["cad"], undefined);
+  assert.equal(data.prices["reserve-490"]?.["cad"], undefined);
 
   const avail = (await (await fetch(`${origin}/availability.json`, { headers: { "x-vercel-ip-country": "CA" } })).json()) as {
     currency: string;
+    currencies?: string[];
     prices: Record<string, Record<string, { amount_cents: number }>>;
   };
   assert.equal(avail.currency, "USD");
-  assert.equal(avail.prices["reserve-490"]?.["CAD"]?.amount_cents, 69000);
+  assert.deepEqual(avail.currencies, ["USD"]);
+  assert.equal(avail.prices["hold-190"]?.["USD"]?.amount_cents, 19000);
   assert.equal(avail.prices["reserve-490"]?.["USD"]?.amount_cents, 49000);
+  assert.equal(avail.prices["hold-190"]?.["CAD"], undefined);
+  assert.equal(avail.prices["reserve-490"]?.["CAD"], undefined);
+
+  const catalog = (await (await fetch(`${origin}/v1/catalog.json`)).json()) as {
+    currencies?: string[];
+    currency_note?: string;
+    offers: Array<{ sku: string; prices?: Record<string, unknown> }>;
+  };
+  assert.deepEqual(catalog.currencies, ["USD"]);
+  assert.doesNotMatch(catalog.currency_note ?? "", /CAD/);
+  assert.equal(catalog.offers.find((o) => o.sku === "reserve-490")?.prices?.["CAD"], undefined);
+  assert.equal((catalog.offers.find((o) => o.sku === "reserve-490")?.prices?.["USD"] as { amount_cents?: number } | undefined)?.amount_cents, 49000);
 
   const quote = (await (await fetch(`${origin}/v1/quote?sku=hold-190&format=post_checkout&days=30&currency=cad`)).json()) as Record<string, unknown>;
   assert.equal(quote.currency, "CAD");

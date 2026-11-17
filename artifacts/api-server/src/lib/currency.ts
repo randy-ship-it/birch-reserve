@@ -17,6 +17,11 @@ export const CURRENCY_COOKIE = "br_currency";
  */
 export const PUBLIC_CAD_ENABLED = false;
 
+/** Currencies advertised on public pages and feeds. CAD stays in the offer table for existing checkouts. */
+export const PUBLIC_CURRENCIES: readonly ReserveCurrency[] = PUBLIC_CAD_ENABLED
+  ? (["usd", "cad"] as const)
+  : ([RESERVE_CURRENCY] as const);
+
 /** Edge/CDN headers that carry the visitor's ISO country. First match wins. */
 const COUNTRY_HEADERS = [
   "x-vercel-ip-country",

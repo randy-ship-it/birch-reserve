@@ -38,7 +38,6 @@ import {
   getPublicReserveOfferBySku,
   PUBLIC_RESERVE_OFFERS,
   RESERVE_CURRENCY,
-  RESERVE_CURRENCIES,
   localizeReservePriceCopy,
   offerAmountCents,
   offerPriceLabel,
@@ -48,7 +47,7 @@ import {
   type PublicReserveOffer,
   type ReserveCurrency,
 } from "../lib/reserveOffers";
-import { PUBLIC_CAD_ENABLED, currencyCookieHeader, decideCurrency } from "../lib/currency";
+import { PUBLIC_CAD_ENABLED, PUBLIC_CURRENCIES, currencyCookieHeader, decideCurrency } from "../lib/currency";
 import { isBonusDraftRequested, renderBonusTierDraftHtml } from "../lib/bonusTierDraft";
 import {
   admitUcpProfileResolution,
@@ -550,8 +549,8 @@ router.get("/v1/catalog.json", (_req, res) => {
   res.json({
     catalog_version: "2026-09-24",
     currency: "USD",
-    currencies: RESERVE_CURRENCIES.map((c) => c.toUpperCase()),
-    currency_note: "amount_cents and due_today are USD. See prices for CAD. Pass currency=cad to /v1/quote and /v1/checkout to pay in CAD.",
+    currencies: PUBLIC_CURRENCIES.map((c) => c.toUpperCase()),
+    currency_note: "Priced in USD. amount_cents and due_today are USD.",
     default_sku: DEFAULT_RESERVE_OFFER.sku,
     inventory_model: "shared_reserve_pool",
     offers: PUBLIC_RESERVE_OFFERS.map((offer) => ({
@@ -591,7 +590,7 @@ router.get("/v1/catalog.json", (_req, res) => {
 /** Exact due-today price in every payable currency for one public SKU. */
 function priceTable(offer: PublicReserveOffer) {
   return Object.fromEntries(
-    RESERVE_CURRENCIES.map((c) => [
+    PUBLIC_CURRENCIES.map((c) => [
       c.toUpperCase(),
       {
         amount_cents: offerAmountCents(offer, c),
@@ -613,7 +612,7 @@ async function sendAvailabilityJson(
   res.json({
     currency: decision.currency.toUpperCase(),
     currency_source: decision.source,
-    currencies: RESERVE_CURRENCIES.map((c) => c.toUpperCase()),
+    currencies: PUBLIC_CURRENCIES.map((c) => c.toUpperCase()),
     prices: Object.fromEntries(
       PUBLIC_RESERVE_OFFERS.map((offer) => [offer.sku, priceTable(offer)]),
     ),
@@ -654,7 +653,7 @@ router.get("/api/currency", (req, res): void => {
       PUBLIC_RESERVE_OFFERS.map((offer) => [
         offer.sku,
         Object.fromEntries(
-          RESERVE_CURRENCIES.map((c) => [
+          PUBLIC_CURRENCIES.map((c) => [
             c,
             {
               amountCents: offerAmountCents(offer, c),

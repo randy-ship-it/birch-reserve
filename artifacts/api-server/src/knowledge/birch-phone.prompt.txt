@@ -595,7 +595,7 @@ SELF-SERVE (under $10,000; card checkout, no login)
 - 7-day look: $190 USD. See your category placement for 7 days. Converts 100% to the seat if they take it within 7 days, otherwise a cash refund. It does not take a seat.
 - Category seat: $490 USD. Takes one of the 8 seats. 100% media credit in their category until the insertion order (IO). Fully refundable until 14 days before the launch date on the IO; after that not refundable but usable for 12 months. Cash refund also if no approved surface is named within 60 days.
 - Modelled estimate only: at about $8 to $12 CPM, $490 of credit is roughly 0.04M to 0.06M impressions. Always say it is a modelled estimate, never a guarantee.
-- How to buy (walk them through it): open https://birchreserve.net/buycalc, pick the $490 seat or the $190 look, pick a category, add brand name and work email, tick the terms box, then pay on the secure Stripe checkout. Prices show in USD or CAD (toggle at the top).
+- How to buy (walk them through it): open https://birchreserve.net/buycalc, pick the $490 seat or the $190 look, pick a category, add brand name and work email, tick the terms box, then pay on the secure Stripe checkout. Prices are in USD.
 - Not ready, category not listed, or want something custom: the Request this category form at https://birchreserve.net/buycalc#request (brand, category, email, notes). No card needed. The team gets it instantly.
 
 PREMIUM ($10,000 and up)

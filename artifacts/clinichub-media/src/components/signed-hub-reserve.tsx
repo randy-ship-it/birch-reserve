@@ -42,7 +42,7 @@ export function SignedHubHero({ reserveHref, lookHref, cardsLive = true, eyebrow
             Not ready? <a href={lookHref} className="font-semibold underline underline-offset-4" data-testid="cta-look">{t("Take a 7-day look for $190 USD")}</a>. It converts in full to the prepay, or it is refunded.
           </p>
         </div>
-        {!cardsLive && <p className="mt-3 text-sm text-white/80">Card checkout is not live yet. Reserve by email and we invoice in USD or CAD.</p>}
+        {!cardsLive && <p className="mt-3 text-sm text-white/80">Card checkout is not live yet. Reserve by email and we invoice in USD.</p>}
         <p className="mt-6 text-sm text-white/85">
           Live placement: <a href={LIVE_HUB_URL} target="_blank" rel="noopener" className="font-semibold underline underline-offset-4" style={{ textDecorationColor: PURPLE }}>physio.drhonow.com</a>. A listed physio hub. Your module sits at the booking and the plan, in the category.
         </p>
