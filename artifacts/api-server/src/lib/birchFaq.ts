@@ -51,6 +51,18 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
       text: `Thanks${c.name ? `, ${c.name.split(" ")[0]}` : ""}. I've sent your call-back request to the Birch team${c.best_time ? ` for ${c.best_time}` : ""}. They'll reach you at ${c.phone || c.email}. If you'd rather not wait, call ${BIRCH_SALES_PHONE}.`,
     };
   }
+  if (/\bcad\b|canadian|canada|currency|us dollars|\busd\b|exchange rate/.test(t)) {
+    return { intent: "currency", callback: null, text: `Prices are in USD for every buyer, including Canadian brands: $190 USD for the 7-day look and $490 USD to reserve. The currency you see on the Stripe checkout is the currency you're charged. Start at ${BUY}, or ask us anything first at ${REQ}.` };
+  }
+  if (/anyone else|who else|other brands?|competitor|already (in|taken|booked)|someone else/.test(t)) {
+    return { intent: "competition", callback: null, text: `We don't share who has reserved or how much space is taken. The $490 USD reserve is a shared category reserve, so it isn't exclusive; owning your category is a premium slot ($25,000 to $50,000 USD, inquire only). Early placements are limited, so reserving now gets you in as hubs launch: ${BUY}` };
+  }
+  if (/how (does|do|would) (it|this|birch|the reserve)( \w+)? work|how it works|what happens (after|next|when)|the process/.test(t)) {
+    return { intent: "how", callback: null, text: `Three steps: reserve your space for $490 USD (or take a $190 USD 7-day look first), pay by card on the Stripe checkout with no login, then approve the insertion order that names the hub and placement. Nothing runs before you approve it, and the full amount is media credit. Start at ${BUY}` };
+  }
+  if (/audience|who (will |would )?(see|sees)|who are (the )?members|demographic|who do (you|i) reach|who('s| is) the (audience|customer)/.test(t)) {
+    return { intent: "audience", callback: null, text: `Members of private, members-only health and wellness hubs, reached right after they book or buy and when they log back in. Live today: Integrity Fitness and DR-HO'S physio, with more hubs launching. You can open a live hub now at https://physio.drhonow.com, or reserve at ${BUY}.` };
+  }
   if (/exclusiv|one brand/.test(t) && /490|seat/.test(t) && !/premium|\d{2,3}\s?k\b/.test(t)) {
     return { intent: "exclusive", callback: null, text: `The $490 reserve isn't exclusive. It reserves a share of display space across the hub network, curated as hubs launch. Exclusivity is a premium slot, $25,000 to $50,000, inquire only. Want the team to call you about premium?` };
   }
@@ -91,6 +103,6 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
   return {
     intent: "general",
     callback: null,
-    text: `Birch Reserve sells display space across a growing network of private health and wellness hubs, right after a member books or buys. Reserving is $490 (or take a 7-day look for $190), and premium slots are $25,000 and up. Want to reserve at ${BUY}, or have the team call you?`,
+    text: `Birch Reserve sells display space inside private, members-only health and wellness hubs, right after a member books or buys. Reserve for $490 USD or take a 7-day look for $190 USD at ${BUY}. Not ready? Send a quick question with no card at ${REQ}, or call ${BIRCH_SALES_PHONE}.`,
   };
 }

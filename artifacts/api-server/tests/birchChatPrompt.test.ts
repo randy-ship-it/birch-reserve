@@ -1,0 +1,109 @@
+/** Site-chat prompt builder + reply guard (Randy, Nov 17 2026). Pure: no network, no DB. */
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import {
+  BIRCH_LINKS,
+  buildBirchChatSystemPrompt,
+  findBannedContent,
+  softenReply,
+} from "../src/lib/birchChatPrompt";
+import { buildGrokRequest, GROK_MAX_TOKENS, GROK_TEMPERATURE } from "../src/routes/randyChat";
+import { birchFaqAnswer } from "../src/lib/birchFaq";
+
+const live = { reserve: true, areaLock: false, deposits: false };
+
+test("prompt carries the site offer in USD only", () => {
+  const p = buildBirchChatSystemPrompt({ checkout: live });
+  assert.match(p, /\$190 USD/);
+  assert.match(p, /\$490 USD/);
+  assert.match(p, /\$25,000 to \$50,000 USD/);
+  assert.match(p, /USD only, for every buyer including Canadian brands/);
+  assert.match(p, /Integrity Fitness/);
+  assert.match(p, /DR-HO'S physio/);
+  assert.match(p, /In queue/);
+  assert.ok(p.includes(BIRCH_LINKS.reserve490) && p.includes(BIRCH_LINKS.look190) && p.includes(BIRCH_LINKS.request));
+  assert.match(p, /\[\[CALLBACK\]\]/);
+});
+
+test("prompt never carries banned content or internal numbers", () => {
+  const p = buildBirchChatSystemPrompt({ checkout: live, pagePath: "/for/acme", chipId: "how_seats" });
+  // Only the rule line may name Clairvoyant.
+  assert.equal(p.match(/Clairvoyant/g)?.length, 1);
+  // CAD and $899 appear only inside the rule lines that forbid them.
+  const withoutRules = p.replace(/^.*(Can I pay in CAD|Never mention \$899).*$/gm, "");
+  assert.doesNotMatch(withoutRules, /\bCAD\b|C\$|\$270|\$690|\$899/);
+  assert.doesNotMatch(p, /\b(grok|xai|openai|gpt)\b/i);
+  assert.doesNotMatch(p, /Hi there(?!")/);
+  assert.doesNotMatch(p, /seats_open|seats_paid|8 of 8|\b8 seats\b|184,176|46,044|42 listed|20MM|128MM|8\.7/);
+  assert.doesNotMatch(p, /\u2014|\u2013/);
+});
+
+test("prompt follows checkout state and turn context", () => {
+  const off = buildBirchChatSystemPrompt({ checkout: { reserve: false, areaLock: false, deposits: false } });
+  assert.match(off, /Card checkout is OFF/);
+  assert.ok(!off.includes(BIRCH_LINKS.reserve490));
+  const forPage = buildBirchChatSystemPrompt({ checkout: live, pagePath: "/for/acme" });
+  assert.match(forPage, /private brand-fit page/);
+  const hear = buildBirchChatSystemPrompt({ checkout: live, mode: "hear", chipId: "talk_human" });
+  assert.match(hear, /spoken-friendly/);
+  assert.match(hear, /Talk to a human/);
+});
+
+test("grok request: one system prompt, full recent history, tuned sampling, GROK_MODEL respected", () => {
+  const body = {
+    messages: [
+      { role: "assistant" as const, content: "Hey, what brings you to Birch Reserve?" },
+      { role: "user" as const, content: "We sell a TENS device." },
+      { role: "assistant" as const, content: "Nice. Pain relief fits. Budget?" },
+      { role: "user" as const, content: "About $500." },
+    ],
+  };
+  const req = buildGrokRequest(body, "grok-test-model");
+  assert.equal(req.model, "grok-test-model");
+  assert.equal(req.temperature, GROK_TEMPERATURE);
+  assert.equal(req.max_tokens, GROK_MAX_TOKENS);
+  assert.equal(req.messages.filter((m) => m.role === "system").length, 1);
+  assert.deepEqual(req.messages.slice(1).map((m) => m.role), ["assistant", "user", "assistant", "user"]);
+  assert.equal(req.messages.at(-1)!.content, "About $500.");
+});
+
+test("reply guard catches the hard bans and lets good replies through", () => {
+  for (const bad of [
+    "We're powered by Grok from xAI.",
+    "That's C$690 for Canadian buyers.",
+    "It's $270 for the look.",
+    "Right now $0 booked so far, 8 of 8 seats open.",
+    "There are 3 seats left in your category.",
+    "0 of 42 partners signed so far.",
+    "Birch share is 20% on direct sales.",
+    "Clairvoyant runs the hubs.",
+    "The legacy reserve was $899.",
+  ]) assert.ok(findBannedContent(bad), bad);
+  for (const good of [
+    "Prices are in USD for every buyer, including Canadian brands: $190 USD and $490 USD.",
+    "Reserve for $490 USD at https://birchreserve.net/buycalc?sku=reserve-490",
+    "Four placements in every hub, right after a member books or buys.",
+    "The agency of record earns 10% of media spend, paid in cash.",
+  ]) assert.equal(findBannedContent(good), null, good);
+  assert.equal(softenReply("Hi there! Happy to help."), "Hi! Happy to help.");
+});
+
+test("fallback FAQ answers the five buyer questions usefully, in USD, with no banned content", () => {
+  const qs: Array<[string, string]> = [
+    ["How much does it cost?", "price"],
+    ["How does it work?", "how"],
+    ["Who is the audience?", "audience"],
+    ["Is anyone else in my category?", "competition"],
+    ["Can I pay in CAD?", "currency"],
+  ];
+  for (const [q, intent] of qs) {
+    const a = birchFaqAnswer([{ role: "user", content: q }]);
+    assert.equal(a.intent, intent, q);
+    assert.equal(findBannedContent(a.text), null, q);
+    assert.doesNotMatch(a.text, /\bCAD\b/);
+    assert.match(a.text, /https:\/\/birchreserve\.net\/buycalc|physio\.drhonow\.com/);
+  }
+  const general = birchFaqAnswer([{ role: "user", content: "hello" }]);
+  assert.match(general.text, /\$490 USD/);
+  assert.match(general.text, /buycalc#request/);
+});

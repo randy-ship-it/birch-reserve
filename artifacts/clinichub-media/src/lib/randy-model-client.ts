@@ -170,14 +170,14 @@ async function stubRandyReply(
 
   if (/\b(190|490|hold|reserve|seat|price|pricing|buy|checkout)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "Reserve for $490 (100% media credit until the IO) or take a $190 7-day look at https://birchreserve.net/buycalc. Want to pay there, call, or keep going here?",
+      text: "Reserve for $490 USD (100% media credit until the IO) or take a $190 USD 7-day look at https://birchreserve.net/buycalc. Prices are USD for every buyer. Want to pay there, call, or keep going here?",
       source: "stub",
       offerHandoff: true,
     };
   }
 
   return {
-    text: "Got it. Which category are you thinking about for the Scale clinic hubs? Call is there whenever you want it; and I can line up a callback once I know a bit more.",
+    text: "Got it. What do you sell? I'll match you to the right category. You can reserve for $490 USD or take a $190 USD 7-day look at https://birchreserve.net/buycalc, or send a quick question with no card at https://birchreserve.net/buycalc#request.",
     source: "stub",
     offerHandoff: stubOfferHandoff(req),
   };
