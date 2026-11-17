@@ -6,7 +6,7 @@ export const OVERHAUL_OG_IMAGE = "https://birchreserve.net/og-birch-reserve-hubs
 
 export type RouteMeta = { title: string; description: string; jsonld?: Record<string, unknown>; /** Per-route share image; defaults to OVERHAUL_OG_IMAGE. */ image?: string };
 
-export const MEDIA_KIT_OG_IMAGE = "https://birchreserve.net/og-media-kit.png";
+export const MEDIA_KIT_OG_IMAGE = "https://birchreserve.net/og-media-kit-usd.png";
 
 const ORG = { "@type": "Organization", name: "Birch Reserve", url: "https://birchreserve.net/" };
 
@@ -39,14 +39,14 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
     },
   },
   "/buyers": {
-    title: "For media buyers | Birch Reserve",
-    description: "Machine-readable catalog, quotes and Stripe-hosted checkout for media buyers. Display and CPC inside co-branded health & wellness hubs. Modelled views labelled.",
-    jsonld: { "@context": "https://schema.org", "@graph": [...slotProductsJsonLd(), areaLockProductJsonLd(), { "@type": "WebAPI", name: "Birch Reserve buying API", documentation: "https://birchreserve.net/v1/agent/openapi.json", url: "https://birchreserve.net/v1/agent/catalog.json", provider: ORG }] },
+    title: "For media buyers & agencies | Birch Reserve",
+    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. Live hubs: Integrity Fitness and DR-HO'S physio.",
+    jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/ai-buyers": {
-    title: "For media buyers | Birch Reserve",
-    description: "Machine-readable catalog, quotes and Stripe-hosted checkout for media buyers. Display and CPC inside co-branded health & wellness hubs. Modelled views labelled.",
-    jsonld: { "@context": "https://schema.org", "@graph": [...slotProductsJsonLd(), areaLockProductJsonLd(), { "@type": "WebAPI", name: "Birch Reserve buying API", documentation: "https://birchreserve.net/v1/agent/openapi.json", url: "https://birchreserve.net/v1/agent/catalog.json", provider: ORG }] },
+    title: "For media buyers & agencies | Birch Reserve",
+    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. Live hubs: Integrity Fitness and DR-HO'S physio.",
+    jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/rates": {
     title: "Rates | Birch Reserve",
@@ -67,6 +67,23 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
     jsonld: { "@context": "https://schema.org", "@type": "Service", name: "Agency test budgets", provider: ORG, areaServed: ["CA", "US"], serviceType: "Retail media / post-purchase advertising" },
   },
 };
+
+/** The two public offers (media kit, Nov 2026): USD only, card checkout on the Stripe-hosted /buycalc page. */
+export function buyersOffersJsonLd(): Record<string, unknown>[] {
+  return [
+    { sku: "hold-190", name: "7-day category look", price: 190, description: "Hold your category for 7 days. Converts in full to the $490 USD reserve within 7 days, or refunded. Does not lock in a slot." },
+    { sku: "reserve-490", name: "Category reserve", price: 490, description: "Reserve display space across the hub network. Media credit, fully refundable until 14 days before your launch date, usable for 12 months." },
+  ].map((o) => ({
+    "@type": "Product",
+    "@id": `https://birchreserve.net/buyers#${o.sku}`,
+    name: `Birch Reserve ${o.name}`,
+    sku: o.sku,
+    category: "Health and wellness retail media / display",
+    description: o.description,
+    brand: { "@type": "Brand", name: "Birch Reserve" },
+    offers: [{ "@type": "Offer", price: o.price, priceCurrency: "USD", availability: "https://schema.org/LimitedAvailability", url: `https://birchreserve.net/buycalc?sku=${o.sku}`, seller: ORG }],
+  }));
+}
 
 export function slotProductsJsonLd(): Record<string, unknown>[] {
   return slotOffers().map((o) => ({

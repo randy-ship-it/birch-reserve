@@ -296,8 +296,8 @@ test("media kit share image: /media-kit head uses its own OG image, other routes
   const { withRouteSeo } = await import("../src/lib/publicSeo");
   const shell = `<html><head><title>x</title><meta property="og:image" content="old" /><meta name="twitter:image" content="old" /></head><body></body></html>`;
   const kit = withRouteSeo(shell, "/media-kit");
-  assert.match(kit, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-media-kit\.png" \/>/);
-  assert.match(kit, /<meta name="twitter:image" content="https:\/\/birchreserve\.net\/og-media-kit\.png" \/>/);
+  assert.match(kit, /<meta property="og:image" content="https:\/\/birchreserve\.net\/og-media-kit-usd\.png" \/>/);
+  assert.match(kit, /<meta name="twitter:image" content="https:\/\/birchreserve\.net\/og-media-kit-usd\.png" \/>/);
   const rates = withRouteSeo(shell, "/rates");
   assert.doesNotMatch(rates, /og-media-kit/);
 });
