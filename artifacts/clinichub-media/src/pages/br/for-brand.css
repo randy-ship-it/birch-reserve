@@ -1,0 +1,175 @@
+/*
+ * /for/[brand] leave-behind only. Do not import from site chrome.
+ * Hides the floating Hear Randy / Q&A dock so it cannot cover hub tiles,
+ * and keeps the first paint clear of the fixed header.
+ */
+
+html.birch-for-brand-page {
+  scroll-padding-top: 5rem;
+}
+
+html.birch-for-brand-page elevenlabs-convai,
+html.birch-for-brand-page .birch-dock-squirrel {
+  display: none !important;
+}
+
+.for-brand {
+  padding-bottom: 4.5rem;
+}
+
+.for-brand-hero {
+  scroll-margin-top: 5rem;
+}
+
+/* Two-circle Venn: vertical on small screens, side-by-side from md. */
+.for-venn {
+  margin-top: 2rem;
+}
+
+.for-venn-stage {
+  position: relative;
+  width: min(100%, 22.5rem);
+  margin-inline: auto;
+}
+
+.for-venn-art {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.for-venn-art-desktop {
+  display: none;
+}
+
+.for-venn-fill-left {
+  fill: #fff;
+}
+
+.for-venn-fill-right {
+  fill: color-mix(in srgb, var(--foreground) 6%, #fff);
+}
+
+.for-venn-fill-lens {
+  fill: var(--accent);
+}
+
+.for-venn-stroke {
+  fill: none;
+  stroke: var(--foreground);
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.for-venn-copy {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  padding: 0.35rem 0.55rem;
+}
+
+.for-venn-kicker {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--foreground) 58%, transparent);
+}
+
+.for-venn-lens-copy .for-venn-kicker {
+  color: var(--accent-foreground);
+  opacity: 0.75;
+}
+
+.for-venn-copy ul {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.for-venn-copy li {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  font-size: 0.6875rem;
+  line-height: 1.25;
+  color: var(--foreground);
+}
+
+.for-venn-lens-copy li {
+  color: var(--accent-foreground);
+}
+
+/* Mobile: stacked circles, viewBox 360×570 */
+.for-venn-left-copy {
+  left: 14%;
+  width: 72%;
+  top: 6%;
+  height: 28%;
+}
+
+.for-venn-lens-copy {
+  left: 13%;
+  width: 74%;
+  top: 37%;
+  height: 26%;
+}
+
+.for-venn-right-copy {
+  left: 14%;
+  width: 72%;
+  top: 66%;
+  height: 28%;
+}
+
+@media (min-width: 768px) {
+  .for-venn-stage {
+    width: min(100%, 36rem);
+  }
+
+  .for-venn-art-mobile {
+    display: none;
+  }
+
+  .for-venn-art-desktop {
+    display: block;
+  }
+
+  /* Desktop: side-by-side circles, viewBox 560×380 */
+  .for-venn-left-copy {
+    left: 4%;
+    width: 30%;
+    top: 18%;
+    height: 64%;
+  }
+
+  .for-venn-lens-copy {
+    left: 35%;
+    width: 30%;
+    top: 16%;
+    height: 68%;
+  }
+
+  .for-venn-right-copy {
+    left: 66%;
+    width: 30%;
+    top: 18%;
+    height: 64%;
+  }
+
+  .for-venn-copy li {
+    font-size: 0.8125rem;
+  }
+}
