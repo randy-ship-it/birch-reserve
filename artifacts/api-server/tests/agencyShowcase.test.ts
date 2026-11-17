@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { AGENCY_EXAMPLES, AGENCY_SHARE, BRAND_BONUS_LINE, INVENTORY_LINE, SELL_ASSUMPTION_LINE, SELL_ASSUMPTION_PCT, SPEC_ROWS } from "../src/lib/overhaul/agencyShowcase";
+import { AGENCY_EXAMPLES, AGENCY_SHARE, BRAND_BONUS_LINE, GOAL_PLAN, INVENTORY_LINE, SELL_ASSUMPTION_LINE, SELL_ASSUMPTION_PCT, SPEC_ROWS } from "../src/lib/overhaul/agencyShowcase";
 import { AGENCY_CASH_PCT, agencyCash } from "../src/lib/overhaul/mediaKit";
 import { AGENCY, DEPOSIT_TIERS, SURFACES } from "../src/lib/overhaul/model";
 
@@ -93,4 +93,22 @@ test("/agencies (Nov 16 2026): fast lock path, broker block, honest urgency only
   assert.doesNotMatch(page, /\bCAD\b|t\.cad/);
   // Reuses the shared spec sheet, IO steps and payout table.
   for (const c of ["<InventorySpec />", "<IoProcess />", "<AgencyPayouts />"]) assert.ok(page.includes(c), c);
+});
+
+test("plan by goal (Nov 17 2026): four goals map to the four spec-sheet placements at the published starting rates, no claims", () => {
+  assert.deepEqual(GOAL_PLAN.map((g) => g.key), ["awareness", "consideration", "conversion", "loyalty"]);
+  assert.deepEqual(new Set(GOAL_PLAN.map((g) => g.placement)), new Set(SPEC_ROWS.map((r) => r.key)));
+  for (const g of GOAL_PLAN) {
+    const row = SPEC_ROWS.find((r) => r.key === g.placement)!;
+    assert.equal(g.cpmFloorUsd, row.cpmFloorUsd, g.key);
+    assert.equal(g.cpcFloorUsd, row.cpcFloorUsd, g.key);
+    assert.equal(g.inquire, row.inquire, g.key);
+    assert.match(g.measure, /^(Views|Clicks|UTM visits|promo-code redemptions|and| )+$/i, g.key);
+    assert.doesNotMatch(g.brief + g.measure, /guarantee|lift|CTR|\d+%|signed partner|Align|Clairvoyant|Kalaya/i, g.key);
+  }
+  assert.equal(GOAL_PLAN.find((g) => g.key === "conversion")!.buy, "Insertion order (inquire)");
+  const page = read("../clinichub-media/src/pages/br/agencies.tsx");
+  assert.match(page, /id="plan-by-goal"/);
+  assert.match(page, /<GoalPlanner \/>/);
+  assert.match(read("../clinichub-media/src/components/br/agency-showcase.tsx"), /Starting rates are illustrative planning estimates, not a quote/);
 });

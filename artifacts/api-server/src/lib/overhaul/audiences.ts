@@ -212,6 +212,34 @@ export const MARKET_CONTEXT: Array<{ key: string; pillar: string; stat: string; 
     url: "https://www.nutraingredients.com/Article/2024/11/07/2024-CRN-Consumer-Survey-75-of-Americans-use-supplements/",
     year: "2024",
   },
+  // Nov 17 2026 daily scan: queued categories (Food & nutrition, Pets). Same rules: cited, dated, population-level.
+  {
+    key: "fruit-veg",
+    pillar: "Food & nutrition",
+    stat: "21.6%",
+    line: "of Canadian adults ate fruit and vegetables five or more times a day in 2023 (women 25.8%, men 17.3%).",
+    source: "Statistics Canada, Health of Canadians 2024 (Canadian Community Health Survey 2023)",
+    url: "https://www150.statcan.gc.ca/n1/pub/82-570-x/2024001/section3-eng.htm",
+    year: "2025",
+  },
+  {
+    key: "pets-ca",
+    pillar: "Pets (in queue)",
+    stat: "39.5% / 38.1%",
+    line: "of Canadian households own at least one cat (about 6.2 million households) or at least one dog (about 6.0 million), 2025 estimates.",
+    source: "Agriculture and Agri-Food Canada, Sector Trend Analysis: pet food trends in Canada (Euromonitor data)",
+    url: "https://agriculture.canada.ca/en/international-trade/reports-and-guides/sector-trend-analysis-pet-food-trends-canada-0",
+    year: "2026",
+  },
+  {
+    key: "pets-us",
+    pillar: "Pets (in queue)",
+    stat: "94 million",
+    line: "US households owned at least one pet in 2024, up from 82 million in 2023.",
+    source: "American Pet Products Association, 2025 State of the Industry Report (via PetfoodIndustry)",
+    url: "https://www.petfoodindustry.com/pet-food-market/market-trends-and-reports/news/15741428/report-pet-ownership-expands-as-gen-z-shifts-trends",
+    year: "2025",
+  },
 ];
 
 export const SOURCES: Array<{ basis: Basis; source: string; what: string }> = [
@@ -219,7 +247,7 @@ export const SOURCES: Array<{ basis: Basis; source: string; what: string }> = [
   { basis: "measured", source: "Live hub inventory", what: "The launch brands and Calm Joints racquet pages listed on this page." },
   { basis: "modelled", source: "TAM feed (scalehealth.ca/tam)", what: "Orders a year, age band, gender skew, mobile share and stated intents by category, modelled from launch-partner customers." },
   { basis: "estimated", source: "Channel benchmarks", what: "Click-through bands by moment. Ranges, not promises." },
-  { basis: "estimated", source: "Public research (Health Canada, Statistics Canada, CRN)", what: "Population-level market context per pillar, linked to each source. Not Birch audience sizes or delivery." },
+  { basis: "estimated", source: "Public research (Health Canada, Statistics Canada, CRN, AAFC, APPA)", what: "Population-level market context per pillar, linked to each source. Not Birch audience sizes or delivery." },
 ];
 
 export function fmtOrdersShort(n: number): string {

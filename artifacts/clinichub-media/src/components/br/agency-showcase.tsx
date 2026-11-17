@@ -10,6 +10,7 @@ import {
   AGENCY_EXAMPLES,
   AGENCY_SHARE,
   BRAND_BONUS_LINE,
+  GOAL_PLAN,
   INVENTORY_LINE,
   SELL_ASSUMPTION_LINE,
   SELL_ASSUMPTION_PCT,
@@ -27,6 +28,49 @@ function Kicker({ children, dark = false }: { children: ReactNode; dark?: boolea
 function Tag({ children, tone = "line" }: { children: ReactNode; tone?: "line" | "lime" | "dark" }) {
   const t = tone === "lime" ? "bg-accent text-accent-foreground" : tone === "dark" ? "border border-background/35 text-background/75" : "border border-foreground/25 text-foreground/70";
   return <span className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${t}`}>{children}</span>;
+}
+
+/**
+ * Plan by goal (Nov 17 2026 daily scan): map a client brief to the placement that fits.
+ * Rates come from SPEC_ROWS via GOAL_PLAN; labelled illustrative starting rates.
+ */
+export function GoalPlanner() {
+  return (
+    <div data-testid="goal-planner">
+      <div className="grid gap-px border border-foreground/15 bg-foreground/15 sm:grid-cols-2 lg:grid-cols-4">
+        {GOAL_PLAN.map((g) => (
+          <article key={g.key} className="flex flex-col bg-background p-5 md:p-6" data-testid={`goal-${g.key}`}>
+            <div className="flex items-start justify-between gap-2">
+              <Kicker>Goal</Kicker>
+              {g.inquire ? <InquireBadge /> : <Tag>Self-serve</Tag>}
+            </div>
+            <h3 className="mt-1 font-display text-2xl leading-tight">{g.goal}</h3>
+            <p className="mt-2 text-sm text-foreground/80">{g.brief}</p>
+            <dl className="mt-4 space-y-2 border-t border-border pt-3 text-sm">
+              <div>
+                <dt className="text-[10px] font-semibold uppercase tracking-wider text-foreground/55">Placement</dt>
+                <dd className="font-semibold">{g.label}</dd>
+                <dd className="text-xs text-muted-foreground">{g.moment}</dd>
+              </div>
+              <div>
+                <dt className="text-[10px] font-semibold uppercase tracking-wider text-foreground/55">Starting at (USD)</dt>
+                <dd className="tabular-nums">${g.cpmFloorUsd} CPM · ${g.cpcFloorUsd.toFixed(2)} CPC</dd>
+              </div>
+              <div>
+                <dt className="text-[10px] font-semibold uppercase tracking-wider text-foreground/55">Reported as</dt>
+                <dd>{g.measure}</dd>
+              </div>
+              <div>
+                <dt className="text-[10px] font-semibold uppercase tracking-wider text-foreground/55">How to buy</dt>
+                <dd>{g.buy}</dd>
+              </div>
+            </dl>
+          </article>
+        ))}
+      </div>
+      <p className="mt-4 text-xs text-muted-foreground">Starting rates are illustrative planning estimates, not a quote. Reporting is aggregate only. One IO can mix goals; it names each hub, surface and date before anything runs.</p>
+    </div>
+  );
 }
 
 /** Hero: what the inventory is, plus the agency economics card. */

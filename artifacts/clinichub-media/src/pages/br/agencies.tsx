@@ -1,6 +1,6 @@
 import { CheckCircle2 } from "lucide-react";
 import { LeadForm } from "@/components/br/lead-form";
-import { AgencyPayouts, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
+import { AgencyPayouts, GoalPlanner, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
 import { SLOT_LADDER } from "../../../../api-server/src/lib/overhaul/model";
@@ -60,7 +60,19 @@ export default function BrAgencies() {
           </div>
         </div>
       </Section>
-      <Section tone="soft">
+      <Section tone="soft" id="plan-by-goal">
+        <Eyebrow>Plan by goal</Eyebrow>
+        <H2>Drop it into the media plan you already have.</H2>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">Match your client's brief to the hub placement that fits it, then send us the brief. We reply with hub fit and a draft insertion order.</p>
+        <div className="mt-8">
+          <GoalPlanner />
+        </div>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Cta href="#talk" testId="goal-cta-io">Send the brief · get a draft IO</Cta>
+          <Cta href={RESERVE_HREF} variant="line" testId="goal-cta-reserve">Reserve for a client · $490 USD</Cta>
+        </div>
+      </Section>
+      <Section>
         <div data-testid="agency-why-now">
           <Eyebrow>Why lock a client test now</Eyebrow>
           <H2>Starter rates, while early placements last.</H2>
@@ -76,7 +88,7 @@ export default function BrAgencies() {
           <p className="mt-4 text-xs text-muted-foreground">Aggregate reporting only. Any view figure is a modelled estimate, not measured delivery or a guarantee.</p>
         </div>
       </Section>
-      <Section>
+      <Section tone="soft">
         <Eyebrow>Test budget tiers</Eyebrow>
         <H2>Same ladder as brands.</H2>
         <div className="mt-8 grid gap-px border border-foreground/15 bg-foreground/15 md:grid-cols-4">
@@ -90,7 +102,7 @@ export default function BrAgencies() {
           ))}
         </div>
       </Section>
-      <Section tone="soft">
+      <Section>
         <Eyebrow>Spec sheet</Eyebrow>
         <H2>Four placements. Public starting rates.</H2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">Forward this to your client or planner. The IO names the hub, surface, format and dates.</p>
@@ -98,21 +110,21 @@ export default function BrAgencies() {
           <InventorySpec />
         </div>
       </Section>
-      <Section>
+      <Section tone="soft">
         <Eyebrow>From brief to live</Eyebrow>
         <H2>Six steps. Nothing runs before the IO.</H2>
         <div className="mt-8">
           <IoProcess />
         </div>
       </Section>
-      <Section tone="soft">
+      <Section>
         <Eyebrow>Agency of record</Eyebrow>
         <H2>Your cut of every client you place.</H2>
         <div className="mt-8">
           <AgencyPayouts />
         </div>
       </Section>
-      <Section>
+      <Section tone="soft">
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]" data-testid="agency-brokers">
           <div>
             <Eyebrow>Brokers &amp; media resellers</Eyebrow>
@@ -139,7 +151,7 @@ export default function BrAgencies() {
           </div>
         </div>
       </Section>
-      <Section tone="soft" id="talk">
+      <Section id="talk">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <H2>Tell us about your clients.</H2>
@@ -162,11 +174,12 @@ export default function BrAgencies() {
           />
         </div>
       </Section>
-      <Section>
+      <Section tone="soft">
         <Faq
           items={[
             { q: "Can we prepay for several clients?", a: "Yes. One prepay can be split across clients; each client gets its own insertion order and reporting." },
             { q: "Is there a commission?", a: "Yes: 10% of media spend, paid in cash to the agency of record. Brand bonus credit is the client's (the brand's), separate from the agency's 10% cash: +5% from $1,500, +10% from $3,000, +15% from $6,000 USD prepay." },
+            { q: "Which placement fits which goal?", a: "Awareness: the hub home page. Consideration: product, services and booking pages. Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Retention and loyalty: the member dashboard behind login. One IO can mix them." },
             { q: "How is performance tracked?", a: "Every placement carries your UTM parameters and, if you want, a promo code. We report views and clicks per hub and surface. Aggregate only." },
             { q: "Do brokers and media resellers qualify?", a: "Yes. When you are the agency of record on the insertion order, you earn 10% of media spend, paid in cash, the same as an agency. List every brand you represent in one inquiry; each gets its own IO and reporting." },
             { q: "Why lock a test now?", a: "New placements open at starter rates, and a placement's rate can step up only once reporting shows it performs. Prepaid credit keeps its rate for its term, and the $490 USD reserve stays fully refundable until 14 days before the launch date on the IO." },
