@@ -90,7 +90,7 @@ export function RateCard({ currency }: { currency: Currency }) {
       </table>
       </div>
       <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-        Prices are starting-at (starter) rates from the <a href="/rates" className="underline underline-offset-2">rate card</a> <Modelled>Illustrative estimate</Modelled>: not sold rates or a quote; your insertion order sets the final rate. Views per month per sponsor position <Modelled />: one of five rotating positions (20% share of voice) at 75% availability. Hubs without their own feed row use the network median partner until their feed lands. Core package floor $190 USD / $270 CAD. Partner email and partner-site display are available on request.
+        Prices are starting-at (starter) rates from the <a href="/rates" className="underline underline-offset-2">rate card</a> <Modelled>Illustrative estimate</Modelled>: not sold rates or a quote; your insertion order sets the final rate. Views per month per sponsor position <Modelled />: one of five rotating positions (20% share of voice) at 75% availability. Hubs without their own feed row use the network median partner until their feed lands. Core package floor $190 USD. Only DR-HO'S is live among the brand hubs listed; the rest are in queue. Partner email and partner-site display are available on request.
       </p>
       <PlacementDialog open={ex} onClose={() => setEx(null)} />
     </div>

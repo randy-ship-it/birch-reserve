@@ -3,7 +3,7 @@ import { LeadForm } from "@/components/br/lead-form";
 import { AgencyPayouts, GoalPlanner, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
-import { SLOT_LADDER } from "../../../../api-server/src/lib/overhaul/model";
+import { StarterOffers } from "@/components/br/starter-offers";
 
 /**
  * Why lock a client test now (Nov 16 2026 daily scan). Honest urgency only: every line restates terms
@@ -89,17 +89,10 @@ export default function BrAgencies() {
         </div>
       </Section>
       <Section tone="soft">
-        <Eyebrow>Test budget tiers</Eyebrow>
-        <H2>Same ladder as brands.</H2>
-        <div className="mt-8 grid gap-px border border-foreground/15 bg-foreground/15 md:grid-cols-4">
-          {SLOT_LADDER.map((t) => (
-            <div key={t.key} className="bg-background p-6">
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">{t.label}</p>
-              <p className="mt-2 font-display text-4xl">${t.usd.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">USD</p>
-              <p className="mt-3 text-sm">{t.bonusPct ? `+${t.bonusPct}% bonus credit` : "Rate card"}</p>
-            </div>
-          ))}
+        <Eyebrow>Client test budgets</Eyebrow>
+        <H2>Same two offers as brands. Both USD.</H2>
+        <div className="mt-8">
+          <StarterOffers testId="agency-offers" />
         </div>
       </Section>
       <Section>
@@ -168,7 +161,7 @@ export default function BrAgencies() {
               { name: "email", label: "Work email", type: "email", required: true },
               { name: "website", label: "Agency website", type: "url" },
               { name: "client_categories", label: "Client categories", type: "select", options: ["Health & wellness DTC", "Supplements / nutrition", "Fitness / recovery", "Food / beverage", "Pets", "Mixed"] },
-              { name: "test_budget", label: "Test budget per client", type: "select", options: ["Under $1,500", "$1,500–$3,000", "$3,000–$6,000", "Over $6,000"] },
+              { name: "test_budget", label: "Test budget per client", type: "select", options: ["$190 USD 7-day look", "$490 USD reserve", "Premium slot (inquiry)", "Not sure yet"] },
               { name: "message", label: "Notes", type: "textarea" },
             ]}
           />
@@ -178,7 +171,7 @@ export default function BrAgencies() {
         <Faq
           items={[
             { q: "Can we prepay for several clients?", a: "Yes. One prepay can be split across clients; each client gets its own insertion order and reporting." },
-            { q: "Is there a commission?", a: "Yes: 10% of media spend, paid in cash to the agency of record. Brand bonus credit is the client's (the brand's), separate from the agency's 10% cash: +5% from $1,500, +10% from $3,000, +15% from $6,000 USD prepay." },
+            { q: "Is there a commission?", a: "Yes: 10% of media spend, paid in cash to the agency of record. Small tests can start self-serve on the $190 USD look or the $490 USD reserve." },
             { q: "Which placement fits which goal?", a: "Awareness: the hub home page. Consideration: product, services and booking pages. Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Retention and loyalty: the member dashboard behind login. One IO can mix them." },
             { q: "How is performance tracked?", a: "Every placement carries your UTM parameters and, if you want, a promo code. We report views and clicks per hub and surface. Aggregate only." },
             { q: "Do brokers and media resellers qualify?", a: "Yes. When you are the agency of record on the insertion order, you earn 10% of media spend, paid in cash, the same as an agency. List every brand you represent in one inquiry; each gets its own IO and reporting." },

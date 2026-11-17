@@ -73,27 +73,27 @@ export type BrandHub = Hub & {
   banner: string;
   recovery: "Recovery" | "Longevity" | "Food" | "Wellness services";
   audience: string;
-  bannerStatus: "Live";
+  bannerStatus: "Live" | "In queue";
 };
 
 const EXTRA: Record<string, Pick<BrandHub, "logo" | "banner" | "recovery" | "audience" | "bannerStatus">> = {
   "dr-ho": { logo: "/partner-logos/dr-ho.png", banner: "/hub-banners/dr-ho.webp", recovery: "Recovery", audience: "Pain-relief device buyers (TENS / EMS), mostly 45+", bannerStatus: "Live" },
-  "jack-health": { logo: "/partner-logos/jack-health.png", banner: "/hub-banners/jack-health.webp", recovery: "Longevity", audience: "Men's health and longevity members", bannerStatus: "Live" },
-  "jill-health": { logo: "/partner-logos/jill-health.png", banner: "/hub-banners/jill-health.webp", recovery: "Longevity", audience: "Women's health, midlife and menopause members", bannerStatus: "Live" },
-  "bird-and-be": { logo: "/partner-logos/bird-and-be.png", banner: "/hub-banners/bird-and-be.webp", recovery: "Recovery", audience: "Postpartum recovery and pelvic-floor care", bannerStatus: "Live" },
-  "roll-recovery": { logo: "/partner-logos/roll-recovery.png", banner: "/hub-banners/roll-recovery.webp", recovery: "Recovery", audience: "Athletes and active adults buying recovery hardware", bannerStatus: "Live" },
-  nutriprocan: { logo: "/partner-logos/nutriprocan.png", banner: "/hub-banners/nutriprocan.webp", recovery: "Food", audience: "Nutrition and dietitian-guided eating", bannerStatus: "Live" },
-  sole: { logo: "/partner-logos/sole.png", banner: "/hub-banners/sole.webp", recovery: "Recovery", audience: "Foot pain, insoles and active footwear buyers", bannerStatus: "Live" },
+  "jack-health": { logo: "/partner-logos/jack-health.png", banner: "/hub-banners/jack-health.webp", recovery: "Longevity", audience: "Men's health and longevity members", bannerStatus: "In queue" },
+  "jill-health": { logo: "/partner-logos/jill-health.png", banner: "/hub-banners/jill-health.webp", recovery: "Longevity", audience: "Women's health, midlife and menopause members", bannerStatus: "In queue" },
+  "bird-and-be": { logo: "/partner-logos/bird-and-be.png", banner: "/hub-banners/bird-and-be.webp", recovery: "Recovery", audience: "Postpartum recovery and pelvic-floor care", bannerStatus: "In queue" },
+  "roll-recovery": { logo: "/partner-logos/roll-recovery.png", banner: "/hub-banners/roll-recovery.webp", recovery: "Recovery", audience: "Athletes and active adults buying recovery hardware", bannerStatus: "In queue" },
+  nutriprocan: { logo: "/partner-logos/nutriprocan.png", banner: "/hub-banners/nutriprocan.webp", recovery: "Food", audience: "Nutrition and dietitian-guided eating", bannerStatus: "In queue" },
+  sole: { logo: "/partner-logos/sole.png", banner: "/hub-banners/sole.webp", recovery: "Recovery", audience: "Foot pain, insoles and active footwear buyers", bannerStatus: "In queue" },
 };
 
-/** The eight brand hubs Randy named (Nov 12): live inventory, details for email-registered viewers. */
+/** The brand hubs Randy named (Nov 12). Only DR-HO'S is live today (plus the Integrity Fitness studio hub); the rest are in queue (Nov 17 2026). */
 export const BRAND_HUBS: BrandHub[] = [
   ...KIT_HUBS.filter((h) => h.kind === "brand").map((h) => ({ ...h, ...EXTRA[h.key]! })),
   {
     key: "effortless-admin",
     name: "Effortless Admin",
     kind: "brand",
-    status: "Live inventory",
+    status: "In queue",
     url: "",
     category: "Workplace benefits and admin",
     basis: "Network median partner (no hub feed yet)",
@@ -102,7 +102,7 @@ export const BRAND_HUBS: BrandHub[] = [
     banner: "/hub-banners/effortless-admin.webp",
     recovery: "Wellness services",
     audience: "Employees reaching care through their benefits",
-    bannerStatus: "Live",
+    bannerStatus: "In queue",
   },
 ];
 
@@ -111,8 +111,8 @@ export const INVENTORY = {
   liveSpendDownMonths: 6,
   queueMultiple: 3,
   queueBy: "year end 2026",
-  line: "All eight named hubs are live inventory, spending down over the 6 months after your deposit lands.",
-  queueLine: "3x more inventory is in queue by year end, and we're taking deposits for queued inventory too.",
+  line: "Live hubs today: Integrity Fitness and DR-HO'S physio. Placements are curated as each hub launches.",
+  queueLine: "The other listed brand hubs are in queue, not live yet; more hubs launch over time.",
 } as const;
 
 export const CLINIC_NETWORK = KIT_HUBS.find((h) => h.kind === "clinic")!;
@@ -302,7 +302,7 @@ export const PUBLISHER_INCENTIVE = {
 export const AGENCY = {
   commissionPct: 10,
   line: "10% of media spend, paid in cash to the agency of record.",
-  bonusNote: "Brand bonus credit is the client's (the brand's), separate from the agency's 10% cash: +5% from $1,500, +10% from $3,000, +15% from $6,000 USD prepay.",
+  bonusNote: "Client tests can start self-serve on the $190 USD 7-day look or the $490 USD category reserve.",
 } as const;
 
 // ---------------------------------------------------------------- benchmarks

@@ -113,7 +113,7 @@ test("/v1/area/checkout never opens card checkout for an area lock, even with th
   }
 });
 
-test("/v1/agent/checkout: area lock is inquire-only; a $490 starter slot still opens card checkout", async () => {
+test("/v1/agent/checkout: area lock is not an agent offer; agent checkout never opens a card session", async () => {
   process.env.AREA_LOCK_ENABLED = "true";
   process.env.SPONSOR_DEPOSITS_ENABLED = "true";
   process.env.STRIPE_SECRET_KEY = "sk_test_dummy";
@@ -122,18 +122,15 @@ test("/v1/agent/checkout: area lock is inquire-only; a $490 starter slot still o
   try {
     await withServer(app, async (base) => {
       const cat = (await (await fetch(`${base}/v1/agent/catalog.json`)).json()) as Record<string, unknown>;
-      assert.ok(JSON.stringify(cat).includes('"area_lock":"held"'));
+      assert.ok(JSON.stringify(cat).includes('"agent_checkout":"held"'));
       const area = await post(`${base}/v1/agent/checkout`, { offer: "area-lock", postal: "L4C 3G5", term: 3, category: "Physio", business: "Example Studio (test)", email: "owner@example.com", agree: true });
-      const aj = (await area.json()) as { status: string; inquire_only?: boolean; checkout_url?: string };
-      assert.equal(area.status, 202);
-      assert.equal(aj.inquire_only, true);
-      assert.equal(aj.checkout_url, undefined);
+      assert.equal(area.status, 400);
+      const slot = await post(`${base}/v1/agent/checkout`, { offer: "reserve-490", brand: "Example Brand (test)", email: "buyer@example.com", agree: true });
+      const sj = (await slot.json()) as { status: string; amount: number; checkout_url?: string };
+      assert.equal(slot.status, 202);
+      assert.equal(sj.status, "held");
+      assert.equal(sj.checkout_url, undefined);
       assert.equal(called, 0);
-      const slot = await post(`${base}/v1/agent/checkout`, { offer: "slot-490", currency: "usd", brand: "Example Brand (test)", email: "buyer@example.com", agree: true });
-      const sj = (await slot.json()) as { status: string; amount: number };
-      assert.equal(sj.status, "open");
-      assert.equal(sj.amount, 490);
-      assert.equal(called, 1);
     });
   } finally {
     delete process.env.AREA_LOCK_ENABLED;

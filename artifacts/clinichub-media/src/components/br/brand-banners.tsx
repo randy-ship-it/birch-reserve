@@ -9,7 +9,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { BRAND_HUBS, type BrandHub } from "../../../../api-server/src/lib/overhaul/model";
 
 function Badge({ status }: { status: BrandHub["bannerStatus"] }) {
-  return <span className="bg-[#1f8a4c] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">{status}</span>;
+  return <span className={`${status === "Live" ? "bg-[#1f8a4c]" : "bg-foreground/60"} px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white`}>{status}</span>;
 }
 
 export function BrandBannerCard({ hub, locked = false }: { hub: BrandHub; locked?: boolean }) {
@@ -38,7 +38,7 @@ export function BrandBannerCard({ hub, locked = false }: { hub: BrandHub; locked
   );
 }
 
-export function BrandBanners({ title = "Live co-branded hubs listed with Scale", hubs = BRAND_HUBS }: { title?: string; hubs?: BrandHub[] }) {
+export function BrandBanners({ title = "Co-branded brand hubs listed with Scale", hubs = BRAND_HUBS }: { title?: string; hubs?: BrandHub[] }) {
   const track = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(0);
   const scrollBy = (dir: 1 | -1) => {
@@ -79,7 +79,7 @@ export function BrandBanners({ title = "Live co-branded hubs listed with Scale",
           <ChevronRight className="size-4" />
         </button>
       </div>
-      <p className="mt-4 text-center text-xs text-muted-foreground">Listed partners, live inventory. Audience and view figures are modelled.</p>
+      <p className="mt-4 text-center text-xs text-muted-foreground">Listed partners. Live today: DR-HO'S (and the Integrity Fitness studio hub); the others are in queue. Audience and view figures are modelled.</p>
     </div>
   );
 }

@@ -1,11 +1,11 @@
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { Lock, MapPin } from "lucide-react";
 import { MetaComparison } from "@/components/br/blocks";
-import { SlotLadder } from "@/components/br/slot-ladder";
+import { StarterOffers } from "@/components/br/starter-offers";
 import { InquireBadge } from "@/components/br/quick-buy";
 import { PREMIUM_INQUIRY_MESSAGE, isPremiumOffer } from "../../../../api-server/src/lib/premiumInquireOnly";
 import { Cta, Eyebrow, Faq, Field, H1, H2, JsonLd, Lede, Modelled, Section, inputClass, postJson, useOverhaulStatus, usePageMeta } from "@/components/br/ui";
-import { AREA_LOCK, PLACEMENT_LABELS, quoteAreaLock, type AreaQuote, type Currency } from "../../../../api-server/src/lib/overhaul/model";
+import { AREA_LOCK, PLACEMENT_LABELS, quoteAreaLock, type AreaQuote } from "../../../../api-server/src/lib/overhaul/model";
 
 const CATEGORIES = ["Physiotherapy / rehab", "Chiropractic", "Massage therapy", "Gym / fitness studio", "Yoga / pilates studio", "Nutrition / dietitian", "Health food / grocery", "Wellness clinic / naturopath", "Recovery studio (sauna, cold plunge)", "Footwear / orthotics retail", "Pet care / pet store", "Other health & wellness"];
 
@@ -13,15 +13,13 @@ const FAQ = [
   { q: "What does “up to 50%” mean?", a: `We hold up to ${AREA_LOCK.standardSharePct}% of the display slots shown to hub members within ${AREA_LOCK.radiusKm} km of your postal code for your category. In dense downtown cores (for example Toronto M5, downtown Montreal, Vancouver V6B/V6C/V6E and major US downtowns) the cap is ${AREA_LOCK.denseCoreSharePct}% because so many businesses share the same blocks.` },
   { q: "When does my term start?", a: "Your 1 to 6 month term starts the day your displays go live, not the day you pay." },
   { q: "What if traffic in my area grows?", a: "Your share grows with it. You keep the right to keep pace: more views in your area are offered to you first, at your locked discount, before anyone else can buy them." },
-  { q: "What do I get for the deposit?", a: `The full deposit becomes media credit at ${AREA_LOCK.discountPct}% off the rate card, plus an estimated number of page views across hubs (modelled from the TAM feed at starter rates; an illustrative estimate, not a guarantee).` },
-  { q: "Why is it $4,900 now?", a: `That's the launch rate, held until ${AREA_LOCK.launchRateUntil}. Locking also unlocks ${AREA_LOCK.followOnDiscountPct}% off the rate card on follow-on spend, up to $${AREA_LOCK.followOnCapUsd.toLocaleString()} USD ($${AREA_LOCK.followOnCapCad.toLocaleString()} CAD) over your term.` },
-  { q: "What if I don't use all my credit?", a: "At the end of your term you choose: take a refund of the unused credit, or extend your spend-down month by month at the same discount." },
-  { q: "Which placements can I get?", a: `${PLACEMENT_LABELS.join(", ")}. Display or CPC, on the named live hubs plus the health and wellness business hubs near you.` },
+  { q: "What does it cost?", a: "Self-serve starts at a $190 USD 7-day look or a $490 USD category reserve, priced in USD for every buyer. An area lock is a premium slot, quoted by inquiry against the hubs near you." },
+  { q: "Which placements can I get?", a: `${PLACEMENT_LABELS.join(", ")}. Display or CPC, on the live hubs (Integrity Fitness and DR-HO'S physio today) plus hubs near you as they launch.` },
   { q: "Is it exclusive?", a: "Yes, by category in your area: while your lock is active we won't sell another lock in your category within your radius." },
 ];
 
 export default function BrAdvertiseLocal() {
-  usePageMeta("Lock down my area | Birch Reserve", `Hold up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of your postal code for 1–6 months. $${AREA_LOCK.priceCad.toLocaleString()} CAD / $${AREA_LOCK.priceUsd.toLocaleString()} USD launch rate until ${AREA_LOCK.launchRateUntil}.`);
+  usePageMeta("Local businesses & studios | Birch Reserve", "Reach hub members near you. Start with a $190 USD 7-day look or a $490 USD category reserve; area locks are premium, by inquiry.");
   const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const [postal, setPostal] = useState(params.get("postal") ?? "");
   const [term, setTerm] = useState(3);
@@ -33,8 +31,7 @@ export default function BrAdvertiseLocal() {
   const areaInquireOnly = isPremiumOffer("area-lock");
   const quote = useMemo(() => (submitted ? quoteAreaLock(submitted, term) : null), [submitted, term]);
   const ok = quote && quote.ok ? (quote as AreaQuote) : null;
-  const currency: Currency = ok?.currency ?? "cad";
-  useEffect(() => {
+    useEffect(() => {
     if (ok) document.getElementById("quote")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [ok?.area.code]);
 
@@ -49,7 +46,7 @@ export default function BrAdvertiseLocal() {
     setBusy(true);
     setCheckoutMsg(null);
     try {
-      const r = await postJson<{ url?: string; error?: string; held?: boolean; message?: string }>("/v1/area/checkout", { postal: ok.area.code, term, category: fd.get("category"), business: fd.get("business"), website: fd.get("website"), email: fd.get("email"), agree: fd.get("agree") === "on", currency: ok.currency });
+      const r = await postJson<{ url?: string; error?: string; held?: boolean; message?: string }>("/v1/area/checkout", { postal: ok.area.code, term, category: fd.get("category"), business: fd.get("business"), website: fd.get("website"), email: fd.get("email"), agree: fd.get("agree") === "on", currency: "usd" });
       if (r.ok && r.data.url) {
         window.location.href = r.data.url;
         return;
@@ -68,24 +65,22 @@ export default function BrAdvertiseLocal() {
 
   return (
     <div data-testid="br-advertise-local">
-      <JsonLd data={{ "@context": "https://schema.org", "@type": "Offer", name: "Birch Reserve area lock", description: `Up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km for 1-6 months`, priceSpecification: [{ "@type": "PriceSpecification", price: AREA_LOCK.priceCad, priceCurrency: "CAD" }, { "@type": "PriceSpecification", price: AREA_LOCK.priceUsd, priceCurrency: "USD" }], seller: { "@type": "Organization", name: "Birch Reserve" }, url: "https://birchreserve.net/advertise/local" }} />
+      <JsonLd data={{ "@context": "https://schema.org", "@type": "OfferCatalog", name: "Birch Reserve self-serve offers", itemListElement: [{ "@type": "Offer", name: "7-day category look", sku: "hold-190", price: 190, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=hold-190" }, { "@type": "Offer", name: "Category reserve", sku: "reserve-490", price: 490, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=reserve-490" }] }} />
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1fr_1fr]">
           <div>
             <Eyebrow>Advertise · Local businesses &amp; studios</Eyebrow>
-            <H1>Lock down my area.</H1>
+            <H1>Reach hub members near you.</H1>
             {areaInquireOnly ? <p className="mt-3"><InquireBadge /> <span className="text-sm text-muted-foreground">Premium slot: by inquiry, not card.</span></p> : null}
             <Lede>
-              Put your postal code in. Hold up to <strong>{AREA_LOCK.standardSharePct}%</strong> of hub display within <strong>{AREA_LOCK.radiusKm} km</strong> of you ({AREA_LOCK.denseCoreSharePct}% in busy city centres), for <strong>1 to 6 months</strong> from when your displays start.
+              Start self-serve for <strong>$190 USD</strong> (7-day look) or <strong>$490 USD</strong> (category reserve): <a className="underline underline-offset-2" href="#slots">see the two offers</a>. Want your area to yourself? Put your postal code in to ask about an area lock: up to <strong>{AREA_LOCK.standardSharePct}%</strong> of hub display within <strong>{AREA_LOCK.radiusKm} km</strong> of you ({AREA_LOCK.denseCoreSharePct}% in busy city centres), for <strong>1 to 6 months</strong> from when your displays start.
             </Lede>
             <ul className="mt-8 space-y-3 text-sm">
               {[
-                `$${AREA_LOCK.priceCad.toLocaleString()} CAD or $${AREA_LOCK.priceUsd.toLocaleString()} USD: launch rate until ${AREA_LOCK.launchRateUntil}, exclusive in your category`,
-                `All of it becomes ad credit at ${AREA_LOCK.discountPct}% off the rate card`,
-                `Plus ${AREA_LOCK.followOnDiscountPct}% off follow-on spend up to $${AREA_LOCK.followOnCapUsd.toLocaleString()} USD over your term`,
-                "Estimated page views across hubs at starter rates (illustrative)",
-                "Unused credit: refund, or extend month by month at the same discount",
-                "If traffic grows, you keep the right to keep pace with spend",
+                "Exclusive in your category within your radius while the lock is active",
+                "Premium slot: priced by inquiry against the hubs near you, not by card",
+                "Estimated local views shown below are modelled, not guaranteed",
+                "If traffic grows, you keep the right to keep pace",
               ].map((t) => (
                 <li key={t} className="flex gap-2">
                   <Lock className="mt-0.5 size-4 shrink-0" /> {t}
@@ -120,20 +115,11 @@ export default function BrAdvertiseLocal() {
                     Up to {ok.sharePct}% of display · {ok.radiusKm} km
                   </p>
                 </div>
-                <dl className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                <dl className="mt-4 grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
                   <div>
-                    <dt className="text-xs uppercase tracking-wider text-foreground/55">Deposit</dt>
-                    <dd className="font-display text-3xl">${ok.price.toLocaleString()} <span className="text-base">{ok.currency.toUpperCase()}</span></dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs uppercase tracking-wider text-foreground/55">Ad credit at rate card</dt>
-                    <dd className="font-display text-3xl">${ok.creditAtRateCard.toLocaleString()}</dd>
-                    <dd className="text-xs text-muted-foreground">{ok.discountPct}% off</dd>
-                  </div>
-                  <div>
-                    <dt className="text-xs uppercase tracking-wider text-foreground/55">Estimated page views <Modelled>Illustrative estimate</Modelled></dt>
-                    <dd className="font-display text-3xl">{ok.guaranteedViews.toLocaleString()}</dd>
-                    <dd className="text-xs text-muted-foreground">across hubs · ${ok.effectiveCpm.toFixed(2)} {ok.currency.toUpperCase()} per 1,000</dd>
+                    <dt className="text-xs uppercase tracking-wider text-foreground/55">Area lock price</dt>
+                    <dd className="font-display text-3xl">By inquiry</dd>
+                    <dd className="text-xs text-muted-foreground">or start at $190 / $490 USD</dd>
                   </div>
                   <div>
                     <dt className="text-xs uppercase tracking-wider text-foreground/55">Your locked local views <Modelled /></dt>
@@ -141,9 +127,6 @@ export default function BrAdvertiseLocal() {
                     <dd className="text-xs text-muted-foreground">a month, within {ok.radiusKm} km</dd>
                   </div>
                 </dl>
-                <p className="mt-3 text-xs text-muted-foreground">
-                  Over {ok.termMonths} month{ok.termMonths === 1 ? "" : "s"}: about {ok.localOverTerm.toLocaleString()} local views at your share{ok.networkTopUp > 0 ? `; the remaining ${ok.networkTopUp.toLocaleString()} estimated views come from matched members across the hub network` : ", more than the estimate"}.
-                </p>
                 <form onSubmit={onLock} className="mt-6 grid gap-3 border-t border-border pt-5 md:grid-cols-2" data-testid="area-lock-form">
                   <Field label="Business name">
                     <input name="business" required className={inputClass} />
@@ -165,10 +148,10 @@ export default function BrAdvertiseLocal() {
                     <input name="email" type="email" required className={inputClass} />
                   </Field>
                   <label className="flex items-start gap-2 text-xs text-muted-foreground md:col-span-2">
-                    <input type="checkbox" name="agree" required className="mt-0.5" /> I agree to the area-lock terms: exclusive in my category and radius; launch rate until {AREA_LOCK.launchRateUntil}; term starts at display start; {AREA_LOCK.followOnDiscountPct}% off follow-on spend up to ${AREA_LOCK.followOnCapUsd.toLocaleString()} USD; unused credit can be refunded or extended month by month at the same discount.
+                    <input type="checkbox" name="agree" required className="mt-0.5" /> I'm asking about an area lock: exclusive in my category and radius, term starts at display start, priced by inquiry. No charge today.
                   </label>
                   <button type="submit" disabled={busy} className="h-12 bg-accent text-sm font-semibold text-accent-foreground hover:bg-foreground hover:text-background disabled:opacity-60 md:col-span-2" data-testid="area-lock-submit">
-                    {busy ? (areaInquireOnly ? "Sending…" : "Opening checkout…") : areaInquireOnly ? "Send inquiry" : status?.areaLockCheckout ? `Lock ${ok.area.area} for $${ok.price.toLocaleString()} ${ok.currency.toUpperCase()}` : `Reserve ${ok.area.area} by inquiry`}
+                    {busy ? (areaInquireOnly ? "Sending…" : "Opening checkout…") : areaInquireOnly ? "Send inquiry" : `Ask about locking ${ok.area.area}`}
                   </button>
                   {areaInquireOnly ? (
                     <p className="text-xs text-muted-foreground md:col-span-2" data-testid="area-inquire-note">
@@ -184,11 +167,10 @@ export default function BrAdvertiseLocal() {
       </Section>
 
       <Section tone="soft" id="slots">
-        <Eyebrow>Smaller, non-exclusive slots</Eyebrow>
-        <H2>Not ready to lock an area? Start smaller.</H2>
-        <Lede>Bigger deposits buy the rate down. Credit works on any of the four placements.</Lede>
+        <Eyebrow>Start self-serve</Eyebrow>
+        <H2>Two ways to start. Both USD.</H2>
         <div className="mt-10">
-          <SlotLadder currency={currency} audience="local" />
+          <StarterOffers testId="local-offers" />
         </div>
       </Section>
 
@@ -203,7 +185,7 @@ export default function BrAdvertiseLocal() {
       <Section tone="soft">
         <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr]">
           <div>
-            <H2>Area lock, plainly.</H2>
+            <H2>Plain answers.</H2>
             <div className="mt-6">
               <Cta href="/match" variant="line">Check my audience match first</Cta>
             </div>
