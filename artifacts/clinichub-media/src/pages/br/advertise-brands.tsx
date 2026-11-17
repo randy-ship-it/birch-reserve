@@ -1,32 +1,29 @@
 import { MetaComparison, SurfacesGrid, TamStrip } from "@/components/br/blocks";
 import { BrandBanners } from "@/components/br/brand-banners";
 import { RateCard } from "@/components/br/rate-card";
-import { SlotLadder } from "@/components/br/slot-ladder";
+import { StarterOffers } from "@/components/br/starter-offers";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
-import { useCurrency } from "@/lib/currency";
-import { SLOT_LADDER } from "../../../../api-server/src/lib/overhaul/model";
 
 const FAQ = [
-  { q: "What is a spend commit?", a: "You prepay a deposit that becomes ad credit. The named hubs are live inventory, so we send an insertion order naming the hubs and placements and your credit spends down over 6 months from when it lands. Unused credit can be refunded, or extended month by month at the same rate. 3x more inventory is in queue by year end, and you can put deposits on that too." },
-  { q: "How do bigger deposits buy the rate down?", a: "Each tier adds bonus credit: +5% at $1,500 USD, +10% at $3,000 and +15% at $6,000. That is an effective 4.8%, 9.1% and 13.0% off the rate card." },
-  { q: "Can I own a category?", a: "Yes. A category lock holds your category across the hubs where it runs. Ask us and we'll quote it against the hubs you want." },
+  { q: "What do I buy?", a: "Start with a $190 USD 7-day category look or a $490 USD category reserve. Your payment is media credit. We send an insertion order naming the hub and placements, and nothing runs until you approve it." },
+  { q: "Which hubs are live?", a: "Integrity Fitness and DR-HO'S physio are live today. More hubs launch over time, and placements are curated as each one goes live." },
+  { q: "Can I own a category?", a: "Premium slots add exclusivity and priority placement, by inquiry only. See the media kit or ask us and we'll quote it against the hubs you want." },
   { q: "How is it reported?", a: "Aggregate only: views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. No patient data and no clinical pixels." },
 ];
 
 export default function BrAdvertiseBrands() {
-  usePageMeta("Brand spend commits | Birch Reserve", "Lock in spend across co-branded Recovery Brand hubs and health & wellness business hubs. Prepay and get up to 15% bonus credit.");
-  const { currency, setCurrency } = useCurrency();
+  usePageMeta("Advertise to brands | Birch Reserve", "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. Live hubs: Integrity Fitness and DR-HO'S physio.");
   return (
     <div data-testid="br-advertise-brands">
-      <JsonLd data={{ "@context": "https://schema.org", "@type": "OfferCatalog", name: "Birch Reserve brand spend commits", itemListElement: SLOT_LADDER.map((t) => ({ "@type": "Offer", name: t.label, price: t.usd, priceCurrency: "USD", description: t.note })) }} />
+      <JsonLd data={{ "@context": "https://schema.org", "@type": "OfferCatalog", name: "Birch Reserve self-serve offers", itemListElement: [{ "@type": "Offer", name: "7-day category look", sku: "hold-190", price: 190, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=hold-190" }, { "@type": "Offer", name: "Category reserve", sku: "reserve-490", price: 490, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=reserve-490" }] }} />
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
             <Eyebrow>Advertise · Brands</Eyebrow>
-            <H1>Lock in spend before the hubs fill.</H1>
-            <Lede>Prepay a test budget once. Your credit runs on the co-branded hubs that fit your audience, on the hub home page, in product and services pages and after purchase.</Lede>
+            <H1>Put your brand inside private health and wellness hubs.</H1>
+            <Lede>Your ad runs on the pages members use right after they buy or book, and when they log back in. Live today: Integrity Fitness and DR-HO'S physio, with more hubs launching. Start for $190 USD or $490 USD.</Lede>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Cta href="#slots">Choose a deposit</Cta>
+              <Cta href="#slots">See the two offers</Cta>
               <Cta href="/match" variant="line">Match my audience</Cta>
             </div>
           </div>
@@ -37,21 +34,10 @@ export default function BrAdvertiseBrands() {
       </Section>
 
       <Section tone="soft" id="slots">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <Eyebrow>Spend commits</Eyebrow>
-            <H2>Bigger deposit, better rate.</H2>
-          </div>
-          <div className="flex border border-foreground/25 text-sm" role="group" aria-label="Currency">
-            {(["usd", "cad"] as const).map((c) => (
-              <button key={c} type="button" onClick={() => setCurrency(c)} className={`px-4 py-2 font-semibold ${currency === c ? "bg-foreground text-background" : ""}`}>
-                {c.toUpperCase()}
-              </button>
-            ))}
-          </div>
-        </div>
+        <Eyebrow>Start self-serve</Eyebrow>
+        <H2>Two ways to start. Both USD.</H2>
         <div className="mt-10">
-          <SlotLadder currency={currency} audience="brand" />
+          <StarterOffers testId="brands-offers" />
         </div>
       </Section>
 
@@ -68,12 +54,12 @@ export default function BrAdvertiseBrands() {
         <H2>Per hub, per month.</H2>
         <p className="mt-3 max-w-2xl text-sm text-muted-foreground">Starting-at rates, the same ones as the <a href="/rates" className="underline underline-offset-2">five-surface rate card</a>. Illustrative estimates, not a quote.</p>
         <div className="mt-8">
-          <RateCard currency={currency} />
+          <RateCard currency="usd" />
         </div>
       </Section>
 
       <Section>
-        <BrandBanners title="Hubs your credit can run on" />
+        <BrandBanners title="Brand hubs listed with Scale (in queue)" />
       </Section>
 
       <Section tone="soft">
@@ -87,9 +73,9 @@ export default function BrAdvertiseBrands() {
       <Section>
         <div className="grid gap-10 lg:grid-cols-[1fr_1.3fr]">
           <div>
-            <H2>How spend commits work.</H2>
+            <H2>How it works.</H2>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Cta href="/media-kit" variant="line">Marketing kit</Cta>
+              <Cta href="/media-kit" variant="line">Media kit</Cta>
               <Cta href="/agencies" variant="line">For agencies</Cta>
               <Cta href="/advertiser-guides" variant="line">Advertiser guides</Cta>
             </div>

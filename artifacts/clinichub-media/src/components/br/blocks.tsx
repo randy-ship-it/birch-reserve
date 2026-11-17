@@ -1,5 +1,5 @@
 import { ArrowUpRight, Building2, Megaphone, Store, Users } from "lucide-react";
-import { BENCHMARKS, POSITIONING, SURFACES, TAM, areaLockGuaranteedViews, blendedHubCpmUsd, CPC_FLOOR_USD } from "../../../../api-server/src/lib/overhaul/model";
+import { BENCHMARKS, POSITIONING, SURFACES, TAM, blendedHubCpmUsd, CPC_FLOOR_USD } from "../../../../api-server/src/lib/overhaul/model";
 import { Modelled } from "./ui";
 import { BLENDED, RATE_SURFACES } from "../../../../api-server/src/lib/overhaul/pricing";
 
@@ -12,8 +12,8 @@ const STARTER_BY_SURFACE: Record<string, { cpm: number; cpc: number }> = {
 };
 
 export const PATHS = [
-  { group: "Advertise", who: "Brands", href: "/advertise/brands", Icon: Megaphone, line: "Lock in spend across co-branded hubs. Prepay and get bonus credit.", cta: "Brand spend commits" },
-  { group: "Advertise", who: "Local businesses & studios", href: "/advertise/local", Icon: Store, line: "Lock down your area: up to 50% of hub display within 5 km of you.", cta: "Lock down my area" },
+  { group: "Advertise", who: "Brands", href: "/advertise/brands", Icon: Megaphone, line: "Display inside private health and wellness hubs. Start at $190 USD or $490 USD.", cta: "Advertise as a brand" },
+  { group: "Advertise", who: "Local businesses & studios", href: "/advertise/local", Icon: Store, line: "Reach hub members near you. Start at $190 USD or $490 USD; area locks by inquiry.", cta: "Advertise locally" },
   { group: "Publish", who: "Brands", href: "/publish/brands", Icon: Building2, line: "Have a recovery audience? Apply for a co-branded hub. Or ask about display / CPC only.", cta: "Inquire to publish" },
   { group: "Publish", who: "Studios & retail", href: "/publish/studios", Icon: Users, line: "Activate your hub and earn $500 cash or $700+ in ad credit.", cta: "Activate my hub" },
 ] as const;
@@ -112,7 +112,6 @@ export function TamStrip({ tone = "light", compact = false }: { tone?: "light" |
 }
 
 export function MetaComparison() {
-  const g = areaLockGuaranteedViews();
   return (
     <div data-testid="meta-comparison">
       <div className="overflow-x-auto">
@@ -139,7 +138,7 @@ export function MetaComparison() {
               <td className="py-3 pr-4 font-medium">CPM, health &amp; wellness</td>
               <td className="py-3 pr-4 text-muted-foreground">$20.70 USD (Meta, 2025)¹</td>
               <td className="py-3">
-                Starting at ${RATE_SURFACES[0]!.cpmStarter[0]}–{RATE_SURFACES[4]!.cpmStarter[0]} USD by surface (~${BLENDED.starterCpm} blended) · 5 km area lock ~${g.effectiveCpmUsd.toFixed(2)} <Modelled>Estimate</Modelled>
+                Starting at ${RATE_SURFACES[0]!.cpmStarter[0]}–{RATE_SURFACES[4]!.cpmStarter[0]} USD by surface (~${BLENDED.starterCpm} blended) <Modelled>Estimate</Modelled>
               </td>
             </tr>
             <tr>
@@ -155,7 +154,7 @@ export function MetaComparison() {
             <tr>
               <td className="py-3 pr-4 font-medium">Bidding</td>
               <td className="py-3 pr-4 text-muted-foreground">Auction, price moves daily</td>
-              <td className="py-3">Fixed price you lock in, with the right to keep pace if traffic grows</td>
+              <td className="py-3">Fixed price: $190 USD look or $490 USD reserve, no auction</td>
             </tr>
           </tbody>
         </table>

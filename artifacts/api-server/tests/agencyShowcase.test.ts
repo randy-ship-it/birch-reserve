@@ -19,20 +19,21 @@ test("agency cut: 10% of media spend, paid in cash to the agency of record (Rand
   assert.equal(agencyCash(50000), 5000);
 });
 
-test("/agencies: 10% paid in cash; brand bonus credit is the client's, separate from the agency cash", () => {
+test("/agencies: 10% paid in cash; client tests start on the $190 / $490 USD offers", () => {
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
   assert.match(page, /10% of media spend, paid in cash to the agency of record/);
-  assert.match(page, /Brand bonus credit is the client's \(the brand's\), separate from the agency's 10% cash/);
-  assert.doesNotMatch(page, /Agency prepay also earns the same bonus credit tiers as brands/);
+  assert.doesNotMatch(page, /\$1,500|\$3,000|\$6,000|SLOT_LADDER/);
+  assert.match(page, /StarterOffers/);
   assert.equal(AGENCY.line, "10% of media spend, paid in cash to the agency of record.");
-  assert.match(AGENCY.bonusNote, /Brand bonus credit is the client's \(the brand's\), separate from the agency's 10% cash/);
+  assert.match(AGENCY.bonusNote, /\$190 USD/);
+  assert.match(AGENCY.bonusNote, /\$490 USD/);
 });
 
-test("brand bonus credit is labelled as the brand's and kept separate from the 10% cash", () => {
-  assert.match(BRAND_BONUS_LINE, /^Brand bonus credit/);
-  assert.match(BRAND_BONUS_LINE, /separate from your 10% cash/);
-  for (const t of DEPOSIT_TIERS) assert.ok(BRAND_BONUS_LINE.includes(`+${t.bonusPct}% from $${t.usd.toLocaleString("en-US")}`));
-  assert.match(read("../clinichub-media/src/pages/br/advertise-brands.tsx"), /\+5% at \$1,500 USD, \+10% at \$3,000 and \+15% at \$6,000/);
+test("brand pages lead with the $190 / $490 USD offers, not the old deposit ladder", () => {
+  const brands = read("../clinichub-media/src/pages/br/advertise-brands.tsx");
+  assert.doesNotMatch(brands, /\$1,500|\$3,000|\$6,000|SlotLadder/);
+  assert.match(brands, /StarterOffers/);
+  void BRAND_BONUS_LINE; void DEPOSIT_TIERS;
 });
 
 test("spec sheet: four placements at the published starting CPMs, Post-Purchase is Inquire", () => {

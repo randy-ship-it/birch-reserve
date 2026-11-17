@@ -542,19 +542,6 @@ router.get("/llms.txt", (_req, res) => {
   res.type("text/plain").send(
     [
       llmsTxt(),
-      "",
-      "## Legacy machine checkout (category seat)",
-      "Prepay your category. Not an open auction.",
-      "- hold-190 · $190 USD ($270 CAD for Canadian buyers) · 7-day category look · does not lock in a slot",
-      "- reserve-490 · $490 USD ($690 CAD for Canadian buyers) · prepay your category · 100% display credit · fully refundable until 14 days before your launch date",
-      `Machine catalog: /v1/catalog.json`,
-      `Availability: /v1/availability.json`,
-      `Quote: /v1/quote?sku=reserve-490&format=post_checkout&days=30`,
-      `Checkout: POST /v1/checkout`,
-      `UCP discovery: /.well-known/ucp`,
-      `Formats: ${FORMATS.join(", ")}.`,
-      `Human calculator: /buycalc`,
-      "Contact: sales@silverbirchgrowth.com",
     ].join("\n"),
   );
 });

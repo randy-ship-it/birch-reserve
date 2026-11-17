@@ -116,12 +116,12 @@ export type Hub = {
 
 export const HUBS: Hub[] = [
   { key: "dr-ho", name: "DR-HO’S", kind: "brand", status: "Live inventory", url: "https://physio.drhonow.com/dr-ho/portal", category: "Pain relief", basis: "Partner feed row (DR-HO’S)", views: DRHO },
-  { key: "jack-health", name: "Jack Health", kind: "brand", status: "Live inventory", url: "https://scalehealth.ca/jack-health", category: "Men’s health", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "jill-health", name: "Jill Health", kind: "brand", status: "Live inventory", url: "https://scalehealth.ca/jill-health", category: "Women’s health", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "bird-and-be", name: "Bird & Be", kind: "brand", status: "Live inventory", url: "https://scalehealth.ca/bird-and-be", category: "Women’s health (postpartum)", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "roll-recovery", name: "Roll Recovery", kind: "brand", status: "Live inventory", url: "https://scalehealth.ca/roll-recovery", category: "Recovery hardware", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "nutriprocan", name: "NutriProCan", kind: "brand", status: "Live inventory", url: "https://scalehealth.ca/nutriprocan", category: "Nutrition", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "sole", name: "SOLE", kind: "brand", status: "Live inventory", url: "https://scalehealth.ca/sole", category: "Footwear and insoles", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "jack-health", name: "Jack Health", kind: "brand", status: "In queue", url: "https://scalehealth.ca/jack-health", category: "Men’s health", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "jill-health", name: "Jill Health", kind: "brand", status: "In queue", url: "https://scalehealth.ca/jill-health", category: "Women’s health", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "bird-and-be", name: "Bird & Be", kind: "brand", status: "In queue", url: "https://scalehealth.ca/bird-and-be", category: "Women’s health (postpartum)", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "roll-recovery", name: "Roll Recovery", kind: "brand", status: "In queue", url: "https://scalehealth.ca/roll-recovery", category: "Recovery hardware", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "nutriprocan", name: "NutriProCan", kind: "brand", status: "In queue", url: "https://scalehealth.ca/nutriprocan", category: "Nutrition", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "sole", name: "SOLE", kind: "brand", status: "In queue", url: "https://scalehealth.ca/sole", category: "Footwear and insoles", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
   { key: "clinic-network", name: "Clinic hub network (pooled)", kind: "clinic", status: "Onboarding", url: "https://scalehealth.ca/clinichubs", category: "Physio, mobility, gym and studio members", basis: "TAM feed provider-network row", views: CLINIC_NETWORK },
 ];
 

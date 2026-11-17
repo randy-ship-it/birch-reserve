@@ -9,14 +9,14 @@ import { CategoryRequestForm, FaceBeforeFlight, FounderNote, PrimeHero, SALES_EM
 import { AgencyHero, AgencyPayouts, InsiderGrid, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { LOOK_HREF, RESERVE_HREF, MetaHook, PackPicker, ProveItLadder, RateCardV2 } from "@/components/br/pricing";
-import { AREA_LOCK, INVENTORY, PUBLISHER_INCENTIVE } from "../../../../api-server/src/lib/overhaul/model";
+import { INVENTORY, PUBLISHER_INCENTIVE } from "../../../../api-server/src/lib/overhaul/model";
 
 const FAQ = [
   { q: "Where exactly do the ads run?", a: "Only inside co-branded hubs from Recovery Brands (recovery, longevity and food today; pets in queue) and inside health and wellness business hubs such as physio, gym, studio and clinic hubs. Each hub has four placements: post-purchase, the hub home page, product and services pages, and the member dashboard behind login." },
-  { q: "Is the inventory live?", a: `Yes. ${INVENTORY.line} ${INVENTORY.queueLine}` },
+  { q: "Which hubs are live?", a: `${INVENTORY.line} ${INVENTORY.queueLine}` },
   { q: "Is this display or cost-per-click?", a: "Both. Every placement can be bought as display (priced per thousand views) or CPC (priced per click). Deposits and area locks draw down against either." },
   { q: "Are the audience numbers measured?", a: "Not yet. Any audience or view figure on this site is a modelled estimate, not measured delivery. We don't publish a network views figure; your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
-  { q: "Can a local business or studio buy?", a: `Yes. Lock down your area holds up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of your postal code (${AREA_LOCK.denseCoreSharePct}% in dense downtown cores) for 1 to 6 months from when displays start.` },
+  { q: "Can a local business or studio buy?", a: "Yes. Start with the same $190 USD 7-day look or $490 USD reserve. Locking your area (a share of hub display near your postal code) is a premium option, by inquiry." },
   { q: "How do I become a publisher?", a: `Studios and retailers activate a hub at scalehealth.ca/clinichubs and earn $${PUBLISHER_INCENTIVE.cashCad} cash or $${PUBLISHER_INCENTIVE.creditCad}+ in ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded hub.` },
   { q: "Do agencies get anything?", a: `Yes. ${AGENCY_SHARE.line} Agencies can also prepay a client test budget and get UTM and promo-code reporting per hub and surface.` },
 ];
@@ -236,21 +236,16 @@ export default function BrHome() {
       <Section tone="ink">
         <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center" data-testid="home-buyers">
           <div>
-            <Eyebrow className="text-accent">For media buyers</Eyebrow>
-            <H2 className="text-background">A machine-readable catalog, quotes and checkout.</H2>
+            <Eyebrow className="text-accent">For media buyers &amp; agencies</Eyebrow>
+            <H2 className="text-background">Two offers, priced in USD.</H2>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-background/75">
-              Every slot, price and modelled view count is machine-readable. Read the catalog, quote any offer and hand off to a Stripe-hosted checkout, with no forms in the way.
+              A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. Agencies earn 10% of media spend in cash.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Cta href="/buyers">How buyers purchase</Cta>
-              <Cta href="/llms.txt" variant="line" className="border-background/40 text-background">llms.txt</Cta>
+              <Cta href="/buyers">For media buyers</Cta>
+              <Cta href="/media-kit" variant="line" className="border-background/40 text-background">See the media kit</Cta>
             </div>
           </div>
-          <pre className="overflow-x-auto border border-background/20 p-4 font-mono text-[12px] leading-relaxed text-accent">{`GET  /v1/agent/catalog.json
-GET  /v1/agent/quote?offer=sponsor-3000
-POST /v1/agent/checkout
-GET  /v1/agent/openapi.json
-GET  /.well-known/agent.json`}</pre>
         </div>
       </Section>
 
@@ -262,7 +257,7 @@ GET  /.well-known/agent.json`}</pre>
             <Eyebrow>Questions</Eyebrow>
             <H2>Plain answers.</H2>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Cta href="/media-kit" variant="line">Read the marketing kit</Cta>
+              <Cta href="/media-kit" variant="line">Read the media kit</Cta>
               <MediaKitPdfLink variant="line" testId="home-media-kit-pdf" />
             </div>
             <div className="mt-8 border border-foreground/15 bg-white p-5">

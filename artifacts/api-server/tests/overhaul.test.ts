@@ -126,55 +126,53 @@ import { agentCatalog, agentQuote, agentOpenApi, agentCard, slotOffers } from ".
 import { createAgentRouter } from "../src/routes/agent";
 import { llmsTxt, slotProductsJsonLd } from "../src/lib/overhaul/seo";
 
-test("agent catalog lists every slot + area lock with prices and modelled views", () => {
-  const c = agentCatalog({ slotsCheckout: false, areaLockCheckout: false });
-  assert.deepEqual(c.offers.map((o) => o.offer_key), ["slot-490", ...SLOT_LADDER.slice(1).map((s) => s.key), "area-lock"]);
-  assert.equal(c.inventory.modelled, true);
+test("agent catalog: the two media-kit offers in USD, only live hubs, agent checkout held", () => {
+  const c = agentCatalog();
+  assert.deepEqual(c.offers.map((o) => [o.offer_key, o.price_usd]), [["hold-190", 190], ["reserve-490", 490]]);
+  assert.deepEqual(c.currencies, ["USD"]);
   assert.equal(c.inventory.surfaces.length, 4);
-  assert.ok(c.inventory.surfaces.some((x) => /dashboard/i.test(x.label)));
+  assert.deepEqual(c.inventory.live_hubs.map((h) => h.name), ["Integrity Fitness", "DR-HO'S physio"]);
   assert.equal(c.agency.commission_pct_of_media_spend, 10);
-  assert.ok(c.inventory.live_hubs.every((h) => h.status === "live inventory"));
-  assert.equal(c.checkout_status.spend_commits, "held");
-  const s3000 = slotOffers().find((o) => o.prices.usd === 3000)!;
-  assert.equal(s3000.media_credit.usd, 3300);
-  assert.equal(s3000.modelled_hub_page_views, 258100);
+  assert.equal(c.checkout_status.agent_checkout, "held");
+  assert.doesNotMatch(JSON.stringify(c), /CAD|sponsor-|area-lock|live inventory/);
   assert.equal(slotProductsJsonLd().length, SLOT_LADDER.length);
+  void slotOffers;
 });
 
-test("agent quote: slots, area lock, unknown offer", () => {
-  const q = agentQuote({ offer: SLOT_LADDER[3]!.key, currency: "cad" });
-  assert.equal(q.ok, true);
-  if (q.ok) assert.equal(q.amount, 8400);
-  const a = agentQuote({ offer: "area-lock", postal: "M5V 2T6", term: 3 });
-  assert.equal(a.ok && a.amount, 4900);
+test("agent quote: public offers only, USD", () => {
+  const q = agentQuote({ offer: "reserve-490" });
+  assert.equal(q.ok && q.amount, 490);
+  assert.equal(q.ok && q.currency, "usd");
+  assert.equal(agentQuote({ offer: "sponsor-3000" }).ok, false);
   assert.equal(agentQuote({ offer: "nope" }).ok, false);
   assert.ok(agentOpenApi().paths["/v1/agent/checkout"]);
-  assert.equal(agentCard().skills.length, 4);
-  assert.match(llmsTxt(), /\/v1\/agent\/catalog\.json/);
+  assert.equal(agentCard().skills.length, 3);
+  const llms = llmsTxt();
+  assert.match(llms, /\/v1\/agent\/catalog\.json/);
+  assert.match(llms, /\$190 USD/);
+  assert.match(llms, /\$490 USD/);
+  assert.doesNotMatch(llms, /CAD|sponsor-|All eight/);
 });
 
-test("agent checkout holds (202, no charge) when the env gate is closed", async () => {
-  delete process.env.SPONSOR_DEPOSITS_ENABLED;
+test("agent checkout always holds (202, no charge) and points to the human checkout", async () => {
+  process.env.SPONSOR_DEPOSITS_ENABLED = "true";
+  process.env.STRIPE_SECRET_KEY = "sk_test_dummy";
   let called = 0;
   const app = express().use(createAgentRouter({ createSession: async () => { called++; return { url: "x", livemode: false }; } }));
   const server = app.listen(0);
   const port = (server.address() as { port: number }).port;
   try {
-    const r = await fetch(`http://127.0.0.1:${port}/v1/agent/checkout`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ offer: SLOT_LADDER[2]!.key, brand: "Acme", email: "a@acme.com", agree: true }) });
+    const r = await fetch(`http://127.0.0.1:${port}/v1/agent/checkout`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ offer: "reserve-490", brand: "Acme", email: "a@acme.com", agree: true }) });
     assert.equal(r.status, 202);
-    const j = (await r.json()) as { status: string; amount: number };
+    const j = (await r.json()) as { status: string; amount: number; human_checkout: string };
     assert.equal(j.status, "held");
-    assert.equal(j.amount, 3000);
+    assert.equal(j.amount, 490);
+    assert.match(j.human_checkout, /\/buycalc\?sku=reserve-490$/);
     assert.equal(called, 0);
-    const bad = await fetch(`http://127.0.0.1:${port}/v1/agent/checkout`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ offer: "slot-490", brand: "Acme", email: "a@acme.com" }) });
+    const bad = await fetch(`http://127.0.0.1:${port}/v1/agent/checkout`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ offer: "sponsor-3000", brand: "Acme", email: "a@acme.com", agree: true }) });
     assert.equal(bad.status, 400);
-    process.env.SPONSOR_DEPOSITS_ENABLED = "true";
-    process.env.STRIPE_SECRET_KEY = "sk_test_dummy";
-    const open = await fetch(`http://127.0.0.1:${port}/v1/agent/checkout`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ offer: "slot-490", currency: "cad", brand: "Acme", email: "a@acme.com", agree: true }) });
-    const oj = (await open.json()) as { status: string; amount: number };
-    assert.equal(oj.status, "open");
-    assert.equal(oj.amount, 690);
-    assert.equal(called, 1);
+    const noAgree = await fetch(`http://127.0.0.1:${port}/v1/agent/checkout`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ offer: "hold-190", email: "a@acme.com" }) });
+    assert.equal(noAgree.status, 400);
   } finally {
     delete process.env.SPONSOR_DEPOSITS_ENABLED;
     delete process.env.STRIPE_SECRET_KEY;

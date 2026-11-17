@@ -5,11 +5,25 @@
  */
 import { AGENCY, AREA_LOCK, BRAND_HUBS, INVENTORY, PLACEMENT_LABELS, PUBLISHER_INCENTIVE, CPC_FLOOR_USD, SLOT_LADDER, SURFACES, TAM, areaLockGuaranteedViews, blendedHubCpmUsd, quoteAreaLock, type Currency } from "./model";
 
-export const AGENT_CATALOG_VERSION = "2026-11-12";
+export const AGENT_CATALOG_VERSION = "2026-11-17";
 export const SITE = "https://birchreserve.net";
 export const HANDOFF_EMAIL = "sales@silverbirchgrowth.com";
 
-export type AgentOfferKey = (typeof SLOT_LADDER)[number]["key"] | "area-lock";
+export type AgentOfferKey = "hold-190" | "reserve-490";
+
+/** Live hubs anyone can open today (media kit, Nov 17 2026). */
+export const AGENT_LIVE_HUBS = [
+  { name: "Integrity Fitness", type: "studio hub", status: "live" },
+  { name: "DR-HO'S physio", type: "brand hub", status: "live" },
+] as const;
+
+/** The two public offers, same as the media kit. USD only. Humans pay on the Stripe-hosted /buycalc page. */
+export function publicOffers() {
+  return [
+    { offer_key: "hold-190", name: "7-day category look", price_usd: 190, currency: "USD", terms: "Hold your category for 7 days. Converts in full to the $490 USD reserve within 7 days, or refunded. Does not lock in a slot.", human_checkout: `${SITE}/buycalc?sku=hold-190` },
+    { offer_key: "reserve-490", name: "Category reserve", price_usd: 490, currency: "USD", terms: "Reserve display space across the hub network. Media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months. Nothing runs before the buyer approves an insertion order.", human_checkout: `${SITE}/buycalc?sku=reserve-490` },
+  ];
+}
 
 /** Modelled hub page views a slot's credit buys at the blended rate card (not guaranteed). */
 export function modelledViewsForCreditUsd(creditUsd: number): number {
@@ -63,57 +77,40 @@ export function areaLockOffer() {
   };
 }
 
-export function agentCatalog(status: { slotsCheckout: boolean; areaLockCheckout: boolean }) {
+export function agentCatalog(_status?: unknown) {
   return {
     catalog_version: AGENT_CATALOG_VERSION,
     seller: { name: "Birch Reserve", legal_name: "Silver Birch Growth Inc.", url: SITE, email: HANDOFF_EMAIL, address: "Toronto, Ontario, Canada" },
-    what_you_buy: `Display and CPC placements inside co-branded Recovery Brand hubs and health & wellness business hubs, on four placements: ${PLACEMENT_LABELS.join(", ")}.`,
-    currencies: ["USD", "CAD"],
-    currency_rule: "Canadian buyers pay CAD; everyone else USD. Pass currency explicitly to override.",
+    what_you_buy: `Display space inside private health and wellness hubs, on four placements: ${PLACEMENT_LABELS.join(", ")}.`,
+    currencies: ["USD"],
+    currency_rule: "USD for every buyer, including Canadian brands.",
     inventory: {
-      modelled: true,
-      source: TAM.source,
-      read_on: TAM.readOn,
-      listed_partners: TAM.listedPartners,
-      surfaces: SURFACES.map((s) => ({ key: s.key, label: s.label, formats: ["display", "cpc"], starting_at_cpm_usd: s.cpmUsd, description: s.blurb })),
-      blended_hub_cpm_usd: Number(blendedHubCpmUsd().toFixed(2)),
-      cpc_floor_usd: CPC_FLOOR_USD,
-      modelled_ctr_band: [TAM.ctrLo, TAM.ctrHi],
-      live_hubs: BRAND_HUBS.map((h) => ({ name: h.name, category: h.category, status: "live inventory" })),
-      live_inventory: INVENTORY.line,
-      spend_down_months_from_deposit: INVENTORY.liveSpendDownMonths,
-      queue: { multiple_of_live: INVENTORY.queueMultiple, by: INVENTORY.queueBy, deposits_accepted: true, note: INVENTORY.queueLine },
+      live_hubs: AGENT_LIVE_HUBS,
+      note: "More hubs launch over time; placements are curated as each one goes live. Audience and view figures are modelled estimates, not measured delivery.",
+      surfaces: SURFACES.map((s) => ({ key: s.key, label: s.label, description: s.blurb })),
     },
-    offers: [...slotOffers(), areaLockOffer()],
+    offers: publicOffers(),
+    premium: { note: "Premium slots (exclusivity, priority placement) are inquire-only.", human_page: `${SITE}/media-kit#premium`, email: HANDOFF_EMAIL },
     checkout_status: {
-      spend_commits: status.slotsCheckout ? "open" : "held",
-      area_lock: status.areaLockCheckout ? "open" : "held",
-      held_means: `Checkout returns status "held": reserved by inquiry, confirmed within 1 business day by email from ${HANDOFF_EMAIL}. No charge is made.`,
+      agent_checkout: "held",
+      held_means: `Agent checkout is on hold. POST /v1/agent/checkout records the request and we reply by email from ${HANDOFF_EMAIL}; no charge is made. To pay now, send the buyer to the offer's human_checkout page (Stripe-hosted).`,
     },
-    agency: { commission_pct_of_media_spend: AGENCY.commissionPct, paid_to: "agency of record", paid_in: "cash", bonus_credit: AGENCY.bonusNote },
-    publisher_payout: {
-      cash_cad: PUBLISHER_INCENTIVE.cashCad,
-      ad_credit_cad: PUBLISHER_INCENTIVE.creditCad,
-      activate_via: PUBLISHER_INCENTIVE.activationChannels,
-      clock: PUBLISHER_INCENTIVE.clockRule,
-      exclusions: PUBLISHER_INCENTIVE.selfPurchaseRule,
-    },
+    agency: { commission_pct_of_media_spend: AGENCY.commissionPct, paid_to: "agency of record", paid_in: "cash" },
     endpoints: {
       catalog: "/v1/agent/catalog.json",
-      quote: "/v1/agent/quote",
+      quote: "/v1/agent/quote?offer=reserve-490",
       checkout: "/v1/agent/checkout",
-      match: "/v1/match",
       openapi: "/v1/agent/openapi.json",
       agent_card: "/.well-known/agent.json",
-      ucp: "/.well-known/ucp",
       llms: "/llms.txt",
-      legacy_catalog: "/v1/catalog.json",
+      human_page: `${SITE}/buyers`,
+      media_kit: `${SITE}/media-kit`,
     },
     rules: [
       "Aggregate reporting only. No patient data, no clinical pixels, no open auction.",
-      "Modelled figures are labelled modelled. Only the area lock carries a views guarantee (modelled).",
-      "Payment is media credit, spent down on live hubs under an insertion order that names the hubs. Unused credit: refund, or extend month by month at the same discount.",
-      "Agents must pass agree:true only after showing the buyer the terms and price.",
+      "Modelled figures are labelled modelled. No impression, reach, click or sales guarantees.",
+      "Payment is media credit, used under an insertion order that names the hub and placement.",
+      "Agents must show the buyer the terms and price before sending agree:true.",
     ],
   };
 }
@@ -122,56 +119,37 @@ export type AgentQuoteInput = { offer?: string; currency?: string; postal?: stri
 
 export function agentQuote(input: AgentQuoteInput) {
   const offer = String(input.offer ?? "").trim();
-  const cur = String(input.currency ?? "").toLowerCase();
-  const currency: Currency | undefined = cur === "cad" || cur === "usd" ? cur : undefined;
-  if (offer === "area-lock") {
-    const q = quoteAreaLock(String(input.postal ?? ""), Number(input.term ?? 3), currency);
-    if (!q.ok) return { ok: false as const, error: q.error };
-    return { ok: true as const, offer: "area-lock", currency: q.currency, amount: q.price, quote: q, checkout: { method: "POST", path: "/v1/agent/checkout" } };
-  }
-  const slot = slotOffers().find((s) => s.offer_key === offer);
-  if (!slot) return { ok: false as const, error: `Unknown offer. Use one of: ${[...SLOT_LADDER.map((s) => s.key), "area-lock"].join(", ")}.` };
-  const c: Currency = currency ?? "usd";
-  return {
-    ok: true as const,
-    offer: slot.offer_key,
-    currency: c,
-    amount: slot.prices[c],
-    media_credit: slot.media_credit[c],
-    bonus_credit_pct: slot.bonus_credit_pct,
-    modelled_hub_page_views: slot.modelled_hub_page_views,
-    modelled: true,
-    checkout: { method: "POST", path: "/v1/agent/checkout" },
-  };
+  const o = publicOffers().find((x) => x.offer_key === offer);
+  if (!o) return { ok: false as const, error: "Unknown offer. Use one of: hold-190, reserve-490." };
+  return { ok: true as const, offer: o.offer_key, name: o.name, currency: "usd" as const, amount: o.price_usd, terms: o.terms, human_checkout: o.human_checkout, agent_checkout: "held" as const };
 }
 
 export function agentCard() {
   return {
     schema_version: "agent-card/0.1",
     name: "Birch Reserve ad buying",
-    description: "Buy display and CPC inside co-branded health & wellness hubs. Machine-readable catalog, quotes and Stripe-hosted checkout.",
+    description: "Display space inside private health & wellness hubs: a $190 USD 7-day look or a $490 USD category reserve. Machine-readable catalog and quotes; buyers pay on a Stripe-hosted page.",
     url: SITE,
     provider: { organization: "Silver Birch Growth Inc.", url: SITE, email: HANDOFF_EMAIL },
     documentation: `${SITE}/buyers`,
     openapi: `${SITE}/v1/agent/openapi.json`,
     llms: `${SITE}/llms.txt`,
     ucp: `${SITE}/.well-known/ucp`,
-    authentication: { type: "none", note: "Public read endpoints. Checkout hands the buyer a Stripe-hosted page; no delegated payment." },
-    capabilities: { streaming: false, payments: "stripe_hosted_checkout_handoff" },
+    authentication: { type: "none", note: "Public read endpoints. Agent checkout is on hold; buyers pay on the Stripe-hosted page. No delegated payment." },
+    capabilities: { streaming: false, payments: "human_stripe_hosted_checkout" },
     skills: [
       { id: "browse_inventory", name: "Browse inventory and offers", endpoint: "GET /v1/agent/catalog.json" },
-      { id: "match_audience", name: "Score a brand's audience fit (modelled)", endpoint: "POST /v1/match" },
-      { id: "quote", name: "Quote an offer", endpoint: "GET /v1/agent/quote" },
-      { id: "checkout", name: "Open Stripe checkout or hold the request", endpoint: "POST /v1/agent/checkout" },
+            { id: "quote", name: "Quote an offer", endpoint: "GET /v1/agent/quote" },
+      { id: "checkout", name: "Record a purchase request (held, no charge)", endpoint: "POST /v1/agent/checkout" },
     ],
   };
 }
 
 export function agentOpenApi() {
-  const offerEnum = [...SLOT_LADDER.map((s) => s.key), "area-lock"];
+  const offerEnum = ["hold-190", "reserve-490"];
   return {
     openapi: "3.1.0",
-    info: { title: "Birch Reserve buying API", version: AGENT_CATALOG_VERSION, description: "Catalog, quote and checkout for media buyers. Audience figures are modelled. Checkout returns a Stripe-hosted URL when open, otherwise status held (saved, no charge).", contact: { email: HANDOFF_EMAIL } },
+    info: { title: "Birch Reserve buying API", version: AGENT_CATALOG_VERSION, description: "Catalog and quotes for the two public offers ($190 USD look, $490 USD reserve). Agent checkout is on hold: requests are saved with no charge; buyers pay on the Stripe-hosted human_checkout page. Audience figures are modelled.", contact: { email: HANDOFF_EMAIL } },
     servers: [{ url: SITE }],
     paths: {
       "/v1/agent/catalog.json": { get: { operationId: "getCatalog", summary: "Inventory, surfaces, offers and checkout status", responses: { "200": { description: "Catalog" } } } },
@@ -181,9 +159,6 @@ export function agentOpenApi() {
           summary: "Quote one offer",
           parameters: [
             { name: "offer", in: "query", required: true, schema: { type: "string", enum: offerEnum } },
-            { name: "currency", in: "query", schema: { type: "string", enum: ["usd", "cad"] } },
-            { name: "postal", in: "query", description: "Required for area-lock. Canadian postal code or US ZIP.", schema: { type: "string" } },
-            { name: "term", in: "query", description: "Area-lock months, 1-6.", schema: { type: "integer", minimum: 1, maximum: 6 } },
           ],
           responses: { "200": { description: "Quote" }, "400": { description: "Bad input" } },
         },
@@ -191,7 +166,7 @@ export function agentOpenApi() {
       "/v1/agent/checkout": {
         post: {
           operationId: "createCheckout",
-          summary: "Open Stripe-hosted checkout, or hold the request when checkout is closed",
+          summary: "Record a purchase request. Agent checkout is on hold: always 202 held, no charge.",
           requestBody: {
             required: true,
             content: {
@@ -201,13 +176,8 @@ export function agentOpenApi() {
                   required: ["offer", "email", "agree"],
                   properties: {
                     offer: { type: "string", enum: offerEnum },
-                    currency: { type: "string", enum: ["usd", "cad"] },
                     email: { type: "string", format: "email" },
-                    brand: { type: "string", description: "Required for spend commits." },
-                    business: { type: "string", description: "Required for area-lock." },
-                    category: { type: "string", description: "Required for area-lock." },
-                    postal: { type: "string" },
-                    term: { type: "integer", minimum: 1, maximum: 6 },
+                    brand: { type: "string" },
                     website: { type: "string" },
                     agent: { type: "string", description: "Name of the buying agent, for reporting." },
                     agree: { type: "boolean", const: true, description: "Buyer accepted the terms." },
@@ -216,10 +186,9 @@ export function agentOpenApi() {
               },
             },
           },
-          responses: { "200": { description: "status open with a Stripe checkout url" }, "202": { description: "status held: saved, no charge, a person follows up" }, "400": { description: "Bad input" } },
+          responses: { "202": { description: "status held: saved, no charge, we reply by email; includes human_checkout for the buyer" }, "400": { description: "Bad input" } },
         },
       },
-      "/v1/match": { post: { operationId: "matchAudience", summary: "Modelled audience match score for a URL + blurb", requestBody: { content: { "application/json": { schema: { type: "object", required: ["url"], properties: { url: { type: "string" }, blurb: { type: "string" }, email: { type: "string" } } } } } }, responses: { "200": { description: "Score, 3 reasons, recommended offer" } } } },
     },
   };
 }
