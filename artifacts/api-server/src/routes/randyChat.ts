@@ -4,14 +4,15 @@
  * Mirrors concierge.ts patterns (origin check, rate limit, short caps) but uses
  * xAI Chat Completions (https://api.x.ai/v1) instead of OpenAI.
  *
- * Model: GROK_MODEL env, default `grok-4.3`.
+ * Model: GROK_MODEL env, default `grok-4.7` (xAI flagship, Nov 17 2026).
  * Override to `grok-4` when quality > latency.
  *
  * Auth: XAI_API_KEY (alias GROK_API_KEY). Never log or echo the key.
  */
 import { createHash, timingSafeEqual } from "node:crypto";
 import express, { Router, type IRouter, type Request, type RequestHandler } from "express";
-import { loadVoiceCloserSystemPrompt } from "../lib/voiceCloserKnowledge";
+import { buildBirchChatSystemPrompt, findBannedContent, softenReply } from "../lib/birchChatPrompt";
+import { siteCheckoutState } from "../lib/checkoutState";
 import {
   ensureTranscriptSweepTimer,
   logIntakeForSession,
@@ -27,7 +28,7 @@ import { hasValidQaHeader } from "../lib/testTraffic";
 import { FRIENDLY_429, LIMITS, limiter } from "../lib/rateLimit";
 import { attributionFrom } from "../lib/publicGuards";
 import { birchFaqAnswer } from "../lib/birchFaq";
-import { BIRCH_SALES_PHONE, birchCanonicalFacts } from "../lib/birchFacts";
+import { BIRCH_SALES_PHONE } from "../lib/birchFacts";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { isTestIdentity } from "../lib/testTraffic";
 
@@ -84,7 +85,7 @@ const MODEL_WINDOW_MESSAGES = 20;
 const MODEL_WINDOW_CHARS = 9_000;
 const XAI_BASE = "https://api.x.ai/v1";
 /** Default model. GROK_MODEL still overrides this on the host. */
-const DEFAULT_GROK_MODEL = "grok-4.3";
+const DEFAULT_GROK_MODEL = "grok-4.7";
 /**
  * Body limit for the chat routes. The widget may send the whole thread (up to 80
  * turns x 1,500 chars, ~125kb of JSON); the app-wide 32kb parser would 413 long
@@ -140,6 +141,10 @@ const PAGE_PATH_PATTERN = /^\/[A-Za-z0-9._~/?=&%-]{0,199}$/;
 const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal";
 
 /**
+ * LEGACY (kept for the older rule tests): the site chat no longer sends this or the
+ * vendored sales-brain pack. The live chat prompt is buildBirchChatSystemPrompt()
+ * in ../lib/birchChatPrompt.ts (Randy, Nov 17 2026).
+ *
  * Thin birchreserve.net wrapper. The brain (identity, qualify flow, routing, Scale
  * answers, NEVER-SAY) lives in src/knowledge/birch-chat.prompt.txt, vendored from
  * /workspace/sales-brain/dist. Only widget-specific rules live here.
@@ -157,15 +162,6 @@ export const BIRCH_SITE_SCOPE_PROMPT = [
   "Never promise per-seat impressions, CTR, or view guarantees (no reach or click promises either). Modelled numbers must be called modelled. Never call the $490 reserve exclusive; only a premium slot adds exclusivity. Never quote category lists or seat counts.",
 ].join(" ");
 
-const CHIP_INTENT_NOTES: Record<string, string> = {
-  how_seats:
-    "Visitor tapped \"How it works\": explain that a $490 reserve buys a share of display space across the growing hub network, curated as hubs launch, plus the $190 USD look; premium slots add exclusivity. Give https://birchreserve.net/buycalc, then ask what they sell.",
-  hold_190:
-    "Visitor tapped \"Reserve space\": walk them through reserving at https://birchreserve.net/buycalc ($490 USD reserve or $190 USD look), and ask what they sell.",
-  live_hub: `Visitor tapped \"See a live hub\": share ${LIVE_HUB_PROOF_URL} as the live proof, then ask what they would want to show there.`,
-  talk_human:
-    "Visitor tapped \"Talk to a human\": say you can set that up, ask the first quick question (company or brand), and mention the AI call or a callback come right after.",
-};
 
 /** 6:50pm: per-session 20 msgs/min and per-IP 60 per 10 min on the Grok route. */
 const chatSessionLimiter = limiter(LIMITS.chatPerSession);
@@ -482,20 +478,36 @@ function inferOfferHandoff(body: RandyChatBody): boolean {
   return userTurns >= 2;
 }
 
-async function callGrok(
-  systemPrompt: string,
-  body: RandyChatBody,
-  apiKey: string,
-): Promise<string> {
-  const model = getGrokModel();
-  const modeNote =
-    body.mode === "hear"
-      ? "Caller selected Hear Randy: reply in concise spoken-friendly text. Do not claim live in-widget voice; Eve/Grok realtime voice is pending."
-      : "Caller is in Chat Randy text mode.";
-  const chipNote = body.chipId
-    ? CHIP_INTENT_NOTES[body.chipId] ?? `UI chip selected: ${body.chipId}.`
-    : "";
+/** Sampling for the sales concierge: steady facts, natural tone, short replies. */
+export const GROK_TEMPERATURE = 0.4;
+/** Reasoning models spend part of this on thinking; the prompt keeps replies to 2-4 sentences. */
+export const GROK_MAX_TOKENS = 1_500;
 
+/** Exactly what goes to xAI for one turn (exported for tests; no network). */
+export function buildGrokRequest(body: RandyChatBody, model = getGrokModel()) {
+  const systemPrompt = buildBirchChatSystemPrompt({
+    mode: body.mode,
+    chipId: body.chipId,
+    pagePath: body.pagePath,
+    checkout: siteCheckoutState(),
+  });
+  return {
+    model,
+    max_tokens: GROK_MAX_TOKENS,
+    temperature: GROK_TEMPERATURE,
+    ...(model.startsWith("grok-3-mini") ? { reasoning_effort: "low" } : {}),
+    messages: [
+      { role: "system", content: systemPrompt },
+      // Full recent thread (both sides) so the model keeps context across turns.
+      ...modelWindow(body.messages).map((m) => ({
+        role: m.role === "assistant" ? "assistant" : "user",
+        content: m.content,
+      })),
+    ],
+  };
+}
+
+async function callGrok(body: RandyChatBody, apiKey: string): Promise<string> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), PROVIDER_TIMEOUT_MS);
 
@@ -506,27 +518,7 @@ async function callGrok(
         "content-type": "application/json",
         authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model,
-        // grok-3-mini reasons before answering; reasoning tokens share this budget,
-        // so 420 could yield empty content (→ 503). Keep replies short via the prompt.
-        max_tokens: 1_200,
-        temperature: 0.6,
-        ...(model.startsWith("grok-3-mini") ? { reasoning_effort: "low" } : {}),
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "system", content: BIRCH_SITE_SCOPE_PROMPT },
-          { role: "system", content: birchCanonicalFacts() },
-          {
-            role: "system",
-            content: `${modeNote} ${chipNote} Keep replies short (2–5 sentences). Never invent checkout URLs. Birch Reserve only unless the visitor raises another company. At most one URL per reply, from the verified routing table only.`.trim(),
-          },
-          ...modelWindow(body.messages).map((m) => ({
-            role: m.role === "assistant" ? "assistant" : "user",
-            content: m.content,
-          })),
-        ],
-      }),
+      body: JSON.stringify(buildGrokRequest(body)),
       signal: controller.signal,
     });
 
@@ -639,23 +631,17 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
     return;
   }
 
-  let systemPrompt: string;
-  try {
-    systemPrompt = loadVoiceCloserSystemPrompt();
-  } catch (error) {
-    req.log?.error(
-      { err: error instanceof Error ? error.message : "knowledge_load_failed" },
-      "Randy chat knowledge load failed",
-    );
-    res.status(503).json(disabledPayload("knowledge", "Randy chat knowledge pack unavailable."));
-    return;
-  }
-
   const startedAt = Date.now();
   try {
-    const raw = await callGrok(systemPrompt, body, apiKey);
+    const raw = await callGrok(body, apiKey);
     const { text: withoutMarker, callback } = extractCallbackMarker(raw);
-    let text = polishReply(withoutMarker, body.messages);
+    let text = softenReply(polishReply(withoutMarker, body.messages));
+    const banned = findBannedContent(text);
+    if (banned) {
+      // Hard content rule tripped: send the deterministic answer instead (never the slip).
+      req.log?.warn({ kind: "chat_guard", rule: banned }, "Randy chat reply replaced by FAQ (guard)");
+      text = birchFaqAnswer(body.messages).text;
+    }
     if (callback) {
       const alert = await sendChatCallbackAlert(callback, body, qa);
       req.log?.info({ kind: "chat_callback", alert: alert.status }, "Randy chat call-back submitted");
