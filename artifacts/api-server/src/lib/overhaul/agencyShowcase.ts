@@ -31,7 +31,7 @@ export const AGENCY_SHARE = {
  * Brand bonus credit: already stated for brands on /advertise/brands (DEPOSIT_TIERS, +5/+10/+15%).
  * It is the client's media credit, separate from the agency's 10% cash.
  */
-export const BRAND_BONUS_LINE = `Brand bonus credit (the client's, separate from your ${AGENCY_CASH_PCT}% cash): ${DEPOSIT_TIERS.map((t) => `+${t.bonusPct}% from $${t.usd.toLocaleString("en-US")}`).join(", ")} USD prepay.`;
+export const BRAND_BONUS_LINE = `Client tests start self-serve on the $190 USD 7-day look or the $490 USD reserve; premium slots by inquiry. Separate from your ${AGENCY_CASH_PCT}% cash.`;
 
 /** Worked examples on the public tiers: $490 seat (card) and the $25K premium floor (inquire). */
 export const AGENCY_EXAMPLES = [

@@ -38,7 +38,7 @@ const NAV_LINKS = [
 const FOOTER_COLS = [
   { label: 'Advertise', items: [{ href: '/advertise/brands', label: 'Brands' }, { href: '/advertise/local', label: 'Local businesses & studios' }, { href: '/rates', label: 'Rates' }, { href: '/match', label: 'Match your audience' }, { href: '/audiences', label: 'Audience insights' }, { href: '/media-kit', label: 'Media kit' }, { href: MEDIA_KIT_ONE_PAGER_HREF, label: 'Media kit PDF' }] },
   { label: 'Publish', items: [{ href: '/publish/brands', label: 'Brands' }, { href: '/publish/studios', label: 'Studios & retail' }, { href: 'https://www.scalehealth.ca/clinichubs', label: 'scalehealth.ca/clinichubs' }] },
-  { label: 'More', items: [{ href: '/hubs', label: 'Hubs' }, { href: '/agencies', label: 'Agencies' }, { href: '/buyers', label: 'Buyers' }, { href: '/llms.txt', label: 'llms.txt' }, { href: '/inventory', label: 'Live inventory' }, { href: '/insights', label: 'Insights' }, { href: '/about', label: 'About' }, { href: '/terms', label: 'Terms' }, { href: '/privacy', label: 'Privacy' }] },
+  { label: 'More', items: [{ href: '/hubs', label: 'Hubs' }, { href: '/agencies', label: 'Agencies' }, { href: '/buyers', label: 'Buyers' }, { href: '/llms.txt', label: 'llms.txt' }, { href: '/inventory', label: 'Partner inventory' }, { href: '/insights', label: 'Insights' }, { href: '/about', label: 'About' }, { href: '/terms', label: 'Terms' }, { href: '/privacy', label: 'Privacy' }] },
 ] as const;
 
 export function Layout({ children }: { children: ReactNode }) {
