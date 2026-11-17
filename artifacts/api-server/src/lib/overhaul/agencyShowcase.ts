@@ -71,5 +71,23 @@ export const SPEC_ROWS = SURFACES.map((s) => ({
   inquire: isPremiumPlacement(s.key),
 }));
 
+/**
+ * Plan by goal (daily scan, Nov 17 2026; Uber Advertising-style full-funnel framing).
+ * Maps a client brief's goal to the hub placement that fits it. Rates and "how to buy" are read
+ * from SPEC_ROWS (no new prices); "measured by" lists only the reporting already published
+ * (views, clicks, UTM visits, promo-code redemptions). No lift, CTR or reach claims.
+ */
+const GOALS: Array<{ key: string; goal: string; brief: string; placement: (typeof SURFACES)[number]["key"]; measure: string }> = [
+  { key: "awareness", goal: "Awareness", brief: "Get the brand seen by health and wellness members.", placement: "hub_home", measure: "Views and clicks" },
+  { key: "consideration", goal: "Consideration", brief: "Sit next to products, services and bookings while members browse.", placement: "product_services", measure: "Clicks and UTM visits" },
+  { key: "conversion", goal: "Conversion", brief: "Reach members right after they've paid for an order or booking.", placement: "post_purchase", measure: "UTM visits and promo-code redemptions" },
+  { key: "loyalty", goal: "Retention & loyalty", brief: "Stay in front of members who come back to their account.", placement: "member_dashboard", measure: "Clicks and promo-code redemptions" },
+];
+
+export const GOAL_PLAN = GOALS.map((g) => {
+  const row = SPEC_ROWS.find((r) => r.key === g.placement)!;
+  return { ...g, label: row.label, moment: row.moment, cpmFloorUsd: row.cpmFloorUsd, cpcFloorUsd: row.cpcFloorUsd, inquire: row.inquire, buy: row.inquire ? "Insertion order (inquire)" : "Card reserve or insertion order" };
+});
+
 export const INVENTORY_LINE = `First-party post-purchase and member-hub placements across private, co-branded health and wellness hubs.`;
 export const SPEND_DOWN_MONTHS = INVENTORY.liveSpendDownMonths;

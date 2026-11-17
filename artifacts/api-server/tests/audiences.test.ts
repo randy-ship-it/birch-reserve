@@ -67,3 +67,9 @@ test("market context (Nov 16 2026): every public-research figure is cited, dated
   assert.match(page, /not the size of our audience, our reach or what a campaign will deliver/);
   assert.ok(A.SOURCES.some((s) => /Public research/.test(s.source)));
 });
+
+test("market context (Nov 17 2026): queued categories added with citations; Pets marked in queue", () => {
+  for (const k of ["fruit-veg", "pets-ca", "pets-us"]) assert.ok(A.MARKET_CONTEXT.some((m) => m.key === k), k);
+  assert.ok(A.MARKET_CONTEXT.filter((m) => /Pets/.test(m.pillar)).every((m) => /in queue/.test(m.pillar)));
+  assert.equal(new Set(A.MARKET_CONTEXT.map((m) => m.key)).size, A.MARKET_CONTEXT.length);
+});
