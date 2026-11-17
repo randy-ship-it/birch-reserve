@@ -47,6 +47,7 @@ const API_PATHS = [
   "/match/?",
   "/hubs/?",
   "/media-kit/?",
+  "/for(?:/.*)?",
   "/mediakit/?",
   "/agencies/?",
   "/ai-buyers/?",

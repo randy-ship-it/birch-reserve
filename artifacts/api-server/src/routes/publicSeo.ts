@@ -21,6 +21,7 @@ import {
   withRouteSeo,
 } from "../lib/publicSeo";
 import { currencyCookieHeader, decideCurrency } from "../lib/currency";
+import { getBrandFit } from "../lib/overhaul/brandFits";
 
 const router: IRouter = Router();
 
@@ -98,6 +99,31 @@ for (const path of SPA_SHELL_PATHS) {
     res.type("html").send(html);
   });
 }
+
+router.get("/for/:slug", (req, res, next) => {
+  const fit = getBrandFit(String(req.params.slug ?? ""));
+  if (!fit) {
+    next();
+    return;
+  }
+  const path = `/for/${fit.slug}`;
+  let html: string;
+  try {
+    html = withRouteSeo(readSpaIndexHtml(), path);
+    const title = `${fit.name} customer fit | Birch Reserve`;
+    html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${title}</title>`);
+    html = html.replace(
+      /<meta\s+name="description"[^>]*>/i,
+      `<meta name="description" content="${fit.lede.replaceAll('"', "&quot;")}" />`,
+    );
+  } catch (error) {
+    logger.error({ err: error, path }, "SPA shell for brand-fit page is missing");
+    res.status(500).type("text/plain").send("Page unavailable.");
+    return;
+  }
+  res.set("Cache-Control", "public, max-age=0, must-revalidate");
+  res.type("html").send(html);
+});
 
 const FILE_EXTENSION = /\.[a-z0-9]{1,8}$/i;
 
