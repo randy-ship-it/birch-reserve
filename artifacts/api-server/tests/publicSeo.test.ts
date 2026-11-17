@@ -436,3 +436,20 @@ test("the volume-bonus draft renders only with the draft flag, in the page curre
   assert.match(usd, /13\.0%/);
   assert.match(usd, /\$490 USD/);
 });
+
+test("GET /for/rad-roller is a public noindex shell and is not in the sitemap", async () => {
+  const res = await fetch(`${origin}/for/rad-roller`);
+  assert.equal(res.status, 200);
+  const html = await res.text();
+  assert.match(html, /id="root"/);
+  assert.match(html, /<meta name="robots" content="noindex"\s*\/>/);
+  assert.match(html, /<title>RAD Roller customer fit \| Birch Reserve<\/title>/);
+  assert.match(html, /<script type="module"/);
+  const miss = await fetch(`${origin}/for/not-a-real-brand`);
+  assert.equal(miss.status, 404);
+  const missHtml = await miss.text();
+  assert.match(missHtml, /<meta name="robots" content="noindex"\s*\/>/);
+  const map = await fetch(`${origin}/sitemap.xml`);
+  const xml = await map.text();
+  assert.doesNotMatch(xml, /\/for\//);
+});

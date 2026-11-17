@@ -32,6 +32,7 @@ import BrAgencies from '@/pages/br/agencies';
 import BrAiBuyers from '@/pages/br/ai-buyers';
 import BrAudiences from '@/pages/br/audiences';
 import BrSampleProfile from '@/pages/br/sample-profile';
+import BrForBrand from '@/pages/br/for-brand';
 import SellAdsPage from '@/pages/sell-ads';
 import Terms from '@/pages/terms';
 import Privacy from '@/pages/privacy';
@@ -278,6 +279,9 @@ function Router() {
         </Route>
         <Route path="/agencies">
           <Layout><BrAgencies /></Layout>
+        </Route>
+        <Route path="/for/:slug">
+          <Layout><BrForBrand /></Layout>
         </Route>
         <Route path="/audiences/sample-profile">
           <Layout><BrSampleProfile /></Layout>

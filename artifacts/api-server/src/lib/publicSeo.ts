@@ -85,6 +85,13 @@ const CANONICAL_ALIAS: Readonly<Record<string, string>> = {
 
 const NOINDEX_PATHS = new Set<string>(["/success", "/splash/activation"]);
 
+export function isNoIndexPath(pathname: string): boolean {
+  const clean = normalizedPath(pathname);
+  if (NOINDEX_PATHS.has(clean)) return true;
+  // Unlisted brand-fit pages (/for/:slug) are public with the link, but never indexed.
+  return clean === "/for" || clean.startsWith("/for/");
+}
+
 export function normalizedPath(pathname: string): string {
   const withSlash = pathname.startsWith("/") ? pathname : `/${pathname}`;
   const clean = withSlash.length > 1 ? withSlash.replace(/\/+$/, "") : "/";
@@ -216,7 +223,7 @@ export function withRouteSeo(html: string, pathname: string): string {
     next = replaceTag(next, /<meta\s+name="twitter:image"[^>]*>/i, `<meta name="twitter:image" content="${routeImage}" />`);
     if (meta.jsonld) next = next.replace("</head>", `<script type="application/ld+json">${JSON.stringify(meta.jsonld).replace(/</g, "\\u003c")}</script>\n</head>`);
   }
-  if (NOINDEX_PATHS.has(normalizedPath(pathname))) {
+  if (isNoIndexPath(pathname)) {
     next = replaceTag(next, /<meta\s+name="robots"[^>]*>/i, `<meta name="robots" content="noindex" />`);
   }
   return next;
