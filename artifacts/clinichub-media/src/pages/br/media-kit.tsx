@@ -7,6 +7,7 @@ import { PlacementVisual, type PlacementKey } from "@/components/br/placement-ex
 import { BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BUYER_FAQ_TITLE, BuyerFaq, EarlySlots, FlightTimeline, ProgramsCallout, SAMPLE_REPORT, FLIGHT_TIMELINE, SampleIoLink, SampleReport, SeeTheUnit } from "@/components/br/buyer-comfort";
+import { DoorRoute } from "@/components/br/door-route";
 import { AvailabilityStrip, CategoryRequestForm, FaceBeforeFlight, FounderNote, NETWORK_HUBS, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import {
   AGENCY_CASH_PCT,
@@ -285,6 +286,12 @@ export default function BrMediaKit() {
       </Block>
 
       {/* Five questions buyers ask (buyer comfort, Nov 17 2026) */}
+      <section id="doors" className="scroll-mt-20 border-b border-border/70 bg-foreground text-background">
+        <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14">
+          <DoorRoute requestHref="#request" testId="mk-doors" />
+        </div>
+      </section>
+
       <Block id="buyer-faq" eyebrow="Questions" title={BUYER_FAQ_TITLE}>
         <BuyerFaq />
       </Block>

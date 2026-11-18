@@ -6,6 +6,7 @@ import { UPGRADE_PATH_LINE } from "../../../../api-server/src/lib/overhaul/media
 import { MediaKitPdfLink, ProofStrip, SalesContact, TrustBand, TrustFaq } from "@/components/br/trust";
 import { QuickBuy } from "@/components/br/quick-buy";
 import { ModellingNote } from "@/components/br/buyer-comfort";
+import { DoorRoute } from "@/components/br/door-route";
 import { CategoryRequestForm, FaceBeforeFlight, FounderNote, PrimeHero, SALES_EMAIL, SALES_PHONE_DISPLAY, SALES_PHONE_HREF, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import { AgencyHero, AgencyPayouts, InsiderGrid, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
@@ -104,6 +105,10 @@ export default function BrHome() {
         <div className="mt-8">
           <ProofStrip />
         </div>
+      </Section>
+
+      <Section id="doors" tone="ink">
+        <DoorRoute requestHref="#request" testId="home-doors" large />
       </Section>
 
       <Section id="inventory">

@@ -325,3 +325,52 @@ test("media kit dual sales motion: programs callout under the tiers, one FAQ, sh
     assert.doesNotMatch(s, /\bCAD\b|deposit|guarantee(d)? (reach|delivery|results)|seats open|sales@birchreserve/i);
   }
 });
+
+test("street-team door section: est. 2026 headline from the census file, inquire-only, area-level, home + media kit only", async () => {
+  const { readFileSync, existsSync } = await import("node:fs");
+  const { resolve } = await import("node:path");
+  const { DOOR_ROUTE, DOOR_HEADLINE, DOOR_DETAIL_ROWS } = await import("../src/lib/doorRoute");
+  const { DOOR_ROUTE_DATA: D } = await import("../src/lib/doorRouteData");
+  const web = (rel: string) => readFileSync(resolve(process.cwd(), "../clinichub-media", rel), "utf8");
+
+  // est. 2026 incomes are the 2021 Census (2020 income) figures x the CPI factor, nearest $100.
+  const r100 = (n: number) => Math.round((n * D.incomeFactor) / 100) * 100;
+  assert.equal(D.est2026.avgHouseholdIncomeCad, r100(D.census2021.avgHouseholdIncome2020Cad));
+  assert.deepEqual([...D.est2026.medianHouseholdIncomeCadRange], D.census2021.medianHouseholdIncome2020CadRange.map(r100));
+  assert.equal(D.est2026.label, "est. 2026");
+
+  // Collapsed row: 3–4 est. 2026 stats, never the 2021 actuals.
+  assert.ok(DOOR_HEADLINE.length >= 3 && DOOR_HEADLINE.length <= 4);
+  assert.deepEqual(DOOR_HEADLINE.map((s) => s.value), ["$327K", "$166–206K", "71%", "68%"]);
+  assert.doesNotMatch(JSON.stringify(DOOR_HEADLINE), /267K|266,900|135|168/);
+  assert.match(DOOR_ROUTE.censusQualifier, /est\. 2026 · CAD/);
+  // Expanded view carries the 2021 actuals and the method.
+  assert.equal(DOOR_DETAIL_ROWS[0]!.census, "$266,900 (2020 income)");
+  assert.equal(DOOR_DETAIL_ROWS[1]!.census, "$135,000–$168,000");
+  assert.match(DOOR_ROUTE.censusMethod, /1\.226/);
+  assert.match(DOOR_ROUTE.censusMethod, /not a forecast/);
+  assert.match(DOOR_ROUTE.censusMethod, /carried forward/);
+
+  // Copy rules.
+  const copy = JSON.stringify({ DOOR_ROUTE, DOOR_HEADLINE, DOOR_DETAIL_ROWS, D });
+  assert.match(DOOR_ROUTE.title, /^Day 1: lead ambassador testing areas around our private network\.$/);
+  assert.match(DOOR_ROUTE.body, /sought-after door-to-door display and performance-based placements, targeted by neighbourhood/);
+  assert.match(DOOR_ROUTE.body, /limited by route/);
+  assert.match(DOOR_ROUTE.goal, /up to 1MM doors with multiple offers/);
+  assert.match(DOOR_ROUTE.goalNote, /target, modelled, not a guarantee/);
+  assert.match(DOOR_ROUTE.inquireNote, /by inquiry only/);
+  assert.doesNotMatch(copy, /exclusiv|USD|\bguaranteed\b|deposit/i);
+  // Area-level only: no postal codes, street names, house numbers or door counts.
+  assert.doesNotMatch(copy, /\b[A-Z]\d[A-Z] ?\d[A-Z]\d\b|\b[A-Z][a-z]+ (Avenue|Road|Street)\b|Deloraine|Melrose|Golfdale|doors (hit|knocked)|\b\d+ doors\b/);
+  for (const href of [DOOR_ROUTE.sourceHref, DOOR_ROUTE.cpiHref]) assert.match(href, /^https:\/\//);
+
+  // Placement: home and media kit, not /buycalc; map with webp + jpg fallback; collapsed expander.
+  assert.match(web("src/pages/br/home.tsx"), /<DoorRoute [^>]*testId="home-doors"/);
+  assert.match(web("src/pages/br/media-kit.tsx"), /<DoorRoute [^>]*testId="mk-doors"/);
+  assert.doesNotMatch(readFileSync(resolve(process.cwd(), "src/routes/publicBuying.ts"), "utf8"), /doorRoute|street team|ambassador/i);
+  const comp = web("src/components/br/door-route.tsx");
+  assert.match(comp, /<details className="group/);
+  assert.doesNotMatch(comp, /<details[^>]* open/);
+  assert.match(comp, /type="image\/webp"/);
+  for (const f of [DOOR_ROUTE.mapWebp, DOOR_ROUTE.mapJpg]) assert.ok(existsSync(resolve(process.cwd(), "../clinichub-media/public" + f)), f);
+});
