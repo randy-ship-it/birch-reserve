@@ -78,7 +78,7 @@ import {
 } from "./splashAdReservations";
 import { logger, recordUcpProxyForwardingShape } from "../lib/logger";
 import { publicSeoTags } from "../lib/publicSeo";
-import { BUYER_COMFORT_CSS, buyerFaqHtml, earlySlotsHtml, flightTimelineHtml, sampleIoCheckoutHtml, sampleIoFactHtml, seeTheUnitHtml } from "../lib/buyerComfortHtml";
+import { BUYER_COMFORT_CSS, buyerFaqHtml, flightTimelineHtml, heroInquireHtml, heroSubHtml, liveHubTalkHtml, offersSampleIoHtml, sampleIoCheckoutHtml, seeTheUnitHtml, sharedSeatsHtml } from "../lib/buyerComfortHtml";
 import { PREPAY_REFUND_CUTOFF_DAYS } from "../lib/reserveOffers";
 import { handleUiEvent } from "../lib/uiEvents";
 import { sendSalesAlert } from "../lib/salesAlert";
@@ -2357,27 +2357,29 @@ function renderBuycalcHtmlUsd(input: {
 <header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav aria-label="Buy page"><a class="tl" href="/media-kit">Media kit</a><a class="tl" href="#request">Ask about a placement</a><a class="tl tel" href="tel:+16479316278">(647) 931-6278</a>${currencyToggleHtml(currency, { sku: input.sku, format: input.format, category })}</nav></div></header>
 <main>
 <section class="hero"><div class="wrap"><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
+${heroSubHtml(price(look), price(seat))}
 <p class="avail" data-testid="buycalc-avail"><span class="dot" aria-hidden="true"></span><span><strong>Limited early placements</strong> · curated as hubs launch</span></p>
-${earlySlotsHtml()}
 <p class="lede">Reserve a share of display space across our growing network of private, members-only health and wellness hubs (physio, fitness and recovery today), with more launching. Your brand shows right after a member books or buys. All of it is media credit until the insertion order (IO), fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
 <div class="ctas"><a class="btn" href="/buycalc?sku=reserve-490#reserve" data-pick-sku="reserve-490">Reserve your space · ${price(seat)}</a><a class="btn line" href="/buycalc?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · ${price(look)}</a></div>
-<p class="hero-contact">Questions? <a href="tel:+16479316278">(647) 931-6278</a> · <a href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">sales@silverbirchgrowth.com</a> · <a href="#request">Ask about a placement</a></p></div></section>
+${heroInquireHtml()}</div></section>
 
 <section class="band" id="offers"><div class="wrap"><p class="kicker">Two ways in</p><h2>Pick your start.</h2>
 <div class="offers">${offerCard(look, { eyebrow: "7-day look", name: "See it before you commit", lines: ["See your placement for 7 days while you decide.", "Converts in full to the reserve within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Reserve", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the hub network. Credit lasts 12 months.`, "Placements are curated as hubs launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Reserve your space · ${price(seat)}` })}</div>
+${offersSampleIoHtml()}
 <!--BONUS_TIER_DRAFT-->
 </div></section>
 ${seeTheUnitHtml(price(look), price(seat))}
 
 <section class="band" id="included"><div class="wrap"><p class="kicker">What you get</p><h2>Plain terms.</h2>
-<ul class="facts"><li>A share of display space across the hub network. No auction.</li><li>100% of what you pay is media credit.</li><li>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</li><li>The insertion order names the hub and placement before anything runs.</li><li>Aggregate reporting only. No PHI, no clinical pixels.</li><li>No impression guarantee, and no reach or click forecast.</li>${sampleIoFactHtml()}</ul>
-<div class="proof"><p><span class="tag">Live placement</span><a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>, a listed physio hub. Your card sits at the booking and the plan. Illustrative until your insertion order names the hub.</p>
+<ul class="facts"><li>A share of display space across the hub network. No auction.</li><li>100% of what you pay is media credit.</li><li>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</li><li>The insertion order names the hub and placement before anything runs.</li><li>Aggregate reporting only. No PHI, no clinical pixels.</li><li>No impression guarantee, and no reach or click forecast.</li></ul>
+<div class="proof"><p><span class="tag">Live hub</span><a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>, a listed physio hub. Your card sits at the booking and the plan. Illustrative until your insertion order names the hub.${liveHubTalkHtml()}</p>
 <p><span class="tag">Public benchmark</span>Not a Birch result: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p></div>
 </div></section>
 ${flightTimelineHtml(price(look), price(seat))}
 
 <section class="band" id="categories"><div class="wrap"><p class="kicker">The network</p><h2>A growing network of private hubs.</h2>
 <p class="open-count"><strong>Limited early placements</strong> · We curate placements as each hub launches. Want a premium slot or something custom? Ask below.</p>
+${sharedSeatsHtml()}
 <ul class="cat-strip" data-testid="network-hubs"><li><span style="min-height:0">Integrity Fitness</span></li><li><span style="min-height:0">DR-HO'S physio</span></li><li><span style="min-height:0">More hubs launching</span></li></ul>
 </div></section>
 
@@ -2411,7 +2413,7 @@ ${buyerFaqHtml(price(look), price(seat))}
 <button id="r-submit" class="btn" type="submit">Send request</button>
 <p id="r-message" role="status" aria-live="polite"></p>
 </form>
-<aside class="talk"><h3>Talk to a person</h3><p>Same-day replies on weekdays.</p><a class="btn" href="tel:+16479316278">Call (647) 931-6278</a><a class="btn line" href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20placement%20request">sales@silverbirchgrowth.com</a></aside>
+<aside class="talk"><h3>Talk to us</h3><p>We reply within 1 business day.</p><a class="btn" href="tel:+16479316278">Call (647) 931-6278</a><a class="btn line" href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20placement%20request">sales@silverbirchgrowth.com</a></aside>
 </div></div></section>
 </main>
 <footer><div class="wrap"><p>Media credit until IO · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only</p><p>Silver Birch Growth Inc. · Toronto, Ontario · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · <a href="tel:+16479316278">(647) 931-6278</a></p><p>Machine-readable catalog: <a href="/v1/catalog.json">/v1/catalog.json</a> · <a href="/v1/quote?sku=reserve-490&amp;format=post_checkout&amp;days=30">/v1/quote</a> · <a href="/llms.txt">/llms.txt</a></p></div></footer>

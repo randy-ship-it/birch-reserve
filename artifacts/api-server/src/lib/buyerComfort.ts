@@ -28,6 +28,37 @@ export const EARLY_SLOTS = {
   line: "We're curating the network hub by hub. Early buyers take shared category seats as each hub launches, at starter rates. Every seat is shared, not exclusive.",
 } as const;
 
+/**
+ * Dual sales motion (Randy, Nov 17 2026 8:56 PM ET): self-serve plus phone / premium closes.
+ * The 647 line is a phone assistant that books a call back, so copy says "request a call back",
+ * never "the sales team walks you through" on the call.
+ */
+export const SALES_PHONE_DISPLAY = "(647) 931-6278";
+export const SALES_PHONE_HREF = "tel:+16479316278";
+export const SALES_EMAIL = "sales@silverbirchgrowth.com";
+export const REQUEST_HREF = "/buycalc#request";
+export const REPLY_LINE = "We reply within 1 business day.";
+
+export const DUAL_MOTION = {
+  /** A1: /buycalc subhead under the H1. */
+  heroSub: "Start yourself with a $190 USD look or $490 USD reserve. Or talk to us about a larger display share, priority placement, or a program across more than one hub.",
+  /** A2: secondary inquire link under the self-serve buttons. */
+  inquireLabel: "Ask about a premium slot or multi-hub program",
+  callBack: "to request a call back",
+  /** B1: one line under the offer cards. */
+  sampleIoLead: "Before you pay: read the",
+  sampleIoLabel: "sample insertion order",
+  sampleIoTail: "you'd approve before anything runs.",
+  /** A3: /media-kit, under the tier cards. */
+  programsTitle: "Larger or multi-hub programs start with a call.",
+  programsBody: "We'll walk through display share, priority placement and the sample insertion order, and the scope is set on your IO.",
+  /** A4 (merged with the early-slots strap on /buycalc; short form under A3 on /media-kit). */
+  sharedBuycalc: "Self-serve seats stay shared, open to more than one brand, while the network is curated hub by hub. Only a premium slot locks a category.",
+  sharedKit: "Self-serve seats stay shared, not exclusive, while the network is curated hub by hub. Exclusivity is a premium slot only.",
+  /** B3: added to the live hub proof line on /buycalc. */
+  liveHubLead: "Want to talk through current options?",
+} as const;
+
 /** 1. How a test dollar becomes a flight. */
 export const FLIGHT_TIMELINE = {
   kicker: "From card to flight",
@@ -62,11 +93,26 @@ export const SEE_THE_UNIT = {
   caption: "Example of the mock Birch sends: an illustrative card drawn on a live hub page (DR-HO'S recovery path). Not a live ad and not a Birch result. Your IO names the hub and surface.",
 } as const;
 
-/** 3. Five questions buyers ask. Answers match /terms. */
-export const BUYER_FAQ: Array<{ q: string; a: string; link?: BuyerLink }> = [
+/** 3. Questions buyers ask. Answers match /terms. B2 (Nov 17 8:56 PM ET) added the three dual-motion questions. */
+export const BUYER_FAQ_TITLE = "Questions buyers ask.";
+export const BUYER_FAQ: Array<{ q: string; a: string; link?: BuyerLink; tail?: string }> = [
+  {
+    q: "Can I start with a small test and grow?",
+    a: "Yes. The $190 USD look and the $490 USD reserve are media credit, paid by card. A larger display share, priority placement or a program across more than one hub is a conversation:",
+    link: { label: "ask about a premium slot", href: "/buycalc#request" },
+  },
+  {
+    q: "What happens after I pay?",
+    a: "Your payment is media credit. An insertion order names the hub and surface before anything runs. The $490 USD reserve is fully refundable until 14 days before the launch date on your IO. The $190 USD look converts in full to the reserve within 7 days, otherwise it's refunded.",
+  },
   {
     q: "Is my category exclusive or shared?",
     a: "Shared, not exclusive. The $490 USD reserve is a shared category seat, open to more than one brand in the same category. It does not lock your category, and neither does the $190 USD look. Category exclusivity is only available as a premium slot ($25,000 to $50,000 USD, inquire only, set on an insertion order).",
+  },
+  {
+    q: "How do larger or priority placements work?",
+    a: "Premium slots are inquire only, never a card purchase. Send a request or call (647) 931-6278 to request a call back. We reply with an insertion order that sets the term, display share and placement.",
+    link: { label: "Ask about a premium slot", href: "/buycalc#request" },
   },
   {
     q: "What if we can't name a hub?",

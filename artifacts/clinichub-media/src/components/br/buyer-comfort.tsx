@@ -4,7 +4,12 @@
  */
 import {
   BUYER_FAQ,
+  BUYER_FAQ_TITLE,
   CREATIVE_BRIEF_HREF,
+  DUAL_MOTION,
+  SALES_EMAIL,
+  SALES_PHONE_DISPLAY,
+  SALES_PHONE_HREF,
   EARLY_SLOTS,
   FLIGHT_TIMELINE,
   LIVE_HUB_LINKS,
@@ -145,11 +150,14 @@ export function SampleReport() {
 
 export function BuyerFaq() {
   return (
-    <div className="space-y-2" data-testid="buyer-faq">
+    <div className="max-w-3xl border-t border-foreground" data-testid="buyer-faq">
       {BUYER_FAQ.map((f) => (
-        <details key={f.q} className="border border-foreground/20 bg-white p-4">
-          <summary className="cursor-pointer font-semibold">{f.q}</summary>
-          <p className="mt-2 text-sm text-foreground/80">
+        <details key={f.q} className="group border-b border-foreground/15">
+          <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-4 py-4 text-base font-semibold [&::-webkit-details-marker]:hidden">
+            {f.q}
+            <span aria-hidden className="flex-none font-display text-2xl leading-none transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <p className="pb-5 pr-9 text-sm leading-relaxed text-foreground/80">
             {f.a}
             {f.link ? (
               <>
@@ -164,4 +172,28 @@ export function BuyerFaq() {
   );
 }
 
-export { SAMPLE_REPORT, FLIGHT_TIMELINE };
+/** A3 + A4 (Nov 17 8:56 PM ET): one compact programs callout under the media kit tier cards. */
+export function ProgramsCallout() {
+  return (
+    <div className="mt-4 flex flex-col gap-4 border border-foreground/20 bg-secondary/40 p-5 md:flex-row md:items-center md:justify-between md:p-6" data-testid="programs-callout">
+      <div className="max-w-2xl">
+        <p className="font-display text-xl leading-snug">{DUAL_MOTION.programsTitle}</p>
+        <p className="mt-1 text-sm text-foreground/80">
+          We'll walk through display share, priority placement and the{" "}
+          <a href={SAMPLE_IO_HREF} className="font-semibold underline underline-offset-2" data-testid="programs-sample-io">sample insertion order</a>, and the scope is set on your IO.
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">{DUAL_MOTION.sharedKit}</p>
+      </div>
+      <div className="flex flex-col gap-2 text-sm sm:flex-row md:flex-none md:flex-col md:items-stretch">
+        <a href={SALES_PHONE_HREF} className="inline-flex min-h-11 items-center justify-center bg-foreground px-4 font-semibold text-background hover:bg-accent hover:text-foreground" data-testid="programs-call">
+          Request a call back · {SALES_PHONE_DISPLAY}
+        </a>
+        <a href={`mailto:${SALES_EMAIL}?subject=Birch%20Reserve%20program`} className="inline-flex min-h-11 items-center justify-center border border-foreground/30 px-4 font-semibold hover:border-foreground" data-testid="programs-email">
+          {SALES_EMAIL}
+        </a>
+      </div>
+    </div>
+  );
+}
+
+export { SAMPLE_REPORT, FLIGHT_TIMELINE, BUYER_FAQ_TITLE };

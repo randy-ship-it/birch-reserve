@@ -6,7 +6,7 @@ import { SALES_REPLY_LINE } from "@/lib/seller-identity";
 import { PlacementVisual, type PlacementKey } from "@/components/br/placement-example";
 import { BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
-import { BuyerFaq, EarlySlots, FlightTimeline, ModellingNote, SAMPLE_REPORT, FLIGHT_TIMELINE, SampleIoLink, SampleReport, SeeTheUnit } from "@/components/br/buyer-comfort";
+import { BUYER_FAQ_TITLE, BuyerFaq, EarlySlots, FlightTimeline, ProgramsCallout, SAMPLE_REPORT, FLIGHT_TIMELINE, SampleIoLink, SampleReport, SeeTheUnit } from "@/components/br/buyer-comfort";
 import { AvailabilityStrip, CategoryRequestForm, FaceBeforeFlight, FounderNote, NETWORK_HUBS, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import {
   AGENCY_CASH_PCT,
@@ -226,7 +226,6 @@ export default function BrMediaKit() {
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-foreground/55">{MEDIA_KIT_OFFERS.seat.name}</p>
                 <p className="mt-1 font-display text-4xl leading-none">{usd(MEDIA_KIT_OFFERS.seat.spendUsd)} <span className="text-lg">USD</span></p>
                 <p className="mt-1 text-xs text-muted-foreground">Reserves your share of the network. Fully refundable until 14 days before launch. <Tag>Modelled</Tag> Modelled estimate, not a guarantee: about {impr(seatEx.imprLo)}–{impr(seatEx.imprHi)} impressions at {cpm}.</p>
-                <ModellingNote className="mt-1" />
               </div>
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -252,6 +251,8 @@ export default function BrMediaKit() {
           </article>
         </div>
 
+        <ProgramsCallout />
+
         <h3 className="mt-8 flex items-center gap-2 font-display text-xl">The math <Tag>Modelled</Tag></h3>
         <div className="mt-3 divide-y divide-border border-y border-border text-sm" data-testid="mk-math">
           {MEDIA_KIT_EXAMPLES.map((e) => (
@@ -267,7 +268,6 @@ export default function BrMediaKit() {
         <p className="mt-3 text-xs text-muted-foreground">
           All prices in USD. Effective {cpm} and every impression figure above are modelled estimates, not a guarantee. Impressions = credit ÷ CPM × 1,000. Final rate, currency and term are set on your IO. Premium is inquire-only.
         </p>
-        <ModellingNote className="mt-2" />
       </Block>
 
       {/* Sample report layout (buyer comfort, Nov 17 2026) */}
@@ -278,7 +278,6 @@ export default function BrMediaKit() {
       {/* Categories */}
       <Block id="categories" eyebrow="The network" title="A growing network of private hubs." tone="soft">
         <AvailabilityStrip />
-        <EarlySlots />
         <p className="mt-4 text-sm text-foreground/80">Your reserve buys a share of display space across the network. We curate placements as each hub launches, and your insertion order names where you show before anything runs. Want exclusivity, a premium slot, or something custom? Ask below.</p>
         <div id="request" className="mt-8 scroll-mt-20 max-w-2xl">
           <CategoryRequestForm path="/media-kit" />
@@ -286,7 +285,7 @@ export default function BrMediaKit() {
       </Block>
 
       {/* Five questions buyers ask (buyer comfort, Nov 17 2026) */}
-      <Block id="buyer-faq" eyebrow="Questions" title="Five questions buyers ask.">
+      <Block id="buyer-faq" eyebrow="Questions" title={BUYER_FAQ_TITLE}>
         <BuyerFaq />
       </Block>
 
