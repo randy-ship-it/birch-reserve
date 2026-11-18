@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { AGENCY_EXAMPLES, AGENCY_SHARE, BRAND_BONUS_LINE, GOAL_PLAN, INVENTORY_LINE, SELL_ASSUMPTION_LINE, SELL_ASSUMPTION_PCT, SPEC_ROWS } from "../src/lib/overhaul/agencyShowcase";
+import { AGENCY_EXAMPLES, AGENCY_FAQ, AGENCY_SHARE, BRAND_BONUS_LINE, GOAL_PLAN, PLAIN_TERMS, INVENTORY_LINE, SELL_ASSUMPTION_LINE, SELL_ASSUMPTION_PCT, SPEC_ROWS } from "../src/lib/overhaul/agencyShowcase";
 import { AGENCY_CASH_PCT, agencyCash } from "../src/lib/overhaul/mediaKit";
 import { AGENCY, DEPOSIT_TIERS, SURFACES } from "../src/lib/overhaul/model";
+import { OVERHAUL_ROUTES, llmsTxt } from "../src/lib/overhaul/seo";
 
 const read = (f: string) => readFileSync(resolve(process.cwd(), f), "utf8");
 
@@ -112,4 +113,37 @@ test("plan by goal (Nov 17 2026): four goals map to the four spec-sheet placemen
   assert.match(page, /id="plan-by-goal"/);
   assert.match(page, /<GoalPlanner \/>/);
   assert.match(read("../clinichub-media/src/components/br/agency-showcase.tsx"), /Starting rates are illustrative planning estimates, not a quote/);
+});
+
+test("in plain terms (Nov 18 2026): five category answers, published terms only, one server-side FAQPage on /agencies", () => {
+  assert.deepEqual(PLAIN_TERMS.map((t) => t.key), ["what", "moment", "data", "report", "start"]);
+  const text = PLAIN_TERMS.map((t) => t.q + " " + t.a).join("\n");
+  // Restates published terms only: the two USD offers, the 14-day refund window, aggregate reporting.
+  assert.match(text, /\$190 USD 7-day look/);
+  assert.match(text, /\$490 USD reserve/);
+  assert.match(text, /fully refundable until 14 days before the launch date/);
+  assert.match(text, /Never names, contact details or health information/);
+  // No counts, claims, guarantees, banned names or CAD.
+  assert.doesNotMatch(text, /guarantee|lift|CTR|\b\d+MM\b|million|listed partners|signed partner|Align\b|Clairvoyant|Kalaya|80 locations|we sell them customers|\bCAD\b/i);
+  // Only the four published placements.
+  for (const s of ["post-purchase", "hub home page", "product and services pages", "member dashboard"]) assert.match(text, new RegExp(s, "i"), s);
+  const meta = OVERHAUL_ROUTES["/agencies"].jsonld as { "@graph": Array<Record<string, unknown>> };
+  const faqs = meta["@graph"].filter((n) => n["@type"] === "FAQPage");
+  assert.equal(faqs.length, 1);
+  assert.equal((faqs[0].mainEntity as unknown[]).length, PLAIN_TERMS.length + AGENCY_FAQ.length);
+  assert.ok(meta["@graph"].some((n) => n["@type"] === "Service"));
+  const page = read("../clinichub-media/src/pages/br/agencies.tsx");
+  assert.match(page, /id="plain-terms"/);
+  assert.match(page, /<PlainTerms \/>/);
+  // The client FAQ does not emit a second FAQPage.
+  assert.match(page, /<Faq items=\{AGENCY_FAQ\} schema=\{false\} \/>/);
+  assert.match(llmsTxt(), /agencies#plain-terms/);
+});
+
+test("home (Nov 18 2026): one FAQPage for the page, not two", () => {
+  const home = read("../clinichub-media/src/pages/br/home.tsx");
+  assert.match(home, /<TrustFaq schema=\{false\} \/>/);
+  assert.match(home, /<Faq items=\{FAQ\} schema=\{false\} \/>/);
+  assert.equal((home.match(/"FAQPage"/g) ?? []).length, 1);
+  assert.match(home, /\[\.\.\.TRUST_FAQ, \.\.\.FAQ\]/);
 });

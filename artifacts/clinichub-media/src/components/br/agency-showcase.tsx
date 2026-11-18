@@ -12,6 +12,7 @@ import {
   BRAND_BONUS_LINE,
   GOAL_PLAN,
   INVENTORY_LINE,
+  PLAIN_TERMS,
   SELL_ASSUMPTION_LINE,
   SELL_ASSUMPTION_PCT,
   SPEC_ROWS,
@@ -28,6 +29,24 @@ function Kicker({ children, dark = false }: { children: ReactNode; dark?: boolea
 function Tag({ children, tone = "line" }: { children: ReactNode; tone?: "line" | "lime" | "dark" }) {
   const t = tone === "lime" ? "bg-accent text-accent-foreground" : tone === "dark" ? "border border-background/35 text-background/75" : "border border-foreground/25 text-foreground/70";
   return <span className={`inline-flex items-center px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${t}`}>{children}</span>;
+}
+
+/**
+ * In plain terms (Nov 18 2026 daily scan): five forwardable answers that define the category.
+ * Copy lives in PLAIN_TERMS (api-server) so the server head can emit the same Q&As as FAQPage JSON-LD.
+ */
+export function PlainTerms() {
+  return (
+    <ol className="grid gap-px border border-foreground/15 bg-foreground/15 md:grid-cols-2" data-testid="plain-terms">
+      {PLAIN_TERMS.map((t, i) => (
+        <li key={t.key} className={`min-w-0 bg-background p-6 ${i === PLAIN_TERMS.length - 1 && PLAIN_TERMS.length % 2 ? "md:col-span-2" : ""}`}>
+          <Kicker>{String(i + 1).padStart(2, "0")}</Kicker>
+          <h3 className="mt-2 font-display text-2xl leading-tight">{t.q}</h3>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t.a}</p>
+        </li>
+      ))}
+    </ol>
+  );
 }
 
 /**

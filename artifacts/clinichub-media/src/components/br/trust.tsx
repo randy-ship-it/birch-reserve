@@ -281,10 +281,10 @@ export function TrustBand() {
   );
 }
 
-export function TrustFaq() {
+export function TrustFaq({ schema = true }: { schema?: boolean }) {
   return (
     <div data-testid="trust-faq">
-      <Faq items={TRUST_FAQ} />
+      <Faq items={TRUST_FAQ} schema={schema} />
     </div>
   );
 }
