@@ -1,5 +1,6 @@
 /** Per-route head + llms.txt for the overhaul routes (crawlable without JS). */
 import { slotOffers, areaLockOffer } from "./agent";
+import { AGENCY_FAQ, PLAIN_TERMS, faqPageJsonLd } from "./agencyShowcase";
 import { AGENCY, AREA_LOCK, BRAND_HUBS, INVENTORY, PLACEMENT_LABELS, PUBLISHER_INCENTIVE, SLOT_LADDER, TAM, areaLockGuaranteedViews } from "./model";
 
 export const OVERHAUL_OG_IMAGE = "https://birchreserve.net/og-birch-reserve-hubs.png";
@@ -64,7 +65,14 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/agencies": {
     title: "For agencies & brokers | Birch Reserve",
     description: "Agencies, brokers and media resellers: prepay a client test into private health & wellness hubs from $490 USD. Spec sheet, sample IO, UTM and promo-code reporting, 10% of media spend paid in cash to the agency of record.",
-    jsonld: { "@context": "https://schema.org", "@type": "Service", name: "Agency test budgets", provider: ORG, areaServed: ["CA", "US"], serviceType: "Retail media / post-purchase advertising" },
+    jsonld: {
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "Service", name: "Agency test budgets", provider: ORG, areaServed: ["CA", "US"], serviceType: "Retail media / post-purchase advertising" },
+        // Nov 18 2026: the one FAQPage for /agencies (plain-terms explainer + agency FAQ), crawlable without JS.
+        faqPageJsonLd([...PLAIN_TERMS, ...AGENCY_FAQ]),
+      ],
+    },
   },
 };
 
@@ -137,6 +145,7 @@ export function llmsTxt(): string {
     "- Match your audience: https://birchreserve.net/match",
     "- Hubs: https://birchreserve.net/hubs · Rates: https://birchreserve.net/rates",
     `- Agencies: https://birchreserve.net/agencies · ${AGENCY.line}`,
+    "- In plain terms (what Birch is, the moment, where figures come from, reporting, how to start): https://birchreserve.net/agencies#plain-terms",
     "- Publishers (studios & retail): https://birchreserve.net/publish/studios · Brands with a recovery audience: https://birchreserve.net/publish/brands",
     "",
     "## For AI agents",

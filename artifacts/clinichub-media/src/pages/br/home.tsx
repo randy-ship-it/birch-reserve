@@ -3,7 +3,7 @@ import { BrandBanners } from "@/components/br/brand-banners";
 import { FourPaths, MetaComparison, PositioningBand, SurfacesGrid } from "@/components/br/blocks";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
 import { UPGRADE_PATH_LINE } from "../../../../api-server/src/lib/overhaul/mediaKit";
-import { MediaKitPdfLink, ProofStrip, SalesContact, TrustBand, TrustFaq } from "@/components/br/trust";
+import { MediaKitPdfLink, ProofStrip, SalesContact, TRUST_FAQ, TrustBand, TrustFaq } from "@/components/br/trust";
 import { QuickBuy } from "@/components/br/quick-buy";
 import { ModellingNote } from "@/components/br/buyer-comfort";
 import { DoorRoute } from "@/components/br/door-route";
@@ -276,8 +276,10 @@ export default function BrHome() {
             </div>
           </div>
           <div className="space-y-8">
-            <TrustFaq />
-            <Faq items={FAQ} />
+            {/* Nov 18 2026: one FAQPage for the page (was two: trust + home), so search engines read it cleanly. */}
+            <TrustFaq schema={false} />
+            <Faq items={FAQ} schema={false} />
+            <JsonLd data={{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: [...TRUST_FAQ, ...FAQ].map((it) => ({ "@type": "Question", name: it.q, acceptedAnswer: { "@type": "Answer", text: it.a } })) }} />
           </div>
         </div>
       </Section>

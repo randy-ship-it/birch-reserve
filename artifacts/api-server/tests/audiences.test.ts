@@ -73,3 +73,14 @@ test("market context (Nov 17 2026): queued categories added with citations; Pets
   assert.ok(A.MARKET_CONTEXT.filter((m) => /Pets/.test(m.pillar)).every((m) => /in queue/.test(m.pillar)));
   assert.equal(new Set(A.MARKET_CONTEXT.map((m) => m.key)).size, A.MARKET_CONTEXT.length);
 });
+
+test("market context (Nov 18 2026): Longevity and Medi/Spa added with citations; Medi/Spa marked in queue", () => {
+  for (const k of ["age-65-ca", "spa-visits-us"]) assert.ok(A.MARKET_CONTEXT.some((m) => m.key === k), k);
+  const spa = A.MARKET_CONTEXT.find((m) => m.key === "spa-visits-us")!;
+  assert.match(spa.pillar, /in queue/);
+  assert.match(spa.url, /^https:\/\/experienceispa\.com\//);
+  const age = A.MARKET_CONTEXT.find((m) => m.key === "age-65-ca")!;
+  assert.match(age.url, /^https:\/\/www150\.statcan\.gc\.ca\//);
+  assert.equal(age.stat, "20.0%");
+  assert.equal(new Set(A.MARKET_CONTEXT.map((m) => m.key)).size, A.MARKET_CONTEXT.length);
+});

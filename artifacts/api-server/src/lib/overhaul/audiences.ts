@@ -240,6 +240,25 @@ export const MARKET_CONTEXT: Array<{ key: string; pillar: string; stat: string; 
     url: "https://www.petfoodindustry.com/pet-food-market/market-trends-and-reports/news/15741428/report-pet-ownership-expands-as-gen-z-shifts-trends",
     year: "2025",
   },
+  // Nov 18 2026 daily scan: Longevity and Medi/Spa. Same rules: cited, dated, population-level, never Birch reach.
+  {
+    key: "age-65-ca",
+    pillar: "Longevity",
+    stat: "20.0%",
+    line: "of people in Canada were aged 65 and older on July 1, 2026, about 1 in 5 and up 0.6 points in a year.",
+    source: "Statistics Canada, The Daily: Canada's population estimates, age and gender (Table 17-10-0005-01)",
+    url: "https://www150.statcan.gc.ca/n1/daily-quotidien/260923/dq260923a-eng.htm",
+    year: "2026",
+  },
+  {
+    key: "spa-visits-us",
+    pillar: "Medi/Spa (in queue)",
+    stat: "191 million",
+    line: "spa visits in the US in 2025, up 1.8%, at an average of $123.10 USD in revenue per visit.",
+    source: "International SPA Association, 2026 ISPA U.S. Spa Industry Study \u201cBig Five\u201d (conducted by PwC)",
+    url: "https://experienceispa.com/press-releases/powered-by-the-industry-it-serves-ispas-2026-big-five-statistics-show-steady-gains-and-enduring-strength/",
+    year: "2026",
+  },
 ];
 
 export const SOURCES: Array<{ basis: Basis; source: string; what: string }> = [

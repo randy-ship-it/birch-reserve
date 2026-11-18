@@ -108,7 +108,8 @@ export function JsonLd({ data }: { data: unknown }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />;
 }
 
-export function Faq({ items }: { items: Array<{ q: string; a: string }> }) {
+/** One FAQPage per page: pass schema={false} when the page (or the server head) emits a combined FAQPage. */
+export function Faq({ items, schema = true }: { items: Array<{ q: string; a: string }>; schema?: boolean }) {
   return (
     <div className="divide-y divide-border border-y border-border">
       {items.map((it) => (
@@ -120,7 +121,7 @@ export function Faq({ items }: { items: Array<{ q: string; a: string }> }) {
           <p className="mt-3 max-w-3xl leading-relaxed text-muted-foreground">{it.a}</p>
         </details>
       ))}
-      <JsonLd data={{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: items.map((it) => ({ "@type": "Question", name: it.q, acceptedAnswer: { "@type": "Answer", text: it.a } })) }} />
+      {schema && <JsonLd data={{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: items.map((it) => ({ "@type": "Question", name: it.q, acceptedAnswer: { "@type": "Answer", text: it.a } })) }} />}
     </div>
   );
 }

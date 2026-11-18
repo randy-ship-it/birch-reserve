@@ -89,5 +89,55 @@ export const GOAL_PLAN = GOALS.map((g) => {
   return { ...g, label: row.label, moment: row.moment, cpmFloorUsd: row.cpmFloorUsd, cpcFloorUsd: row.cpcFloorUsd, inquire: row.inquire, buy: row.inquire ? "Insertion order (inquire)" : "Card reserve or insertion order" };
 });
 
+/**
+ * In plain terms (Nov 18 2026 daily scan; CVS Media Exchange-style category explainer).
+ * Five answers a planner can forward to a client. Every answer restates copy already published on
+ * home, /audiences, /agencies, /media-kit or /terms: no new prices, no counts, no reach or lift claims.
+ * Rendered on /agencies#plain-terms and emitted server-side as FAQPage JSON-LD (crawlable without JS).
+ */
+export const PLAIN_TERMS: Array<{ key: string; q: string; a: string }> = [
+  {
+    key: "what",
+    q: "What is Birch Reserve?",
+    a: "Display and CPC ad space inside private health and wellness hubs: co-branded hubs from Recovery Brands, and health and wellness business hubs such as physio, gym, studio and clinic hubs. It is not an open auction or a public ad network. Placements run inside a private member experience, and every brand is hand-picked to fit the audience.",
+  },
+  {
+    key: "moment",
+    q: "Which moment does a placement reach?",
+    a: "Each hub has four placements: post-purchase, right after a paid order or booking (premium, by insertion order); the hub home page; product and services pages; and the member dashboard behind login. Each can be bought as display (priced per thousand views) or CPC (priced per click).",
+  },
+  {
+    key: "data",
+    q: "Where do the audience figures come from?",
+    a: "Every figure is labelled. Measured figures come from our own hub analytics and are shown as shares. Modelled figures are built from the customers of the brands launching on the network. Market context is cited public research about the population, not our reach. None of it is audited delivery; your campaign itself is measured with UTM links and promo codes.",
+  },
+  {
+    key: "report",
+    q: "What does the client get back?",
+    a: "Aggregate reporting per hub and surface: views, clicks, UTM visits and promo-code redemptions. Never names, contact details or health information.",
+  },
+  {
+    key: "start",
+    q: "How does a client start, and what is the risk?",
+    a: "Self-serve with the $190 USD 7-day look, which converts in full to the reserve within 7 days or is refunded, or the $490 USD reserve: 100% media credit, fully refundable until 14 days before the launch date on the insertion order. Premium slots are by inquiry. Nothing runs until the IO names the hub and surface.",
+  },
+];
+
+/** The /agencies FAQ (moved here from the page on Nov 18 2026 so the server can emit one FAQPage). */
+export const AGENCY_FAQ: Array<{ q: string; a: string }> = [
+  { q: "Can we prepay for several clients?", a: "Yes. One prepay can be split across clients; each client gets its own insertion order and reporting." },
+  { q: "Is there a commission?", a: "Yes: 10% of media spend, paid in cash to the agency of record. Small tests can start self-serve on the $190 USD look or the $490 USD reserve." },
+  { q: "Which placement fits which goal?", a: "Awareness: the hub home page. Consideration: product, services and booking pages. Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Retention and loyalty: the member dashboard behind login. One IO can mix them." },
+  { q: "How is performance tracked?", a: "Every placement carries your UTM parameters and, if you want, a promo code. We report views and clicks per hub and surface. Aggregate only." },
+  { q: "Do brokers and media resellers qualify?", a: "Yes. When you are the agency of record on the insertion order, you earn 10% of media spend, paid in cash, the same as an agency. List every brand you represent in one inquiry; each gets its own IO and reporting." },
+  { q: "Why lock a test now?", a: "New placements open at starter rates, and a placement's rate can step up only once reporting shows it performs. Prepaid credit keeps its rate for its term, and the $490 USD reserve stays fully refundable until 14 days before the launch date on the IO." },
+  { q: "Can our bots read this site?", a: "Yes: see /llms.txt, /sitemap.xml and the structured data on each page." },
+];
+
+/** schema.org FAQPage for a list of Q&As (one per page; Google flags duplicate FAQPage blocks). */
+export function faqPageJsonLd(items: Array<{ q: string; a: string }>): Record<string, unknown> {
+  return { "@type": "FAQPage", mainEntity: items.map((it) => ({ "@type": "Question", name: it.q, acceptedAnswer: { "@type": "Answer", text: it.a } })) };
+}
+
 export const INVENTORY_LINE = `First-party post-purchase and member-hub placements across private, co-branded health and wellness hubs.`;
 export const SPEND_DOWN_MONTHS = INVENTORY.liveSpendDownMonths;
