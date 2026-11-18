@@ -44,7 +44,7 @@ export function birchCanonicalFacts(): string {
     `- The agency of record earns ${AGENCY_CASH_PCT}% of media spend, paid in cash per the IO. Example: a $${seat.spendUsd} reserve pays the agency $${agencyCash(seat.spendUsd)}; a $25,000 premium slot pays $${agencyCash(25_000).toLocaleString("en-US")}.`,
     "",
     "LOCAL BUSINESSES",
-    `- Lock down my area: a deposit of $${AREA_LOCK.priceUsd.toLocaleString("en-US")} USD (launch rate until ${AREA_LOCK.launchRateUntil}) holds up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of their postal code for 1 to 6 months. Details at https://birchreserve.net/advertise/local.`,
+    `- Lock down my area: a $${AREA_LOCK.priceUsd.toLocaleString("en-US")} USD launch price (launch rate until ${AREA_LOCK.launchRateUntil}), never call it a deposit. It holds up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of their postal code for 1 to 6 months. Details at https://birchreserve.net/advertise/local.`,
     "",
     "NETWORK",
     "- Do not quote audience size, order counts, partner counts or savings versus Meta. Any view or impression figure is a modelled estimate and must be called modelled. Never say 8.7MM.",

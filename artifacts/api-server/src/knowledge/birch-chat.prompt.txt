@@ -605,7 +605,7 @@ AGENCIES
 - The agency of record earns 10% of media spend, paid in cash per the IO. Example: a $490 seat pays the agency $49; a $25,000 premium slot pays $2,500.
 
 LOCAL BUSINESSES
-- Lock down my area: a deposit of $4,900 CAD or $3,500 USD (launch rate until Dec 31, 2026) holds up to 50% of hub display within 5 km of their postal code for 1 to 6 months. Details at https://birchreserve.net/advertise/local.
+- Lock down my area: a $3,500 USD launch price (launch rate until Dec 31, 2026; never call it a deposit) holds up to 50% of hub display within 5 km of their postal code for 1 to 6 months. Details at https://birchreserve.net/advertise/local.
 
 NETWORK (modelled, partner-provided, not audited)
 - 20MM+ orders being onboarded across 42 listed partner brands. Listed partners are not yet live for display. Always call these modelled. Never say 8.7MM.

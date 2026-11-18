@@ -453,3 +453,34 @@ test("GET /for/rad-roller is a public noindex shell and is not in the sitemap", 
   const xml = await map.text();
   assert.doesNotMatch(xml, /\/for\//);
 });
+
+test("buycalc dual sales motion (Randy, Nov 17 2026 8:56 PM ET): additive copy, self-serve path intact", () => {
+  const html = renderBuycalcHtml({ seatsOpen: 3, seatsTotal: 8 });
+  // A1 subhead sits under the H1.
+  assert.match(html, /No bidding\.<\/h1>\n<p class="hero-sub" data-testid="hero-sub">Start yourself with a \$190 USD look or \$490 USD reserve\. Or talk to us about a larger display share, priority placement, or a program across more than one hub\.<\/p>/);
+  // Self-serve buttons unchanged; A2 inquire link is a secondary text link, not a third button.
+  assert.match(html, /<div class="ctas"><a class="btn" href="\/buycalc\?sku=reserve-490#reserve" data-pick-sku="reserve-490">Reserve your space · \$490 USD<\/a><a class="btn line" href="\/buycalc\?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · \$190 USD<\/a><\/div>/);
+  assert.match(html, /<p class="hero-inquire" data-testid="hero-inquire"><a href="#request">Ask about a premium slot or multi-hub program →<\/a><\/p>/);
+  assert.match(html, /Or call <a href="tel:\+16479316278">\(647\) 931-6278<\/a> to request a call back · <a href="mailto:sales@silverbirchgrowth\.com/);
+  // B1 sample IO next to the offer cards.
+  assert.match(html, /data-testid="offers-sample-io">Before you pay: read the <a href="\/sample-io">sample insertion order<\/a> you'd approve before anything runs\./);
+  // B2 three new questions in the one FAQ.
+  assert.match(html, /<h2>Questions buyers ask\.<\/h2>/);
+  for (const q of ["Can I start with a small test and grow?", "What happens after I pay?", "How do larger or priority placements work?"]) {
+    assert.equal((html.match(new RegExp(q.replace(/[?.]/g, "\\$&"), "g")) ?? []).length, 1, q);
+  }
+  assert.match(html, /The \$190 USD look converts in full to the reserve within 7 days, otherwise it's refunded\./);
+  // B3 + Live hub tag.
+  assert.match(html, /<span class="tag">Live hub<\/span>/);
+  assert.doesNotMatch(html, /Live placement/);
+  assert.match(html, /Illustrative until your insertion order names the hub\. Want to talk through current options\? <a href="#request">Ask about a placement<\/a>/);
+  // A4 merged with the early-slots strap, once.
+  assert.equal((html.match(/Self-serve seats stay shared, open to more than one brand/g) ?? []).length, 1);
+  // Reply time standardized; no same-day promise.
+  assert.match(html, /We reply within 1 business day\./);
+  assert.doesNotMatch(html, /same-day/i);
+  // Hard rules.
+  assert.doesNotMatch(html, /exclusiv/i);
+  assert.doesNotMatch(html, /seats open|\b\d+ of \d+\b|CAD|guaranteed/i);
+  assert.doesNotMatch(html, /sales@birchreserve\.net/);
+});

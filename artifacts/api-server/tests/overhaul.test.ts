@@ -299,3 +299,29 @@ test("media kit share image: /media-kit head uses its own OG image, other routes
   const rates = withRouteSeo(shell, "/rates");
   assert.doesNotMatch(rates, /og-media-kit/);
 });
+
+test("media kit dual sales motion: programs callout under the tiers, one FAQ, shared seats (Nov 17 2026)", async () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const read = (rel: string) => {
+    for (const base of [resolve(here, "../../clinichub-media/src"), resolve(process.cwd(), "../clinichub-media/src"), resolve(process.cwd(), "artifacts/clinichub-media/src")]) {
+      try { return readFileSync(resolve(base, rel), "utf8"); } catch { /* next */ }
+    }
+    throw new Error(`missing ${rel}`);
+  };
+  const kit = read("pages/br/media-kit.tsx");
+  const comp = read("components/br/buyer-comfort.tsx");
+  assert.ok(kit.indexOf("<ProgramsCallout />") > kit.indexOf('data-testid="mk-rate-cards"'));
+  assert.ok(kit.indexOf("<ProgramsCallout />") < kit.indexOf("The math <Tag>Modelled</Tag>"));
+  assert.equal((kit.match(/<BuyerFaq \/>/g) ?? []).length, 1);
+  assert.match(comp, /Request a call back · \{SALES_PHONE_DISPLAY\}/);
+  assert.match(comp, /href=\{SAMPLE_IO_HREF\}[^>]*data-testid="programs-sample-io"/);
+  const { DUAL_MOTION, BUYER_FAQ, BUYER_FAQ_TITLE, REPLY_LINE } = await import("../src/lib/buyerComfort");
+  assert.equal(BUYER_FAQ_TITLE, "Questions buyers ask.");
+  assert.equal(BUYER_FAQ.length, 8);
+  assert.match(DUAL_MOTION.sharedKit, /shared, not exclusive/);
+  assert.doesNotMatch(DUAL_MOTION.sharedBuycalc, /exclusiv/i);
+  assert.equal(REPLY_LINE, "We reply within 1 business day.");
+  for (const s of [JSON.stringify(DUAL_MOTION), JSON.stringify(BUYER_FAQ)]) {
+    assert.doesNotMatch(s, /\bCAD\b|deposit|guarantee(d)? (reach|delivery|results)|seats open|sales@birchreserve/i);
+  }
+});

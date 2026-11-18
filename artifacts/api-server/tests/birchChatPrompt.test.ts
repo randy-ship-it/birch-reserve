@@ -107,3 +107,30 @@ test("fallback FAQ answers the five buyer questions usefully, in USD, with no ba
   assert.match(general.text, /\$490 USD/);
   assert.match(general.text, /buycalc#request/);
 });
+
+test("area lock is a launch price, never a deposit, everywhere the chat and phone agent read (Randy, Nov 17 2026)", async () => {
+  const { birchCanonicalFacts } = await import("../src/lib/birchFacts");
+  const { readFileSync } = await import("node:fs");
+  const { dirname, join } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const facts = birchCanonicalFacts();
+  const prompt = buildBirchChatSystemPrompt({ checkout: live });
+  const here = dirname(fileURLToPath(import.meta.url));
+  const knowledge = ["birch-chat.prompt.txt", "birch-phone.prompt.txt"].map((f) => {
+    for (const base of [join(here, "../src/knowledge"), join(process.cwd(), "src/knowledge"), join(process.cwd(), "artifacts/api-server/src/knowledge")]) {
+      try { return readFileSync(join(base, f), "utf8"); } catch { /* next */ }
+    }
+    throw new Error(`missing ${f}`);
+  });
+  for (const text of [facts, prompt, ...knowledge]) {
+    const areaLines = text.split("\n").filter((l) => /lock down my area|area lock/i.test(l) && /3,500/.test(l));
+    assert.ok(areaLines.length > 0);
+    for (const l of areaLines) {
+      assert.match(l, /\$3,500 USD launch price/);
+      assert.doesNotMatch(l.replace(/never (call it )?a deposit/gi, ""), /deposit/i);
+      assert.doesNotMatch(l, /CAD/);
+    }
+  }
+  assert.doesNotMatch(prompt, /same-day/i);
+  assert.match(prompt, /within 1 business day/);
+});
