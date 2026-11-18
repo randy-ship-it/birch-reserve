@@ -78,6 +78,7 @@ import {
 } from "./splashAdReservations";
 import { logger, recordUcpProxyForwardingShape } from "../lib/logger";
 import { publicSeoTags } from "../lib/publicSeo";
+import { BUYER_COMFORT_CSS, buyerFaqHtml, earlySlotsHtml, flightTimelineHtml, sampleIoCheckoutHtml, sampleIoFactHtml, seeTheUnitHtml } from "../lib/buyerComfortHtml";
 import { PREPAY_REFUND_CUTOFF_DAYS } from "../lib/reserveOffers";
 import { handleUiEvent } from "../lib/uiEvents";
 import { sendSalesAlert } from "../lib/salesAlert";
@@ -2352,11 +2353,12 @@ function renderBuycalcHtmlUsd(input: {
 })}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>${BUYCALC_CSS}</style></head><body>
+<style>${BUYCALC_CSS}${BUYER_COMFORT_CSS}</style></head><body>
 <header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav aria-label="Buy page"><a class="tl" href="/media-kit">Media kit</a><a class="tl" href="#request">Ask about a placement</a><a class="tl tel" href="tel:+16479316278">(647) 931-6278</a>${currencyToggleHtml(currency, { sku: input.sku, format: input.format, category })}</nav></div></header>
 <main>
 <section class="hero"><div class="wrap"><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
 <p class="avail" data-testid="buycalc-avail"><span class="dot" aria-hidden="true"></span><span><strong>Limited early placements</strong> · curated as hubs launch</span></p>
+${earlySlotsHtml()}
 <p class="lede">Reserve a share of display space across our growing network of private, members-only health and wellness hubs (physio, fitness and recovery today), with more launching. Your brand shows right after a member books or buys. All of it is media credit until the insertion order (IO), fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
 <div class="ctas"><a class="btn" href="/buycalc?sku=reserve-490#reserve" data-pick-sku="reserve-490">Reserve your space · ${price(seat)}</a><a class="btn line" href="/buycalc?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · ${price(look)}</a></div>
 <p class="hero-contact">Questions? <a href="tel:+16479316278">(647) 931-6278</a> · <a href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">sales@silverbirchgrowth.com</a> · <a href="#request">Ask about a placement</a></p></div></section>
@@ -2365,12 +2367,14 @@ function renderBuycalcHtmlUsd(input: {
 <div class="offers">${offerCard(look, { eyebrow: "7-day look", name: "See it before you commit", lines: ["See your placement for 7 days while you decide.", "Converts in full to the reserve within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Reserve", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the hub network. Credit lasts 12 months.`, "Placements are curated as hubs launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Reserve your space · ${price(seat)}` })}</div>
 <!--BONUS_TIER_DRAFT-->
 </div></section>
+${seeTheUnitHtml(price(look), price(seat))}
 
 <section class="band" id="included"><div class="wrap"><p class="kicker">What you get</p><h2>Plain terms.</h2>
-<ul class="facts"><li>A share of display space across the hub network. No auction.</li><li>100% of what you pay is media credit.</li><li>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</li><li>The insertion order names the hub and placement before anything runs.</li><li>Aggregate reporting only. No PHI, no clinical pixels.</li><li>No impression guarantee, and no reach or click forecast.</li></ul>
+<ul class="facts"><li>A share of display space across the hub network. No auction.</li><li>100% of what you pay is media credit.</li><li>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</li><li>The insertion order names the hub and placement before anything runs.</li><li>Aggregate reporting only. No PHI, no clinical pixels.</li><li>No impression guarantee, and no reach or click forecast.</li>${sampleIoFactHtml()}</ul>
 <div class="proof"><p><span class="tag">Live placement</span><a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>, a listed physio hub. Your card sits at the booking and the plan. Illustrative until your insertion order names the hub.</p>
 <p><span class="tag">Public benchmark</span>Not a Birch result: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p></div>
 </div></section>
+${flightTimelineHtml(price(look), price(seat))}
 
 <section class="band" id="categories"><div class="wrap"><p class="kicker">The network</p><h2>A growing network of private hubs.</h2>
 <p class="open-count"><strong>Limited early placements</strong> · We curate placements as each hub launches. Want a premium slot or something custom? Ask below.</p>
@@ -2385,6 +2389,7 @@ ${category ? `<input type="hidden" name="category" value="${category}">` : ""}
 <label for="f-email">Work email</label><input id="f-email" name="email" type="email" required autocomplete="email">
 <div class="row2"><div><label for="f-web">Website <span class="fine">(optional)</span></label><input id="f-web" name="website_url" type="url" inputmode="url" placeholder="https://"></div><div><label for="f-format">Where it shows</label><select id="f-format" name="format_pref">${FORMATS.map((f) => `<option value="${f}"${(isFormat(input.format) ? input.format : DEFAULT_SELF_SERVE_FORMAT) === f ? " selected" : ""}${isPremiumFormat(f) ? ' data-inquire="1"' : ""}>${BUYCALC_FORMAT_LABELS[f]}${isPremiumFormat(f) ? " · Inquire" : ""}</option>`).join("")}</select></div></div>
 <label class="check"><input id="terms" type="checkbox" required><span>I agree to the draft <a href="/terms">terms</a> before any charge.</span></label>
+${sampleIoCheckoutHtml()}
 <button id="submit" class="btn" type="submit">${submitLabel}</button>
 <p class="fine" id="checkout-note">${checkoutLive ? "Secure card checkout by Stripe. Payment counts once Stripe confirms it." : "Card checkout is not open yet. Submitting saves your seat request and alerts our sales team. No card is charged."}</p>
 <p class="fine" id="inquire-note" hidden>${PREMIUM_INQUIRY_MESSAGE}</p>
@@ -2393,6 +2398,7 @@ ${category ? `<input type="hidden" name="category" value="${category}">` : ""}
 </form>
 <aside class="talk"><h3>Rather talk first?</h3><p>We'll walk you through the hubs, placements and the brief.</p><a class="btn" href="tel:+16479316278">Call (647) 931-6278</a><a class="btn line" href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20seat">sales@silverbirchgrowth.com</a><a class="btn line" href="/media-kit">See the media kit</a></aside>
 </div></div></section>
+${buyerFaqHtml(price(look), price(seat))}
 
 <section class="band" id="request"><div class="wrap"><div class="buy">
 <form id="catreq" novalidate data-testid="category-request-form"><p class="kicker">No card needed</p><h2 style="margin-bottom:6px">Ask about a placement.</h2>

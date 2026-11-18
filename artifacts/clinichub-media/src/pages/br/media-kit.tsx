@@ -6,6 +6,7 @@ import { SALES_REPLY_LINE } from "@/lib/seller-identity";
 import { PlacementVisual, type PlacementKey } from "@/components/br/placement-example";
 import { BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
+import { BuyerFaq, EarlySlots, FlightTimeline, ModellingNote, SAMPLE_REPORT, FLIGHT_TIMELINE, SampleIoLink, SampleReport, SeeTheUnit } from "@/components/br/buyer-comfort";
 import { AvailabilityStrip, CategoryRequestForm, FaceBeforeFlight, FounderNote, NETWORK_HUBS, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import {
   AGENCY_CASH_PCT,
@@ -139,6 +140,7 @@ export default function BrMediaKit() {
           <p className="mt-3 text-sm font-semibold" data-testid="mk-upgrade">{UPGRADE_PATH_LINE}</p>
           <div className="mt-5">
             <AvailabilityStrip />
+            <EarlySlots />
           </div>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row" id="download">
             <Cta href={RESERVE_HREF} variant="lime" testId="mk-reserve-hero" className="w-full sm:w-auto">Reserve your space — {price.seat}</Cta>
@@ -157,6 +159,13 @@ export default function BrMediaKit() {
         </div>
       </section>
 
+      {/* See the unit before you lock (buyer comfort, Nov 17 2026) */}
+      <section id="see-the-unit" className="scroll-mt-20 border-b border-border/70 bg-background">
+        <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14">
+          <SeeTheUnit />
+        </div>
+      </section>
+
       {/* How to start */}
       <Block id="start" eyebrow="How to start" title="Three steps, about a minute" tone="soft">
         <ol className="grid gap-3 md:grid-cols-3" data-testid="mk-how-to-start">
@@ -168,6 +177,13 @@ export default function BrMediaKit() {
             </li>
           ))}
         </ol>
+        <SampleIoLink className="mt-4" />
+      </Block>
+
+      {/* How a test dollar becomes a flight (buyer comfort, Nov 17 2026) */}
+      <Block id="flight" eyebrow={FLIGHT_TIMELINE.kicker} title={FLIGHT_TIMELINE.title}>
+        <FlightTimeline />
+        <SampleIoLink className="mt-4" />
       </Block>
 
       {/* Surfaces */}
@@ -210,6 +226,7 @@ export default function BrMediaKit() {
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-foreground/55">{MEDIA_KIT_OFFERS.seat.name}</p>
                 <p className="mt-1 font-display text-4xl leading-none">{usd(MEDIA_KIT_OFFERS.seat.spendUsd)} <span className="text-lg">USD</span></p>
                 <p className="mt-1 text-xs text-muted-foreground">Reserves your share of the network. Fully refundable until 14 days before launch. <Tag>Modelled</Tag> Modelled estimate, not a guarantee: about {impr(seatEx.imprLo)}–{impr(seatEx.imprHi)} impressions at {cpm}.</p>
+                <ModellingNote className="mt-1" />
               </div>
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -250,15 +267,27 @@ export default function BrMediaKit() {
         <p className="mt-3 text-xs text-muted-foreground">
           All prices in USD. Effective {cpm} and every impression figure above are modelled estimates, not a guarantee. Impressions = credit ÷ CPM × 1,000. Final rate, currency and term are set on your IO. Premium is inquire-only.
         </p>
+        <ModellingNote className="mt-2" />
+      </Block>
+
+      {/* Sample report layout (buyer comfort, Nov 17 2026) */}
+      <Block id="sample-report" eyebrow={SAMPLE_REPORT.kicker} title={SAMPLE_REPORT.title} tone="soft">
+        <SampleReport />
       </Block>
 
       {/* Categories */}
       <Block id="categories" eyebrow="The network" title="A growing network of private hubs." tone="soft">
         <AvailabilityStrip />
+        <EarlySlots />
         <p className="mt-4 text-sm text-foreground/80">Your reserve buys a share of display space across the network. We curate placements as each hub launches, and your insertion order names where you show before anything runs. Want exclusivity, a premium slot, or something custom? Ask below.</p>
         <div id="request" className="mt-8 scroll-mt-20 max-w-2xl">
           <CategoryRequestForm path="/media-kit" />
         </div>
+      </Block>
+
+      {/* Five questions buyers ask (buyer comfort, Nov 17 2026) */}
+      <Block id="buyer-faq" eyebrow="Questions" title="Five questions buyers ask.">
+        <BuyerFaq />
       </Block>
 
       {/* Agency + rules */}
@@ -277,6 +306,7 @@ export default function BrMediaKit() {
                 <li key={r} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-foreground/70" aria-hidden />{r}</li>
               ))}
             </ul>
+            <SampleIoLink className="mt-3" />
           </div>
         </div>
       </Block>

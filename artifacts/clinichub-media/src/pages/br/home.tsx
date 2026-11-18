@@ -5,6 +5,7 @@ import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@
 import { UPGRADE_PATH_LINE } from "../../../../api-server/src/lib/overhaul/mediaKit";
 import { MediaKitPdfLink, ProofStrip, SalesContact, TrustBand, TrustFaq } from "@/components/br/trust";
 import { QuickBuy } from "@/components/br/quick-buy";
+import { ModellingNote } from "@/components/br/buyer-comfort";
 import { CategoryRequestForm, FaceBeforeFlight, FounderNote, PrimeHero, SALES_EMAIL, SALES_PHONE_DISPLAY, SALES_PHONE_HREF, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import { AgencyHero, AgencyPayouts, InsiderGrid, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
@@ -125,6 +126,7 @@ export default function BrHome() {
           <p className="max-w-md text-sm text-muted-foreground">Pick a placement, pick your start, see the modelled views and CPM, then pay by card on the secure checkout. No login.</p>
         </div>
         <QuickBuy />
+        <ModellingNote className="mt-4" />
       </Section>
 
       <Section id="rates">
@@ -136,6 +138,7 @@ export default function BrHome() {
           <p className="max-w-md text-sm text-muted-foreground">New placements open at starter rates. They only move up once your reporting proves they work.</p>
         </div>
         <RateCardV2 />
+        <ModellingNote className="mt-4" />
       </Section>
 
       <Section tone="soft" id="insider">
