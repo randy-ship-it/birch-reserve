@@ -1,3 +1,4 @@
+import { StartSmall } from "@/components/br/start-small";
 import { KitCta } from "@/components/br/kit-cta";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { Check, Mail, Phone } from "lucide-react";
@@ -177,6 +178,12 @@ export default function BrMediaKit() {
       </section>
 
       {/* How to start */}
+      <section id="start-small" className="scroll-mt-20 border-b border-border/70 bg-background">
+        <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14">
+          <StartSmall page="media-kit" id="start-small-tiers" />
+        </div>
+      </section>
+
       <Block id="start" eyebrow="How to start" title="Three steps, about a minute" tone="soft">
         <ol className="grid gap-3 md:grid-cols-3" data-testid="mk-how-to-start">
           {HOW_TO_START.map((s) => (

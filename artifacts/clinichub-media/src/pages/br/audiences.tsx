@@ -1,5 +1,6 @@
+import { StartSmall } from "@/components/br/start-small";
 import { Lock, ShieldCheck, Sparkles } from "lucide-react";
-import { LOOK_HREF, SeatCtas } from "@/components/br/pricing";
+import { LOOK_HREF } from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
 import { TRUST_FAQ } from "@/components/br/trust";
 import { SampleBenefitsProfile } from "@/components/br/sample-benefits-profile";
@@ -427,28 +428,11 @@ export default function BrAudiences() {
         <SampleBenefitsProfile />
       </Section>
 
-      {/* CTA */}
+      {/* Start small (Nov 19 2026): replaces the old "Start now" block */}
       <Section tone="soft" id="start">
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div>
-            <Eyebrow>Start now</Eyebrow>
-            <H2>Put your brand in front of the segment that fits.</H2>
-            <p className="mt-4 max-w-2xl text-muted-foreground">
-              Start with a $190 refundable 7-day look and see your placement first, or reserve for $490. Credit spends down over 6 months and unused credit is refundable. Want a category to yourself, or a premium slot? Send an inquiry and we'll quote it.
-            </p>
-            <SeatCtas className="mt-8" />
-            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-              <a href="/match" className="underline underline-offset-4" data-testid="audiences-inquire">
-                Send an inquiry: match my audience
-              </a>
-              <a href="/agencies#talk" className="underline underline-offset-4">
-                Agency? 10% of media spend, paid in cash
-              </a>
-            </div>
-          </div>
-          <div>
-            <Faq items={[...FAQ, ...TRUST_FAQ]} />
-          </div>
+        <StartSmall page="audiences" id="start-small" />
+        <div className="mt-12 max-w-3xl">
+          <Faq items={[...FAQ, ...TRUST_FAQ]} />
         </div>
       </Section>
     </div>

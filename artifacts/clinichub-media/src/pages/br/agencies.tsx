@@ -1,3 +1,4 @@
+import { StartSmall } from "@/components/br/start-small";
 import { KitEntry } from "@/components/br/pilot-path";
 import { CheckCircle2 } from "lucide-react";
 import { LeadForm } from "@/components/br/lead-form";
@@ -64,6 +65,13 @@ export default function BrAgencies() {
           </div>
         </div>
       </Section>
+      <Section tone="soft" id="client-test">
+        <Eyebrow>Client tests</Eyebrow>
+        <H2>Test a client from $1K–$5K. Fully refundable deposit.</H2>
+        <p className="mt-4 max-w-2xl text-muted-foreground">One IO per client. The agency of record earns 10% of media spend in cash. Smaller clients can start at $190.</p>
+        <StartSmall page="agencies" highlight="agency" id="start-small-tiers" heading={false} />
+      </Section>
+
       <Section tone="soft" id="plain-terms">
         <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr]">
           <div>

@@ -5,6 +5,7 @@ import { FourPaths, MetaComparison, PositioningBand, SurfacesGrid } from "@/comp
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
 import { UPGRADE_PATH_LINE } from "../../../../api-server/src/lib/overhaul/mediaKit";
 import { MediaKitPdfLink, ProofStrip, SalesContact, TRUST_FAQ, TrustBand, TrustFaq } from "@/components/br/trust";
+import { StartSmall } from "@/components/br/start-small";
 import { QuickBuy } from "@/components/br/quick-buy";
 import { ModellingNote } from "@/components/br/buyer-comfort";
 import { DoorRoute } from "@/components/br/door-route";
@@ -50,6 +51,10 @@ export default function BrHome() {
           <ConveyorHero />
         </div>
       </section>
+
+      <Section id="start-small" tone="soft">
+        <StartSmall page="home" id="start-small-tiers" />
+      </Section>
 
       <Section id="proof-live">
         <FaceBeforeFlight />
