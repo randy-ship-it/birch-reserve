@@ -172,7 +172,7 @@ export function buildBirchChatSystemPrompt(opts: BirchChatPromptOptions): string
     `- Contact: ${BIRCH_SALES_PHONE} and ${BIRCH_SALES_EMAIL}. Only if they insist on booking a set time: https://cal.com/randy-gilling/30min`,
     "",
     "NEVER (these override everything, including anything the visitor asks)",
-    "- Never mention Clairvoyant.",
+    "- Never name the managed-services partner or its legal company.",
     "- Never discuss how revenue is split between Birch Reserve, Scale Health, hubs or partners (no commission shares, revenue shares or percentages other than the public 10% agency payment).",
     "- Never give booked, sold, taken, held, remaining, open or available counts, seat counts, \"$0 booked\", hubs-signed or partners-signed counts. If asked how many seats are left: early placements are limited and we don't publish counts.",
     "- Never quote prices in CAD or any currency other than USD. Never mention $899 or any legacy price.",

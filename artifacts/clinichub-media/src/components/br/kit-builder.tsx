@@ -27,7 +27,8 @@ import { withGeo } from "@/lib/kitView";
 import { errorDetail, trackIntake } from "@/lib/intakeTrack";
 import { fridayEligibility, reviewGates, type LeadGates } from "@/lib/fridayBrandIntake";
 
-const numIn = "mt-1 h-12 w-full rounded-xl border border-foreground/20 bg-white px-3 text-base tabular-nums outline-none focus:border-foreground focus:ring-2 focus:ring-accent";
+const numBase = "h-12 rounded-xl border border-foreground/20 bg-white px-3 text-base tabular-nums outline-none focus:border-foreground focus:ring-2 focus:ring-accent";
+const numIn = `mt-1 w-full ${numBase}`;
 const lab = "block text-[11px] font-bold uppercase tracking-wider text-foreground/60";
 const chip = (on: boolean) => `h-11 rounded-xl text-sm font-bold transition ${on ? "bg-foreground text-background shadow" : "bg-foreground/[0.06] hover:bg-foreground/[0.1]"}`;
 const $ = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
@@ -173,8 +174,8 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
             <div className="col-span-2">
               <span className={lab}>Average cart (USD)</span>
               <div className="mt-1 flex items-center gap-3">
-                <input data-testid="kit-aov" type="number" inputMode="decimal" min={0} value={aov} onChange={(e) => tap(setAov)(Math.max(0, Number(e.target.value)))} className={`${numIn} mt-0 w-28 shrink-0`} />
-                <input data-testid="kit-aov-slider" aria-label="Average cart slider" type="range" min={KIT_CALC_CONFIG.cartSlider.min} max={KIT_CALC_CONFIG.cartSlider.max} step={KIT_CALC_CONFIG.cartSlider.step} value={Math.min(aov, KIT_CALC_CONFIG.cartSlider.max)} onChange={(e) => tap(setAov)(Number(e.target.value))} className="h-2 w-full cursor-pointer accent-[#0b1f3a]" />
+                <input data-testid="kit-aov" type="number" inputMode="decimal" min={0} value={aov} onChange={(e) => tap(setAov)(Math.max(0, Number(e.target.value)))} className={`${numBase} w-28 shrink-0`} />
+                <input data-testid="kit-aov-slider" aria-label="Average cart slider" type="range" min={KIT_CALC_CONFIG.cartSlider.min} max={KIT_CALC_CONFIG.cartSlider.max} step={KIT_CALC_CONFIG.cartSlider.step} value={Math.min(aov, KIT_CALC_CONFIG.cartSlider.max)} onChange={(e) => tap(setAov)(Number(e.target.value))} className="h-2 min-w-0 flex-1 cursor-pointer accent-[#0b1f3a]" />
               </div>
             </div>
             <div className="col-span-2">
@@ -183,7 +184,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
                 {[...KIT_CALC_CONFIG.ordersStepper.steps].reverse().map((s) => (
                   <button key={`-${s}`} type="button" aria-label={`Minus ${s}`} onClick={() => tap(setOrders)(Math.max(0, orders - s))} className="inline-flex h-12 min-w-12 items-center justify-center rounded-xl bg-foreground/[0.06] px-2 text-xs font-bold"><Minus className="size-3" />{s}</button>
                 ))}
-                <input data-testid="kit-orders" type="number" inputMode="numeric" min={0} value={orders} onChange={(e) => tap(setOrders)(Math.max(0, Math.round(Number(e.target.value))))} className={`${numIn} mt-0 text-center`} />
+                <input data-testid="kit-orders" type="number" inputMode="numeric" min={0} value={orders} onChange={(e) => tap(setOrders)(Math.max(0, Math.round(Number(e.target.value))))} className={`${numBase} w-full min-w-0 flex-1 text-center`} />
                 {KIT_CALC_CONFIG.ordersStepper.steps.map((s) => (
                   <button key={`+${s}`} type="button" aria-label={`Plus ${s}`} onClick={() => tap(setOrders)(orders + s)} className="inline-flex h-12 min-w-12 items-center justify-center rounded-xl bg-foreground/[0.06] px-2 text-xs font-bold"><Plus className="size-3" />{s}</button>
                 ))}

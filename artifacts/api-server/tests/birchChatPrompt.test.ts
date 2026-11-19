@@ -27,8 +27,8 @@ test("prompt carries the site offer in USD only", () => {
 
 test("prompt never carries banned content or internal numbers", () => {
   const p = buildBirchChatSystemPrompt({ checkout: live, pagePath: "/for/acme", chipId: "how_seats" });
-  // Only the rule line may name Clairvoyant.
-  assert.equal(p.match(/Clairvoyant/g)?.length, 1);
+  // Randy Nov 19 2026: the prompt names neither the partner nor its legal company, not even in a rule line.
+  assert.doesNotMatch(p, /Clairvoyant|\bAlign\b|alignwellness/i);
   // CAD and $899 appear only inside the rule lines that forbid them.
   const withoutRules = p.replace(/^.*(Can I pay in CAD|Never mention \$899).*$/gm, "");
   assert.doesNotMatch(withoutRules, /\bCAD\b|C\$|\$270|\$690|\$899/);

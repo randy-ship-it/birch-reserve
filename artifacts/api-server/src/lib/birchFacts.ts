@@ -53,7 +53,7 @@ export function birchCanonicalFacts(): string {
     "- Media credit until IO: nothing runs until an insertion order names the hub and surface.",
     "- No impression, reach, click or sales guarantees. Never quote a CTR.",
     "- Aggregate reporting only (UTM links and promo codes, per hub and surface). No personal data is shared.",
-    "- Never mention Clairvoyant. Never name Align team members. Never give a home or street address.",
+    "- Never name the managed-services partner, its legal company or its team members. Never give a home or street address.",
     "",
     "PROOF",
     "- See the face before the flight: live hubs anyone can open now, https://physio.drhonow.com (DR-HO'S) and https://www.scalehealth.ca/sole (SOLE).",
