@@ -24,7 +24,7 @@ const hostOf = (w: string) => w.trim().replace(/^https?:\/\//i, "").replace(/^ww
 
 /** Advertiser side: Brand (kit), Supplier, Sponsor. The publisher side is a single role. */
 const ROLE_CHIPS: Array<{ key: IntakeRole; label: string; sub: string }> = [
-  { key: "kit", label: "Brand", sub: "Get my kit" },
+  { key: "kit", label: "Brand", sub: "Get my Monetization Kit" },
   { key: "supplier", label: "Supplier", sub: "Performance brand" },
   { key: "sponsor", label: "Sponsor", sub: "Own a category or area" },
 ];

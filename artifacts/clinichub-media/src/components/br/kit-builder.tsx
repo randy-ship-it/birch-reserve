@@ -89,8 +89,8 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
 
   async function exportKit(reportToken: string | null) {
     const slug = (brandLabel || "my").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "my";
-    saveBlob(await kitPdfBlob([svgA, svgB]), `birch-reserve-kit-${slug}.pdf`);
-    saveBlob(await kitPngBlob([svgA, svgB]), `birch-reserve-kit-${slug}.png`);
+    saveBlob(await kitPdfBlob([svgA, svgB]), `birch-reserve-monetization-kit-${slug}.pdf`);
+    saveBlob(await kitPngBlob([svgA, svgB]), `birch-reserve-monetization-kit-${slug}.png`);
     trackIntake("advertiser", "kit_download", "pdf");
     trackIntake("advertiser", "kit_download", "png");
     if (reportToken) for (const f of ["pdf", "png"] as const) await fridayIntake().download(reportToken, f).catch(() => undefined); // kit_download lead event
@@ -155,7 +155,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
       {showMockBanner ? <MockBanner /> : null}
       <div className="container mx-auto grid gap-6 px-4 py-10 md:py-14 lg:grid-cols-[minmax(0,26rem)_1fr]">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Your personalized media kit</p>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Your personalized Monetization Kit</p>
           <h2 className="font-display text-4xl leading-[1.02] md:text-5xl">Download my kit</h2>
           <p className="mt-2 text-sm text-muted-foreground">Four quick numbers. A two-sided kit: your revenue opportunity and your exposure opportunity.</p>
           <div className="mt-2"><SaveChip state={state} version={ref?.version} /></div>
@@ -231,7 +231,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
           <div className="mt-3"><ExposureCard exposure={expo.ex} source={expo.source} testId="kit-exposure" /></div>
           {step === "contact" && !report && !held ? (
             <div className="mt-4 grid gap-2 rounded-2xl border border-foreground/15 bg-white p-4" data-testid="kit-contact">
-              <p className="text-sm font-semibold">Where should we send your kit?</p>
+              <p className="text-sm font-semibold">Where should we send your Monetization Kit?</p>
               <p className="text-xs text-muted-foreground">Brand-level only. A person checks the numbers and confirms fit by hand. Nothing is booked or charged.</p>
               <input data-testid="kit-website" onFocus={() => trackIntake("advertiser", "field_start", "website", { dedupe: true })} value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" autoComplete="url" className={numIn} />
               <input data-testid="kit-email" onFocus={() => trackIntake("advertiser", "field_start", "email", { dedupe: true })} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourbrand.com" autoComplete="email" className={numIn} />
@@ -239,12 +239,12 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
             </div>
           ) : null}
           {err ? <p className="mt-2 text-sm font-semibold text-red-700" data-testid="kit-error">{err}</p> : null}
-          {queued ? <p className="mt-3 rounded-xl bg-lime-50 p-3 text-sm" data-testid="kit-queued">Received as pending review. Your kit above is a live preview; your full report follows after review.</p> : null}
+          {queued ? <p className="mt-3 rounded-xl bg-lime-50 p-3 text-sm" data-testid="kit-queued">Received as pending review. Your Monetization Kit above is a live preview; your full report follows after review.</p> : null}
           {held ? <p className="mt-3 flex gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900" data-testid="kit-held"><ShieldAlert className="size-4 shrink-0" />{HELD_COPY}</p> : null}
           <LeadGatesStatus gates={gates} testId="kit-lead-gates" />
           <IntakeWarnings testId="kit-warnings" />
           <button type="button" data-testid="kit-download" onClick={getKit} disabled={busy === "busy"} className="mt-5 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 text-base font-bold text-accent-foreground shadow-lg shadow-lime-500/20 transition hover:bg-foreground hover:text-background">
-            {busy === "busy" ? <Loader2 className="size-5 animate-spin" /> : busy === "done" ? <Check className="size-5" /> : <Download className="size-5" />} {busy === "done" ? "Kit downloaded (PDF + PNG)" : step === "contact" && !report ? "Get my kit" : "Download my kit"}
+            {busy === "busy" ? <Loader2 className="size-5 animate-spin" /> : busy === "done" ? <Check className="size-5" /> : <Download className="size-5" />} {busy === "done" ? "Monetization Kit downloaded (PDF + PNG)" : step === "contact" && !report ? "Get my Monetization Kit" : "Download my Monetization Kit"}
           </button>
           {busy === "done" || queued || held ? <div className="mt-4" data-testid="kit-next-cta"><PrimaryCta side="advertiser" where="kit" /></div> : null}
           {ref && (report || held) ? (

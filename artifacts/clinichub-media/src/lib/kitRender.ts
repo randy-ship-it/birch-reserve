@@ -240,7 +240,7 @@ export function pdfFromJpegs(pages: Array<{ jpeg: Uint8Array; w: number; h: numb
   const xref = len;
   push(`xref\n0 ${total}\n0000000000 65535 f \n`);
   for (let i = 1; i < total; i++) push(`${String(offsets[i]).padStart(10, "0")} 00000 n \n`);
-  push(`trailer\n<< /Size ${total} /Root 1 0 R /Info << /Title (Birch Reserve media kit) /Producer (Birch Reserve) >> >>\nstartxref\n${xref}\n%%EOF`);
+  push(`trailer\n<< /Size ${total} /Root 1 0 R /Info << /Title (Birch Reserve Monetization Kit) /Producer (Birch Reserve) >> >>\nstartxref\n${xref}\n%%EOF`);
   return new Blob(chunks as BlobPart[], { type: "application/pdf" });
 }
 

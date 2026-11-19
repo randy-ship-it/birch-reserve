@@ -5,7 +5,7 @@ import { KitBuilder } from "@/components/br/kit-builder";
 import { CategoryCards, HubShots, PilotHero, ReportingBlock, ThreeSteps } from "@/components/br/pilot-path";
 
 export default function BrBrandKit() {
-  usePageMeta("Download your media kit | Birch Reserve", "Four numbers in, a two-sided media kit out: your revenue opportunity and your exposure opportunity. Estimates only.");
+  usePageMeta("Download your Monetization Kit | Birch Reserve", "Four numbers in, a two-sided Monetization Kit out: your revenue opportunity and your exposure opportunity. Estimates only.");
   return (
     <div data-testid="brand-kit-page">
       <MockBanner />

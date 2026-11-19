@@ -36,7 +36,7 @@ export function SampleKit({ publisherFirst = false, costExtra }: { publisherFirs
       <p className="mt-1 max-w-2xl text-sm" style={{ color: RT.mute }}>Where your customers fit, what it costs to reach them, and what a hub could earn. Every figure is an estimate.</p>
       <div className="mt-4"><ReportV2 report={report} sample compact costExtra={costExtra} /></div>
       <div className="mt-6 p-3 md:p-6" style={{ background: RT.paper, borderRadius: 24 }} data-testid="sample-kit-sides">
-        <h3 className="text-[24px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Build your kit</h3>
+        <h3 className="text-[24px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Build your Monetization Kit</h3>
         <div className="mt-3 inline-flex rounded-full p-1 xl:hidden" style={{ background: RT.track }} role="tablist">
           {(["a", "b"] as const).map((s) => (
             <button key={s} role="tab" aria-selected={side === s} onClick={() => setSide(s)} data-testid={`sample-tab-${s}`} className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider" style={side === s ? { background: RT.forest, color: "#fff" } : { color: RT.mute }}>{s === "a" ? "Side A · Revenue" : "Side B · Exposure"}</button>

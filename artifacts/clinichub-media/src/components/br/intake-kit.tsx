@@ -106,7 +106,7 @@ export function MockBanner() {
 /** Two sides (Randy via Emma, 10:44 PM ET): Advertiser = Brand kit · Supplier · Sponsor; Publisher on its own. */
 const ROLE_SIDES: Array<{ side: "advertiser" | "publisher"; label: string; roles: Array<{ key: IntakeRole; label: string; href: string; icon: typeof Store }> }> = [
   { side: "advertiser", label: "Advertiser", roles: [
-    { key: "kit", label: "Brand kit", href: "/brand-kit#my-kit", icon: Target },
+    { key: "kit", label: "Monetization Kit", href: "/brand-kit#my-kit", icon: Target },
     { key: "supplier", label: "Supplier", href: "/intake/supplier", icon: Target },
     { key: "sponsor", label: "Sponsor", href: "/intake/sponsor", icon: Megaphone },
   ] },

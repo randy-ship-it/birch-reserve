@@ -21,7 +21,7 @@ const REPEAT_LABEL = (n: number) => KIT_CALC_CONFIG.repeatBands.find((b) => n >=
 
 export default function BrKitReport() {
   const { token = "" } = useParams<{ token: string }>();
-  usePageMeta("Your media kit | Birch Reserve", "Private kit report.");
+  usePageMeta("Your Monetization Kit | Birch Reserve", "Private kit report.");
   const [state, setState] = useState<"loading" | "draft" | "missing" | "ready" | "error">("loading");
   const [report, setReport] = useState<FridayReport | null>(null);
   const [side, setSide] = useState<"a" | "b">("a");
@@ -57,8 +57,8 @@ export default function BrKitReport() {
   const svgB = view ? kitSideB(view) : "";
   const expo = pickExposure(report?.exposure, market, !!report?.mock);
   async function dl() {
-    saveBlob(await kitPdfBlob([svgA, svgB]), "birch-reserve-kit.pdf");
-    saveBlob(await kitPngBlob([svgA, svgB]), "birch-reserve-kit.png");
+    saveBlob(await kitPdfBlob([svgA, svgB]), "birch-reserve-monetization-kit.pdf");
+    saveBlob(await kitPngBlob([svgA, svgB]), "birch-reserve-monetization-kit.png");
     for (const f of ["pdf", "png"] as const) {
       trackIntake("advertiser", "kit_download", f);
       await fridayIntake().download(token, f).catch(() => undefined);
@@ -69,9 +69,9 @@ export default function BrKitReport() {
       <MockBanner />
       <div className="container mx-auto px-4 py-8 md:py-12">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Private link · not indexed</p>
-        <h1 className="font-display text-4xl md:text-6xl">Your report and media kit</h1>
+        <h1 className="font-display text-4xl md:text-6xl">Your report and Monetization Kit</h1>
         {state === "loading" ? <p className="mt-6 flex items-center gap-2"><Loader2 className="size-4 animate-spin" />Loading your report…</p> : null}
-        {state === "draft" ? <p className="mt-6" data-testid="kit-report-draft">This kit is still a draft. Finish it on <a href="/brand-kit" className="underline">your kit page</a>.</p> : null}
+        {state === "draft" ? <p className="mt-6" data-testid="kit-report-draft">This Monetization Kit is still a draft. Finish it on <a href="/brand-kit" className="underline">your kit page</a>.</p> : null}
         {state === "missing" ? <p className="mt-6" data-testid="kit-report-missing">We couldn't find this kit. The link may have been rotated.</p> : null}
         {state === "error" ? <p className="mt-6">We couldn't load your report right now. Try again shortly.</p> : null}
         {report?.status?.public_mirror === "held" ? <p className="mt-6 rounded-xl bg-amber-50 p-3 text-amber-900" data-testid="kit-held">{HELD_COPY}</p> : null}
@@ -96,7 +96,7 @@ export default function BrKitReport() {
               earnCta={<PrimaryCta side="publisher" where="report" />}
             />
             <section className="p-3 md:p-6" style={{ background: RT.paper, borderRadius: 24, fontFamily: RT_SANS }} data-testid="report-kit">
-              <h2 className="text-[24px] md:text-[28px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Build your kit</h2>
+              <h2 className="text-[24px] md:text-[28px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Build your Monetization Kit</h2>
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <div className="inline-flex rounded-full p-1" style={{ background: RT.track }} role="tablist">
                   {(["a", "b"] as const).map((s) => (
