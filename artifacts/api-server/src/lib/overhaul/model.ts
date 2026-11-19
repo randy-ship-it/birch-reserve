@@ -83,10 +83,10 @@ const EXTRA: Record<string, Pick<BrandHub, "logo" | "banner" | "recovery" | "aud
   "bird-and-be": { logo: "/partner-logos/bird-and-be.png", banner: "/hub-banners/bird-and-be.webp", recovery: "Recovery", audience: "Postpartum recovery and pelvic-floor care", bannerStatus: "In queue" },
   "roll-recovery": { logo: "/partner-logos/roll-recovery.png", banner: "/hub-banners/roll-recovery.webp", recovery: "Recovery", audience: "Athletes and active adults buying recovery hardware", bannerStatus: "In queue" },
   nutriprocan: { logo: "/partner-logos/nutriprocan.png", banner: "/hub-banners/nutriprocan.webp", recovery: "Food", audience: "Nutrition and dietitian-guided eating", bannerStatus: "In queue" },
-  sole: { logo: "/partner-logos/sole.png", banner: "/hub-banners/sole.webp", recovery: "Recovery", audience: "Foot pain, insoles and active footwear buyers", bannerStatus: "In queue" },
+  sole: { logo: "/partner-logos/sole.png", banner: "/hub-banners/sole.webp", recovery: "Recovery", audience: "Foot pain, insoles and active footwear buyers", bannerStatus: "Live" },
 };
 
-/** The brand hubs Randy named (Nov 12). Only DR-HO'S is live today; the rest are in queue (Nov 17 2026). */
+/** The brand hubs Randy named (Nov 12). DR-HO'S and SOLE are live today (SOLE added Nov 19 2026, Randy 11:10 AM ET); the rest are in queue. */
 export const BRAND_HUBS: BrandHub[] = [
   ...KIT_HUBS.filter((h) => h.kind === "brand").map((h) => ({ ...h, ...EXTRA[h.key]! })),
   {
@@ -111,7 +111,7 @@ export const INVENTORY = {
   liveSpendDownMonths: 6,
   queueMultiple: 3,
   queueBy: "year end 2026",
-  line: "Live today: DR-HO'S physio. Placements are curated as each hub launches.",
+  line: "Live today: DR-HO'S physio and SOLE. Placements are curated as each hub launches.",
   queueLine: "The other listed brand hubs are in queue, not live yet; more hubs launch over time.",
 } as const;
 

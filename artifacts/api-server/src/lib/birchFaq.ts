@@ -61,7 +61,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return { intent: "how", callback: null, text: `Three steps: reserve your space for $490 USD (or take a $190 USD 7-day look first), pay by card on the Stripe checkout with no login, then approve the insertion order that names the hub and placement. Nothing runs before you approve it, and the full amount is media credit. Start at ${BUY}` };
   }
   if (/audience|who (will |would )?(see|sees)|who are (the )?members|demographic|who do (you|i) reach|who('s| is) the (audience|customer)/.test(t)) {
-    return { intent: "audience", callback: null, text: `Members of private, members-only health and wellness hubs, reached right after they book or buy and when they log back in. Live today: DR-HO'S physio, with more hubs launching. You can open a live hub now at https://physio.drhonow.com, or reserve at ${BUY}.` };
+    return { intent: "audience", callback: null, text: `Members of private, members-only health and wellness hubs, reached right after they book or buy and when they log back in. Live today: DR-HO'S physio and SOLE, with more hubs launching. You can open a live hub now at https://physio.drhonow.com (DR-HO'S) or https://www.scalehealth.ca/sole (SOLE), or reserve at ${BUY}.` };
   }
   if (/exclusiv|one brand/.test(t) && /490|seat/.test(t) && !/premium|\d{2,3}\s?k\b/.test(t)) {
     return { intent: "exclusive", callback: null, text: `The $490 reserve isn't exclusive. It reserves a share of display space across the hub network, curated as hubs launch. Exclusivity is a premium slot, $25,000 to $50,000, inquire only. Want the team to call you about premium?` };
@@ -92,7 +92,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return { intent: "categories", callback: null, text: `You get a share of display space across our growing network of private, members-only health and wellness hubs, with more launching. Placements are curated as each hub launches, and early spots are limited. Reserve at ${BUY}.` };
   }
   if (/proof|see|example|hub|where|show|who sees/.test(t)) {
-    return { intent: "proof", callback: null, text: `See the face before the flight: a live hub anyone can open now is https://physio.drhonow.com (DR-HO'S). Ads sit on the thank-you page, the hub home page, product and services pages, and the member dashboard. The media kit is ${KIT}.` };
+    return { intent: "proof", callback: null, text: `See the face before the flight: live hubs anyone can open now are https://physio.drhonow.com (DR-HO'S) and https://www.scalehealth.ca/sole (SOLE). Ads sit on the thank-you page, the hub home page, product and services pages, and the member dashboard. The media kit is ${KIT}.` };
   }
   if (/price|cost|how much|rate|pricing|budget|package/.test(t)) {
     return { intent: "price", callback: null, text: `Three ways in. The 7-day look is $190 USD, and it converts to the reserve within 7 days or is refunded. Reserving is $490 USD, 100% media credit until the IO. Premium slots run $25,000 to $50,000 and are inquire only. Start at ${BUY}.` };

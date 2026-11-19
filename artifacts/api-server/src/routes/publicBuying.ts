@@ -2372,7 +2372,7 @@ ${seeTheUnitHtml(price(look), price(seat))}
 
 <section class="band" id="included"><div class="wrap"><p class="kicker">What you get</p><h2>Plain terms.</h2>
 <ul class="facts"><li>A share of display space across the hub network. No auction.</li><li>100% of what you pay is media credit.</li><li>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</li><li>The insertion order names the hub and placement before anything runs.</li><li>Aggregate reporting only. No PHI, no clinical pixels.</li><li>No impression guarantee, and no reach or click forecast.</li></ul>
-<div class="proof"><p><span class="tag">Live hub</span><a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>, a listed physio hub. Your card sits at the booking and the plan. Illustrative until your insertion order names the hub.${liveHubTalkHtml()}</p>
+<div class="proof"><p><span class="tag">Live hub</span><a href="https://physio.drhonow.com" target="_blank" rel="noopener">physio.drhonow.com</a>, a listed physio hub, and <a href="https://www.scalehealth.ca/sole" target="_blank" rel="noopener">scalehealth.ca/sole</a>, the SOLE hub. Your card sits at the booking and the plan. Illustrative until your insertion order names the hub.${liveHubTalkHtml()}</p>
 <p><span class="tag">Public benchmark</span>Not a Birch result: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p></div>
 </div></section>
 ${flightTimelineHtml(price(look), price(seat))}
@@ -2380,7 +2380,7 @@ ${flightTimelineHtml(price(look), price(seat))}
 <section class="band" id="categories"><div class="wrap"><p class="kicker">The network</p><h2>A growing network of private hubs.</h2>
 <p class="open-count"><strong>Limited early placements</strong> · We curate placements as each hub launches. Want a premium slot or something custom? Ask below.</p>
 ${sharedSeatsHtml()}
-<ul class="cat-strip" data-testid="network-hubs"><li><span style="min-height:0">DR-HO'S physio</span></li><li><span style="min-height:0">More hubs launching</span></li></ul>
+<ul class="cat-strip" data-testid="network-hubs"><li><span style="min-height:0">DR-HO'S physio</span></li><li><span style="min-height:0">SOLE</span></li><li><span style="min-height:0">More hubs launching</span></li></ul>
 </div></section>
 
 <section class="band" id="buy"><div class="wrap"><div class="buy">

@@ -15,7 +15,7 @@ export type ExampleHub = {
   name: string;
   kind: string;
   image: string;
-  /** Only DR-HO links out. */
+  /** Only live hubs link out (DR-HO'S, SOLE). */
   href?: string;
 };
 
@@ -27,6 +27,7 @@ export const EXAMPLE_HUBS: ReadonlyArray<ExampleHub> = [
     image: "/hub-gallery/drho.webp",
     href: "https://physio.drhonow.com/dr-ho/portal",
   },
+  { id: "sole", name: "SOLE", kind: "Product brand hub", image: "/hub-gallery/sole.webp", href: "https://www.scalehealth.ca/sole" },
   { id: "kalaya", name: "Kalaya", kind: "Product brand hub", image: "/hub-gallery/kalaya.webp" },
   { id: "jill-health", name: "Jill Health", kind: "Health brand hub", image: "/hub-gallery/jill-health.webp" },
   { id: "jack-health", name: "Jack Health", kind: "Health brand hub", image: "/hub-gallery/jack-health.webp" },

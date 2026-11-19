@@ -127,7 +127,7 @@ After two answers: one benefit tied to THEIR audience, then a close fork. Do not
 |---|---|
 | "What are the options?" | "A $490 category seat is 100% media credit until we sign an insertion order, or take a $190 7-day look first. Premium slots are $25K to $50K, inquire only. Want the checkout link?" |
 | "Is it exclusive?" / "Can I hold or lock my category?" | "The $490 seat isn't exclusive: it's one of 8 shared seats, open to more than one brand per category. Category exclusivity is a premium slot, $25K to $50K, inquire only. Want the team to call you about that?" |
-| "Show me proof / what does it look like?" | Send or offer live proof hub https://physio.drhonow.com/dr-ho/portal (say "the live DR-HO hub" on phone). Caption mindset: illustrative, not their receipt. Media kit for modeled demographics: https://birchreserve.net/kit. |
+| "Show me proof / what does it look like?" | Send or offer a live proof hub: https://physio.drhonow.com/dr-ho/portal (say "the live DR-HO hub" on phone) or the SOLE hub https://www.scalehealth.ca/sole (say "the live SOLE hub"). Caption mindset: illustrative, not their receipt. Media kit for modeled demographics: https://birchreserve.net/kit. |
 | "How many impressions / CTR / will I get X views?" | Do not invent numbers. Platform story only: Scale curated 50MM+ unique viewers in its first 4 months and is on track for 100MM+ by year end, high-end recovery goers. Never turn that into a per-seat guarantee. Pivot: "Your seat sits inside recovery hubs at checkout and booking moments. Want to lock one?" |
 | "We need a big / annual / enterprise program" | Premium slots are $25K to $50K, inquire only; larger annual programs, inquire. Not Stripe self-serve. Capture intake; team callback. Do not invent CPM or seat math for this tier. |
 | "I want to talk to a person / book a time" | Do not jump to Cal. Take two or three intake questions, offer callback or keep closing the seat. Cal https://cal.com/randy-gilling/30min (Mon–Fri 1–3pm ET) ONLY if they explicitly insist on a set time AFTER qualify. |
@@ -168,6 +168,7 @@ Only the URLs in this table are routable. Every row was verified in headless Chr
 | Brand partnership / other Scale | General Scale | https://scalehealth.ca (homepage only) | verified homepage |
 | Investor / buyer | RDGDH portfolio | https://rdgdh.com/portfolio | verified |
 | Wants to see proof | Live hub | https://physio.drhonow.com/dr-ho/portal | verified |
+| Wants to see proof (feet / footwear / insoles) | Live SOLE hub | https://www.scalehealth.ca/sole | verified |
 | Wants a human | Team callback: take name, company, role, phone, email, need, size, timing | (no link; intake is captured and emailed to the team) | verified |
 | Explicitly insists on a set booking time | Randy's calendar | https://cal.com/randy-gilling/30min (last resort only, never offered proactively) | verified |
 
@@ -254,11 +255,12 @@ Categories (companion lock):
 7. Men’s health  
 8. Diagnostics / services  
 
-Network: listed Scale Health hubs (live proof below) plus a launching cohort of brand hubs. Named logos (not reach numbers): DR-HO’S · Kalaya · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery.
+Network: listed Scale Health hubs (live proof below) plus a launching cohort of brand hubs. Live hubs: DR-HO’S and SOLE. Named logos (not reach numbers): DR-HO’S · SOLE · Kalaya · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery.
 
 ## Live proof
 
-**https://physio.drhonow.com/dr-ho/portal**  
+**https://physio.drhonow.com/dr-ho/portal** (DR-HO’S)  
+**https://www.scalehealth.ca/sole** (SOLE)  
 Caption on every mock: “Illustrative, not your receipt.”
 
 **Also (quiet secondary, not hero):** https://weprize.net — live SBG / Birch Reserve display placement example. Placement example only — not a Scale hub seat; no reach / impression / traffic claims. WePrize points brands to birchreserve.net to buy space; Birch reciprocates as a quiet proof point.
@@ -329,7 +331,7 @@ On-prem clinic/studio surfaces via Align / Scale clinic hubs = separate IO line,
 | Studio or audience wanting a free store | https://scalehealth.ca/clinichubs |
 | Virtual rehab or care | https://alignwellness.ca |
 
-Audience question ("who sees the ads?", "how big is the audience?"): the ad runs inside listed recovery-brand hubs, at the moment someone checks out, signs up for a plan, or books a session, so it reaches people already buying recovery care, not a cold feed. Mention the live proof hub (https://physio.drhonow.com/dr-ho/portal) and offer the media kit for modeled demographics (https://birchreserve.net/kit). You can say Scale reached 50MM+ unique viewers in its first 4 months and is on track for 100MM+ by year end, all high-end recovery goers. Never turn that into a per-seat reach, impressions, or CTR promise.
+Audience question ("who sees the ads?", "how big is the audience?"): the ad runs inside listed recovery-brand hubs, at the moment someone checks out, signs up for a plan, or books a session, so it reaches people already buying recovery care, not a cold feed. Mention the live proof hubs (https://physio.drhonow.com/dr-ho/portal and https://www.scalehealth.ca/sole) and offer the media kit for modeled demographics (https://birchreserve.net/kit). You can say Scale reached 50MM+ unique viewers in its first 4 months and is on track for 100MM+ by year end, all high-end recovery goers. Never turn that into a per-seat reach, impressions, or CTR promise.
 
 Inventory story: the first placement is the thank-you moment after someone buys or books on a Scale hub (post_checkout and scheduled_service), not a stranger's feed. Media kit: https://birchreserve.net/kit. Audience numbers there are modeled from launch hubs; never present them as measured.
 
@@ -341,7 +343,7 @@ Never tell a Birch buyer their seat equals any view count. Partner range to name
 |---|---|
 | Options | $190 7-day look (converts to the seat or refunded). $490 category seat = 100% media credit until the IO. Premium $25K to $50K, inquire only. |
 | "Is it exclusive?" / holding a category | The $490 seat is not exclusive: one of 8 shared seats, open to more than one brand per category. Category exclusivity is a premium slot ($25K to $50K, inquire only, on an IO). |
-| Proof / mock | Primary: live DR-HO hub https://physio.drhonow.com/dr-ho/portal ("illustrative, not your receipt"). Secondary placement example (not hero, no reach): https://weprize.net. Kit: https://birchreserve.net/kit. |
+| Proof / mock | Primary: live DR-HO hub https://physio.drhonow.com/dr-ho/portal or live SOLE hub https://www.scalehealth.ca/sole ("illustrative, not your receipt"). Secondary placement example (not hero, no reach): https://weprize.net. Kit: https://birchreserve.net/kit. |
 | Impressions / CTR / guarantees | Refuse invented numbers. Platform scale story only (50MM+ uniques in 4 months, on track for 100MM+ by year end). Pivot to the checkout and booking moments the seat sits in. |
 | Premium / enterprise / big annual | Premium slots $25K to $50K, inquire only; larger annual programs, inquire. Intake + team call-back. No invented CPM. |
 | Person / calendar | Qualify first. Callback default. Cal https://cal.com/randy-gilling/30min only post-qualify if they insist on a set time. |
@@ -462,9 +464,9 @@ Plan **3× or higher** average customer value versus Google, visitor arrives as 
 
 ## Brand hubs / launch queue (INTERNAL, logos OK publicly; stages not for prospect dumps)
 
-Live proof hub: **DR-HO’s** → https://physio.drhonow.com/dr-ho/portal  
+Live proof hubs: **DR-HO’s** → https://physio.drhonow.com/dr-ho/portal · **SOLE** → https://www.scalehealth.ca/sole  
 
-Launching cohort names (public logos OK): Kalaya · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery · Sole (and others in queue).
+Launching cohort names (public logos OK): Kalaya · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery (and others in queue).
 
 Full stage table is INTERNAL (`INTERNAL-Clinic-Hubs-Launch-Queue-24Sep2026.md`). Do not forward contracting/economics stages to prospects. Public: “launching cohort,” named logos, live proof URL.
 
@@ -491,7 +493,7 @@ If caller is a clinician wanting bookings: stop the Birch pitch, give https://sc
 
 ## UNKNOWN
 
-- Exact live hub count beyond “DR-HO’s live + launching cohort” as sold inventory → UNKNOWN; do not invent.
+- Exact live hub count beyond “DR-HO’s and SOLE live + launching cohort” as sold inventory → UNKNOWN; do not invent.
 - US reopen date → UNKNOWN until Randy.
 - Per-brand launch URLs in queue (some garbled in source) → verify; do not invent.
 
@@ -617,7 +619,7 @@ RULES
 - Never mention Clairvoyant. Never say Align, Align Wellness or alignwellness.ca to a visitor (call those locations 'retail hubs'), and never name Align team members. Never name the internal CRM or backend; say Birch Reserve. Never give a home or street address.
 
 PROOF
-- See the face before the flight: a live hub anyone can open now, https://physio.drhonow.com (DR-HO'S).
+- See the face before the flight: live hubs anyone can open now, https://physio.drhonow.com (DR-HO'S) and https://www.scalehealth.ca/sole (SOLE).
 - Media kit, one link: https://birchreserve.net/media-kit
 
 ROUTING

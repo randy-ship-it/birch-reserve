@@ -121,7 +121,7 @@ export const HUBS: Hub[] = [
   { key: "bird-and-be", name: "Bird & Be", kind: "brand", status: "In queue", url: "https://scalehealth.ca/bird-and-be", category: "Women’s health (postpartum)", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
   { key: "roll-recovery", name: "Roll Recovery", kind: "brand", status: "In queue", url: "https://scalehealth.ca/roll-recovery", category: "Recovery hardware", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
   { key: "nutriprocan", name: "NutriProCan", kind: "brand", status: "In queue", url: "https://scalehealth.ca/nutriprocan", category: "Nutrition", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "sole", name: "SOLE", kind: "brand", status: "In queue", url: "https://scalehealth.ca/sole", category: "Footwear and insoles", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
+  { key: "sole", name: "SOLE", kind: "brand", status: "Live inventory", url: "https://www.scalehealth.ca/sole", category: "Footwear and insoles", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
   { key: "clinic-network", name: "Clinic hub network (pooled)", kind: "clinic", status: "Onboarding", url: "https://scalehealth.ca/clinichubs", category: "Physio, mobility, gym and studio members", basis: "TAM feed provider-network row", views: CLINIC_NETWORK },
 ];
 
