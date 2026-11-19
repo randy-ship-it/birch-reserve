@@ -219,7 +219,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
               </select>
             </label>
           </div>
-          <div className="mt-5 rounded-2xl bg-[#0b1f3a] p-4 text-white" data-testid="kit-quick" data-source={view.source}>
+          <div className="mt-5 rounded-2xl bg-[#0b1f3a] p-4 text-white" data-testid="kit-quick" data-source={view.source === "friday" ? "report" : view.source}>
             <div className="flex items-center gap-2"><EstimateTag /><span className="text-xs text-white/70">GP LTV per customer</span>
               <span data-testid="kit-source" className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${view.source === "friday" ? "bg-lime-300 text-[#0b1f3a]" : "bg-white/15 text-white"}`}>{view.source === "friday" ? (view.mock ? "Preview · mock data" : "From your report") : "Live preview"}</span>
               <span className="ml-auto"><InfoPop dark title="Formula and assumptions" label="Formula" testId="kit-formula">{(view.source === "friday" ? view.formula : KIT_CALC_FORMULA).map((f) => <p key={f}>• {f}</p>)}<hr className="my-2" />{KIT_CALC_ASSUMPTIONS.map((a) => <p key={a} className="text-xs">{a}</p>)}<p className="mt-2 text-xs">While you type, numbers are a live preview. After you send, the LTV and channel fit come from your report.</p></InfoPop></span>
