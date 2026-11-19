@@ -37,7 +37,7 @@ export default function BrIntakeSupplier() {
       const r = ref ?? (await api.create(payload));
       const res = await api.submit(r, payload, { email: email.trim(), website: website.trim(), elapsed_ms: Date.now() - t0.current });
       setReportToken(r.reportToken);
-      setSent(Object.values(res.approvals).includes("pending_review") ? "pending_review" : "error");
+      setSent(res.status === "submitted" || Object.values(res.approvals ?? {}).includes("pending_review") ? "pending_review" : "error");
     } catch (e) {
       const code = e instanceof Error ? e.message : "";
       setErr(code === "email" ? "Add a valid work email." : code === "website" ? "Add your website." : code === "too_fast" ? "One moment, then try again." : "The Friday intake is not open yet. Nothing was sent.");
