@@ -19,6 +19,22 @@ import { MOCK_SHARES, STREET_TEAM_REACH } from "../../../../api-server/src/lib/k
 import { PUBLISHER_SURFACES, RETAIL_COPY } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import type { ReportModel } from "@/components/br/report-v2";
 import { EstimatePop } from "@/components/br/report-v2";
+import { Details } from "@/components/br/details";
+import { IN_LOCATION, inLocationReach, type PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
+
+/** In-location display (Randy, Nov 19 2026 10:54 AM ET): the brand's own locations × monthly visitors. Estimate; no rate
+ * is invented (priced by IO, the same per-door economics as Street Team). */
+export function InLocationRow({ physical, testId }: { physical: PhysicalAnswer | null | undefined; testId: string }) {
+  const r = inLocationReach(physical);
+  if (!r) return null;
+  return (
+    <div className="grid grid-cols-[1fr_auto] items-baseline gap-2 px-3 py-2.5 text-[13px] md:grid-cols-[1.3fr_1fr_1fr]" style={{ borderTop: `1px solid ${RT.line}`, background: "#F3FBF6" }} data-testid={testId}>
+      <span className="min-w-0"><span className="font-semibold" style={{ color: RT.ink }}>{IN_LOCATION.name}</span><span className="block text-[11px]" style={{ color: RT.mute }}>{IN_LOCATION.unit}{r.locations ? ` · ${r.locations.toLocaleString("en-US")} location${r.locations === 1 ? "" : "s"}` : ""}</span></span>
+      <span className="text-right tabular-nums"><span className="text-[17px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{big(r.monthlyVisits)}</span><span className="block text-[10px] font-bold uppercase tracking-wider" style={{ color: RT.mintInk }}>Estimate</span></span>
+      <span className="col-span-2 text-[11px] md:col-span-1 md:text-right" style={{ color: RT.mute }}>{IN_LOCATION.pricing} · from your numbers</span>
+    </div>
+  );
+}
 
 type LoHi = { low: number; high: number };
 type LLH = { low: number; likely: number; high: number };
@@ -144,7 +160,7 @@ function ChannelTable({ rows, extra, testId }: { rows: ChannelRow[]; extra?: Rea
 }
 
 /* ------------------------------------------------------------------ (a) supplier exposure view */
-export function SupplierExposureView({ m, exposure, source, cta, onAccelerate }: { m: ReportModel; exposure: FridayExposure; source: "report" | "mock" | "sample"; cta?: ReactNode; onAccelerate?: ReactNode }) {
+export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, physical }: { m: ReportModel; exposure: FridayExposure; source: "report" | "mock" | "sample"; cta?: ReactNode; onAccelerate?: ReactNode; physical?: PhysicalAnswer | null }) {
   const [tier, setTier] = useState<Tier>(m.isAccelerate ? "accelerate" : "performance_only");
   const perf = channelRows(exposure, "performance_only");
   const acc = channelRows(exposure, "accelerate");
@@ -170,7 +186,7 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate }:
               <p><strong>Performance-only</strong> (pay on results, no CPC/CPM) uses the lower half of that range ({pct(s.min)}–{pct(s.mid)}). You pay on results, not for ad space.</p>
               {tier === "accelerate" ? <p><strong>Accelerate</strong> adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}), plus the display views a $1,000 test buys at rate-card CPM (budget ÷ CPM × 1,000).</p> : <p><strong>Accelerate</strong> (optional) adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}). Switch to With Accelerate to see how it is sized.</p>}
               <p>12 months = the monthly figure × 12 for page views. Customers and homes are an audience in reach, so they are not multiplied.</p>
-              <p style={{ color: RT.mute }}>Network figures as reported by Scale Health; targets are goals. Estimates in USD where money is shown. Not a forecast, not a guarantee. No CTR or ROAS is promised.</p>
+              <p style={{ color: RT.mute }}>Network figures as reported by Scale Health; targets are goals. Estimates in USD where money is shown. Not a forecast or a promise of any result.</p>
             </EstimatePop>
           </span>
         </div>
@@ -220,10 +236,11 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate }:
                 <span className="text-right tabular-nums"><span className="text-[17px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{big(own.on)}</span><span className="block text-[11px]" style={{ color: RT.mute }}>up to {big(own.all)}</span></span>
                 <span className="col-span-2 text-[11px] md:col-span-1 md:text-right" style={{ color: RT.mute }}>{m.isPublisher ? "max exposure: on" : "unlocks max exposure"}</span>
               </div>
+              <InLocationRow physical={physical} testId="supplier-channels-in-location" />
             </>
           }
         />
-        <p className="mt-3 text-[12px]" style={{ color: RT.mute }}>{RETAIL_COPY} · network figures and targets. Estimates, not guarantees.</p>
+        <Details testId="supplier-details"><p>{RETAIL_COPY} · network figures and targets. Estimates, not guarantees.</p></Details>
         {onAccelerate && !m.isAccelerate ? <div className="mt-4">{onAccelerate}</div> : null}
         {cta ? <div className="mt-4">{cta}</div> : null}
       </div>
@@ -232,7 +249,7 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate }:
 }
 
 /* ------------------------------------------------------------------ (b) hub max-exposure + earnings view */
-export function HubView({ m, exposure, cta }: { m: ReportModel; exposure: FridayExposure; cta?: ReactNode }) {
+export function HubView({ m, exposure, cta, physical }: { m: ReportModel; exposure: FridayExposure; cta?: ReactNode; physical?: PhysicalAnswer | null }) {
   const now = m.total;
   const later = m.later && now && m.later.high > now.high ? m.later : null;
   const earn: LLH | null = now ? { low: now.low, likely: (now.low + now.high) / 2, high: later?.high ?? now.high } : null;
@@ -290,8 +307,8 @@ export function HubView({ m, exposure, cta }: { m: ReportModel; exposure: Friday
           </div>
         ) : null}
         <p className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-bold" style={{ color: RT.ink }}><TrendingUp className="size-4" style={{ color: RT.mintInk }} aria-hidden />Max exposure: your products on your own hub plus across the network</p>
-        <ChannelTable rows={rows} testId="hub-channels" />
-        <p className="mt-3 text-[12px]" style={{ color: RT.mute }}>{RETAIL_COPY} · network figures and targets. Estimates, not guarantees.</p>
+        <ChannelTable rows={rows} testId="hub-channels" extra={<InLocationRow physical={physical} testId="hub-channels-in-location" />} />
+        <Details testId="hub-details"><p>{RETAIL_COPY} · network figures and targets. Estimates, not guarantees.</p></Details>
         {cta ? <div className="mt-4">{cta}</div> : null}
       </div>
     </section>

@@ -15,7 +15,9 @@ import { MockBanner } from "@/components/br/intake-kit";
 import { KitSides } from "@/components/br/kit-builder";
 import { fridayEligibility, fridayIntake, HELD_COPY, type FridayReport } from "@/lib/fridayBrandIntake";
 import { fridayView } from "@/lib/kitView";
-import { kitSideA, kitSideB, kitPdfBlob, kitPngBlob, saveBlob, imageToDataUrl } from "@/lib/kitRender";
+import { kitCover, kitSideA, kitSideB, kitPdfBlob, kitPngBlob, saveBlob, imageToDataUrl } from "@/lib/kitRender";
+import { kitSummary } from "@/lib/kitSummary";
+import { loadPrefill } from "@/lib/intakePrefill";
 import { KIT_CALC_CONFIG, kitCalc } from "../../../../api-server/src/lib/kitCalc";
 
 const REPEAT_LABEL = (n: number) => KIT_CALC_CONFIG.repeatBands.find((b) => n >= b.lo && n <= b.hi)?.label ?? String(n);
@@ -57,8 +59,10 @@ export default function BrKitReport() {
   const svgA = view ? kitSideA(view) : "";
   const svgB = view ? kitSideB(view) : "";
   const expo = pickExposure(report?.exposure, market, !!report?.mock);
+  const physical = useMemo(() => loadPrefill()?.physical ?? null, []);
   async function dl() {
-    saveBlob(await kitPdfBlob([svgA, svgB]), "birch-reserve-monetization-kit.pdf");
+    const cover = full ? kitCover(kitSummary(full, expo.ex, physical, full.mock ? "mock" : "friday", typeof window !== "undefined" ? window.location.href.split("?")[0] : undefined)) : null;
+    saveBlob(await kitPdfBlob(cover ? [cover, svgA, svgB] : [svgA, svgB]), "birch-reserve-monetization-kit.pdf");
     saveBlob(await kitPngBlob([svgA, svgB]), "birch-reserve-monetization-kit.png");
     for (const f of ["pdf", "png"] as const) {
       trackIntake("advertiser", "kit_download", f);
@@ -88,6 +92,7 @@ export default function BrKitReport() {
               map={map}
               exposure={expo.ex}
               exposureSource={expo.source === "friday" ? "report" : "mock"}
+              physical={physical}
               costExtra={
                 <>
                   <div className="mt-5 rounded-[10px] p-4 text-white" style={{ background: RT.forest }} data-testid="report-cost">

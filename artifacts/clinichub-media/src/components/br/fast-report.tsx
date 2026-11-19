@@ -4,8 +4,14 @@
  * "from your site" tag; gaps (needs_input) become prompts in "Add detail to sharpen your numbers". Defaults are
  * labelled. Friday's full report is reviewed by a person first. Birch never fetches the brand's site itself.
  */
-import { ArrowRight, Plus, Rocket, Sparkles } from "lucide-react";
-import { useMemo, useState, type ReactNode } from "react";
+import { ArrowRight, Download, Loader2, Mail, Plus, Rocket, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Details } from "@/components/br/details";
+import { adapterMode, reportPath } from "@/lib/fridayBrandIntake";
+import { kitCover, kitPdfBlob, kitSideA, kitSideB, imageToDataUrl, saveBlob } from "@/lib/kitRender";
+import { kitSummary } from "@/lib/kitSummary";
+import { previewView, withGeo } from "@/lib/kitView";
+import { kitCalc } from "../../../../api-server/src/lib/kitCalc";
 import { ReportV2 } from "@/components/br/report-v2";
 import { LeadGatesStatus, PrimaryCta } from "@/components/br/intake-sell";
 import { IntakeWarnings } from "@/components/br/intake-warnings";
@@ -20,8 +26,9 @@ import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation"
 import { trackIntake } from "@/lib/intakeTrack";
 import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { FRIDAY_CATEGORIES } from "../../../../api-server/src/lib/kitCalc/fridayV12";
+import type { PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
 
-export type QuickResult = { side: IntakeSide; roles: string[]; host: string; autofill: Autofill | null; fallback: boolean; typedMarket: Market | null; held: boolean; ref?: IntakeRef; payload?: IntakePayload; contact?: { email: string; website: string }; shared?: SharedAnswers; brand?: string | null; category?: string | null };
+export type QuickResult = { side: IntakeSide; roles: string[]; host: string; autofill: Autofill | null; fallback: boolean; typedMarket: Market | null; held: boolean; ref?: IntakeRef; payload?: IntakePayload; contact?: { email: string; website: string }; shared?: SharedAnswers; brand?: string | null; category?: string | null; physical?: PhysicalAnswer | null };
 const DEFAULT_CAT = "recovery_devices";
 const catLabel = (k: string) => FRIDAY_CATEGORIES.find((c) => c.key === k)?.label ?? k;
 const geoText = (g?: { sells?: string[] } | null) => (g?.sells?.length ? g.sells.map((c) => (c === "CA" ? "Canada" : c === "US" ? "USA" : c)).join(" + ") : null);
@@ -74,6 +81,43 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
   };
   const exposure = useMemo(() => mockExposure(q.typedMarket ?? undefined), [q.typedMarket]);
   const supplierOnly = q.roles.includes("supplier") && !q.roles.includes("publisher");
+  // Downloadable PDF (cover with the report's key numbers + Side A + Side B) and the kit email (flag-gated server side).
+  const token = q.ref?.reportToken && !q.ref.legacy && !q.held ? q.ref.reportToken : null;
+  const reportUrl = token ? `https://birchreserve.net${reportPath(token)}` : undefined;
+  const summary = useMemo(() => kitSummary(report, exposure, q.physical, q.autofill?.mock || adapterMode() === "mock" ? "mock" : "preview", reportUrl), [report, exposure, q.physical, q.autofill, reportUrl]);
+  const buildPdf = async () => {
+    const calc = kitCalc({ aovUsd: aov ?? QUICK_DEFAULTS.aov_usd, monthlyOrders: QUICK_DEFAULTS.orders_per_month, purchasesPerYear: QUICK_DEFAULTS.purchases_per_year, marginBand: QUICK_DEFAULTS.margin_band });
+    const map = await imageToDataUrl("/street-team/door-route.jpg");
+    const view = withGeo(previewView(calc, { brand: name ?? q.host, categoryKey: cat, categoryLabel: catLabel(cat), repeatLabel: QUICK_DEFAULTS.repeat_label, mapDataUrl: map, domain: q.host }), q.typedMarket);
+    return kitPdfBlob([kitCover(summary), kitSideA(view), kitSideB(view)]);
+  };
+  const [pdfBusy, setPdfBusy] = useState(false);
+  const downloadPdf = async () => {
+    setPdfBusy(true);
+    trackIntake(q.side, "kit_download", "pdf");
+    try { saveBlob(await buildPdf(), "birch-reserve-monetization-kit.pdf"); } finally { setPdfBusy(false); }
+  };
+  const [mailed, setMailed] = useState<string | null>(null);
+  const mailTried = useRef(false);
+  useEffect(() => {
+    // Live submits only (never ?mock=1). The server sends nothing unless KIT_EMAIL_ENABLED=on (default OFF), and on
+    // previews only to test+…@silverbirchgrowth.com; in production only for a submitted lead with this email.
+    const email = q.contact?.email;
+    if (mailTried.current || !token || !email || !q.ref?.id || adapterMode() === "mock" || q.autofill?.mock) return;
+    mailTried.current = true;
+    (async () => {
+      try {
+        const blob = await buildPdf();
+        const b64 = await new Promise<string>((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(",")[1] ?? ""); fr.onerror = rej; fr.readAsDataURL(blob); });
+        const r = await fetch("/v1/kit-email", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, intake_id: q.ref!.id, report_path: reportPath(token), brand: name ?? null, headline: summary.email, pdf_b64: b64.length <= 3_400_000 ? b64 : undefined }) });
+        const j = (await r.json().catch(() => ({}))) as { sent?: boolean };
+        if (j.sent) { setMailed(email); trackIntake(q.side, "step_complete", "kit_email"); }
+      } catch {
+        /* the email is a bonus; the kit is on screen and downloadable */
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
   const earnCta = supplierOnly && q.ref ? (
     <button type="button" onClick={() => addRole("publisher", "add_hub")} disabled={!!adding} data-testid="report-add-hub" className="inline-flex h-11 items-center gap-1.5 rounded-full px-5 text-sm font-bold" style={{ background: RT.forest, color: "#fff" }}><Plus className="size-4" />{adding === "publisher" ? "Adding…" : "Add my hub to unlock max exposure"}</button>
   ) : undefined;
@@ -103,7 +147,7 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
           {needs.map((k) => <li key={k}>• {needPrompt(k, q.autofill?.notes)}</li>)}
         </ul>
       ) : null}
-      <p className="mt-2 text-[11px] text-white/60">Updates the same request. What you type always replaces what we read from your site.</p>
+
     </div>
   );
   return (
@@ -118,18 +162,25 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
             </div>
           ))}
         </dl>
-        {q.autofill?.mock ? <p className="mt-2 text-[11px]" style={{ color: RT.mute }} data-testid="fast-autofill-mock">Preview · mock data: we don't read your site on this preview, so every value is a default.</p> : null}
-        {q.fallback ? <p className="mt-2 text-[11px]" style={{ color: RT.mute }} data-testid="fast-fallback">Site auto-fill is not switched on yet, so these are defaults.</p> : null}
-        <div className="mt-4 rounded-2xl p-3 text-sm" style={{ background: RT.paper, color: RT.body }} data-testid="fast-in-review">
-          <strong>Your full report is in review.</strong> We sent your request to Birch Reserve. A person reviews it before the full report is released{q.held ? ", after we confirm brand ownership (usually within one business day)" : ""}.
+        <div className="mt-4 flex flex-wrap items-center gap-2" data-testid="fast-kit-actions">
+          <button type="button" onClick={downloadPdf} disabled={pdfBusy} data-testid="fast-download-pdf" className="inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-bold" style={{ background: RT.forest, color: "#fff" }}>{pdfBusy ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}Download my kit (PDF)</button>
+          {mailed ? <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold" style={{ color: RT.mintInk }} data-testid="fast-kit-emailed"><Mail className="size-4" />Sent to {mailed}</span> : null}
+        </div>
+        <div className="mt-3 rounded-2xl p-3 text-sm" style={{ background: RT.paper, color: RT.body }} data-testid="fast-in-review">
+          <strong>Your full report is in review.</strong> A person reviews it first{q.held ? ", after we confirm brand ownership" : ""}.
         </div>
         <LeadGatesStatus gates={{ review: "pending_review" }} testId="fast-lead-gates" />
+        <Details testId="fast-details">
+          {q.autofill?.mock ? <p data-testid="fast-autofill-mock">Preview · mock data: we don't read your site on this preview, so every value is a default.</p> : null}
+          {q.fallback ? <p data-testid="fast-fallback">Site auto-fill is not switched on yet, so these are defaults.</p> : null}
+          <p>We sent your request to Birch Reserve. A person reviews it before the full report is released{q.held ? " (brand ownership check, usually within one business day)" : ""}. Values tagged "default" are placeholders until you add detail.</p>
+        </Details>
         <IntakeWarnings testId="fast-warnings" />
         {hasKit || !oneForm ? <div className="mt-4">{upgrade("top")}</div> : null}
         {hasKit || !oneForm ? <div className="mt-3"><PrimaryCta side={q.side} where="done" /></div> : null}
       </div>
       {oneForm && q.ref && q.payload ? <IntakeDetails key={q.roles.join(",")} intake={q.ref} payload={{ ...q.payload, roles: q.roles as IntakePayload["roles"] }} roles={q.roles} shared={q.shared ?? { brand: "", categories: [], skus: "", audience: "" }} /> : null}
-      <ReportV2 report={report} exposure={exposure} exposureSource="mock" earnCta={earnCta} supplierCta={supplierOnly ? earnCta : undefined} onAccelerate={accCta} />
+      <ReportV2 report={report} exposure={exposure} exposureSource="mock" earnCta={earnCta} supplierCta={supplierOnly ? earnCta : undefined} onAccelerate={accCta} physical={q.physical} />
       {hasKit || !oneForm ? upgrade("bottom") : null}
     </section>
   );

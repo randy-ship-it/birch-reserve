@@ -296,3 +296,55 @@ export async function imageToDataUrl(src: string): Promise<string | undefined> {
     return undefined;
   }
 }
+
+/**
+ * Cover page of the downloadable / emailed Monetization Kit PDF (Randy, Nov 19 2026 10:54 AM ET): the report's key
+ * numbers at a glance, then Side A and Side B. Values come from the report on screen (kitSummary.ts); no new figures.
+ */
+export type KitCover = {
+  brand: string;
+  source: "preview" | "friday" | "sample" | "mock";
+  headline: Array<{ value: string; label: string; sub?: string }>;
+  channels: Array<{ name: string; value: string; note: string }>;
+  reportUrl?: string;
+};
+export function kitCover(c: KitCover): string {
+  const stats = c.headline.slice(0, 3);
+  const w = stats.length ? Math.floor((1056 - (stats.length - 1) * 24) / stats.length) : 1056;
+  const statSvg = stats
+    .map((s, i) => {
+      const x = 72 + i * (w + 24);
+      return `<rect x="${x}" y="560" width="${w}" height="250" rx="28" fill="#ffffff" fill-opacity=".08" stroke="#fff" stroke-opacity=".18"/>
+      <text x="${x + 32}" y="690" font-family="${SERIF}" font-size="${stats.length > 2 ? 72 : 88}" fill="${LIME}">${esc(s.value)}</text>
+      ${wrap(s.label, Math.floor(w / 12)).slice(0, 2).map((l, k) => `<text x="${x + 32}" y="${738 + k * 26}" font-family="${SANS}" font-size="21" fill="#fff" opacity=".85">${esc(l)}</text>`).join("")}
+      ${s.sub ? `<text x="${x + 32}" y="${790}" font-family="${SANS}" font-size="16" fill="#fff" opacity=".55">${esc(s.sub.slice(0, Math.floor(w / 9)))}</text>` : ""}`;
+    })
+    .join("");
+  const rows = c.channels.slice(0, 6);
+  const rowSvg = rows
+    .map((r, i) => {
+      const y = 960 + i * 86;
+      return `<rect x="72" y="${y}" width="1056" height="72" rx="18" fill="#ffffff" fill-opacity="${r.name === "In-location display" ? ".14" : ".06"}"/>
+      <text x="104" y="${y + 45}" font-family="${SANS}" font-size="24" font-weight="700" fill="#fff">${esc(r.name)}</text>
+      <text x="640" y="${y + 45}" font-family="${SERIF}" font-size="30" fill="${LIME}">${esc(r.value)}</text>
+      <text x="1096" y="${y + 45}" text-anchor="end" font-family="${SANS}" font-size="16" fill="#fff" opacity=".65">${esc(r.note.slice(0, 34))}</text>`;
+    })
+    .join("");
+  const src = c.source === "sample" ? "Sample · example values" : c.source === "mock" ? "Preview · mock data" : c.source === "friday" ? "From your report" : "Quick estimate";
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${KIT_W}" height="${KIT_H}" viewBox="0 0 ${KIT_W} ${KIT_H}">
+  <defs><radialGradient id="glowC" cx="90%" cy="0%" r="75%"><stop offset="0" stop-color="${LIME}" stop-opacity=".6"/><stop offset="1" stop-color="${NAVY}" stop-opacity="0"/></radialGradient></defs>
+  <rect width="100%" height="100%" fill="${NAVY}"/><rect width="100%" height="100%" fill="url(#glowC)"/>
+  <text x="72" y="96" font-family="${SANS}" font-size="18" font-weight="700" letter-spacing="4" fill="${LIME}">BIRCH RESERVE</text>
+  <text x="1128" y="96" text-anchor="end" font-family="${SANS}" font-size="16" font-weight="700" letter-spacing="2" fill="#fff" opacity=".6">${esc(src.toUpperCase())}</text>
+  <text x="72" y="300" font-family="${SERIF}" font-size="104" fill="#fff">Your Monetization Kit</text>
+  <text x="72" y="372" font-family="${SANS}" font-size="30" fill="#fff" opacity=".8">Prepared for ${esc(clip(c.brand || "your brand", 40))}</text>
+  ${pill(72, 410, "Estimate · USD")}
+  ${pill(268, 410, "Reviewed by a person", "#e0f2fe", "#0c4a6e")}
+  <text x="72" y="530" font-family="${SANS}" font-size="20" font-weight="700" letter-spacing="2" fill="${LIME}">AT A GLANCE</text>
+  ${statSvg}
+  <text x="72" y="925" font-family="${SANS}" font-size="20" font-weight="700" letter-spacing="2" fill="${LIME}">WHERE YOU GET SEEN</text>
+  ${rowSvg}
+  <text x="72" y="1500" font-family="${SANS}" font-size="20" fill="#fff" opacity=".85">${esc(c.reportUrl ? `Your kit online: ${c.reportUrl.replace(/^https?:\/\//, "")}` : "birchreserve.net/intake")}</text>
+  <text x="72" y="1540" font-family="${SANS}" font-size="15" fill="#fff" opacity=".55">Estimates from your inputs and Birch Reserve modelled figures (network figures and targets). Not a guarantee of views, sales or earnings. USD.</text>
+</svg>`;
+}

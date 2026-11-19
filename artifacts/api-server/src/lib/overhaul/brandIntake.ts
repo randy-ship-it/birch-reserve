@@ -142,7 +142,7 @@ export const PUBLISHER_ASSUMPTIONS = [
   `Views: the network median partner hub (modelled), scaled by your hub-size slider.`,
   `Sell-through: ${SELL_ASSUMPTION_PCT}% of available space is sold (a planning assumption, not a delivery commitment).`,
   `At ramp = the low end of each published starter range. Normalized = the top of the same published range. No later-rate numbers are published.`,
-  `CPC mode uses the midpoint of each placement's benchmark CTR band. Ranges, not promises.`,
+  `CPC mode uses the midpoint of each placement's modelled engagement range. Ranges, not promises.`,
   `Your payout: ${PAYOUT.basePct}% of media revenue. Tier breakpoints are not set yet (placeholder tiers).`,
   `Transactions (bookings, products) use only the numbers you enter. Leave them at 0 to skip.`,
   `Estimates only. Not a guarantee of views, clicks, sales or payouts. Payouts follow the hub agreement.`,
@@ -229,7 +229,8 @@ export type IntakePayload = {
    * → the v1 `blurb` as labelled lines. See /workspace/br-intake/CONTRACT-GAPS.md §H.
    */
   company_name?: string;
-  shared?: { categories?: string[]; skus?: number; audience_customers?: number };
+  /** physical: "Do you have physical locations?" (Nov 19 2026 10:54 AM ET) → In-location display line; see inLocation.ts. */
+  shared?: { categories?: string[]; skus?: number; audience_customers?: number; physical?: import("./inLocation").PhysicalAnswer };
   hub?: { type?: string; locations?: number; foot_traffic_month?: number; web_visitors_month?: number; page_views_month?: number; email_list?: number; screens?: number; surfaces?: string[]; cities?: string; decision_maker_role?: string };
   supplier_detail?: { avg_price_usd?: number; margin_band?: string; retail_now?: string; ships?: string; accelerate_budget?: string };
   notes?: string[];

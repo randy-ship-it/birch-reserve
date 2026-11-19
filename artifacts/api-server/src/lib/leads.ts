@@ -49,8 +49,11 @@ export type LeadMeta = {
   /** Brand intake (Monetization Kit): "abandoned" (partial lead) or "submitted". */
   stage?: string;
   friday_intake_id?: string;
+  /** Kit drop-off nudge (Nov 19 2026): ISO time the ONE nudge was sent; ISO time the lead unsubscribed. */
+  nudged_at?: string;
+  unsub?: string;
 };
-const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id", "stage", "friday_intake_id"] as const;
+const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id", "stage", "friday_intake_id", "nudged_at", "unsub"] as const;
 
 /** Keep only well-typed, non-empty keys (never empty strings). */
 export function cleanLeadMeta(raw: unknown): LeadMeta {

@@ -18,6 +18,8 @@ import { visibleHubs } from "../../../../api-server/src/lib/overhaul/hubMatch";
 import { CHANNEL_GEO } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { mockExposure, readExposure, type FridayExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 import { HubView, SupplierExposureView } from "@/components/br/report-views";
+import { Details } from "@/components/br/details";
+import type { PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
 
 const FKEY: Record<string, string> = { hubs: "scale-hubs", calm_joints: "calm-joints", street_team: "street-team", retail: "retail-network" };
 type LoHi = { low: number; high: number };
@@ -166,14 +168,13 @@ export function ReportHero({ m, sample }: { m: ReportModel; sample?: boolean }) 
           <h2 className="mt-2 text-[34px] leading-[1.05] md:text-[52px]" style={{ fontFamily: RT_SERIF }}>
             {top ? <>{m.name}'s customers fit best with <em style={{ color: RT.mint }}>{top}</em>{more ? ` and ${more} more partner${more > 1 ? "s" : ""}.` : "."}</> : <>Where {m.name}'s customers fit best.</>}
           </h2>
-          <p className="mt-3 max-w-xl text-[17px] text-white/80">Ranked by fit with your customers. Every fit is an estimate, confirmed by a person.</p>
+          <Details dark testId="hero-details"><p>Ranked by fit with your customers. Every fit is an estimate, confirmed by a person.</p></Details>
         </div>
         {m.score != null ? (
           <div className="flex items-center gap-4 p-4" style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.14)", borderRadius: 24 }} data-testid="fit-score">
             <FitRing score={m.score} />
             <div className="text-sm">
               <p className="font-semibold">Fit score · {fitLabelOf(m.score).replace(" fit", "")}</p>
-              <p className="text-white/60">Average of your three strongest channels.</p>
               <ul className="mt-1 space-y-0.5">{m.top3.map((c) => <li key={c.name}><span className="font-semibold">{c.name}</span> <span className="text-white/60">· {c.label}</span></li>)}</ul>
             </div>
           </div>
@@ -188,7 +189,6 @@ export function ChannelTilesV2({ m, map }: { m: ReportModel; map?: string }) {
     <section data-testid="report-tiles" style={{ fontFamily: RT_SANS, color: RT.body }}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-[24px] md:text-[28px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Where you fit</h2>
-        <span className="text-[13px]" style={{ color: RT.mute }}>Network figures and targets for each channel.</span>
       </div>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         {m.tiles.map((t) => (
@@ -205,7 +205,7 @@ export function ChannelTilesV2({ m, map }: { m: ReportModel; map?: string }) {
               </dl>
             ) : <p className="mt-3 text-[34px] leading-none" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Figures to come</p>}
             <FitMeter pct={t.fit} label={t.fitLabel} />
-            <p className="mt-2 text-[13px]">{t.line}</p>
+            <Details label="About this channel" testId={`v2-tile-${t.key}-details`}><p>{t.line}</p></Details>
           </article>
         ))}
       </div>
@@ -218,7 +218,7 @@ export function HubCards({ m }: { m: ReportModel }) {
   return (
     <section data-testid="report-hubs" style={{ fontFamily: RT_SANS, color: RT.body }}>
       <h2 className="text-[24px] md:text-[28px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Partners, ranked</h2>
-      <p className="text-[13px]" style={{ color: RT.mute }}>Proposed hubs, subject to human confirmation.</p>
+      <Details testId="hubs-details"><p>Proposed hubs, subject to human confirmation.</p></Details>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         {m.hubs.map((h, i) => (
           <article key={h.key ?? h.name} data-testid={`hub-card-${i + 1}`} className={`p-5 ${i === 0 ? "md:col-span-2" : ""}`} style={card}>
@@ -261,7 +261,7 @@ export function CostSide({ m, extra }: { m: ReportModel; extra?: ReactNode }) {
           ) : null}
           <p>A $1,000 test buys about {views ? `${k(views.low)}–${k(views.high)}` : "—"} views on display, or {clicks ? `${Math.round(clicks.low)}–${Math.round(clicks.high)}` : "—"} clicks on CPC. Views = budget ÷ CPM × 1,000; clicks = budget ÷ CPC.</p>
           {m.dop && !m.dop.needs_input ? <p>Revenue opportunity from Scale demand = Scale demand orders a year in your category × a capture share of {pct(m.dop.capture_share?.min)}–{pct(m.dop.capture_share?.max)} (placeholder) × your average cart. Canada orders only.</p> : null}
-          <p style={{ color: RT.mute }}>Network figures are reported figures and targets, not guarantees. No CTR or ROAS is promised.</p>
+          <p style={{ color: RT.mute }}>Network figures are reported figures and targets, not promises of any result.</p>
         </EstimatePop>
       </div>
       <RangeBar label="Cost per 1,000 views (CPM)" range={m.cpm} unit="CPM" axisMax={axis(m.cpm, 40)} note="Display on your best-fit placements." />
@@ -344,7 +344,7 @@ export function EarningsSide({ m, cta }: { m: ReportModel; cta?: ReactNode }) {
  * The report's views follow the roles (Randy, Nov 19 2026 9:39 AM ET): one form, both answers. Supplier exposure view
  * (performance-only terms vs with Accelerate) + hub max-exposure + earnings view. Legacy two-sided order kept otherwise.
  */
-export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposureSource, onAccelerate }: { m: ReportModel; costExtra?: ReactNode; earnCta?: ReactNode; supplierCta?: ReactNode; exposure?: FridayExposure; exposureSource?: "report" | "mock" | "sample"; onAccelerate?: ReactNode }) {
+export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposureSource, onAccelerate, physical }: { m: ReportModel; costExtra?: ReactNode; earnCta?: ReactNode; supplierCta?: ReactNode; exposure?: FridayExposure; exposureSource?: "report" | "mock" | "sample"; onAccelerate?: ReactNode; physical?: PhysicalAnswer | null }) {
   const cost = <CostSide key="cost" m={m} extra={costExtra} />;
   const earn = <EarningsSide key="earn" m={m} cta={earnCta} />;
   if (m.isSupplier || m.isPublisher) {
@@ -355,10 +355,10 @@ export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposur
     return (
       <section data-testid="report-two-sides" data-first={sides[0]} data-sides={sides.join(",")} data-accelerate={m.isAccelerate ? "true" : "false"} style={{ fontFamily: RT_SANS }}>
         <h2 className="text-[26px] md:text-[34px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{m.isSupplier && m.isPublisher ? "Both answers from one form: your exposure + your hub earnings" : m.isSupplier ? "Your supplier exposure" : "Your hub: max exposure + earnings"}</h2>
-        <p className="text-[13px]" style={{ color: RT.mute }}>Estimates and modelled ranges in USD, each view labelled. Reviewed by a person before anything goes live.</p>
+        <p className="text-[13px]" style={{ color: RT.mute }}>Estimates in USD.</p>
         <div className={`mt-4 grid items-start gap-4 ${sides.length > 1 ? "lg:grid-cols-2" : ""}`}>
-          {m.isSupplier ? <SupplierExposureView key="sup" m={m} exposure={ex} source={src} cta={supplierCta} onAccelerate={onAccelerate} /> : null}
-          {m.isPublisher ? <HubView key="hub" m={m} exposure={ex} cta={earnCta} /> : null}
+          {m.isSupplier ? <SupplierExposureView key="sup" m={m} exposure={ex} source={src} cta={supplierCta} onAccelerate={onAccelerate} physical={physical} /> : null}
+          {m.isPublisher ? <HubView key="hub" m={m} exposure={ex} cta={earnCta} physical={physical} /> : null}
         </div>
       </section>
     );
@@ -373,14 +373,14 @@ export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposur
 }
 
 /** The full report body on the design system's paper background. */
-export function ReportV2({ report, sample, map, costExtra, earnCta, supplierCta, compact, exposure, exposureSource, onAccelerate }: { report: FridayReport; sample?: boolean; map?: string; costExtra?: ReactNode; earnCta?: ReactNode; supplierCta?: ReactNode; compact?: boolean; exposure?: FridayExposure; exposureSource?: "report" | "mock" | "sample"; onAccelerate?: ReactNode }) {
+export function ReportV2({ report, sample, map, costExtra, earnCta, supplierCta, compact, exposure, exposureSource, onAccelerate, physical }: { report: FridayReport; sample?: boolean; map?: string; costExtra?: ReactNode; earnCta?: ReactNode; supplierCta?: ReactNode; compact?: boolean; exposure?: FridayExposure; exposureSource?: "report" | "mock" | "sample"; onAccelerate?: ReactNode; physical?: PhysicalAnswer | null }) {
   const m = buildModel(report);
   return (
     <div data-testid={sample ? "report-v2-sample" : "report-v2"} className="space-y-8 p-3 md:p-6" style={{ background: RT.paper, borderRadius: 24 }}>
       <ReportHero m={m} sample={sample} />
       <ChannelTilesV2 m={m} map={map} />
       {compact ? null : <HubCards m={m} />}
-      <TwoSides m={m} costExtra={costExtra} earnCta={earnCta} supplierCta={supplierCta} exposure={exposure} exposureSource={exposureSource} onAccelerate={onAccelerate} />
+      <TwoSides m={m} costExtra={costExtra} earnCta={earnCta} supplierCta={supplierCta} exposure={exposure} exposureSource={exposureSource} onAccelerate={onAccelerate} physical={physical} />
     </div>
   );
 }

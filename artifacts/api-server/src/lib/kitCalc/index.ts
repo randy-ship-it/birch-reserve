@@ -5,7 +5,7 @@
  * Side A ("Your revenue opportunity"), transparent math only:
  *   purchasesPerYear = repeat (visits / purchases per customer per year, >= 1)
  *   GP LTV per customer = AOV × purchasesPerYear × margin band (lo..hi) × horizon years (lo..hi)
- *   Scale visits         = spend ÷ blended hub CPM × 1000 × CTR band (lo..hi)        (Birch modelled figures)
+ *   Scale visits         = spend ÷ blended hub CPM × 1000 × modelled engagement (lo..hi)        (Birch modelled figures)
  *   New customers        = Scale visits × your conversion scenario %
  *   Revenue opportunity  = new customers × AOV × purchasesPerYear × horizon years
  *   GP opportunity       = new customers × GP LTV
@@ -80,7 +80,7 @@ export function repeatRange(key: string): Range {
 
 export const KIT_CALC_FORMULA = [
   "GP LTV per customer = average cart × margin band × purchases per year × 1–3 years (low with low, high with high).",
-  "Scale visits = spend ÷ blended hub CPM × 1,000 × the ‘Browsing the hub’ CTR band (Birch modelled figures).",
+  "Scale visits = spend ÷ blended hub CPM × 1,000 × the modelled engagement range for ‘Browsing the hub’ (Birch modelled figures).",
   "New customers = Scale visits × your conversion scenario.",
   "Revenue opportunity = new customers × average cart × purchases per year × 1–3 years.",
   "Gross-profit opportunity = new customers × GP LTV. Break-even = spend ÷ GP LTV.",
@@ -89,7 +89,7 @@ export const KIT_CALC_FORMULA = [
 export const KIT_CALC_ASSUMPTIONS = [
   CONFIG.ltvHorizonYears.label,
   `Blended hub CPM $${CONFIG.demand.blendedHubCpmUsd} USD: ${CONFIG.demand.blendedHubCpmSource}.`,
-  `CTR band ${(CONFIG.demand.ctrBand.lo * 100).toFixed(2)}–${(CONFIG.demand.ctrBand.hi * 100).toFixed(1)}%: ${CONFIG.demand.ctrBand.source}.`,
+  `Modelled engagement ${(CONFIG.demand.ctrBand.lo * 100).toFixed(2)}–${(CONFIG.demand.ctrBand.hi * 100).toFixed(1)}%: ${CONFIG.demand.ctrBand.source}.`,
   CONFIG.conversionLabel,
-  "Spend levels are existing Birch prices. Views are modelled, not guaranteed. No impression, click, sales or ROAS guarantee.",
+  "Spend levels are existing Birch prices. Views and engagement are modelled estimates, not promises of any specific result.",
 ];

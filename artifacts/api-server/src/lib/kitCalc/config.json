@@ -63,7 +63,7 @@
     "ctrBand": {
       "lo": 0.0025,
       "hi": 0.006,
-      "source": "Birch INTENT_LADDER 'Browsing the hub' benchmark CTR band (Estimate; ranges, not promises)"
+      "source": "Birch INTENT_LADDER 'Browsing the hub' modelled engagement range (Estimate; ranges, not promises)"
     }
   },
   "conversionScenariosPct": [
