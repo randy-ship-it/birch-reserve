@@ -1,0 +1,17 @@
+import { chromium } from "@playwright/test";
+const B = process.env.B || "http://127.0.0.1:4199";
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 1280, height: 900 } });
+const errs = []; p.on("pageerror", (e) => errs.push(String(e)));
+await p.goto(`${B}/intake?mock=1`, { waitUntil: "networkidle" });
+await p.screenshot({ path: "/tmp/q-form.png" });
+await p.getByTestId("intake-accelerate").click();
+await p.getByTestId("intake-website").fill("glowtonic.com");
+await p.getByTestId("intake-email").fill("test+preview@silverbirchgrowth.com");
+await p.waitForTimeout(1500);
+await p.getByTestId("intake-submit").click();
+await p.getByTestId("fast-report").waitFor({ timeout: 15000 });
+await p.getByTestId("report-two-sides").first().scrollIntoViewIfNeeded();
+await p.getByTestId("report-two-sides").first().screenshot({ path: "/tmp/q-report.png" });
+console.log(JSON.stringify(errs));
+await b.close();

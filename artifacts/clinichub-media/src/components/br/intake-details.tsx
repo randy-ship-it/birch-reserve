@@ -44,11 +44,14 @@ const MARGINS = [{ k: "lt_30", l: "Under 30%" }, { k: "30_50", l: "30–50%" }, 
 const f = "h-11 w-full rounded-xl border border-foreground/20 bg-white px-3 text-sm outline-none focus:border-foreground";
 const lab = "block text-[11px] font-bold uppercase tracking-wider text-foreground/60";
 
+const fmtN = (v: string) => { const n = numOrU(v); return n == null ? v : n.toLocaleString("en-US"); };
+
 export function IntakeDetails({ intake: intakeRef, payload, roles, shared, onSaved }: { intake: IntakeRef; payload: IntakePayload; roles: string[]; shared: SharedAnswers; onSaved?: () => void }) {
   const isHub = roles.includes("publisher");
   const isSup = roles.includes("supplier");
   const [hub, setHub] = useState({ type: "", locations: "", foot: "", visitors: "", views: "", emails: "", screens: "", cities: "", dm: "", surfaces: [] as string[] });
-  const [sup, setSup] = useState({ price: "", margin: "", retail: "", ships: "" });
+  const isAcc = roles.includes("kit");
+  const [sup, setSup] = useState({ price: "", margin: "", retail: "", ships: "", budget: "" });
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -60,7 +63,7 @@ export function IntakeDetails({ intake: intakeRef, payload, roles, shared, onSav
       const next: IntakePayload = {
         ...payload,
         ...(isHub ? { hub: { type: hub.type || undefined, locations: numOrU(hub.locations), foot_traffic_month: numOrU(hub.foot), web_visitors_month: numOrU(hub.visitors), page_views_month: numOrU(hub.views), email_list: numOrU(hub.emails), screens: numOrU(hub.screens), surfaces: hub.surfaces, cities: hub.cities.trim() || undefined, decision_maker_role: hub.dm.trim() || undefined } } : {}),
-        ...(isSup ? { supplier_detail: { avg_price_usd: numOrU(sup.price), margin_band: sup.margin || undefined, retail_now: sup.retail || undefined, ships: sup.ships || undefined } } : {}),
+        ...(isSup ? { supplier_detail: { avg_price_usd: numOrU(sup.price), margin_band: sup.margin || undefined, retail_now: sup.retail || undefined, ships: sup.ships || undefined, accelerate_budget: (isAcc && sup.budget) || undefined } } : {}),
       };
       await fridayIntake().update(intakeRef, next);
       trackIntake("advertiser", "step_complete", "hub_details");
@@ -72,7 +75,7 @@ export function IntakeDetails({ intake: intakeRef, payload, roles, shared, onSav
       setBusy(false);
     }
   };
-  const prefilled = [shared.brand && `Brand: ${shared.brand}`, shared.categories.length && `${shared.categories.length} ${shared.categories.length === 1 ? "category" : "categories"}`, shared.skus && `${shared.skus} SKUs`, shared.audience && `${shared.audience} customers`].filter(Boolean) as string[];
+  const prefilled = [shared.brand && `Brand: ${shared.brand}`, shared.categories.length && `${shared.categories.length} ${shared.categories.length === 1 ? "category" : "categories"}`, shared.skus && `${fmtN(shared.skus)} SKUs`, shared.audience && `${fmtN(shared.audience)} customers`].filter(Boolean) as string[];
   return (
     <section className="rounded-3xl bg-white p-5 shadow-xl md:p-6" style={{ border: `1px solid ${RT.line}` }} data-testid="intake-details">
       <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: RT.mintInk }}>Optional · 2 minutes · updates the same request</p>
@@ -81,12 +84,13 @@ export function IntakeDetails({ intake: intakeRef, payload, roles, shared, onSav
       <div className={`mt-4 grid gap-4 ${isHub && isSup ? "lg:grid-cols-2" : ""}`}>
         {isSup ? (
           <div className="rounded-2xl p-4" style={{ background: RT.paper }} data-testid="details-supplier">
-            <p className="flex items-center gap-2 text-sm font-bold" style={{ color: RT.ink }}><Package className="size-4" />Supplier · performance only</p>
+            <p className="flex items-center gap-2 text-sm font-bold" style={{ color: RT.ink }}><Package className="size-4" />Supplier · performance only{isAcc ? " + Accelerate" : ""}</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <label><span className={lab}>Typical price / cart (USD)</span><input className={f} inputMode="numeric" value={sup.price} onChange={(e) => setSup({ ...sup, price: e.target.value })} placeholder="e.g. 60" data-testid="sup-price" /></label>
               <label><span className={lab}>Gross margin</span><select className={f} value={sup.margin} onChange={(e) => setSup({ ...sup, margin: e.target.value })} data-testid="sup-margin"><option value="">Pick one</option>{MARGINS.map((m) => <option key={m.k} value={m.k}>{m.l}</option>)}</select></label>
               <label><span className={lab}>In retail today?</span><select className={f} value={sup.retail} onChange={(e) => setSup({ ...sup, retail: e.target.value })} data-testid="sup-retail"><option value="">Pick one</option><option>Yes, in stores</option><option>Online only</option><option>Not yet</option></select></label>
               <label><span className={lab}>Fulfilment</span><select className={f} value={sup.ships} onChange={(e) => setSup({ ...sup, ships: e.target.value })} data-testid="sup-ships"><option value="">Pick one</option><option>We ship direct</option><option>Wholesale to stores</option><option>Both</option></select></label>
+              {isAcc ? <label className="sm:col-span-2"><span className={lab}>Accelerate test budget (USD)</span><select className={f} value={sup.budget} onChange={(e) => setSup({ ...sup, budget: e.target.value })} data-testid="sup-accelerate-budget"><option value="">Pick one</option><option>$1,000 test</option><option>$1,000–$5,000 a month</option><option>$5,000+ a month</option><option>Not sure yet</option></select></label> : null}
             </div>
           </div>
         ) : null}

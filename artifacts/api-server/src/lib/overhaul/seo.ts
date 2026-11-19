@@ -18,9 +18,9 @@ const INTAKE_DESC = "One short form for suppliers and hubs. See what your hub co
 
 export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/intake": { title: "Get your Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
-  "/intake/publisher": { title: "What your hub could earn · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
+  "/intake/publisher": { title: "Hub · max exposure + earnings · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
   "/intake/supplier": { title: "Supplier exposure, performance only · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
-  "/intake/sponsor": { title: "Sponsor options · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
+  "/intake/sponsor": { title: "Supplier + Accelerate · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
   "/advertise/brands": {
     title: "Advertise to brands | Birch Reserve",
     description: "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. Live today: DR-HO'S physio.",

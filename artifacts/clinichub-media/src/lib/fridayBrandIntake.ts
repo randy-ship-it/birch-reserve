@@ -179,8 +179,8 @@ const num = (n: unknown) => (typeof n === "number" && Number.isFinite(n) && n >=
 export function oneFormFields(p: IntakePayload, body: Record<string, unknown>): void {
   const lines: string[] = [];
   const roles = new Set([p.role, ...(p.roles ?? [])]);
-  const intent = roles.has("supplier") && roles.has("publisher") ? "supplier + hub" : roles.has("supplier") ? "supplier only (performance, no advertising)" : roles.has("publisher") ? "hub only" : null;
-  if (intent) lines.push(`Intake choice: ${intent}${roles.has("kit") ? " + display advertising" : ""}.`);
+  const intent = roles.has("supplier") && roles.has("publisher") ? "supplier + hub" : roles.has("supplier") ? "supplier only (performance)" : roles.has("publisher") ? "hub only" : null;
+  if (intent) lines.push(`Intake choice: ${intent}${roles.has("kit") ? " + Accelerate (premium display placements)" : ""}.`);
   if (p.company_name) {
     body.company_name = p.company_name.slice(0, 120);
     lines.push(`Brand: ${p.company_name.slice(0, 120)}.`);
@@ -225,7 +225,7 @@ export function oneFormFields(p: IntakePayload, body: Record<string, unknown>): 
     if (num(sd.avg_price_usd) != null) calc.avg_cart_usd = num(sd.avg_price_usd);
     if (sd.margin_band && ((V12_MARGIN as readonly string[]).includes(sd.margin_band) || FRIDAY_MARGIN.has(sd.margin_band))) calc.margin_band = sd.margin_band;
     if (Object.keys(calc).length) body.calculator = calc;
-    const supBits = [sd.retail_now ? `in retail now: ${sd.retail_now}` : null, sd.ships ? `fulfilment: ${sd.ships}` : null].filter(Boolean);
+    const supBits = [sd.retail_now ? `in retail now: ${sd.retail_now}` : null, sd.ships ? `fulfilment: ${sd.ships}` : null, sd.accelerate_budget ? `Accelerate test budget: ${sd.accelerate_budget}` : null].filter(Boolean);
     if (supBits.length) lines.push(`Supplier: ${supBits.join("; ")}.`);
   }
   for (const n of p.notes ?? []) if (n.trim()) lines.push(n.trim().slice(0, 600));

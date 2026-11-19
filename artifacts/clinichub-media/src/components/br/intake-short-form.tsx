@@ -1,16 +1,17 @@
 /**
  * ONE FORM intake, the default on /intake (Randy voice 8:30 AM + via Emma 9:34 AM ET, Nov 19 2026).
- * - Roles: Supplier (performance only, pay on results) + Hub, BOTH preselected. Display advertising is a smaller,
- *   secondary option lower on the form. Sponsors have their own page.
+ * - Roles: Supplier (performance only, pay on results) + Hub, BOTH preselected (Randy 9:39 AM ET). Accelerate (premium
+ *   display placements) is an option INSIDE the supplier card, never a separate "advertiser" role (sent as the kit role).
+ *   Category / area locks keep their own page. Visitor copy never says advertiser / publisher / sponsor.
  * - Positive framing: a hub unlocks maximum performance exposure (shelf space and eyeballs); supplier-only still works.
  * - Fast first: website + work email + one button. Shared answers (brand, location, categories, SKUs, audience) are
  *   optional here and asked ONCE for both sides. Role-specific detail comes after the submit (IntakeDetails), prefilled,
  *   updating the same record. Friday is contacted only on the final click (server routes add the secret).
  */
 import { IntakeWarnings } from "@/components/br/intake-warnings";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "wouter";
-import { ArrowRight, Check, ChevronDown, Loader2, ShieldAlert, Store, Package, Plus } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Loader2, ShieldAlert, Store, Package, Plus, Rocket } from "lucide-react";
 import type { IntakeRole } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { RETAIL_COPY } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { FRIDAY_CATEGORIES } from "../../../../api-server/src/lib/kitCalc/fridayV12";
@@ -30,25 +31,42 @@ const input = "h-12 w-full rounded-xl border border-foreground/20 bg-white px-3 
 const small = "h-11 w-full rounded-xl border border-foreground/20 bg-white px-3 text-sm outline-none focus:border-foreground";
 const ERR: Record<string, string> = { fast_needs_website_email: "Add your website and a work email to get your Monetization Kit.", too_fast: "One sec: give it a moment and try again.", email: "Use a valid work email.", website: "Add your website.", individual_data: "Please keep it to business-level details (no customer names or contacts).", rate_limited: "Too many tries. Please wait a minute." };
 
-export type OneFormRoles = { supplier: boolean; hub: boolean; advertiser: boolean };
-export const rolesOf = (r: OneFormRoles): IntakeRole[] => [...(r.supplier ? (["supplier"] as const) : []), ...(r.hub ? (["publisher"] as const) : []), ...(r.advertiser ? (["kit"] as const) : [])];
-const sideFor = (r: OneFormRoles): IntakeSide => (r.hub && !r.supplier && !r.advertiser ? "publisher" : "advertiser");
+export type OneFormRoles = { supplier: boolean; hub: boolean; accelerate: boolean };
+export const rolesOf = (r: OneFormRoles): IntakeRole[] => [...(r.supplier ? (["supplier"] as const) : []), ...(r.hub ? (["publisher"] as const) : []), ...(r.supplier && r.accelerate ? (["kit"] as const) : [])];
+const sideFor = (r: OneFormRoles): IntakeSide => (r.hub && !r.supplier ? "publisher" : "advertiser");
 const EMPTY_SHARED: SharedAnswers = { brand: "", categories: [], skus: "", audience: "" };
 
-function RoleCard({ on, onClick, icon: Icon, title, sub, tag, testId }: { on: boolean; onClick: () => void; icon: typeof Store; title: string; sub: string; tag?: string; testId: string }) {
+function RoleCard({ on, onClick, icon: Icon, title, sub, tag, testId, children }: { on: boolean; onClick: () => void; icon: typeof Store; title: string; sub: string; tag?: string; testId: string; children?: ReactNode }) {
   return (
-    <button type="button" role="checkbox" aria-checked={on} onClick={onClick} data-testid={testId} className={`relative flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition ${on ? "border-[#0b1f3a] bg-[#0b1f3a] text-white shadow-lg" : "border-foreground/15 bg-white hover:border-foreground/40"}`}>
-      <span className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md border-2 ${on ? "border-lime-300 bg-lime-300 text-[#0b1f3a]" : "border-foreground/30"}`}>{on ? <Check className="size-4" /> : null}</span>
-      <span className="min-w-0">
-        <span className="flex flex-wrap items-center gap-2"><Icon className={`size-4 ${on ? "text-lime-300" : "text-foreground/50"}`} aria-hidden /><span className="text-base font-bold">{title}</span>{tag ? <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${on ? "bg-lime-300 text-[#0b1f3a]" : "bg-foreground/[0.07] text-foreground/70"}`}>{tag}</span> : null}</span>
-        <span className={`mt-1 block text-[13px] leading-snug ${on ? "text-white/80" : "text-foreground/65"}`}>{sub}</span>
+    <div data-testid={`${testId}-card`} className={`rounded-2xl border-2 p-4 transition ${on ? "border-[#0b1f3a] bg-[#0b1f3a] text-white shadow-lg" : "border-foreground/15 bg-white hover:border-foreground/40"}`}>
+      <button type="button" role="checkbox" aria-checked={on} onClick={onClick} data-testid={testId} className="flex w-full items-start gap-3 text-left">
+        <span className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md border-2 ${on ? "border-lime-300 bg-lime-300 text-[#0b1f3a]" : "border-foreground/30"}`}>{on ? <Check className="size-4" /> : null}</span>
+        <span className="min-w-0">
+          <span className="flex flex-wrap items-center gap-2"><Icon className={`size-4 ${on ? "text-lime-300" : "text-foreground/50"}`} aria-hidden /><span className="text-base font-bold">{title}</span>{tag ? <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${on ? "bg-lime-300 text-[#0b1f3a]" : "bg-foreground/[0.07] text-foreground/70"}`}>{tag}</span> : null}</span>
+          <span className={`mt-1 block text-[13px] leading-snug ${on ? "text-white/80" : "text-foreground/65"}`}>{sub}</span>
+        </span>
+      </button>
+      {children}
+    </div>
+  );
+}
+
+/** Accelerate lives INSIDE the supplier card: the accelerated supplier option (premium display), never a separate "advertiser" role. */
+function AccelerateToggle({ on, onClick }: { on: boolean; onClick: () => void }) {
+  return (
+    <button type="button" role="switch" aria-checked={on} onClick={onClick} data-testid="intake-accelerate" className={`mt-3 flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${on ? "bg-lime-300 text-[#0b1f3a]" : "bg-white/10 text-white hover:bg-white/15"}`}>
+      <Rocket className={`size-5 shrink-0 ${on ? "text-[#0b1f3a]" : "text-lime-300"}`} aria-hidden />
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-center gap-2 text-sm font-bold">Accelerate<span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${on ? "bg-[#0b1f3a] text-lime-300" : "bg-white/15 text-white/80"}`}>Optional</span></span>
+        <span className={`mt-0.5 block text-[12px] leading-snug ${on ? "text-[#0b1f3a]/80" : "text-white/75"}`}>Add premium display placements to speed up exposure.</span>
       </span>
+      <span aria-hidden className={`relative h-6 w-11 shrink-0 rounded-full transition ${on ? "bg-[#0b1f3a]" : "bg-white/25"}`}><span className={`absolute top-0.5 size-5 rounded-full bg-white transition-all ${on ? "left-[22px]" : "left-0.5"}`} /></span>
     </button>
   );
 }
 
 export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) => void }) {
-  const [r, setR] = useState<OneFormRoles>({ supplier: true, hub: true, advertiser: false });
+  const [r, setR] = useState<OneFormRoles>({ supplier: true, hub: true, accelerate: false });
   const roles = rolesOf(r);
   const side = sideFor(r);
   const [market, setMarketRaw] = useState<Market>(DEFAULT_MARKET);
@@ -68,10 +86,12 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
   const flip = (k: keyof OneFormRoles) => {
     setR((cur) => {
       const next = { ...cur, [k]: !cur[k] };
-      if (!next.supplier && !next.hub && !next.advertiser) return cur; // keep at least one
+      if (k === "accelerate" && !cur.supplier) return cur; // Accelerate is a supplier option
+      if (!next.supplier) next.accelerate = false;
+      if (!next.supplier && !next.hub) return cur; // keep at least one
       return next;
     });
-    trackIntake("advertiser", "field_start", k === "supplier" ? "supplier" : k === "hub" ? "add_hub" : "kit", { dedupe: true });
+    trackIntake("advertiser", "field_start", k === "supplier" ? "supplier" : k === "hub" ? "add_hub" : "accelerate", { dedupe: true });
   };
   const addHub = () => { setR((c) => ({ ...c, hub: true })); trackIntake("advertiser", "cta_click", "add_hub"); };
   const toggleCat = (k: string) => setShared((s) => ({ ...s, categories: s.categories.includes(k) ? s.categories.filter((x) => x !== k) : s.categories.length >= 3 ? s.categories : [...s.categories, k] }));
@@ -81,7 +101,7 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
     setErr(null);
     if (hp) return setDone({ ref: { id: "", editToken: "", reportToken: "", version: 0 }, held: false, gates: null }); // honeypot: send nothing
     trackIntake(side, "step_complete", "contact");
-    if (r.supplier && !r.hub && !r.advertiser) trackIntake("advertiser", "submit", "supply_only");
+    if (r.supplier && !r.hub && !r.accelerate) trackIntake("advertiser", "submit", "supply_only");
     setBusy(true);
     try {
       const api = fridayIntake();
@@ -95,7 +115,7 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
       const fr = await api.fast(payload, { email: email.trim(), website: website.trim(), elapsed_ms: Date.now() - t0.current });
       const { ref: next, sub, autofill } = fr;
       saveRef(roles[0]!, next);
-      if (r.advertiser) saveRef("kit", next); // Expanded (kit builder) upgrades this same record
+      if (r.supplier && r.accelerate) saveRef("kit", next); // Expanded (kit builder) upgrades this same record
       const af = autofill?.fields ?? {};
       const afMarket = af.geo?.value?.sells?.length ? { sells_in: af.geo.value.sells.filter((c): c is "CA" | "US" => c === "CA" || c === "US"), ships_to: (af.geo.value.ships ?? af.geo.value.sells).filter((c): c is "CA" | "US" => c === "CA" || c === "US"), regions: [] } : undefined;
       savePrefill({ website: website.trim(), email: email.trim(), market: marketTouched ? market : afMarket ?? market, category: shared.categories[0] ?? af.category?.value, categorySource: shared.categories[0] ? "typed" : af.category ? "site" : "default", brand: shared.brand.trim() || af.company_name?.value, aov: af.avg_cart_usd?.value, needs: autofill?.needs_input });
@@ -143,8 +163,10 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
       <fieldset>
         <legend className="text-[11px] font-bold uppercase tracking-wider text-foreground/60">You are… <span className="font-semibold normal-case tracking-normal text-foreground/50">(most brands are both)</span></legend>
         <div className="mt-2 grid gap-2 md:grid-cols-2" data-testid="intake-roles">
-          <RoleCard on={r.supplier} onClick={() => flip("supplier")} icon={Package} title="Supplier" tag="Performance only" sub="Get your products into hubs. Pay on results, no ad spend. We curate the fit." testId="intake-role-supplier" />
-          <RoleCard on={r.hub} onClick={() => flip("hub")} icon={Store} title="Hub" tag="Max exposure" sub="Your own audience, shelf space and pages. Earn a share, and unlock maximum exposure for your products." testId="intake-role-hub" />
+          <RoleCard on={r.supplier} onClick={() => flip("supplier")} icon={Package} title="Supplier" tag="Performance only" sub="Get your products into curated hubs. Pay on results, no ad spend." testId="intake-role-supplier">
+            {r.supplier ? <AccelerateToggle on={r.accelerate} onClick={() => flip("accelerate")} /> : null}
+          </RoleCard>
+          <RoleCard on={r.hub} onClick={() => flip("hub")} icon={Store} title="Hub" tag="Max exposure" sub="Have an audience, shelf, screens or pages? Put your products in front of it for max exposure, and earn a share." testId="intake-role-hub" />
         </div>
         {supplierOnly ? (
           <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-lime-300 bg-lime-50 p-4 md:flex-row md:items-center md:justify-between" data-testid="supplier-only-note">
@@ -190,12 +212,8 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
         </div>
       ) : null}
 
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-foreground/10 pt-3 text-[13px]" data-testid="intake-secondary">
-        <label className="inline-flex cursor-pointer items-center gap-2 text-foreground/70" data-testid="intake-role-advertiser">
-          <input type="checkbox" checked={r.advertiser} onChange={() => flip("advertiser")} className="size-4 accent-[#0b1f3a]" data-testid="intake-role-advertiser-input" />
-          Also interested in display advertising
-        </label>
-        <a href="/intake/sponsor" className="text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-sponsor-link">Own a category or area? Sponsor options</a>
+      <div className="mt-4 border-t border-foreground/10 pt-3 text-[13px]" data-testid="intake-secondary">
+        <a href="/intake/sponsor" className="text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-sponsor-link">Want to own a category or an area? See category and area locks</a>
       </div>
       <p className="mt-2 text-[11px] text-muted-foreground">Business-level only, no customer data. Every figure is an estimate, reviewed by a person. Nothing is booked or charged.</p>
     </form>

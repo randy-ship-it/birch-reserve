@@ -11,11 +11,10 @@ import { trackIntake } from "@/lib/intakeTrack";
 import { CountUp, EstimateTag, InfoPop, MockBanner, RoleTabs, SaveChip, Segmented, Toggle, basePayload, useAutosave, ChannelTiles, ContactSubmit } from "@/components/br/intake-kit";
 import { PAYOUT, PUBLISHER_ASSUMPTIONS, PUBLISHER_SURFACES, projectPublisher, type PricingMode, type PubSurfaceKey } from "../../../../api-server/src/lib/overhaul/brandIntake";
 
-const pct = (r: readonly [number, number]) => `${(r[0] * 100).toFixed(r[0] < 0.01 ? 2 : 1)}–${(r[1] * 100).toFixed(r[1] < 0.01 ? 2 : 1)}%`;
 const usd = (n: number, d = 0) => `$${n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d })}`;
 
 export default function BrIntakePublisher() {
-  usePageMeta("Publisher payouts estimate | Birch Reserve", "Toggle your hub surfaces and see an estimated monthly payout at ramp and once pricing normalizes. Estimates only.");
+  usePageMeta("Hub · max exposure + earnings | Birch Reserve", "Put curated products in front of your audience for max exposure, and see what your hub could earn. Estimates in USD.");
   const [on, setOn] = useState<Partial<Record<PubSurfaceKey, boolean>>>({});
   const [mode, setMode] = useState<PricingMode>("cpm");
   const [sizeX, setSizeX] = useState(1);
@@ -41,8 +40,8 @@ export default function BrIntakePublisher() {
       <MockBanner />
       <RoleTabs active="publisher" />
       <header className="container mx-auto px-4 pb-4 pt-8 md:pt-12">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For hubs · Publisher</p>
-        <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">What your hub could earn</h1>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For hubs · Max exposure</p>
+        <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Max exposure for your hub, plus a share.</h1>
         <p className="mt-3 max-w-xl text-base text-muted-foreground">Switch surfaces on. Watch the estimate move. You keep {PAYOUT.basePct}% of media revenue, rising by tier.</p>
         <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <KitCta placement="hero_role_publisher" size="md" sub="One form for hub + supplier. Website + email to start." />
@@ -127,7 +126,7 @@ export default function BrIntakePublisher() {
                   </div>
                   <Toggle on={row.on} onChange={(v) => touch(setOn)({ ...on, [s.key]: v })} label={`Turn ${s.label} on or off`} testId={`toggle-${s.key}`} />
                 </div>
-                <dl className="mt-3 grid grid-cols-3 gap-2 text-center">
+                <dl className="mt-3 grid grid-cols-2 gap-2 text-center">
                   <div className="rounded-lg bg-foreground/[0.04] p-2">
                     <dt className="text-[10px] font-bold uppercase tracking-wider text-foreground/55">CPM</dt>
                     <dd className="text-sm font-semibold tabular-nums">{s.cpm ? (s.cpm[0] === s.cpm[1] ? usd(s.cpm[0]) : `${usd(s.cpm[0])}–${s.cpm[1]}`) : "Not set"}</dd>
@@ -135,10 +134,6 @@ export default function BrIntakePublisher() {
                   <div className="rounded-lg bg-foreground/[0.04] p-2">
                     <dt className="text-[10px] font-bold uppercase tracking-wider text-foreground/55">CPC</dt>
                     <dd className="text-sm font-semibold tabular-nums">{s.cpc ? `${usd(s.cpc[0], 2)}–${s.cpc[1].toFixed(2)}` : "Not set"}</dd>
-                  </div>
-                  <div className="rounded-lg bg-foreground/[0.04] p-2">
-                    <dt className="text-[10px] font-bold uppercase tracking-wider text-foreground/55">CTR band</dt>
-                    <dd className="text-sm font-semibold tabular-nums">{s.ctr ? pct(s.ctr) : "Not set"}</dd>
                   </div>
                 </dl>
                 <div className="mt-3 flex items-center justify-between gap-2">

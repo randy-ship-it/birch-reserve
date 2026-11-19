@@ -86,6 +86,8 @@ export default function BrKitReport() {
             <ReportV2
               report={full ?? report!}
               map={map}
+              exposure={expo.ex}
+              exposureSource={expo.source === "friday" ? "report" : "mock"}
               costExtra={
                 <>
                   <div className="mt-5 rounded-[10px] p-4 text-white" style={{ background: RT.forest }} data-testid="report-cost">

@@ -4,7 +4,7 @@
  * "from your site" tag; gaps (needs_input) become prompts in "Add detail to sharpen your numbers". Defaults are
  * labelled. Friday's full report is reviewed by a person first. Birch never fetches the brand's site itself.
  */
-import { ArrowRight, Plus, Sparkles } from "lucide-react";
+import { ArrowRight, Plus, Rocket, Sparkles } from "lucide-react";
 import { useMemo, useState, type ReactNode } from "react";
 import { ReportV2 } from "@/components/br/report-v2";
 import { LeadGatesStatus, PrimaryCta } from "@/components/br/intake-sell";
@@ -16,7 +16,6 @@ import type { Autofill, IntakeRef } from "@/lib/fridayBrandIntake";
 import { fridayIntake } from "@/lib/fridayBrandIntake";
 import type { IntakePayload } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { IntakeDetails, type SharedAnswers } from "@/components/br/intake-details";
-import { ExposureCard } from "@/components/br/intake-geo";
 import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 import { trackIntake } from "@/lib/intakeTrack";
 import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
@@ -56,26 +55,30 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
   const aov = typeof f.avg_cart_usd?.value === "number" ? f.avg_cart_usd.value : null;
   const report = useMemo(() => quickReport({ roles: q.roles, category: cat, host: q.host, name, aovUsd: aov }), [q, cat, name, aov]);
   const isPub = q.side === "publisher";
-  const oneForm = q.roles.includes("supplier") || (q.roles.includes("publisher") && !q.roles.includes("kit"));
+  const oneForm = q.roles.includes("supplier") || q.roles.includes("publisher");
   const hasKit = q.roles.includes("kit");
-  const [addingHub, setAddingHub] = useState(false);
-  const addHub = async () => {
+  const [adding, setAdding] = useState<string | null>(null);
+  // "Add my hub" / "Add Accelerate" after the submit update the SAME record (PATCH), never a second form.
+  const addRole = async (role: "publisher" | "kit", detail: "add_hub" | "accelerate") => {
     if (!q.ref || !q.payload) return;
-    setAddingHub(true);
-    trackIntake("advertiser", "cta_click", "add_hub");
+    setAdding(role);
+    trackIntake("advertiser", "cta_click", detail);
     try {
-      await fridayIntake().update(q.ref, { ...q.payload, roles: [...new Set([...(q.payload.roles ?? []), "publisher" as const])] });
-      setExtraRoles(["publisher"]);
+      await fridayIntake().update(q.ref, { ...q.payload, roles: [...new Set([...(q.payload.roles ?? []), ...extraRoles, role])] as IntakePayload["roles"] });
+      setExtraRoles((x) => [...new Set([...x, role])]);
     } catch {
-      /* keep the supplier view; the button stays available */
+      /* keep the current view; the button stays available */
     } finally {
-      setAddingHub(false);
+      setAdding(null);
     }
   };
-  const exposure = useMemo(() => ({ ...mockExposure(q.typedMarket ?? undefined), basis: "Estimate: network figures / targets × placeholder activation shares (not a forecast)" }), [q.typedMarket]);
+  const exposure = useMemo(() => mockExposure(q.typedMarket ?? undefined), [q.typedMarket]);
   const supplierOnly = q.roles.includes("supplier") && !q.roles.includes("publisher");
   const earnCta = supplierOnly && q.ref ? (
-    <button type="button" onClick={addHub} disabled={addingHub} data-testid="report-add-hub" className="inline-flex h-11 items-center gap-1.5 rounded-full px-5 text-sm font-bold" style={{ background: RT.forest, color: "#fff" }}><Plus className="size-4" />{addingHub ? "Adding…" : "Add my hub to unlock max exposure"}</button>
+    <button type="button" onClick={() => addRole("publisher", "add_hub")} disabled={!!adding} data-testid="report-add-hub" className="inline-flex h-11 items-center gap-1.5 rounded-full px-5 text-sm font-bold" style={{ background: RT.forest, color: "#fff" }}><Plus className="size-4" />{adding === "publisher" ? "Adding…" : "Add my hub to unlock max exposure"}</button>
+  ) : undefined;
+  const accCta = q.roles.includes("supplier") && !q.roles.includes("kit") && q.ref ? (
+    <button type="button" onClick={() => addRole("kit", "accelerate")} disabled={!!adding} data-testid="report-add-accelerate" className="inline-flex h-11 items-center gap-1.5 rounded-full px-5 text-sm font-bold" style={{ background: RT.mint, color: RT.forest }}><Rocket className="size-4" />{adding === "kit" ? "Adding…" : "Add Accelerate to my request"}</button>
   ) : undefined;
   const needs = [...new Set([...(q.autofill?.needs_input ?? (q.fallback ? ["category", "avg_cart_usd", "geo"] : [])), ...(isPub ? [] : ["orders_per_month", "purchases_per_year", "margin_band"])])].filter((k) => !(k === "geo" && q.typedMarket));
   const rows: Array<{ k: string; label: string; value: ReactNode; tag: ReactNode }> = [
@@ -126,7 +129,7 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
         {hasKit || !oneForm ? <div className="mt-3"><PrimaryCta side={q.side} where="done" /></div> : null}
       </div>
       {oneForm && q.ref && q.payload ? <IntakeDetails key={q.roles.join(",")} intake={q.ref} payload={{ ...q.payload, roles: q.roles as IntakePayload["roles"] }} roles={q.roles} shared={q.shared ?? { brand: "", categories: [], skus: "", audience: "" }} /> : null}
-      <ReportV2 report={report} supplierExtra={<ExposureCard exposure={exposure} source="mock" sync={false} testId="supplier-exposure" v2 />} earnCta={earnCta} />
+      <ReportV2 report={report} exposure={exposure} exposureSource="mock" earnCta={earnCta} supplierCta={supplierOnly ? earnCta : undefined} onAccelerate={accCta} />
       {hasKit || !oneForm ? upgrade("bottom") : null}
     </section>
   );

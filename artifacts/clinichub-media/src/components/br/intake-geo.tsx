@@ -89,7 +89,7 @@ export function ActivationRange({ kind, block, source, testId }: { kind: "advert
   const hi = Math.max(block.later.max, lo + 1);
   const pct = (n: number) => `${Math.min(100, Math.max(0, ((n - lo) / (hi - lo)) * 100))}%`;
   const per = block.period === "month" ? " / month" : block.period === "test" ? " per test" : "";
-  const title = kind === "publisher" ? "Publisher monetization" : "Advertiser exposure value";
+  const title = kind === "publisher" ? "Hub earnings" : "Supplier exposure value";
   const srcLabel = source === "friday" ? "From your report" : source === "sample" ? "Sample · example values" : "Preview · modelled estimate";
   return (
     <section data-testid={testId ?? `activation-${kind}`} data-source={source === "friday" ? "report" : source} className="rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm">

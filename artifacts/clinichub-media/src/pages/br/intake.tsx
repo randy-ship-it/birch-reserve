@@ -10,14 +10,13 @@ import { trackIntake, type IntakeSide } from "@/lib/intakeTrack";
 import { usePageMeta } from "@/components/br/ui";
 import { MockBanner } from "@/components/br/intake-kit";
 import { IntakeShortForm } from "@/components/br/intake-short-form";
-import { ExposureCard } from "@/components/br/intake-geo";
 import { ReportV2 } from "@/components/br/report-v2";
 import { ShareBar } from "@/components/br/share-bar";
 import { sampleReport } from "@/lib/fridayMockReport";
 import { RT, RT_SANS, RT_SERIF } from "@/lib/reportTokens";
 import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 
-const SAMPLE_EXPOSURE = { ...mockExposure({ sells_in: ["CA", "US"], ships_to: ["CA", "US"], regions: ["BC"] }), basis: "Sample: network figures / targets × example activation shares (1%–5%)" };
+const SAMPLE_EXPOSURE = { ...mockExposure({ sells_in: ["CA", "US"], ships_to: ["CA", "US"], regions: ["ON"] }), basis: "Sample: network figures / targets × example activation shares (1%–5%)" };
 
 type Mode = "fast" | "expanded";
 export default function BrIntake() {
@@ -46,7 +45,7 @@ export default function BrIntake() {
           <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <ShareBar testId="share-bar-intake" />
             {mode === "fast" ? (
-              <button type="button" onClick={() => setMode("expanded")} className="text-left text-[13px] text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-mode-expanded">Advertising with display? Open the full advertiser form</button>
+              <button type="button" onClick={() => setMode("expanded")} className="text-left text-[13px] text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-mode-expanded">Prefer the detailed calculator? Open the full kit builder</button>
             ) : (
               <button type="button" onClick={() => setMode("fast")} className="text-left text-[13px] font-semibold text-foreground/70 underline" data-testid="intake-mode-fast">Back to the short form</button>
             )}
@@ -60,9 +59,9 @@ export default function BrIntake() {
       ) : null}
       <div className="container mx-auto px-4 pb-12 pt-6" style={{ fontFamily: RT_SANS }} data-testid="sample-kit">
         <span className="rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider" style={{ background: RT.mint, color: RT.forest }} data-testid="sample-label">Sample · example values only</span>
-        <h2 className="mt-3 text-3xl md:text-5xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you get: both sides in one kit.</h2>
-        <p className="mt-1 max-w-2xl text-sm" style={{ color: RT.mute }}>Supplier exposure and hub earnings for a fictional example brand. Every figure is an estimate or modelled range in USD, not a result or a guarantee.</p>
-        <div className="mt-4"><ReportV2 report={sample} sample compact supplierExtra={<ExposureCard exposure={SAMPLE_EXPOSURE} source="sample" sync={false} testId="sample-exposure" v2 />} /></div>
+        <h2 className="mt-3 text-3xl md:text-5xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you get: both answers from one form.</h2>
+        <p className="mt-1 max-w-2xl text-sm" style={{ color: RT.mute }}>Supplier exposure (performance only and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range in USD, not a result or a guarantee.</p>
+        <div className="mt-4"><ReportV2 report={sample} sample compact exposure={SAMPLE_EXPOSURE} exposureSource="sample" /></div>
       </div>
     </div>
   );

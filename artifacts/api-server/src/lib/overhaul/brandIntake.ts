@@ -66,7 +66,7 @@ export const PUBLISHER_SURFACES: PubSurface[] = [
   { key: "services", label: "Services & booking", where: rate("services").where, monthlyViews: MEDIAN.product_services - Math.round(MEDIAN.product_services / 2), cpm: rate("services").cpmStarter, cpc: rate("services").cpcStarter, ctr: ctr("Browsing the hub"), source: "Rate card: services & booking pages. Views: half of product / services (modelled split).", defaultOn: true },
   { key: "member_dashboard", label: "Member dashboard", where: rate("dashboard").where, monthlyViews: MEDIAN.member_dashboard, cpm: rate("dashboard").cpmStarter, cpc: rate("dashboard").cpcStarter, ctr: ctr("Coming back"), source: "Rate card: member dashboard. CTR band: Coming back.", defaultOn: true },
   { key: "newsletter", label: "Newsletter", where: EMAIL_SLOT.where, monthlyViews: MEDIAN.partner_email, cpm: [EMAIL_SLOT.cpmUsd, EMAIL_SLOT.cpmUsd], cpc: null, ctr: null, source: "Spec sheet: partner email module, $30 CPM. No CPC or CTR on file.", defaultOn: false },
-  { key: "social", label: "Social", where: "Sponsored posts on the hub's own social accounts.", monthlyViews: null, cpm: null, cpc: null, ctr: null, source: "No Birch rate on file yet. Priced by IO.", defaultOn: false },
+  { key: "social", label: "Social", where: "Paid posts on the hub's own social accounts.", monthlyViews: null, cpm: null, cpc: null, ctr: null, source: "No Birch rate on file yet. Priced by IO.", defaultOn: false },
 ];
 
 export type PricingMode = "cpm" | "cpc";
@@ -170,7 +170,7 @@ export const FIRST_LOOK = {
 export const MAX_DISTRIBUTION = {
   label: "Max distribution",
   line: "Show my offers on every eligible hub, newsletter and surface in the network.",
-  note: "Without a hub or publisher of your own in the network, your performance TAM is limited to the hubs that accept your category.",
+  note: "Supplier-only reaches every hub that accepts your category. Add a hub of your own to unlock max exposure.",
 } as const;
 
 export const INTEREST_FINE =
@@ -231,7 +231,7 @@ export type IntakePayload = {
   company_name?: string;
   shared?: { categories?: string[]; skus?: number; audience_customers?: number };
   hub?: { type?: string; locations?: number; foot_traffic_month?: number; web_visitors_month?: number; page_views_month?: number; email_list?: number; screens?: number; surfaces?: string[]; cities?: string; decision_maker_role?: string };
-  supplier_detail?: { avg_price_usd?: number; margin_band?: string; retail_now?: string; ships?: string };
+  supplier_detail?: { avg_price_usd?: number; margin_band?: string; retail_now?: string; ships?: string; accelerate_budget?: string };
   notes?: string[];
   /** Lead events (e.g. kit_download). Not yet in Friday's contract: see CONTRACT-GAPS.md. */
   events?: Array<{ type: "kit_download"; at: string; formats: Array<"pdf" | "png"> }>;
