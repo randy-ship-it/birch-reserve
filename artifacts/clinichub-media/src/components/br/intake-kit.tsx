@@ -150,7 +150,7 @@ export function useAutosave(role: IntakeRole, payload: IntakePayload, enabled: b
       setState("saving");
       try {
         const api = fridayIntake();
-        const next = ref ? await api.update(ref, payload).catch(() => api.create(payload)) : await api.create(payload);
+        const next = ref ? await api.update(ref, payload).catch(() => ref) /* never re-create a draft on a failed autosave */ : await api.create(payload);
         saveRef(role, next);
         setRef(next);
         setState("saved");

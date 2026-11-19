@@ -6,11 +6,14 @@
  * Once Friday answers (after submit), the LTV estimate and channel fit are shown EXACTLY as Friday returns
  * them (brand-report.v1 `ltv` + `demand_fit`), never recomputed here. Mock adapter on previews.
  */
+import { IntakeWarnings } from "@/components/br/intake-warnings";
+import { useBrandCategories } from "@/lib/brandCategories";
+import { toBirchCategory } from "../../../../api-server/src/lib/kitCalc/fridayV12";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Download, Loader2, Check, Minus, Plus, Link2, ShieldAlert } from "lucide-react";
 import { KIT_CALC_ASSUMPTIONS, KIT_CALC_CONFIG, KIT_CALC_FORMULA, kitCalc, repeatRange } from "../../../../api-server/src/lib/kitCalc";
-import { SUPPLIER_CATEGORIES, KIT_FIT_FINE } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { KIT_FIT_FINE } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import type { IntakePayload } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { kitSideA, kitSideB, kitPdfBlob, kitPngBlob, saveBlob, imageToDataUrl } from "@/lib/kitRender";
 import { previewView, fridayView, type KitView } from "@/lib/kitView";
@@ -31,7 +34,8 @@ const ERR: Record<string, string> = { too_fast: "One sec: give it a moment and t
 
 export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: string; showMockBanner?: boolean }) {
   const [brand, setBrand] = useState("");
-  const [cat, setCat] = useState(SUPPLIER_CATEGORIES[0]!.key);
+  const [cat, setCat] = useState<string>("recovery_devices"); // Friday v1.2 §6 shared category key
+  const cats = useBrandCategories();
   const [aov, setAov] = useState(80);
   const [orders, setOrders] = useState(500);
   const [repeat, setRepeat] = useState(KIT_CALC_CONFIG.repeatBands[1]!.key);
@@ -63,7 +67,8 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
   const ppyR = repeatRange(repeat);
   const repeatLabel = KIT_CALC_CONFIG.repeatBands.find((b) => b.key === repeat)!.label;
   const calc = useMemo(() => kitCalc({ aovUsd: aov, monthlyOrders: orders, purchasesPerYear: ppyR, marginBand: band, spendUsd: spend, conversionPct: conv }), [aov, orders, repeat, band, spend, conv]); // eslint-disable-line react-hooks/exhaustive-deps
-  const catLabel = SUPPLIER_CATEGORIES.find((c) => c.key === cat)!.label;
+  const catLabel = cats.find((c) => c.key === cat)?.label ?? cat;
+  const birchCat = toBirchCategory(cat);
   const brandLabel = brand.trim().slice(0, 40);
   const payload: IntakePayload = {
     ...basePayload("kit"),
@@ -73,7 +78,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
   const { ref, state, setRef } = useAutosave("kit", payload, touched);
 
   const view: KitView = useMemo(
-    () => withGeo(report ? fridayView(report, calc, { brand: brandLabel, categoryLabel: catLabel, repeatLabel, mapDataUrl: map }) : previewView(calc, { brand: brandLabel, categoryKey: cat, categoryLabel: catLabel, repeatLabel, mapDataUrl: map }), market, fridayEligibility(report)),
+    () => withGeo(report ? fridayView(report, calc, { brand: brandLabel, categoryLabel: catLabel, repeatLabel, mapDataUrl: map }) : previewView(calc, { brand: brandLabel, categoryKey: birchCat, categoryLabel: catLabel, repeatLabel, mapDataUrl: map }), market, fridayEligibility(report)),
     [report, calc, brandLabel, cat, map, market], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const expo = pickExposure(report?.exposure, market, !!report?.mock);
@@ -159,7 +164,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
             <label className="col-span-2">
               <span className={lab}>Category</span>
               <select data-testid="kit-category" value={cat} onChange={(e) => tap(setCat)(e.target.value)} className={numIn}>
-                {SUPPLIER_CATEGORIES.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
+                {cats.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
               </select>
             </label>
             <div className="col-span-2">
@@ -234,6 +239,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
           {queued ? <p className="mt-3 rounded-xl bg-lime-50 p-3 text-sm" data-testid="kit-queued">Received as pending review. Your kit above is a live preview; the full report from Friday follows after review.</p> : null}
           {held ? <p className="mt-3 flex gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900" data-testid="kit-held"><ShieldAlert className="size-4 shrink-0" />{HELD_COPY}</p> : null}
           <LeadGatesStatus gates={gates} testId="kit-lead-gates" />
+          <IntakeWarnings testId="kit-warnings" />
           <button type="button" data-testid="kit-download" onClick={getKit} disabled={busy === "busy"} className="mt-5 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 text-base font-bold text-accent-foreground shadow-lg shadow-lime-500/20 transition hover:bg-foreground hover:text-background">
             {busy === "busy" ? <Loader2 className="size-5 animate-spin" /> : busy === "done" ? <Check className="size-5" /> : <Download className="size-5" />} {busy === "done" ? "Kit downloaded (PDF + PNG)" : step === "contact" && !report ? "Get my kit" : "Download my kit"}
           </button>

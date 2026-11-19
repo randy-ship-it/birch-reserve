@@ -11,9 +11,15 @@ import { isIntakeEvent } from "../src/lib/intakeEvents";
 const SECRET = "test-only-not-a-real-secret-value";
 const ENV = { FRIDAY_API_URL: "https://friday.example", FRIDAY_API_KEY: SECRET } as NodeJS.ProcessEnv;
 
-async function serve(env: NodeJS.ProcessEnv, fetchImpl: typeof fetch) {
+/** Friday's v1.2 capability probe (GET /api/public/brand-categories) is answered here: 404 = strict v1 (live today). */
+async function serve(env: NodeJS.ProcessEnv, fetchImpl: typeof fetch, v12 = false) {
   const app = express();
-  app.use(createBrandIntakeProxy({ env, fetchImpl }));
+  app.set("trust proxy", false);
+  const wrapped = (async (url: string, init?: RequestInit) =>
+    String(url).endsWith("/api/public/brand-categories")
+      ? v12 ? new Response(JSON.stringify({ categories: [{ key: "recovery_devices", label: "Recovery Devices & Equipment" }] }), { status: 200 }) : new Response("{}", { status: 404 })
+      : fetchImpl(url, init as RequestInit)) as unknown as typeof fetch;
+  app.use(createBrandIntakeProxy({ env, fetchImpl: wrapped }));
   const srv = app.listen(0);
   await new Promise((r) => srv.once("listening", r));
   const base = `http://127.0.0.1:${(srv.address() as AddressInfo).port}`;
@@ -154,21 +160,38 @@ test("TEST records: only test@/test+…@silverbirchgrowth.com submissions get th
   assert.equal((markTest({ email: "growth@examplebrand.com" }) as { blurb?: string }).blurb, undefined);
 });
 
-test("v1.1 geo body: strict v1 Friday rejects it → Birch retries once as v1 (geo text stays in profile.geography)", async () => {
+test("v1.2 body on strict v1 Friday: downgraded BEFORE sending (one call, no retry): no geo/company_name/category/repeat_band, v1 margin alias", async () => {
   const bodies: Array<Record<string, unknown>> = [];
-  const f = (async (_url: string, init: RequestInit) => {
-    const b = JSON.parse(String(init.body)) as Record<string, unknown>;
-    bodies.push(b);
-    if ("geo" in b) return new Response(JSON.stringify({ ok: false, error: "invalid", issues: [{ path: "geo", message: "Unrecognized key" }] }), { status: 400 });
-    return new Response(JSON.stringify({ ok: true, id: "bi_abc12345", status: "draft", version: 0, editToken: "e".repeat(20), reportToken: "r".repeat(20) }), { status: 201 });
-  }) as unknown as typeof fetch;
-  const s = await serve(ENV, f);
-  const r = await realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ roles: ["brand"], geo: { sells: ["US"], ships: ["US"] }, profile: { geography: "Sells in: USA" }, company_url: "" }) });
-  s.close();
-  assert.equal(r.status, 201);
+  const f = (async (_url: string, init: RequestInit) => (bodies.push(JSON.parse(String(init.body))), new Response(JSON.stringify({ ok: true, id: "bi_abc12345", status: "draft", version: 0, editToken: "e".repeat(20), reportToken: "r".repeat(20) }), { status: 201 }))) as unknown as typeof fetch;
+  const v12 = { roles: ["brand"], geo: { sells: ["US"], ships: ["US"] }, company_name: "Example Co", category: "recovery_devices", calculator: { avg_cart_usd: 80, orders_per_month: 500, purchases_per_year: 2, margin_band: "30_50", repeat_band: "2_3" }, profile: { geography: "Sells in: USA" }, company_url: "" };
+  const s1 = await serve(ENV, f);
+  const r1 = await realFetch(`${s1.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(v12) });
+  s1.close();
+  assert.equal(r1.status, 201);
+  assert.equal(bodies.length, 1);
+  for (const k of ["geo", "company_name", "category"]) assert.ok(!(k in bodies[0]!), k);
+  assert.deepEqual(bodies[0]!.calculator, { avg_cart_usd: 80, orders_per_month: 500, purchases_per_year: 2, margin_band: "20_40" });
+  assert.deepEqual(bodies[0]!.profile, { geography: "Sells in: USA" });
+  // Friday on v1.2: the body goes through as sent (Birch margin keys are canonical, repeat_band + category kept).
+  const s2 = await serve(ENV, f, true);
+  await realFetch(`${s2.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(v12) });
+  s2.close();
   assert.equal(bodies.length, 2);
-  assert.ok(!("geo" in bodies[1]!));
-  assert.deepEqual(bodies[1]!.profile, { geography: "Sells in: USA" });
+  assert.equal(bodies[1]!.category, "recovery_devices");
+  assert.deepEqual(bodies[1]!.calculator, v12.calculator);
+  assert.deepEqual(bodies[1]!.geo, v12.geo);
+});
+
+test("X-Client-IP: the visitor IP (first value, validated) goes to Friday server-side; junk is never forwarded", async () => {
+  const hs: Array<Record<string, string>> = [];
+  const f = (async (_u: string, init: RequestInit) => (hs.push(init.headers as Record<string, string>), new Response(JSON.stringify({ ok: true, id: "bi_abc12345", editToken: "e".repeat(20), reportToken: "r".repeat(20), version: 0 }), { status: 201 }))) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  await realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": "203.0.113.7, 10.0.0.1" }, body: "{}" });
+  await realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json", "x-real-ip": "not-an-ip" }, body: "{}" });
+  s.close();
+  assert.equal(hs[0]!["X-Client-IP"], "203.0.113.7");
+  assert.ok(!("X-Forwarded-For" in hs[0]!));
+  assert.notEqual(hs[1]!["X-Client-IP"], "not-an-ip");
 });
 
 test("v1.1 exposure: US-only brand gets no Street Team now or later; Canada outside Ontario gets a later value", async () => {
@@ -185,11 +208,11 @@ test("v1.1 exposure: US-only brand gets no Street Team now or later; Canada outs
 });
 
 test("excluded competing hubs never reach the browser: keys, flagged items and never-mention names are stripped", () => {
-  const raw = { report: { hubs: [{ key: "a", name: "Good Hub", fit: 80 }, { key: "b", name: "Rival Hub", excluded: true }, { key: "c", name: "Other", status: "excluded_competes" }, { key: "k", name: "Kalaya" }], excluded: [{ name: "Rival Hub", reason: "competes" }], excluded_hubs: ["x"], demand_fit: { anchor_hubs: [{ key: "a", name: "Good Hub" }], excluded_count: 2 }, exposure: { channels: [{ key: "hubs", competes: true }] } } };
+  const raw = { report: { hubs: [{ key: "a", name: "Good Hub", fit: 80 }, { key: "b", name: "Rival Hub", excluded: true }, { key: "c", name: "Other", status: "excluded_competes" }, { key: "k", name: "Clairvoyant Hub" }, { key: "kalaya", name: "Kalaya" }], excluded: [{ name: "Rival Hub", reason: "competes" }], excluded_hubs: ["x"], demand_fit: { anchor_hubs: [{ key: "a", name: "Good Hub" }], excluded_count: 2 }, exposure: { channels: [{ key: "hubs", competes: true }] } } };
   const out = publicGates(JSON.stringify(raw));
-  assert.doesNotMatch(out, /exclu|compet|Rival|Kalaya/i);
+  assert.doesNotMatch(out, /exclu|compet|Rival|Clairvoyant/i);
   const o = JSON.parse(out);
-  assert.deepEqual(o.report.hubs.map((h: { key: string }) => h.key), ["a"]);
+  assert.deepEqual(o.report.hubs.map((h: { key: string }) => h.key), ["a", "kalaya"]); // Kalaya may be named (Randy 11:34 PM)
   assert.equal(o.report.demand_fit.anchor_hubs.length, 1);
 });
 
@@ -199,4 +222,55 @@ test("retail copy reads exactly '120+ retail locations · 1MM+ recovery customer
   assert.equal(CHANNEL_TILES.find((t) => t.key === "retail-network")!.line, RETAIL_COPY);
   assert.equal(EXPOSURE_CHANNELS.find((t) => t.key === "retail-network")!.reach, RETAIL_COPY);
   assert.doesNotMatch(JSON.stringify([CHANNEL_TILES, EXPOSURE_CHANNELS]), /across Canada/);
+});
+
+/* ---------------- 10:35 PM leak regression: drafts / autosave / PATCH never reach /api/intake ---------------- */
+test("drafts, autosaves and PATCHes NEVER call Friday /api/intake, even when brand-intake v1 is missing (404)", async () => {
+  const intake: string[] = [];
+  globalThis.fetch = (async (url: string) => (intake.push(String(url)), new Response("{}", { status: 201 }))) as unknown as typeof fetch;
+  try {
+    const f = (async () => new Response(JSON.stringify({ ok: false, error: "not_found" }), { status: 404 })) as unknown as typeof fetch;
+    const s = await serve(ENV, f);
+    const post = (b: unknown) => realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(b) });
+    const patch = (b: unknown) => realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { method: "PATCH", headers: { "content-type": "application/json", "x-edit-token": "t".repeat(24) }, body: JSON.stringify(b) });
+    const drafts = [
+      {}, // first autosave create
+      { roles: ["brand"], calculator: { avg_cart_usd: 80 } },
+      { roles: ["brand"], email: "", submit: true }, // empty email
+      { roles: ["brand"], email: "   ", submit: true },
+      { roles: ["brand"], email: "not-an-email", submit: true },
+      { roles: ["brand"], email: "growth@example.com" }, // email but not a submit (autosave after typing)
+      { roles: ["brand"], email: "growth@example.com", submit: false },
+      { roles: ["brand"], email: "growth@example.com", submit: "true" },
+      { roles: ["publisher"], website: "example.com", submit: true }, // submit without email
+    ];
+    for (const d of drafts) {
+      const r = await post(d);
+      const j = await r.json();
+      assert.equal(j.lead, false, JSON.stringify(d));
+    }
+    for (const d of [...drafts, { roles: ["brand"], email: "growth@example.com", submit: true }]) await patch(d); // PATCH never falls back, even a full submit
+    await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/kit`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: "growth@example.com" }) });
+    await realFetch(`${s.base}/v1/brand-kit/download`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ reportToken: "r".repeat(20), format: "pdf" }) });
+    s.close();
+    assert.deepEqual(intake.filter((u) => /\/api\/intake/.test(u)), []);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
+
+test("sendIntake itself refuses a brand_intake draft or an email-less record (defence in depth)", async () => {
+  const { sendIntake } = await import("../src/lib/overhaul/fridayIntake");
+  let called = 0;
+  globalThis.fetch = (async () => (called++, new Response("{}", { status: 201 }))) as unknown as typeof fetch;
+  try {
+    assert.equal((await sendIntake({ kind: "brand_intake", path: "/intake", meta: { submitted: false } }, ENV)).status, "skipped");
+    assert.equal((await sendIntake({ kind: "brand_intake", email: "growth@example.com", path: "/intake", meta: { submitted: false } }, ENV)).status, "skipped");
+    assert.equal((await sendIntake({ kind: "brand_intake", email: "", path: "/intake", meta: { submitted: true } }, ENV)).status, "skipped");
+    assert.equal(called, 0);
+    assert.equal((await sendIntake({ kind: "brand_intake", email: "growth@example.com", path: "/intake", meta: { submitted: true } }, ENV)).status, "sent");
+    assert.equal(called, 1);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
 });

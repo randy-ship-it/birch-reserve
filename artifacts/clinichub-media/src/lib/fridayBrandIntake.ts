@@ -18,6 +18,7 @@ import { mockExposure, type FridayExposure } from "../../../api-server/src/lib/k
 import type { IntakePayload, IntakeRole, PubSurfaceKey } from "../../../api-server/src/lib/overhaul/brandIntake";
 import { SUPPLIER_CATEGORIES } from "../../../api-server/src/lib/overhaul/brandIntake";
 import { mockReport } from "./fridayMockReport";
+import { V12_MARGIN, V12_REPEAT, toFridayCategory } from "../../../api-server/src/lib/kitCalc/fridayV12";
 
 
 export type IntakeRef = { id: string; editToken: string; reportToken: string; version: number; legacy?: boolean };
@@ -57,8 +58,20 @@ export type FridayReport = {
   /** v1.1 (Friday PR #213): geo-scoped markets and the advertiser exposure range. Used when present, else a labelled mock. */
   geo?: { markets?: string[]; markets_stated?: boolean; regions?: Record<string, string[]>; input?: unknown; channel_geo?: Record<string, unknown> };
   exposure?: FridayExposure;
+  /** v1.2 §5: Scale-demand revenue opportunity (Estimate) or needs_input with missing[]. No partner names or counts. */
+  demand_opportunity?: DemandOpportunity;
   mock?: boolean;
 };
+export type MinMax = { min: number; max: number };
+export type DemandOpportunity = { label?: string; model?: string; basis?: string; needs_input: boolean; missing?: string[]; category?: { key: string; label: string } | null; scale_demand_orders_yr?: number | null; capture_share?: MinMax & { placeholder?: boolean }; annual_usd?: MinMax | null; monthly_usd?: MinMax | null; mock?: boolean };
+
+/** v1.2 §7: Friday returns warnings[] only when it ignored something (e.g. "geo ignored: …"). Shown gently. */
+export const WARN_EVENT = "br-intake-warnings";
+function emitWarnings(d: unknown) {
+  const w = (d as { warnings?: unknown })?.warnings;
+  if (typeof window === "undefined" || !Array.isArray(w) || !w.length) return;
+  window.dispatchEvent(new CustomEvent(WARN_EVENT, { detail: w.filter((x): x is string => typeof x === "string").slice(0, 5) }));
+}
 export type { Market };
 
 /** Per-channel eligibility from a v1.1 report (exposure first, then channel tiles); [] on a v1 report. */
@@ -126,12 +139,16 @@ export function toFridayBody(p: IntakePayload, extra: Partial<SubmitContact> & {
   if (p.sponsor) body.sponsor = { skus: p.sponsor.interest, ...(p.sponsor.category ? { categories: [p.sponsor.category] } : {}), ...(p.sponsor.area ? { area: p.sponsor.area } : {}) };
   if (p.kit_calculator) {
     const k = p.kit_calculator;
-    // Friday v1 margin keys are under_20 | 20_40 | 40_60 | 60_plus; Birch's chips (lt_30 …) differ, and the body is
-    // strict, so a Birch band is only sent when Friday knows it (see CONTRACT-GAPS.md). Friday then reports needs_input.
-    body.calculator = { avg_cart_usd: k.aov_usd, orders_per_month: k.monthly_orders, purchases_per_year: k.purchases_per_year, ...(FRIDAY_MARGIN.has(k.margin_band) ? { margin_band: k.margin_band } : {}) };
+    // Contract v1.2 §1–2: Birch margin keys are canonical and repeat_band is accepted. The Birch server downgrades
+    // the body for strict v1 (toV1Body: v1 margin alias, no repeat_band/category/geo) until Friday deploys v1.2.
+    const margin = (V12_MARGIN as readonly string[]).includes(k.margin_band) || FRIDAY_MARGIN.has(k.margin_band) ? k.margin_band : undefined;
+    const repeat = k.repeat_band && (V12_REPEAT as readonly string[]).includes(k.repeat_band) ? k.repeat_band : undefined;
+    body.calculator = { avg_cart_usd: k.aov_usd, orders_per_month: k.monthly_orders, purchases_per_year: k.purchases_per_year, ...(margin ? { margin_band: margin } : {}), ...(repeat ? { repeat_band: repeat } : {}) };
+    const cat = toFridayCategory(k.category);
+    if (cat) body.category = cat; // v1.2 §5–6 shared category key
   }
   if (p.market && (p.market.sells_in.length || p.market.ships_to.length)) {
-    // v1.1 `geo` block; the Birch server retries without it if Friday is still on strict v1 (see brandIntakeProxy.ts).
+    // v1.1 `geo` block (v1.2 §7: never a 400; Birch's server drops it for strict v1).
     body.geo = marketToFridayGeo(p.market, p.role === "publisher" ? "publisher" : "advertiser");
     body.profile = { geography: marketToGeographyText(p.market) };
   }
@@ -245,6 +262,7 @@ const BIRCH = ""; // same origin: Birch server routes, which forward to Friday s
 const live = {
   async create(payload: IntakePayload): Promise<IntakeRef> {
     const d = await j<{ id: string; editToken: string; reportToken: string; version: number; fallback?: string }>(await fetch(`${BIRCH}/v1/brand-intake`, { method: "POST", headers: H(), body: JSON.stringify(toFridayBody(payload)) }));
+    emitWarnings(d);
     // brand-intake-v1 not deployed on Friday yet: the Birch server pushed the lead to Friday's /api/intake instead.
     if (d.fallback === "api_intake") return { id: "bi_LEGACYLEAD", editToken: "legacy-no-edit-token", reportToken: "legacy-no-report-token", version: 1, legacy: true };
     if (!d.id) throw new Error("dropped");
@@ -253,12 +271,15 @@ const live = {
   async update(ref: IntakeRef, payload: IntakePayload): Promise<IntakeRef> {
     if (ref.legacy) return ref; // v1 not deployed: the draft stays in this browser until submit
     const d = await j<{ version: number }>(await fetch(`${BIRCH}/v1/brand-intake/${encodeURIComponent(ref.id)}`, { method: "PATCH", headers: H(ref), body: JSON.stringify(toFridayBody(payload)) }));
+    emitWarnings(d);
     return { ...ref, version: d.version };
   },
   async submit(ref: IntakeRef, payload: IntakePayload, contact: SubmitContact): Promise<SubmitResult> {
     // v1 not deployed: one-shot submit through the Birch server, which pushes the lead to Friday's /api/intake.
     if (ref.legacy) return j(await fetch(`${BIRCH}/v1/brand-intake`, { method: "POST", headers: H(), body: JSON.stringify(toFridayBody(payload, { ...contact, submit: true })) }));
-    return j(await fetch(`${BIRCH}/v1/brand-intake/${encodeURIComponent(ref.id)}`, { method: "PATCH", headers: H(ref), body: JSON.stringify(toFridayBody(payload, { ...contact, submit: true })) }));
+    const d = await j<SubmitResult>(await fetch(`${BIRCH}/v1/brand-intake/${encodeURIComponent(ref.id)}`, { method: "PATCH", headers: H(ref), body: JSON.stringify(toFridayBody(payload, { ...contact, submit: true })) }));
+    emitWarnings(d);
+    return d;
   },
   async kit(ref: IntakeRef, kit: KitBody): Promise<{ status: "pending_review" }> {
     if (ref.legacy) throw new Error("not_submitted");

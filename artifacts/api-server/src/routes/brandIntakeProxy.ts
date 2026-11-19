@@ -24,6 +24,9 @@
  */
 import { Router, json, type Request, type Response } from "express";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
+import { isIP } from "node:net";
+import { FRIDAY_CATEGORIES, toV1Body } from "../lib/kitCalc/fridayV12";
+import { NEVER_HUB_NAME } from "../lib/overhaul/hubNameFilter";
 
 type Env = NodeJS.ProcessEnv;
 const ID_RE = /^bi_[A-Za-z0-9_-]{4,64}$/;
@@ -39,12 +42,35 @@ export function fridayBrandConfig(env: Env = process.env): { base: string; key: 
   return { base, key, org: env.FRIDAY_WORKSPACE?.trim() || "birchreserve" };
 }
 
+/** The visitor's IP as seen by Birch's edge (first value only), or null when it is not a valid IPv4/IPv6. */
+export function clientIp(req: Request): string | null {
+  const first = (v: string | undefined) => v?.split(",")[0]?.trim();
+  const c = first(req.get("x-vercel-forwarded-for")) || first(req.get("x-real-ip")) || first(req.get("x-forwarded-for")) || req.ip || "";
+  const ip = c.replace(/^::ffff:/i, "");
+  return isIP(ip) ? ip : null;
+}
+
+/**
+ * The ONLY gate for Friday's legacy /api/intake from the brand-intake flow: a final submit (submit === true) with a
+ * real email address. Drafts, autosaves, PATCHes, kit requests and downloads never qualify.
+ * (Nov 18 2026, 10:35 PM ET leak: commit 6a32485 pushed every POST /v1/brand-intake to /api/intake when Friday's v1
+ * route 404'd, including email-less autosave drafts. See PLAN.md.)
+ */
+const LEGACY_EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/;
+export function legacyIntakeAllowed(body: unknown): boolean {
+  if (!body || typeof body !== "object") return false;
+  const b = body as Record<string, unknown>;
+  return b.submit === true && typeof b.email === "string" && LEGACY_EMAIL_RE.test(b.email.trim());
+}
+
 /** Headers Birch sends to Friday. The secret only ever goes in X-Intake-Secret. */
 export function fridayHeaders(cfg: { key: string; org: string }, req: Request): Record<string, string> {
   const h: Record<string, string> = { "Content-Type": "application/json", "X-Intake-Secret": cfg.key, "X-Org-Id": cfg.org };
   const edit = req.get("x-edit-token");
   if (edit && TOKEN_RE.test(edit)) h["X-Edit-Token"] = edit;
-  if (req.ip) h["X-Forwarded-For"] = req.ip; // so Friday rate-limits per visitor, not per Birch server
+  // v1.2 §3: Friday rate-limits per visitor via X-Client-IP (server-to-server only; one IP, validated).
+  const ip = clientIp(req);
+  if (ip) h["X-Client-IP"] = ip;
   return h;
 }
 
@@ -90,7 +116,6 @@ const INTERNAL_KEYS = ["partner_match", "existing_hub_partner_lead", "is_a_hub",
  * array item flagged excluded. Hub-like items whose name is on Birch's never-mention list are dropped too.
  */
 const EXCLUDED_KEY = /exclu|compet/i;
-const NEVER_NAME = /medvibe|clairvoyant|\balign\b|alset|kalaya/i;
 export function stripExcluded(v: unknown): unknown {
   if (Array.isArray(v)) {
     return v
@@ -100,7 +125,7 @@ export function stripExcluded(v: unknown): unknown {
         if (o.excluded === true || o.competes === true) return false;
         if (typeof o.status === "string" && EXCLUDED_KEY.test(o.status)) return false;
         if (typeof o.state === "string" && EXCLUDED_KEY.test(o.state)) return false;
-        if (typeof o.name === "string" && NEVER_NAME.test(o.name)) return false;
+        if (typeof o.name === "string" && NEVER_HUB_NAME.test(o.name)) return false;
         return true;
       })
       .map(stripExcluded);
@@ -161,27 +186,44 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       return null;
     }
   }
-  /** Friday v1 is strict: if it rejects the v1.1-only keys, retry once without them (v1.1 tolerance). */
-  async function forwardTolerant(req: Request, res: Response, method: "POST" | "PATCH", path: string, payload: unknown) {
-    const out = await forward(req, res, method, path, payload);
-    if (!out || out.status !== 400 || !payload || typeof payload !== "object") return out;
-    const b = payload as Record<string, unknown>;
-    if (!("geo" in b) && !("company_name" in b)) return out;
-    if (!/"invalid"/.test(out.text)) return out;
-    const { geo: _g, company_name: _c, ...v1 } = b;
-    log("brand-intake v1.1 keys rejected; retried as v1", { path: path.replace(/\/[A-Za-z0-9_-]{8,}(?=\/|\?|$)/g, "/:x") });
-    return forward(req, res, method, path, v1);
+  /**
+   * Contract version: v1.2 is detected by its public GET /api/public/brand-categories (cached 5 min). On strict v1
+   * the body is downgraded before sending (toV1Body). No retry-without-geo path any more (v1.2 §7).
+   */
+  let probe: { at: number; v12: boolean; categories: unknown } | null = null;
+  async function fridayV12(): Promise<{ v12: boolean; categories: unknown }> {
+    if (probe && Date.now() - probe.at < 5 * 60_000) return probe;
+    const cfg = fridayBrandConfig(env);
+    let v12 = false;
+    let categories: unknown = null;
+    if (cfg) {
+      try {
+        const r = await f(`${cfg.base}/api/public/brand-categories`, { method: "GET", headers: { Accept: "application/json" }, signal: AbortSignal.timeout(5_000) });
+        if (r.ok) {
+          const d = (await r.json().catch(() => null)) as { categories?: unknown } | null;
+          if (d && Array.isArray(d.categories)) (v12 = true), (categories = d);
+        }
+      } catch {
+        /* treat as v1 */
+      }
+    }
+    probe = { at: Date.now(), v12, categories };
+    return probe;
+  }
+  async function shaped(body: unknown): Promise<unknown> {
+    const b = markTest(body ?? {}) as Record<string, unknown>;
+    return (await fridayV12()).v12 ? b : toV1Body(b);
   }
   const send = (res: Response, out: { status: number; text: string }) => res.status(out.status).type("application/json").send(publicGates(out.text || "{}"));
 
   router.post("/v1/brand-intake", body, async (req, res) => {
-    const out = await forwardTolerant(req, res, "POST", "/api/public/brand-intake", markTest(req.body ?? {}));
+    const out = await forward(req, res, "POST", "/api/public/brand-intake", await shaped(req.body));
     if (!out) return;
     if (out.status === 404) {
       // v1 not deployed. Drafts (no email yet) stay in the browser; only a submission with contact details is
       // pushed to /api/intake, so autosave never creates anonymous leads.
       const b = (req.body ?? {}) as Record<string, unknown>;
-      if (b.submit !== true || typeof b.email !== "string") {
+      if (!legacyIntakeAllowed(b)) {
         res.status(202).json({ ok: true, fallback: "api_intake", lead: false, draft: "local" });
         return;
       }
@@ -194,7 +236,8 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
   router.patch("/v1/brand-intake/:id", body, async (req, res) => {
     const id = String(req.params.id);
     if (!ID_RE.test(id)) return void res.status(404).json({ ok: false, error: "not_found" });
-    const out = await forwardTolerant(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, markTest(req.body ?? {}));
+    // PATCH (autosave or submit) only ever goes to brand-intake v1; it never falls back to /api/intake.
+    const out = await forward(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, await shaped(req.body));
     if (!out) return;
     send(res, out);
   });
@@ -207,6 +250,12 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
   router.post("/v1/brand-kit/download", body, async (req, res) => {
     const out = await forward(req, res, "POST", "/api/public/brand-kit/download", req.body ?? {});
     if (out) send(res, out);
+  });
+  /** v1.2 §6 shared category keys (Friday's list when it serves one, else the static copy of the contract table). */
+  router.get("/v1/brand-categories", async (_req, res) => {
+    const p = await fridayV12();
+    res.setHeader("Cache-Control", "public, max-age=300");
+    res.json(p.v12 && p.categories ? p.categories : { categories: FRIDAY_CATEGORIES, source: "static" });
   });
   router.get("/v1/brand-report/:token", async (req, res) => {
     const token = String(req.params.token);

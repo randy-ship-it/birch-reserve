@@ -39,7 +39,7 @@ const copy = () =>
 
 test("hard rules: no private partners, banned names, counts, guarantees or deposit wording", () => {
   const c = copy();
-  for (const bad of [/medvibe/i, /clairvoyant/i, /\bAlign\b/, /alignwellness/i, /alset/i, /kalaya/i, /80 locations/i, /\bdeposit\b/i, /\bsigned (partners|hubs)\b/i, /\b\d+\s+(booked|sold|signed)\b/i, /guaranteed (views|clicks|impressions|roas)/i, /\bCAD\b/]) {
+  for (const bad of [/medvibe/i, /clairvoyant/i, /\bAlign\b/, /alignwellness/i, /alset/i, /80 locations/i, /\bdeposit\b/i, /\bsigned (partners|hubs)\b/i, /\b\d+\s+(booked|sold|signed)\b/i, /guaranteed (views|clicks|impressions|roas)/i, /\bCAD\b/]) {
     assert.ok(!bad.test(c), `found ${bad}`);
   }
   assert.ok(!/exclusive/i.test(c.replace(/not exclusive/gi, "")), "only 'not exclusive' may appear");
@@ -137,10 +137,10 @@ test("kit calculator module stays framework-light (reusable by scalehealth.ca/cl
 
 test("Side B anchor hubs: proposed, pending Randy, public-OK names only", () => {
   assert.equal(ANCHOR_HUBS_STATUS, "Proposed, pending Randy's confirmation");
-  const publicNames = new Set([...BRAND_HUBS.map((h) => h.name), "Integrity Fitness"]);
+  const publicNames = new Set([...BRAND_HUBS.map((h) => h.name), "Integrity Fitness", "Kalaya"]); // Kalaya public per Randy 11:34 PM
   assert.ok(INVENTORY.line.includes("Integrity Fitness"));
   for (const h of PROPOSED_ANCHOR_HUBS) assert.ok(publicNames.has(h.name), h.name);
-  assert.ok(PROPOSED_ANCHOR_HUBS.length >= 5 && PROPOSED_ANCHOR_HUBS.length <= 6);
+  assert.deepEqual(PROPOSED_ANCHOR_HUBS.map((h) => h.key), ["dr-ho", "roll-recovery", "jill-health", "jack-health", "nutriprocan", "sole", "effortless-admin", "kalaya"]);
   assert.deepEqual(EXPOSURE_CHANNELS[0]!.cpm, HUB_RATE_RANGE.cpm);
   assert.deepEqual(HUB_RATE_RANGE.cpm, [4, 30]);
   assert.ok(EXPOSURE_CHANNELS.slice(1).every((c) => c.cpm === null), "no rate card for other channels: priced by IO");

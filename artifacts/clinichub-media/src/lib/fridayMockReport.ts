@@ -7,6 +7,7 @@ import type { FridayReport, ReportView } from "./fridayBrandIntake";
 import type { IntakePayload } from "../../../api-server/src/lib/overhaul/brandIntake";
 import { CHANNEL_TILES, PROPOSED_ANCHOR_HUBS, RATE_PLACEMENTS, hubFit, projectPublisher } from "../../../api-server/src/lib/overhaul/brandIntake";
 import { KIT_CALC_CONFIG, kitCalc } from "../../../api-server/src/lib/kitCalc";
+import { toBirchCategory } from "../../../api-server/src/lib/kitCalc/fridayV12";
 
 const FK: Record<string, string> = { "scale-hubs": "hubs", "calm-joints": "calm_joints", "street-team": "street_team", "retail-network": "retail" };
 const lh = (r: readonly [number, number]) => ({ low: r[0], high: r[1] });
@@ -16,7 +17,7 @@ export function mockReport(payload: IntakePayload, body: Record<string, unknown>
   const k = payload.kit_calculator;
   const c = kitCalc({ aovUsd: k?.aov_usd ?? calc?.avg_cart_usd ?? 0, monthlyOrders: k?.monthly_orders ?? calc?.orders_per_month ?? 0, purchasesPerYear: k?.purchases_per_year_range ?? calc?.purchases_per_year ?? 1, marginBand: k?.margin_band ?? calc?.margin_band ?? "" });
   const missing = calc ? [] : ["avg_cart_usd", "orders_per_month", "purchases_per_year", "margin_band"];
-  const cat = k?.category ?? "recovery";
+  const cat = toBirchCategory(k?.category ?? "recovery");
   const fits = hubFit(cat);
   const report: FridayReport = {
     schema: "brand-report.v1",
@@ -43,11 +44,13 @@ export function mockReport(payload: IntakePayload, body: Record<string, unknown>
       channels: CHANNEL_TILES.map((t, i) => ({ key: FK[t.key]!, name: t.name, fit: [80, 50, 50, 50][i]!, fit_label: i === 0 ? "Good fit (mock)" : "Possible fit (mock)", subject_to_human_confirmation: true })),
       anchor_hubs: PROPOSED_ANCHOR_HUBS.map((h) => {
         const f = fits.find((x) => x.key === h.key)!;
-        return { key: h.key, name: h.name, status: h.live ? "Live" : "Coming soon", confirmed_anchor: false, fit: f.fit === "Likely fit" ? 80 : 40, fit_label: `${f.fit === "Likely fit" ? "Good fit" : "Possible fit"} (mock)`, reason: h.what, subject_to_human_confirmation: true };
+        return { key: h.key, name: h.name, status: h.live ? "Live" : "In queue", confirmed_anchor: false, fit: f.fit === "Likely fit" ? 80 : 40, fit_label: `${f.fit === "Likely fit" ? "Good fit" : "Possible fit"} (mock)`, reason: h.what, subject_to_human_confirmation: true };
       }),
     },
     channels: CHANNEL_TILES.map((t) => ({ key: FK[t.key]!, name: t.name, figures: t.key === "retail-network" ? ["120+ retail locations", "1MM+ recovery customers", "Canada + USA"] : t.stats.map((s) => `${s.v} ${s.l}`), figures_label: "network figures / targets", fit: 0, fit_label: "", line: t.line, image: "image" in t ? t.image : null })),
     placements: RATE_PLACEMENTS.map((r) => ({ key: r.key, label: r.label, fit: 0, fit_label: "", cpm_usd: lh(r.cpm), cpc_usd: lh(r.cpc), needs_rate: false })),
+    // v1.2 §5 shape. Birch has no access to Friday's TAM, so the mock is always needs_input (honest, labelled mock).
+    demand_opportunity: { label: "Estimate", model: "scale-tam-demand-v1", needs_input: true, missing: calc ? ["scale_demand_unavailable"] : ["avg_cart_usd", "scale_demand_unavailable"], category: null, scale_demand_orders_yr: null, capture_share: { min: 0.01, max: 0.25, placeholder: true }, annual_usd: null, monthly_usd: null, mock: true },
     mock: true,
   };
   if (view === "publisher" && payload.publisher) {
@@ -62,7 +65,7 @@ export function mockReport(payload: IntakePayload, body: Record<string, unknown>
 /** Labelled SAMPLE for /intake: a fictional "Example brand" with example inputs. Not a real brand, never sent to Friday. */
 export function sampleReport(): FridayReport {
   const payload = {
-    kit_calculator: { brand_label: "Example brand", category: "recovery" },
+    kit_calculator: { brand_label: "Example brand", category: "recovery_devices" },
     publisher: { mode: "display", size_x: 1, conversion_pct: 1, value_per_conversion_usd: 0, surfaces: [{ key: "post_purchase", on: true }, { key: "home", on: true }, { key: "product", on: true }, { key: "newsletter", on: true }, { key: "social", on: true }] },
   } as unknown as IntakePayload;
   const body = { calculator: { avg_cart_usd: 80, orders_per_month: 500, purchases_per_year: 2.5, margin_band: "30_50" } };

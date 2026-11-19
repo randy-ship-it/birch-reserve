@@ -3,6 +3,7 @@
  * creates a lead in Friday CRM: create (brand-intake-v1 POST) then submit, via Birch's server routes, which add
  * the intake secret server-side. Nothing is booked, charged or auto-accepted.
  */
+import { IntakeWarnings } from "@/components/br/intake-warnings";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { ArrowRight, Check, Loader2, ShieldAlert } from "lucide-react";
@@ -71,6 +72,7 @@ export function IntakeShortForm() {
         <h2 className="mt-3 font-display text-3xl">Thanks. A person at Birch Reserve reviews every request.</h2>
         <p className="mt-2 text-sm text-muted-foreground">Nothing is booked, charged or accepted automatically.</p>
         <LeadGatesStatus gates={done.gates} />
+        <IntakeWarnings />
         {done.held ? <p className="mt-3 flex gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900" data-testid="intake-held"><ShieldAlert className="size-4 shrink-0" />{HELD_COPY}</p> : null}
         <div className="mt-5"><PrimaryCta side={side} where="done" /></div>
         <div className="mt-4 flex flex-wrap gap-3 text-sm font-semibold">

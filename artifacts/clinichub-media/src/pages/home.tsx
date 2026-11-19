@@ -533,7 +533,7 @@ export default function Home() {
               $100K–$250K+ · Coming soon / Inquire within
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Multi-hub or on-prem Align. Credit, not a flight. Not a self-serve Stripe SKU — inquire within.
+              Multi-hub or on-prem retail hubs. Credit, not a flight. Not a self-serve Stripe SKU — inquire within.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Button
@@ -649,7 +649,7 @@ export default function Home() {
               <MapPin className="mb-7 size-6 text-accent" />
               <h3 className="mb-3 font-display text-3xl">On-prem, on request</h3>
               <p className="text-sm leading-relaxed text-background/70 mb-4">
-                On-prem surfaces in Align's network of health and wellness businesses and in Scale hubs are a separate insertion-order line. They are not sold as digital reach.
+                On-prem surfaces in retail hubs and in Scale hubs are a separate insertion-order line. They are not sold as digital reach.
               </p>
               <div className="flex flex-wrap gap-2">
                 <a

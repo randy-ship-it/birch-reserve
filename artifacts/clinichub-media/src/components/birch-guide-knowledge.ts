@@ -14,10 +14,10 @@ Prices: $190 = 7-day look (100% credit if you convert). $490 = category prepay: 
 8 advertiser categories inside listed Scale Health hubs, not eight websites. Early slots go to Reserve List brands first; categories stay open to more than one brand and no brand gets more than 20% of a category. Never offer to hold or lock a category or promise exclusivity.
 Also (placement example, not hero): https://weprize.net — live SBG/Birch display example. Placement only; not a Scale hub seat; no reach/impression claims. WePrize points brands to birchreserve.net; Birch reciprocates as quiet proof.
 Never state 50MM, 1MM, CTR, LTV dollars, or impression guarantees.
-Never quote Align CIM financials, partner payouts, or rdgdh investor targets as current Birch traffic.
+Never quote private partner financials, partner payouts, or rdgdh investor targets as current Birch traffic.
 Never collect or discuss patient / PHI data. Aggregate reporting only. No clinical pixels.
 If asked “how many people will see my ad?” answer: “We do not sell a guaranteed impression count. Reserve List brands get early slots first as each category activates. We name the surface on the insertion order.”
-If asked about Align’s 80 locations: “On-prem clinic and studio surfaces are a separate insertion-order line, available on request. The public product is digital hubs.”
+If asked about retail hub locations: “On-prem clinic and studio surfaces are a separate insertion-order line, available on request. The public product is digital hubs.”
 Big accounts / multi-hub / on-prem → Book a call.
 Providers listing a surface → free opt-in, not a charge.
 Seller: Silver Birch Growth Inc., Toronto. Stripe descriptor should read SCALE HEALTH*BIRCH or BIRCH RESERVE.`;

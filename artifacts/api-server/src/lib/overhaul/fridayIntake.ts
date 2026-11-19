@@ -87,6 +87,8 @@ function hostOf(url: string): string {
 export async function sendIntake(input: IntakeInput, env: NodeJS.ProcessEnv = process.env): Promise<IntakeResult> {
   const externalId = intakeExternalId(input);
   if (env.FRIDAY_PUSH_DISABLED === "true") return { status: "skipped", externalId };
+  // Defence in depth for the brand-intake fallback: never push a draft or an email-less record to /api/intake.
+  if (input.kind === "brand_intake" && (!input.email || !/@/.test(input.email) || (input.meta as { submitted?: unknown } | undefined)?.submitted !== true)) return { status: "skipped", externalId };
   const base = env.FRIDAY_API_URL?.trim();
   const key = env.FRIDAY_API_KEY?.trim();
   if (!base || !key) return { status: "skipped", externalId };

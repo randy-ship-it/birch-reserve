@@ -67,7 +67,7 @@ export type RandyChatMode = "chat" | "hear" | "call";
 
 /**
  * HARD Randy 2026-09-24 3:31pm ET: birchreserve.net = BIRCH RESERVE ONLY.
- * Greeting + chips are Birch only. Scale / Align / RDGDH knowledge is used
+ * Greeting + chips are Birch only. Scale / retail-hub / RDGDH knowledge is used
  * only when the visitor raises it mid-dialogue — never a portfolio menu here.
  */
 export type DiscoveryChipId =

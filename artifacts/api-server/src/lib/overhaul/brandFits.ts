@@ -265,8 +265,8 @@ const radRoller: BrandFit = {
     },
     {
       status: "street-team",
-      title: "Street team, Align Wellness Network footprint",
-      line: "The street team follows the Align Wellness Network footprint in the Greater Toronto and Hamilton Area, in studios and recovery rooms.",
+      title: "Street team, retail hub footprint",
+      line: "The street team follows the retail hub footprint in the Greater Toronto and Hamilton Area, in studios and recovery rooms.",
       strength: "good",
     },
     {
@@ -346,7 +346,7 @@ const radRoller: BrandFit = {
     },
     {
       label: "Friday / Birch snapshot",
-      text: "Live hubs named in the Birch media kit (Integrity Fitness and DR-HO'S physio). Cataloged launching brands and Calm Joints racquet pages from the audience snapshot fed by the TAM / Friday inventory read on Nov 13, 2026. Street team footprint follows the Align Wellness Network in the GTHA.",
+      text: "Live hubs named in the Birch media kit (Integrity Fitness and DR-HO'S physio). Cataloged launching brands and Calm Joints racquet pages from the audience snapshot fed by the TAM / Friday inventory read on Nov 13, 2026. Street team footprint follows the retail hubs in the GTHA.",
     },
   ],
 };

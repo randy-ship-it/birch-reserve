@@ -5,17 +5,17 @@
  * Used by /kit/r/:token (Friday data) and the /intake sample (labelled sample). Birch's site chrome stays Birch's.
  *
  * Never rendered: Friday's internal "excluded: competes" data (stripped server-side too), match results, private
- * partners. Hub names are also checked against Birch's never-mention list.
+ * partners. Hub names are checked against Birch's never-mention list (Kalaya is allowed; known anchors show by name).
  */
 import { useEffect, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { RT, RT_SERIF, RT_SANS, RT_SHADOW, fitLabelOf, monogramBg } from "@/lib/reportTokens";
 import type { FridayReport } from "@/lib/fridayBrandIntake";
 import { fridayEligibility } from "@/lib/fridayBrandIntake";
-import { CHANNEL_TILES, PUBLISHER_SURFACES, RETAIL_COPY } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { CHANNEL_TILES, PUBLISHER_SURFACES, RETAIL_COPY, anchorName } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { NEVER_HUB_NAME } from "../../../../api-server/src/lib/overhaul/hubNameFilter";
 import { CHANNEL_GEO } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 
-const NEVER = /medvibe|clairvoyant|\balign\b|alset|kalaya/i;
 const FKEY: Record<string, string> = { hubs: "scale-hubs", calm_joints: "calm-joints", street_team: "street-team", retail: "retail-network" };
 type LoHi = { low: number; high: number };
 const usd = (n: number, d = 0) => `$${n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d })}`;
@@ -47,13 +47,14 @@ export function buildModel(r: FridayReport) {
   const scored = df.filter((c) => typeof c.fit === "number").sort((a, b) => b.fit - a.fit).slice(0, 3);
   const score = scored.length ? Math.round(scored.reduce((s, c) => s + c.fit, 0) / scored.length) : null;
   const rawHubs = ((r as { hubs?: Array<{ key: string; name: string; status?: string; fit?: number; fit_label?: string; reason?: string | null; tier?: string; logo?: string }> }).hubs ?? r.demand_fit?.anchor_hubs ?? []) as Array<{ key: string; name: string; status?: string; fit?: number; fit_label?: string; reason?: string | null; tier?: string; logo?: string }>;
-  const hubs = rawHubs.filter((h) => h && h.name && !NEVER.test(h.name)).slice(0, 5);
+  const hubs = rawHubs.map((h) => (h && h.name ? { ...h, name: anchorName(h.key, h.name) } : h)).filter((h) => h && h.name && !NEVER_HUB_NAME.test(h.name)).slice(0, 5);
   const placements = (r.placements ?? []).filter((p) => p.label);
   const cpm = r.headline?.best_fit_cpm_usd ?? avg(placements.map((p) => p.cpm_usd));
   const cpc = r.headline?.best_fit_cpc_usd ?? avg(placements.map((p) => p.cpc_usd));
   // Publisher side (view=publisher only): v1.1 publisher_monetization, else v1 surfaces (last ramp step), else mock surfaces.
   const rd = (r.role_data ?? {}) as Record<string, unknown>;
-  const pm = rd.publisher_monetization as { monthly_usd?: LoHi | null } | undefined;
+  const pm = rd.publisher_monetization as { monthly_usd?: LoHi | null; now?: { min: number; max: number } | null; later?: { min: number; max: number } | null } | undefined;
+  const mm = (x: { min: number; max: number } | null | undefined): LoHi | null => (x && typeof x.min === "number" && typeof x.max === "number" ? { low: x.min, high: x.max } : null);
   const pub = rd.publisher as { surfaces?: Array<Record<string, unknown>>; config?: { base_share?: number } } | undefined;
   const label = (key: string) => PUBLISHER_SURFACES.find((s) => s.key === key)?.label ?? key.replace(/_/g, " ");
   const earnings = (pub?.surfaces ?? []).map((s) => {
@@ -64,8 +65,11 @@ export function buildModel(r: FridayReport) {
     return { surface: label(String(s.surface)), pay: ok ? pay! : null, needs: !ok };
   });
   const sum = earnings.filter((e) => e.pay).reduce((a, e) => ({ low: a.low + e.pay!.low, high: a.high + e.pay!.high }), { low: 0, high: 0 });
-  const total = pm?.monthly_usd ?? (earnings.some((e) => e.pay) ? sum : null);
-  return { name, domain, updated: r.updated, tiles, score, top3: scored.map((c) => ({ name: c.name, label: c.fit_label })), hubs, placements, cpm, cpc, share: pub?.config?.base_share ?? 0.35, earnings, total, isPublisher: (r.roles ?? []).includes("publisher"), publisherFirst: (r.roles ?? [])[0] === "publisher", mock: !!r.mock };
+  // v1.2 §4: now = surfaces the hub turned on, later = every surface with views. monthly_usd (v1.1) equals now.
+  const total = mm(pm?.now) ?? pm?.monthly_usd ?? (earnings.some((e) => e.pay) ? sum : null);
+  const later = mm(pm?.later);
+  const dop = r.demand_opportunity ?? null;
+  return { name, domain, updated: r.updated, tiles, score, top3: scored.map((c) => ({ name: c.name, label: c.fit_label })), hubs, placements, cpm, cpc, share: pub?.config?.base_share ?? 0.35, earnings, total, later, dop, isPublisher: (r.roles ?? []).includes("publisher"), publisherFirst: (r.roles ?? [])[0] === "publisher", mock: !!r.mock };
 }
 function avg(xs: Array<LoHi | null | undefined>): LoHi | null {
   const v = xs.filter((x): x is LoHi => !!x);
@@ -251,6 +255,7 @@ export function CostSide({ m, extra }: { m: ReportModel; extra?: ReactNode }) {
               <tbody>{m.placements.map((p) => <tr key={p.key} style={{ borderTop: `1px solid ${RT.line}` }}><td className="py-2 pr-2">{p.label}</td><td className="pr-2">{p.cpm_usd ? money(p.cpm_usd) : "— (needs rate)"}</td><td>{p.cpc_usd ? money(p.cpc_usd, 2) : "— (needs rate)"}</td></tr>)}</tbody></table>
           ) : null}
           <p>A $1,000 test buys about {views ? `${k(views.low)}–${k(views.high)}` : "—"} views on display, or {clicks ? `${Math.round(clicks.low)}–${Math.round(clicks.high)}` : "—"} clicks on CPC. Views = budget ÷ CPM × 1,000; clicks = budget ÷ CPC.</p>
+          {m.dop && !m.dop.needs_input ? <p>Revenue opportunity from Scale demand = Scale demand orders a year in your category × a capture share of {pct(m.dop.capture_share?.min)}–{pct(m.dop.capture_share?.max)} (placeholder) × your average cart. Canada orders only.</p> : null}
           <p style={{ color: RT.mute }}>Network figures are reported figures and targets, not guarantees. No CTR or ROAS is promised.</p>
         </EstimatePop>
       </div>
@@ -260,12 +265,41 @@ export function CostSide({ m, extra }: { m: ReportModel; extra?: ReactNode }) {
         <div className="p-3" style={{ background: RT.paper, borderRadius: 10 }}><p className="text-[28px] leading-none" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{views ? `${k(views.low)}–${k(views.high)}` : "—"}</p><p className="mt-1 text-[12px]" style={{ color: RT.mute }}>views for a $1,000 display test</p></div>
         <div className="p-3" style={{ background: RT.paper, borderRadius: 10 }}><p className="text-[28px] leading-none" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{clicks ? `${Math.round(clicks.low)}–${Math.round(clicks.high)}` : "—"}</p><p className="mt-1 text-[12px]" style={{ color: RT.mute }}>clicks for a $1,000 CPC test</p></div>
       </div>
+      <DemandOpportunityBox m={m} />
       {m.placements.length ? (
         <table className="mt-4 w-full text-left text-[13px]" data-testid="placement-table"><thead><tr className="text-[11px] uppercase tracking-wider" style={{ color: RT.mute }}><th className="py-2">Placement</th><th>CPM</th><th>CPC</th></tr></thead>
           <tbody>{m.placements.map((p) => <tr key={p.key} style={{ borderTop: `1px solid ${RT.line}` }}><td className="py-2 pr-2"><span className="font-semibold" style={{ color: RT.ink }}>{p.label}</span>{p.fit_label ? <FitMeter pct={p.fit || null} label={p.fit_label} /> : null}</td><td className="pr-2 tabular-nums">{p.cpm_usd ? money(p.cpm_usd) : "—"}</td><td className="tabular-nums">{p.cpc_usd ? money(p.cpc_usd, 2) : "—"}</td></tr>)}</tbody></table>
       ) : null}
       {extra}
     </section>
+  );
+}
+
+const pct = (n?: number) => (typeof n === "number" ? `${Math.round(n * (n <= 1 ? 100 : 1))}%` : "—");
+const MISSING: Record<string, string> = {
+  category: "your category",
+  avg_cart_usd: "your average cart",
+  markets_include_canada: "Canada in your markets (Scale demand covers Canada orders)",
+  no_scale_demand_in_category: "Scale demand in your category (none yet)",
+  scale_demand_unavailable: "Scale demand data (not available yet)",
+};
+/** v1.2 §5 demand_opportunity: a range when Friday has one; otherwise what it still needs, gently. */
+function DemandOpportunityBox({ m }: { m: ReportModel }) {
+  const d = m.dop;
+  if (!d) return null;
+  const mo = d.monthly_usd;
+  return (
+    <div className="mt-4 p-4" style={{ background: RT.paper, borderRadius: 10 }} data-testid="demand-opportunity" data-needs-input={d.needs_input ? "true" : "false"}>
+      <p className="text-sm font-semibold" style={{ color: RT.ink }}>Revenue opportunity from Scale demand{d.mock ? " (mock)" : ""}</p>
+      {!d.needs_input && mo ? (
+        <>
+          <p className="mt-1 text-[28px] leading-none" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{money({ low: mo.min, high: mo.max }, 0)} <span className="text-sm">/ mo</span></p>
+          <p className="mt-1 text-[12px]" style={{ color: RT.mute }}>{d.category?.label ? `${d.category.label} · ` : ""}{d.scale_demand_orders_yr ? `about ${k(d.scale_demand_orders_yr)} Scale demand orders a year · ` : ""}capture share is a placeholder.</p>
+        </>
+      ) : (
+        <p className="mt-1 text-[13px]" style={{ color: RT.mute }}>We can estimate this once we have {(d.missing ?? []).map((x) => MISSING[x] ?? x.replace(/_/g, " ")).join(", ") || "a little more detail"}.</p>
+      )}
+    </div>
   );
 }
 
@@ -288,8 +322,9 @@ export function EarningsSide({ m, cta }: { m: ReportModel; cta?: ReactNode }) {
         <>
           <div className="mt-4 grid grid-cols-2 gap-3">
             <div className="p-3" style={{ background: RT.paper, borderRadius: 10 }}><p className="text-[28px] leading-none" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{Math.round(m.share * 100)}%</p><p className="mt-1 text-[12px]" style={{ color: RT.mute }}>your share of media revenue (base)</p></div>
-            <div className="p-3" style={{ background: RT.paper, borderRadius: 10 }} data-testid="earnings-total"><p className="text-[28px] leading-none" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{m.total ? money(m.total) : "—"}</p><p className="mt-1 text-[12px]" style={{ color: RT.mute }}>a month at month 12</p></div>
+            <div className="p-3" style={{ background: RT.paper, borderRadius: 10 }} data-testid="earnings-total"><p className="text-[28px] leading-none" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{m.total ? money(m.total) : "—"}</p><p className="mt-1 text-[12px]" style={{ color: RT.mute }}>a month at month 12, surfaces on now</p></div>
           </div>
+          {m.later ? <div className="mt-3 p-3" style={{ background: RT.paper, borderRadius: 10 }} data-testid="earnings-later"><p className="text-[22px] leading-none" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{money(m.later)} <span className="text-sm">/ mo</span></p><p className="mt-1 text-[12px]" style={{ color: RT.mute }}>later, with every surface that has views turned on</p></div> : null}
           {m.earnings.map((e) => e.pay ? <RangeBar key={e.surface} label={e.surface} range={e.pay} unit="/ mo" axisMax={axisMax} d={0} /> : <p key={e.surface} className="mt-3 flex justify-between text-sm"><span className="font-semibold" style={{ color: RT.ink }}>{e.surface}</span><span style={{ color: RT.mute }}>— (needs rate / needs monthly views)</span></p>)}
         </>
       ) : (
