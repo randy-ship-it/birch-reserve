@@ -20,6 +20,7 @@ import { mockExposure, readExposure, type FridayExposure } from "../../../../api
 import { HubView, SupplierExposureView } from "@/components/br/report-views";
 import { Details } from "@/components/br/details";
 import type { PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
+import { applyNetworkCopy, useNetworkCopy } from "@/lib/networkCopy";
 
 const FKEY: Record<string, string> = { hubs: "scale-hubs", calm_joints: "calm-joints", street_team: "street-team", retail: "retail-network" };
 type LoHi = { low: number; high: number };
@@ -185,13 +186,14 @@ export function ReportHero({ m, sample }: { m: ReportModel; sample?: boolean }) 
 }
 
 export function ChannelTilesV2({ m, map }: { m: ReportModel; map?: string }) {
+  const tiles = applyNetworkCopy(m.tiles, useNetworkCopy());
   return (
     <section data-testid="report-tiles" style={{ fontFamily: RT_SANS, color: RT.body }}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-[24px] md:text-[28px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Where you fit</h2>
       </div>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
-        {m.tiles.map((t) => (
+        {tiles.map((t) => (
           <article key={t.key} data-testid={`v2-tile-${t.key}`} data-eligibility={t.eligible} className="overflow-hidden p-5" style={card}>
             {t.image ? <img src={map ?? t.image} alt="Street team route areas shown as an area-level heat map. No homes or addresses." className="mb-3 h-28 w-full object-cover" style={{ borderRadius: 10 }} loading="lazy" /> : null}
             <div className="flex flex-wrap items-center gap-2">

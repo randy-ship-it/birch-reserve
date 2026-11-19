@@ -100,3 +100,17 @@ test("supplier preset copy: hard rules; /intake/supplier is the shared intake, n
   assert.match(visible, /\+ Own hub/);
   assert.match(visible, /\+ Display CPM\/CPC/);
 });
+
+test("network copy (1:56 PM): supplier override only; identity without a provider", async () => {
+  const { SUPPLIER_NETWORK_COPY, applyNetworkCopy } = await import("../../clinichub-media/src/lib/networkCopy");
+  assert.equal(SUPPLIER_NETWORK_COPY.retail, "120+ retail hubs · 1MM+ recovery customers (est., growing to 300–500+ hubs) · Canada + USA");
+  assert.equal(SUPPLIER_NETWORK_COPY.tag, "retail-network estimate");
+  assert.equal(SUPPLIER_NETWORK_COPY.street, "reaches a few million doors targeted around the retail network");
+  const tiles = [{ key: "retail-network", fig: [{ v: "120+", l: "retail hubs" }], line: "x" }, { key: "street-team", fig: [{ v: "500K–1MM", l: "homes in reach" }], line: "y" }, { key: "scale-hubs", fig: [], line: "z" }];
+  assert.equal(applyNetworkCopy(tiles, null), tiles, "default pages unchanged");
+  const s = JSON.stringify(applyNetworkCopy(tiles, SUPPLIER_NETWORK_COPY));
+  assert.ok(!/500K|homes in reach/.test(s));
+  assert.match(s, /growing to 300–500\+ hubs/);
+  assert.match(s, /doors targeted around the retail network/);
+  assert.ok(!/\bAlign\b/i.test(s));
+});
