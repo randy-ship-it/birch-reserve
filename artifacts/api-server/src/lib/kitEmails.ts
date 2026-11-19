@@ -72,7 +72,7 @@ export function renderKitEmail(i: KitEmailInput): { subject: string; html: strin
   const who = i.brand?.trim() ? esc(i.brand.trim()) : "your brand";
   const stats = [i.headline?.exposureMonth ? [i.headline.exposureMonth, "page-view exposures a month, likely"] : null, i.headline?.earningsMonth ? [i.headline.earningsMonth, "hub earnings a month, likely"] : null].filter(Boolean) as string[][];
   const statHtml = stats.length
-    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0"><tr>${stats.map(([v, l]) => `<td style="background:${MINT};border-radius:14px;padding:14px 16px;width:50%"><div style="font-family:Georgia,serif;font-size:28px;color:${FOREST}">${esc(v)}</div><div style="font-size:12px;color:${FOREST}">${esc(l)}</div></td>`).join('<td style="width:12px;font-size:0;line-height:0">&nbsp;</td>')}</tr></table>`
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px -8px;border-collapse:separate;border-spacing:8px 0;width:calc(100% + 16px)"><tr>${stats.map(([v, l]) => `<td style="background:${MINT};border-radius:14px;padding:14px 16px;width:50%"><div style="font-family:Georgia,serif;font-size:28px;color:${FOREST}">${esc(v)}</div><div style="font-size:12px;color:${FOREST}">${esc(l)}</div></td>`).join('')}</tr></table>`
     : "";
   const inner = `<h1 style="font-family:Georgia,serif;font-weight:normal;font-size:30px;line-height:1.15;margin:0 0 10px">Your Monetization Kit is ready.</h1>
 <p style="font-size:15px;line-height:1.55;margin:0;color:${MUTE}">Here is what ${who} could reach and earn across health and wellness hubs. Estimates, reviewed by a person.</p>
