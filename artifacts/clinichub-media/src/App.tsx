@@ -30,6 +30,13 @@ import BrHubs from '@/pages/br/hubs';
 import BrMediaKit from '@/pages/br/media-kit';
 import BrAgencies from '@/pages/br/agencies';
 import BrMediaBuyers from '@/pages/br/media-buyers';
+import BrBrandKit from '@/pages/br/brand-kit';
+import BrKitReport from '@/pages/br/kit-report';
+import BrIntake from '@/pages/br/intake';
+import BrIntakePublisher from '@/pages/br/intake-publisher';
+import BrIntakeSupplier from '@/pages/br/intake-supplier';
+import BrIntakeSponsor from '@/pages/br/intake-sponsor';
+import BrIntakeReport from '@/pages/br/intake-report';
 import BrAiBuyers from '@/pages/br/ai-buyers';
 import BrAudiences from '@/pages/br/audiences';
 import BrSampleProfile from '@/pages/br/sample-profile';
@@ -280,6 +287,27 @@ function Router() {
         </Route>
         <Route path="/agencies">
           <Layout><BrAgencies /></Layout>
+        </Route>
+        <Route path="/brand-kit">
+          <Layout><BrBrandKit /></Layout>
+        </Route>
+        <Route path="/kit/r/:token">
+          <Layout><BrKitReport /></Layout>
+        </Route>
+        <Route path="/intake/publisher">
+          <Layout><BrIntakePublisher /></Layout>
+        </Route>
+        <Route path="/intake/supplier">
+          <Layout><BrIntakeSupplier /></Layout>
+        </Route>
+        <Route path="/intake/sponsor">
+          <Layout><BrIntakeSponsor /></Layout>
+        </Route>
+        <Route path="/intake/report">
+          <Layout><BrIntakeReport /></Layout>
+        </Route>
+        <Route path="/intake">
+          <Layout><BrIntake /></Layout>
         </Route>
         <Route path="/media-buyers">
           <Layout><BrMediaBuyers /></Layout>

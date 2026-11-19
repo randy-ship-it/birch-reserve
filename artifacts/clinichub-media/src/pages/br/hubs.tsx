@@ -70,7 +70,7 @@ function HubDetail({ hub, unlocked }: { hub: BrandHub; unlocked: boolean }) {
 }
 
 export default function BrHubs() {
-  usePageMeta("Hubs | Birch Reserve", "Live hubs today: Integrity Fitness and DR-HO'S physio. More brand hubs are in queue. Register your email to see audience, placements and modelled views.");
+  usePageMeta("Hubs | Birch Reserve", "Live today: DR-HO'S physio. More brand hubs are in queue. Register your email to see audience, placements and modelled views.");
   const [unlocked, setUnlocked] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -106,7 +106,7 @@ export default function BrHubs() {
           <div>
             <Eyebrow>Hubs</Eyebrow>
             <H1>See inside the hubs.</H1>
-            <Lede>Live today: Integrity Fitness and DR-HO'S physio. The other listed brand hubs below are in queue and go live over time; placements are curated as each one launches. Register your email to see each hub's audience, placements and modelled views. To start, take a <a className="underline underline-offset-2" href="/media-kit">$190 USD 7-day look or a $490 USD reserve</a>.</Lede>
+            <Lede>Live today: DR-HO'S physio. The other listed brand hubs below are in queue and go live over time; placements are curated as each one launches. Register your email to see each hub's audience, placements and modelled views. To start, take a <a className="underline underline-offset-2" href="/media-kit">$190 USD 7-day look or a $490 USD reserve</a>.</Lede>
           </div>
           {unlocked ? (
             <p className="inline-flex items-center gap-2 bg-accent px-4 py-3 text-sm font-semibold" data-testid="hubs-unlocked">

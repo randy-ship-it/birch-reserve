@@ -78,7 +78,7 @@ Plan **3× or higher** average customer value versus Google, visitor arrives as 
 
 Live proof hub: **DR-HO’s** → https://physio.drhonow.com/dr-ho/portal  
 
-Launching cohort names (public logos OK): Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery · Sole (and others in queue).
+Launching cohort names (public logos OK): Kalaya · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery · Sole (and others in queue).
 
 Full stage table is INTERNAL (`INTERNAL-Clinic-Hubs-Launch-Queue-24Sep2026.md`). Do not forward contracting/economics stages to prospects. Public: “launching cohort,” named logos, live proof URL.
 

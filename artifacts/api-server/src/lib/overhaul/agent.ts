@@ -13,7 +13,6 @@ export type AgentOfferKey = "hold-190" | "reserve-490";
 
 /** Live hubs anyone can open today (media kit, Nov 17 2026). */
 export const AGENT_LIVE_HUBS = [
-  { name: "Integrity Fitness", type: "studio hub", status: "live" },
   { name: "DR-HO'S physio", type: "brand hub", status: "live" },
 ] as const;
 

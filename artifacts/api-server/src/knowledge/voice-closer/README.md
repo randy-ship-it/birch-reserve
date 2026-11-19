@@ -12,7 +12,7 @@ Instructions + facts for a Grok voice (or chat) agent that **sounds like Randy G
 1. **Birch Reserve** — click-to-callback closer + site chat “Randy” avatar (same pack)
 2. **Scale Health** — providers / clinichubs / brand hubs (consumer #1)
 3. **Align Wellness / CHI** — fulfillment / MSP network (consumer #2)
-4. **RDGDH portfolio** — SBG, Friday, WePrize, WeFlush, ParKings/GetParkings when present
+4. **RDGDH portfolio** — SBG, WePrize, WeFlush, ParKings/GetParkings when present
 
 The agent is **portfolio-aware Randy**, not a Birch-only pusher. Birch owns the files; other lanes pull the same locks.
 
@@ -58,7 +58,7 @@ Paste into Voice Agent Builder / `session.instructions` in this order:
 - `/workspace/scale-biz-knowledge/INTERNAL-Scale-Align-Monetization-23Sep2026.md` (**internal economics only — never speak % to prospects**)
 - `/workspace/scale-us/HARD-TALKTRACK-REFRESH-2026-09-24.md`
 - `/workspace/scale-clinic-fulfillment/ICA_TALKTRACK_LOCK_2026-09-22.md` (CA ON / US STOP reopen note)
-- `/workspace/friday-crm/docs/PORTFOLIO.md`
+- internal CRM portfolio doc
 - Live portfolio JSON-LD on https://rdgdh.com/portfolio
 
 Anything not in those files → mark **UNKNOWN** and offer Book a call / email randy@silverbirchgrowth.com.

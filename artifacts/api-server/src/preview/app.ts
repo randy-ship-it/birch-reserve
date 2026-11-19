@@ -5,6 +5,7 @@
  */
 import express, { type Express } from "express";
 import { createOverhaulRouter } from "../routes/overhaul";
+import { createBrandIntakeProxy } from "../routes/brandIntakeProxy";
 import { createAgentRouter } from "../routes/agent";
 import sponsorPageRouter from "../routes/sponsorPage";
 import { getStripeClient } from "../lib/stripeClient";
@@ -38,6 +39,7 @@ export function createPreviewApp(indexHtml: string): Express {
       },
     }),
   );
+  app.use(createBrandIntakeProxy());
   app.use(sponsorPageRouter);
   app.get("/api/currency", (req, res) => {
     const d = decideCurrency(req);
@@ -63,6 +65,10 @@ export function createPreviewApp(indexHtml: string): Express {
   const shells = new Set<string>([...SPA_SHELL_PATHS, "/"]);
   app.get(/.*/, (req, res) => {
     const p = normalizedPath(req.path);
+    if (p.startsWith("/kit/r/")) {
+      res.type("html").setHeader("Cache-Control", "private, no-store").setHeader("Referrer-Policy", "no-referrer").send(withRouteSeo(indexHtml, "/kit/r/report"));
+      return;
+    }
     if (!shells.has(p) && !p.startsWith("/insights")) {
       res.status(200).type("html").send(indexHtml); // SPA handles its own 404
       return;

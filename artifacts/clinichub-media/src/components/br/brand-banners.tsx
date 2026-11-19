@@ -79,7 +79,7 @@ export function BrandBanners({ title = "Co-branded brand hubs listed with Scale"
           <ChevronRight className="size-4" />
         </button>
       </div>
-      <p className="mt-4 text-center text-xs text-muted-foreground">Listed partners. Live today: DR-HO'S (and the Integrity Fitness studio hub); the others are in queue. Audience and view figures are modelled.</p>
+      <p className="mt-4 text-center text-xs text-muted-foreground">Listed partners. Live today: DR-HO'S; the others are in queue. Audience and view figures are modelled.</p>
     </div>
   );
 }

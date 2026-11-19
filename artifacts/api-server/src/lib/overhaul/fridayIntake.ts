@@ -6,7 +6,7 @@
  */
 import { createHash } from "node:crypto";
 
-export type IntakeKind = "match_tool" | "hub_access" | "cobranded_hub_inquiry" | "display_cpc_inquiry" | "publisher_studio" | "area_lock_interest" | "agency_inquiry" | "deposit_interest" | "agent_checkout" | "premium_inquiry" | "category_request";
+export type IntakeKind = "match_tool" | "hub_access" | "cobranded_hub_inquiry" | "display_cpc_inquiry" | "publisher_studio" | "area_lock_interest" | "agency_inquiry" | "deposit_interest" | "agent_checkout" | "premium_inquiry" | "category_request" | "brand_intake";
 
 export type IntakeInput = {
   kind: IntakeKind;
@@ -37,6 +37,7 @@ const SOURCE: Record<IntakeKind, string> = {
   agent_checkout: "Birch buying-agent checkout",
   premium_inquiry: "Birch premium slot inquiry (inquire-only, IO)",
   category_request: "Birch request-this-category form",
+  brand_intake: "Birch brand intake (brand-intake-v1 fallback)",
 };
 
 export function intakeExternalId(input: IntakeInput): string {
@@ -86,6 +87,8 @@ function hostOf(url: string): string {
 export async function sendIntake(input: IntakeInput, env: NodeJS.ProcessEnv = process.env): Promise<IntakeResult> {
   const externalId = intakeExternalId(input);
   if (env.FRIDAY_PUSH_DISABLED === "true") return { status: "skipped", externalId };
+  // Defence in depth for the brand-intake fallback: never push a draft or an email-less record to /api/intake.
+  if (input.kind === "brand_intake" && (!input.email || !/@/.test(input.email) || (input.meta as { submitted?: unknown } | undefined)?.submitted !== true)) return { status: "skipped", externalId };
   const base = env.FRIDAY_API_URL?.trim();
   const key = env.FRIDAY_API_KEY?.trim();
   if (!base || !key) return { status: "skipped", externalId };

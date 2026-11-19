@@ -63,7 +63,7 @@ export function PlacementVisual({ k }: { k: PlacementKey }) {
   switch (k) {
     case "landing":
       return (
-        <Shot src="/hub-gallery/integrity.webp" alt="Integrity Fitness × Scale Health hub home page, with an example banner and tile drawn on top">
+        <Shot src="/hub-gallery/drho.webp" alt="DR-HO'S physio hub home page, with an example banner and tile drawn on top">
           <Unit className="absolute left-[4%] right-[4%] top-[14%] py-2" label="Your brand · hub banner" />
           <Unit className="absolute bottom-[6%] left-[6%] w-[36%]" label="Your brand · native tile" />
         </Shot>

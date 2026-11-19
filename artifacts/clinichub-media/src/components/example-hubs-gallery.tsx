@@ -31,7 +31,6 @@ export const EXAMPLE_HUBS: ReadonlyArray<ExampleHub> = [
   { id: "jill-health", name: "Jill Health", kind: "Health brand hub", image: "/hub-gallery/jill-health.webp" },
   { id: "jack-health", name: "Jack Health", kind: "Health brand hub", image: "/hub-gallery/jack-health.webp" },
   { id: "effortless-admin", name: "Effortless Admin", kind: "Benefits hub", image: "/hub-gallery/effortless-admin.webp" },
-  { id: "integrity", name: "Integrity Fitness", kind: "Fitness location hub", image: "/hub-gallery/integrity.webp" },
 ];
 
 function CardBody({ hub }: { hub: ExampleHub }) {

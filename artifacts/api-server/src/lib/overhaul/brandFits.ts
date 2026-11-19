@@ -30,7 +30,7 @@ export type ProfilePoint = {
   label: string;
   text: string;
   /** Shown in the sources pop-out. */
-  source: "public site" | "shared with Scale Health" | "Friday / Birch snapshot";
+  source: "public site" | "shared with Scale Health" | "Birch snapshot";
 };
 
 export type OverlapItem = {
@@ -159,14 +159,6 @@ const radRoller: BrandFit = {
   ],
   hubTiles: [
     {
-      title: "Integrity Fitness hub",
-      status: "live",
-      imageSrc: "/hub-gallery/integrity.webp",
-      imageAlt: "Integrity Fitness × Scale Health members-only hub, live",
-      href: "https://www.scalehealth.ca/integrity",
-      hrefTitle: "Integrity Fitness hub",
-    },
-    {
       title: "DR-HO'S physio hub",
       status: "live",
       imageSrc: "/hub-gallery/drho.webp",
@@ -238,9 +230,8 @@ const radRoller: BrandFit = {
     {
       status: "live",
       title: "Live recovery hubs",
-      line: "Two hubs anyone can open today: Integrity Fitness and the DR-HO'S physio hub. These are the only hubs we call live.",
+      line: "One hub anyone can open today: the DR-HO'S physio hub. It is the only hub we call live.",
       links: [
-        { title: "Integrity Fitness hub", href: "https://www.scalehealth.ca/integrity" },
         { title: "DR-HO'S physio hub", href: "https://physio.drhonow.com" },
       ],
       strength: "strong",
@@ -265,8 +256,8 @@ const radRoller: BrandFit = {
     },
     {
       status: "street-team",
-      title: "Street team, Align Wellness Network footprint",
-      line: "The street team follows the Align Wellness Network footprint in the Greater Toronto and Hamilton Area, in studios and recovery rooms.",
+      title: "Street team, retail hub footprint",
+      line: "The street team follows the retail hub footprint in the Greater Toronto and Hamilton Area, in studios and recovery rooms.",
       strength: "good",
     },
     {
@@ -282,7 +273,6 @@ const radRoller: BrandFit = {
       why: "The thank-you page after a care booking or recovery purchase is the moment people are sent home with a mobility tool.",
       icon: "purchase",
       links: [
-        { title: "Integrity Fitness hub", href: "https://www.scalehealth.ca/integrity" },
         { title: "DR-HO'S physio hub", href: "https://physio.drhonow.com" },
       ],
     },
@@ -321,13 +311,6 @@ const radRoller: BrandFit = {
   performanceOnlyLine: "A performance-only path is also available.",
   heroVisuals: [
     {
-      src: "/hub-gallery/integrity.webp",
-      alt: "Integrity Fitness × Scale Health members-only hub, live",
-      caption: "Integrity Fitness hub, live",
-      href: "https://www.scalehealth.ca/integrity",
-      hrefTitle: "Integrity Fitness hub",
-    },
-    {
       src: "/hub-gallery/drho.webp",
       alt: "DR-HO'S physio hub, live",
       caption: "DR-HO'S physio hub, live",
@@ -345,8 +328,8 @@ const radRoller: BrandFit = {
       text: "The roughly 20% Canada / 80% US mix, and the Neuro Roller, Muscle Flushing Kit and Point Release Kit as starter tools.",
     },
     {
-      label: "Friday / Birch snapshot",
-      text: "Live hubs named in the Birch media kit (Integrity Fitness and DR-HO'S physio). Cataloged launching brands and Calm Joints racquet pages from the audience snapshot fed by the TAM / Friday inventory read on Nov 13, 2026. Street team footprint follows the Align Wellness Network in the GTHA.",
+      label: "Birch snapshot",
+      text: "Live hub named in the Birch media kit (DR-HO'S physio). Cataloged launching brands and Calm Joints racquet pages from the audience snapshot fed by the TAM inventory read on Nov 13, 2026. Street team footprint follows the retail hubs in the GTHA.",
     },
   ],
 };

@@ -86,7 +86,7 @@ const EXTRA: Record<string, Pick<BrandHub, "logo" | "banner" | "recovery" | "aud
   sole: { logo: "/partner-logos/sole.png", banner: "/hub-banners/sole.webp", recovery: "Recovery", audience: "Foot pain, insoles and active footwear buyers", bannerStatus: "In queue" },
 };
 
-/** The brand hubs Randy named (Nov 12). Only DR-HO'S is live today (plus the Integrity Fitness studio hub); the rest are in queue (Nov 17 2026). */
+/** The brand hubs Randy named (Nov 12). Only DR-HO'S is live today; the rest are in queue (Nov 17 2026). */
 export const BRAND_HUBS: BrandHub[] = [
   ...KIT_HUBS.filter((h) => h.kind === "brand").map((h) => ({ ...h, ...EXTRA[h.key]! })),
   {
@@ -111,7 +111,7 @@ export const INVENTORY = {
   liveSpendDownMonths: 6,
   queueMultiple: 3,
   queueBy: "year end 2026",
-  line: "Live hubs today: Integrity Fitness and DR-HO'S physio. Placements are curated as each hub launches.",
+  line: "Live today: DR-HO'S physio. Placements are curated as each hub launches.",
   queueLine: "The other listed brand hubs are in queue, not live yet; more hubs launch over time.",
 } as const;
 

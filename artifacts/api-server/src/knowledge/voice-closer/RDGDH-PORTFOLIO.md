@@ -18,14 +18,9 @@ No invented metrics. If a number is only on an investor CIM or diligence pack, d
 | **AIforHealth Alliance** | https://rdgdh.com/portfolio/aiforhealth | Members-only alliance of North American health & wellness operators; SBG bench; holdco funnel. |
 | **Reforged** | https://getreforged.org | Indigenous-led brick-and-mortar opportunity platform; public launch sequenced after Scale Health in Fall 2026 per schema (timing = site claim; do not invent progress). |
 
-Friday paste also positions **Friday** (https://fridayapp.org) as portfolio innovation / public pilot CRM built by SBG bench, free during pilot, not monetizing yet. Treat as portfolio-adjacent product; confirm live card on rdgdh if citing as “on the portfolio page.”
+## Internal CRM (ops spine)
 
-## Friday CRM (ops spine)
-
-- URL: https://fridayapp.org  
-- In-house CRM / Lane OS used across Scale lanes; public pilot.  
-- Five portfolio workspaces: `rdgdh`, `alignwellness`, `scalehealth`, `silverbirchgrowth`, `birchreserve` (see friday-crm/docs/PORTFOLIO.md).  
-- Named access: Randy (owner all), Jon (admin all), Simar (SBG + Scale), Chris (Align). Barb = Scale Connect intake path.
+- Birch Reserve, Scale and SBG use an in-house CRM for leads and review. Never name it to callers; say "our team" or "Birch Reserve".
 
 ## Sister / bench products present in workspace (not all on RDGDH portfolio grid)
 
@@ -35,7 +30,7 @@ Friday paste also positions **Friday** (https://fridayapp.org) as portfolio inno
 | **WeFlush** | https://weflush.org (also poopmap.org redirect family) | Bathroom / flush map PWA, “Get the inside flush.” Community map product; WeFlush Bot owns. |
 | **ParKings / GetParkings** | https://getparkings.com | Toronto-first: parking-ticket screening letter (you file on toronto.ca/aps; first eligible letter free; not a law firm) + user-drop street parking map. No promised outcome. |
 
-Do not invent ARR, user counts, or “customers paying” for Friday / WePrize / WeFlush / ParKings.
+Do not invent ARR, user counts, or “customers paying” for WePrize / WeFlush / ParKings.
 
 ## Entity map (accounting primer, one sentence each)
 
@@ -53,6 +48,6 @@ Do not invent ARR, user counts, or “customers paying” for Friday / WePrize /
 
 ## UNKNOWN
 
-- Whether Friday / WePrize / WeFlush / ParKings cards are all live on rdgdh.com/portfolio at this moment beyond Align/Scale/SBG/AIforHealth/Reforged schema → verify before claiming “on the portfolio page.”
+- Whether WePrize / WeFlush / ParKings cards are all live on rdgdh.com/portfolio at this moment beyond Align/Scale/SBG/AIforHealth/Reforged schema → verify before claiming “on the portfolio page.”
 - WePrize is live at https://weprize.net (confirmed 2026-09-25). Domain attach is no longer TBD.
 - Scale 100% under RDGDH on a signed cap table → flagged unverified in CHI walk-in note; do not assert.

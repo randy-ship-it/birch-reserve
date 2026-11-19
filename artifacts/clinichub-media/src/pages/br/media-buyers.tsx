@@ -1,3 +1,4 @@
+import { KitEntry } from "@/components/br/pilot-path";
 import { CheckCircle2 } from "lucide-react";
 import { LeadForm } from "@/components/br/lead-form";
 import { InventorySpec, IoProcess } from "@/components/br/agency-showcase";
@@ -18,6 +19,7 @@ export default function BrMediaBuyers() {
   );
   return (
     <div data-testid="br-media-buyers">
+      <KitEntry from="media-buyers" />
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>

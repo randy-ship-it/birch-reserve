@@ -18,7 +18,7 @@ test("prompt carries the site offer in USD only", () => {
   assert.match(p, /\$490 USD/);
   assert.match(p, /\$25,000 to \$50,000 USD/);
   assert.match(p, /USD only, for every buyer including Canadian brands/);
-  assert.match(p, /Integrity Fitness/);
+  assert.doesNotMatch(p, /Integrity/i);
   assert.match(p, /DR-HO'S physio/);
   assert.match(p, /In queue/);
   assert.ok(p.includes(BIRCH_LINKS.reserve490) && p.includes(BIRCH_LINKS.look190) && p.includes(BIRCH_LINKS.request));

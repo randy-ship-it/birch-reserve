@@ -15,7 +15,7 @@ const ORG = { "@type": "Organization", name: "Birch Reserve", url: "https://birc
 export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/advertise/brands": {
     title: "Advertise to brands | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. Live hubs: Integrity Fitness and DR-HO'S physio.",
+    description: "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. Live today: DR-HO'S physio.",
     jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/advertise/local": {
@@ -26,7 +26,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/publish/brands": { title: "Publish · Brands | Birch Reserve", description: "Brands with a recovery audience can apply for a co-branded hub. Otherwise, inquire about display or CPC-only opportunities outside hubs." },
   "/publish/studios": { title: "Publish · Studios & retail | Birch Reserve", description: `Activate your hub with pre-built monetizations and our marketplace. Earn $${PUBLISHER_INCENTIVE.cashCad} cash or $${PUBLISHER_INCENTIVE.creditCad}+ in ad credit.` },
   "/match": { title: "Match your audience | Birch Reserve", description: "Enter your website and a short note. See how well your audience matches the Scale Activity launch audience profile, as a clean % with three reasons." },
-  "/hubs": { title: "Hubs | Birch Reserve", description: "Live hubs today: Integrity Fitness and DR-HO'S physio. More brand hubs are in queue. Register your email to see audience, placements and modelled views." },
+  "/hubs": { title: "Hubs | Birch Reserve", description: "Live today: DR-HO'S physio. More brand hubs are in queue. Register your email to see audience, placements and modelled views." },
   "/media-kit": {
     title: "Media kit | Birch Reserve",
     image: MEDIA_KIT_OG_IMAGE,
@@ -42,12 +42,12 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   },
   "/buyers": {
     title: "For media buyers & agencies | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. Live hubs: Integrity Fitness and DR-HO'S physio.",
+    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. Live today: DR-HO'S physio.",
     jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/ai-buyers": {
     title: "For media buyers & agencies | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. Live hubs: Integrity Fitness and DR-HO'S physio.",
+    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. Live today: DR-HO'S physio.",
     jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/rates": {
@@ -159,7 +159,7 @@ export function llmsTxt(): string {
     "- Premium slots (exclusivity, priority placement, area locks): inquire-only · https://birchreserve.net/media-kit#premium",
     "",
     "## Live hubs",
-    "- Integrity Fitness · DR-HO'S physio. More hubs launch over time; placements are curated as each goes live.",
+    "- DR-HO'S physio. More hubs launch over time; placements are curated as each goes live.",
     "",
     "## Pages",
     "- Media kit: https://birchreserve.net/media-kit · PDF: https://birchreserve.net/birch-reserve-one-pager.pdf",

@@ -29,7 +29,7 @@ const AGENT_LINKS: Array<[string, string, string]> = [
 export default function BrAiBuyers() {
   usePageMeta(
     "For media buyers & agencies | Birch Reserve",
-    "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. Live hubs: Integrity Fitness and DR-HO'S physio.",
+    "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. Live today: DR-HO'S physio.",
   );
   const price = priceLabels(useAvailability());
   const hubs = NETWORK_HUBS.join(" and ");

@@ -14,7 +14,8 @@ export type AnalyticsEvent =
   | "checkout_click"
   | "checkout_success"
   | "call_click"
-  | "media_kit_download";
+  | "media_kit_download"
+  | "intake_step";
 
 export type AnalyticsProps = Record<string, string | number | boolean | undefined>;
 

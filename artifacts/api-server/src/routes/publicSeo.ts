@@ -100,6 +100,23 @@ for (const path of SPA_SHELL_PATHS) {
   });
 }
 
+// Private brand kit report link (Nov 18 2026): /kit/r/:reportToken renders the two-sided kit client-side from
+// Friday's brand-report API. noindex, no-store, no referrer (the token is in the URL).
+router.get("/kit/r/:token", (req, res) => {
+  let html: string;
+  try {
+    html = withRouteSeo(readSpaIndexHtml(), "/kit/r/report"); // token never in canonical / og:url
+  } catch (error) {
+    logger.error({ err: error }, "SPA shell for kit report is missing");
+    res.status(500).type("text/plain").send("Page unavailable.");
+    return;
+  }
+  res.set("Cache-Control", "private, no-store");
+  res.set("Referrer-Policy", "no-referrer");
+  res.set("X-Robots-Tag", "noindex, nofollow");
+  res.type("html").send(html);
+});
+
 router.get("/for/:slug", (req, res, next) => {
   const fit = getBrandFit(String(req.params.slug ?? ""));
   if (!fit) {

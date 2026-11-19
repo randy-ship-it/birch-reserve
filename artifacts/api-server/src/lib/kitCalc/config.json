@@ -1,0 +1,117 @@
+{
+  "version": "kit-calc-2026-11-18",
+  "currency": "USD",
+  "_note": "Framework-light kit calculator config (Birch Reserve, reusable by scalehealth.ca/clinichubs later). Every number is either a user-picked band, a stated assumption, or an existing Birch Reserve modelled figure with its source. No outside benchmarks.",
+  "marginBands": [
+    {
+      "key": "lt_30",
+      "label": "<30%",
+      "lo": 0.1,
+      "hi": 0.3
+    },
+    {
+      "key": "30_50",
+      "label": "30–50%",
+      "lo": 0.3,
+      "hi": 0.5
+    },
+    {
+      "key": "50_70",
+      "label": "50–70%",
+      "lo": 0.5,
+      "hi": 0.7
+    },
+    {
+      "key": "70_plus",
+      "label": "70%+",
+      "lo": 0.7,
+      "hi": 0.8
+    }
+  ],
+  "ltvHorizonYears": {
+    "lo": 1,
+    "hi": 3,
+    "basis": "assumption",
+    "label": "LTV horizon: 1 to 3 years of the purchase rate you entered (an assumption you can see, not a benchmark).",
+    "placeholder": true
+  },
+  "spendLevels": [
+    {
+      "usd": 490,
+      "label": "$490 USD reserve",
+      "source": "Birch public SKU reserve-490"
+    },
+    {
+      "usd": 1500,
+      "label": "$1,500 USD",
+      "source": "Birch DEPOSIT_TIERS sponsor-1500"
+    },
+    {
+      "usd": 3000,
+      "label": "$3,000 USD",
+      "source": "Birch DEPOSIT_TIERS sponsor-3000"
+    },
+    {
+      "usd": 6000,
+      "label": "$6,000 USD",
+      "source": "Birch DEPOSIT_TIERS sponsor-6000"
+    }
+  ],
+  "demand": {
+    "blendedHubCpmUsd": 12.78,
+    "blendedHubCpmSource": "Birch blendedHubCpmUsd(): rate-card CPM blended across the four hub placements by modelled views (Modelled)",
+    "ctrBand": {
+      "lo": 0.0025,
+      "hi": 0.006,
+      "source": "Birch INTENT_LADDER 'Browsing the hub' benchmark CTR band (Estimate; ranges, not promises)"
+    }
+  },
+  "conversionScenariosPct": [
+    0.5,
+    1,
+    2,
+    3
+  ],
+  "defaultConversionPct": 1,
+  "conversionLabel": "Scenario: the share of Scale visits that become a customer. You pick it; it is not a benchmark.",
+  "_marginNote": "Chips per Randy (Nov 18 2026 10:11 PM ET): <30% / 30–50% / 50–70% / 70%+. Floor 10% and cap 80% follow Friday ltv-v1's outer bounds. Friday brand-intake.v1 bands differ (under_20|20_40|40_60|60_plus): see CONTRACT-GAPS.md.",
+  "repeatBands": [
+    {
+      "key": "1",
+      "label": "1",
+      "lo": 1,
+      "hi": 1
+    },
+    {
+      "key": "2_3",
+      "label": "2–3",
+      "lo": 2,
+      "hi": 3
+    },
+    {
+      "key": "4_6",
+      "label": "4–6",
+      "lo": 4,
+      "hi": 6
+    },
+    {
+      "key": "7_plus",
+      "label": "7+",
+      "lo": 7,
+      "hi": 7
+    }
+  ],
+  "cartSlider": {
+    "min": 5,
+    "max": 1000,
+    "step": 5
+  },
+  "ordersStepper": {
+    "min": 0,
+    "max": 1000000,
+    "steps": [
+      10,
+      100
+    ]
+  }
+}
