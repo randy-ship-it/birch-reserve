@@ -16,7 +16,8 @@ import { Check, Rocket, Store, Package, TrendingUp } from "lucide-react";
 import { RT, RT_SERIF, RT_SANS, RT_SHADOW } from "@/lib/reportTokens";
 import type { FridayExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 import { MOCK_SHARES, STREET_TEAM_REACH } from "../../../../api-server/src/lib/kitCalc/activation";
-import { PUBLISHER_SURFACES, RETAIL_COPY } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { PUBLISHER_SURFACES } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { RetailNetworkLine, useNetworkCopy } from "@/lib/networkCopy";
 import type { ReportModel } from "@/components/br/report-v2";
 import { EstimatePop } from "@/components/br/report-v2";
 import { Details } from "@/components/br/details";
@@ -129,6 +130,7 @@ function Stat({ label, value, sub, testId, wide }: { label: string; value: strin
   );
 }
 function ChannelTable({ rows, extra, testId }: { rows: ChannelRow[]; extra?: ReactNode; testId: string }) {
+  const nc = useNetworkCopy();
   return (
     <div className="mt-4 overflow-hidden" style={{ border: `1px solid ${RT.line}`, borderRadius: 14 }} data-testid={testId}>
       <div className="grid grid-cols-[1fr_auto] gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-wider md:grid-cols-[1.3fr_1fr_1fr]" style={{ background: RT.paper, color: RT.mute }}>
@@ -138,9 +140,11 @@ function ChannelTable({ rows, extra, testId }: { rows: ChannelRow[]; extra?: Rea
         <div key={r.key} className="grid grid-cols-[1fr_auto] items-baseline gap-2 px-3 py-2.5 text-[13px] md:grid-cols-[1.3fr_1fr_1fr]" style={{ borderTop: `1px solid ${RT.line}` }} data-testid={`${testId}-${r.key}`}>
           <span className="min-w-0">
             <span className="font-semibold" style={{ color: RT.ink }}>{r.name}</span>
-            <span className="block text-[11px]" style={{ color: RT.mute }}>{r.unit ? `${r.unit}${r.monthly ? " / month" : " in reach"} · ` : ""}{r.geo}</span>
+            <span className="block text-[11px]" style={{ color: RT.mute }}>{nc && r.key === "street_team" ? "doors · " : r.unit ? `${r.unit}${r.monthly ? " / month" : " in reach"} · ` : ""}{r.geo}</span>
           </span>
-          {r.range ? (
+          {nc && r.key === "street_team" ? (
+            <span className="text-right text-[12px] md:col-span-2" style={{ color: RT.mute }} data-testid={`${testId}-street-reach`}>{nc.street.charAt(0).toUpperCase() + nc.street.slice(1)}</span>
+          ) : r.range ? (
             <>
               <span className="text-right tabular-nums" style={{ color: RT.ink }}><span className="text-[17px]" style={{ fontFamily: RT_SERIF }}>{big(r.range.likely)}</span><span className="block text-[11px]" style={{ color: RT.mute }}>{big(r.range.low)}–{big(r.range.high)}</span></span>
               <span className="col-span-2 text-[11px] md:col-span-1 md:text-right md:text-[13px]" style={{ color: RT.mute }}>
@@ -168,6 +172,7 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
   const hubs = rows.find((r) => r.key === "hubs")?.range ?? null;
   const perfHubs = perf.find((r) => r.key === "hubs")?.range ?? null;
   const accHubs = acc.find((r) => r.key === "hubs")?.range ?? null;
+  const nc = useNetworkCopy();
   const reach = rows.filter((r) => !r.monthly && r.range).reduce((a, r) => ({ low: a.low + r.range!.low, likely: a.likely + r.range!.likely, high: a.high + r.range!.high }), { low: 0, likely: 0, high: 0 });
   const disp = tier === "accelerate" ? displayPer1k(m.cpm) : null;
   const own = ownHubViews();
@@ -204,7 +209,7 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
             <Headline value={hubs.likely * 12} unit="page-view exposures over 12 months, likely" range={scale(hubs, 12)} fmt={big} dark testId="supplier-headline-year" />
           </div>
         ) : null}
-        {reach.likely > 0 ? <p className="mt-4 text-[14px] text-white/85" data-testid="supplier-reach">Plus about <strong className="text-white">{big(reach.likely)}</strong> recovery customers and homes in reach ({big(reach.low)}–{big(reach.high)}).</p> : null}
+        {nc && reach.likely > 0 ? <p className="mt-4 text-[14px] text-white/85" data-testid="supplier-reach">Plus recovery customers across the retail network, and a Street Team that {nc.street}.</p> : reach.likely > 0 ? <p className="mt-4 text-[14px] text-white/85" data-testid="supplier-reach">Plus about <strong className="text-white">{big(reach.likely)}</strong> recovery customers and homes in reach ({big(reach.low)}–{big(reach.high)}).</p> : null}
       </div>
       <div className="p-5 md:p-6">
         <div className="grid gap-3 sm:grid-cols-2" data-testid="supplier-compare">
@@ -240,7 +245,7 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
             </>
           }
         />
-        <Details testId="supplier-details"><p>{RETAIL_COPY} · network figures and targets. Estimates, not guarantees.</p></Details>
+        <Details testId="supplier-details"><p><RetailNetworkLine fallbackTag="network figures and targets" />. Estimates, not guarantees.</p></Details>
         {onAccelerate && !m.isAccelerate ? <div className="mt-4">{onAccelerate}</div> : null}
         {cta ? <div className="mt-4">{cta}</div> : null}
       </div>
@@ -308,7 +313,7 @@ export function HubView({ m, exposure, cta, physical }: { m: ReportModel; exposu
         ) : null}
         <p className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-bold" style={{ color: RT.ink }}><TrendingUp className="size-4" style={{ color: RT.mintInk }} aria-hidden />Max exposure: your products on your own hub plus across the network</p>
         <ChannelTable rows={rows} testId="hub-channels" extra={<InLocationRow physical={physical} testId="hub-channels-in-location" />} />
-        <Details testId="hub-details"><p>{RETAIL_COPY} · network figures and targets. Estimates, not guarantees.</p></Details>
+        <Details testId="hub-details"><p><RetailNetworkLine fallbackTag="network figures and targets" />. Estimates, not guarantees.</p></Details>
         {cta ? <div className="mt-4">{cta}</div> : null}
       </div>
     </section>

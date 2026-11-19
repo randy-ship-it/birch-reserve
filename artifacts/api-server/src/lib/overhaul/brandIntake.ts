@@ -234,6 +234,8 @@ export type IntakePayload = {
   hub?: { type?: string; locations?: number; foot_traffic_month?: number; web_visitors_month?: number; page_views_month?: number; email_list?: number; screens?: number; surfaces?: string[]; cities?: string; decision_maker_role?: string };
   supplier_detail?: { avg_price_usd?: number; margin_band?: string; retail_now?: string; ships?: string; accelerate_budget?: string };
   notes?: string[];
+  /** Supplier hub request (/intake/supplier): Birch-only key, stripped server-side; always pending_approval (never auto-publish). */
+  hub_request?: { role: "supplier"; status: "pending_approval"; hub_name?: string; hub_slug?: string };
   /** Lead events (e.g. kit_download). Not yet in Friday's contract: see CONTRACT-GAPS.md. */
   events?: Array<{ type: "kit_download"; at: string; formats: Array<"pdf" | "png"> }>;
 };

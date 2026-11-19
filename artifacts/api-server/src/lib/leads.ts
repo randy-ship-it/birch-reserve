@@ -52,8 +52,12 @@ export type LeadMeta = {
   /** Kit drop-off nudge (Nov 19 2026): ISO time the ONE nudge was sent; ISO time the lead unsubscribed. */
   nudged_at?: string;
   unsub?: string;
+  /** Supplier hub request (/intake/supplier, Nov 19 2026): intake_role "supplier", hub_status "pending_approval" until Randy or Jon approve. */
+  intake_role?: string;
+  hub_status?: string;
+  hub_slug?: string;
 };
-const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id", "stage", "friday_intake_id", "nudged_at", "unsub"] as const;
+const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id", "stage", "friday_intake_id", "nudged_at", "unsub", "intake_role", "hub_status", "hub_slug"] as const;
 
 /** Keep only well-typed, non-empty keys (never empty strings). */
 export function cleanLeadMeta(raw: unknown): LeadMeta {

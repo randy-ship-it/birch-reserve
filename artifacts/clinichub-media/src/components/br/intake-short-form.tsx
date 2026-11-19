@@ -27,6 +27,7 @@ import { FastReport, type QuickResult } from "@/components/br/fast-report";
 import { numOrU, type SharedAnswers } from "@/components/br/intake-details";
 import { Details } from "@/components/br/details";
 import { cleanPhysical, inLocationReach, type PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
+import { ExposureLadder, SupplierDone, SupplierFees, brandFromUrl, hubSlugOf, levelOf, rolesForLevel, type IntakePreset } from "@/components/br/supplier-mode";
 
 /** "Do you have physical locations?" (Randy, Nov 19 2026 10:54 AM ET): yes/no; if yes, how many + monthly visitors. */
 export type PhysForm = { has: boolean | null; locations: string; visitors: string; basis: "per_location" | "total" };
@@ -103,14 +104,16 @@ function AccelerateToggle({ on, onClick }: { on: boolean; onClick: () => void })
   );
 }
 
-export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) => void }) {
+/** preset "supplier" (/intake/supplier): exposure ladder instead of role cards, brand prefill (?brand=), quiet fees, own hub as pending approval. No preset = the default /intake, unchanged. */
+export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: IntakeSide) => void; preset?: IntakePreset }) {
+  const sup = preset === "supplier";
   const [r, setR] = useState<OneFormRoles>({ supplier: true, hub: true, accelerate: false });
   const roles = rolesOf(r);
   const side = sideFor(r);
   const [market, setMarketRaw] = useState<Market>(DEFAULT_MARKET);
   const [marketTouched, setMarketTouched] = useState(false);
   const setMarket = (m: Market) => { setMarketTouched(true); setMarketRaw(m); };
-  const [shared, setShared] = useState<SharedAnswers>(EMPTY_SHARED);
+  const [shared, setShared] = useState<SharedAnswers>(() => (sup ? { ...EMPTY_SHARED, brand: brandFromUrl() } : EMPTY_SHARED));
   const [phys, setPhys] = useState<PhysForm>(EMPTY_PHYS);
   const [more, setMore] = useState(false);
   const [website, setWebsite] = useState("");
@@ -158,6 +161,8 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
     ...(marketTouched && market.sells_in.length ? { market } : {}),
     ...(shared.brand.trim() ? { company_name: shared.brand.trim() } : {}),
     shared: { categories: shared.categories, skus: numOrU(shared.skus), audience_customers: numOrU(shared.audience), ...(physOf(phys) ? { physical: physOf(phys) } : {}) },
+    // Supplier preset + own hub: the hub is created as pending_approval (Randy or Jon approve; never auto-publish).
+    ...(sup && r.hub ? { hub_request: { role: "supplier" as const, status: "pending_approval" as const, ...(shared.brand.trim() ? { hub_name: shared.brand.trim().slice(0, 120) } : {}), ...(hubSlugOf(shared.brand.trim() || hostOf(website).split(".")[0]!) ? { hub_slug: hubSlugOf(shared.brand.trim() || hostOf(website).split(".")[0]!) } : {}) }, notes: [`Supplier intake (/intake/supplier), exposure level ${levelOf(r)}: ${r.accelerate ? "own hub + CPM/CPC display" : "own hub"}, pending Birch Reserve approval.`] } : sup ? { notes: ["Supplier intake (/intake/supplier), exposure level 1: performance only."] } : {}),
   });
   // Partial lead (Randy via Emma, Nov 19 2026 10:21 AM ET): once the email is valid, save what's filled in
   // (debounced) and keep updating the SAME record. It stays "abandoned" until the final click flips it to submitted.
@@ -224,6 +229,8 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
 
   if (done && quick)
     return (
+      <>
+      {sup ? <SupplierDone brand={quick.brand ?? ""} level={levelOf(r)} /> : null}
       <FastReport
         q={quick}
         onAddDetail={() => {
@@ -233,6 +240,7 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
           else window.location.assign("/brand-kit#my-kit");
         }}
       />
+      </>
     );
   if (done)
     return (
@@ -251,7 +259,8 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
   const supplierOnly = r.supplier && !r.hub;
   return (
     <form onSubmit={submit} data-testid="intake-short-form" data-roles={roles.join(",")} className="rounded-3xl border border-foreground/10 bg-white p-5 shadow-xl md:p-6">
-      <fieldset>
+      {sup ? <ExposureLadder level={levelOf(r)} onPick={(l) => { setR(rolesForLevel(l)); trackIntake("advertiser", "field_start", l === 3 ? "accelerate" : l === 2 ? "add_hub" : "supplier", { dedupe: true }); }} /> : null}
+      {sup ? null : <fieldset>
         <legend className="text-[11px] font-bold uppercase tracking-wider text-foreground/60">You are… <span className="font-semibold normal-case tracking-normal text-foreground/50">(most brands are both)</span></legend>
         <div className="mt-2 grid gap-2 md:grid-cols-2" data-testid="intake-roles">
           <RoleCard on={r.supplier} onClick={() => flip("supplier")} icon={Package} title="Supplier" tag="Performance-only" sub="Get into curated hubs. Pay on results." testId="intake-role-supplier">
@@ -268,15 +277,16 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
             <button type="button" onClick={addHub} data-testid="supplier-only-add-hub" className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-lime-300 hover:text-[#0b1f3a]"><Plus className="size-4" />Add my hub</button>
           </div>
         ) : null}
-      </fieldset>
+      </fieldset>}
       {resumed ? <p className="mt-3 rounded-xl bg-lime-50 p-3 text-sm font-semibold text-[#0b1f3a]" data-testid="intake-resumed">Welcome back. We saved your answers: check them and get your kit.</p> : null}
       <LocationsQuestion value={phys} onChange={setPhys} side={side} />
 
-      <div className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
+      <div className={`mt-4 grid gap-3 ${sup ? "md:grid-cols-[1fr_1fr_1fr_auto]" : "md:grid-cols-[1fr_1fr_auto]"}`}>
+        {sup ? <input data-testid="intake-brand" aria-label="Brand name" value={shared.brand} onFocus={fieldStart(side, "brand")} onChange={(e) => setShared({ ...shared, brand: e.target.value })} placeholder="Brand name" autoComplete="organization" className={input} /> : null}
         <input data-testid="intake-website" aria-label="Website" required value={website} onFocus={fieldStart(side, "website")} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" autoComplete="url" className={input} />
         <input data-testid="intake-email" aria-label="Work email" required type="email" value={email} onFocus={fieldStart(side, "email")} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourbrand.com" autoComplete="email" className={input} />
         <button type="submit" disabled={busy} data-testid="intake-submit" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 transition hover:bg-[#0b1f3a] hover:text-white">
-          {busy ? <Loader2 className="size-5 animate-spin" /> : null} Get my Monetization Kit <ArrowRight className="size-5" />
+          {busy ? <Loader2 className="size-5 animate-spin" /> : null} {sup && r.hub ? "Create my hub" : "Get my Monetization Kit"} <ArrowRight className="size-5" />
         </button>
       </div>
       <input tabIndex={-1} aria-hidden autoComplete="off" name="company_url" value={hp} onChange={(e) => setHp(e.target.value)} className="absolute -left-[9999px] h-0 w-0 opacity-0" />
@@ -287,7 +297,7 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
       </button>
       {more ? (
         <div className="mt-3 grid gap-3 rounded-2xl bg-foreground/[0.03] p-3 md:grid-cols-2" data-testid="intake-shared">
-          <input data-testid="shared-brand" aria-label="Brand name" value={shared.brand} onFocus={fieldStart(side, "brand")} onChange={(e) => setShared({ ...shared, brand: e.target.value })} placeholder="Brand name" className={small} />
+          {sup ? null : <input data-testid="shared-brand" aria-label="Brand name" value={shared.brand} onFocus={fieldStart(side, "brand")} onChange={(e) => setShared({ ...shared, brand: e.target.value })} placeholder="Brand name" className={small} />}
           <div className="grid grid-cols-2 gap-3">
             <input data-testid="shared-skus" aria-label="Products or SKUs" inputMode="numeric" value={shared.skus} onChange={(e) => setShared({ ...shared, skus: e.target.value })} placeholder="Products / SKUs" className={small} />
             <input data-testid="shared-audience" aria-label="Customers (audience size)" inputMode="numeric" value={shared.audience} onChange={(e) => setShared({ ...shared, audience: e.target.value })} placeholder="Customers (approx.)" className={small} />
@@ -308,6 +318,7 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
       <div className="mt-4 border-t border-foreground/10 pt-3 text-[13px]" data-testid="intake-secondary">
         <a href="/intake/sponsor" className="text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-sponsor-link">Want to own a category or an area? See category and area locks</a>
       </div>
+      {sup ? <SupplierFees /> : null}
       <Details testId="intake-fine"><p>Business-level only, no customer data. Every figure is an estimate, reviewed by a person. Nothing is booked or charged. Optional answers are asked once and used for both sides.</p></Details>
     </form>
   );
