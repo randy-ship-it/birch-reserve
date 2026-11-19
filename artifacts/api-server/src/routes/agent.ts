@@ -2,6 +2,8 @@
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { agentCard, agentCatalog, agentOpenApi, agentQuote, publicOffers, HANDOFF_EMAIL } from "../lib/overhaul/agent";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
+import { AUDIENCE_LABEL, audienceMode, hubAudiences, ioRateGuidance, publicSummary, quoteAudience } from "../lib/overhaul/hubAudience";
+import { BRAND_HUBS } from "../lib/overhaul/model";
 import type { CreateSession } from "./overhaul";
 
 const str = (v: unknown, max = 300) => String(v ?? "").trim().slice(0, max);
@@ -20,10 +22,43 @@ export function createAgentRouter(deps: { createSession?: CreateSession; log?: (
     res.json(agentCatalog());
   });
 
-  router.get("/v1/agent/quote", cors, (req, res) => {
+  router.get("/v1/agent/quote", cors, async (req, res) => {
     const q = agentQuote({ offer: str(req.query.offer, 40) });
     res.set("Cache-Control", "no-store");
-    res.status(q.ok ? 200 : 400).json(q);
+    const hubKey = str(req.query.hub, 60);
+    if (!q.ok || !hubKey) {
+      res.status(q.ok ? 200 : 400).json(q);
+      return;
+    }
+    const hub = BRAND_HUBS.find((h) => h.key === hubKey);
+    if (!hub) {
+      res.status(400).json({ ok: false, error: "Unknown hub." });
+      return;
+    }
+    // Hub-reported audience (Friday): pricing and targeting only. The SKU amount above never changes.
+    const a = (await hubAudiences()).get(hub.key) ?? null;
+    const mode = audienceMode(process.env, req.query.audience_mode);
+    res.json({
+      ...q,
+      hub: { key: hub.key, name: hub.name },
+      hub_audience: a ? quoteAudience(a) : null,
+      io_rate_guidance: ioRateGuidance(a, str(req.query.category, 80)),
+      ...(mode === "summary" ? { public_summary: publicSummary(a) } : {}),
+      audience_mode: mode,
+    });
+  });
+
+  // Public listing summaries. Mode "private" (default) returns no items: nothing renders on public pages.
+  router.get("/v1/hubs/audience-summaries", cors, async (req, res) => {
+    const mode = audienceMode(process.env, req.query.audience_mode);
+    res.set("Cache-Control", mode === "summary" ? "public, max-age=300" : "no-store");
+    if (mode !== "summary") {
+      res.json({ mode, label: AUDIENCE_LABEL, items: [] });
+      return;
+    }
+    const map = await hubAudiences();
+    const items = [...map.entries()].map(([hub_key, a]) => ({ hub_key, summary: publicSummary(a) })).filter((i) => i.summary);
+    res.json({ mode, label: AUDIENCE_LABEL, items });
   });
 
   router.get("/v1/agent/openapi.json", cors, (_req, res) => res.json(agentOpenApi()));
