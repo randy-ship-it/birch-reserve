@@ -124,6 +124,13 @@ const VALID_CHIPS = new Set([
   "hold_190",
   "live_hub",
   "talk_human",
+  "kit_performance",
+  "kit_hub_earn",
+  "kit_after_submit",
+  "cpm_cpc",
+  "channels",
+  "earn_with_us",
+  "place_ads",
 ]);
 /**
  * Pre-#11 chip ids. Accepted (and ignored) so a browser tab still running the

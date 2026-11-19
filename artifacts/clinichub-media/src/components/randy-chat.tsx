@@ -34,8 +34,8 @@ import {
   QUALIFY_QUESTIONS,
   RANDY_TEL_DISPLAY,
   RANDY_TEL_HREF,
-  SMART_OPENER,
-  SUGGESTION_CHIPS,
+  chipsForPath,
+  openerForPath,
   TALK_HUMAN_REPLY,
   TEASER_TEXT,
   qualifyDoneMessage,
@@ -237,7 +237,7 @@ export function RandyChat() {
 
   const ensureThread = useCallback(() => {
     if (messagesRef.current.length === 0) {
-      setThread([{ id: "opener", role: "randy", text: SMART_OPENER }]);
+      setThread([{ id: "opener", role: "randy", text: openerForPath(typeof window !== "undefined" ? window.location.pathname : undefined) }]);
     }
   }, [setThread]);
 
@@ -915,7 +915,7 @@ export function RandyChat() {
                   {/* Suggestion chips on fresh opener (staggered) */}
                   {messages.length === 1 && messages[0]?.id === "opener" && !typing && (
                     <div className="flex flex-wrap gap-2 pl-8" data-testid="randy-suggestion-chips">
-                      {SUGGESTION_CHIPS.map((chip, i) => (
+                      {chipsForPath(typeof window !== "undefined" ? window.location.pathname : undefined).map((chip, i) => (
                         <button
                           key={chip.id}
                           type="button"
