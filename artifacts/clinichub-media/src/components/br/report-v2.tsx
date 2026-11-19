@@ -14,7 +14,10 @@ import type { FridayReport } from "@/lib/fridayBrandIntake";
 import { fridayEligibility } from "@/lib/fridayBrandIntake";
 import { CHANNEL_TILES, PUBLISHER_SURFACES, RETAIL_COPY, anchorName } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { NEVER_HUB_NAME } from "../../../../api-server/src/lib/overhaul/hubNameFilter";
+import { visibleHubs } from "../../../../api-server/src/lib/overhaul/hubMatch";
 import { CHANNEL_GEO } from "../../../../api-server/src/lib/kitCalc/channelGeo";
+import { mockExposure, readExposure, type FridayExposure } from "../../../../api-server/src/lib/kitCalc/activation";
+import { HubView, SupplierExposureView } from "@/components/br/report-views";
 
 const FKEY: Record<string, string> = { hubs: "scale-hubs", calm_joints: "calm-joints", street_team: "street-team", retail: "retail-network" };
 type LoHi = { low: number; high: number };
@@ -47,7 +50,9 @@ export function buildModel(r: FridayReport) {
   const scored = df.filter((c) => typeof c.fit === "number").sort((a, b) => b.fit - a.fit).slice(0, 3);
   const score = scored.length ? Math.round(scored.reduce((s, c) => s + c.fit, 0) / scored.length) : null;
   const rawHubs = ((r as { hubs?: Array<{ key: string; name: string; status?: string; fit?: number; fit_label?: string; reason?: string | null; tier?: string; logo?: string }> }).hubs ?? r.demand_fit?.anchor_hubs ?? []) as Array<{ key: string; name: string; status?: string; fit?: number; fit_label?: string; reason?: string | null; tier?: string; logo?: string }>;
-  const hubs = rawHubs.map((h) => (h && h.name ? { ...h, name: anchorName(h.key, h.name) } : h)).filter((h) => h && h.name && !NEVER_HUB_NAME.test(h.name)).slice(0, 5);
+  // Hub matching rules (hubMatch.ts): conflicting hubs are flagged hidden, never shown; opposite kind first.
+  const ruled = visibleHubs(rawHubs as Array<(typeof rawHubs)[number] & { hidden?: boolean }>, { domain, category: r.brand?.category ?? r.demand_opportunity?.category?.key ?? null });
+  const hubs = ruled.map((h) => (h && h.name ? { ...h, name: anchorName(h.key, h.name) } : h)).filter((h) => h && h.name && !NEVER_HUB_NAME.test(h.name)).slice(0, 5);
   const placements = (r.placements ?? []).filter((p) => p.label);
   const cpm = r.headline?.best_fit_cpm_usd ?? avg(placements.map((p) => p.cpm_usd));
   const cpc = r.headline?.best_fit_cpc_usd ?? avg(placements.map((p) => p.cpc_usd));
@@ -69,7 +74,7 @@ export function buildModel(r: FridayReport) {
   const total = mm(pm?.now) ?? pm?.monthly_usd ?? (earnings.some((e) => e.pay) ? sum : null);
   const later = mm(pm?.later);
   const dop = r.demand_opportunity ?? null;
-  return { name, domain, updated: r.updated, tiles, score, top3: scored.map((c) => ({ name: c.name, label: c.fit_label })), hubs, placements, cpm, cpc, share: pub?.config?.base_share ?? 0.35, earnings, total, later, dop, isPublisher: (r.roles ?? []).includes("publisher"), publisherFirst: (r.roles ?? [])[0] === "publisher", mock: !!r.mock };
+  return { name, domain, updated: r.updated, tiles, score, top3: scored.map((c) => ({ name: c.name, label: c.fit_label })), hubs, placements, cpm, cpc, share: pub?.config?.base_share ?? 0.35, earnings, total, later, dop, isPublisher: (r.roles ?? []).includes("publisher"), publisherFirst: (r.roles ?? [])[0] === "publisher", isSupplier: (r.roles ?? []).includes("supplier"), isAccelerate: (r.roles ?? []).some((x) => x === "brand" || x === "kit" || x === "advertiser" || x === "sponsor"), mock: !!r.mock, geo: r.geo ?? null, exposure: readExposure((r as { exposure?: unknown }).exposure) };
 }
 function avg(xs: Array<LoHi | null | undefined>): LoHi | null {
   const v = xs.filter((x): x is LoHi => !!x);
@@ -245,7 +250,7 @@ export function CostSide({ m, extra }: { m: ReportModel; extra?: ReactNode }) {
     <section data-report-half="advertiser-cost" data-testid="report-half-advertiser" className="p-5 md:p-6" style={{ ...card, borderRadius: 24, fontFamily: RT_SANS, color: RT.body }}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className={eyebrow} style={{ color: RT.mintInk }}>If you're advertising</p>
+          <p className={eyebrow} style={{ color: RT.mintInk }}>Accelerate · premium display</p>
           <h3 className="mt-1 text-[24px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What it costs to reach customers</h3>
         </div>
         <EstimatePop title="Estimate: what it costs" testId="estimate-cost">
@@ -309,7 +314,7 @@ export function EarningsSide({ m, cta }: { m: ReportModel; cta?: ReactNode }) {
     <section data-report-half="publisher-earnings" data-testid="report-half-publisher" className="p-5 md:p-6" style={{ ...card, borderRadius: 24, fontFamily: RT_SANS, color: RT.body }}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className={eyebrow} style={{ color: RT.mintInk }}>If you're a publisher (hub)</p>
+          <p className={eyebrow} style={{ color: RT.mintInk }}>Hub · max exposure</p>
           <h3 className="mt-1 text-[24px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you could earn</h3>
         </div>
         <EstimatePop title="Estimate: what you could earn" testId="estimate-earn">
@@ -328,35 +333,54 @@ export function EarningsSide({ m, cta }: { m: ReportModel; cta?: ReactNode }) {
           {m.earnings.map((e) => e.pay ? <RangeBar key={e.surface} label={e.surface} range={e.pay} unit="/ mo" axisMax={axisMax} d={0} /> : <p key={e.surface} className="mt-3 flex justify-between text-sm"><span className="font-semibold" style={{ color: RT.ink }}>{e.surface}</span><span style={{ color: RT.mute }}>— (needs rate / needs monthly views)</span></p>)}
         </>
       ) : (
-        <p className="mt-4 text-[14px]" data-testid="earnings-empty">Run a hub too? Publishers keep a share of media revenue from their own screens and pages. Send your hub's surfaces and we estimate what they could earn.</p>
+        <p className="mt-4 text-[14px]" data-testid="earnings-empty">Add your hub to unlock max exposure. Hubs keep a share of media revenue from their own shelf space, screens and pages, and your products get the most eyeballs. Supplier-only works too.</p>
       )}
       {cta ? <div className="mt-5">{cta}</div> : null}
     </section>
   );
 }
 
-/** Both sides; the intake's first role decides the order (publisher first → earnings first). */
-export function TwoSides({ m, costExtra, earnCta }: { m: ReportModel; costExtra?: ReactNode; earnCta?: ReactNode }) {
+/**
+ * The report's views follow the roles (Randy, Nov 19 2026 9:39 AM ET): one form, both answers. Supplier exposure view
+ * (performance-only terms vs with Accelerate) + hub max-exposure + earnings view. Legacy two-sided order kept otherwise.
+ */
+export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposureSource, onAccelerate }: { m: ReportModel; costExtra?: ReactNode; earnCta?: ReactNode; supplierCta?: ReactNode; exposure?: FridayExposure; exposureSource?: "report" | "mock" | "sample"; onAccelerate?: ReactNode }) {
   const cost = <CostSide key="cost" m={m} extra={costExtra} />;
   const earn = <EarningsSide key="earn" m={m} cta={earnCta} />;
+  if (m.isSupplier || m.isPublisher) {
+    const mk = m.geo?.markets?.length ? { sells_in: m.geo.markets as Array<"CA" | "US">, ships_to: m.geo.markets as Array<"CA" | "US">, regions: Object.values(m.geo.regions ?? {}).flat() } : null;
+    const ex = exposure ?? m.exposure ?? mockExposure(mk);
+    const src = exposureSource ?? (exposure || !m.exposure ? "mock" : "report");
+    const sides = [m.isSupplier ? "supplier" : null, m.isPublisher ? "hub" : null].filter(Boolean) as string[];
+    return (
+      <section data-testid="report-two-sides" data-first={sides[0]} data-sides={sides.join(",")} data-accelerate={m.isAccelerate ? "true" : "false"} style={{ fontFamily: RT_SANS }}>
+        <h2 className="text-[26px] md:text-[34px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{m.isSupplier && m.isPublisher ? "Both answers from one form: your exposure + your hub earnings" : m.isSupplier ? "Your supplier exposure" : "Your hub: max exposure + earnings"}</h2>
+        <p className="text-[13px]" style={{ color: RT.mute }}>Estimates and modelled ranges in USD, each view labelled. Reviewed by a person before anything goes live.</p>
+        <div className={`mt-4 grid items-start gap-4 ${sides.length > 1 ? "lg:grid-cols-2" : ""}`}>
+          {m.isSupplier ? <SupplierExposureView key="sup" m={m} exposure={ex} source={src} cta={supplierCta} onAccelerate={onAccelerate} /> : null}
+          {m.isPublisher ? <HubView key="hub" m={m} exposure={ex} cta={earnCta} /> : null}
+        </div>
+      </section>
+    );
+  }
   return (
-    <section data-testid="report-two-sides" data-first={m.publisherFirst ? "publisher" : "advertiser"} style={{ fontFamily: RT_SANS }}>
-      <h2 className="text-[24px] md:text-[28px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Two sides of the network</h2>
-      <p className="text-[13px]" style={{ color: RT.mute }}>Advertising costs money; publishing earns it. Each side is labelled.</p>
+    <section data-testid="report-two-sides" data-first={m.publisherFirst ? "hub" : "accelerate"} style={{ fontFamily: RT_SANS }}>
+      <h2 className="text-[24px] md:text-[28px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Exposure + earnings, side by side</h2>
+      <p className="text-[13px]" style={{ color: RT.mute }}>Accelerate is optional paid display; your hub earns a share. Each side is labelled.</p>
       <div className="mt-4 grid items-start gap-4 md:grid-cols-2">{m.publisherFirst ? [earn, cost] : [cost, earn]}</div>
     </section>
   );
 }
 
 /** The full report body on the design system's paper background. */
-export function ReportV2({ report, sample, map, costExtra, earnCta, compact }: { report: FridayReport; sample?: boolean; map?: string; costExtra?: ReactNode; earnCta?: ReactNode; compact?: boolean }) {
+export function ReportV2({ report, sample, map, costExtra, earnCta, supplierCta, compact, exposure, exposureSource, onAccelerate }: { report: FridayReport; sample?: boolean; map?: string; costExtra?: ReactNode; earnCta?: ReactNode; supplierCta?: ReactNode; compact?: boolean; exposure?: FridayExposure; exposureSource?: "report" | "mock" | "sample"; onAccelerate?: ReactNode }) {
   const m = buildModel(report);
   return (
     <div data-testid={sample ? "report-v2-sample" : "report-v2"} className="space-y-8 p-3 md:p-6" style={{ background: RT.paper, borderRadius: 24 }}>
       <ReportHero m={m} sample={sample} />
       <ChannelTilesV2 m={m} map={map} />
       {compact ? null : <HubCards m={m} />}
-      <TwoSides m={m} costExtra={costExtra} earnCta={earnCta} />
+      <TwoSides m={m} costExtra={costExtra} earnCta={earnCta} supplierCta={supplierCta} exposure={exposure} exposureSource={exposureSource} onAccelerate={onAccelerate} />
     </div>
   );
 }

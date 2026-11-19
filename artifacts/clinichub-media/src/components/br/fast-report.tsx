@@ -4,19 +4,24 @@
  * "from your site" tag; gaps (needs_input) become prompts in "Add detail to sharpen your numbers". Defaults are
  * labelled. Friday's full report is reviewed by a person first. Birch never fetches the brand's site itself.
  */
-import { ArrowRight, Sparkles } from "lucide-react";
-import { useMemo, type ReactNode } from "react";
+import { ArrowRight, Plus, Rocket, Sparkles } from "lucide-react";
+import { useMemo, useState, type ReactNode } from "react";
 import { ReportV2 } from "@/components/br/report-v2";
 import { LeadGatesStatus, PrimaryCta } from "@/components/br/intake-sell";
 import { IntakeWarnings } from "@/components/br/intake-warnings";
 import { QUICK_DEFAULTS, quickReport } from "@/lib/fridayMockReport";
 import { RT, RT_SANS, RT_SERIF } from "@/lib/reportTokens";
 import type { IntakeSide } from "@/lib/intakeTrack";
-import type { Autofill } from "@/lib/fridayBrandIntake";
+import type { Autofill, IntakeRef } from "@/lib/fridayBrandIntake";
+import { fridayIntake } from "@/lib/fridayBrandIntake";
+import type { IntakePayload } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { IntakeDetails, type SharedAnswers } from "@/components/br/intake-details";
+import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
+import { trackIntake } from "@/lib/intakeTrack";
 import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { FRIDAY_CATEGORIES } from "../../../../api-server/src/lib/kitCalc/fridayV12";
 
-export type QuickResult = { side: IntakeSide; roles: string[]; host: string; autofill: Autofill | null; fallback: boolean; typedMarket: Market | null; held: boolean };
+export type QuickResult = { side: IntakeSide; roles: string[]; host: string; autofill: Autofill | null; fallback: boolean; typedMarket: Market | null; held: boolean; ref?: IntakeRef; payload?: IntakePayload; contact?: { email: string; website: string }; shared?: SharedAnswers; brand?: string | null; category?: string | null };
 const DEFAULT_CAT = "recovery_devices";
 const catLabel = (k: string) => FRIDAY_CATEGORIES.find((c) => c.key === k)?.label ?? k;
 const geoText = (g?: { sells?: string[] } | null) => (g?.sells?.length ? g.sells.map((c) => (c === "CA" ? "Canada" : c === "US" ? "USA" : c)).join(" + ") : null);
@@ -40,13 +45,41 @@ export function needPrompt(key: string, notes: string[] = []): string {
 const FromSite = () => <span className="ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={{ background: RT.mint, color: RT.mintInk }} data-testid="from-site-tag">from your site</span>;
 const Dflt = () => <span className="ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={{ background: RT.track, color: RT.mute }}>default</span>;
 
-export function FastReport({ q, onAddDetail }: { q: QuickResult; onAddDetail: () => void }) {
+export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail: () => void }) {
+  // "Add my hub" after a supplier-only submit adds the hub role to the SAME record (PATCH), never a second form.
+  const [extraRoles, setExtraRoles] = useState<string[]>([]);
+  const q = useMemo(() => ({ ...q0, roles: [...new Set([...q0.roles, ...extraRoles])] }), [q0, extraRoles]);
   const f = q.autofill?.fields ?? {};
-  const name = f.company_name?.value ?? null;
-  const cat = f.category?.value ?? DEFAULT_CAT;
+  const name = q.brand ?? f.company_name?.value ?? null;
+  const cat = q.category ?? f.category?.value ?? DEFAULT_CAT;
   const aov = typeof f.avg_cart_usd?.value === "number" ? f.avg_cart_usd.value : null;
   const report = useMemo(() => quickReport({ roles: q.roles, category: cat, host: q.host, name, aovUsd: aov }), [q, cat, name, aov]);
   const isPub = q.side === "publisher";
+  const oneForm = q.roles.includes("supplier") || q.roles.includes("publisher");
+  const hasKit = q.roles.includes("kit");
+  const [adding, setAdding] = useState<string | null>(null);
+  // "Add my hub" / "Add Accelerate" after the submit update the SAME record (PATCH), never a second form.
+  const addRole = async (role: "publisher" | "kit", detail: "add_hub" | "accelerate") => {
+    if (!q.ref || !q.payload) return;
+    setAdding(role);
+    trackIntake("advertiser", "cta_click", detail);
+    try {
+      await fridayIntake().update(q.ref, { ...q.payload, roles: [...new Set([...(q.payload.roles ?? []), ...extraRoles, role])] as IntakePayload["roles"] });
+      setExtraRoles((x) => [...new Set([...x, role])]);
+    } catch {
+      /* keep the current view; the button stays available */
+    } finally {
+      setAdding(null);
+    }
+  };
+  const exposure = useMemo(() => mockExposure(q.typedMarket ?? undefined), [q.typedMarket]);
+  const supplierOnly = q.roles.includes("supplier") && !q.roles.includes("publisher");
+  const earnCta = supplierOnly && q.ref ? (
+    <button type="button" onClick={() => addRole("publisher", "add_hub")} disabled={!!adding} data-testid="report-add-hub" className="inline-flex h-11 items-center gap-1.5 rounded-full px-5 text-sm font-bold" style={{ background: RT.forest, color: "#fff" }}><Plus className="size-4" />{adding === "publisher" ? "Adding…" : "Add my hub to unlock max exposure"}</button>
+  ) : undefined;
+  const accCta = q.roles.includes("supplier") && !q.roles.includes("kit") && q.ref ? (
+    <button type="button" onClick={() => addRole("kit", "accelerate")} disabled={!!adding} data-testid="report-add-accelerate" className="inline-flex h-11 items-center gap-1.5 rounded-full px-5 text-sm font-bold" style={{ background: RT.mint, color: RT.forest }}><Rocket className="size-4" />{adding === "kit" ? "Adding…" : "Add Accelerate to my request"}</button>
+  ) : undefined;
   const needs = [...new Set([...(q.autofill?.needs_input ?? (q.fallback ? ["category", "avg_cart_usd", "geo"] : [])), ...(isPub ? [] : ["orders_per_month", "purchases_per_year", "margin_band"])])].filter((k) => !(k === "geo" && q.typedMarket));
   const rows: Array<{ k: string; label: string; value: ReactNode; tag: ReactNode }> = [
     { k: "name", label: "Brand", value: name ?? q.host, tag: name ? <FromSite /> : null },
@@ -92,11 +125,12 @@ export function FastReport({ q, onAddDetail }: { q: QuickResult; onAddDetail: ()
         </div>
         <LeadGatesStatus gates={{ review: "pending_review" }} testId="fast-lead-gates" />
         <IntakeWarnings testId="fast-warnings" />
-        <div className="mt-4">{upgrade("top")}</div>
-        <div className="mt-3"><PrimaryCta side={q.side} where="done" /></div>
+        {hasKit || !oneForm ? <div className="mt-4">{upgrade("top")}</div> : null}
+        {hasKit || !oneForm ? <div className="mt-3"><PrimaryCta side={q.side} where="done" /></div> : null}
       </div>
-      <ReportV2 report={report} />
-      {upgrade("bottom")}
+      {oneForm && q.ref && q.payload ? <IntakeDetails key={q.roles.join(",")} intake={q.ref} payload={{ ...q.payload, roles: q.roles as IntakePayload["roles"] }} roles={q.roles} shared={q.shared ?? { brand: "", categories: [], skus: "", audience: "" }} /> : null}
+      <ReportV2 report={report} exposure={exposure} exposureSource="mock" earnCta={earnCta} supplierCta={supplierOnly ? earnCta : undefined} onAccelerate={accCta} />
+      {hasKit || !oneForm ? upgrade("bottom") : null}
     </section>
   );
 }

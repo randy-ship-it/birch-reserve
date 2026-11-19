@@ -17,6 +17,8 @@ export const INTAKE_DETAILS = [
   "look_190", "reserve_490", "kit", "sample_io", "report", "publisher_payout", "send_for_review", "supplier_first_look", "sponsor_lock",
   // fast / expanded modes (Randy 11:36 PM)
   "fast", "expanded", "quick_report", "add_detail", "update",
+  // simplified intake (Randy voice, Nov 19 2026 8:30 AM ET): supply-only choice, "Add a hub too", hub details
+  "supply_only", "add_hub", "hub_details", "accelerate", "partial_saved",
   // formats / errors
   "pdf", "png", "too_fast", "invalid_email", "invalid_website", "rate_limited", "unreachable",
 ] as const;

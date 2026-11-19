@@ -1,3 +1,5 @@
+import { KitCta } from "@/components/br/kit-cta";
+import { ShareBar } from "@/components/br/share-bar";
 import { useState } from "react";
 import { Lock, MapPin, Timer, ArrowRight } from "lucide-react";
 import { usePageMeta } from "@/components/br/ui";
@@ -11,7 +13,7 @@ import { SPONSOR_OFFERS, SUPPLIER_CATEGORIES, HUB_RATE_RANGE } from "../../../..
 const ICON = { "hold-190": Timer, "reserve-490": Lock, "area-lock": MapPin } as const;
 
 export default function BrIntakeSponsor() {
-  usePageMeta("Sponsor: lock a category or an area | Birch Reserve", "Start with the $190 USD 7-day look, the $490 USD category reserve or the $3,500 USD area lock launch price.");
+  usePageMeta("Supplier + Accelerate: lock a category or an area | Birch Reserve", "Start with the $190 USD 7-day look, the $490 USD category reserve or the $3,500 USD area lock launch price.");
   const [cat, setCat] = useState(SUPPLIER_CATEGORIES[0]!.key);
   const [ref, setRef] = useState<IntakeRef | null>(null);
   const [market, setMarket] = useState<Market>(DEFAULT_MARKET);
@@ -21,9 +23,13 @@ export default function BrIntakeSponsor() {
       <MockBanner />
       <RoleTabs active="sponsor" />
       <header className="container mx-auto px-4 pb-4 pt-8 md:pt-12">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For sponsors</p>
-        <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Lock your category. Or your area.</h1>
-        <p className="mt-3 max-w-xl text-base text-muted-foreground">Three published prices. Pay on the same secure Stripe page as always. Nothing runs before you approve an insertion order.</p>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For suppliers · Accelerate</p>
+        <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Accelerate: lock your category, or your area.</h1>
+        <p className="mt-3 max-w-xl text-base text-muted-foreground">Premium placements that speed up exposure. Three published prices. Pay on the same secure Stripe page as always. Nothing runs before you approve an insertion order.</p>
+        <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <KitCta placement="hero_role_sponsor" size="md" sub="One form for hub + supplier. Website + email to start." />
+          <ShareBar testId="share-bar-role" />
+        </div>
       </header>
       <section className="container mx-auto px-4 pb-4">
         <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-white p-3 shadow-sm" data-testid="sponsor-category-chips">
@@ -66,7 +72,7 @@ export default function BrIntakeSponsor() {
           </InfoPop></span>
         </div>
       </section>
-      <section className="container mx-auto px-4 pb-8"><ContactSubmit role="sponsor" payload={payload} draft={ref} setRef={setRef} label="Send lock interest" /></section>
+      <section className="container mx-auto px-4 pb-8"><ContactSubmit role="sponsor" payload={payload} draft={ref} setRef={setRef} label="Send Accelerate interest" /></section>
       <section className="container mx-auto max-w-xl px-4 pt-6"><MarketPicker value={market} onChange={setMarket} /></section>
       <ChannelTiles market={market} />
     </div>

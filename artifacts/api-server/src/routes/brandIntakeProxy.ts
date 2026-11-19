@@ -63,6 +63,42 @@ export function legacyIntakeAllowed(body: unknown): boolean {
   return b.submit === true && typeof b.email === "string" && LEGACY_EMAIL_RE.test(b.email.trim());
 }
 
+/**
+ * Partial-lead capture (Randy via Emma, Nov 19 2026 10:21 AM ET). Deliberately relaxes "only a final submit reaches
+ * Friday": once the visitor has typed a VALID email, the browser saves a partial lead (stage "partial", debounced) and
+ * keeps PATCHing the same record. Each partial save is tagged ABANDONED in the v1 blurb; the final submit (PATCH
+ * submit:true, from_partial:true) re-sends the blurb without that tag and with a SUBMITTED line, which flips it.
+ * Guards kept: never written without a valid email (400 partial_needs_email, nothing forwarded), and the 404 legacy
+ * /api/intake fallback still only fires for a final submit (legacyIntakeAllowed), so partials never go there.
+ * `stage`, `from_partial` and `src` are Birch-only keys: stripped here before Friday sees the body (strict v1).
+ */
+export const PARTIAL_TAG = "[ABANDONED · partial lead] Email captured on the Monetization Kit form; not submitted yet. Flips to submitted on the final click.";
+export const SUBMITTED_TAG = "[SUBMITTED · was a partial lead]";
+export type Stage = "partial" | "submitted" | null;
+export function stageOf(body: unknown): Stage {
+  const b = (body ?? {}) as Record<string, unknown>;
+  if (b.stage === "partial") return "partial"; // explicit partial wins: a partial save never submits
+  return b.submit === true ? "submitted" : null;
+}
+/** Mirror hosts (SCALE-MIRROR.md): a short, allow-listed source tag only. */
+const SRC_RE = /^[a-z0-9_]{2,32}$/;
+export function prepareStage(body: unknown): { body: Record<string, unknown>; stage: Stage; error?: string } {
+  const b = { ...((body ?? {}) as Record<string, unknown>) };
+  const stage = stageOf(b);
+  const fromPartial = b.from_partial === true;
+  const src = typeof b.src === "string" && SRC_RE.test(b.src) ? b.src : null;
+  delete b.stage;
+  delete b.from_partial;
+  delete b.src;
+  if (stage === "partial") {
+    if (!legacyIntakeAllowed({ ...b, submit: true })) return { body: b, stage, error: "partial_needs_email" };
+    delete b.submit;
+  }
+  const lines = [stage === "partial" ? PARTIAL_TAG : stage === "submitted" && fromPartial ? SUBMITTED_TAG : null, src ? `Source: ${src.replace(/_/g, " ")}.` : null].filter(Boolean) as string[];
+  if (lines.length) b.blurb = [...lines, typeof b.blurb === "string" ? b.blurb : ""].filter(Boolean).join("\n").slice(0, 6000);
+  return { body: b, stage };
+}
+
 /** Headers Birch sends to Friday. The secret only ever goes in X-Intake-Secret. */
 export function fridayHeaders(cfg: { key: string; org: string }, req: Request): Record<string, string> {
   const h: Record<string, string> = { "Content-Type": "application/json", "X-Intake-Secret": cfg.key, "X-Org-Id": cfg.org };
@@ -160,7 +196,8 @@ export function publicGates(text: string): string {
   return JSON.stringify(root);
 }
 
-export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fetch; log?: (msg: string, extra?: Record<string, unknown>) => void } = {}) {
+export type IntakeLeadEvent = { fridayId: string | null; email: string; website: string | null; stage: "partial" | "submitted"; roles: string[]; path: string };
+export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fetch; log?: (msg: string, extra?: Record<string, unknown>) => void; recordLead?: (e: IntakeLeadEvent) => Promise<void> } = {}) {
   const router = Router();
   const body = json({ limit: "64kb" });
   const env = opts.env ?? process.env;
@@ -215,6 +252,19 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     return (await fridayV12()).v12 ? b : toV1Body(b);
   }
   const send = (res: Response, out: { status: number; text: string }) => res.status(out.status).type("application/json").send(publicGates(out.text || "{}"));
+  /** BR leads mirror of partial + submitted intakes (same pipeline as full submissions). Never throws, never blocks. */
+  const recordLead = opts.recordLead ?? defaultRecordLead(env);
+  function noteLead(b: Record<string, unknown>, stage: Stage, out: { status: number; text: string }, id?: string) {
+    if (!stage || out.status >= 300 || typeof b.email !== "string") return;
+    let fid: string | null = id ?? null;
+    try {
+      const d = JSON.parse(out.text || "{}") as { id?: unknown };
+      if (typeof d.id === "string" && ID_RE.test(d.id)) fid = d.id;
+    } catch {
+      /* keep id */
+    }
+    void recordLead({ fridayId: fid, email: b.email.trim().toLowerCase(), website: typeof b.website === "string" ? b.website.slice(0, 200) : null, stage, roles: Array.isArray(b.roles) ? (b.roles as unknown[]).map(String).slice(0, 6) : [], path: "/intake" }).catch(() => undefined);
+  }
 
   router.post("/v1/brand-intake", body, async (req, res) => {
     const fast = (req.body as Record<string, unknown> | undefined)?.submit_mode === "fast";
@@ -224,7 +274,9 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       if (typeof fb.website !== "string" || !fb.website.trim() || !legacyIntakeAllowed({ ...fb, submit: true })) return void res.status(400).json({ ok: false, error: "fast_needs_website_email" });
       if (env.FRIDAY_FAST_MODE === "off") return void res.status(409).json({ ok: false, error: "fast_unsupported" });
     }
-    const eff = (fast ? { ...(req.body as object), submit: true } : req.body ?? {}) as Record<string, unknown>;
+    const prep = prepareStage(fast ? { ...(req.body as object), submit: true } : req.body ?? {});
+    if (prep.error) return void res.status(400).json({ ok: false, error: prep.error });
+    const eff = prep.body;
     const out = await forward(req, res, "POST", "/api/public/brand-intake", await shaped(eff));
     if (!out) return;
     if (fast && out.status === 400 && /"invalid"/.test(out.text) && !/fast_needs_website_email|"website"|"email"|too_fast/.test(out.text)) {
@@ -244,6 +296,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       res.status(r.status === "sent" ? 202 : 503).json({ ok: r.status === "sent", fallback: "api_intake", lead: r.status === "sent", status: "submitted", version: 1, approvals: {}, error: r.status === "sent" ? undefined : "intake_failed" });
       return;
     }
+    noteLead(eff, prep.stage, out);
     send(res, out);
   });
   router.patch("/v1/brand-intake/:id", body, async (req, res) => {
@@ -252,8 +305,11 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     // v1.3 §2: fast is create-only; an upgrade PATCHes with submit_mode "expanded". Never forward a fast PATCH.
     if ((req.body as Record<string, unknown> | undefined)?.submit_mode === "fast") return void res.status(400).json({ ok: false, error: "fast_create_only" });
     // PATCH (autosave or submit) only ever goes to brand-intake v1; it never falls back to /api/intake.
-    const out = await forward(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, await shaped(req.body));
+    const prep = prepareStage(req.body);
+    if (prep.error) return void res.status(400).json({ ok: false, error: prep.error });
+    const out = await forward(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, await shaped(prep.body));
     if (!out) return;
+    noteLead(prep.body, prep.stage, out, id);
     send(res, out);
   });
   router.post("/v1/brand-intake/:id/kit", body, async (req, res) => {
@@ -297,4 +353,19 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     if (out) send(res, out);
   });
   return router;
+}
+
+/**
+ * Default BR leads writer: production only (previews and tests never touch the prod store), one row per Friday
+ * record (`brandintake:<id>`, or the email when Friday had no id). Friday already holds the record via brand-intake
+ * v1, so the row is marked sent to Friday and is never re-pushed to /api/intake (no duplicate CRM lead).
+ */
+function defaultRecordLead(env: Env) {
+  return async (e: IntakeLeadEvent) => {
+    if (env.VERCEL_ENV !== "production") return;
+    const { upsertLeadSafe, getLeadStore } = await import("../lib/leads");
+    const id = `brandintake:${e.fridayId ?? e.email}`.slice(0, 200);
+    const lead = await upsertLeadSafe({ id, source: "brand_intake", sourceRef: e.fridayId ?? e.email, email: e.email, company: e.website, need: `Monetization Kit intake (${e.roles.join(", ") || "brand"}) · ${e.stage === "partial" ? "abandoned (partial)" : "submitted"}`, pagePath: e.path, isTest: TEST_EMAIL_RE.test(e.email), meta: { stage: e.stage === "partial" ? "abandoned" : "submitted", friday_intake_id: e.fridayId ?? undefined } });
+    if (lead) await getLeadStore().markFriday(lead.id, { status: "sent", contactId: e.fridayId, dealId: null }, new Date(), false).catch(() => undefined);
+  };
 }

@@ -1,4 +1,5 @@
 /** /kit/r/:reportToken (noindex): Friday's brand-report.v1 (view=brand, + view=publisher role_data) in Friday's report design system v2, inside Birch chrome. */
+import { ShareBar } from "@/components/br/share-bar";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "wouter";
 import { Download, Loader2 } from "lucide-react";
@@ -70,6 +71,8 @@ export default function BrKitReport() {
       <div className="container mx-auto px-4 py-8 md:py-12">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Private link · not indexed</p>
         <h1 className="font-display text-4xl md:text-6xl">Your report and Monetization Kit</h1>
+        {/* Sharing from a private report shares the public intake, never this report's token link. */}
+        <div className="mt-4"><ShareBar testId="share-bar-report" href="intake" text="Get your own Monetization Kit: hub earnings and supplier exposure, estimated and reviewed by a person." /></div>
         {state === "loading" ? <p className="mt-6 flex items-center gap-2"><Loader2 className="size-4 animate-spin" />Loading your report…</p> : null}
         {state === "draft" ? <p className="mt-6" data-testid="kit-report-draft">This Monetization Kit is still a draft. Finish it on <a href="/brand-kit" className="underline">your kit page</a>.</p> : null}
         {state === "missing" ? <p className="mt-6" data-testid="kit-report-missing">We couldn't find this kit. The link may have been rotated.</p> : null}
@@ -83,6 +86,8 @@ export default function BrKitReport() {
             <ReportV2
               report={full ?? report!}
               map={map}
+              exposure={expo.ex}
+              exposureSource={expo.source === "friday" ? "report" : "mock"}
               costExtra={
                 <>
                   <div className="mt-5 rounded-[10px] p-4 text-white" style={{ background: RT.forest }} data-testid="report-cost">

@@ -14,8 +14,8 @@ import type { LeadGates } from "@/lib/fridayBrandIntake";
 export const sideOf = (roles: readonly IntakeRole[] | IntakeRole): IntakeSide => ((Array.isArray(roles) ? roles : [roles]).every((r) => r === "publisher") ? "publisher" : "advertiser");
 
 export const SIDES: Record<IntakeSide, { label: string; sub: string; icon: typeof Store }> = {
-  advertiser: { label: "Advertiser", sub: "Brand · Supplier · Sponsor: buy seats on hub screens", icon: Megaphone },
-  publisher: { label: "Publisher", sub: "Run a hub: earn from your screens and pages", icon: Store },
+  advertiser: { label: "Supplier", sub: "Performance-only (pay on results, no CPC/CPM), plus optional Accelerate for premium placements", icon: Megaphone },
+  publisher: { label: "Hub", sub: "Max exposure: earn from your screens and pages", icon: Store },
 };
 
 export function SideSwitch({ side, onChange }: { side: IntakeSide; onChange: (s: IntakeSide) => void }) {
@@ -67,7 +67,7 @@ export function CtaBand({ side, where, line }: { side: IntakeSide; where: Intake
   return (
     <section data-testid={`cta-band-${where}`} className="border-y border-border/70 bg-[#0b1f3a] text-white">
       <div className="container mx-auto flex flex-col gap-3 px-4 py-5 md:flex-row md:items-center md:justify-between">
-        <p className="max-w-xl text-sm text-white/85">{line ?? (side === "publisher" ? "Your hub's screens and pages, sold to vetted brands. A person at Birch Reserve reviews every hub." : "Seats on live hub screens, sold by category. Start with the $190 USD look; the reserve is $490 USD.")}</p>
+        <p className="max-w-xl text-sm text-white/85">{line ?? (side === "publisher" ? "Your hub's screens and pages: max exposure for curated products, and a share for you. A person at Birch Reserve reviews every hub." : "Accelerate on live hub screens, by category. Start with the $190 USD look; the reserve is $490 USD.")}</p>
         <PrimaryCta side={side} where={where} tone="dark" />
       </div>
     </section>

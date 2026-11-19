@@ -12,7 +12,15 @@ export const MEDIA_KIT_OG_IMAGE = "https://birchreserve.net/og-media-kit-usd.png
 
 const ORG = { "@type": "Organization", name: "Birch Reserve", url: "https://birchreserve.net/" };
 
+/** Share image for the intake (Nov 19 2026): 1200×630, on brand, no CRM or partner names. */
+export const INTAKE_OG_IMAGE = "https://birchreserve.net/og-monetization-kit.png";
+const INTAKE_DESC = "One short form for suppliers and hubs. See what your hub could earn and where your products get seen, side by side. Estimates in USD, reviewed by a person.";
+
 export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
+  "/intake": { title: "Get your Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
+  "/intake/publisher": { title: "Hub · max exposure + earnings · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
+  "/intake/supplier": { title: "Supplier · Performance-only (pay on results) · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
+  "/intake/sponsor": { title: "Supplier + Accelerate · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
   "/advertise/brands": {
     title: "Advertise to brands | Birch Reserve",
     description: "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. Live today: DR-HO'S physio.",

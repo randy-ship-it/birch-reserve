@@ -1,5 +1,7 @@
+import { mirrorFrame } from "./middlewares/mirrorFrame";
 import express, { type Express } from "express";
 import { clerkMiddleware } from "@clerk/express";
+import { shareEventsRouter } from "./routes/shareEvents";
 import { publishableKeyFromHost } from "@clerk/shared/keys";
 import pinoHttp from "pino-http";
 import router from "./routes/index";
@@ -93,6 +95,7 @@ app.use(
     },
   }),
 );
+app.use(mirrorFrame());
 app.use(createBrandIntakeProxy({ log: (msg, extra) => logger.info(extra ?? {}, msg) }));
 app.use(sponsorPageRouter);
 app.use(publicPagesRouter);
@@ -164,6 +167,8 @@ app.post("/api/launch/randy-chat", requireHuman());
 // Machine-buying and human-buying surfaces intentionally live at the origin
 // root and must remain ahead of any frontend fallback.
 app.use(publicBuyingRouter);
+// Share + referral tracking (Nov 19 2026): public POST /v1/share-events, staff-only GET /api/sales/share-events.
+app.use(shareEventsRouter);
 app.use("/api", router);
 
 export default app;

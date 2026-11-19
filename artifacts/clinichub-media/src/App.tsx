@@ -33,6 +33,7 @@ import BrMediaBuyers from '@/pages/br/media-buyers';
 import BrBrandKit from '@/pages/br/brand-kit';
 import BrKitReport from '@/pages/br/kit-report';
 import BrIntake from '@/pages/br/intake';
+import ShareEventsPage from '@/pages/sales/share-events';
 import BrIntakePublisher from '@/pages/br/intake-publisher';
 import BrIntakeSupplier from '@/pages/br/intake-supplier';
 import BrIntakeSponsor from '@/pages/br/intake-sponsor';
@@ -373,6 +374,15 @@ function Router() {
           <Layout><TeamAccess /></Layout>
         </Route>
         {/* Internal team page (Emma 7:21pm): signed-in team only; the public gets the 404. */}
+        {/* Internal share + referral events (Nov 19 2026): signed-in team only; the API also checks sales access. */}
+        <Route path="/sales/share-events">
+          <Show when="signed-in">
+            <Layout><ShareEventsPage /></Layout>
+          </Show>
+          <Show when="signed-out">
+            <Layout><NotFound /></Layout>
+          </Show>
+        </Route>
         <Route path="/sales/voice-demo">
           <Show when="signed-in">
             <Layout><VoiceDemo /></Layout>

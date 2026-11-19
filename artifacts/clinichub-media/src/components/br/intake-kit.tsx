@@ -105,12 +105,12 @@ export function MockBanner() {
 
 /** Two sides (Randy via Emma, 10:44 PM ET): Advertiser = Brand kit · Supplier · Sponsor; Publisher on its own. */
 const ROLE_SIDES: Array<{ side: "advertiser" | "publisher"; label: string; roles: Array<{ key: IntakeRole; label: string; href: string; icon: typeof Store }> }> = [
-  { side: "advertiser", label: "Advertiser", roles: [
+  { side: "advertiser", label: "Supplier", roles: [
     { key: "kit", label: "Monetization Kit", href: "/brand-kit#my-kit", icon: Target },
-    { key: "supplier", label: "Supplier", href: "/intake/supplier", icon: Target },
-    { key: "sponsor", label: "Sponsor", href: "/intake/sponsor", icon: Megaphone },
+    { key: "supplier", label: "Performance-only", href: "/intake/supplier", icon: Target },
+    { key: "sponsor", label: "Accelerate", href: "/intake/sponsor", icon: Megaphone },
   ] },
-  { side: "publisher", label: "Publisher", roles: [{ key: "publisher", label: "Publisher", href: "/intake/publisher", icon: Store }] },
+  { side: "publisher", label: "Hub", roles: [{ key: "publisher", label: "Max exposure", href: "/intake/publisher", icon: Store }] },
 ];
 
 export function RoleTabs({ active }: { active?: IntakeRole }) {
@@ -128,7 +128,7 @@ export function RoleTabs({ active }: { active?: IntakeRole }) {
               <span className="px-2 text-[10px] font-bold uppercase tracking-wider text-foreground/55">{g.label}</span>
               {g.roles.map((r) => (
                 <a key={r.key} href={r.href} data-testid={`role-tab-${r.key}`} aria-current={active === r.key ? "page" : undefined} className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${active === r.key ? "bg-foreground text-background" : "text-foreground/70 hover:bg-foreground/5"}`}>
-                  <r.icon className="size-4" aria-hidden /> {g.side === "publisher" ? "Hub payouts" : r.label}
+                  <r.icon className="size-4" aria-hidden /> {r.label}
                 </a>
               ))}
             </div>

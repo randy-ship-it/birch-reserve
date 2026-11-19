@@ -305,3 +305,94 @@ test("v1.3 fast mode: website+email required (nothing sent otherwise); strict Fr
   assert.equal((await p.json()).error, "fast_create_only");
   assert.equal(calls.length, n);
 });
+
+/* ------------------------------------------------------------------ partial-lead capture (Nov 19 2026 10:21 AM ET) */
+import { PARTIAL_TAG, SUBMITTED_TAG, prepareStage, type IntakeLeadEvent } from "../src/routes/brandIntakeProxy";
+
+async function serveRL(fetchImpl: typeof fetch, leads: IntakeLeadEvent[]) {
+  const app = express();
+  const wrapped = (async (url: string, init?: RequestInit) =>
+    String(url).endsWith("/api/public/brand-categories") ? new Response("{}", { status: 404 }) : fetchImpl(url, init as RequestInit)) as unknown as typeof fetch;
+  app.use(createBrandIntakeProxy({ env: ENV, fetchImpl: wrapped, recordLead: async (e) => void leads.push(e) }));
+  const srv = app.listen(0);
+  await new Promise((r) => srv.once("listening", r));
+  return { base: `http://127.0.0.1:${(srv.address() as AddressInfo).port}`, close: () => srv.close() };
+}
+const settle = () => new Promise((r) => setTimeout(r, 20));
+
+test("partial without a valid email → 400 partial_needs_email; nothing forwarded, no lead row", async () => {
+  const calls: string[] = [];
+  const leads: IntakeLeadEvent[] = [];
+  const f = (async (url: string) => (calls.push(String(url)), new Response("{}", { status: 201 }))) as unknown as typeof fetch;
+  const s = await serveRL(f, leads);
+  for (const email of [undefined, "", "nope", "a@b"]) {
+    const r = await realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ roles: ["brand"], stage: "partial", ...(email === undefined ? {} : { email }) }) });
+    assert.equal(r.status, 400);
+    assert.equal((await r.json()).error, "partial_needs_email");
+  }
+  const p = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { method: "PATCH", headers: { "content-type": "application/json", "x-edit-token": "t".repeat(24) }, body: JSON.stringify({ stage: "partial" }) });
+  await settle();
+  s.close();
+  assert.equal(p.status, 400);
+  assert.equal(calls.length, 0);
+  assert.equal(leads.length, 0);
+});
+
+test("partial with a valid email → forwarded as a DRAFT (no submit) tagged ABANDONED; Birch-only keys stripped; lead row 'partial'", async () => {
+  const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+  const leads: IntakeLeadEvent[] = [];
+  const f = (async (url: string, init: RequestInit) => (calls.push({ url: String(url), body: JSON.parse(String(init.body)) }), new Response(JSON.stringify({ ok: true, id: "bi_part0001", status: "draft", version: 0, editToken: "e".repeat(20), reportToken: "r".repeat(20) }), { status: 201 }))) as unknown as typeof fetch;
+  const s = await serveRL(f, leads);
+  const r = await realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ roles: ["brand"], stage: "partial", submit: true, email: "Growth@Example.com", website: "example.com", blurb: "Intent: supplier only", src: "scale_mirror" }) });
+  await settle();
+  s.close();
+  assert.equal(r.status, 201);
+  const b = calls[0]!.body;
+  assert.ok(!("stage" in b) && !("src" in b) && !("from_partial" in b) && !("submit" in b));
+  assert.ok(String(b.blurb).startsWith(PARTIAL_TAG));
+  assert.match(String(b.blurb), /Source: scale mirror\./);
+  assert.match(String(b.blurb), /Intent: supplier only/);
+  assert.deepEqual(leads.map((l) => [l.stage, l.fridayId, l.email]), [["partial", "bi_part0001", "growth@example.com"]]);
+});
+
+test("partial on a missing v1 (404) stays in the browser: no /api/intake push (legacy guard kept)", async () => {
+  let pushed = 0;
+  globalThis.fetch = (async () => (pushed++, new Response("{}", { status: 201 }))) as unknown as typeof fetch;
+  try {
+    const leads: IntakeLeadEvent[] = [];
+    const s = await serveRL((async () => new Response("{}", { status: 404 })) as unknown as typeof fetch, leads);
+    const r = await realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ roles: ["brand"], stage: "partial", email: "a@example.com" }) });
+    const d = await r.json();
+    await settle();
+    s.close();
+    assert.equal(r.status, 202);
+    assert.deepEqual([d.fallback, d.lead, d.draft], ["api_intake", false, "local"]);
+    assert.equal(pushed, 0);
+    assert.equal(leads.length, 0);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
+
+test("final submit on the partial record (PATCH submit + from_partial) flips it: SUBMITTED tag, no ABANDONED tag, lead row 'submitted'", async () => {
+  const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+  const leads: IntakeLeadEvent[] = [];
+  const f = (async (url: string, init: RequestInit) => (calls.push({ url: String(url), body: JSON.parse(String(init.body)) }), new Response(JSON.stringify({ ok: true, status: "submitted", version: 1 }), { status: 200 }))) as unknown as typeof fetch;
+  const s = await serveRL(f, leads);
+  const r = await realFetch(`${s.base}/v1/brand-intake/bi_part0001`, { method: "PATCH", headers: { "content-type": "application/json", "x-edit-token": "t".repeat(24) }, body: JSON.stringify({ submit: true, from_partial: true, email: "a@example.com", website: "example.com", elapsed_ms: 4000, blurb: "Intent: supplier only" }) });
+  await settle();
+  s.close();
+  assert.equal(r.status, 200);
+  const b = calls[0]!.body;
+  assert.equal(b.submit, true);
+  assert.ok(!("from_partial" in b));
+  assert.ok(String(b.blurb).startsWith(SUBMITTED_TAG));
+  assert.ok(!String(b.blurb).includes("ABANDONED"));
+  assert.deepEqual(leads.map((l) => [l.stage, l.fridayId]), [["submitted", "bi_part0001"]]);
+});
+
+test("prepareStage: a bad src tag is dropped; plain drafts are untouched", () => {
+  assert.ok(!/Source:/.test(String(prepareStage({ stage: "partial", email: "a@example.com", src: "<script>" }).body.blurb)));
+  const d = prepareStage({ roles: ["brand"], blurb: "x" });
+  assert.deepEqual([d.stage, d.body.blurb, d.error], [null, "x", undefined]);
+});

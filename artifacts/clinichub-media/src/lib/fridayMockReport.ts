@@ -8,11 +8,12 @@ import type { IntakePayload } from "../../../api-server/src/lib/overhaul/brandIn
 import { CHANNEL_TILES, PROPOSED_ANCHOR_HUBS, RATE_PLACEMENTS, hubFit, projectPublisher } from "../../../api-server/src/lib/overhaul/brandIntake";
 import { KIT_CALC_CONFIG, kitCalc } from "../../../api-server/src/lib/kitCalc";
 import { toBirchCategory } from "../../../api-server/src/lib/kitCalc/fridayV12";
+import { matchHubs, type BrandCtx } from "../../../api-server/src/lib/overhaul/hubMatch";
 
 const FK: Record<string, string> = { "scale-hubs": "hubs", "calm-joints": "calm_joints", "street-team": "street_team", "retail-network": "retail" };
 const lh = (r: readonly [number, number]) => ({ low: r[0], high: r[1] });
 
-export function mockReport(payload: IntakePayload, body: Record<string, unknown>, view: ReportView, version: number, updated: string, roles: string[], mirror?: "published" | "held"): FridayReport {
+export function mockReport(payload: IntakePayload, body: Record<string, unknown>, view: ReportView, version: number, updated: string, roles: string[], mirror?: "published" | "held", brandCtx?: BrandCtx): FridayReport {
   const calc = body.calculator as { avg_cart_usd?: number; orders_per_month?: number; purchases_per_year?: number; margin_band?: string } | undefined;
   const k = payload.kit_calculator;
   const c = kitCalc({ aovUsd: k?.aov_usd ?? calc?.avg_cart_usd ?? 0, monthlyOrders: k?.monthly_orders ?? calc?.orders_per_month ?? 0, purchasesPerYear: k?.purchases_per_year_range ?? calc?.purchases_per_year ?? 1, marginBand: k?.margin_band ?? calc?.margin_band ?? "" });
@@ -42,9 +43,11 @@ export function mockReport(payload: IntakePayload, body: Record<string, unknown>
     demand_fit: {
       label: "Estimate · subject to human confirmation",
       channels: CHANNEL_TILES.map((t, i) => ({ key: FK[t.key]!, name: t.name, fit: [80, 50, 50, 50][i]!, fit_label: i === 0 ? "Good fit (mock)" : "Possible fit (mock)", subject_to_human_confirmation: true })),
-      anchor_hubs: PROPOSED_ANCHOR_HUBS.map((h) => {
+      // Hub matching rules (hubMatch.ts): conflicts stay in the list, flagged hidden for an approver; never rendered.
+      anchor_hubs: matchHubs(PROPOSED_ANCHOR_HUBS.map((h) => h.key), { category: k?.category ?? "recovery", ...brandCtx }).map((d) => {
+        const h = PROPOSED_ANCHOR_HUBS.find((x) => x.key === d.key)!;
         const f = fits.find((x) => x.key === h.key)!;
-        return { key: h.key, name: h.name, status: h.live ? "Live" : "In queue", confirmed_anchor: false, fit: f.fit === "Likely fit" ? 80 : 40, fit_label: `${f.fit === "Likely fit" ? "Good fit" : "Possible fit"} (mock)`, reason: h.what, subject_to_human_confirmation: true };
+        return { key: h.key, name: h.name, status: h.live ? "Live" : "In queue", confirmed_anchor: false, fit: f.fit === "Likely fit" ? 80 : 40, fit_label: `${f.fit === "Likely fit" ? "Good fit" : "Possible fit"} (mock)`, reason: h.what, subject_to_human_confirmation: true , ...(d.hidden ? { hidden: true, flag: d.reason ?? "conflict" } : {})};
       }),
     },
     channels: CHANNEL_TILES.map((t) => ({ key: FK[t.key]!, name: t.name, figures: t.key === "retail-network" ? ["120+ retail hubs", "1MM+ recovery customers", "Canada + USA"] : t.stats.map((s) => `${s.v} ${s.l}`), figures_label: "network figures / targets", fit: 0, fit_label: "", line: t.line, image: "image" in t ? t.image : null })),
@@ -87,9 +90,9 @@ export function quickReport(o: { roles: string[]; category: string; host: string
     publisher: { mode: "display", size_x: 1, conversion_pct: 1, value_per_conversion_usd: 0, surfaces: ["post_purchase", "home", "product", "member_dashboard", "newsletter"].map((key) => ({ key, on: true })) },
   } as unknown as IntakePayload;
   const body = { calculator: { avg_cart_usd: o.aovUsd ?? QUICK_DEFAULTS.aov_usd, orders_per_month: QUICK_DEFAULTS.orders_per_month, purchases_per_year: QUICK_DEFAULTS.purchases_per_year, margin_band: QUICK_DEFAULTS.margin_band } };
-  const r = mockReport(payload, body, o.roles.includes("publisher") ? "publisher" : "brand", 1, new Date().toISOString(), o.roles);
+  const r = mockReport(payload, body, o.roles.includes("publisher") ? "publisher" : "brand", 1, new Date().toISOString(), o.roles, undefined, { domain: o.host, category: o.category });
   const unmock = (s: string) => s.replace(/\s*\(mock\)/g, "");
-  r.brand = { name: o.name || o.host, domain: o.host };
+  r.brand = { name: o.name || o.host, domain: o.host, category: o.category };
   if (r.demand_fit) {
     r.demand_fit.channels = r.demand_fit.channels.map((c) => ({ ...c, fit_label: unmock(c.fit_label) }));
     r.demand_fit.anchor_hubs = r.demand_fit.anchor_hubs.map((h) => ({ ...h, fit_label: unmock(h.fit_label) }));
