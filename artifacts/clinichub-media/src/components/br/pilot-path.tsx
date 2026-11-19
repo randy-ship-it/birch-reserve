@@ -15,7 +15,7 @@ export function PilotHero({ testId = "pilot-hero", headingLevel = 2 }: { testId?
           <H className="mt-3 font-display text-4xl leading-[1.02] md:text-6xl">{PILOT_HERO.title}</H>
           <p className="mt-3 text-lg text-lime-200 md:text-xl">{PILOT_HERO.sub}</p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <a href={PILOT_HERO.kitHref} data-testid={`${testId}-kit`} className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-lime-300 px-7 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 transition hover:bg-white"><Download className="size-5" />Download my kit</a>
+            <a href={PILOT_HERO.kitHref} data-testid={`${testId}-kit`} className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-lime-300 px-7 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 transition hover:bg-white"><Download className="size-5" />Get my Monetization Kit</a>
             <a href={PILOT_HERO.lookHref} data-testid={`${testId}-look`} className="inline-flex h-14 items-center justify-center gap-2 rounded-full border-2 border-white/80 px-7 text-base font-bold transition hover:bg-white hover:text-[#0b1f3a]">Start the $190 USD look <ArrowRight className="size-5" /></a>
           </div>
           <p className="mt-4 max-w-xl text-sm text-white/80" data-testid={`${testId}-terms`}>{PILOT_HERO.lookTerms}</p>
@@ -147,7 +147,7 @@ export function KitEntry({ from }: { from: string }) {
     <section data-testid={`kit-entry-${from}`} className="border-b border-border/70 bg-lime-200">
       <div className="container mx-auto flex flex-col gap-3 px-4 py-5 md:flex-row md:items-center md:justify-between">
         <p className="font-display text-xl text-[#0b1f3a] md:text-2xl">Get your personalized Monetization Kit: revenue + exposure, in four numbers. <span className="text-sm font-sans text-[#0b1f3a]/70">Estimate</span></p>
-        <a href="/brand-kit#my-kit" className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-6 text-sm font-bold text-lime-300"><Download className="size-4" />Download my kit</a>
+        <a href="/brand-kit#my-kit" className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-6 text-sm font-bold text-lime-300"><Download className="size-4" />Get my Monetization Kit</a>
       </div>
     </section>
   );

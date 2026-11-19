@@ -156,7 +156,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
       <div className="container mx-auto grid gap-6 px-4 py-10 md:py-14 lg:grid-cols-[minmax(0,26rem)_1fr]">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Your personalized Monetization Kit</p>
-          <h2 className="font-display text-4xl leading-[1.02] md:text-5xl">Download my kit</h2>
+          <h2 className="font-display text-4xl leading-[1.02] md:text-5xl">Get my Monetization Kit</h2>
           <p className="mt-2 text-sm text-muted-foreground">Four quick numbers. A two-sided kit: your revenue opportunity and your exposure opportunity.</p>
           <div className="mt-2"><SaveChip state={state} version={ref?.version} /></div>
           <div className="mt-5 grid grid-cols-2 gap-3">
