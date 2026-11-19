@@ -3,6 +3,15 @@ import { usePageMeta } from "@/components/br/ui";
 import { MockBanner } from "@/components/br/intake-kit";
 import { IntakeShortForm } from "@/components/br/intake-short-form";
 import { SampleKit } from "@/components/br/sample-kit";
+import { CtaBand, SampleLeadStatus } from "@/components/br/intake-sell";
+import { ActivationRange } from "@/components/br/intake-geo";
+import { kitCalc } from "../../../../api-server/src/lib/kitCalc";
+import { advertiserActivation, publisherActivation } from "../../../../api-server/src/lib/kitCalc/activation";
+import { SAMPLE_INPUTS } from "@/lib/kitView";
+
+/** Sample-only inputs (example values, not a real brand or hub). */
+const SAMPLE_AD = advertiserActivation(kitCalc({ aovUsd: SAMPLE_INPUTS.aovUsd, monthlyOrders: SAMPLE_INPUTS.monthlyOrders, purchasesPerYear: SAMPLE_INPUTS.repeat, marginBand: SAMPLE_INPUTS.marginBand, spendUsd: SAMPLE_INPUTS.spendUsd, conversionPct: SAMPLE_INPUTS.conversionPct }).revenueOppUsd, { sells_in: ["CA", "US"], ships_to: ["CA", "US"], regions: ["BC"] });
+const SAMPLE_PUB = publisherActivation({ on: { post_purchase: true, home: true }, mode: "cpm", sizeX: 1, conversionPct: 0, valuePerConversionUsd: 0 });
 
 export default function BrIntake() {
   usePageMeta("Get your media kit | Birch Reserve, powered by Friday", "Three fields. A two-sided media kit: your revenue opportunity and your exposure fit. Estimates only, reviewed by a person.");
@@ -13,11 +22,19 @@ export default function BrIntake() {
         <div className="container mx-auto max-w-5xl px-4 pb-8 pt-10 md:pt-16">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · powered by Friday</p>
           <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Get your media kit.</h1>
-          <p className="mt-2 max-w-xl text-base text-muted-foreground">Three fields. We send back your revenue opportunity and where your brand fits across the network.</p>
+          <p className="mt-2 max-w-xl text-base text-muted-foreground">Pick your side. Advertisers get a two-sided kit: revenue opportunity and where the brand fits across the network. Publishers get what their hub could earn.</p>
           <div className="mt-6"><IntakeShortForm /></div>
         </div>
       </section>
-      <div className="container mx-auto px-4 pb-14 pt-6"><SampleKit /></div>
+      <div className="container mx-auto px-4 pb-10 pt-6">
+        <SampleKit />
+        <div className="mt-6 grid gap-4 lg:grid-cols-2" data-testid="sample-activation">
+          <ActivationRange kind="advertiser" block={SAMPLE_AD} source="sample" testId="sample-activation-advertiser" />
+          <ActivationRange kind="publisher" block={SAMPLE_PUB} source="sample" testId="sample-activation-publisher" />
+        </div>
+        <div className="mt-4 max-w-2xl"><SampleLeadStatus /></div>
+      </div>
+      <CtaBand side="advertiser" where="intake" />
     </div>
   );
 }

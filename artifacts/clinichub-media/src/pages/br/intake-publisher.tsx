@@ -2,6 +2,10 @@ import { useMemo, useState } from "react";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Sparkles, TrendingUp, Layers } from "lucide-react";
 import { usePageMeta } from "@/components/br/ui";
+import { ActivationRange, DEFAULT_MARKET, MarketPicker, pickActivation } from "@/components/br/intake-geo";
+import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
+import { publisherActivation } from "../../../../api-server/src/lib/kitCalc/activation";
+import { trackIntake } from "@/lib/intakeTrack";
 import { CountUp, EstimateTag, InfoPop, MockBanner, RoleTabs, SaveChip, Segmented, Toggle, basePayload, useAutosave, ChannelTiles, ContactSubmit } from "@/components/br/intake-kit";
 import { PAYOUT, PUBLISHER_ASSUMPTIONS, PUBLISHER_SURFACES, projectPublisher, type PricingMode, type PubSurfaceKey } from "../../../../api-server/src/lib/overhaul/brandIntake";
 
@@ -16,14 +20,16 @@ export default function BrIntakePublisher() {
   const [conv, setConv] = useState(0);
   const [value, setValue] = useState(0);
   const [touched, setTouched] = useState(false);
+  const [market, setMarket] = useState<Market>(DEFAULT_MARKET);
   const p = useMemo(() => projectPublisher({ on, mode, sizeX, conversionPct: conv, valuePerConversionUsd: value }), [on, mode, sizeX, conv, value]);
   const touch = <T,>(f: (v: T) => void) => (v: T) => {
+    if (!touched) trackIntake("publisher", "field_start", "inputs", { dedupe: true });
     setTouched(true);
     f(v);
   };
   const payload = useMemo(
-    () => ({ ...basePayload("publisher"), publisher: { surfaces: p.rows.map((r) => ({ key: r.key, on: r.on })), mode, size_x: sizeX, conversion_pct: conv, value_per_conversion_usd: value } }),
-    [p, mode, sizeX, conv, value],
+    () => ({ ...basePayload("publisher"), publisher: { surfaces: p.rows.map((r) => ({ key: r.key, on: r.on })), mode, size_x: sizeX, conversion_pct: conv, value_per_conversion_usd: value }, ...(market.sells_in.length ? { market } : {}) }),
+    [p, mode, sizeX, conv, value, market],
   );
   const { ref, state, setRef } = useAutosave("publisher", payload, touched);
   const chart = p.rows.filter((r) => r.on && r.priced).map((r) => ({ name: r.label, ramp: r.payoutUsd[0], normalized: r.payoutUsd[1] - r.payoutUsd[0] }));
@@ -196,8 +202,12 @@ export default function BrIntakePublisher() {
           </ol>
         </div>
       </section>
+      <section className="container mx-auto grid gap-4 px-4 pb-6 lg:grid-cols-[minmax(0,22rem)_1fr]">
+        <MarketPicker value={market} onChange={touch(setMarket)} side="publisher" />
+        <ActivationRange kind="publisher" {...pickActivation(undefined, publisherActivation({ on, mode, sizeX, conversionPct: conv, valuePerConversionUsd: value }))} />
+      </section>
       <section className="container mx-auto px-4 pb-8"><ContactSubmit role="publisher" payload={payload} draft={ref} setRef={setRef} label="Send to Birch" /></section>
-      <ChannelTiles />
+      <ChannelTiles market={market} />
     </div>
   );
 }

@@ -1,4 +1,9 @@
 /** Shared bits for the Birch brand intake (preview). Mobile-first; fine print lives in popovers. */
+import { CHANNEL_GEO, type Eligibility, type Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
+import { EligChip, eligibilityOf } from "@/components/br/intake-geo";
+import { CtaBand, LeadGatesStatus, PrimaryCta, sideOf } from "@/components/br/intake-sell";
+import { errorDetail, fieldStart, trackIntake } from "@/lib/intakeTrack";
+import type { LeadGates } from "@/lib/fridayBrandIntake";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { animate } from "framer-motion";
 import { Info, Store, Megaphone, Target, Check, CloudUpload, FlaskConical } from "lucide-react";
@@ -97,29 +102,40 @@ export function MockBanner() {
   );
 }
 
-const ROLES: Array<{ key: IntakeRole; label: string; href: string; icon: typeof Store }> = [
-  { key: "publisher", label: "Publisher", href: "/intake/publisher", icon: Store },
-  { key: "supplier", label: "Supplier", href: "/intake/supplier", icon: Target },
-  { key: "sponsor", label: "Sponsor", href: "/intake/sponsor", icon: Megaphone },
+/** Two sides (Randy via Emma, 10:44 PM ET): Advertiser = Brand kit · Supplier · Sponsor; Publisher on its own. */
+const ROLE_SIDES: Array<{ side: "advertiser" | "publisher"; label: string; roles: Array<{ key: IntakeRole; label: string; href: string; icon: typeof Store }> }> = [
+  { side: "advertiser", label: "Advertiser", roles: [
+    { key: "kit", label: "Brand kit", href: "/brand-kit#my-kit", icon: Target },
+    { key: "supplier", label: "Supplier", href: "/intake/supplier", icon: Target },
+    { key: "sponsor", label: "Sponsor", href: "/intake/sponsor", icon: Megaphone },
+  ] },
+  { side: "publisher", label: "Publisher", roles: [{ key: "publisher", label: "Publisher", href: "/intake/publisher", icon: Store }] },
 ];
 
 export function RoleTabs({ active }: { active?: IntakeRole }) {
+  const side = active ? sideOf(active) : "advertiser";
+  useEffect(() => {
+    if (active) trackIntake(side, "view", active === "kit" ? "brand_kit" : active, { dedupe: true });
+    else trackIntake(side, "view", "intake", { dedupe: true });
+  }, [active, side]);
   return (
-    <nav aria-label="Choose your role" className="sticky top-16 z-30 border-b border-border/70 bg-background/90 backdrop-blur">
-      <div className="container mx-auto flex gap-1 overflow-x-auto px-4 py-2">
-        {ROLES.map((r) => (
-          <a
-            key={r.key}
-            href={r.href}
-            data-testid={`role-tab-${r.key}`}
-            aria-current={active === r.key ? "page" : undefined}
-            className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${active === r.key ? "bg-foreground text-background" : "text-foreground/70 hover:bg-foreground/5"}`}
-          >
-            <r.icon className="size-4" aria-hidden /> {r.label}
-          </a>
-        ))}
-      </div>
-    </nav>
+    <>
+      <nav aria-label="Choose your side" className="sticky top-16 z-30 border-b border-border/70 bg-background/90 backdrop-blur">
+        <div className="container mx-auto flex items-center gap-3 overflow-x-auto px-4 py-2">
+          {ROLE_SIDES.map((g) => (
+            <div key={g.side} data-testid={`role-side-${g.side}`} className={`flex shrink-0 items-center gap-1 rounded-full p-1 ${side === g.side && active ? "bg-foreground/[0.06]" : ""}`}>
+              <span className="px-2 text-[10px] font-bold uppercase tracking-wider text-foreground/55">{g.label}</span>
+              {g.roles.map((r) => (
+                <a key={r.key} href={r.href} data-testid={`role-tab-${r.key}`} aria-current={active === r.key ? "page" : undefined} className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${active === r.key ? "bg-foreground text-background" : "text-foreground/70 hover:bg-foreground/5"}`}>
+                  <r.icon className="size-4" aria-hidden /> {g.side === "publisher" ? "Hub payouts" : r.label}
+                </a>
+              ))}
+            </div>
+          ))}
+        </div>
+      </nav>
+      {active ? <CtaBand side={side} where={active === "kit" ? "brand_kit" : active} /> : null}
+    </>
   );
 }
 
@@ -193,13 +209,17 @@ const TILE_ART: Record<string, ReactNode> = {
   ),
 };
 
-export function ChannelTiles() {
+export function ChannelTiles({ market, fridayGeo }: { market?: Market | null; fridayGeo?: Array<{ key: string; eligibility: Eligibility }> } = {}) {
+  const geoOf = (k: string) => CHANNEL_GEO.find((g) => g.key === k);
+  const rows = CHANNEL_TILES.map((t) => ({ t, g: geoOf(t.key), el: geoOf(t.key) ? eligibilityOf(geoOf(t.key)!.key, market, fridayGeo).e : ("now" as Eligibility) }));
+  const shown = rows.filter((r) => r.el !== "not_available");
+  const hidden = rows.filter((r) => r.el === "not_available");
   return (
     <section data-testid="channel-tiles" className="container mx-auto px-4 py-10 md:py-14">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Grow your reach with Scale</p>
-          <h2 className="font-display text-3xl md:text-4xl">Four channels, one intake</h2>
+          <h2 className="font-display text-3xl md:text-4xl">{hidden.length ? "Channels in your markets" : "Four channels, one intake"}</h2>
         </div>
         <div className="flex items-center gap-3">
           <span className="rounded-full bg-sky-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-sky-900 ring-1 ring-sky-300" data-testid="network-figures-label">{CHANNEL_TILES_LABEL}</span>
@@ -209,14 +229,15 @@ export function ChannelTiles() {
         </div>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {CHANNEL_TILES.map((t) => (
-          <article key={t.key} data-testid={`channel-tile-${t.key}`} className="relative isolate flex min-h-56 flex-col justify-end overflow-hidden rounded-2xl bg-[#0b1f3a] p-5 text-white shadow-lg">
+        {shown.map(({ t, g, el }) => (
+          <article key={t.key} data-testid={`channel-tile-${t.key}`} data-eligibility={el} className="relative isolate flex min-h-56 flex-col justify-end overflow-hidden rounded-2xl bg-[#0b1f3a] p-5 text-white shadow-lg">
             {"image" in t && t.image ? (
               <img src={t.image} alt="Street team route areas shown as an area-level heat map. No homes or addresses." className="absolute inset-0 -z-10 h-full w-full object-cover opacity-70" loading="lazy" />
             ) : (
               <div className="absolute inset-0 -z-10">{TILE_ART[t.key]}</div>
             )}
             <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#0b1f3a] via-[#0b1f3a]/70 to-transparent" />
+            {g ? <div className="mb-2"><EligChip e={el} geo={g.label} /></div> : null}
             <h3 className="font-display text-2xl">{t.name}</h3>
             {t.stats.length ? (
               <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2">
@@ -234,6 +255,7 @@ export function ChannelTiles() {
           </article>
         ))}
       </div>
+      {hidden.length ? <p className="mt-3 text-xs text-muted-foreground" data-testid="channel-tiles-hidden-note">{hidden.map((h) => `${h.t.name} (${h.g?.label ?? ""})`).join(", ")}: not in your markets yet, so not shown.</p> : null}
     </section>
   );
 }
@@ -245,10 +267,13 @@ export function ContactSubmit({ role, payload, draft, setRef, label }: { role: I
   const [hp, setHp] = useState("");
   const [state, setState] = useState<"idle" | "busy" | "done" | "error">("idle");
   const [err, setErr] = useState<string | null>(null);
+  const [gates, setGates] = useState<LeadGates | null>(null);
   const t0 = useRef(Date.now());
+  const side = sideOf(role);
   async function go() {
     setErr(null);
     if (hp) return setState("done");
+    trackIntake(side, "step_complete", "contact");
     setState("busy");
     try {
       const api = fridayIntake();
@@ -257,22 +282,29 @@ export function ContactSubmit({ role, payload, draft, setRef, label }: { role: I
       const next = { ...r, version: res.version };
       saveRef(role, next);
       setRef(next);
+      setGates({ partner_match: res.partner_match, inventory_approval: res.inventory_approval, mock: res.mock });
+      trackIntake(side, "submit", role === "kit" ? "kit" : role);
       setState("done");
     } catch (e) {
       const c = (e as Error).message;
+      trackIntake(side, "submit_error", errorDetail(c));
       setErr(c === "email" ? "Add a valid work email." : c === "website" ? "Add your website." : c === "too_fast" ? "One moment, then try again." : "Couldn't reach Friday. Nothing was sent.");
       setState("error");
     }
   }
   return (
-    <div data-testid={`${role}-contact-submit`} className="rounded-2xl border border-foreground/15 bg-white p-4">
+    <div id={`${role}-contact-submit`} data-testid={`${role}-contact-submit`} className="scroll-mt-32 rounded-2xl border border-foreground/15 bg-white p-4">
       {state === "done" ? (
-        <p data-testid={`${role}-pending-review`} className="text-sm">Received as <strong>pending approval</strong>. A person at Birch Reserve reviews every request; nothing is accepted automatically and nothing is booked or charged.</p>
+        <div>
+          <p data-testid={`${role}-pending-review`} className="text-sm">Received as <strong>pending approval</strong>. A person at Birch Reserve reviews every request; nothing is accepted automatically and nothing is booked or charged.</p>
+          <LeadGatesStatus gates={gates} testId={`${role}-lead-gates`} />
+          {side === "advertiser" ? <div className="mt-4"><PrimaryCta side="advertiser" where="done" /></div> : null}
+        </div>
       ) : (
         <>
           <div className="grid gap-2 md:grid-cols-[1fr_1fr_auto]">
-            <input data-testid={`${role}-website`} value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" aria-label="Website" className="h-11 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
-            <input data-testid={`${role}-email`} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email" aria-label="Work email" className="h-11 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
+            <input data-testid={`${role}-website`} onFocus={fieldStart(side, "website")} value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" aria-label="Website" className="h-11 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
+            <input data-testid={`${role}-email`} onFocus={fieldStart(side, "email")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email" aria-label="Work email" className="h-11 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
             <button type="button" data-testid={`${role}-submit`} onClick={go} disabled={state === "busy"} className="h-11 rounded-full bg-foreground px-5 text-sm font-bold text-background">{label}</button>
           </div>
           <input tabIndex={-1} aria-hidden autoComplete="off" name="company_url" value={hp} onChange={(e) => setHp(e.target.value)} className="absolute -left-[9999px] h-0 w-0 opacity-0" />

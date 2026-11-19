@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { Lock, MapPin, Timer, ArrowRight } from "lucide-react";
 import { usePageMeta } from "@/components/br/ui";
+import { ActivationRange, DEFAULT_MARKET, MarketPicker, pickActivation } from "@/components/br/intake-geo";
+import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
+
 import { ChannelTiles, ContactSubmit, EstimateTag, InfoPop, MockBanner, RoleTabs, basePayload } from "@/components/br/intake-kit";
 import type { IntakeRef } from "@/lib/fridayBrandIntake";
 import { SPONSOR_OFFERS, SUPPLIER_CATEGORIES, HUB_RATE_RANGE } from "../../../../api-server/src/lib/overhaul/brandIntake";
@@ -11,7 +14,8 @@ export default function BrIntakeSponsor() {
   usePageMeta("Sponsor: lock a category or an area | Birch Reserve", "Start with the $190 USD 7-day look, the $490 USD category reserve or the $3,500 USD area lock launch price.");
   const [cat, setCat] = useState(SUPPLIER_CATEGORIES[0]!.key);
   const [ref, setRef] = useState<IntakeRef | null>(null);
-  const payload = { ...basePayload("sponsor"), sponsor: { interest: [], category: cat } };
+  const [market, setMarket] = useState<Market>(DEFAULT_MARKET);
+  const payload = { ...basePayload("sponsor"), sponsor: { interest: [], category: cat }, ...(market.sells_in.length ? { market } : {}) };
   return (
     <div className="bg-[radial-gradient(ellipse_at_top,_#fef9c3_0%,_transparent_55%)]">
       <MockBanner />
@@ -63,7 +67,8 @@ export default function BrIntakeSponsor() {
         </div>
       </section>
       <section className="container mx-auto px-4 pb-8"><ContactSubmit role="sponsor" payload={payload} draft={ref} setRef={setRef} label="Send lock interest" /></section>
-      <ChannelTiles />
+      <section className="container mx-auto max-w-xl px-4 pt-6"><MarketPicker value={market} onChange={setMarket} /></section>
+      <ChannelTiles market={market} />
     </div>
   );
 }

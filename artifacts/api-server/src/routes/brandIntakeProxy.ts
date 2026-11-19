@@ -33,7 +33,8 @@ const VIEWS = new Set(["brand", "publisher", "supplier", "sponsor"]);
 export function fridayBrandConfig(env: Env = process.env): { base: string; key: string; org: string } | null {
   if (env.FRIDAY_PUSH_DISABLED === "true") return null;
   const base = env.FRIDAY_API_URL?.trim().replace(/\/+$/, "").replace(/\/api(\/intake)?$/i, "");
-  const key = env.FRIDAY_API_KEY?.trim();
+  // brand-intake-v1 names INTAKE_WEBHOOK_SECRET; the existing Birch → Friday key is the fallback.
+  const key = (env.INTAKE_WEBHOOK_SECRET || env.FRIDAY_API_KEY)?.trim();
   if (!base || !key) return null;
   return { base, key, org: env.FRIDAY_WORKSPACE?.trim() || "birchreserve" };
 }
@@ -67,6 +68,54 @@ function legacyLead(body: Record<string, unknown>, path: string) {
   };
 }
 
+/** QA submissions from Birch previews (test@ / test+…@silverbirchgrowth.com) are marked TEST in Friday. */
+export const TEST_EMAIL_RE = /^test(\+[a-z0-9._-]+)?@silverbirchgrowth\.com$/i;
+export function markTest(body: unknown): unknown {
+  if (!body || typeof body !== "object") return body;
+  const b = body as Record<string, unknown>;
+  if (typeof b.email !== "string" || !TEST_EMAIL_RE.test(b.email)) return body;
+  const note = "[TEST] Birch preview QA record (br-preview). Not a real brand. Safe to delete.";
+  return { ...b, blurb: typeof b.blurb === "string" && b.blurb ? `${note} ${b.blurb}`.slice(0, 6000) : note };
+}
+
+const MATCH = new Set(["linked", "none", "checking"]);
+const APPROVAL = new Set(["pending", "approved", "declined", "not_required"]);
+/**
+ * Friday's hub-partner match and inventory approval gate reach the browser as status enums ONLY
+ * (assumed names partner_match / inventory_approval, see CONTRACT-GAPS.md). Any partner name, id, approver
+ * or note Friday might add is dropped here, so public views never carry private partners.
+ */
+export function publicGates(text: string): string {
+  let d: unknown;
+  try {
+    d = JSON.parse(text);
+  } catch {
+    return text;
+  }
+  if (!d || typeof d !== "object") return text;
+  const clean = (o: Record<string, unknown>) => {
+    // v1.1 may send a boolean flag instead of a status object.
+    if (typeof o.existing_hub_partner_lead === "boolean") {
+      if (!("partner_match" in o)) o.partner_match = { status: o.existing_hub_partner_lead ? "linked" : "none" };
+      delete o.existing_hub_partner_lead;
+    }
+    for (const [k, ok] of [["partner_match", MATCH], ["inventory_approval", APPROVAL]] as const) {
+      if (!(k in o)) continue;
+      const st = (o[k] as { status?: unknown } | null)?.status;
+      if (typeof st === "string" && ok.has(st)) o[k] = { status: st };
+      else delete o[k];
+    }
+  };
+  const root = d as Record<string, unknown>;
+  clean(root);
+  const rep = root.report as Record<string, unknown> | undefined;
+  if (rep && typeof rep === "object") {
+    clean(rep);
+    if (rep.status && typeof rep.status === "object") clean(rep.status as Record<string, unknown>);
+  }
+  return JSON.stringify(root);
+}
+
 export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fetch; log?: (msg: string, extra?: Record<string, unknown>) => void } = {}) {
   const router = Router();
   const body = json({ limit: "64kb" });
@@ -93,10 +142,10 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       return null;
     }
   }
-  const send = (res: Response, out: { status: number; text: string }) => res.status(out.status).type("application/json").send(out.text || "{}");
+  const send = (res: Response, out: { status: number; text: string }) => res.status(out.status).type("application/json").send(publicGates(out.text || "{}"));
 
   router.post("/v1/brand-intake", body, async (req, res) => {
-    const out = await forward(req, res, "POST", "/api/public/brand-intake", req.body ?? {});
+    const out = await forward(req, res, "POST", "/api/public/brand-intake", markTest(req.body ?? {}));
     if (!out) return;
     if (out.status === 404) {
       // v1 not deployed. Drafts (no email yet) stay in the browser; only a submission with contact details is
@@ -115,7 +164,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
   router.patch("/v1/brand-intake/:id", body, async (req, res) => {
     const id = String(req.params.id);
     if (!ID_RE.test(id)) return void res.status(404).json({ ok: false, error: "not_found" });
-    const out = await forward(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, req.body ?? {});
+    const out = await forward(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, markTest(req.body ?? {}));
     if (!out) return;
     send(res, out);
   });

@@ -16,6 +16,13 @@ import { kitSideA, kitSideB, kitPdfBlob, kitPngBlob, saveBlob, imageToDataUrl } 
 import { previewView, fridayView, type KitView } from "@/lib/kitView";
 import { EDIT_TOKEN_WARNING, HELD_COPY, adoptResumeFragment, fridayIntake, reportPath, resumeLink, saveRef, type FridayReport } from "@/lib/fridayBrandIntake";
 import { EstimateTag, InfoPop, MockBanner, basePayload, useAutosave, SaveChip } from "@/components/br/intake-kit";
+import { ActivationRange, DEFAULT_MARKET, MarketPicker, pickActivation } from "@/components/br/intake-geo";
+import { LeadGatesStatus, PrimaryCta } from "@/components/br/intake-sell";
+import { advertiserActivation } from "../../../../api-server/src/lib/kitCalc/activation";
+import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
+import { withGeo } from "@/lib/kitView";
+import { errorDetail, trackIntake } from "@/lib/intakeTrack";
+import type { LeadGates } from "@/lib/fridayBrandIntake";
 
 const numIn = "mt-1 h-12 w-full rounded-xl border border-foreground/20 bg-white px-3 text-base tabular-nums outline-none focus:border-foreground focus:ring-2 focus:ring-accent";
 const lab = "block text-[11px] font-bold uppercase tracking-wider text-foreground/60";
@@ -32,6 +39,8 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
   const [band, setBand] = useState(KIT_CALC_CONFIG.marginBands[1]!.key);
   const [spend, setSpend] = useState(KIT_CALC_CONFIG.spendLevels[0]!.usd);
   const [conv, setConv] = useState(KIT_CALC_CONFIG.defaultConversionPct);
+  const [market, setMarket] = useState<Market>(DEFAULT_MARKET);
+  const [gates, setGates] = useState<LeadGates | null>(null);
   const [touched, setTouched] = useState(false);
   const [side, setSide] = useState<"a" | "b">("a");
   const [step, setStep] = useState<"inputs" | "contact">("inputs");
@@ -48,8 +57,9 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
   useState(() => adoptResumeFragment("kit")); // #edit=… → localStorage before autosave reads the ref
   useEffect(() => {
     imageToDataUrl("/street-team/door-route.jpg").then(setMap);
+    trackIntake("advertiser", "view", window.location.pathname.startsWith("/media-kit") ? "media_kit" : "brand_kit", { dedupe: true });
   }, []);
-  const tap = <T,>(f: (v: T) => void) => (v: T) => { setTouched(true); setReport(null); f(v); };
+  const tap = <T,>(f: (v: T) => void) => (v: T) => { if (!touched) trackIntake("advertiser", "field_start", "inputs", { dedupe: true }); setTouched(true); setReport(null); f(v); };
 
   const ppyR = repeatRange(repeat);
   const repeatLabel = KIT_CALC_CONFIG.repeatBands.find((b) => b.key === repeat)!.label;
@@ -58,14 +68,16 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
   const brandLabel = brand.trim().slice(0, 40);
   const payload: IntakePayload = {
     ...basePayload("kit"),
+    ...(market.sells_in.length || market.ships_to.length ? { market } : {}),
     kit_calculator: { aov_usd: aov, monthly_orders: orders, purchases_per_year: ppyR[0], purchases_per_year_range: ppyR, repeat_band: repeat, margin_band: band, spend_usd: spend, conversion_pct: conv, category: cat, brand_label: brandLabel || undefined, calc_version: KIT_CALC_CONFIG.version },
   };
   const { ref, state, setRef } = useAutosave("kit", payload, touched);
 
   const view: KitView = useMemo(
-    () => (report ? fridayView(report, calc, { brand: brandLabel, categoryLabel: catLabel, repeatLabel, mapDataUrl: map }) : previewView(calc, { brand: brandLabel, categoryKey: cat, categoryLabel: catLabel, repeatLabel, mapDataUrl: map })),
-    [report, calc, brandLabel, cat, map], // eslint-disable-line react-hooks/exhaustive-deps
+    () => withGeo(report ? fridayView(report, calc, { brand: brandLabel, categoryLabel: catLabel, repeatLabel, mapDataUrl: map }) : previewView(calc, { brand: brandLabel, categoryKey: cat, categoryLabel: catLabel, repeatLabel, mapDataUrl: map }), market, report?.geo?.channels),
+    [report, calc, brandLabel, cat, map, market], // eslint-disable-line react-hooks/exhaustive-deps
   );
+  const act = pickActivation(report?.activation?.advertiser_exposure_usd, advertiserActivation(view.revenueOpp, market));
   const svgA = useMemo(() => kitSideA(view), [view]);
   const svgB = useMemo(() => kitSideB(view), [view]);
 
@@ -73,11 +85,16 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
     const slug = (brandLabel || "my").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "my";
     saveBlob(await kitPdfBlob([svgA, svgB]), `birch-reserve-kit-${slug}.pdf`);
     saveBlob(await kitPngBlob([svgA, svgB]), `birch-reserve-kit-${slug}.png`);
+    trackIntake("advertiser", "kit_download", "pdf");
+    trackIntake("advertiser", "kit_download", "png");
     if (reportToken) for (const f of ["pdf", "png"] as const) await fridayIntake().download(reportToken, f).catch(() => undefined); // kit_download lead event
   }
 
   async function getKit() {
-    if (step === "inputs" && !report) return setStep("contact");
+    if (step === "inputs" && !report) {
+      trackIntake("advertiser", "step_complete", "calculator");
+      return setStep("contact");
+    }
     setErr(null);
     setBusy("busy");
     try {
@@ -86,6 +103,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
         return setBusy("done");
       }
       if (hp) return setBusy("done"); // honeypot: pretend success, send nothing
+      trackIntake("advertiser", "step_complete", "contact");
       const api = fridayIntake();
       const r0 = ref ?? (await api.create(payload));
       const r1 = await api.update(r0, payload).catch(() => r0);
@@ -93,19 +111,26 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
       const next = { ...r1, version: sub.version };
       saveRef("kit", next);
       setRef(next);
+      trackIntake("advertiser", "submit", "kit");
+      setGates({ partner_match: sub.partner_match, inventory_approval: sub.inventory_approval, mock: sub.mock });
       if (sub.public_mirror === "held") {
         setHeld(true);
         await exportKit(next.reportToken); // preview kit only; Friday's numbers are released after review
         return setBusy("done");
       }
       const rep = await api.reportView(next.reportToken, "brand");
-      if (rep?.ready) setReport(rep.report);
+      if (rep?.ready) {
+        setReport(rep.report);
+        const st = rep.report.status;
+        if (st?.partner_match || st?.inventory_approval) setGates((g) => ({ partner_match: st.partner_match ?? g?.partner_match, inventory_approval: st.inventory_approval ?? g?.inventory_approval, mock: !!rep.report.mock }));
+      }
       else {
         setQueued(true); // received by Friday; the full report is released once Friday's kit report is live
         await exportKit(null);
       }
       setBusy("done");
     } catch (e) {
+      trackIntake("advertiser", "submit_error", errorDetail((e as Error).message));
       setErr(ERR[(e as Error).message] ?? "Couldn't reach Friday. Your inputs are saved on this device; try again.");
       setBusy("error");
     }
@@ -175,6 +200,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
                 ))}
               </div>
             </div>
+            <div className="col-span-2"><MarketPicker value={market} onChange={(m) => tap(setMarket)(m)} compact /></div>
             <label>
               <span className={lab}>Scale test spend</span>
               <select data-testid="kit-spend" value={spend} onChange={(e) => tap(setSpend)(Number(e.target.value))} className={numIn}>
@@ -197,21 +223,24 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
             <p className="text-xs text-white/70">Revenue opportunity {$(view.revenueOpp[0])}–{$(view.revenueOpp[1])} from a {$(spend)} USD test <EstimateTag /></p>
             {view.source === "friday" ? <p className="mt-1 text-[11px] text-lime-200/90">Channel fit: {view.fitHeader}</p> : null}
           </div>
+          <div className="mt-3"><ActivationRange kind="advertiser" block={act.block} source={act.source} /></div>
           {step === "contact" && !report && !held ? (
             <div className="mt-4 grid gap-2 rounded-2xl border border-foreground/15 bg-white p-4" data-testid="kit-contact">
               <p className="text-sm font-semibold">Where should we send your kit?</p>
               <p className="text-xs text-muted-foreground">Brand-level only. Friday checks the numbers and confirms fit by hand. Nothing is booked or charged.</p>
-              <input data-testid="kit-website" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" autoComplete="url" className={numIn} />
-              <input data-testid="kit-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourbrand.com" autoComplete="email" className={numIn} />
+              <input data-testid="kit-website" onFocus={() => trackIntake("advertiser", "field_start", "website", { dedupe: true })} value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" autoComplete="url" className={numIn} />
+              <input data-testid="kit-email" onFocus={() => trackIntake("advertiser", "field_start", "email", { dedupe: true })} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourbrand.com" autoComplete="email" className={numIn} />
               <input tabIndex={-1} aria-hidden autoComplete="off" name="company_url" value={hp} onChange={(e) => setHp(e.target.value)} className="absolute -left-[9999px] h-0 w-0 opacity-0" />
             </div>
           ) : null}
           {err ? <p className="mt-2 text-sm font-semibold text-red-700" data-testid="kit-error">{err}</p> : null}
           {queued ? <p className="mt-3 rounded-xl bg-lime-50 p-3 text-sm" data-testid="kit-queued">Received as pending review. Your kit above is a live preview; the full report from Friday follows after review.</p> : null}
           {held ? <p className="mt-3 flex gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900" data-testid="kit-held"><ShieldAlert className="size-4 shrink-0" />{HELD_COPY}</p> : null}
+          <LeadGatesStatus gates={gates} testId="kit-lead-gates" />
           <button type="button" data-testid="kit-download" onClick={getKit} disabled={busy === "busy"} className="mt-5 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 text-base font-bold text-accent-foreground shadow-lg shadow-lime-500/20 transition hover:bg-foreground hover:text-background">
             {busy === "busy" ? <Loader2 className="size-5 animate-spin" /> : busy === "done" ? <Check className="size-5" /> : <Download className="size-5" />} {busy === "done" ? "Kit downloaded (PDF + PNG)" : step === "contact" && !report ? "Get my kit" : "Download my kit"}
           </button>
+          {busy === "done" || queued || held ? <div className="mt-4" data-testid="kit-next-cta"><PrimaryCta side="advertiser" where="kit" /></div> : null}
           {ref && (report || held) ? (
             <div className="mt-3 space-y-1 text-sm" data-testid="kit-links">
               {report ? <Link href={reportPath(ref.reportToken)} className="font-semibold underline" data-testid="kit-report-link">Open your report</Link> : null}

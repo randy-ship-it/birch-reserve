@@ -1,6 +1,11 @@
 import { useMemo, useRef, useState } from "react";
 import { Eye, Radar, ShieldCheck, Send } from "lucide-react";
 import { usePageMeta } from "@/components/br/ui";
+import { ActivationRange, DEFAULT_MARKET, MarketPicker, pickActivation } from "@/components/br/intake-geo";
+import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
+import { LeadGatesStatus, PrimaryCta } from "@/components/br/intake-sell";
+import { errorDetail, fieldStart, trackIntake } from "@/lib/intakeTrack";
+import type { LeadGates } from "@/lib/fridayBrandIntake";
 import { ChannelTiles, EstimateTag, InfoPop, MockBanner, RoleTabs, SaveChip, Segmented, Toggle, basePayload, useAutosave } from "@/components/br/intake-kit";
 import { FIRST_LOOK, INTEREST_FINE, MAX_DISTRIBUTION, SUPPLIER_CATEGORIES, type TriState } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { fridayIntake, reportPath } from "@/lib/fridayBrandIntake";
@@ -14,6 +19,8 @@ export default function BrIntakeSupplier() {
   const [state, setState] = useState<Record<string, TriState>>(() => Object.fromEntries(SUPPLIER_CATEGORIES.map((c) => [c.key, c.rank <= 3 ? "on" : "maybe"])));
   const [fl, setFl] = useState<Record<string, boolean>>({});
   const [touched, setTouched] = useState(false);
+  const [market, setMarket] = useState<Market>(DEFAULT_MARKET);
+  const [gates, setGates] = useState<LeadGates | null>(null);
   const [sent, setSent] = useState<"idle" | "busy" | "pending_review" | "error">("idle");
   const [reportToken, setReportToken] = useState<string | null>(null);
   const [email, setEmail] = useState("");
@@ -22,8 +29,8 @@ export default function BrIntakeSupplier() {
   const t0 = useRef(Date.now());
   const top = Math.max(...SUPPLIER_CATEGORIES.map((c) => c.ordersYr));
   const payload = useMemo(
-    () => ({ ...basePayload("supplier"), supplier: { max_distribution: maxDist, categories: SUPPLIER_CATEGORIES.map((c) => ({ key: c.key, state: state[c.key]!, first_look: c.firstLook && state[c.key] !== "off" && !!fl[c.key] })) } }),
-    [maxDist, state, fl],
+    () => ({ ...basePayload("supplier"), supplier: { max_distribution: maxDist, categories: SUPPLIER_CATEGORIES.map((c) => ({ key: c.key, state: state[c.key]!, first_look: c.firstLook && state[c.key] !== "off" && !!fl[c.key] })) }, ...(market.sells_in.length ? { market } : {}) }),
+    [maxDist, state, fl, market],
   );
   const { ref, state: save } = useAutosave("supplier", payload, touched);
   const onCount = Object.values(state).filter((s) => s === "on").length;
@@ -37,9 +44,12 @@ export default function BrIntakeSupplier() {
       const r = ref ?? (await api.create(payload));
       const res = await api.submit(r, payload, { email: email.trim(), website: website.trim(), elapsed_ms: Date.now() - t0.current });
       setReportToken(r.reportToken);
+      setGates({ partner_match: res.partner_match, inventory_approval: res.inventory_approval, mock: res.mock });
+      trackIntake("advertiser", "submit", "supplier");
       setSent(res.status === "submitted" || Object.values(res.approvals ?? {}).includes("pending_review") ? "pending_review" : "error");
     } catch (e) {
       const code = e instanceof Error ? e.message : "";
+      trackIntake("advertiser", "submit_error", errorDetail(code));
       setErr(code === "email" ? "Add a valid work email." : code === "website" ? "Add your website." : code === "too_fast" ? "One moment, then try again." : "The Friday intake is not open yet. Nothing was sent.");
       setSent("error");
     }
@@ -124,8 +134,8 @@ export default function BrIntakeSupplier() {
           <ShieldCheck className="size-6 shrink-0" aria-hidden />
           <p className="flex-1 text-sm" data-testid="interest-fine">{INTEREST_FINE}</p>
           <div className="grid gap-2 sm:grid-cols-2 md:w-96">
-            <input data-testid="supplier-website" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" aria-label="Website" className="h-11 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
-            <input data-testid="supplier-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email" aria-label="Work email" className="h-11 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
+            <input data-testid="supplier-website" onFocus={fieldStart("advertiser", "website")} value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" aria-label="Website" className="h-11 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
+            <input data-testid="supplier-email" onFocus={fieldStart("advertiser", "email")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email" aria-label="Work email" className="h-11 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
             <input tabIndex={-1} aria-hidden name="company_url" className="hidden" defaultValue="" />
           </div>
           <SaveChip state={save} version={ref?.version} />
@@ -133,11 +143,13 @@ export default function BrIntakeSupplier() {
             <Send className="size-4" aria-hidden /> {sent === "pending_review" ? "Sent · pending approval" : sent === "busy" ? "Sending…" : "Send my interest"}
           </button>
         </div>
-        {sent === "pending_review" ? <p data-testid="pending-review" className="mt-3 rounded-xl bg-lime-100 p-3 text-sm">Received as <strong>pending approval</strong>. A person at Birch Reserve reviews every request; nothing is accepted automatically and nothing is booked or charged.{reportToken ? <> <a className="font-semibold underline" href={reportPath(reportToken)}>View your report</a></> : null}</p> : null}
+        {sent === "pending_review" ? <p data-testid="pending-review" className="mt-3 rounded-xl bg-lime-100 p-3 text-sm">Received as <strong>pending approval</strong>. A person at Birch Reserve reviews every request; nothing is accepted automatically and nothing is booked or charged.{reportToken && !reportToken.startsWith("legacy-") ? <> <a className="font-semibold underline" href={reportPath(reportToken)}>View your report</a></> : null}</p> : null}
+        {sent === "pending_review" ? <><LeadGatesStatus gates={gates} testId="supplier-lead-gates" /><div className="mt-4"><PrimaryCta side="advertiser" where="done" /></div></> : null}
         {sent === "error" ? <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-900">{err || "Nothing was sent."}</p> : null}
         <p className="mt-2 text-[11px] text-muted-foreground">Your email and website are used only to review your request. They are never shown on any page.</p>
       </section>
-      <ChannelTiles />
+      <section className="container mx-auto max-w-xl px-4 pt-6"><MarketPicker value={market} onChange={(m) => { setTouched(true); setMarket(m); }} /></section>
+      <ChannelTiles market={market} />
     </div>
   );
 }

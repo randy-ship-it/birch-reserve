@@ -4,6 +4,7 @@
  *   friday:  Friday's brand-report.v1 (ltv + demand_fit shown exactly as returned, never recomputed).
  * Demand reach (views → visits → customers) is Birch's own modelled math in both cases; Friday has no field for it yet.
  */
+import { CHANNEL_GEO, channelEligibility, type Eligibility, type Market } from "../../../api-server/src/lib/kitCalc/channelGeo";
 import type { KitCalcResult } from "../../../api-server/src/lib/kitCalc";
 type Range = readonly [number, number];
 import { KIT_CALC_FORMULA } from "../../../api-server/src/lib/kitCalc";
@@ -26,7 +27,7 @@ export type KitView = {
   formula: string[];
   fitHeader: string;
   hubs: Array<{ name: string; status: string; fitLabel: string; what?: string }>;
-  channels: Array<{ key: string; name: string; figures: string[]; fitLabel: string | null; rateNote: string; image?: string }>;
+  channels: Array<{ key: string; name: string; figures: string[]; fitLabel: string | null; rateNote: string; image?: string; geo?: string; eligibility?: Eligibility }>;
   hubRates: { cpm: Range; cpc: Range; fitLabel: string | null };
   mapDataUrl?: string;
 };
@@ -110,5 +111,20 @@ export function sampleView(calc: KitCalcResult, mapDataUrl?: string): KitView {
     hubs: v.hubs.map((h) => ({ ...h, fitLabel: "Example fit" })),
     channels: v.channels.map((c) => ({ ...c, fitLabel: "Example fit" })),
     hubRates: { ...v.hubRates, fitLabel: "Example fit" },
+  };
+}
+
+const ELIG_SHORT: Record<Eligibility, string> = { now: "Now", later: "Later", not_available: "Not in your markets yet" };
+/** Per-channel geography on the kit (Friday's eligibility when present, else the config). */
+export function withGeo(v: KitView, market: Market | null | undefined, fridayGeo?: Array<{ key: string; eligibility: Eligibility }>): KitView {
+  return {
+    ...v,
+    channels: v.channels.map((c) => {
+      const g = CHANNEL_GEO.find((x) => x.key === c.key);
+      if (!g) return c;
+      const f = fridayGeo?.find((x) => x.key === g.friday_key || x.key === g.key)?.eligibility;
+      const e = f ?? channelEligibility(g.key, market);
+      return { ...c, eligibility: e, geo: `${ELIG_SHORT[e]} · ${g.label}` };
+    }),
   };
 }

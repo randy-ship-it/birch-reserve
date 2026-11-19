@@ -209,6 +209,8 @@ export type IntakePayload = {
   terms_version: string;
   website?: string;
   email?: string;
+  /** Where the brand sells and ships (Randy via Emma, 10:48 PM ET). Sent to v1 as profile.geography text. */
+  market?: import("../kitCalc/channelGeo").Market;
   publisher?: { surfaces: Array<{ key: PubSurfaceKey; on: boolean }>; mode: PricingMode; size_x: number; conversion_pct: number; value_per_conversion_usd: number };
   supplier?: { max_distribution: boolean; categories: Array<{ key: string; state: TriState; first_look: boolean }> };
   sponsor?: { interest: Array<(typeof SPONSOR_OFFERS)[number]["key"]>; category?: string; area?: string };

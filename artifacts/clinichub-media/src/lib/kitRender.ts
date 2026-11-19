@@ -119,7 +119,7 @@ export function kitSideB(d: KitData): string {
         .slice(0, 2)
         .map((l, k) => `<text x="${x + 24}" y="${y + 236 + k * 24}" font-family="${SANS}" font-size="18" fill="${LIME}">${esc(l)}</text>`)
         .join("")}
-      <text x="${x + 24}" y="${y + 306}" font-family="${SANS}" font-size="16" fill="#fff" opacity=".7">${esc(c.rateNote)}</text>`;
+      <text x="${x + 24}" y="${y + 306}" font-family="${SANS}" font-size="16" fill="#fff" opacity=".7">${esc(c.geo ? `${c.geo} · ${c.rateNote}`.slice(0, 44) : c.rateNote)}</text>`;
     })
     .join("");
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${KIT_W}" height="${KIT_H}" viewBox="0 0 ${KIT_W} ${KIT_H}">

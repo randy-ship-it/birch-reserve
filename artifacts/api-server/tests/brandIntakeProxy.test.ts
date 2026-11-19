@@ -5,7 +5,8 @@ import express from "express";
 import type { AddressInfo } from "node:net";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { resolve, join } from "node:path";
-import { createBrandIntakeProxy } from "../src/routes/brandIntakeProxy";
+import { createBrandIntakeProxy, markTest, publicGates } from "../src/routes/brandIntakeProxy";
+import { isIntakeEvent } from "../src/lib/intakeEvents";
 
 const SECRET = "test-only-not-a-real-secret-value";
 const ENV = { FRIDAY_API_URL: "https://friday.example", FRIDAY_API_KEY: SECRET } as NodeJS.ProcessEnv;
@@ -106,4 +107,39 @@ test("the secret's env names never appear in client sources; the browser only ca
   const a = readFileSync(join(root, "lib/fridayBrandIntake.ts"), "utf8");
   assert.ok(!/fridayapp\.org/.test(a), "browser never calls Friday directly");
   assert.match(a, /\/v1\/brand-intake/);
+});
+
+test("hub-partner match and approval gate reach the browser as status enums only (no partner names, ids or approvers)", () => {
+  const out = JSON.parse(publicGates(JSON.stringify({ status: "submitted", partner_match: { status: "linked", partner_id: "p_1", partner_name: "Private Clinic" }, inventory_approval: { status: "pending", approver: "someone" }, report: { status: { partner_match: { status: "weird" } } } })));
+  assert.deepEqual(out.partner_match, { status: "linked" });
+  assert.deepEqual(out.inventory_approval, { status: "pending" });
+  assert.equal(out.report.status.partner_match, undefined);
+  assert.ok(!/Private Clinic|p_1|someone/.test(JSON.stringify(out)));
+});
+
+test("intake funnel events: fixed side/action/detail lists only, so no personal data can ride in an event name", () => {
+  assert.ok(isIntakeEvent("intake.advertiser.view.intake"));
+  assert.ok(isIntakeEvent("intake.publisher.submit"));
+  assert.ok(isIntakeEvent("intake.advertiser.cta_click.look_190"));
+  assert.ok(!isIntakeEvent("intake.advertiser.submit.growth_examplebrand_com"));
+  assert.ok(!isIntakeEvent("intake.buyer.view"));
+  assert.ok(!isIntakeEvent("intake.advertiser.email_typed.email"));
+});
+
+test("channel geography: Street Team is Ontario now, Canada later; a US-only brand doesn't see it as available", async () => {
+  const { channelEligibility, CHANNEL_GEO } = await import("../src/lib/kitCalc/channelGeo");
+  const { advertiserActivation } = await import("../src/lib/kitCalc/activation");
+  assert.equal(CHANNEL_GEO.find((c) => c.key === "street-team")!.label, "Ontario now, Canada later");
+  assert.equal(channelEligibility("street-team", { sells_in: ["US"], ships_to: ["US"] }), "not_available");
+  assert.equal(channelEligibility("street-team", { sells_in: ["CA"], ships_to: ["CA"], regions: ["BC"] }), "later");
+  assert.equal(channelEligibility("street-team", { sells_in: ["CA"], ships_to: ["CA"], regions: ["ON"] }), "now");
+  for (const k of ["scale-hubs", "calm-joints", "retail-network"] as const) assert.equal(channelEligibility(k, { sells_in: ["US"], ships_to: ["US"] }), "now");
+  const a = advertiserActivation([100, 400], { sells_in: ["CA"], ships_to: ["CA"], regions: ["BC"] });
+  assert.deepEqual(a.now, { min: 75, max: 300 });
+  assert.deepEqual(a.later, { min: 100, max: 400 });
+});
+
+test("TEST records: only test@/test+…@silverbirchgrowth.com submissions get the [TEST] blurb", () => {
+  assert.match(String((markTest({ email: "test+br-preview@silverbirchgrowth.com" }) as { blurb: string }).blurb), /^\[TEST\]/);
+  assert.equal((markTest({ email: "growth@examplebrand.com" }) as { blurb?: string }).blurb, undefined);
 });

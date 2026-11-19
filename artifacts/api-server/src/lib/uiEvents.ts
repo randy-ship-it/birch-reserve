@@ -5,6 +5,7 @@ import {
 import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import { logger } from "./logger";
+import { isIntakeEvent } from "./intakeEvents";
 
 export const UI_EVENTS = [
   "cta_hero_reserve",
@@ -20,7 +21,8 @@ export const UI_EVENTS = [
   "cta_private_distribution",
 ] as const;
 
-export type UiEventName = (typeof UI_EVENTS)[number];
+/** Fixed CTA events, or an intake funnel event `intake.<side>.<action>[.<detail>]` from fixed lists (lib/intakeEvents.ts). */
+export type UiEventName = (typeof UI_EVENTS)[number] | `intake.${string}`;
 export type UiEventOffer = "hold-190" | "reserve-490";
 
 export type ParsedUiEvent = {
@@ -77,7 +79,7 @@ export function parseUiEvent(body: unknown): ParsedUiEvent | null {
 
   const event = record.event;
   const path = record.path;
-  if (typeof event !== "string" || !UI_EVENT_SET.has(event)) return null;
+  if (typeof event !== "string" || !(UI_EVENT_SET.has(event) || isIntakeEvent(event))) return null;
   if (typeof path !== "string" || path.length > 200 || !PATH_PATTERN.test(path)) return null;
 
   let offer: UiEventOffer | null = null;
@@ -90,7 +92,9 @@ export function parseUiEvent(body: unknown): ParsedUiEvent | null {
     if (typeof record.locale !== "string" || !LOCALE_PATTERN.test(record.locale)) return null;
   }
 
-  return { event: event as UiEventName, path, offer };
+  // Private report links carry a token in the path: never store it.
+  const safePath = /^\/kit\/r\//.test(path) ? "/kit/r/report" : path;
+  return { event: event as UiEventName, path: safePath, offer };
 }
 
 export function uiEventsJsonParser() {

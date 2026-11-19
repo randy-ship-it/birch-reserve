@@ -3,6 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "wouter";
 import { Download, Loader2 } from "lucide-react";
 import { usePageMeta } from "@/components/br/ui";
+import { CtaBand, LeadGatesStatus, PrimaryCta } from "@/components/br/intake-sell";
+import { ActivationRange, pickActivation } from "@/components/br/intake-geo";
+import { advertiserActivation } from "../../../../api-server/src/lib/kitCalc/activation";
+import { withGeo } from "@/lib/kitView";
+import { trackIntake } from "@/lib/intakeTrack";
+import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { MockBanner } from "@/components/br/intake-kit";
 import { KitSides } from "@/components/br/kit-builder";
 import { fridayIntake, HELD_COPY, type FridayReport } from "@/lib/fridayBrandIntake";
@@ -26,18 +32,25 @@ export default function BrKitReport() {
       .then((r) => (r === null ? setState("missing") : r.ready ? (setReport(r.report), setState("ready")) : setState("draft")))
       .catch(() => setState("error"));
   }, [token]);
+  useEffect(() => {
+    if (state !== "loading") trackIntake("advertiser", "view", state === "ready" ? (report?.status?.public_mirror === "held" ? "report_held" : "report_ready") : state === "draft" ? "report_draft" : state === "missing" ? "report_missing" : "report_error", { dedupe: true });
+  }, [state, report]);
+  const market: Market | null = report?.geo ? { sells_in: (report.geo.sells_in ?? []).filter((c): c is "CA" | "US" => c === "CA" || c === "US"), ships_to: (report.geo.ships_to ?? []).filter((c): c is "CA" | "US" => c === "CA" || c === "US"), regions: report.geo.regions } : null;
   const view = useMemo(() => {
     if (!report) return null;
     const i = (report.ltv?.inputs ?? {}) as { avg_cart_usd?: number; orders_per_month?: number; purchases_per_year?: number; margin_band?: string };
     const calc = kitCalc({ aovUsd: i.avg_cart_usd ?? 0, monthlyOrders: i.orders_per_month ?? 0, purchasesPerYear: i.purchases_per_year ?? 1, marginBand: i.margin_band ?? "" });
-    return fridayView(report, calc, { brand: report.brand?.name ?? "", categoryLabel: "Your category", repeatLabel: REPEAT_LABEL(i.purchases_per_year ?? 1), mapDataUrl: map });
-  }, [report, map]);
+    return withGeo(fridayView(report, calc, { brand: report.brand?.name ?? "", categoryLabel: "Your category", repeatLabel: REPEAT_LABEL(i.purchases_per_year ?? 1), mapDataUrl: map }), market, report.geo?.channels);
+  }, [report, map]); // eslint-disable-line react-hooks/exhaustive-deps
   const svgA = view ? kitSideA(view) : "";
   const svgB = view ? kitSideB(view) : "";
   async function dl() {
     saveBlob(await kitPdfBlob([svgA, svgB]), "birch-reserve-kit.pdf");
     saveBlob(await kitPngBlob([svgA, svgB]), "birch-reserve-kit.png");
-    for (const f of ["pdf", "png"] as const) await fridayIntake().download(token, f).catch(() => undefined);
+    for (const f of ["pdf", "png"] as const) {
+      trackIntake("advertiser", "kit_download", f);
+      await fridayIntake().download(token, f).catch(() => undefined);
+    }
   }
   return (
     <div data-testid="kit-report-page">
@@ -61,10 +74,14 @@ export default function BrKitReport() {
               <button type="button" onClick={dl} data-testid="kit-report-download" className="inline-flex h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-bold text-accent-foreground"><Download className="size-4" />Download PDF + PNG</button>
               <span className="text-xs text-muted-foreground">LTV and channel fit as returned by Friday{report?.mock ? " (mock on preview)" : ""}. Channel fit is subject to human confirmation.</span>
             </div>
+            <LeadGatesStatus gates={report ? { partner_match: report.status?.partner_match, inventory_approval: report.status?.inventory_approval, mock: !!report.mock } : null} testId="report-lead-gates" />
+            <div className="mt-4 max-w-3xl"><ActivationRange kind="advertiser" {...pickActivation(report?.activation?.advertiser_exposure_usd, advertiserActivation(view.revenueOpp, market))} /></div>
             <div className="mt-4"><KitSides svgA={svgA} svgB={svgB} side={side} /></div>
           </>
         ) : null}
+        {state !== "loading" ? <div className="mt-6" data-testid="report-primary-cta"><PrimaryCta side="advertiser" where="report" /></div> : null}
       </div>
+      <CtaBand side="advertiser" where="report" />
     </div>
   );
 }
