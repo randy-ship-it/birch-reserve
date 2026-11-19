@@ -342,7 +342,7 @@ export function EarningsSide({ m, cta }: { m: ReportModel; cta?: ReactNode }) {
 
 /**
  * The report's views follow the roles (Randy, Nov 19 2026 9:39 AM ET): one form, both answers. Supplier exposure view
- * (performance only vs with Accelerate) + hub max-exposure + earnings view. Legacy two-sided order kept otherwise.
+ * (performance-only terms vs with Accelerate) + hub max-exposure + earnings view. Legacy two-sided order kept otherwise.
  */
 export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposureSource, onAccelerate }: { m: ReportModel; costExtra?: ReactNode; earnCta?: ReactNode; supplierCta?: ReactNode; exposure?: FridayExposure; exposureSource?: "report" | "mock" | "sample"; onAccelerate?: ReactNode }) {
   const cost = <CostSide key="cost" m={m} extra={costExtra} />;

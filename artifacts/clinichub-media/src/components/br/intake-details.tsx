@@ -84,7 +84,7 @@ export function IntakeDetails({ intake: intakeRef, payload, roles, shared, onSav
       <div className={`mt-4 grid gap-4 ${isHub && isSup ? "lg:grid-cols-2" : ""}`}>
         {isSup ? (
           <div className="rounded-2xl p-4" style={{ background: RT.paper }} data-testid="details-supplier">
-            <p className="flex items-center gap-2 text-sm font-bold" style={{ color: RT.ink }}><Package className="size-4" />Supplier · performance only{isAcc ? " + Accelerate" : ""}</p>
+            <p className="flex items-center gap-2 text-sm font-bold" style={{ color: RT.ink }}><Package className="size-4" />Supplier · Performance-only (pay on results, no CPC/CPM){isAcc ? " + Accelerate" : ""}</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               <label><span className={lab}>Typical price / cart (USD)</span><input className={f} inputMode="numeric" value={sup.price} onChange={(e) => setSup({ ...sup, price: e.target.value })} placeholder="e.g. 60" data-testid="sup-price" /></label>
               <label><span className={lab}>Gross margin</span><select className={f} value={sup.margin} onChange={(e) => setSup({ ...sup, margin: e.target.value })} data-testid="sup-margin"><option value="">Pick one</option>{MARGINS.map((m) => <option key={m.k} value={m.k}>{m.l}</option>)}</select></label>

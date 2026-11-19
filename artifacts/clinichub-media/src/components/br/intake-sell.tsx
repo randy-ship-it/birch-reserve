@@ -14,7 +14,7 @@ import type { LeadGates } from "@/lib/fridayBrandIntake";
 export const sideOf = (roles: readonly IntakeRole[] | IntakeRole): IntakeSide => ((Array.isArray(roles) ? roles : [roles]).every((r) => r === "publisher") ? "publisher" : "advertiser");
 
 export const SIDES: Record<IntakeSide, { label: string; sub: string; icon: typeof Store }> = {
-  advertiser: { label: "Supplier", sub: "Performance only, plus Accelerate for premium placements", icon: Megaphone },
+  advertiser: { label: "Supplier", sub: "Performance-only (pay on results, no CPC/CPM), plus optional Accelerate for premium placements", icon: Megaphone },
   publisher: { label: "Hub", sub: "Max exposure: earn from your screens and pages", icon: Store },
 };
 

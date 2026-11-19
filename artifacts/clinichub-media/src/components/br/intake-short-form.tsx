@@ -1,6 +1,6 @@
 /**
  * ONE FORM intake, the default on /intake (Randy voice 8:30 AM + via Emma 9:34 AM ET, Nov 19 2026).
- * - Roles: Supplier (performance only, pay on results) + Hub, BOTH preselected (Randy 9:39 AM ET). Accelerate (premium
+ * - Roles: Supplier (performance-only terms: pay on results, no CPC/CPM) + Hub, BOTH preselected (Randy 9:39 AM ET). Accelerate (premium
  *   display placements) is an option INSIDE the supplier card, never a separate "advertiser" role (sent as the kit role).
  *   Category / area locks keep their own page. Visitor copy never says advertiser / publisher / sponsor.
  * - Positive framing: a hub unlocks maximum performance exposure (shelf space and eyeballs); supplier-only still works.
@@ -198,7 +198,7 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
       <fieldset>
         <legend className="text-[11px] font-bold uppercase tracking-wider text-foreground/60">You are… <span className="font-semibold normal-case tracking-normal text-foreground/50">(most brands are both)</span></legend>
         <div className="mt-2 grid gap-2 md:grid-cols-2" data-testid="intake-roles">
-          <RoleCard on={r.supplier} onClick={() => flip("supplier")} icon={Package} title="Supplier" tag="Performance only" sub="Get your products into curated hubs. Pay on results, no ad spend." testId="intake-role-supplier">
+          <RoleCard on={r.supplier} onClick={() => flip("supplier")} icon={Package} title="Supplier" tag="Performance-only" sub="Get your products into curated hubs. Pay on results, no ad spend." testId="intake-role-supplier">
             {r.supplier ? <AccelerateToggle on={r.accelerate} onClick={() => flip("accelerate")} /> : null}
           </RoleCard>
           <RoleCard on={r.hub} onClick={() => flip("hub")} icon={Store} title="Hub" tag="Max exposure" sub="Have an audience, shelf, screens or pages? Put your products in front of it for max exposure, and earn a share." testId="intake-role-hub" />

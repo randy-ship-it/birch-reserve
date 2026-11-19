@@ -107,7 +107,7 @@ export function MockBanner() {
 const ROLE_SIDES: Array<{ side: "advertiser" | "publisher"; label: string; roles: Array<{ key: IntakeRole; label: string; href: string; icon: typeof Store }> }> = [
   { side: "advertiser", label: "Supplier", roles: [
     { key: "kit", label: "Monetization Kit", href: "/brand-kit#my-kit", icon: Target },
-    { key: "supplier", label: "Performance only", href: "/intake/supplier", icon: Target },
+    { key: "supplier", label: "Performance-only", href: "/intake/supplier", icon: Target },
     { key: "sponsor", label: "Accelerate", href: "/intake/sponsor", icon: Megaphone },
   ] },
   { side: "publisher", label: "Hub", roles: [{ key: "publisher", label: "Max exposure", href: "/intake/publisher", icon: Store }] },

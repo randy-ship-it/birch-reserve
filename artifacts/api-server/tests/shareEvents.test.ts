@@ -45,7 +45,7 @@ test("one form: supplier + hub map to v1 keys, extras to a labelled blurb, no na
   assert.match(blurb, /decision maker role: Owner/);
   const only: Record<string, unknown> = {};
   oneFormFields({ schema: "birch-brand-intake/v1-draft", role: "supplier", roles: ["supplier"], site: "birchreserve.net", terms_version: "t" }, only);
-  assert.match(String(only.blurb), /supplier only \(performance\)\.$/m);
+  assert.match(String(only.blurb), /supplier only \(performance-only terms: pay on results, no CPC\/CPM\)\.$/m);
   const acc: Record<string, unknown> = {};
   oneFormFields({ schema: "birch-brand-intake/v1-draft", role: "supplier", roles: ["supplier", "publisher", "kit"], site: "birchreserve.net", terms_version: "t", supplier_detail: { accelerate_budget: "$1,000 test" } }, acc);
   assert.match(String(acc.blurb), /supplier \+ hub \+ Accelerate \(premium display placements\)/);

@@ -32,7 +32,7 @@ export default function BrIntake() {
     r.roles = ["supplier", "publisher"];
     return r;
   }, []);
-  usePageMeta("Get your Monetization Kit | Birch Reserve", "One short form for suppliers and hubs. See your hub earnings and supplier performance exposure, side by side. Estimates in USD, reviewed by a person.");
+  usePageMeta("Get your Monetization Kit | Birch Reserve", "One short form for suppliers and hubs. See your hub earnings and your supplier exposure on performance-only terms (pay on results), side by side. Estimates in USD, reviewed by a person.");
   return (
     <div data-testid="intake-landing">
       <MockBanner />
@@ -60,7 +60,7 @@ export default function BrIntake() {
       <div className="container mx-auto px-4 pb-12 pt-6" style={{ fontFamily: RT_SANS }} data-testid="sample-kit">
         <span className="rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider" style={{ background: RT.mint, color: RT.forest }} data-testid="sample-label">Sample · example values only</span>
         <h2 className="mt-3 text-3xl md:text-5xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you get: both answers from one form.</h2>
-        <p className="mt-1 max-w-2xl text-sm" style={{ color: RT.mute }}>Supplier exposure (performance only and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range in USD, not a result or a guarantee.</p>
+        <p className="mt-1 max-w-2xl text-sm" style={{ color: RT.mute }}>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range in USD, not a result or a guarantee.</p>
         <div className="mt-4"><ReportV2 report={sample} sample compact exposure={SAMPLE_EXPOSURE} exposureSource="sample" /></div>
       </div>
     </div>

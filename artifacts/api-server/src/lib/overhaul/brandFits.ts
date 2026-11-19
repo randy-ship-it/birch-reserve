@@ -308,7 +308,7 @@ const radRoller: BrandFit = {
     { name: "Calm Joints", href: "https://calmjoints.org/pickleball", logoSrc: "/for-brands/hubs/calm-joints-mark.svg" },
   ],
   launchingNote: "Cataloged brands already launching on Scale Health hubs and Calm Joints — the company RAD would sit with.",
-  performanceOnlyLine: "A performance-only path is also available.",
+  performanceOnlyLine: "Performance-only terms are also available (pay on results, no CPC/CPM).",
   heroVisuals: [
     {
       src: "/hub-gallery/drho.webp",

@@ -180,7 +180,7 @@ const num = (n: unknown) => (typeof n === "number" && Number.isFinite(n) && n >=
 export function oneFormFields(p: IntakePayload, body: Record<string, unknown>): void {
   const lines: string[] = [];
   const roles = new Set([p.role, ...(p.roles ?? [])]);
-  const intent = roles.has("supplier") && roles.has("publisher") ? "supplier + hub" : roles.has("supplier") ? "supplier only (performance)" : roles.has("publisher") ? "hub only" : null;
+  const intent = roles.has("supplier") && roles.has("publisher") ? "supplier + hub" : roles.has("supplier") ? "supplier only (performance-only terms: pay on results, no CPC/CPM)" : roles.has("publisher") ? "hub only" : null;
   if (intent) lines.push(`Intake choice: ${intent}${roles.has("kit") ? " + Accelerate (premium display placements)" : ""}.`);
   if (p.company_name) {
     body.company_name = p.company_name.slice(0, 120);

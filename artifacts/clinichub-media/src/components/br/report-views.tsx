@@ -1,13 +1,13 @@
 /**
  * The report's two views (Randy, Nov 19 2026 9:39 AM ET): one form, both answers.
- *   (a) Supplier exposure view, performance only vs with Accelerate (premium display, optional).
+ *   (a) Supplier exposure view, performance-only terms (pay on results, no CPC/CPM) vs with Accelerate (premium display, optional).
  *   (b) Hub max-exposure + earnings view.
  * Every number is derived from existing model inputs only:
  *   - network figures and targets (CHANNEL_TILES / activation.ts FIG, as reported by Scale Health),
  *   - the placeholder activation shares (MOCK_SHARES 1%–5%, or Friday's `exposure.activation` when present),
  *   - rate-card CPMs (report placements) for Accelerate display views per $1,000,
  *   - the hub surface model (PUBLISHER_SURFACES median views, 35% base share) or Friday's publisher figures.
- * Tiers are a modelling choice on the placeholder range: performance only = lower half (min → mid share),
+ * Tiers are a modelling choice on the placeholder range: performance-only = lower half (min → mid share),
  * Accelerate = upper half (mid → max share). Low / likely / high = the ends and middle of each half.
  * Labelled Estimate / Modelled everywhere. USD. No CTR/ROAS, no guarantees.
  */
@@ -37,7 +37,8 @@ const NAMES: Record<string, { name: string; unit: string; monthly: boolean }> = 
   calm_joints: { name: "Calm Joints", unit: "", monthly: false },
 };
 const ORDER = ["hubs", "retail", "street_team", "calm_joints"];
-export type Tier = "performance" | "accelerate";
+/** performance_only = performance-only TERMS (pay on results, no CPC/CPM), not a kind of brand. */
+export type Tier = "performance_only" | "accelerate";
 export type ChannelRow = { key: string; name: string; unit: string; monthly: boolean; geo: string; range: LLH | null; later: LLH | null; note: string | null };
 
 export function sharesOf(ex: FridayExposure) {
@@ -48,7 +49,7 @@ export function sharesOf(ex: FridayExposure) {
 /** Channel rows for one tier: base figure (= channel now.min ÷ min share) × the tier's share band. */
 export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
   const s = sharesOf(ex);
-  const [lo, hi] = tier === "performance" ? [s.min, s.mid] : [s.mid, s.max];
+  const [lo, hi] = tier === "performance_only" ? [s.min, s.mid] : [s.mid, s.max];
   return ORDER.map((key) => {
     const c = ex.channels.find((x) => x.key === key);
     const n = NAMES[key]!;
@@ -137,8 +138,8 @@ function ChannelTable({ rows, extra, testId }: { rows: ChannelRow[]; extra?: Rea
 
 /* ------------------------------------------------------------------ (a) supplier exposure view */
 export function SupplierExposureView({ m, exposure, source, cta, onAccelerate }: { m: ReportModel; exposure: FridayExposure; source: "report" | "mock" | "sample"; cta?: ReactNode; onAccelerate?: ReactNode }) {
-  const [tier, setTier] = useState<Tier>(m.isAccelerate ? "accelerate" : "performance");
-  const perf = channelRows(exposure, "performance");
+  const [tier, setTier] = useState<Tier>(m.isAccelerate ? "accelerate" : "performance_only");
+  const perf = channelRows(exposure, "performance_only");
   const acc = channelRows(exposure, "accelerate");
   const rows = tier === "accelerate" ? acc : perf;
   const hubs = rows.find((r) => r.key === "hubs")?.range ?? null;
@@ -159,8 +160,8 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate }:
           <span className="ml-auto flex items-center gap-2"><Pill tone="mint">{src}</Pill>
             <EstimatePop title="How the supplier exposure is modelled" testId="estimate-supplier">
               <p>Exposure = network figures and targets × an activation share, scoped to where you sell and ship. Activation shares are placeholders ({pct(s.min)}–{pct(s.max)}) until real placements confirm them.</p>
-              <p><strong>Performance only</strong> uses the lower half of that range ({pct(s.min)}–{pct(s.mid)}). You pay on results, not for ad space.</p>
-              <p><strong>Accelerate</strong> adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}), plus the display views a $1,000 test buys at rate-card CPM (budget ÷ CPM × 1,000).</p>
+              <p><strong>Performance-only</strong> (pay on results, no CPC/CPM) uses the lower half of that range ({pct(s.min)}–{pct(s.mid)}). You pay on results, not for ad space.</p>
+              {tier === "accelerate" ? <p><strong>Accelerate</strong> adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}), plus the display views a $1,000 test buys at rate-card CPM (budget ÷ CPM × 1,000).</p> : <p><strong>Accelerate</strong> (optional) adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}). Switch to With Accelerate to see how it is sized.</p>}
               <p>12 months = the monthly figure × 12 for page views. Customers and homes are an audience in reach, so they are not multiplied.</p>
               <p style={{ color: RT.mute }}>Network figures as reported by Scale Health; targets are goals. Estimates in USD where money is shown. Not a forecast, not a guarantee. No CTR or ROAS is promised.</p>
             </EstimatePop>
@@ -168,9 +169,9 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate }:
         </div>
         <h3 className="mt-3 text-[26px] leading-tight md:text-[32px]" style={{ fontFamily: RT_SERIF }}>Where your products get seen</h3>
         <div className="mt-4 grid w-full grid-cols-2 rounded-full p-1 sm:inline-grid sm:w-auto" style={{ background: "rgba(255,255,255,.1)" }} role="tablist" aria-label="Supplier tier">
-          {(["performance", "accelerate"] as const).map((t) => (
+          {(["performance_only", "accelerate"] as const).map((t) => (
             <button key={t} type="button" role="tab" aria-selected={tier === t} onClick={() => setTier(t)} data-testid={`supplier-tier-${t}`} className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 py-2 text-xs font-bold transition sm:px-4" style={tier === t ? { background: RT.mint, color: RT.forest } : { color: "rgba(255,255,255,.75)" }}>
-              {(t === "accelerate") === m.isAccelerate ? <Check className="size-3.5" aria-hidden /> : t === "accelerate" ? <Rocket className="size-3.5" aria-hidden /> : null}{t === "performance" ? "Performance only" : "With Accelerate"}{(t === "accelerate") === m.isAccelerate ? <span className="sr-only"> (your pick)</span> : null}
+              {(t === "accelerate") === m.isAccelerate ? <Check className="size-3.5" aria-hidden /> : t === "accelerate" ? <Rocket className="size-3.5" aria-hidden /> : null}{t === "performance_only" ? "Performance-only" : "With Accelerate"}{(t === "accelerate") === m.isAccelerate ? <span className="sr-only"> (your pick)</span> : null}
             </button>
           ))}
         </div>
@@ -184,8 +185,8 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate }:
       </div>
       <div className="p-5 md:p-6">
         <div className="grid gap-3 sm:grid-cols-2" data-testid="supplier-compare">
-          <div className="p-3" style={{ background: tier === "performance" ? RT.mint : RT.paper, borderRadius: 12 }}>
-            <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: RT.mintInk }}>Performance only · pay on results</p>
+          <div className="p-3" style={{ background: tier === "performance_only" ? RT.mint : RT.paper, borderRadius: 12 }}>
+            <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: RT.mintInk }}>Performance-only · pay on results, no CPC/CPM</p>
             <p className="mt-1 text-[24px] leading-none tabular-nums" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{perfHubs ? `${big(perfHubs.likely)} / mo` : "—"}</p>
             <p className="mt-1 text-[12px]" style={{ color: RT.mute }}>Curated placement on hubs that fit your category.</p>
           </div>
@@ -229,7 +230,7 @@ export function HubView({ m, exposure, cta }: { m: ReportModel; exposure: Friday
   const later = m.later && now && m.later.high > now.high ? m.later : null;
   const earn: LLH | null = now ? { low: now.low, likely: (now.low + now.high) / 2, high: later?.high ?? now.high } : null;
   const own = ownHubViews();
-  const rows = channelRows(exposure, m.isAccelerate ? "accelerate" : "performance");
+  const rows = channelRows(exposure, m.isAccelerate ? "accelerate" : "performance_only");
   const surfaces = m.earnings.filter((e) => e.pay).sort((a, b) => b.pay!.high - a.pay!.high);
   const needs = m.earnings.filter((e) => !e.pay);
   return (

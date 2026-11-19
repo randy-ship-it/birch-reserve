@@ -62,7 +62,7 @@ export default function BrIntakeSupplier() {
       <MockBanner />
       <RoleTabs active="supplier" />
       <header className="container mx-auto px-4 pb-4 pt-8 md:pt-12">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For performance brands · Supplier</p>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For suppliers · Performance-only (pay on results, no CPC/CPM)</p>
         <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Where your offers should run</h1>
         <p className="mt-3 max-w-xl text-base text-muted-foreground">Turn categories on, off or maybe. Ask for a first look where it is offered. Nothing here is binding.</p>
         <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -88,11 +88,10 @@ export default function BrIntakeSupplier() {
           </div>
         </div>
         <div className="rounded-3xl border border-foreground/10 bg-white p-6" data-testid="first-look-card">
-          <div className="flex items-center gap-2"><Eye className="size-5" aria-hidden /><h2 className="font-bold">{FIRST_LOOK.title}</h2><EstimateTag /></div>
+          <div className="flex items-center gap-2"><Eye className="size-5" aria-hidden /><h2 className="font-bold">{FIRST_LOOK.title}</h2><span className="rounded-full bg-foreground/[0.07] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-foreground/70">With Accelerate · optional</span></div>
           <p className="mt-1 text-sm">{FIRST_LOOK.line}</p>
-          <p className="mt-3 font-display text-2xl">from ${FIRST_LOOK.cpmUsd} CPM · ${FIRST_LOOK.cpcUsd.toFixed(2)} CPC</p>
-          <p className="text-[11px] text-muted-foreground">Limited, published starter rates · USD</p>
-          <div className="mt-3"><InfoPop title="First look" testId="first-look-pop"><p>{FIRST_LOOK.fine}</p></InfoPop></div>
+          <p className="mt-3 text-sm font-semibold" data-testid="first-look-perf-only">Performance-only stays pay on results, no CPC/CPM. First look is an optional Accelerate add-on; its display rates are on the <a href="/intake/sponsor" className="underline">Accelerate page</a>.</p>
+          <div className="mt-3"><InfoPop title="First look" testId="first-look-pop"><p>First look is a right to review and decline a category before it is offered to other buyers. It is part of Accelerate (optional, premium display), not performance-only. It is not a lock and not exclusive. Interest only, subject to approval and terms.</p></InfoPop></div>
         </div>
       </section>
 
