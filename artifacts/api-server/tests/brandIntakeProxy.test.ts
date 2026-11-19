@@ -396,3 +396,44 @@ test("prepareStage: a bad src tag is dropped; plain drafts are untouched", () =>
   const d = prepareStage({ roles: ["brand"], blurb: "x" });
   assert.deepEqual([d.stage, d.body.blurb, d.error], [null, "x", undefined]);
 });
+
+test("prefill read-back GET: needs a valid id + X-Edit-Token, forwards the token, no-store/no-referrer", async () => {
+  const calls: Array<{ url: string; init: RequestInit }> = [];
+  const f = (async (url: string, init: RequestInit) => (calls.push({ url, init }), new Response(JSON.stringify({ ok: true, id: "bi_abc12345", status: "draft", version: 0, fields: { company_name: "Northline" } }), { status: 200 }))) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  const ok = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { headers: { "x-edit-token": "t".repeat(24) } });
+  const noTok = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`);
+  const badId = await realFetch(`${s.base}/v1/brand-intake/..%2Fadmin`, { headers: { "x-edit-token": "t".repeat(24) } });
+  const text = await ok.text();
+  s.close();
+  assert.equal(ok.status, 200);
+  assert.match(text, /Northline/);
+  assert.equal(calls.length, 1, "no token / bad id never reach the backend");
+  assert.equal(calls[0]!.url, "https://friday.example/api/public/brand-intake/bi_abc12345");
+  assert.equal(calls[0]!.init.method, "GET");
+  assert.equal((calls[0]!.init.headers as Record<string, string>)["X-Edit-Token"], "t".repeat(24));
+  assert.equal(ok.headers.get("cache-control"), "private, no-store");
+  assert.equal(ok.headers.get("referrer-policy"), "no-referrer");
+  assert.equal(noTok.status, 404);
+  assert.equal(badId.status, 404);
+  assert.ok(!text.includes(SECRET));
+});
+
+test("prefill read-back GET before the backend ships it: generic 404 → 503 readback_unavailable; a real not_found / 410 passes through", async () => {
+  let reply = new Response("Cannot GET", { status: 404 });
+  const f = (async () => reply) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  const h = { "x-edit-token": "t".repeat(24) };
+  const missing = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { headers: h });
+  reply = new Response(JSON.stringify({ ok: false, error: "not_found" }), { status: 404 });
+  const gone = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { headers: h });
+  reply = new Response(JSON.stringify({ ok: false, error: "link_expired" }), { status: 410 });
+  const expired = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { headers: h });
+  s.close();
+  assert.equal(missing.status, 503);
+  assert.equal(((await missing.json()) as { error: string }).error, "readback_unavailable");
+  assert.equal(gone.status, 404);
+  assert.equal(((await gone.json()) as { error: string }).error, "not_found");
+  assert.equal(expired.status, 410);
+  assert.equal(((await expired.json()) as { error: string }).error, "link_expired");
+});

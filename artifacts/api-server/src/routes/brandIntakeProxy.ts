@@ -312,6 +312,27 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     noteLead(prep.body, prep.stage, out, id);
     send(res, out);
   });
+  /**
+   * Prefilled brand links (PREVIEW, Nov 19 2026): read the saved answers back so the form hydrates instead of
+   * starting from defaults. Needs the holder's X-Edit-Token. Contract: hub-intake-prefill/BIRCH-CONTRACT.md §2.
+   * Until the backend serves this GET it answers with its generic 404, which is reported as readback_unavailable
+   * (never as "link no longer valid").
+   */
+  router.get("/v1/brand-intake/:id", async (req, res) => {
+    const id = String(req.params.id);
+    res.setHeader("Referrer-Policy", "no-referrer");
+    if (!ID_RE.test(id) || !TOKEN_RE.test(req.get("x-edit-token") ?? "")) return void res.status(404).json({ ok: false, error: "not_found" });
+    const out = await forward(req, res, "GET", `/api/public/brand-intake/${encodeURIComponent(id)}`);
+    if (!out) return;
+    let code: unknown = null;
+    try {
+      code = (JSON.parse(out.text || "{}") as { error?: unknown }).error;
+    } catch {
+      /* non-JSON (route missing) */
+    }
+    if (out.status === 404 && code !== "not_found") return void res.status(503).json({ ok: false, error: "readback_unavailable" });
+    send(res, out);
+  });
   router.post("/v1/brand-intake/:id/kit", body, async (req, res) => {
     const id = String(req.params.id);
     if (!ID_RE.test(id)) return void res.status(404).json({ ok: false, error: "not_found" });

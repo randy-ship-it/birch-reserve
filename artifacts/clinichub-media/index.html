@@ -60,6 +60,14 @@
             }).catch(function () {});
           }
         } catch (e) {}
+        // Prefilled brand links (/intake/b/:slug#edit=…): move the private key out of the address bar before any
+        // other script can read it. The page picks it up from this tab's sessionStorage.
+        try {
+          if (location.pathname.indexOf("/intake/b/") === 0 && /(?:^#|&)edit=/.test(location.hash)) {
+            sessionStorage.setItem("br_prefill_hash_v1", location.hash);
+            history.replaceState(null, "", location.pathname + location.search);
+          }
+        } catch (e) {}
         // If this page is running an older bundle than the server now serves, reload once.
         var KEY = "birch:bundle-reload-at";
         function currentBundle() {
