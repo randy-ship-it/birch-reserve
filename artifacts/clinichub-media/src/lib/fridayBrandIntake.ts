@@ -18,7 +18,7 @@ import { mockExposure, type FridayExposure } from "../../../api-server/src/lib/k
 import type { IntakePayload, IntakeRole, PubSurfaceKey } from "../../../api-server/src/lib/overhaul/brandIntake";
 import { SUPPLIER_CATEGORIES } from "../../../api-server/src/lib/overhaul/brandIntake";
 import { mockReport } from "./fridayMockReport";
-import { V12_MARGIN, V12_REPEAT, toFridayCategory } from "../../../api-server/src/lib/kitCalc/fridayV12";
+import { FRIDAY_CATEGORIES, V12_MARGIN, V12_REPEAT, toFridayCategory } from "../../../api-server/src/lib/kitCalc/fridayV12";
 
 
 export type IntakeRef = { id: string; editToken: string; reportToken: string; version: number; legacy?: boolean; /** Friday answered in v1.3 (submit_mode): upgrades PATCH with submit_mode "expanded". */ v13?: boolean };
@@ -162,11 +162,74 @@ export function toFridayBody(p: IntakePayload, extra: Partial<SubmitContact> & {
     if (c) body.category = c; // fast mode: guessed from the site title / meta, or the labelled default
   }
   if (p.kit_calculator?.brand_label) body.company_name = p.kit_calculator.brand_label.slice(0, 120);
+  oneFormFields(p, body);
   if (extra.email) body.email = extra.email;
   if (extra.website) body.website = extra.website;
   if (extra.elapsed_ms != null) body.elapsed_ms = extra.elapsed_ms;
   if (extra.submit) body.submit = true;
   return body;
+}
+
+/**
+ * One-form intake → v1 keys (Randy via Emma, Nov 19 2026 9:34 AM ET). Shared answers are asked once and feed both
+ * sides; role detail arrives after the fast submit on the same record. No v1 field → a labelled `blurb` line
+ * (aggregate only, no names: the decision maker is a role/title). Gaps: /workspace/br-intake/CONTRACT-GAPS.md §H.
+ */
+const num = (n: unknown) => (typeof n === "number" && Number.isFinite(n) && n >= 0 ? Math.round(n) : undefined);
+export function oneFormFields(p: IntakePayload, body: Record<string, unknown>): void {
+  const lines: string[] = [];
+  const roles = new Set([p.role, ...(p.roles ?? [])]);
+  const intent = roles.has("supplier") && roles.has("publisher") ? "supplier + hub" : roles.has("supplier") ? "supplier only (performance, no advertising)" : roles.has("publisher") ? "hub only" : null;
+  if (intent) lines.push(`Intake choice: ${intent}${roles.has("kit") ? " + display advertising" : ""}.`);
+  if (p.company_name) {
+    body.company_name = p.company_name.slice(0, 120);
+    lines.push(`Brand: ${p.company_name.slice(0, 120)}.`);
+  }
+  const profile: Record<string, unknown> = { ...((body.profile as Record<string, unknown>) ?? {}) };
+  const sh = p.shared ?? {};
+  if (sh.categories?.length) {
+    const labels = sh.categories.map((k) => FRIDAY_CATEGORIES.find((c) => c.key === k)?.label ?? k);
+    if (!body.category) {
+      const c = toFridayCategory(sh.categories[0]!);
+      if (c) body.category = c;
+    }
+    if (roles.has("supplier")) body.supplier = { ...((body.supplier as Record<string, unknown>) ?? {}), first_look: { ...(((body.supplier as Record<string, unknown>)?.first_look as Record<string, string>) ?? {}), ...Object.fromEntries(labels.map((l) => [l, "on"])) } };
+    profile.interests = labels.join(", ");
+  }
+  if (num(sh.skus) != null) lines.push(`Products / SKUs: ${num(sh.skus)}.`);
+  const audience: Record<string, number> = {};
+  if (num(sh.audience_customers) != null) audience.customers = num(sh.audience_customers)!;
+  const h = p.hub;
+  const metrics: Record<string, unknown> = {};
+  if (h) {
+    if (num(h.email_list) != null) audience.emails = num(h.email_list)!;
+    if (num(h.web_visitors_month) != null) metrics.web_visitors = { value: num(h.web_visitors_month), period: "per month", source: "hub-reported" };
+    if (h.surfaces?.length) body.publisher = { ...((body.publisher as Record<string, unknown>) ?? {}), surfaces: [...new Set([...((((body.publisher as Record<string, unknown>)?.surfaces as string[]) ?? [])), ...h.surfaces])] };
+    const hubBits = [
+      h.type ? `type ${h.type}` : null,
+      num(h.locations) != null ? `${num(h.locations)} locations` : null,
+      num(h.foot_traffic_month) != null ? `${num(h.foot_traffic_month)} in-person visits / month` : null,
+      num(h.page_views_month) != null ? `${num(h.page_views_month)} page views / month` : null,
+      num(h.screens) != null ? `${num(h.screens)} screens / display surfaces` : null,
+      h.cities ? `cities: ${h.cities.slice(0, 200)}` : null,
+      h.decision_maker_role ? `decision maker role: ${h.decision_maker_role.slice(0, 80)}` : null,
+    ].filter(Boolean);
+    if (hubBits.length) lines.push(`Hub (hub-reported): ${hubBits.join("; ")}.`);
+  }
+  if (Object.keys(audience).length) profile.audience = { ...((profile.audience as Record<string, unknown>) ?? {}), ...audience };
+  if (Object.keys(metrics).length) profile.reach = { metrics };
+  if (Object.keys(profile).length) body.profile = profile;
+  const sd = p.supplier_detail;
+  if (sd) {
+    const calc: Record<string, unknown> = { ...((body.calculator as Record<string, unknown>) ?? {}) };
+    if (num(sd.avg_price_usd) != null) calc.avg_cart_usd = num(sd.avg_price_usd);
+    if (sd.margin_band && ((V12_MARGIN as readonly string[]).includes(sd.margin_band) || FRIDAY_MARGIN.has(sd.margin_band))) calc.margin_band = sd.margin_band;
+    if (Object.keys(calc).length) body.calculator = calc;
+    const supBits = [sd.retail_now ? `in retail now: ${sd.retail_now}` : null, sd.ships ? `fulfilment: ${sd.ships}` : null].filter(Boolean);
+    if (supBits.length) lines.push(`Supplier: ${supBits.join("; ")}.`);
+  }
+  for (const n of p.notes ?? []) if (n.trim()) lines.push(n.trim().slice(0, 600));
+  if (lines.length) body.blurb = lines.join("\n").slice(0, 6000);
 }
 
 /* ------------------------------ mock (preview only) ------------------------------ */

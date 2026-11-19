@@ -83,6 +83,7 @@ const FIGURE_STYLES = `
    covers hero copy. --birch-dock-bottom is shared with hear-randy-elevenlabs. */
 :root { --birch-dock-bottom: calc(14px + env(safe-area-inset-bottom)); }
 html:has([data-testid="mobile-sticky-reserve-cta"]) { --birch-dock-bottom: calc(7.75rem + env(safe-area-inset-bottom)); }
+@media (max-width: 1023px) { html:has([data-testid="sticky-kit-cta"]) { --birch-dock-bottom: calc(5.25rem + env(safe-area-inset-bottom)); } }
 @media (max-width: 767px) {
   .birch-dock-squirrel { bottom: calc(var(--birch-dock-bottom) + 4px); right: calc(12px + 56px + 8px); }
   body { padding-bottom: 76px; }

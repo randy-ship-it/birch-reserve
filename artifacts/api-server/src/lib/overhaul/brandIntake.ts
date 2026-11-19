@@ -221,6 +221,18 @@ export type IntakePayload = {
   /** v1.2 shared category key (fast mode: guessed from the site title/meta, or a labelled default). */
   category?: string;
   kit_calculator?: { aov_usd: number; monthly_orders: number; purchases_per_year: number; purchases_per_year_range?: [number, number]; repeat_band?: string; margin_band: string; spend_usd: number; conversion_pct: number; category: string; brand_label?: string; calc_version: string };
+  /**
+   * One-form intake (Randy via Emma, Nov 19 2026 9:34 AM ET): shared answers asked once and sent to both sides, plus
+   * role-specific detail after the fast submit. Mapped to v1 keys in toFridayBody (fridayBrandIntake.ts):
+   * company_name (v1.1; dropped on strict v1, so it is also in the blurb), profile.audience / profile.reach (v1),
+   * publisher.surfaces (v1), supplier.first_look (v1), calculator (v1). Anything without a v1 field goes into `notes`
+   * → the v1 `blurb` as labelled lines. See /workspace/br-intake/CONTRACT-GAPS.md §H.
+   */
+  company_name?: string;
+  shared?: { categories?: string[]; skus?: number; audience_customers?: number };
+  hub?: { type?: string; locations?: number; foot_traffic_month?: number; web_visitors_month?: number; page_views_month?: number; email_list?: number; screens?: number; surfaces?: string[]; cities?: string; decision_maker_role?: string };
+  supplier_detail?: { avg_price_usd?: number; margin_band?: string; retail_now?: string; ships?: string };
+  notes?: string[];
   /** Lead events (e.g. kit_download). Not yet in Friday's contract: see CONTRACT-GAPS.md. */
   events?: Array<{ type: "kit_download"; at: string; formats: Array<"pdf" | "png"> }>;
 };

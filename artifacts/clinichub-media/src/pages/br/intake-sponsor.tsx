@@ -1,3 +1,5 @@
+import { KitCta } from "@/components/br/kit-cta";
+import { ShareBar } from "@/components/br/share-bar";
 import { useState } from "react";
 import { Lock, MapPin, Timer, ArrowRight } from "lucide-react";
 import { usePageMeta } from "@/components/br/ui";
@@ -24,6 +26,10 @@ export default function BrIntakeSponsor() {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For sponsors</p>
         <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Lock your category. Or your area.</h1>
         <p className="mt-3 max-w-xl text-base text-muted-foreground">Three published prices. Pay on the same secure Stripe page as always. Nothing runs before you approve an insertion order.</p>
+        <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <KitCta placement="hero_role_sponsor" size="md" sub="One form for hub + supplier. Website + email to start." />
+          <ShareBar testId="share-bar-role" />
+        </div>
       </header>
       <section className="container mx-auto px-4 pb-4">
         <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-white p-3 shadow-sm" data-testid="sponsor-category-chips">

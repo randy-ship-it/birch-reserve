@@ -1,3 +1,4 @@
+import { KitCta } from "@/components/br/kit-cta";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { Check, Mail, Phone } from "lucide-react";
 import { Cta, usePageMeta } from "@/components/br/ui";
@@ -144,7 +145,10 @@ export default function BrMediaKit() {
             <AvailabilityStrip />
             <EarlySlots />
           </div>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row" id="download">
+          <div className="mt-6" data-testid="mk-kit-cta">
+            <KitCta placement="hero_media_kit" size="lg" sub="Free · website + email · hub earnings and supplier exposure, estimated" />
+          </div>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row" id="download">
             <Cta href="#my-kit" variant="lime" testId="mk-download-kit-hero" className="w-full sm:w-auto">Download my kit</Cta>
             <Cta href={RESERVE_HREF} variant="lime" testId="mk-reserve-hero" className="w-full sm:w-auto">Reserve your space — {price.seat}</Cta>
             <Cta href={LOOK_HREF} variant="ink" testId="mk-look-hero" className="w-full sm:w-auto">Take a 7-day look — {price.look}</Cta>

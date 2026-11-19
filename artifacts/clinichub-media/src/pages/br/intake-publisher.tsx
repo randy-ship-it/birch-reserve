@@ -1,3 +1,5 @@
+import { KitCta } from "@/components/br/kit-cta";
+import { ShareBar } from "@/components/br/share-bar";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Sparkles, TrendingUp, Layers } from "lucide-react";
@@ -42,6 +44,10 @@ export default function BrIntakePublisher() {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For hubs · Publisher</p>
         <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">What your hub could earn</h1>
         <p className="mt-3 max-w-xl text-base text-muted-foreground">Switch surfaces on. Watch the estimate move. You keep {PAYOUT.basePct}% of media revenue, rising by tier.</p>
+        <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <KitCta placement="hero_role_publisher" size="md" sub="One form for hub + supplier. Website + email to start." />
+          <ShareBar testId="share-bar-role" />
+        </div>
       </header>
 
       <section className="container mx-auto grid gap-5 px-4 pb-8 lg:grid-cols-[1.1fr_1fr]">

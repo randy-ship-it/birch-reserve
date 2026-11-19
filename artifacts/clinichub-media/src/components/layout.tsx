@@ -8,6 +8,8 @@ import { RandyChat } from '@/components/randy-chat';
 import { HearRandyElevenLabs } from '@/components/hear-randy-elevenlabs';
 import { LingerCapture } from '@/components/linger-capture';
 import { CurrencyToggle } from '@/components/currency-toggle';
+import { KitCta, StickyKitCta, intakeHref } from '@/components/br/kit-cta';
+import { logArrival, logCtaClick } from '@/lib/shareTrack';
 
 const NAV_GROUPS = [
   {
@@ -28,6 +30,7 @@ const NAV_GROUPS = [
 ] as const;
 
 const NAV_LINKS = [
+  { href: '/match', label: 'Match' },
   { href: '/rates', label: 'Rates' },
   { href: '/hubs', label: 'Hubs' },
   { href: '/media-kit', label: 'Media kit' },
@@ -61,6 +64,8 @@ export function Layout({ children }: { children: ReactNode }) {
     return () => window.clearInterval(t);
   }, [location]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Share + referral arrivals (?ref=… / utm_*): logged once per page load (lib/shareTrack.ts).
+  useEffect(() => logArrival(), [location]);
 
 
   return (
@@ -98,24 +103,17 @@ export function Layout({ children }: { children: ReactNode }) {
               <a key={l.href} href={l.href} className="hover:text-foreground/70 transition-colors">{l.label}</a>
             ))}
             <a href="tel:+16479316278" className="font-medium whitespace-nowrap underline-offset-2 hover:underline" data-testid="header-call-birch">(647) 931-6278</a>
-            <a
-              href="/match"
-              className="inline-flex items-center gap-1.5 bg-foreground px-3.5 py-2 font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground whitespace-nowrap"
-              data-testid="nav-match"
-            >
-              <span className="size-1.5 rounded-full bg-accent" aria-hidden />
-              Match your audience
-            </a>
+            <KitCta placement="nav" size="sm" sub={null} testId="nav-kit-cta" />
           </nav>
 
           <div className="lg:hidden flex items-center gap-2">
             <a
-              href="/match"
-              className="inline-flex items-center gap-1.5 bg-foreground px-3 py-2 text-sm font-semibold text-background"
-              data-testid="nav-match-mobile"
+              href={intakeHref('nav_mobile')}
+              onClick={() => logCtaClick('nav_mobile')}
+              className="inline-flex items-center gap-1.5 rounded-full bg-lime-300 px-3.5 py-2 text-sm font-bold text-[#0b1f3a] shadow"
+              data-testid="nav-kit-cta-mobile"
             >
-              <span className="size-1.5 rounded-full bg-accent" aria-hidden />
-              Match
+              Get my kit
             </a>
             <button
               className="p-2 -mr-2 text-foreground"
@@ -214,6 +212,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <HearRandyElevenLabs />
         <LingerCapture />
       </div>
+      <StickyKitCta path={location} />
     </div>
   )
 }

@@ -1,3 +1,5 @@
+import { KitCta } from "@/components/br/kit-cta";
+import { ShareBar } from "@/components/br/share-bar";
 import { useMemo, useRef, useState } from "react";
 import { Eye, Radar, ShieldCheck, Send } from "lucide-react";
 import { usePageMeta } from "@/components/br/ui";
@@ -63,6 +65,10 @@ export default function BrIntakeSupplier() {
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For performance brands · Supplier</p>
         <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Where your offers should run</h1>
         <p className="mt-3 max-w-xl text-base text-muted-foreground">Turn categories on, off or maybe. Ask for a first look where it is offered. Nothing here is binding.</p>
+        <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <KitCta placement="hero_role_supplier" size="md" sub="One form for hub + supplier. Website + email to start." />
+          <ShareBar testId="share-bar-role" />
+        </div>
       </header>
 
       <section className="container mx-auto grid gap-5 px-4 pb-6 lg:grid-cols-3">
