@@ -15,7 +15,7 @@ import { ArrowRight, Check, ChevronDown, Loader2, ShieldAlert, Store, Package, P
 import type { IntakeRole } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { RETAIL_COPY } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { FRIDAY_CATEGORIES } from "../../../../api-server/src/lib/kitCalc/fridayV12";
-import { HELD_COPY, PARTIAL_EMAIL_RE, fridayIntake, reportPath, saveRef, type IntakeRef } from "@/lib/fridayBrandIntake";
+import { HELD_COPY, PARTIAL_EMAIL_RE, adapterMode, fridayIntake, reportPath, saveRef, type IntakeRef } from "@/lib/fridayBrandIntake";
 import { basePayload } from "@/components/br/intake-kit";
 import { LeadGatesStatus, PrimaryCta } from "@/components/br/intake-sell";
 import { DEFAULT_MARKET, MarketPicker } from "@/components/br/intake-geo";
@@ -25,6 +25,42 @@ import { reviewGates, type LeadGates } from "@/lib/fridayBrandIntake";
 import { savePrefill } from "@/lib/intakePrefill";
 import { FastReport, type QuickResult } from "@/components/br/fast-report";
 import { numOrU, type SharedAnswers } from "@/components/br/intake-details";
+import { Details } from "@/components/br/details";
+import { cleanPhysical, inLocationReach, type PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
+
+/** "Do you have physical locations?" (Randy, Nov 19 2026 10:54 AM ET): yes/no; if yes, how many + monthly visitors. */
+export type PhysForm = { has: boolean | null; locations: string; visitors: string; basis: "per_location" | "total" };
+export const EMPTY_PHYS: PhysForm = { has: null, locations: "", visitors: "", basis: "per_location" };
+export const physOf = (p: PhysForm): PhysicalAnswer | undefined => (p.has === null ? undefined : cleanPhysical({ has: p.has, locations: numOrU(p.locations), visitors_month: numOrU(p.visitors), basis: p.basis }) ?? undefined);
+const fmt = (n: number) => n.toLocaleString("en-US");
+
+export function LocationsQuestion({ value: p, onChange, side }: { value: PhysForm; onChange: (p: PhysForm) => void; side: IntakeSide }) {
+  const seg = (on: boolean) => `h-9 rounded-full px-4 text-sm font-bold transition ${on ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/75 ring-1 ring-foreground/15 hover:ring-foreground/40"}`;
+  const reach = inLocationReach(physOf(p));
+  return (
+    <div className="mt-4 rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-3" data-testid="intake-locations">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="mr-1 text-sm font-bold text-[#0b1f3a]">Physical locations?</span>
+        <button type="button" aria-pressed={p.has === true} onClick={() => { onChange({ ...p, has: true }); trackIntake(side, "field_start", "locations", { dedupe: true }); }} className={seg(p.has === true)} data-testid="locations-yes">Yes</button>
+        <button type="button" aria-pressed={p.has === false} onClick={() => onChange({ ...p, has: false })} className={seg(p.has === false)} data-testid="locations-no">No</button>
+      </div>
+      {p.has ? (
+        <div className="mt-3 grid gap-2 sm:grid-cols-[8rem_1fr]">
+          <input data-testid="locations-count" aria-label="Number of locations" inputMode="numeric" value={p.locations} onChange={(e) => onChange({ ...p, locations: e.target.value })} placeholder="Locations" className={small} />
+          <div className="flex min-w-0 gap-2">
+            <input data-testid="locations-visitors" aria-label="Estimated visitors a month" inputMode="numeric" value={p.visitors} onChange={(e) => onChange({ ...p, visitors: e.target.value })} placeholder="Visitors / month (est.)" className={`${small} min-w-0`} />
+            <div className="flex shrink-0 rounded-xl bg-white p-0.5 ring-1 ring-foreground/15" role="radiogroup" aria-label="Visitors are">
+              {(["per_location", "total"] as const).map((b) => (
+                <button key={b} type="button" role="radio" aria-checked={p.basis === b} onClick={() => onChange({ ...p, basis: b })} data-testid={`locations-basis-${b}`} className={`rounded-lg px-2.5 text-xs font-bold ${p.basis === b ? "bg-[#0b1f3a] text-white" : "text-foreground/70"}`}>{b === "total" ? "total" : "each"}</button>
+              ))}
+            </div>
+          </div>
+          {reach ? <p className="text-[12px] text-foreground/65 sm:col-span-2" data-testid="locations-reach">≈ {fmt(reach.monthlyVisits)} in-person visits a month. Shown in your kit as In-location display.</p> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 const hostOf = (w: string) => w.trim().replace(/^https?:\/\//i, "").replace(/^www\./i, "").split(/[/?#]/)[0]!.toLowerCase().slice(0, 80) || "your site";
 const input = "h-12 w-full rounded-xl border border-foreground/20 bg-white px-3 text-base outline-none focus:border-foreground focus:ring-2 focus:ring-accent";
@@ -73,6 +109,7 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
   const [marketTouched, setMarketTouched] = useState(false);
   const setMarket = (m: Market) => { setMarketTouched(true); setMarketRaw(m); };
   const [shared, setShared] = useState<SharedAnswers>(EMPTY_SHARED);
+  const [phys, setPhys] = useState<PhysForm>(EMPTY_PHYS);
   const [more, setMore] = useState(false);
   const [website, setWebsite] = useState("");
   const [email, setEmail] = useState("");
@@ -83,6 +120,23 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
   const [quick, setQuick] = useState<QuickResult | null>(null);
   const t0 = useRef(Date.now());
   useEffect(() => trackIntake(side, "view", "intake", { dedupe: true }), [side]);
+  // Drop-off nudge resume link (Randy, Nov 19 2026 10:54 AM ET): /intake?resume=<signed token> reopens the form
+  // prefilled (email, website, roles). ?mock=1&resume=demo shows the prefilled state on previews without the API.
+  const [resumed, setResumed] = useState(false);
+  useEffect(() => {
+    const t = new URLSearchParams(window.location.search).get("resume");
+    if (!t) return;
+    const apply = (x: { email?: string; website?: string; roles?: string[] }) => {
+      if (x.email) setEmail(x.email);
+      if (x.website) setWebsite(x.website);
+      if (x.roles?.length) setR((c) => ({ supplier: x.roles!.includes("supplier") || (!x.roles!.includes("publisher") && c.supplier), hub: x.roles!.includes("publisher"), accelerate: x.roles!.includes("kit") }));
+      setResumed(true);
+      trackIntake(side, "step_complete", "resume", { dedupe: true });
+    };
+    if (t === "demo" && adapterMode() === "mock") return apply({ email: "test+resume@silverbirchgrowth.com", website: "example-brand.com", roles: ["supplier", "publisher"] });
+    fetch(`/v1/kit-resume?t=${encodeURIComponent(t)}`).then((r) => (r.ok ? r.json() : null)).then((x) => x && apply(x)).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const flip = (k: keyof OneFormRoles) => {
     setR((cur) => {
       const next = { ...cur, [k]: !cur[k] };
@@ -101,7 +155,7 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
     roles,
     ...(marketTouched && market.sells_in.length ? { market } : {}),
     ...(shared.brand.trim() ? { company_name: shared.brand.trim() } : {}),
-    shared: { categories: shared.categories, skus: numOrU(shared.skus), audience_customers: numOrU(shared.audience) },
+    shared: { categories: shared.categories, skus: numOrU(shared.skus), audience_customers: numOrU(shared.audience), ...(physOf(phys) ? { physical: physOf(phys) } : {}) },
   });
   // Partial lead (Randy via Emma, Nov 19 2026 10:21 AM ET): once the email is valid, save what's filled in
   // (debounced) and keep updating the SAME record. It stays "abandoned" until the final click flips it to submitted.
@@ -111,7 +165,7 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
   const partialSig = useRef("");
   const submitted = useRef(false);
   const emailOk = PARTIAL_EMAIL_RE.test(email.trim());
-  const partialKey = JSON.stringify([email.trim(), website.trim(), roles, shared, marketTouched ? market : null]);
+  const partialKey = JSON.stringify([email.trim(), website.trim(), roles, shared, phys, marketTouched ? market : null]);
   useEffect(() => {
     if (!emailOk || hp || submitted.current || partialKey === partialSig.current) return;
     const t = window.setTimeout(() => {
@@ -152,9 +206,9 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
       if (r.supplier && r.accelerate) saveRef("kit", next); // Expanded (kit builder) upgrades this same record
       const af = autofill?.fields ?? {};
       const afMarket = af.geo?.value?.sells?.length ? { sells_in: af.geo.value.sells.filter((c): c is "CA" | "US" => c === "CA" || c === "US"), ships_to: (af.geo.value.ships ?? af.geo.value.sells).filter((c): c is "CA" | "US" => c === "CA" || c === "US"), regions: [] } : undefined;
-      savePrefill({ website: website.trim(), email: email.trim(), market: marketTouched ? market : afMarket ?? market, category: shared.categories[0] ?? af.category?.value, categorySource: shared.categories[0] ? "typed" : af.category ? "site" : "default", brand: shared.brand.trim() || af.company_name?.value, aov: af.avg_cart_usd?.value, needs: autofill?.needs_input });
+      savePrefill({ website: website.trim(), email: email.trim(), market: marketTouched ? market : afMarket ?? market, category: shared.categories[0] ?? af.category?.value, categorySource: shared.categories[0] ? "typed" : af.category ? "site" : "default", brand: shared.brand.trim() || af.company_name?.value, aov: af.avg_cart_usd?.value, needs: autofill?.needs_input, physical: physOf(phys) });
       setDone({ ref: next, held: sub.public_mirror === "held", gates: reviewGates(sub, sub.mock) });
-      setQuick({ side, roles, host: hostOf(website), autofill, fallback: fr.fallback, typedMarket: marketTouched ? market : null, held: sub.public_mirror === "held", ref: next, payload, contact: { email: email.trim(), website: website.trim() }, shared, brand: shared.brand.trim() || null, category: shared.categories[0] ?? null });
+      setQuick({ side, roles, host: hostOf(website), autofill, fallback: fr.fallback, typedMarket: marketTouched ? market : null, held: sub.public_mirror === "held", ref: next, payload, contact: { email: email.trim(), website: website.trim() }, shared, brand: shared.brand.trim() || null, category: shared.categories[0] ?? null, physical: physOf(phys) ?? null });
       trackIntake(side, "submit", "fast");
       trackIntake(side, "view", "quick_report");
     } catch (x) {
@@ -198,21 +252,23 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
       <fieldset>
         <legend className="text-[11px] font-bold uppercase tracking-wider text-foreground/60">You are… <span className="font-semibold normal-case tracking-normal text-foreground/50">(most brands are both)</span></legend>
         <div className="mt-2 grid gap-2 md:grid-cols-2" data-testid="intake-roles">
-          <RoleCard on={r.supplier} onClick={() => flip("supplier")} icon={Package} title="Supplier" tag="Performance-only" sub="Get your products into curated hubs. Pay on results, no ad spend." testId="intake-role-supplier">
+          <RoleCard on={r.supplier} onClick={() => flip("supplier")} icon={Package} title="Supplier" tag="Performance-only" sub="Get into curated hubs. Pay on results." testId="intake-role-supplier">
             {r.supplier ? <AccelerateToggle on={r.accelerate} onClick={() => flip("accelerate")} /> : null}
           </RoleCard>
-          <RoleCard on={r.hub} onClick={() => flip("hub")} icon={Store} title="Hub" tag="Max exposure" sub="Have an audience, shelf, screens or pages? Put your products in front of it for max exposure, and earn a share." testId="intake-role-hub" />
+          <RoleCard on={r.hub} onClick={() => flip("hub")} icon={Store} title="Hub" tag="Max exposure" sub="Your audience, shelf or screens. Earn a share." testId="intake-role-hub" />
         </div>
         {supplierOnly ? (
           <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-lime-300 bg-lime-50 p-4 md:flex-row md:items-center md:justify-between" data-testid="supplier-only-note">
             <div>
-              <p className="text-sm font-bold text-[#0b1f3a]">Supplier-only works. Add your hub to unlock max exposure.</p>
-              <p className="mt-0.5 text-[13px] text-foreground/70">A hub puts your products on your own shelf and pages too, the most shelf space and eyeballs. Network: {RETAIL_COPY} <span className="whitespace-nowrap">(network figures)</span>.</p>
+              <p className="text-sm font-bold text-[#0b1f3a]">Supplier-only works. Add your hub for max exposure.</p>
+              <Details testId="supplier-only-details" className="mt-1"><p>A hub puts your products on your own shelf and pages too. Network: {RETAIL_COPY} (network figures).</p></Details>
             </div>
             <button type="button" onClick={addHub} data-testid="supplier-only-add-hub" className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-lime-300 hover:text-[#0b1f3a]"><Plus className="size-4" />Add my hub</button>
           </div>
         ) : null}
       </fieldset>
+      {resumed ? <p className="mt-3 rounded-xl bg-lime-50 p-3 text-sm font-semibold text-[#0b1f3a]" data-testid="intake-resumed">Welcome back. We saved your answers: check them and get your kit.</p> : null}
+      <LocationsQuestion value={phys} onChange={setPhys} side={side} />
 
       <div className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr_auto]">
         <input data-testid="intake-website" aria-label="Website" required value={website} onFocus={fieldStart(side, "website")} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" autoComplete="url" className={input} />
@@ -225,7 +281,7 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
       {err ? <p className="mt-2 text-sm font-semibold text-red-700" data-testid="intake-error">{err}</p> : null}
 
       <button type="button" onClick={() => setMore((v) => !v)} aria-expanded={more} data-testid="intake-more-toggle" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-foreground/70 underline-offset-2 hover:underline">
-        <ChevronDown className={`size-4 transition ${more ? "rotate-180" : ""}`} />Optional: sharpen it now (asked once, used for both sides)
+        <ChevronDown className={`size-4 transition ${more ? "rotate-180" : ""}`} />More detail (optional)
       </button>
       {more ? (
         <div className="mt-3 grid gap-3 rounded-2xl bg-foreground/[0.03] p-3 md:grid-cols-2" data-testid="intake-shared">
@@ -250,7 +306,7 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
       <div className="mt-4 border-t border-foreground/10 pt-3 text-[13px]" data-testid="intake-secondary">
         <a href="/intake/sponsor" className="text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-sponsor-link">Want to own a category or an area? See category and area locks</a>
       </div>
-      <p className="mt-2 text-[11px] text-muted-foreground">Business-level only, no customer data. Every figure is an estimate, reviewed by a person. Nothing is booked or charged.</p>
+      <Details testId="intake-fine"><p>Business-level only, no customer data. Every figure is an estimate, reviewed by a person. Nothing is booked or charged. Optional answers are asked once and used for both sides.</p></Details>
     </form>
   );
 }

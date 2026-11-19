@@ -4,6 +4,7 @@
  * strong primary CTA. Only a generic review state is shown (Friday's hub-partner match is internal only and never rendered).
  * No approval controls on Birch.
  */
+import { Details } from "@/components/br/details";
 import { ArrowRight, Clock, FlaskConical, Store, Megaphone } from "lucide-react";
 import type { IntakeRole } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
@@ -84,7 +85,7 @@ export function LeadGatesStatus({ gates, testId = "lead-gates" }: { gates: LeadG
     <div data-testid={testId} className="mt-3 flex flex-wrap items-center gap-2">
       {gates.mock ? <span data-testid={`${testId}-mock`} className="inline-flex items-center gap-1 rounded-full bg-violet-700 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"><FlaskConical className="size-3" />Mock · preview state</span> : null}
       <span data-testid={`${testId}-pending`} className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900"><Clock className="size-3.5" />In review, pending BR approval</span>
-      <p className="basis-full text-xs text-muted-foreground">A person at Birch Reserve approves before anything changes on a hub screen or page. Nothing is booked or charged until then.</p>
+      <Details className="basis-full !mt-0" testId={`${testId}-details`}><p>A person at Birch Reserve approves before anything changes on a hub screen or page. Nothing is booked or charged until then.</p></Details>
     </div>
   );
 }

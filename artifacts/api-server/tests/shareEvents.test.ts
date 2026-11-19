@@ -50,6 +50,10 @@ test("one form: supplier + hub map to v1 keys, extras to a labelled blurb, no na
   oneFormFields({ schema: "birch-brand-intake/v1-draft", role: "supplier", roles: ["supplier", "publisher", "kit"], site: "birchreserve.net", terms_version: "t", supplier_detail: { accelerate_budget: "$1,000 test" } }, acc);
   assert.match(String(acc.blurb), /supplier \+ hub \+ Accelerate \(premium display placements\)/);
   assert.match(String(acc.blurb), /Accelerate test budget: \$1,000 test/);
+  // Physical locations (Nov 19 2026 10:54 AM ET): no v1 field yet, so a labelled blurb line (CONTRACT-GAPS.md §J).
+  const loc: Record<string, unknown> = {};
+  oneFormFields({ schema: "birch-brand-intake/v1-draft", role: "supplier", roles: ["supplier", "publisher"], site: "birchreserve.net", terms_version: "t", shared: { physical: { has: true, locations: 3, visitors_month: 1200, basis: "per_location" } } }, loc);
+  assert.match(String(loc.blurb), /Physical locations \(brand-reported\): yes; 3 locations; 1200 visitors \/ month \(per location\); ≈ 3600 in-person visits \/ month in total\. In-location display: priced by IO\./);
 });
 
 test("share events: mirror source tag (src) is allow-listed and summarized by host", () => {

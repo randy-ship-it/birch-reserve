@@ -229,7 +229,8 @@ export type IntakePayload = {
    * → the v1 `blurb` as labelled lines. See /workspace/br-intake/CONTRACT-GAPS.md §H.
    */
   company_name?: string;
-  shared?: { categories?: string[]; skus?: number; audience_customers?: number };
+  /** physical: "Do you have physical locations?" (Nov 19 2026 10:54 AM ET) → In-location display line; see inLocation.ts. */
+  shared?: { categories?: string[]; skus?: number; audience_customers?: number; physical?: import("./inLocation").PhysicalAnswer };
   hub?: { type?: string; locations?: number; foot_traffic_month?: number; web_visitors_month?: number; page_views_month?: number; email_list?: number; screens?: number; surfaces?: string[]; cities?: string; decision_maker_role?: string };
   supplier_detail?: { avg_price_usd?: number; margin_band?: string; retail_now?: string; ships?: string; accelerate_budget?: string };
   notes?: string[];

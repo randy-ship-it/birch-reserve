@@ -13,6 +13,7 @@
  * /workspace/br-intake/CONTRACT-GAPS.md. Labelled MOCK when the Birch server has no Friday config: nothing leaves
  * the browser and every screen says so. Nothing is ever auto-accepted.
  */
+import { cleanPhysical, physicalBlurb } from "../../../api-server/src/lib/overhaul/inLocation";
 import { mirrorSource } from "./shareTrack";
 import { marketToFridayGeo, marketToGeographyText, splitRegions, type Eligibility, type Market } from "../../../api-server/src/lib/kitCalc/channelGeo";
 import { mockExposure, type FridayExposure } from "../../../api-server/src/lib/kitCalc/activation";
@@ -198,6 +199,8 @@ export function oneFormFields(p: IntakePayload, body: Record<string, unknown>): 
     profile.interests = labels.join(", ");
   }
   if (num(sh.skus) != null) lines.push(`Products / SKUs: ${num(sh.skus)}.`);
+  const phys = physicalBlurb(cleanPhysical(sh.physical));
+  if (phys) lines.push(phys); // no v1 field: CONTRACT-GAPS.md §J
   const audience: Record<string, number> = {};
   if (num(sh.audience_customers) != null) audience.customers = num(sh.audience_customers)!;
   const h = p.hub;

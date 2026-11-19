@@ -28,6 +28,10 @@ export type SiteMail = {
   text: string;
   html?: string;
   replyTo?: string;
+  /** Resend attachments: base64 content (e.g. the Monetization Kit PDF). */
+  attachments?: Array<{ filename: string; content: string }>;
+  /** Extra headers (List-Unsubscribe on the nudge). */
+  headers?: Record<string, string>;
 };
 
 export type ResendFetch = (url: string, init: { method: string; headers: Record<string, string>; body: string; signal: AbortSignal }) => Promise<{
@@ -63,6 +67,8 @@ export async function resendSend(mail: SiteMail): Promise<{ id: string | null }>
         text: mail.text,
         ...(mail.html ? { html: mail.html } : {}),
         ...(mail.replyTo ? { reply_to: mail.replyTo } : {}),
+        ...(mail.attachments?.length ? { attachments: mail.attachments } : {}),
+        ...(mail.headers ? { headers: mail.headers } : {}),
       }),
       signal: controller.signal,
     });

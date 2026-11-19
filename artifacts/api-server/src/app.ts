@@ -12,6 +12,7 @@ import advertiserGuidesRouter from "./routes/advertiserGuides";
 import sponsorPageRouter from "./routes/sponsorPage";
 import { createOverhaulRouter } from "./routes/overhaul";
 import { createBrandIntakeProxy } from "./routes/brandIntakeProxy";
+import { createKitEmailRouter } from "./routes/kitEmail";
 import { createAgentRouter } from "./routes/agent";
 import { getStripeClient } from "./lib/stripeClient";
 import publicSeoRouter, { unknownDocument } from "./routes/publicSeo";
@@ -97,6 +98,8 @@ app.use(
 );
 app.use(mirrorFrame());
 app.use(createBrandIntakeProxy({ log: (msg, extra) => logger.info(extra ?? {}, msg) }));
+// Monetization Kit emails + resume/unsubscribe (flags default OFF; lib/kitEmails.ts).
+app.use(createKitEmailRouter());
 app.use(sponsorPageRouter);
 app.use(publicPagesRouter);
 app.use(advertiserGuidesRouter);

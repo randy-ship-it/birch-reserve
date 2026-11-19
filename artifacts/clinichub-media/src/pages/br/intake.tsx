@@ -12,6 +12,7 @@ import { MockBanner } from "@/components/br/intake-kit";
 import { IntakeShortForm } from "@/components/br/intake-short-form";
 import { ReportV2 } from "@/components/br/report-v2";
 import { ShareBar } from "@/components/br/share-bar";
+import { Details } from "@/components/br/details";
 import { sampleReport } from "@/lib/fridayMockReport";
 import { RT, RT_SANS, RT_SERIF } from "@/lib/reportTokens";
 import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
@@ -40,7 +41,7 @@ export default function BrIntake() {
         <div className="container mx-auto max-w-5xl px-4 pb-8 pt-8 md:pt-14">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · Monetization Kit</p>
           <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Get your Monetization Kit.</h1>
-          <p className="mt-2 max-w-2xl text-base text-muted-foreground">One short form. See what your hub could earn and where your products get seen, side by side. Estimates, reviewed by a person.</p>
+          <p className="mt-2 max-w-2xl text-base text-muted-foreground">One short form. Your exposure and earnings, side by side.</p>
           <div className="mt-5">{mode === "fast" ? <IntakeShortForm onExpand={expand} /> : null}</div>
           <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <ShareBar testId="share-bar-intake" />
@@ -59,8 +60,8 @@ export default function BrIntake() {
       ) : null}
       <div className="container mx-auto px-4 pb-12 pt-6" style={{ fontFamily: RT_SANS }} data-testid="sample-kit">
         <span className="rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider" style={{ background: RT.mint, color: RT.forest }} data-testid="sample-label">Sample · example values only</span>
-        <h2 className="mt-3 text-3xl md:text-5xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you get: both answers from one form.</h2>
-        <p className="mt-1 max-w-2xl text-sm" style={{ color: RT.mute }}>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range in USD, not a result or a guarantee.</p>
+        <h2 className="mt-3 text-3xl md:text-5xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you get.</h2>
+        <Details testId="sample-details"><p>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range in USD, not a result or a guarantee.</p></Details>
         <div className="mt-4"><ReportV2 report={sample} sample compact exposure={SAMPLE_EXPOSURE} exposureSource="sample" /></div>
       </div>
     </div>
