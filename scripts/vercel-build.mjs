@@ -40,6 +40,8 @@ const API_PATHS = [
   "/advertise/?",
   "/availability\\.json",
   "/kit/?",
+  "/kit/r/[^/]+/?",
+  "/brand-kit/?",
   "/sponsor/?",
   // Overhaul routes: the function serves the SPA shell with per-route head + JSON-LD.
   "/advertise/(?:brands|local)/?",
@@ -51,6 +53,7 @@ const API_PATHS = [
   "/mediakit/?",
   "/agencies/?",
   "/media-buyers/?",
+  "/intake(?:/(?:publisher|supplier|sponsor|report))?/?",
   "/ai-buyers/?",
   "/terms/?",
   "/privacy/?",

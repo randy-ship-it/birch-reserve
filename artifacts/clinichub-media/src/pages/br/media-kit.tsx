@@ -8,6 +8,7 @@ import { BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BUYER_FAQ_TITLE, BuyerFaq, EarlySlots, FlightTimeline, ProgramsCallout, SAMPLE_REPORT, FLIGHT_TIMELINE, SampleIoLink, SampleReport, SeeTheUnit } from "@/components/br/buyer-comfort";
 import { DoorRoute } from "@/components/br/door-route";
+import { KitBuilder } from "@/components/br/kit-builder";
 import { AvailabilityStrip, CategoryRequestForm, FaceBeforeFlight, FounderNote, NETWORK_HUBS, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import {
   AGENCY_CASH_PCT,
@@ -144,6 +145,7 @@ export default function BrMediaKit() {
             <EarlySlots />
           </div>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row" id="download">
+            <Cta href="#my-kit" variant="lime" testId="mk-download-kit-hero" className="w-full sm:w-auto">Download my kit</Cta>
             <Cta href={RESERVE_HREF} variant="lime" testId="mk-reserve-hero" className="w-full sm:w-auto">Reserve your space — {price.seat}</Cta>
             <Cta href={LOOK_HREF} variant="ink" testId="mk-look-hero" className="w-full sm:w-auto">Take a 7-day look — {price.look}</Cta>
             <Cta href="#request" variant="line" testId="mk-request-hero" className="w-full sm:w-auto">Ask about a placement</Cta>
@@ -152,6 +154,9 @@ export default function BrMediaKit() {
 
         </div>
       </section>
+
+      {/* Download my kit: personalized two-sided kit (preview, Nov 18 2026) */}
+      <KitBuilder />
 
       {/* Proof */}
       <section id="proof" className="scroll-mt-20 border-b border-border/70 bg-background">

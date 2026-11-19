@@ -1,3 +1,4 @@
+import { CategoryCards, PilotHero } from "@/components/br/pilot-path";
 import { ConveyorHero } from "@/components/br/conveyor";
 import { BrandBanners } from "@/components/br/brand-banners";
 import { FourPaths, MetaComparison, PositioningBand, SurfacesGrid } from "@/components/br/blocks";
@@ -41,6 +42,7 @@ export default function BrHome() {
           address: { "@type": "PostalAddress", addressLocality: "Toronto", addressRegion: "ON", addressCountry: "CA" },
         }}
       />
+      <PilotHero testId="home-pilot-hero" />
       <PrimeHero />
 
       <section id="placements" className="scroll-mt-20 border-b border-border/70 bg-background lg:hidden" data-testid="home-placements-mobile">
@@ -52,6 +54,8 @@ export default function BrHome() {
       <Section id="proof-live">
         <FaceBeforeFlight />
       </Section>
+
+      <CategoryCards />
 
       <Section id="request" tone="soft">
         <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">

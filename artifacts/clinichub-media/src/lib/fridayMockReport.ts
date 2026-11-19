@@ -1,0 +1,60 @@
+/**
+ * PREVIEW-ONLY mock of Friday's brand-report.v1 (contract: /workspace/birch-friday-contract/brand-intake-v1.md).
+ * Shape follows the contract; values come from Birch's shared modules so the preview is honest about its source.
+ * Every object carries mock: true and the UI labels it. Never used on birchreserve.net.
+ */
+import type { FridayReport, ReportView } from "./fridayBrandIntake";
+import type { IntakePayload } from "../../../api-server/src/lib/overhaul/brandIntake";
+import { CHANNEL_TILES, PROPOSED_ANCHOR_HUBS, RATE_PLACEMENTS, hubFit, projectPublisher } from "../../../api-server/src/lib/overhaul/brandIntake";
+import { KIT_CALC_CONFIG, kitCalc } from "../../../api-server/src/lib/kitCalc";
+
+const FK: Record<string, string> = { "scale-hubs": "hubs", "calm-joints": "calm_joints", "street-team": "street_team", "retail-network": "retail" };
+const lh = (r: readonly [number, number]) => ({ low: r[0], high: r[1] });
+
+export function mockReport(payload: IntakePayload, body: Record<string, unknown>, view: ReportView, version: number, updated: string, roles: string[], mirror?: "published" | "held"): FridayReport {
+  const calc = body.calculator as { avg_cart_usd?: number; orders_per_month?: number; purchases_per_year?: number; margin_band?: string } | undefined;
+  const k = payload.kit_calculator;
+  const c = kitCalc({ aovUsd: k?.aov_usd ?? calc?.avg_cart_usd ?? 0, monthlyOrders: k?.monthly_orders ?? calc?.orders_per_month ?? 0, purchasesPerYear: k?.purchases_per_year_range ?? calc?.purchases_per_year ?? 1, marginBand: k?.margin_band ?? calc?.margin_band ?? "" });
+  const missing = calc ? [] : ["avg_cart_usd", "orders_per_month", "purchases_per_year", "margin_band"];
+  const cat = k?.category ?? "recovery";
+  const fits = hubFit(cat);
+  const report: FridayReport = {
+    schema: "brand-report.v1",
+    brand: { name: k?.brand_label ?? "Your brand" },
+    version,
+    updated,
+    roles,
+    view,
+    status: { public_mirror: mirror ?? "published", kits_pending: 0 },
+    ltv: {
+      label: "Estimate",
+      model: "ltv-v1",
+      inputs: calc ?? {},
+      lifetime_years: { low: KIT_CALC_CONFIG.ltvHorizonYears.lo, high: KIT_CALC_CONFIG.ltvHorizonYears.hi, placeholder: true },
+      missing,
+      needs_input: missing.length > 0,
+      gp_per_order_usd: missing.length ? null : lh(c.gpPerOrderUsd),
+      gp_ltv_usd: missing.length ? null : lh(c.ltvGpUsd),
+      monthly_gp_usd: missing.length ? null : lh(c.current.monthlyGpUsd),
+      formula: "avg cart × margin band × purchases/yr × lifetime years (lifetime is a placeholder)",
+    },
+    demand_fit: {
+      label: "Estimate · subject to human confirmation",
+      channels: CHANNEL_TILES.map((t, i) => ({ key: FK[t.key]!, name: t.name, fit: [80, 50, 50, 50][i]!, fit_label: i === 0 ? "Good fit (mock)" : "Possible fit (mock)", subject_to_human_confirmation: true })),
+      anchor_hubs: PROPOSED_ANCHOR_HUBS.map((h) => {
+        const f = fits.find((x) => x.key === h.key)!;
+        return { key: h.key, name: h.name, status: h.live ? "Live" : "Coming soon", confirmed_anchor: false, fit: f.fit === "Likely fit" ? 80 : 40, fit_label: `${f.fit === "Likely fit" ? "Good fit" : "Possible fit"} (mock)`, reason: null, subject_to_human_confirmation: true };
+      }),
+    },
+    channels: CHANNEL_TILES.map((t) => ({ key: FK[t.key]!, name: t.name, figures: t.stats.map((s) => `${s.v} ${s.l}`), figures_label: "network figures / targets", fit: 0, fit_label: "", line: t.line, image: "image" in t ? t.image : null })),
+    placements: RATE_PLACEMENTS.map((r) => ({ key: r.key, label: r.label, fit: 0, fit_label: "", cpm_usd: lh(r.cpm), cpc_usd: lh(r.cpc), needs_rate: false })),
+    mock: true,
+  };
+  if (view === "publisher" && payload.publisher) {
+    const p = projectPublisher({ on: Object.fromEntries(payload.publisher.surfaces.map((s) => [s.key, s.on])), mode: payload.publisher.mode, sizeX: payload.publisher.size_x, conversionPct: payload.publisher.conversion_pct, valuePerConversionUsd: payload.publisher.value_per_conversion_usd });
+    report.role_data = { publisher: { surfaces: p.rows.filter((r) => r.on).map((r) => ({ surface: r.key, payout_usd: lh(r.payoutUsd), needs_rate: !r.priced })), config: { base_share: 0.35, tiers: "placeholder" }, mock: true } };
+  }
+  if (view === "supplier" && payload.supplier) report.role_data = { supplier: { first_look: payload.supplier.categories.filter((c) => c.state !== "off").map((c) => ({ category: c.key, choice: c.state, status: "pending_review" })), status: "pending_review" } };
+  if (view === "sponsor" && payload.sponsor) report.role_data = { sponsor: { skus: payload.sponsor.interest, status: "pending_review" } };
+  return report;
+}

@@ -1,3 +1,4 @@
+import { KitEntry } from "@/components/br/pilot-path";
 import { CheckCircle2 } from "lucide-react";
 import { LeadForm } from "@/components/br/lead-form";
 import { AgencyPayouts, GoalPlanner, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
@@ -30,6 +31,7 @@ export default function BrAgencies() {
   return (
     <div data-testid="br-agencies">
       <JsonLd data={{ "@context": "https://schema.org", "@type": "Service", name: "Birch Reserve agency test budgets", provider: { "@type": "Organization", name: "Birch Reserve" }, areaServed: ["CA", "US"], serviceType: "Retail media / post-purchase advertising", url: "https://birchreserve.net/agencies" }} />
+      <KitEntry from="agencies" />
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>

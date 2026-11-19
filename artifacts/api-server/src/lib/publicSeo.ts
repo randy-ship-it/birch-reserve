@@ -78,6 +78,13 @@ export const SPA_SHELL_PATHS = [
   "/rates",
   "/audiences",
   "/audiences/sample-profile",
+  // Brand intake (PREVIEW, Nov 18 2026): noindex until Randy approves. Not in the sitemap.
+  "/intake",
+  "/intake/publisher",
+  "/intake/supplier",
+  "/intake/sponsor",
+  "/intake/report",
+  "/brand-kit",
 ] as const;
 
 /** Client routes that duplicate another URL. The canonical is the target. */
@@ -91,6 +98,9 @@ export function isNoIndexPath(pathname: string): boolean {
   const clean = normalizedPath(pathname);
   if (NOINDEX_PATHS.has(clean)) return true;
   // Unlisted brand-fit pages (/for/:slug) are public with the link, but never indexed.
+  if (clean === "/intake" || clean.startsWith("/intake/")) return true;
+  // Brand kit + private report links (Nov 18 2026): never indexed.
+  if (clean === "/brand-kit" || clean.startsWith("/kit/r/")) return true;
   return clean === "/for" || clean.startsWith("/for/");
 }
 

@@ -9,6 +9,7 @@ import publicPagesRouter from "./routes/publicPages";
 import advertiserGuidesRouter from "./routes/advertiserGuides";
 import sponsorPageRouter from "./routes/sponsorPage";
 import { createOverhaulRouter } from "./routes/overhaul";
+import { createBrandIntakeProxy } from "./routes/brandIntakeProxy";
 import { createAgentRouter } from "./routes/agent";
 import { getStripeClient } from "./lib/stripeClient";
 import publicSeoRouter, { unknownDocument } from "./routes/publicSeo";
@@ -42,7 +43,8 @@ app.use(
         return {
           id: req.id,
           method: req.method,
-          url: req.url?.split("?")[0],
+          // Report tokens are bearer links: never in logs (brand-intake-v1 §2).
+          url: req.url?.split("?")[0]?.replace(/^\/(v1\/brand-report|kit\/r)\/[^/]+/, "/$1/:token"),
         };
       },
       res(res) {
@@ -91,6 +93,7 @@ app.use(
     },
   }),
 );
+app.use(createBrandIntakeProxy({ log: (msg, extra) => logger.info(extra ?? {}, msg) }));
 app.use(sponsorPageRouter);
 app.use(publicPagesRouter);
 app.use(advertiserGuidesRouter);
