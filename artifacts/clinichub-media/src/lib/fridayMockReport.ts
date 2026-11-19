@@ -73,3 +73,28 @@ export function sampleReport(): FridayReport {
   r.brand = { name: "Example brand", domain: "example-brand.test" };
   return r;
 }
+
+/** Fast-mode defaults (labelled on screen). Not the brand's numbers; "Add detail" replaces them. */
+export const QUICK_DEFAULTS = { aov_usd: 80, orders_per_month: 500, repeat_band: "2_3", repeat_label: "2–3 a year", purchases_per_year: 2, margin_band: "30_50", margin_label: "30–50%" } as const;
+/**
+ * Instant on-page "Quick estimate from your website + defaults": the shared calculator, channel tiles and anchor
+ * set, computed in the browser from Friday's v1.3 site auto-fill (when present) and the defaults above. Birch never
+ * fetches the brand's site itself. Never sent to Friday as data.
+ */
+export function quickReport(o: { roles: string[]; category: string; host: string; name?: string | null; aovUsd?: number | null }): FridayReport {
+  const payload = {
+    kit_calculator: { brand_label: o.host, category: o.category },
+    publisher: { mode: "display", size_x: 1, conversion_pct: 1, value_per_conversion_usd: 0, surfaces: ["post_purchase", "home", "product", "member_dashboard", "newsletter"].map((key) => ({ key, on: true })) },
+  } as unknown as IntakePayload;
+  const body = { calculator: { avg_cart_usd: o.aovUsd ?? QUICK_DEFAULTS.aov_usd, orders_per_month: QUICK_DEFAULTS.orders_per_month, purchases_per_year: QUICK_DEFAULTS.purchases_per_year, margin_band: QUICK_DEFAULTS.margin_band } };
+  const r = mockReport(payload, body, o.roles.includes("publisher") ? "publisher" : "brand", 1, new Date().toISOString(), o.roles);
+  const unmock = (s: string) => s.replace(/\s*\(mock\)/g, "");
+  r.brand = { name: o.name || o.host, domain: o.host };
+  if (r.demand_fit) {
+    r.demand_fit.channels = r.demand_fit.channels.map((c) => ({ ...c, fit_label: unmock(c.fit_label) }));
+    r.demand_fit.anchor_hubs = r.demand_fit.anchor_hubs.map((h) => ({ ...h, fit_label: unmock(h.fit_label) }));
+  }
+  r.demand_opportunity = { label: "Estimate", needs_input: true, missing: ["scale_demand_unavailable"] };
+  r.mock = false; // labelled as a quick estimate instead
+  return r;
+}

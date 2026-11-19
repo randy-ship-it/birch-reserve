@@ -218,6 +218,8 @@ export type IntakePayload = {
   supplier?: { max_distribution: boolean; categories: Array<{ key: string; state: TriState; first_look: boolean }> };
   sponsor?: { interest: Array<(typeof SPONSOR_OFFERS)[number]["key"]>; category?: string; area?: string };
   /** Kit calculator inputs (captured data, no PII). Not yet in Friday's contract: see CONTRACT-GAPS.md. */
+  /** v1.2 shared category key (fast mode: guessed from the site title/meta, or a labelled default). */
+  category?: string;
   kit_calculator?: { aov_usd: number; monthly_orders: number; purchases_per_year: number; purchases_per_year_range?: [number, number]; repeat_band?: string; margin_band: string; spend_usd: number; conversion_pct: number; category: string; brand_label?: string; calc_version: string };
   /** Lead events (e.g. kit_download). Not yet in Friday's contract: see CONTRACT-GAPS.md. */
   events?: Array<{ type: "kit_download"; at: string; formats: Array<"pdf" | "png"> }>;

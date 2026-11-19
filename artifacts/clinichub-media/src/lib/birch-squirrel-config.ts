@@ -1,6 +1,6 @@
 /**
  * Birch Q&A Squirrel: the same character as the Friday pipeline squirrel
- * (fridayapp.org/share/align-pipeline). Art is copied from
+ * (a Friday share page). Art is copied from
  * randy-ship-it/friday-crm artifacts/crm/public/brand/ so this site has no
  * runtime dependency on Friday.
  *

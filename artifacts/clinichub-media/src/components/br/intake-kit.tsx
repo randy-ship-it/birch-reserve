@@ -9,6 +9,7 @@ import { animate } from "framer-motion";
 import { Info, Store, Megaphone, Target, Check, CloudUpload, FlaskConical } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CHANNEL_TILES, CHANNEL_TILES_FINE, CHANNEL_TILES_LABEL, INTAKE_TERMS_VERSION, type IntakePayload, type IntakeRole } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { loadPrefill } from "@/lib/intakePrefill";
 import { adapterMode, onAdapterModeChange, fridayIntake, loadRef, saveRef, type IntakeRef } from "@/lib/fridayBrandIntake";
 
 export function EstimateTag({ children = "Estimate" }: { children?: ReactNode }) {
@@ -139,7 +140,10 @@ export function RoleTabs({ active }: { active?: IntakeRole }) {
   );
 }
 
-/** Autosave to Friday (or the preview mock). Creates on first change, then PATCHes. */
+/**
+ * Autosave: PATCHes an existing Friday record only (one created by a final submit with email). It never creates a
+ * record, so nothing reaches Friday before the visitor clicks the final button with an email (Randy, 11:36 PM).
+ */
 export function useAutosave(role: IntakeRole, payload: IntakePayload, enabled: boolean) {
   const [ref, setRef] = useState<IntakeRef | null>(() => (typeof window === "undefined" ? null : loadRef(role)));
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -150,7 +154,8 @@ export function useAutosave(role: IntakeRole, payload: IntakePayload, enabled: b
       setState("saving");
       try {
         const api = fridayIntake();
-        const next = ref ? await api.update(ref, payload).catch(() => ref) /* never re-create a draft on a failed autosave */ : await api.create(payload);
+        if (!ref) return setState("idle"); // inputs stay on this device until the final submit
+        const next = await api.update(ref, payload).catch(() => ref); // never re-create a draft on a failed autosave
         saveRef(role, next);
         setRef(next);
         setState("saved");
@@ -262,8 +267,10 @@ export function ChannelTiles({ market, fridayGeo }: { market?: Market | null; fr
 
 /** Contact + submit bar for a role view: submits the autosaved draft to Friday (lead → submitted, pending review). */
 export function ContactSubmit({ role, payload, draft, setRef, label }: { role: IntakeRole; payload: IntakePayload; draft: IntakeRef | null; setRef: (r: IntakeRef) => void; label: string }) {
-  const [email, setEmail] = useState("");
-  const [website, setWebsite] = useState("");
+  const pre = typeof window === "undefined" ? null : loadPrefill();
+  const [email, setEmail] = useState(pre?.email ?? "");
+  const [website, setWebsite] = useState(pre?.website ?? "");
+  const isUpdate = !!draft && draft.version >= 1; // expanded mode after a fast submit: PATCH the same record
   const [hp, setHp] = useState("");
   const [state, setState] = useState<"idle" | "busy" | "done" | "error">("idle");
   const [err, setErr] = useState<string | null>(null);
@@ -283,7 +290,8 @@ export function ContactSubmit({ role, payload, draft, setRef, label }: { role: I
       saveRef(role, next);
       setRef(next);
       setGates(reviewGates(res, res.mock));
-      trackIntake(side, "submit", role === "kit" ? "kit" : role);
+      trackIntake(side, "submit", isUpdate ? "update" : role === "kit" ? "kit" : role);
+      trackIntake(side, "mode", "expanded");
       setState("done");
     } catch (e) {
       const c = (e as Error).message;
@@ -305,7 +313,7 @@ export function ContactSubmit({ role, payload, draft, setRef, label }: { role: I
           <div className="grid gap-2 md:grid-cols-[1fr_1fr_auto]">
             <input data-testid={`${role}-website`} onFocus={fieldStart(side, "website")} value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" aria-label="Website" className="h-11 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
             <input data-testid={`${role}-email`} onFocus={fieldStart(side, "email")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email" aria-label="Work email" className="h-11 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
-            <button type="button" data-testid={`${role}-submit`} onClick={go} disabled={state === "busy"} className="h-11 rounded-full bg-foreground px-5 text-sm font-bold text-background">{label}</button>
+            <button type="button" data-testid={`${role}-submit`} onClick={go} disabled={state === "busy"} className="h-11 rounded-full bg-foreground px-5 text-sm font-bold text-background">{isUpdate ? "Update my numbers" : label}</button>
           </div>
           <input tabIndex={-1} aria-hidden autoComplete="off" name="company_url" value={hp} onChange={(e) => setHp(e.target.value)} className="absolute -left-[9999px] h-0 w-0 opacity-0" />
           {err ? <p className="mt-2 text-sm font-semibold text-red-700">{err}</p> : null}

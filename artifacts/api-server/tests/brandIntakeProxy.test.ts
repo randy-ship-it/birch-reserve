@@ -274,3 +274,34 @@ test("sendIntake itself refuses a brand_intake draft or an email-less record (de
     globalThis.fetch = realFetch;
   }
 });
+
+test("v1.3 fast mode: website+email required (nothing sent otherwise); strict Friday → fast_unsupported; fast PATCH never forwarded", async () => {
+  const calls: Array<{ url: string; body: Record<string, unknown> }> = [];
+  let mode: "v13" | "strict" = "strict";
+  const f = (async (url: string, init: RequestInit) => {
+    const body = JSON.parse(String(init.body ?? "{}"));
+    calls.push({ url, body });
+    if (mode === "strict" && "submit_mode" in body) return new Response(JSON.stringify({ ok: false, error: "invalid", issues: [{ path: "submit_mode" }] }), { status: 400 });
+    return new Response(JSON.stringify({ ok: true, id: "bi_abc12345", editToken: "e".repeat(20), reportToken: "r".repeat(20), version: 1, submit_mode: "fast", autofill: { fields: {}, needs_input: ["avg_cart_usd"] } }), { status: 201 });
+  }) as unknown as typeof fetch;
+  const s = await serve(ENV, f, true);
+  const post = (b: unknown) => realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(b) });
+  const r0 = await post({ submit_mode: "fast", website: "example.com" });
+  assert.equal(r0.status, 400);
+  assert.equal((await r0.json()).error, "fast_needs_website_email");
+  assert.equal(calls.length, 0);
+  const r1 = await post({ submit_mode: "fast", website: "example.com", email: "growth@example.com" });
+  assert.equal(r1.status, 409);
+  assert.equal((await r1.json()).error, "fast_unsupported");
+  assert.equal(calls[0]!.body.submit, true);
+  mode = "v13";
+  const r2 = await post({ submit_mode: "fast", website: "example.com", email: "growth@example.com" });
+  assert.equal(r2.status, 201);
+  assert.equal((await r2.json()).submit_mode, "fast");
+  const n = calls.length;
+  const p = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { method: "PATCH", headers: { "content-type": "application/json", "x-edit-token": "t".repeat(24) }, body: JSON.stringify({ submit_mode: "fast" }) });
+  s.close();
+  assert.equal(p.status, 400);
+  assert.equal((await p.json()).error, "fast_create_only");
+  assert.equal(calls.length, n);
+});

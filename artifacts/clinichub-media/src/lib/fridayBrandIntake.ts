@@ -21,7 +21,12 @@ import { mockReport } from "./fridayMockReport";
 import { V12_MARGIN, V12_REPEAT, toFridayCategory } from "../../../api-server/src/lib/kitCalc/fridayV12";
 
 
-export type IntakeRef = { id: string; editToken: string; reportToken: string; version: number; legacy?: boolean };
+export type IntakeRef = { id: string; editToken: string; reportToken: string; version: number; legacy?: boolean; /** Friday answered in v1.3 (submit_mode): upgrades PATCH with submit_mode "expanded". */ v13?: boolean };
+/** v1.3 §1b auto-fill field: {value, source:"site_autofill", confidence 0–1, evidence}. */
+export type AutofillField<T = unknown> = { value: T; source: "site_autofill"; confidence: number; evidence?: string };
+export type Autofill = { version?: string; fetched_at?: string; fields: { company_name?: AutofillField<string>; category?: AutofillField<string>; geo?: AutofillField<{ sells?: string[]; ships?: string[] }>; avg_cart_usd?: AutofillField<number>; price_points?: AutofillField<{ currency?: string; count?: number; min?: number; median?: number; max?: number }>; product_types?: AutofillField<string[]> }; needs_input: string[]; notes?: string[]; mock?: boolean };
+/** Fast-mode result: v1.3 auto-fill when Friday has it; null when the adapter fell back to v1 + labelled defaults. */
+export type FastResult = { ref: IntakeRef; sub: SubmitResult; autofill: Autofill | null; fallback: boolean };
 export type IntakeStatus = "draft" | "submitted" | "pending_review" | "approved" | "declined";
 /**
  * Review state shown to the submitter (Friday v1.1 §3–4). Friday's hub-partner MATCH results are INTERNAL ONLY:
@@ -152,6 +157,10 @@ export function toFridayBody(p: IntakePayload, extra: Partial<SubmitContact> & {
     body.geo = marketToFridayGeo(p.market, p.role === "publisher" ? "publisher" : "advertiser");
     body.profile = { geography: marketToGeographyText(p.market) };
   }
+  if (!body.category && p.category) {
+    const c = toFridayCategory(p.category);
+    if (c) body.category = c; // fast mode: guessed from the site title / meta, or the labelled default
+  }
   if (p.kit_calculator?.brand_label) body.company_name = p.kit_calculator.brand_label.slice(0, 120);
   if (extra.email) body.email = extra.email;
   if (extra.website) body.website = extra.website;
@@ -181,6 +190,13 @@ const mockRow = (ref: IntakeRef) => {
 };
 
 const mock = {
+  /** Preview mock of v1.3 fast mode: no site is read. Returns a labelled empty auto-fill with every gap in needs_input. */
+  async fast(payload: IntakePayload, contact: SubmitContact): Promise<FastResult> {
+    if (!contact.website.trim() || !/@/.test(contact.email)) throw new Error("fast_needs_website_email");
+    const ref = await mock.create(payload);
+    const sub = await mock.submit(ref, payload, contact);
+    return { ref: { ...ref, version: sub.version }, sub, autofill: { fields: {}, needs_input: ["company_name", "category", "geo", "avg_cart_usd"], notes: ["Preview mock: Friday's site auto-fill is not called on the preview."], mock: true }, fallback: false };
+  },
   async create(payload: IntakePayload): Promise<IntakeRef> {
     await sleep(120);
     const row: MockRow = { id: `bi_MOCK${rand(8)}`, editToken: `mock-edit-${rand()}`, reportToken: `mock-report-${rand()}`, version: 0, status: "draft", updated_at: new Date().toISOString(), roles: toFridayBody(payload).roles as string[], approvals: {}, body: toFridayBody(payload), payload, events: [], kits: [], mock: true };
@@ -260,11 +276,28 @@ async function j<T>(r: Response): Promise<T> {
 const H = (ref?: IntakeRef) => ({ "Content-Type": "application/json", ...(ref ? { "X-Edit-Token": ref.editToken } : {}) });
 const BIRCH = ""; // same origin: Birch server routes, which forward to Friday server-side
 const live = {
+  /** v1.3 fast mode: ONE POST with submit_mode "fast" + website + email; Friday auto-fills and submits. */
+  async fast(payload: IntakePayload, contact: SubmitContact): Promise<FastResult> {
+    const r = await fetch(`${BIRCH}/v1/brand-intake`, { method: "POST", headers: H(), body: JSON.stringify({ ...toFridayBody(payload, { ...contact, submit: true }), submit_mode: "fast" }) });
+    const d = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string; id?: string; editToken?: string; reportToken?: string; version?: number; submit_mode?: string; autofill?: Autofill; fallback?: string; status?: IntakeStatus; approvals?: Record<string, string>; public_mirror?: "published" | "held"; report_ready?: boolean };
+    if (r.status === 409 && d.error === "fast_unsupported") {
+      // Friday not on v1.3 yet: v1 create + submit (still one final click with the email); labelled defaults on screen.
+      const ref = await live.create(payload);
+      const sub = await live.submit(ref, payload, contact);
+      return { ref: { ...ref, version: sub.version }, sub, autofill: null, fallback: true };
+    }
+    if (!r.ok || d.ok === false) throw new Error(d.error ?? `friday_${r.status}`);
+    emitWarnings(d);
+    const sub: SubmitResult = { status: d.status ?? "submitted", version: d.version ?? 1, approvals: d.approvals ?? {}, public_mirror: d.public_mirror, report_ready: d.report_ready };
+    if (d.fallback === "api_intake") return { ref: { id: "bi_LEGACYLEAD", editToken: "legacy-no-edit-token", reportToken: "legacy-no-report-token", version: 1, legacy: true }, sub, autofill: null, fallback: true };
+    if (!d.id || !d.editToken || !d.reportToken) throw new Error("dropped");
+    return { ref: { id: d.id, editToken: d.editToken, reportToken: d.reportToken, version: d.version ?? 1, v13: typeof d.submit_mode === "string" }, sub, autofill: d.autofill ?? null, fallback: false };
+  },
   async create(payload: IntakePayload): Promise<IntakeRef> {
     const d = await j<{ id: string; editToken: string; reportToken: string; version: number; fallback?: string }>(await fetch(`${BIRCH}/v1/brand-intake`, { method: "POST", headers: H(), body: JSON.stringify(toFridayBody(payload)) }));
     emitWarnings(d);
     // brand-intake-v1 not deployed on Friday yet: the Birch server pushed the lead to Friday's /api/intake instead.
-    if (d.fallback === "api_intake") return { id: "bi_LEGACYLEAD", editToken: "legacy-no-edit-token", reportToken: "legacy-no-report-token", version: 1, legacy: true };
+    if (d.fallback === "api_intake") return { id: "bi_LEGACYLEAD", editToken: "legacy-no-edit-token", reportToken: "legacy-no-report-token", version: 0, legacy: true }; // version 1 only after the submit push
     if (!d.id) throw new Error("dropped");
     return { id: d.id, editToken: d.editToken, reportToken: d.reportToken, version: d.version };
   },
@@ -276,8 +309,12 @@ const live = {
   },
   async submit(ref: IntakeRef, payload: IntakePayload, contact: SubmitContact): Promise<SubmitResult> {
     // v1 not deployed: one-shot submit through the Birch server, which pushes the lead to Friday's /api/intake.
+    // Already pushed once via the legacy fallback: an expanded-mode update must never create a second /api/intake lead.
+    if (ref.legacy && ref.version >= 1) return { status: "submitted", version: ref.version, approvals: {} };
     if (ref.legacy) return j(await fetch(`${BIRCH}/v1/brand-intake`, { method: "POST", headers: H(), body: JSON.stringify(toFridayBody(payload, { ...contact, submit: true })) }));
-    const d = await j<SubmitResult>(await fetch(`${BIRCH}/v1/brand-intake/${encodeURIComponent(ref.id)}`, { method: "PATCH", headers: H(ref), body: JSON.stringify(toFridayBody(payload, { ...contact, submit: true })) }));
+    // v1.3 §2 upgrade: same record (editToken), submit_mode "expanded" → version N+1, same reportToken and lead.
+    const body = { ...toFridayBody(payload, { ...contact, submit: true }), ...(ref.v13 ? { submit_mode: "expanded" } : {}) };
+    const d = await j<SubmitResult>(await fetch(`${BIRCH}/v1/brand-intake/${encodeURIComponent(ref.id)}`, { method: "PATCH", headers: H(ref), body: JSON.stringify(body) }));
     emitWarnings(d);
     return d;
   },
@@ -349,7 +386,8 @@ export function saveRef(role: string, ref: IntakeRef) {
 export async function captureKitLead(payload: IntakePayload, formats: Array<"pdf" | "png">): Promise<IntakeRef> {
   const api = fridayIntake();
   const prev = loadRef("kit");
-  const next = prev ? await api.update(prev, payload).catch(() => api.create(payload)) : await api.create(payload);
+  if (!prev) throw new Error("not_submitted"); // never creates a record outside a final submit with email
+  const next = await api.update(prev, payload).catch(() => prev);
   saveRef("kit", next);
   for (const f of formats) await api.download(next.reportToken, f).catch(() => undefined);
   return next;

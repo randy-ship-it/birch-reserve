@@ -6,6 +6,7 @@
  * Once Friday answers (after submit), the LTV estimate and channel fit are shown EXACTLY as Friday returns
  * them (brand-report.v1 `ltv` + `demand_fit`), never recomputed here. Mock adapter on previews.
  */
+import { loadPrefill } from "@/lib/intakePrefill";
 import { IntakeWarnings } from "@/components/br/intake-warnings";
 import { useBrandCategories } from "@/lib/brandCategories";
 import { toBirchCategory } from "../../../../api-server/src/lib/kitCalc/fridayV12";
@@ -33,22 +34,23 @@ const $ = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
 const ERR: Record<string, string> = { too_fast: "One sec: give it a moment and try again.", email: "Use a valid work email.", website: "Add your brand's website.", individual_data: "Please keep it to brand-level details.", rate_limited: "Too many tries. Please wait a minute." };
 
 export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: string; showMockBanner?: boolean }) {
-  const [brand, setBrand] = useState("");
-  const [cat, setCat] = useState<string>("recovery_devices"); // Friday v1.2 §6 shared category key
+  const [pre] = useState(() => loadPrefill()); // fast → expanded hand-off (same tab)
+  const [brand, setBrand] = useState(pre?.brand?.slice(0, 40) ?? "");
+  const [cat, setCat] = useState<string>(pre?.category ?? "recovery_devices"); // Friday v1.2 §6 shared category key
   const cats = useBrandCategories();
-  const [aov, setAov] = useState(80);
+  const [aov, setAov] = useState(pre?.aov ?? 80); // Friday v1.3 auto-fill (USD sites only), else the default
   const [orders, setOrders] = useState(500);
   const [repeat, setRepeat] = useState(KIT_CALC_CONFIG.repeatBands[1]!.key);
   const [band, setBand] = useState(KIT_CALC_CONFIG.marginBands[1]!.key);
   const [spend, setSpend] = useState(KIT_CALC_CONFIG.spendLevels[0]!.usd);
   const [conv, setConv] = useState(KIT_CALC_CONFIG.defaultConversionPct);
-  const [market, setMarket] = useState<Market>(DEFAULT_MARKET);
+  const [market, setMarket] = useState<Market>(pre?.market ?? DEFAULT_MARKET);
   const [gates, setGates] = useState<LeadGates | null>(null);
   const [touched, setTouched] = useState(false);
   const [side, setSide] = useState<"a" | "b">("a");
   const [step, setStep] = useState<"inputs" | "contact">("inputs");
-  const [email, setEmail] = useState("");
-  const [website, setWebsite] = useState("");
+  const [email, setEmail] = useState(pre?.email ?? "");
+  const [website, setWebsite] = useState(pre?.website ?? "");
   const [hp, setHp] = useState("");
   const [busy, setBusy] = useState<"idle" | "busy" | "done" | "error">("idle");
   const [err, setErr] = useState<string | null>(null);
@@ -115,7 +117,8 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
       const next = { ...r1, version: sub.version };
       saveRef("kit", next);
       setRef(next);
-      trackIntake("advertiser", "submit", "kit");
+      trackIntake("advertiser", "submit", r0.version >= 1 ? "update" : "kit");
+      trackIntake("advertiser", "mode", "expanded");
       setGates(reviewGates(sub, sub.mock));
       if (sub.public_mirror === "held") {
         setHeld(true);

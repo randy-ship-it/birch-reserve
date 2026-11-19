@@ -217,12 +217,25 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
   const send = (res: Response, out: { status: number; text: string }) => res.status(out.status).type("application/json").send(publicGates(out.text || "{}"));
 
   router.post("/v1/brand-intake", body, async (req, res) => {
-    const out = await forward(req, res, "POST", "/api/public/brand-intake", await shaped(req.body));
+    const fast = (req.body as Record<string, unknown> | undefined)?.submit_mode === "fast";
+    if (fast) {
+      // v1.3 §1 fast mode: website + email required (checked here too, so nothing is sent without them).
+      const fb = req.body as Record<string, unknown>;
+      if (typeof fb.website !== "string" || !fb.website.trim() || !legacyIntakeAllowed({ ...fb, submit: true })) return void res.status(400).json({ ok: false, error: "fast_needs_website_email" });
+      if (env.FRIDAY_FAST_MODE === "off") return void res.status(409).json({ ok: false, error: "fast_unsupported" });
+    }
+    const eff = (fast ? { ...(req.body as object), submit: true } : req.body ?? {}) as Record<string, unknown>;
+    const out = await forward(req, res, "POST", "/api/public/brand-intake", await shaped(eff));
     if (!out) return;
+    if (fast && out.status === 400 && /"invalid"/.test(out.text) && !/fast_needs_website_email|"website"|"email"|too_fast/.test(out.text)) {
+      // Friday not on v1.3 yet (strict body rejects submit_mode). A 400 creates nothing; the browser falls back to a
+      // v1 create + submit with labelled defaults and Birch's instant calculator.
+      return void res.status(409).json({ ok: false, error: "fast_unsupported" });
+    }
     if (out.status === 404) {
       // v1 not deployed. Drafts (no email yet) stay in the browser; only a submission with contact details is
       // pushed to /api/intake, so autosave never creates anonymous leads.
-      const b = (req.body ?? {}) as Record<string, unknown>;
+      const b = eff;
       if (!legacyIntakeAllowed(b)) {
         res.status(202).json({ ok: true, fallback: "api_intake", lead: false, draft: "local" });
         return;
@@ -236,6 +249,8 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
   router.patch("/v1/brand-intake/:id", body, async (req, res) => {
     const id = String(req.params.id);
     if (!ID_RE.test(id)) return void res.status(404).json({ ok: false, error: "not_found" });
+    // v1.3 §2: fast is create-only; an upgrade PATCHes with submit_mode "expanded". Never forward a fast PATCH.
+    if ((req.body as Record<string, unknown> | undefined)?.submit_mode === "fast") return void res.status(400).json({ ok: false, error: "fast_create_only" });
     // PATCH (autosave or submit) only ever goes to brand-intake v1; it never falls back to /api/intake.
     const out = await forward(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, await shaped(req.body));
     if (!out) return;
