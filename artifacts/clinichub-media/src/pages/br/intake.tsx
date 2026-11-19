@@ -25,9 +25,8 @@ export default function BrIntake() {
         </div>
       </section>
       <div className="container mx-auto px-4 pb-10 pt-6">
-        <SampleKit />
-        <div className="mt-6 grid gap-4 lg:grid-cols-2" data-testid="sample-activation">
-          <ExposureCard exposure={SAMPLE_EXPOSURE} source="sample" sync={false} testId="sample-exposure" />
+        <SampleKit costExtra={<ExposureCard exposure={SAMPLE_EXPOSURE} source="sample" sync={false} testId="sample-exposure" v2 />} />
+        <div className="mt-6 max-w-2xl" data-testid="sample-activation">
           <ActivationRange kind="publisher" block={SAMPLE_PUB} source="sample" testId="sample-activation-publisher" />
         </div>
         <div className="mt-4 max-w-2xl"><SampleLeadStatus /></div>

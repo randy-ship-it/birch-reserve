@@ -99,7 +99,7 @@ test("channel tiles: Randy's figures labelled network figures / targets; Calm Jo
   assert.ok(/target/.test(t["scale-hubs"]!.stats[2]!.l));
   assert.equal(t["calm-joints"]!.stats.length, 0);
   assert.deepEqual(t["street-team"]!.stats.map((s) => s.v), ["500K", "3MM+"]);
-  assert.deepEqual(t["retail-network"]!.stats.map((s) => s.v), [">120", ">1MM"]);
+  assert.deepEqual(t["retail-network"]!.stats.map((s) => s.v), ["120+", "1MM+", "CA + US"]);
 });
 
 test("kit calculator config matches Birch modelled figures (no outside benchmarks)", () => {

@@ -92,7 +92,7 @@ export function fridayView(r: FridayReport, calc: KitCalcResult, o: { brand: str
     hubs: (df?.anchor_hubs ?? []).slice(0, 6).map((h) => ({ name: h.name, status: h.status, fitLabel: h.fit_label })),
     channels: ["calm-joints", "street-team", "retail-network"].map((k) => {
       const c = EXPOSURE_CHANNELS.find((x) => x.key === k)!;
-      return { key: k, name: fitOf(k)?.name ?? c.name, figures: fridayFig(k) ?? tileFigures(k), fitLabel: fitOf(k)?.fit_label ?? null, rateNote: c.rateNote, image: k === "street-team" ? "map" : undefined };
+      return { key: k, name: fitOf(k)?.name ?? c.name, figures: k === "retail-network" ? tileFigures(k) /* fixed RETAIL_COPY */ : fridayFig(k) ?? tileFigures(k), fitLabel: fitOf(k)?.fit_label ?? null, rateNote: c.rateNote, image: k === "street-team" ? "map" : undefined };
     }),
     hubRates: { cpm: r.headline?.best_fit_cpm_usd ? [r.headline.best_fit_cpm_usd.low, r.headline.best_fit_cpm_usd.high] : HUB_RATE_RANGE.cpm, cpc: r.headline?.best_fit_cpc_usd ? [r.headline.best_fit_cpc_usd.low, r.headline.best_fit_cpc_usd.high] : HUB_RATE_RANGE.cpc, fitLabel: hubsFit?.fit_label ?? null },
     mapDataUrl: o.mapDataUrl,

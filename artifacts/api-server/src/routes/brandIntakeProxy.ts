@@ -84,6 +84,34 @@ export function markTest(body: unknown): unknown {
  * Friday response, Birch drops it here before it reaches a browser. No match badge is rendered anywhere.
  */
 const INTERNAL_KEYS = ["partner_match", "existing_hub_partner_lead", "is_a_hub", "match", "matches", "friday_match", "deltas", "proposed_deltas", "inventory_approval", "approvers", "audit"];
+/**
+ * Friday excludes competing hubs server-side (report-design-system v2: the "excluded: competes" list is INTERNAL
+ * ONLY). If any of it reaches Birch anyway, drop it: any key naming exclusion/competition, at any depth, and any
+ * array item flagged excluded. Hub-like items whose name is on Birch's never-mention list are dropped too.
+ */
+const EXCLUDED_KEY = /exclu|compet/i;
+const NEVER_NAME = /medvibe|clairvoyant|\balign\b|alset|kalaya/i;
+export function stripExcluded(v: unknown): unknown {
+  if (Array.isArray(v)) {
+    return v
+      .filter((x) => {
+        if (!x || typeof x !== "object") return true;
+        const o = x as Record<string, unknown>;
+        if (o.excluded === true || o.competes === true) return false;
+        if (typeof o.status === "string" && EXCLUDED_KEY.test(o.status)) return false;
+        if (typeof o.state === "string" && EXCLUDED_KEY.test(o.state)) return false;
+        if (typeof o.name === "string" && NEVER_NAME.test(o.name)) return false;
+        return true;
+      })
+      .map(stripExcluded);
+  }
+  if (v && typeof v === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, x] of Object.entries(v as Record<string, unknown>)) if (!EXCLUDED_KEY.test(k)) out[k] = stripExcluded(x);
+    return out;
+  }
+  return v;
+}
 export function publicGates(text: string): string {
   let d: unknown;
   try {
@@ -96,7 +124,7 @@ export function publicGates(text: string): string {
     if (!o || typeof o !== "object") return;
     for (const k of INTERNAL_KEYS) delete (o as Record<string, unknown>)[k];
   };
-  const root = d as Record<string, unknown>;
+  const root = stripExcluded(d) as Record<string, unknown>;
   clean(root);
   const rep = root.report as Record<string, unknown> | undefined;
   if (rep && typeof rep === "object") {

@@ -164,7 +164,8 @@ function cell(c: ExposureChannel, h: Horizon, expo: Expo): { text: string; tone:
 }
 
 /** Exposure value card: Now / Later (2027 targets) toggle, minimum ↔ maximum toggle, a visual at each end. */
-export function ExposureCard({ exposure, source, testId = "exposure-card", sync = true }: { exposure: FridayExposure; source: ActivationSource; testId?: string; sync?: boolean }) {
+/** v2: rendered inside a design-system side panel (report-v2.tsx), which owns the side's single Estimate tag. */
+export function ExposureCard({ exposure, source, testId = "exposure-card", sync = true, v2 = false }: { exposure: FridayExposure; source: ActivationSource; testId?: string; sync?: boolean; v2?: boolean }) {
   const init = sync ? readRangeParams() : { h: "now" as Horizon, expo: "min" as Expo };
   const [h, setH] = useState<Horizon>(init.h);
   const [expo, setExpo] = useState<Expo>(init.expo);
@@ -173,10 +174,10 @@ export function ExposureCard({ exposure, source, testId = "exposure-card", sync 
   const srcLabel = source === "friday" ? "From Friday" : source === "sample" ? "Sample · example values" : "Mock · placeholder shares, not a forecast";
   const tog = (on: boolean) => `rounded-full px-3 py-1.5 text-xs font-bold transition ${on ? "bg-foreground text-background" : "text-foreground/60"}`;
   return (
-    <section data-testid={testId} data-source={source} data-h={h} data-expo={expo} className="rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm">
+    <section data-testid={testId} data-source={source} data-h={h} data-expo={expo} className={v2 ? "mt-5 rounded-[10px] bg-[#FAF8F3] p-4 text-[#24332B]" : "rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm"}>
       <div className="flex flex-wrap items-center gap-2">
-        <h3 className="font-display text-xl">Exposure value</h3>
-        <EstimateTag />
+        <h3 className={v2 ? "text-xl text-[#0B1A13] [font-family:'Iowan_Old_Style',Charter,Georgia,serif]" : "font-display text-xl"}>Exposure value</h3>
+        {v2 ? null : <EstimateTag />}
         <span className="rounded-full bg-foreground/[0.06] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">Modelled</span>
         <span data-testid="exposure-source" className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${source === "friday" ? "bg-lime-300 text-[#0b1f3a]" : "bg-violet-100 text-violet-900"}`}>{srcLabel}</span>
       </div>
@@ -192,7 +193,7 @@ export function ExposureCard({ exposure, source, testId = "exposure-card", sync 
       </div>
       <div className="mt-3 grid grid-cols-[auto_1fr_auto] items-center gap-3">
         <figure className="m-0 text-center"><EndArt end="now" /><figcaption className="mt-1 text-[10px] font-bold uppercase tracking-wider text-foreground/60">Now · minimum</figcaption></figure>
-        <div className="relative h-3 rounded-full bg-gradient-to-r from-lime-200 to-[#0b1f3a]/70" data-testid="exposure-bar" aria-label={`Selected: ${h}, ${expo === "min" ? "minimum" : "maximum"} activation`}>
+        <div className={`relative h-3 rounded-full bg-gradient-to-r ${v2 ? "from-[#BFF3D6] to-[#0E3B2A]" : "from-lime-200 to-[#0b1f3a]/70"}`} data-testid="exposure-bar" aria-label={`Selected: ${h}, ${expo === "min" ? "minimum" : "maximum"} activation`}>
           <span className="absolute -top-1 size-5 -translate-x-1/2 rounded-full border-2 border-white bg-foreground shadow" style={{ left: `${(pos / 3) * 100}%` }} data-testid="exposure-thumb" />
         </div>
         <figure className="m-0 text-center"><EndArt end="later" /><figcaption className="mt-1 text-[10px] font-bold uppercase tracking-wider text-foreground/60">Later · maximum</figcaption></figure>

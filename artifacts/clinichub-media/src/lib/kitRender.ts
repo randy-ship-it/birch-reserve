@@ -12,10 +12,11 @@ const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 const $ = (n: number) => (Number.isFinite(n) ? `$${Math.round(n).toLocaleString("en-US")}` : "n/a");
 const $r = (r: readonly [number, number]) => `${$(r[0])}–${$(r[1])}`;
 const n = (x: number) => (Number.isFinite(x) ? Math.round(x).toLocaleString("en-US") : "n/a");
-const SANS = "Helvetica Neue, Helvetica, Arial, sans-serif";
-const SERIF = "Georgia, 'Times New Roman', serif";
-const NAVY = "#0b1f3a";
-const LIME = "#c6f06b";
+/* Friday report design system v2 tokens (lib/reportTokens.ts): forest / mint / paper, Iowan serif + system sans. */
+const SANS = "-apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif";
+const SERIF = "'Iowan Old Style', Charter, Georgia, 'Times New Roman', serif";
+const NAVY = "#0E3B2A"; // forest
+const LIME = "#BFF3D6"; // mint
 
 export type KitData = KitView;
 const srcLabel = (d: KitData) => (d.source === "sample" ? "Sample · example values" : d.source === "friday" ? (d.mock ? "From Friday (mock on preview)" : "From Friday") : "Live preview");
@@ -68,7 +69,7 @@ export function kitSideA(d: KitData): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${KIT_W}" height="${KIT_H}" viewBox="0 0 ${KIT_W} ${KIT_H}">
   <defs>
     <radialGradient id="glowA" cx="85%" cy="8%" r="70%"><stop offset="0" stop-color="${LIME}" stop-opacity=".55"/><stop offset="1" stop-color="${NAVY}" stop-opacity="0"/></radialGradient>
-    <linearGradient id="lime" x1="0" x2="1"><stop offset="0" stop-color="#a3e635"/><stop offset="1" stop-color="${LIME}"/></linearGradient>
+    <linearGradient id="lime" x1="0" x2="1"><stop offset="0" stop-color="#145A3F"/><stop offset="1" stop-color="${LIME}"/></linearGradient>
   </defs>
   <rect width="100%" height="100%" fill="${NAVY}"/><rect width="100%" height="100%" fill="url(#glowA)"/>
   ${header("A", "Your revenue opportunity", d, true)}
@@ -111,20 +112,20 @@ export function kitSideB(d: KitData): string {
       const x = 72 + i * 356;
       const y = 1010;
       const img = c.key === "street-team" && d.mapDataUrl ? `<clipPath id="clip${i}"><rect x="${x}" y="${y}" width="336" height="150" rx="24"/></clipPath><image href="${d.mapDataUrl}" x="${x}" y="${y}" width="336" height="150" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip${i})"/>` : `<rect x="${x}" y="${y}" width="336" height="150" rx="24" fill="url(#ch${i})"/>`;
-      return `<defs><linearGradient id="ch${i}" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="${["#99f6e4", "#c6f06b", "#fde68a"][i]}"/><stop offset="1" stop-color="${NAVY}"/></linearGradient></defs>
+      return `<defs><linearGradient id="ch${i}" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="${["#BFF3D6", "#145A3F", "#ECE8DF"][i]}"/><stop offset="1" stop-color="${NAVY}"/></linearGradient></defs>
       <rect x="${x}" y="${y}" width="336" height="330" rx="24" fill="${NAVY}"/>${img}
       <text x="${x + 24}" y="${y + 200}" font-family="${SERIF}" font-size="32" fill="#fff">${esc(c.name)}</text>
       ${c.fitLabel ? `<rect x="${x + 16}" y="${y + 16}" width="${c.fitLabel.length * 8.4 + 28}" height="32" rx="16" fill="#fff"/><text x="${x + 30}" y="${y + 38}" font-family="${SANS}" font-size="15" font-weight="700" fill="${NAVY}">${esc(c.fitLabel)}</text>` : ""}
       ${wrap(c.figures.join(" · ") || "Figures to come", 30)
-        .slice(0, 2)
-        .map((l, k) => `<text x="${x + 24}" y="${y + 236 + k * 24}" font-family="${SANS}" font-size="18" fill="${LIME}">${esc(l)}</text>`)
+        .slice(0, 3)
+        .map((l, k) => `<text x="${x + 24}" y="${y + 232 + k * 23}" font-family="${SANS}" font-size="18" fill="${LIME}">${esc(l)}</text>`)
         .join("")}
       <text x="${x + 24}" y="${y + 306}" font-family="${SANS}" font-size="16" fill="#fff" opacity=".7">${esc(c.geo ? `${c.geo} · ${c.rateNote}`.slice(0, 44) : c.rateNote)}</text>`;
     })
     .join("");
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${KIT_W}" height="${KIT_H}" viewBox="0 0 ${KIT_W} ${KIT_H}">
-  <defs><radialGradient id="glowB" cx="10%" cy="0%" r="80%"><stop offset="0" stop-color="${LIME}" stop-opacity=".45"/><stop offset="1" stop-color="#f7f5f0" stop-opacity="0"/></radialGradient></defs>
-  <rect width="100%" height="100%" fill="#f7f5f0"/><rect width="100%" height="100%" fill="url(#glowB)"/>
+  <defs><radialGradient id="glowB" cx="10%" cy="0%" r="80%"><stop offset="0" stop-color="${LIME}" stop-opacity=".45"/><stop offset="1" stop-color="#FAF8F3" stop-opacity="0"/></radialGradient></defs>
+  <rect width="100%" height="100%" fill="#FAF8F3"/><rect width="100%" height="100%" fill="url(#glowB)"/>
   ${header("B", "Your exposure opportunity", d, false)}
   ${pill(232, 268, "Network figures / targets", "#e0f2fe", "#0c4a6e")}
   <text x="72" y="384" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing="2" fill="${NAVY}">1 · ANCHOR HUBS (UNCONFIRMED)</text>

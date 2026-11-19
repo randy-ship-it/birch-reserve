@@ -43,10 +43,10 @@ export function mockReport(payload: IntakePayload, body: Record<string, unknown>
       channels: CHANNEL_TILES.map((t, i) => ({ key: FK[t.key]!, name: t.name, fit: [80, 50, 50, 50][i]!, fit_label: i === 0 ? "Good fit (mock)" : "Possible fit (mock)", subject_to_human_confirmation: true })),
       anchor_hubs: PROPOSED_ANCHOR_HUBS.map((h) => {
         const f = fits.find((x) => x.key === h.key)!;
-        return { key: h.key, name: h.name, status: h.live ? "Live" : "Coming soon", confirmed_anchor: false, fit: f.fit === "Likely fit" ? 80 : 40, fit_label: `${f.fit === "Likely fit" ? "Good fit" : "Possible fit"} (mock)`, reason: null, subject_to_human_confirmation: true };
+        return { key: h.key, name: h.name, status: h.live ? "Live" : "Coming soon", confirmed_anchor: false, fit: f.fit === "Likely fit" ? 80 : 40, fit_label: `${f.fit === "Likely fit" ? "Good fit" : "Possible fit"} (mock)`, reason: h.what, subject_to_human_confirmation: true };
       }),
     },
-    channels: CHANNEL_TILES.map((t) => ({ key: FK[t.key]!, name: t.name, figures: t.stats.map((s) => `${s.v} ${s.l}`), figures_label: "network figures / targets", fit: 0, fit_label: "", line: t.line, image: "image" in t ? t.image : null })),
+    channels: CHANNEL_TILES.map((t) => ({ key: FK[t.key]!, name: t.name, figures: t.key === "retail-network" ? ["120+ retail locations", "1MM+ recovery customers", "Canada + USA"] : t.stats.map((s) => `${s.v} ${s.l}`), figures_label: "network figures / targets", fit: 0, fit_label: "", line: t.line, image: "image" in t ? t.image : null })),
     placements: RATE_PLACEMENTS.map((r) => ({ key: r.key, label: r.label, fit: 0, fit_label: "", cpm_usd: lh(r.cpm), cpc_usd: lh(r.cpc), needs_rate: false })),
     mock: true,
   };
@@ -57,4 +57,16 @@ export function mockReport(payload: IntakePayload, body: Record<string, unknown>
   if (view === "supplier" && payload.supplier) report.role_data = { supplier: { first_look: payload.supplier.categories.filter((c) => c.state !== "off").map((c) => ({ category: c.key, choice: c.state, status: "pending_review" })), status: "pending_review" } };
   if (view === "sponsor" && payload.sponsor) report.role_data = { sponsor: { skus: payload.sponsor.interest, status: "pending_review" } };
   return report;
+}
+
+/** Labelled SAMPLE for /intake: a fictional "Example brand" with example inputs. Not a real brand, never sent to Friday. */
+export function sampleReport(): FridayReport {
+  const payload = {
+    kit_calculator: { brand_label: "Example brand", category: "recovery" },
+    publisher: { mode: "display", size_x: 1, conversion_pct: 1, value_per_conversion_usd: 0, surfaces: [{ key: "post_purchase", on: true }, { key: "home", on: true }, { key: "product", on: true }, { key: "newsletter", on: true }, { key: "social", on: true }] },
+  } as unknown as IntakePayload;
+  const body = { calculator: { avg_cart_usd: 80, orders_per_month: 500, purchases_per_year: 2.5, margin_band: "30_50" } };
+  const r = mockReport(payload, body, "publisher", 1, "2026-11-18T12:00:00.000Z", ["advertiser", "publisher"]);
+  r.brand = { name: "Example brand", domain: "example-brand.test" };
+  return r;
 }

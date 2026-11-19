@@ -183,3 +183,20 @@ test("v1.1 exposure: US-only brand gets no Street Team now or later; Canada outs
   assert.equal(readExposure({ channels: [] }), null);
   assert.equal(readExposure(null), null);
 });
+
+test("excluded competing hubs never reach the browser: keys, flagged items and never-mention names are stripped", () => {
+  const raw = { report: { hubs: [{ key: "a", name: "Good Hub", fit: 80 }, { key: "b", name: "Rival Hub", excluded: true }, { key: "c", name: "Other", status: "excluded_competes" }, { key: "k", name: "Kalaya" }], excluded: [{ name: "Rival Hub", reason: "competes" }], excluded_hubs: ["x"], demand_fit: { anchor_hubs: [{ key: "a", name: "Good Hub" }], excluded_count: 2 }, exposure: { channels: [{ key: "hubs", competes: true }] } } };
+  const out = publicGates(JSON.stringify(raw));
+  assert.doesNotMatch(out, /exclu|compet|Rival|Kalaya/i);
+  const o = JSON.parse(out);
+  assert.deepEqual(o.report.hubs.map((h: { key: string }) => h.key), ["a"]);
+  assert.equal(o.report.demand_fit.anchor_hubs.length, 1);
+});
+
+test("retail copy reads exactly '120+ retail locations · 1MM+ recovery customers · Canada + USA' everywhere", async () => {
+  const { RETAIL_COPY, CHANNEL_TILES, EXPOSURE_CHANNELS } = await import("../src/lib/overhaul/brandIntake");
+  assert.equal(RETAIL_COPY, "120+ retail locations · 1MM+ recovery customers · Canada + USA");
+  assert.equal(CHANNEL_TILES.find((t) => t.key === "retail-network")!.line, RETAIL_COPY);
+  assert.equal(EXPOSURE_CHANNELS.find((t) => t.key === "retail-network")!.reach, RETAIL_COPY);
+  assert.doesNotMatch(JSON.stringify([CHANNEL_TILES, EXPOSURE_CHANNELS]), /across Canada/);
+});
