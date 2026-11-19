@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 import { Cta, Eyebrow, Field, H1, Lede, Section, inputClass, postJson, textareaClass, usePageMeta } from "@/components/br/ui";
+import { matchPrefill } from "../../../../api-server/src/lib/overhaul/audiences";
 
 type MatchResponse = {
   score: number;
@@ -35,6 +36,8 @@ export default function BrMatch() {
   const [busy, setBusy] = useState(false);
   const [res, setRes] = useState<MatchResponse | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  // Nov 19 2026: /audiences segment cards link here as /match?audience=<key>; known keys prefill the note.
+  const [prefill] = useState(() => (typeof window === "undefined" ? null : matchPrefill(new URLSearchParams(window.location.search).get("audience"))));
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -59,12 +62,19 @@ export default function BrMatch() {
             <Eyebrow>Match your audience</Eyebrow>
             <H1>How well do your customers match ours?</H1>
             <Lede>Paste your website and tell us in a sentence who you sell to. We read your public pages and compare them with the Scale Activity launch audience profile. You get a % match, three reasons and the best way to start.</Lede>
+            {prefill ? (
+              <p className="mt-6 inline-flex flex-wrap items-center gap-2 border border-foreground/15 bg-secondary/60 px-3 py-2 text-sm" data-testid="match-audience-chip">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-foreground/55">Audience</span>
+                <strong>{prefill.name}</strong>
+                <a href="/audiences#segments" className="text-xs underline underline-offset-2 text-muted-foreground">change</a>
+              </p>
+            ) : null}
             <form onSubmit={onSubmit} className="mt-8 grid gap-4" data-testid="match-form">
               <Field label="Your website">
                 <input name="url" required placeholder="yourstudio.com" className={inputClass} data-testid="match-url" />
               </Field>
               <Field label="Who are your customers? (optional)" hint="A sentence or two helps, especially if your site is light on words.">
-                <textarea name="blurb" placeholder="Busy parents in Oakville who want to get back to running after an injury." className={textareaClass} data-testid="match-blurb" />
+                <textarea name="blurb" defaultValue={prefill?.blurb ?? ""} placeholder="Busy parents in Oakville who want to get back to running after an injury." className={textareaClass} data-testid="match-blurb" />
               </Field>
               <div className="grid gap-4 md:grid-cols-2">
                 <Field label="Work email (optional)" hint="We'll send the full match report.">

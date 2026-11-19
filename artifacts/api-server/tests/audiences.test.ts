@@ -84,3 +84,22 @@ test("market context (Nov 18 2026): Longevity and Medi/Spa added with citations;
   assert.equal(age.stat, "20.0%");
   assert.equal(new Set(A.MARKET_CONTEXT.map((m) => m.key)).size, A.MARKET_CONTEXT.length);
 });
+
+test("market context (Nov 19 2026): Sleep 65+ and Medi/Spa added with citations; segment cards show cited context and a match CTA", () => {
+  for (const k of ["sleep-65-ca", "screens-before-sleep", "medspa-us"]) assert.ok(A.MARKET_CONTEXT.some((m) => m.key === k), k);
+  assert.match(A.MARKET_CONTEXT.find((m) => m.key === "medspa-us")!.pillar, /in queue/);
+  assert.match(A.MARKET_CONTEXT.find((m) => m.key === "medspa-us")!.url, /^https:\/\/www\.americanmedspa\.org\//);
+  assert.equal(new Set(A.MARKET_CONTEXT.map((m) => m.key)).size, A.MARKET_CONTEXT.length);
+  for (const s of A.SEGMENTS) if (s.marketKey) assert.ok(A.segmentContext(s), `${s.key} -> ${s.marketKey}`);
+  assert.ok(A.SEGMENTS.filter((s) => s.marketKey).length >= 3);
+  assert.match(page, /segment-context-\$\{s\.key\}/);
+  assert.match(page, /population-level, not our reach/);
+  assert.match(page, /\/match\?audience=\$\{s\.key\}/);
+  const match = readFileSync(resolve(process.cwd(), "../clinichub-media/src/pages/br/match.tsx"), "utf8");
+  assert.match(match, /matchPrefill\(/);
+  const p = A.matchPrefill("sleep")!;
+  assert.equal(p.name, "Sleep");
+  assert.doesNotMatch(p.blurb, /Birch|guarantee|\d/);
+  assert.equal(A.matchPrefill("nope"), null);
+  assert.equal(A.matchPrefill(null), null);
+});

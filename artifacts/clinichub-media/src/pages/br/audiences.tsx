@@ -18,6 +18,7 @@ import {
   MARKET_CONTEXT,
   fmtOrdersShort,
   fmtPctBand,
+  segmentContext,
   type Basis,
 } from "../../../../api-server/src/lib/overhaul/audiences";
 
@@ -198,7 +199,30 @@ export default function BrAudiences() {
                   <dd className="mt-1">{s.fits}</dd>
                 </div>
               </dl>
-              <div className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-4 text-sm">
+              {(() => {
+                const m = segmentContext(s);
+                return m ? (
+                  <div className="mt-5 border-l-2 border-accent bg-secondary/50 p-3 text-xs leading-relaxed" data-testid={`segment-context-${s.key}`}>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-foreground/55">Market context · population-level, not our reach</p>
+                    <p className="mt-1">
+                      <strong className="tabular-nums">{m.stat}</strong> {m.line}{" "}
+                      <a href={m.url} className="underline underline-offset-2 text-muted-foreground" target="_blank" rel="noopener noreferrer">
+                        Source ({m.year})
+                      </a>
+                    </p>
+                  </div>
+                ) : null;
+              })()}
+              <div className="mt-auto pt-5">
+                <a
+                  href={`/match?audience=${s.key}`}
+                  className="inline-flex min-h-11 w-full items-center justify-center gap-2 border border-foreground px-4 text-sm font-semibold transition-colors hover:bg-foreground hover:text-background"
+                  data-testid={`segment-match-${s.key}`}
+                >
+                  Match my brand to this audience &rarr;
+                </a>
+              </div>
+              <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4 text-sm">
                 <span>
                   Purchase intent: <strong>{s.intent}</strong>
                 </span>
