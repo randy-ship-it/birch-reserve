@@ -46,15 +46,17 @@ export function LocationsQuestion({ value: p, onChange, side }: { value: PhysFor
       </div>
       {p.has ? (
         <div className="mt-3 grid gap-2 sm:grid-cols-[8rem_1fr]">
-          <input data-testid="locations-count" aria-label="Number of locations" inputMode="numeric" value={p.locations} onChange={(e) => onChange({ ...p, locations: e.target.value })} placeholder="Locations" className={small} />
-          <div className="flex min-w-0 gap-2">
-            <input data-testid="locations-visitors" aria-label="Estimated visitors a month" inputMode="numeric" value={p.visitors} onChange={(e) => onChange({ ...p, visitors: e.target.value })} placeholder="Visitors / month (est.)" className={`${small} min-w-0`} />
+          <label className="block min-w-0"><span className="text-[11px] font-bold uppercase tracking-wide text-foreground/55">Locations</span>
+          <input data-testid="locations-count" aria-label="Number of locations" inputMode="numeric" value={p.locations} onChange={(e) => onChange({ ...p, locations: e.target.value })} placeholder="e.g. 12" className={`mt-0.5 ${small}`} /></label>
+          <label className="block min-w-0"><span className="text-[11px] font-bold uppercase tracking-wide text-foreground/55">Visitors a month (est.)</span>
+          <div className="mt-0.5 flex min-w-0 gap-2">
+            <input data-testid="locations-visitors" aria-label="Estimated visitors a month" inputMode="numeric" value={p.visitors} onChange={(e) => onChange({ ...p, visitors: e.target.value })} placeholder="e.g. 3000" className={`${small} min-w-0`} />
             <div className="flex shrink-0 rounded-xl bg-white p-0.5 ring-1 ring-foreground/15" role="radiogroup" aria-label="Visitors are">
               {(["per_location", "total"] as const).map((b) => (
                 <button key={b} type="button" role="radio" aria-checked={p.basis === b} onClick={() => onChange({ ...p, basis: b })} data-testid={`locations-basis-${b}`} className={`rounded-lg px-2.5 text-xs font-bold ${p.basis === b ? "bg-[#0b1f3a] text-white" : "text-foreground/70"}`}>{b === "total" ? "total" : "each"}</button>
               ))}
             </div>
-          </div>
+          </div></label>
           {reach ? <p className="text-[12px] text-foreground/65 sm:col-span-2" data-testid="locations-reach">≈ {fmt(reach.monthlyVisits)} in-person visits a month. Shown in your kit as In-location display.</p> : null}
         </div>
       ) : null}
