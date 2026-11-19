@@ -1,0 +1,58 @@
+{
+  "_EXAMPLE": "EXAMPLE FIXTURE FOR TESTS ONLY. Invented values, not real hub data. Never imported by the site. The live Friday feed had 0 hubs with profiles on Nov 18 2026.",
+  "count": 3,
+  "records": [
+    {
+      "external_id": "fri-deal-EXAMPLE-1",
+      "name": "Jill Health",
+      "kind": "brand",
+      "audience": {
+        "label": "hub-reported",
+        "aggregate_only": true,
+        "profile_id": "EXAMPLE-profile-1",
+        "schema_version": 2,
+        "submissions_combined": 2,
+        "last_submitted_at": "2026-11-18T20:00:00Z",
+        "age_bands": ["25–34", "35–44"],
+        "gender": { "women_pct": 78, "men_pct": 22 },
+        "income_band": "$100K–$150K",
+        "geography": "Toronto",
+        "fsas": ["M4W", "M5R", "m6g"],
+        "interests": ["Menopause care", "Sleep"],
+        "cross_sell": ["Sleep", "Meal kits", "Supplements"],
+        "spend": "$100–$250 / visit",
+        "visit_frequency": "Monthly",
+        "audience": { "customers": 1200, "emails": 900, "followers": 5000 },
+        "channels": ["Instagram", "Email"],
+        "submitter_name": "EXAMPLE Person",
+        "submitter_email": "example-person@example.com",
+        "blurb": "EXAMPLE raw free text that must never be shown"
+      }
+    },
+    {
+      "external_id": "fri-deal-EXAMPLE-2",
+      "name": "DR-HO'S",
+      "kind": "brand",
+      "audience": {
+        "label": "hub-reported",
+        "aggregate_only": true,
+        "submissions_combined": 1,
+        "age_bands": ["45–54", "55–64", "65+"],
+        "gender": { "women_pct": 55, "men_pct": 45 },
+        "income_band": "$50K–$100K",
+        "geography": "M5V 2T6",
+        "fsas": ["M5V"],
+        "interests": ["Pain relief"],
+        "cross_sell": ["Insoles"],
+        "notes": "call me at 416-555-0100",
+        "audience": { "customers": 300 }
+      }
+    },
+    {
+      "external_id": "fri-deal-EXAMPLE-3",
+      "name": "EXAMPLE hub Birch does not list",
+      "audience": { "label": "hub-reported", "aggregate_only": true, "submissions_combined": 1, "geography": "Ottawa", "income_band": "$250K+" }
+    },
+    { "external_id": "fri-deal-EXAMPLE-4", "name": "SOLE" }
+  ]
+}

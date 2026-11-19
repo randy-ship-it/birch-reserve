@@ -8,7 +8,28 @@ import { BRAND_HUBS, SLOTS, type BrandHub } from "../../../../api-server/src/lib
 
 const KEY = "br_hub_access_v1";
 
-function HubDetail({ hub, unlocked }: { hub: BrandHub; unlocked: boolean }) {
+/**
+ * Hub-reported audience one-liners (Friday profiles). The server returns items only when the public-summary flag
+ * is on (BIRCH_HUB_AUDIENCE_PUBLIC=summary; default off). Hubs without a profile get nothing.
+ */
+function useAudienceSummaries(): Record<string, string> {
+  const [map, setMap] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const mode = new URLSearchParams(window.location.search).get("audience_mode");
+    const qs = mode ? `?audience_mode=${encodeURIComponent(mode)}` : "";
+    fetch(`/v1/hubs/audience-summaries${qs}`, { headers: { Accept: "application/json" } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j: { items?: { hub_key: string; summary: string }[] } | null) => {
+        const next: Record<string, string> = {};
+        for (const i of j?.items ?? []) if (i.hub_key && i.summary) next[i.hub_key] = i.summary;
+        setMap(next);
+      })
+      .catch(() => {});
+  }, []);
+  return map;
+}
+
+function HubDetail({ hub, unlocked, audienceSummary }: { hub: BrandHub; unlocked: boolean; audienceSummary?: string }) {
   const { currency } = useCurrency();
   const core = SLOTS.filter((s) => s.core);
   return (
@@ -28,6 +49,12 @@ function HubDetail({ hub, unlocked }: { hub: BrandHub; unlocked: boolean }) {
         <p className="text-sm">
           <span className="font-semibold">Audience:</span> {hub.audience}
         </p>
+        {audienceSummary ? (
+          <p className="mt-1 text-sm" data-testid={`hub-audience-summary-${hub.key}`}>
+            <span className="font-semibold">Hub-reported:</span> {audienceSummary}
+            <span className="block text-[11px] text-muted-foreground">Aggregate figures the hub reported; not audited by Birch Reserve.</span>
+          </p>
+        ) : null}
         <p className="mt-1 text-sm">
           <span className="font-semibold">Vertical:</span> {hub.recovery}
         </p>
@@ -72,6 +99,7 @@ function HubDetail({ hub, unlocked }: { hub: BrandHub; unlocked: boolean }) {
 export default function BrHubs() {
   usePageMeta("Hubs | Birch Reserve", "Live hubs today: Integrity Fitness and DR-HO'S physio. More brand hubs are in queue. Register your email to see audience, placements and modelled views.");
   const [unlocked, setUnlocked] = useState(false);
+  const audienceSummaries = useAudienceSummaries();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   useEffect(() => {
@@ -144,7 +172,7 @@ export default function BrHubs() {
       <Section>
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {BRAND_HUBS.map((h) => (
-            <HubDetail key={h.key} hub={h} unlocked={unlocked} />
+            <HubDetail key={h.key} hub={h} unlocked={unlocked} audienceSummary={audienceSummaries[h.key]} />
           ))}
         </div>
       </Section>
