@@ -12,7 +12,7 @@ import { X } from "lucide-react";
 import { RT, RT_SERIF, RT_SANS, RT_SHADOW, fitLabelOf, monogramBg } from "@/lib/reportTokens";
 import type { FridayReport } from "@/lib/fridayBrandIntake";
 import { fridayEligibility } from "@/lib/fridayBrandIntake";
-import { CHANNEL_TILES, PUBLISHER_SURFACES, RETAIL_COPY, anchorName } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { CHANNEL_TILES, PUBLISHER_SURFACES, RETAIL_COPY, RETAIL_TAG, STREET_REACH_SENTENCE, anchorName } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { NEVER_HUB_NAME } from "../../../../api-server/src/lib/overhaul/hubNameFilter";
 import { visibleHubs } from "../../../../api-server/src/lib/overhaul/hubMatch";
 import { CHANNEL_GEO } from "../../../../api-server/src/lib/kitCalc/channelGeo";
@@ -20,7 +20,6 @@ import { mockExposure, readExposure, type FridayExposure } from "../../../../api
 import { HubView, SupplierExposureView } from "@/components/br/report-views";
 import { Details } from "@/components/br/details";
 import type { PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
-import { applyNetworkCopy, useNetworkCopy } from "@/lib/networkCopy";
 
 const FKEY: Record<string, string> = { hubs: "scale-hubs", calm_joints: "calm-joints", street_team: "street-team", retail: "retail-network" };
 type LoHi = { low: number; high: number };
@@ -44,7 +43,7 @@ export function buildModel(r: FridayReport) {
     const fig = t.key === "retail-network" ? t.stats.map((s) => ({ v: s.v, l: s.l })) : t.stats.map((s) => ({ v: s.v, l: s.l }));
     return {
       key: t.key, name: fc?.name ?? t.name, fig,
-      line: t.key === "retail-network" ? RETAIL_COPY : fc?.line ?? t.line,
+      line: t.key === "retail-network" ? `${RETAIL_COPY} · ${RETAIL_TAG}` : t.key === "street-team" ? STREET_REACH_SENTENCE : fc?.line ?? t.line,
       fit: fit?.fit ?? fc?.fit ?? null, fitLabel: fit?.fit_label ?? fc?.fit_label ?? null,
       geo: e?.label ?? fc?.geo_label ?? g?.label ?? "", eligible: e?.eligibility ?? "now",
       image: "image" in t ? t.image : null,
@@ -186,14 +185,13 @@ export function ReportHero({ m, sample }: { m: ReportModel; sample?: boolean }) 
 }
 
 export function ChannelTilesV2({ m, map }: { m: ReportModel; map?: string }) {
-  const tiles = applyNetworkCopy(m.tiles, useNetworkCopy());
   return (
     <section data-testid="report-tiles" style={{ fontFamily: RT_SANS, color: RT.body }}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-[24px] md:text-[28px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Where you fit</h2>
       </div>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
-        {tiles.map((t) => (
+        {m.tiles.map((t) => (
           <article key={t.key} data-testid={`v2-tile-${t.key}`} data-eligibility={t.eligible} className="overflow-hidden p-5" style={card}>
             {t.image ? <img src={map ?? t.image} alt="Street team route areas shown as an area-level heat map. No homes or addresses." className="mb-3 h-28 w-full object-cover" style={{ borderRadius: 10 }} loading="lazy" /> : null}
             <div className="flex flex-wrap items-center gap-2">

@@ -15,9 +15,8 @@ import { useState, type ReactNode } from "react";
 import { Check, Rocket, Store, Package, TrendingUp } from "lucide-react";
 import { RT, RT_SERIF, RT_SANS, RT_SHADOW } from "@/lib/reportTokens";
 import type { FridayExposure } from "../../../../api-server/src/lib/kitCalc/activation";
-import { MOCK_SHARES, STREET_TEAM_REACH } from "../../../../api-server/src/lib/kitCalc/activation";
-import { PUBLISHER_SURFACES } from "../../../../api-server/src/lib/overhaul/brandIntake";
-import { RetailNetworkLine, useNetworkCopy } from "@/lib/networkCopy";
+import { MOCK_SHARES } from "../../../../api-server/src/lib/kitCalc/activation";
+import { PUBLISHER_SURFACES, RETAIL_COPY, RETAIL_TAG, STREET_REACH_LINE } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import type { ReportModel } from "@/components/br/report-v2";
 import { EstimatePop } from "@/components/br/report-v2";
 import { Details } from "@/components/br/details";
@@ -50,7 +49,7 @@ const scale = (r: LLH, f: number): LLH => ({ low: r.low * f, likely: r.likely * 
 const NAMES: Record<string, { name: string; unit: string; monthly: boolean }> = {
   hubs: { name: "Scale Hubs", unit: "page views", monthly: true },
   retail: { name: "Retail hubs", unit: "recovery customers", monthly: false },
-  street_team: { name: "Street Team · Ontario", unit: "homes", monthly: false },
+  street_team: { name: "Street Team · Ontario", unit: "doors", monthly: false },
   calm_joints: { name: "Calm Joints", unit: "", monthly: false },
 };
 const ORDER = ["hubs", "retail", "street_team", "calm_joints"];
@@ -64,6 +63,9 @@ export function sharesOf(ex: FridayExposure) {
   return { min, mid, max, placeholder: a.placeholder !== false };
 }
 /** Channel rows for one tier: base figure (= channel now.min ÷ min share) × the tier's share band. */
+/** Street Team row note: text reach, never a homes figure (Randy, Nov 19 2026 2:27 PM ET). */
+export const STREET_ROW_NOTE = STREET_REACH_LINE.charAt(0).toUpperCase() + STREET_REACH_LINE.slice(1);
+
 export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
   const s = sharesOf(ex);
   const [lo, hi] = tier === "performance_only" ? [s.min, s.mid] : [s.mid, s.max];
@@ -71,10 +73,11 @@ export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
     const c = ex.channels.find((x) => x.key === key);
     const n = NAMES[key]!;
     if (key === "street_team") {
-      // Homes in reach: 500K–1MM (Ontario now), same on both tiers, never scaled by the activation share. Canada later.
-      const range = c?.eligible_now && c?.now ? llh(STREET_TEAM_REACH.low, STREET_TEAM_REACH.high) : null;
-      const later = c?.later ? llh(STREET_TEAM_REACH.high, STREET_TEAM_REACH.later_high) : null;
-      const note = !c?.eligible_now ? (c?.reason ?? "Not in your markets yet") : null;
+      // Street Team: text reach only ("a few million doors targeted around the retail network"), never a homes figure.
+      // Shown as text, never as a homes figure (Randy, Nov 19 2026 2:27 PM ET).
+      const range = null;
+      const later = null;
+      const note = !c?.eligible_now ? (c?.reason ?? "Not in your markets yet") : STREET_ROW_NOTE;
       return { key, name: n.name, unit: n.unit, monthly: n.monthly, geo: c?.geo_label ?? "", range, later, note };
     }
     const base = c?.now ? c.now.min / s.min : null;
@@ -130,7 +133,6 @@ function Stat({ label, value, sub, testId, wide }: { label: string; value: strin
   );
 }
 function ChannelTable({ rows, extra, testId }: { rows: ChannelRow[]; extra?: ReactNode; testId: string }) {
-  const nc = useNetworkCopy();
   return (
     <div className="mt-4 overflow-hidden" style={{ border: `1px solid ${RT.line}`, borderRadius: 14 }} data-testid={testId}>
       <div className="grid grid-cols-[1fr_auto] gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-wider md:grid-cols-[1.3fr_1fr_1fr]" style={{ background: RT.paper, color: RT.mute }}>
@@ -140,11 +142,9 @@ function ChannelTable({ rows, extra, testId }: { rows: ChannelRow[]; extra?: Rea
         <div key={r.key} className="grid grid-cols-[1fr_auto] items-baseline gap-2 px-3 py-2.5 text-[13px] md:grid-cols-[1.3fr_1fr_1fr]" style={{ borderTop: `1px solid ${RT.line}` }} data-testid={`${testId}-${r.key}`}>
           <span className="min-w-0">
             <span className="font-semibold" style={{ color: RT.ink }}>{r.name}</span>
-            <span className="block text-[11px]" style={{ color: RT.mute }}>{nc && r.key === "street_team" ? "doors · " : r.unit ? `${r.unit}${r.monthly ? " / month" : " in reach"} · ` : ""}{r.geo}</span>
+            <span className="block text-[11px]" style={{ color: RT.mute }}>{r.key === "street_team" ? "doors · " : r.unit ? `${r.unit}${r.monthly ? " / month" : " in reach"} · ` : ""}{r.geo}</span>
           </span>
-          {nc && r.key === "street_team" ? (
-            <span className="text-right text-[12px] md:col-span-2" style={{ color: RT.mute }} data-testid={`${testId}-street-reach`}>{nc.street.charAt(0).toUpperCase() + nc.street.slice(1)}</span>
-          ) : r.range ? (
+          {r.range ? (
             <>
               <span className="text-right tabular-nums" style={{ color: RT.ink }}><span className="text-[17px]" style={{ fontFamily: RT_SERIF }}>{big(r.range.likely)}</span><span className="block text-[11px]" style={{ color: RT.mute }}>{big(r.range.low)}–{big(r.range.high)}</span></span>
               <span className="col-span-2 text-[11px] md:col-span-1 md:text-right md:text-[13px]" style={{ color: RT.mute }}>
@@ -172,7 +172,6 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
   const hubs = rows.find((r) => r.key === "hubs")?.range ?? null;
   const perfHubs = perf.find((r) => r.key === "hubs")?.range ?? null;
   const accHubs = acc.find((r) => r.key === "hubs")?.range ?? null;
-  const nc = useNetworkCopy();
   const reach = rows.filter((r) => !r.monthly && r.range).reduce((a, r) => ({ low: a.low + r.range!.low, likely: a.likely + r.range!.likely, high: a.high + r.range!.high }), { low: 0, likely: 0, high: 0 });
   const disp = tier === "accelerate" ? displayPer1k(m.cpm) : null;
   const own = ownHubViews();
@@ -190,7 +189,7 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
               <p>Exposure = network figures and targets × an activation share, scoped to where you sell and ship. Activation shares are placeholders ({pct(s.min)}–{pct(s.max)}) until real placements confirm them.</p>
               <p><strong>Performance-only</strong> (pay on results, no CPC/CPM) uses the lower half of that range ({pct(s.min)}–{pct(s.mid)}). You pay on results, not for ad space.</p>
               {tier === "accelerate" ? <p><strong>Accelerate</strong> adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}), plus the display views a $1,000 test buys at rate-card CPM (budget ÷ CPM × 1,000).</p> : <p><strong>Accelerate</strong> (optional) adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}). Switch to With Accelerate to see how it is sized.</p>}
-              <p>12 months = the monthly figure × 12 for page views. Customers and homes are an audience in reach, so they are not multiplied.</p>
+              <p>12 months = the monthly figure × 12 for page views. Customers and doors are an audience in reach, so they are not multiplied.</p>
               <p style={{ color: RT.mute }}>Network figures as reported by Scale Health; targets are goals. Estimates in USD where money is shown. Not a forecast or a promise of any result.</p>
             </EstimatePop>
           </span>
@@ -209,7 +208,7 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
             <Headline value={hubs.likely * 12} unit="page-view exposures over 12 months, likely" range={scale(hubs, 12)} fmt={big} dark testId="supplier-headline-year" />
           </div>
         ) : null}
-        {nc && reach.likely > 0 ? <p className="mt-4 text-[14px] text-white/85" data-testid="supplier-reach">Plus recovery customers across the retail network, and a Street Team that {nc.street}.</p> : reach.likely > 0 ? <p className="mt-4 text-[14px] text-white/85" data-testid="supplier-reach">Plus about <strong className="text-white">{big(reach.likely)}</strong> recovery customers and homes in reach ({big(reach.low)}–{big(reach.high)}).</p> : null}
+        {reach.likely > 0 ? <p className="mt-4 text-[14px] text-white/85" data-testid="supplier-reach">Plus about <strong className="text-white">{big(reach.likely)}</strong> recovery customers across the retail network (est.), and a Street Team that {STREET_REACH_LINE}.</p> : null}
       </div>
       <div className="p-5 md:p-6">
         <div className="grid gap-3 sm:grid-cols-2" data-testid="supplier-compare">
@@ -245,7 +244,7 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
             </>
           }
         />
-        <Details testId="supplier-details"><p><RetailNetworkLine fallbackTag="network figures and targets" />. Estimates, not guarantees.</p></Details>
+        <Details testId="supplier-details"><p>{RETAIL_COPY} · {RETAIL_TAG}. Estimates, not guarantees.</p></Details>
         {onAccelerate && !m.isAccelerate ? <div className="mt-4">{onAccelerate}</div> : null}
         {cta ? <div className="mt-4">{cta}</div> : null}
       </div>
@@ -313,7 +312,7 @@ export function HubView({ m, exposure, cta, physical }: { m: ReportModel; exposu
         ) : null}
         <p className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-bold" style={{ color: RT.ink }}><TrendingUp className="size-4" style={{ color: RT.mintInk }} aria-hidden />Max exposure: your products on your own hub plus across the network</p>
         <ChannelTable rows={rows} testId="hub-channels" extra={<InLocationRow physical={physical} testId="hub-channels-in-location" />} />
-        <Details testId="hub-details"><p><RetailNetworkLine fallbackTag="network figures and targets" />. Estimates, not guarantees.</p></Details>
+        <Details testId="hub-details"><p>{RETAIL_COPY} · {RETAIL_TAG}. Estimates, not guarantees.</p></Details>
         {cta ? <div className="mt-4">{cta}</div> : null}
       </div>
     </section>

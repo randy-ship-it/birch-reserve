@@ -18,7 +18,7 @@ import { RT, RT_SANS, RT_SERIF } from "@/lib/reportTokens";
 import { TwoLane, openLane } from "@/components/br/two-lane";
 import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 import { brandFromUrl, presetOf, type IntakePreset } from "@/components/br/supplier-mode";
-import { NetworkCopyProvider, SUPPLIER_NETWORK_COPY } from "@/lib/networkCopy";
+import { RETAIL_COPY, RETAIL_TAG } from "../../../../api-server/src/lib/overhaul/brandIntake";
 
 const SAMPLE_EXPOSURE = { ...mockExposure({ sells_in: ["CA", "US"], ships_to: ["CA", "US"], regions: ["ON"] }), basis: "Sample: network figures / targets × example activation shares (1%–5%)" };
 
@@ -46,7 +46,6 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
   }, []);
   usePageMeta(sup ? "Supplier intake · Max your exposure | Birch Reserve" : "Get your Monetization Kit | Birch Reserve", sup ? "Suppliers start performance-only: no setup fee, no monthly fee, you approve every placement. Max your exposure with your own hub or CPM/CPC display." : "One short form for suppliers and hubs. See your hub earnings and your supplier exposure on performance-only terms (pay on results), side by side. Estimates in USD, reviewed by a person.");
   return (
-    <NetworkCopyProvider value={sup ? SUPPLIER_NETWORK_COPY : null}>
     <div data-testid="intake-landing">
       <MockBanner />
       <section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_55%)]">
@@ -56,7 +55,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · For suppliers</p>
               <h1 className="font-display text-4xl leading-[1.02] md:text-6xl" data-testid="supplier-h1">{brand ? `${brand}, start performance-only.` : "Start performance-only."}</h1>
               <p className="mt-2 max-w-2xl text-base text-muted-foreground">No setup fee, no monthly fee. Max your exposure with your own hub or CPM/CPC display.</p>
-              <p className="mt-3 inline-flex items-start gap-2 rounded-2xl bg-white/80 px-3 py-1.5 text-[12px] font-semibold text-[#0b1f3a] ring-1 ring-foreground/10" data-testid="supplier-network"><span>{SUPPLIER_NETWORK_COPY.retail} <span className="font-normal text-foreground/50">· {SUPPLIER_NETWORK_COPY.tag}</span></span></p>
+              <p className="mt-3 inline-flex items-start gap-2 rounded-2xl bg-white/80 px-3 py-1.5 text-[12px] font-semibold text-[#0b1f3a] ring-1 ring-foreground/10" data-testid="supplier-network"><span>{RETAIL_COPY} <span className="font-normal text-foreground/50">· {RETAIL_TAG}</span></span></p>
             </div>
           ) : (
             <>
@@ -97,6 +96,5 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
         </div>}
       </div>
     </div>
-    </NetworkCopyProvider>
   );
 }
