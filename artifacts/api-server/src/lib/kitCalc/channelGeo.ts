@@ -49,3 +49,20 @@ export function marketLabel(m: Market): string {
 export function marketToGeographyText(m: Market): string {
   return `Sells in: ${m.sells_in.map((x) => COUNTRY_LABEL[x]).join(" + ") || "-"}; ships to: ${m.ships_to.map((x) => COUNTRY_LABEL[x]).join(" + ") || "-"}${m.regions?.length ? `; regions: ${m.regions.join(", ")}` : ""}`;
 }
+
+/** Friday v1.1 intake `geo` (strict): sells / ships countries, regions keyed by country; hub_audience for publishers. */
+export type FridayGeoBody = { sells?: Country[]; ships?: Country[]; regions?: Partial<Record<Country, string[]>>; hub_audience?: { countries: Country[]; regions?: Partial<Record<Country, string[]>> } };
+export function splitRegions(regions: string[] | undefined): Partial<Record<Country, string[]>> | undefined {
+  if (!regions?.length) return undefined;
+  const ca = regions.filter((r) => (CA_PROVINCES as readonly string[]).includes(r));
+  const us = regions.filter((r) => (US_STATES as readonly string[]).includes(r) && !ca.includes(r));
+  const out: Partial<Record<Country, string[]>> = {};
+  if (ca.length) out.CA = ca;
+  if (us.length) out.US = us;
+  return Object.keys(out).length ? out : undefined;
+}
+export function marketToFridayGeo(m: Market, side: "advertiser" | "publisher"): FridayGeoBody {
+  const regions = splitRegions(m.regions);
+  if (side === "publisher") return { hub_audience: { countries: m.sells_in, ...(regions ? { regions } : {}) } };
+  return { sells: m.sells_in, ships: m.ships_to, ...(regions ? { regions } : {}) };
+}

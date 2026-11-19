@@ -1,10 +1,10 @@
 /**
  * Selling the inventory on every intake view (Randy via Emma, Nov 18 2026 10:44 PM ET).
  * Two sides: Advertiser (Brand · Supplier · Sponsor) and Publisher. Every view and report state ends in one
- * strong primary CTA. Friday's hub-partner match and approval gate are shown in plain language from Friday's
- * response (status enums only), with a labelled mock on previews. No approval controls on Birch.
+ * strong primary CTA. Only a generic review state is shown (Friday's hub-partner match is internal only and never rendered).
+ * No approval controls on Birch.
  */
-import { ArrowRight, BadgeCheck, Clock, FlaskConical, Store, Megaphone } from "lucide-react";
+import { ArrowRight, Clock, FlaskConical, Store, Megaphone } from "lucide-react";
 import type { IntakeRole } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { trackCta } from "@/lib/track-cta";
@@ -74,20 +74,17 @@ export function CtaBand({ side, where, line }: { side: IntakeSide; where: Intake
   );
 }
 
-/** Plain-language lead status from Friday's response (status enums only; never partner names). */
+/**
+ * Plain-language review state. Only "In review, pending BR approval", and only when Friday reports pending_review.
+ * Friday's hub-partner match is internal only: no match badge is ever rendered here (withheld per Friday's contract).
+ */
 export function LeadGatesStatus({ gates, testId = "lead-gates" }: { gates: LeadGates | undefined | null; testId?: string }) {
-  const match = gates?.partner_match?.status;
-  const appr = gates?.inventory_approval?.status;
-  if (!match && !appr) return null;
+  if (gates?.review !== "pending_review") return null;
   return (
     <div data-testid={testId} className="mt-3 flex flex-wrap items-center gap-2">
-      {gates?.mock ? <span data-testid={`${testId}-mock`} className="inline-flex items-center gap-1 rounded-full bg-violet-700 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"><FlaskConical className="size-3" />Mock · preview state</span> : null}
-      {match === "linked" ? <span data-testid={`${testId}-linked`} className="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-900"><BadgeCheck className="size-3.5" />Linked to an existing hub partner</span> : null}
-      {match === "checking" ? <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.06] px-3 py-1 text-xs font-bold">Checking for an existing hub partner</span> : null}
-      {appr === "pending" ? <span data-testid={`${testId}-pending`} className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900"><Clock className="size-3.5" />Pending BR approval</span> : null}
-      {appr === "approved" ? <span className="inline-flex items-center gap-1.5 rounded-full bg-lime-200 px-3 py-1 text-xs font-bold"><BadgeCheck className="size-3.5" />Approved by Birch Reserve</span> : null}
-      {appr === "declined" ? <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground/[0.06] px-3 py-1 text-xs font-bold">Not approved this time</span> : null}
-      {appr === "pending" ? <p className="basis-full text-xs text-muted-foreground">A person at Birch Reserve approves before anything changes on a hub screen or page. Nothing is booked or charged until then.</p> : null}
+      {gates.mock ? <span data-testid={`${testId}-mock`} className="inline-flex items-center gap-1 rounded-full bg-violet-700 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"><FlaskConical className="size-3" />Mock · preview state</span> : null}
+      <span data-testid={`${testId}-pending`} className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900"><Clock className="size-3.5" />In review, pending BR approval</span>
+      <p className="basis-full text-xs text-muted-foreground">A person at Birch Reserve approves before anything changes on a hub screen or page. Nothing is booked or charged until then.</p>
     </div>
   );
 }
@@ -96,9 +93,9 @@ export function LeadGatesStatus({ gates, testId = "lead-gates" }: { gates: LeadG
 export function SampleLeadStatus() {
   return (
     <div data-testid="sample-lead-status" className="rounded-2xl border border-dashed border-foreground/25 bg-white p-4">
-      <p className="text-[11px] font-bold uppercase tracking-wider text-foreground/60"><span className="mr-2 rounded-full bg-foreground px-2 py-0.5 text-[10px] text-background">Sample</span>After you send · example statuses</p>
-      <div className="-mt-1"><LeadGatesStatus testId="sample-lead-gates" gates={{ partner_match: { status: "linked" }, inventory_approval: { status: "pending" } }} /></div>
-      <p className="mt-2 text-[11px] text-muted-foreground">Example only. "Linked to an existing hub partner" appears when your request matches a hub already working with Birch Reserve.</p>
+      <p className="text-[11px] font-bold uppercase tracking-wider text-foreground/60"><span className="mr-2 rounded-full bg-foreground px-2 py-0.5 text-[10px] text-background">Sample</span>After you send · example status</p>
+      <div className="-mt-1"><LeadGatesStatus testId="sample-lead-gates" gates={{ review: "pending_review" }} /></div>
+      <p className="mt-2 text-[11px] text-muted-foreground">Example only. Every request is reviewed by a person at Birch Reserve.</p>
     </div>
   );
 }

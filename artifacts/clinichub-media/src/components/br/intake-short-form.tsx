@@ -13,7 +13,7 @@ import { LeadGatesStatus, PrimaryCta, SideSwitch } from "@/components/br/intake-
 import { DEFAULT_MARKET, MarketPicker } from "@/components/br/intake-geo";
 import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { errorDetail, fieldStart, trackIntake, type IntakeSide } from "@/lib/intakeTrack";
-import type { LeadGates } from "@/lib/fridayBrandIntake";
+import { reviewGates, type LeadGates } from "@/lib/fridayBrandIntake";
 
 /** Advertiser side: Brand (kit), Supplier, Sponsor. The publisher side is a single role. */
 const ROLE_CHIPS: Array<{ key: IntakeRole; label: string; sub: string }> = [
@@ -54,7 +54,7 @@ export function IntakeShortForm() {
       const sub = await api.submit(ref, payload, { email: email.trim(), website: website.trim(), elapsed_ms: Date.now() - t0.current }); // → submitted lead, Randy emailed by Friday
       const next = { ...ref, version: sub.version };
       saveRef(roles[0]!, next);
-      setDone({ ref: next, held: sub.public_mirror === "held", gates: { partner_match: sub.partner_match, inventory_approval: sub.inventory_approval, mock: sub.mock } });
+      setDone({ ref: next, held: sub.public_mirror === "held", gates: reviewGates(sub, sub.mock) });
       trackIntake(side, "submit", side === "publisher" ? "publisher" : "intake");
     } catch (x) {
       trackIntake(side, "submit_error", errorDetail((x as Error).message));

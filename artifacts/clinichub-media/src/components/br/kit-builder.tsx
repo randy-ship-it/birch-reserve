@@ -16,13 +16,12 @@ import { kitSideA, kitSideB, kitPdfBlob, kitPngBlob, saveBlob, imageToDataUrl } 
 import { previewView, fridayView, type KitView } from "@/lib/kitView";
 import { EDIT_TOKEN_WARNING, HELD_COPY, adoptResumeFragment, fridayIntake, reportPath, resumeLink, saveRef, type FridayReport } from "@/lib/fridayBrandIntake";
 import { EstimateTag, InfoPop, MockBanner, basePayload, useAutosave, SaveChip } from "@/components/br/intake-kit";
-import { ActivationRange, DEFAULT_MARKET, MarketPicker, pickActivation } from "@/components/br/intake-geo";
+import { DEFAULT_MARKET, ExposureCard, MarketPicker, pickExposure } from "@/components/br/intake-geo";
 import { LeadGatesStatus, PrimaryCta } from "@/components/br/intake-sell";
-import { advertiserActivation } from "../../../../api-server/src/lib/kitCalc/activation";
 import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { withGeo } from "@/lib/kitView";
 import { errorDetail, trackIntake } from "@/lib/intakeTrack";
-import type { LeadGates } from "@/lib/fridayBrandIntake";
+import { fridayEligibility, reviewGates, type LeadGates } from "@/lib/fridayBrandIntake";
 
 const numIn = "mt-1 h-12 w-full rounded-xl border border-foreground/20 bg-white px-3 text-base tabular-nums outline-none focus:border-foreground focus:ring-2 focus:ring-accent";
 const lab = "block text-[11px] font-bold uppercase tracking-wider text-foreground/60";
@@ -74,10 +73,10 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
   const { ref, state, setRef } = useAutosave("kit", payload, touched);
 
   const view: KitView = useMemo(
-    () => withGeo(report ? fridayView(report, calc, { brand: brandLabel, categoryLabel: catLabel, repeatLabel, mapDataUrl: map }) : previewView(calc, { brand: brandLabel, categoryKey: cat, categoryLabel: catLabel, repeatLabel, mapDataUrl: map }), market, report?.geo?.channels),
+    () => withGeo(report ? fridayView(report, calc, { brand: brandLabel, categoryLabel: catLabel, repeatLabel, mapDataUrl: map }) : previewView(calc, { brand: brandLabel, categoryKey: cat, categoryLabel: catLabel, repeatLabel, mapDataUrl: map }), market, fridayEligibility(report)),
     [report, calc, brandLabel, cat, map, market], // eslint-disable-line react-hooks/exhaustive-deps
   );
-  const act = pickActivation(report?.activation?.advertiser_exposure_usd, advertiserActivation(view.revenueOpp, market));
+  const expo = pickExposure(report?.exposure, market, !!report?.mock);
   const svgA = useMemo(() => kitSideA(view), [view]);
   const svgB = useMemo(() => kitSideB(view), [view]);
 
@@ -112,7 +111,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
       saveRef("kit", next);
       setRef(next);
       trackIntake("advertiser", "submit", "kit");
-      setGates({ partner_match: sub.partner_match, inventory_approval: sub.inventory_approval, mock: sub.mock });
+      setGates(reviewGates(sub, sub.mock));
       if (sub.public_mirror === "held") {
         setHeld(true);
         await exportKit(next.reportToken); // preview kit only; Friday's numbers are released after review
@@ -121,8 +120,6 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
       const rep = await api.reportView(next.reportToken, "brand");
       if (rep?.ready) {
         setReport(rep.report);
-        const st = rep.report.status;
-        if (st?.partner_match || st?.inventory_approval) setGates((g) => ({ partner_match: st.partner_match ?? g?.partner_match, inventory_approval: st.inventory_approval ?? g?.inventory_approval, mock: !!rep.report.mock }));
       }
       else {
         setQueued(true); // received by Friday; the full report is released once Friday's kit report is live
@@ -223,7 +220,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
             <p className="text-xs text-white/70">Revenue opportunity {$(view.revenueOpp[0])}–{$(view.revenueOpp[1])} from a {$(spend)} USD test <EstimateTag /></p>
             {view.source === "friday" ? <p className="mt-1 text-[11px] text-lime-200/90">Channel fit: {view.fitHeader}</p> : null}
           </div>
-          <div className="mt-3"><ActivationRange kind="advertiser" block={act.block} source={act.source} /></div>
+          <div className="mt-3"><ExposureCard exposure={expo.ex} source={expo.source} testId="kit-exposure" /></div>
           {step === "contact" && !report && !held ? (
             <div className="mt-4 grid gap-2 rounded-2xl border border-foreground/15 bg-white p-4" data-testid="kit-contact">
               <p className="text-sm font-semibold">Where should we send your kit?</p>

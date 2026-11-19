@@ -78,13 +78,12 @@ export function markTest(body: unknown): unknown {
   return { ...b, blurb: typeof b.blurb === "string" && b.blurb ? `${note} ${b.blurb}`.slice(0, 6000) : note };
 }
 
-const MATCH = new Set(["linked", "none", "checking"]);
-const APPROVAL = new Set(["pending", "approved", "declined", "not_required"]);
 /**
- * Friday's hub-partner match and inventory approval gate reach the browser as status enums ONLY
- * (assumed names partner_match / inventory_approval, see CONTRACT-GAPS.md). Any partner name, id, approver
- * or note Friday might add is dropped here, so public views never carry private partners.
+ * Friday v1.1 §3: match results (existing hub partner lead, is-a-hub, proposed deltas) are INTERNAL ONLY and are
+ * never returned to the submitter or the public payload. Defence in depth: if any such key ever appears in a
+ * Friday response, Birch drops it here before it reaches a browser. No match badge is rendered anywhere.
  */
+const INTERNAL_KEYS = ["partner_match", "existing_hub_partner_lead", "is_a_hub", "match", "matches", "friday_match", "deltas", "proposed_deltas", "inventory_approval", "approvers", "audit"];
 export function publicGates(text: string): string {
   let d: unknown;
   try {
@@ -93,25 +92,17 @@ export function publicGates(text: string): string {
     return text;
   }
   if (!d || typeof d !== "object") return text;
-  const clean = (o: Record<string, unknown>) => {
-    // v1.1 may send a boolean flag instead of a status object.
-    if (typeof o.existing_hub_partner_lead === "boolean") {
-      if (!("partner_match" in o)) o.partner_match = { status: o.existing_hub_partner_lead ? "linked" : "none" };
-      delete o.existing_hub_partner_lead;
-    }
-    for (const [k, ok] of [["partner_match", MATCH], ["inventory_approval", APPROVAL]] as const) {
-      if (!(k in o)) continue;
-      const st = (o[k] as { status?: unknown } | null)?.status;
-      if (typeof st === "string" && ok.has(st)) o[k] = { status: st };
-      else delete o[k];
-    }
+  const clean = (o: unknown) => {
+    if (!o || typeof o !== "object") return;
+    for (const k of INTERNAL_KEYS) delete (o as Record<string, unknown>)[k];
   };
   const root = d as Record<string, unknown>;
   clean(root);
   const rep = root.report as Record<string, unknown> | undefined;
   if (rep && typeof rep === "object") {
     clean(rep);
-    if (rep.status && typeof rep.status === "object") clean(rep.status as Record<string, unknown>);
+    clean(rep.status);
+    clean(rep.geo);
   }
   return JSON.stringify(root);
 }
@@ -142,10 +133,21 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       return null;
     }
   }
+  /** Friday v1 is strict: if it rejects the v1.1-only keys, retry once without them (v1.1 tolerance). */
+  async function forwardTolerant(req: Request, res: Response, method: "POST" | "PATCH", path: string, payload: unknown) {
+    const out = await forward(req, res, method, path, payload);
+    if (!out || out.status !== 400 || !payload || typeof payload !== "object") return out;
+    const b = payload as Record<string, unknown>;
+    if (!("geo" in b) && !("company_name" in b)) return out;
+    if (!/"invalid"/.test(out.text)) return out;
+    const { geo: _g, company_name: _c, ...v1 } = b;
+    log("brand-intake v1.1 keys rejected; retried as v1", { path: path.replace(/\/[A-Za-z0-9_-]{8,}(?=\/|\?|$)/g, "/:x") });
+    return forward(req, res, method, path, v1);
+  }
   const send = (res: Response, out: { status: number; text: string }) => res.status(out.status).type("application/json").send(publicGates(out.text || "{}"));
 
   router.post("/v1/brand-intake", body, async (req, res) => {
-    const out = await forward(req, res, "POST", "/api/public/brand-intake", markTest(req.body ?? {}));
+    const out = await forwardTolerant(req, res, "POST", "/api/public/brand-intake", markTest(req.body ?? {}));
     if (!out) return;
     if (out.status === 404) {
       // v1 not deployed. Drafts (no email yet) stay in the browser; only a submission with contact details is
@@ -164,7 +166,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
   router.patch("/v1/brand-intake/:id", body, async (req, res) => {
     const id = String(req.params.id);
     if (!ID_RE.test(id)) return void res.status(404).json({ ok: false, error: "not_found" });
-    const out = await forward(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, markTest(req.body ?? {}));
+    const out = await forwardTolerant(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, markTest(req.body ?? {}));
     if (!out) return;
     send(res, out);
   });
@@ -183,7 +185,9 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     if (!TOKEN_RE.test(token)) return void res.status(404).json({ ok: false, error: "not_found" });
     const view = VIEWS.has(String(req.query.view)) ? String(req.query.view) : "brand";
     res.setHeader("Referrer-Policy", "no-referrer");
-    const out = await forward(req, res, "GET", `/api/public/brand-report/${encodeURIComponent(token)}?view=${view}`);
+    const expo = req.query.expo === "max" ? "&expo=max" : "";
+    const h = req.query.h === "later" ? "&h=later" : "";
+    const out = await forward(req, res, "GET", `/api/public/brand-report/${encodeURIComponent(token)}?view=${view}${expo}${h}`);
     if (out) send(res, out);
   });
   return router;

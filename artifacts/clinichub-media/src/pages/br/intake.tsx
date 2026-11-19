@@ -4,13 +4,11 @@ import { MockBanner } from "@/components/br/intake-kit";
 import { IntakeShortForm } from "@/components/br/intake-short-form";
 import { SampleKit } from "@/components/br/sample-kit";
 import { CtaBand, SampleLeadStatus } from "@/components/br/intake-sell";
-import { ActivationRange } from "@/components/br/intake-geo";
-import { kitCalc } from "../../../../api-server/src/lib/kitCalc";
-import { advertiserActivation, publisherActivation } from "../../../../api-server/src/lib/kitCalc/activation";
-import { SAMPLE_INPUTS } from "@/lib/kitView";
+import { ActivationRange, ExposureCard } from "@/components/br/intake-geo";
+import { mockExposure, publisherActivation } from "../../../../api-server/src/lib/kitCalc/activation";
 
 /** Sample-only inputs (example values, not a real brand or hub). */
-const SAMPLE_AD = advertiserActivation(kitCalc({ aovUsd: SAMPLE_INPUTS.aovUsd, monthlyOrders: SAMPLE_INPUTS.monthlyOrders, purchasesPerYear: SAMPLE_INPUTS.repeat, marginBand: SAMPLE_INPUTS.marginBand, spendUsd: SAMPLE_INPUTS.spendUsd, conversionPct: SAMPLE_INPUTS.conversionPct }).revenueOppUsd, { sells_in: ["CA", "US"], ships_to: ["CA", "US"], regions: ["BC"] });
+const SAMPLE_EXPOSURE = { ...mockExposure({ sells_in: ["CA", "US"], ships_to: ["CA", "US"], regions: ["BC"] }), basis: "Sample: network figures / targets × example activation shares (1%–5%)" };
 const SAMPLE_PUB = publisherActivation({ on: { post_purchase: true, home: true }, mode: "cpm", sizeX: 1, conversionPct: 0, valuePerConversionUsd: 0 });
 
 export default function BrIntake() {
@@ -29,7 +27,7 @@ export default function BrIntake() {
       <div className="container mx-auto px-4 pb-10 pt-6">
         <SampleKit />
         <div className="mt-6 grid gap-4 lg:grid-cols-2" data-testid="sample-activation">
-          <ActivationRange kind="advertiser" block={SAMPLE_AD} source="sample" testId="sample-activation-advertiser" />
+          <ExposureCard exposure={SAMPLE_EXPOSURE} source="sample" sync={false} testId="sample-exposure" />
           <ActivationRange kind="publisher" block={SAMPLE_PUB} source="sample" testId="sample-activation-publisher" />
         </div>
         <div className="mt-4 max-w-2xl"><SampleLeadStatus /></div>

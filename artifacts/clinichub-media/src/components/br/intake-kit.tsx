@@ -3,7 +3,7 @@ import { CHANNEL_GEO, type Eligibility, type Market } from "../../../../api-serv
 import { EligChip, eligibilityOf } from "@/components/br/intake-geo";
 import { CtaBand, LeadGatesStatus, PrimaryCta, sideOf } from "@/components/br/intake-sell";
 import { errorDetail, fieldStart, trackIntake } from "@/lib/intakeTrack";
-import type { LeadGates } from "@/lib/fridayBrandIntake";
+import { reviewGates, type LeadGates } from "@/lib/fridayBrandIntake";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { animate } from "framer-motion";
 import { Info, Store, Megaphone, Target, Check, CloudUpload, FlaskConical } from "lucide-react";
@@ -209,7 +209,7 @@ const TILE_ART: Record<string, ReactNode> = {
   ),
 };
 
-export function ChannelTiles({ market, fridayGeo }: { market?: Market | null; fridayGeo?: Array<{ key: string; eligibility: Eligibility }> } = {}) {
+export function ChannelTiles({ market, fridayGeo }: { market?: Market | null; fridayGeo?: Array<{ key: string; eligibility: Eligibility; label?: string }> } = {}) {
   const geoOf = (k: string) => CHANNEL_GEO.find((g) => g.key === k);
   const rows = CHANNEL_TILES.map((t) => ({ t, g: geoOf(t.key), el: geoOf(t.key) ? eligibilityOf(geoOf(t.key)!.key, market, fridayGeo).e : ("now" as Eligibility) }));
   const shown = rows.filter((r) => r.el !== "not_available");
@@ -282,7 +282,7 @@ export function ContactSubmit({ role, payload, draft, setRef, label }: { role: I
       const next = { ...r, version: res.version };
       saveRef(role, next);
       setRef(next);
-      setGates({ partner_match: res.partner_match, inventory_approval: res.inventory_approval, mock: res.mock });
+      setGates(reviewGates(res, res.mock));
       trackIntake(side, "submit", role === "kit" ? "kit" : role);
       setState("done");
     } catch (e) {

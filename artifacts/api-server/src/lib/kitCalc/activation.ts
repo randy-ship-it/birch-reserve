@@ -40,3 +40,54 @@ export function readActivation(x: unknown): ActivationBlock | null {
   if (!o || !ok(o.now) || !ok(o.later)) return null;
   return { now: o.now as MinMax, later: o.later as MinMax, period: o.period === "month" ? "month" : o.period === "test" ? "test" : undefined, estimate: true };
 }
+
+/* ---------------- Friday v1.1 `exposure` (brand-report.v1 additive) ---------------- */
+export type ExposureChannel = { key: string; geo_label?: string; eligible_now: boolean; later_option?: boolean; reason?: string | null; unit?: string; now: MinMax | null; later: MinMax | null; figure_now?: string | null; figure_later?: string | null; needs_figure?: boolean };
+export type FridayExposure = { label?: string; basis?: string; markets?: string[]; activation?: { min_share: number; max_share: number; placeholder?: boolean }; geo_weights?: Record<string, number | boolean>; channels: ExposureChannel[] };
+
+/** Tolerant read of Friday's `exposure`; null when absent or malformed (→ labelled mock). */
+export function readExposure(x: unknown): FridayExposure | null {
+  const o = x as FridayExposure | null;
+  if (!o || !Array.isArray(o.channels) || !o.channels.length) return null;
+  const mm = (m: unknown): MinMax | null => {
+    const v = m as Partial<MinMax> | null;
+    return v && typeof v.min === "number" && typeof v.max === "number" && v.min <= v.max ? { min: v.min, max: v.max } : null;
+  };
+  return { ...o, channels: o.channels.filter((c) => c && typeof c.key === "string").map((c) => ({ ...c, eligible_now: !!c.eligible_now, now: mm(c.now), later: mm(c.later) })) };
+}
+
+/**
+ * MOCK exposure in Friday's v1.1 shape, from Randy's network figures only (Friday v1.1 §2 table) and PLACEHOLDER
+ * activation shares. Labelled "Mock · placeholder shares, not a forecast" wherever it renders.
+ */
+export const MOCK_SHARES = { min_share: 0.01, max_share: 0.05, placeholder: true } as const;
+const FIG = [
+  { key: "hubs", unit: "page views / month", now: 700_000_000, later: 5_000_000_000, figure_now: ">700MM page views now", figure_later: ">5B page views (2027 target)" },
+  { key: "street_team", unit: "homes", now: 500_000, later: 3_000_000, figure_now: "500K homes now", figure_later: "3MM+ homes later" },
+  { key: "retail", unit: "recovery customers", now: 1_000_000, later: 1_000_000, figure_now: ">1MM recovery customers", figure_later: ">1MM recovery customers" },
+  { key: "calm_joints", unit: "", now: 0, later: 0, figure_now: null, figure_later: null, needs_figure: true },
+] as const;
+const FKEY_TO_BIRCH: Record<string, ChannelGeoKey> = { hubs: "scale-hubs", calm_joints: "calm-joints", street_team: "street-team", retail: "retail-network" };
+type ChannelGeoKey = "scale-hubs" | "calm-joints" | "street-team" | "retail-network";
+
+export function mockExposure(market: Market | null | undefined): FridayExposure {
+  const s = MOCK_SHARES;
+  const span = (n: number): MinMax => ({ min: Math.round(n * s.min_share), max: Math.round(n * s.max_share) });
+  return {
+    label: "Estimate",
+    basis: "Mock: network figures / targets × placeholder activation shares (1%–5%)",
+    activation: { ...s },
+    channels: FIG.map((f) => {
+      const g = CHANNEL_GEO.find((c) => c.key === FKEY_TO_BIRCH[f.key])!;
+      const e = channelEligibility(g.key, market);
+      const needs = "needs_figure" in f && f.needs_figure;
+      return {
+        key: f.key, geo_label: g.label, eligible_now: e === "now", later_option: !!g.later, unit: f.unit,
+        reason: e === "now" ? null : e === "later" ? "Opens in your markets later (Canada-wide)" : "Not in your markets yet",
+        now: e === "now" && !needs ? span(f.now) : null,
+        later: e !== "not_available" && !needs ? span(f.later) : null,
+        figure_now: f.figure_now, figure_later: f.figure_later, needs_figure: needs || undefined,
+      };
+    }),
+  };
+}

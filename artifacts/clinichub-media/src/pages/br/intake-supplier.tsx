@@ -5,7 +5,7 @@ import { ActivationRange, DEFAULT_MARKET, MarketPicker, pickActivation } from "@
 import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { LeadGatesStatus, PrimaryCta } from "@/components/br/intake-sell";
 import { errorDetail, fieldStart, trackIntake } from "@/lib/intakeTrack";
-import type { LeadGates } from "@/lib/fridayBrandIntake";
+import { reviewGates, type LeadGates } from "@/lib/fridayBrandIntake";
 import { ChannelTiles, EstimateTag, InfoPop, MockBanner, RoleTabs, SaveChip, Segmented, Toggle, basePayload, useAutosave } from "@/components/br/intake-kit";
 import { FIRST_LOOK, INTEREST_FINE, MAX_DISTRIBUTION, SUPPLIER_CATEGORIES, type TriState } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { fridayIntake, reportPath } from "@/lib/fridayBrandIntake";
@@ -44,7 +44,7 @@ export default function BrIntakeSupplier() {
       const r = ref ?? (await api.create(payload));
       const res = await api.submit(r, payload, { email: email.trim(), website: website.trim(), elapsed_ms: Date.now() - t0.current });
       setReportToken(r.reportToken);
-      setGates({ partner_match: res.partner_match, inventory_approval: res.inventory_approval, mock: res.mock });
+      setGates(reviewGates(res, res.mock));
       trackIntake("advertiser", "submit", "supplier");
       setSent(res.status === "submitted" || Object.values(res.approvals ?? {}).includes("pending_review") ? "pending_review" : "error");
     } catch (e) {

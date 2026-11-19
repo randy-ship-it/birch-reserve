@@ -13,8 +13,8 @@
  * /workspace/br-intake/CONTRACT-GAPS.md. Labelled MOCK when the Birch server has no Friday config: nothing leaves
  * the browser and every screen says so. Nothing is ever auto-accepted.
  */
-import { marketToGeographyText, type Eligibility, type Market } from "../../../api-server/src/lib/kitCalc/channelGeo";
-import type { Activation } from "../../../api-server/src/lib/kitCalc/activation";
+import { marketToFridayGeo, marketToGeographyText, splitRegions, type Eligibility, type Market } from "../../../api-server/src/lib/kitCalc/channelGeo";
+import { mockExposure, type FridayExposure } from "../../../api-server/src/lib/kitCalc/activation";
 import type { IntakePayload, IntakeRole, PubSurfaceKey } from "../../../api-server/src/lib/overhaul/brandIntake";
 import { SUPPLIER_CATEGORIES } from "../../../api-server/src/lib/overhaul/brandIntake";
 import { mockReport } from "./fridayMockReport";
@@ -23,15 +23,19 @@ import { mockReport } from "./fridayMockReport";
 export type IntakeRef = { id: string; editToken: string; reportToken: string; version: number; legacy?: boolean };
 export type IntakeStatus = "draft" | "submitted" | "pending_review" | "approved" | "declined";
 /**
- * Friday lead gates (Randy via Emma, Nov 18 2026 10:44 PM ET). ASSUMED field names, listed in CONTRACT-GAPS.md:
- *   partner_match.status       "linked" | "none" | "checking"   (hub-partner lead matching; never a partner name or id)
- *   inventory_approval.status  "pending" | "approved" | "declined" | "not_required"
- *                              (a Birch Reserve person approves before any real inventory change; no controls on Birch)
+ * Review state shown to the submitter (Friday v1.1 §3–4). Friday's hub-partner MATCH results are INTERNAL ONLY:
+ * per Friday's contract they are never returned to the submitter or the public payload, and Birch must never
+ * render a match badge (the "Linked to an existing hub partner" badge is withheld on purpose). The only
+ * submitter-facing state is a generic "In review, pending BR approval" when Friday reports pending_review.
+ * Approvals are server-to-server (X-Approver-Email); Birch never calls them and has no approval UI.
  */
-export type PartnerMatch = { status: "linked" | "none" | "checking" };
-export type InventoryApproval = { status: "pending" | "approved" | "declined" | "not_required" };
-export type LeadGates = { partner_match?: PartnerMatch; inventory_approval?: InventoryApproval; mock?: boolean };
-export type SubmitResult = { status: IntakeStatus; version: number; approvals: Record<string, string>; report_ready?: boolean; public_mirror?: "published" | "held" } & LeadGates;
+export type LeadGates = { review?: "pending_review"; mock?: boolean };
+export function reviewGates(res: { status?: string; approvals?: Record<string, string> } | null | undefined, mock?: boolean): LeadGates | null {
+  if (!res) return null;
+  const pending = res.status === "pending_review" || Object.values(res.approvals ?? {}).includes("pending_review");
+  return pending ? { review: "pending_review", mock } : null;
+}
+export type SubmitResult = { status: IntakeStatus; version: number; approvals: Record<string, string>; report_ready?: boolean; public_mirror?: "published" | "held"; mock?: boolean };
 export type ReportView = "brand" | "publisher" | "supplier" | "sponsor";
 type LoHi = { low: number; high: number };
 /** brand-report.v1 (Friday), only the keys Birch renders. */
@@ -42,19 +46,35 @@ export type FridayReport = {
   updated: string;
   roles: string[];
   view?: ReportView;
-  status?: { public_mirror?: "published" | "held"; kits_pending?: number } & Omit<LeadGates, "mock">;
+  status?: { public_mirror?: "published" | "held"; kits_pending?: number };
   ltv?: { label: string; model: string; inputs: Record<string, unknown>; lifetime_years: LoHi & { placeholder?: boolean }; missing: string[]; needs_input: boolean; gp_per_order_usd: LoHi | null; gp_ltv_usd: LoHi | null; monthly_gp_usd: LoHi | null; formula: string };
   demand_fit?: { label: string; channels: Array<{ key: string; name: string; fit: number; fit_label: string; subject_to_human_confirmation: boolean }>; anchor_hubs: Array<{ key: string; name: string; status: string; confirmed_anchor: boolean; fit: number; fit_label: string; reason: string | null; subject_to_human_confirmation: boolean }> };
-  channels?: Array<{ key: string; name: string; figures: string[]; figures_label: string; fit: number; fit_label: string; line: string; image: string | null }>;
+  /** v1.1 adds geo_label / eligible_now / later_option (+ reason) per tile. */
+  channels?: Array<{ key: string; name: string; figures: string[]; figures_label: string; fit: number; fit_label: string; line: string; image: string | null; geo_label?: string; eligible_now?: boolean; later_option?: boolean; reason?: string | null }>;
   placements?: Array<{ key: string; label: string; fit: number; fit_label: string; cpm_usd: LoHi | null; cpc_usd: LoHi | null; needs_rate: boolean }>;
   headline?: { best_fit_cpm_usd?: LoHi; best_fit_cpc_usd?: LoHi };
   role_data?: Record<string, unknown>;
-  /** v1.1 (coming, ASSUMED names; see CONTRACT-GAPS.md). Used when present, otherwise the labelled mock. */
-  geo?: { sells_in?: string[]; ships_to?: string[]; regions?: string[]; hub_audience_geo?: unknown; channels?: Array<{ key: string; eligibility: Eligibility }> };
-  activation?: Activation;
+  /** v1.1 (Friday PR #213): geo-scoped markets and the advertiser exposure range. Used when present, else a labelled mock. */
+  geo?: { markets?: string[]; markets_stated?: boolean; regions?: Record<string, string[]>; input?: unknown; channel_geo?: Record<string, unknown> };
+  exposure?: FridayExposure;
   mock?: boolean;
 };
 export type { Market };
+
+/** Per-channel eligibility from a v1.1 report (exposure first, then channel tiles); [] on a v1 report. */
+export function fridayEligibility(r: FridayReport | null | undefined): Array<{ key: string; eligibility: Eligibility; label?: string; reason?: string | null }> {
+  if (!r) return [];
+  const ex = r.exposure?.channels ?? [];
+  const tiles = (r.channels ?? []).filter((c) => typeof c.eligible_now === "boolean");
+  const keys = [...new Set([...ex.map((c) => c.key), ...tiles.map((c) => c.key)])];
+  return keys.map((k) => {
+    const e = ex.find((c) => c.key === k);
+    const t = tiles.find((c) => c.key === k);
+    const now = e ? e.eligible_now : !!t?.eligible_now;
+    const later = e ? !!e.later : !!t?.later_option;
+    return { key: k, eligibility: now ? "now" : later ? "later" : "not_available", label: e?.geo_label ?? t?.geo_label, reason: e?.reason ?? t?.reason ?? null };
+  });
+}
 export type ReportResult = { ready: false } | { ready: true; report: FridayReport };
 export type BrandReport = { id: string; version: number; status: IntakeStatus; updated_at: string; roles: string[]; approvals: Record<string, string>; mock?: boolean };
 export type SubmitContact = { email: string; website: string; elapsed_ms: number };
@@ -110,7 +130,12 @@ export function toFridayBody(p: IntakePayload, extra: Partial<SubmitContact> & {
     // strict, so a Birch band is only sent when Friday knows it (see CONTRACT-GAPS.md). Friday then reports needs_input.
     body.calculator = { avg_cart_usd: k.aov_usd, orders_per_month: k.monthly_orders, purchases_per_year: k.purchases_per_year, ...(FRIDAY_MARGIN.has(k.margin_band) ? { margin_band: k.margin_band } : {}) };
   }
-  if (p.market && (p.market.sells_in.length || p.market.ships_to.length)) body.profile = { geography: marketToGeographyText(p.market) };
+  if (p.market && (p.market.sells_in.length || p.market.ships_to.length)) {
+    // v1.1 `geo` block; the Birch server retries without it if Friday is still on strict v1 (see brandIntakeProxy.ts).
+    body.geo = marketToFridayGeo(p.market, p.role === "publisher" ? "publisher" : "advertiser");
+    body.profile = { geography: marketToGeographyText(p.market) };
+  }
+  if (p.kit_calculator?.brand_label) body.company_name = p.kit_calculator.brand_label.slice(0, 120);
   if (extra.email) body.email = extra.email;
   if (extra.website) body.website = extra.website;
   if (extra.elapsed_ms != null) body.elapsed_ms = extra.elapsed_ms;
@@ -120,7 +145,7 @@ export function toFridayBody(p: IntakePayload, extra: Partial<SubmitContact> & {
 
 /* ------------------------------ mock (preview only) ------------------------------ */
 const MOCK_KEY = "br_intake_mock_v1";
-type MockRow = BrandReport & { gates?: Omit<LeadGates, "mock">; public_mirror?: "published" | "held"; editToken: string; reportToken: string; body: Record<string, unknown>; payload: IntakePayload; events: Array<{ type: string; format?: string; at: string }>; kits: KitBody[] };
+type MockRow = BrandReport & { public_mirror?: "published" | "held"; editToken: string; reportToken: string; body: Record<string, unknown>; payload: IntakePayload; events: Array<{ type: string; format?: string; at: string }>; kits: KitBody[] };
 const rand = (n = 18) => Array.from(crypto.getRandomValues(new Uint8Array(n)), (b) => (b % 36).toString(36)).join("");
 function mockAll(): Record<string, MockRow> {
   try {
@@ -171,9 +196,8 @@ const mock = {
     // Friday holds the public mirror when the email domain does not match the website domain.
     const held = contact.email.split("@")[1]!.toLowerCase().replace(/^www\./, "") !== contact.website.toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0];
     row.public_mirror = held ? "held" : "published";
-    row.gates = mockGates(row.roles);
     mockSave(all);
-    return { status: row.status, version: row.version, approvals: row.approvals, report_ready: true, public_mirror: row.public_mirror, ...row.gates, mock: true };
+    return { status: row.status, version: row.version, approvals: row.approvals, report_ready: true, public_mirror: row.public_mirror, mock: true };
   },
   async kit(ref: IntakeRef, kit: KitBody): Promise<{ status: "pending_review" }> {
     await sleep(120);
@@ -204,17 +228,11 @@ const mock = {
     if (!row) return null;
     if (row.version < 1) return { ready: false };
     const rep = mockReport(row.payload, row.body, view, row.version, row.updated_at, row.roles, row.public_mirror);
-    return { ready: true, report: { ...rep, status: { ...rep.status, ...(row.gates ?? mockGates(row.roles)) } } };
+    const m = row.payload.market;
+    // v1.1 shape (mock): geo-scoped markets + exposure from Randy's figures with placeholder shares.
+    return { ready: true, report: { ...rep, geo: m ? { markets: m.sells_in.filter((c) => m.ships_to.includes(c)), markets_stated: true, regions: splitRegions(m.regions) as Record<string, string[]> | undefined } : { markets: ["CA", "US"], markets_stated: false }, exposure: mockExposure(m) } };
   },
 };
-
-/**
- * MOCK gate states (labelled "Mock" in the UI). Publisher leads show the hub-partner match so the badge can be
- * reviewed on previews; every submitted lead waits for Birch Reserve approval before any inventory change.
- */
-export function mockGates(roles: string[]): Omit<LeadGates, "mock"> {
-  return { partner_match: { status: roles.includes("publisher") ? "linked" : "none" }, inventory_approval: { status: "pending" } };
-}
 
 /* ------------------------------ live (Friday) ------------------------------ */
 async function j<T>(r: Response): Promise<T> {

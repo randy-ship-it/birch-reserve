@@ -109,12 +109,22 @@ test("the secret's env names never appear in client sources; the browser only ca
   assert.match(a, /\/v1\/brand-intake/);
 });
 
-test("hub-partner match and approval gate reach the browser as status enums only (no partner names, ids or approvers)", () => {
-  const out = JSON.parse(publicGates(JSON.stringify({ status: "submitted", partner_match: { status: "linked", partner_id: "p_1", partner_name: "Private Clinic" }, inventory_approval: { status: "pending", approver: "someone" }, report: { status: { partner_match: { status: "weird" } } } })));
-  assert.deepEqual(out.partner_match, { status: "linked" });
-  assert.deepEqual(out.inventory_approval, { status: "pending" });
-  assert.equal(out.report.status.partner_match, undefined);
-  assert.ok(!/Private Clinic|p_1|someone/.test(JSON.stringify(out)));
+test("Friday match results never reach the browser (internal only per v1.1 §3)", () => {
+  const out = JSON.parse(publicGates(JSON.stringify({ status: "submitted", approvals: { kit: "pending_review" }, partner_match: { status: "linked", partner_name: "Private Clinic" }, existing_hub_partner_lead: true, is_a_hub: true, report: { status: { existing_hub_partner_lead: true }, proposed_deltas: [{ target: "tam" }] } })));
+  assert.equal(out.partner_match, undefined);
+  assert.equal(out.existing_hub_partner_lead, undefined);
+  assert.equal(out.is_a_hub, undefined);
+  assert.equal(out.report.status.existing_hub_partner_lead, undefined);
+  assert.equal(out.report.proposed_deltas, undefined);
+  assert.deepEqual(out.approvals, { kit: "pending_review" });
+  assert.ok(!/Private Clinic|linked/.test(JSON.stringify(out)));
+});
+
+test("no match badge copy anywhere in the client", () => {
+  const dir = resolve(process.cwd(), "../clinichub-media/src");
+  const walk = (d: string): string[] => readdirSync(d).flatMap((n) => (statSync(join(d, n)).isDirectory() ? walk(join(d, n)) : /\.(ts|tsx)$/.test(n) ? [join(d, n)] : []));
+  const all = walk(dir).map((f) => readFileSync(f, "utf8")).join("\n").replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, "");
+  assert.ok(!/Linked to an existing hub partner/i.test(all));
 });
 
 test("intake funnel events: fixed side/action/detail lists only, so no personal data can ride in an event name", () => {
@@ -142,4 +152,34 @@ test("channel geography: Street Team is Ontario now, Canada later; a US-only bra
 test("TEST records: only test@/test+…@silverbirchgrowth.com submissions get the [TEST] blurb", () => {
   assert.match(String((markTest({ email: "test+br-preview@silverbirchgrowth.com" }) as { blurb: string }).blurb), /^\[TEST\]/);
   assert.equal((markTest({ email: "growth@examplebrand.com" }) as { blurb?: string }).blurb, undefined);
+});
+
+test("v1.1 geo body: strict v1 Friday rejects it → Birch retries once as v1 (geo text stays in profile.geography)", async () => {
+  const bodies: Array<Record<string, unknown>> = [];
+  const f = (async (_url: string, init: RequestInit) => {
+    const b = JSON.parse(String(init.body)) as Record<string, unknown>;
+    bodies.push(b);
+    if ("geo" in b) return new Response(JSON.stringify({ ok: false, error: "invalid", issues: [{ path: "geo", message: "Unrecognized key" }] }), { status: 400 });
+    return new Response(JSON.stringify({ ok: true, id: "bi_abc12345", status: "draft", version: 0, editToken: "e".repeat(20), reportToken: "r".repeat(20) }), { status: 201 });
+  }) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  const r = await realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ roles: ["brand"], geo: { sells: ["US"], ships: ["US"] }, profile: { geography: "Sells in: USA" }, company_url: "" }) });
+  s.close();
+  assert.equal(r.status, 201);
+  assert.equal(bodies.length, 2);
+  assert.ok(!("geo" in bodies[1]!));
+  assert.deepEqual(bodies[1]!.profile, { geography: "Sells in: USA" });
+});
+
+test("v1.1 exposure: US-only brand gets no Street Team now or later; Canada outside Ontario gets a later value", async () => {
+  const { mockExposure, readExposure } = await import("../src/lib/kitCalc/activation");
+  const us = mockExposure({ sells_in: ["US"], ships_to: ["US"] }).channels.find((c) => c.key === "street_team")!;
+  assert.equal(us.eligible_now, false);
+  assert.equal(us.now, null);
+  assert.equal(us.later, null);
+  const bc = mockExposure({ sells_in: ["CA"], ships_to: ["CA"], regions: ["BC"] }).channels.find((c) => c.key === "street_team")!;
+  assert.equal(bc.now, null);
+  assert.ok(bc.later && bc.later.max > bc.later.min);
+  assert.equal(readExposure({ channels: [] }), null);
+  assert.equal(readExposure(null), null);
 });
