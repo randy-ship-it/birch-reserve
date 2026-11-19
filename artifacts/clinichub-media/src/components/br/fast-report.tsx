@@ -4,6 +4,7 @@
  * "from your site" tag; gaps (needs_input) become prompts in "Add detail to sharpen your numbers". Defaults are
  * labelled. Friday's full report is reviewed by a person first. Birch never fetches the brand's site itself.
  */
+import { LaneCtas } from "@/components/br/two-lane";
 import { ArrowRight, Download, Loader2, Mail, Plus, Rocket, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Details } from "@/components/br/details";
@@ -177,7 +178,7 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
         </Details>
         <IntakeWarnings testId="fast-warnings" />
         {hasKit || !oneForm ? <div className="mt-4">{upgrade("top")}</div> : null}
-        {hasKit || !oneForm ? <div className="mt-3"><PrimaryCta side={q.side} where="done" /></div> : null}
+        {hasKit || !oneForm ? <div className="mt-3"><PrimaryCta side={q.side} where="done" /></div> : <LaneCtas />}
       </div>
       {oneForm && q.ref && q.payload ? <IntakeDetails key={q.roles.join(",")} intake={q.ref} payload={{ ...q.payload, roles: q.roles as IntakePayload["roles"] }} roles={q.roles} shared={q.shared ?? { brand: "", categories: [], skus: "", audience: "" }} /> : null}
       <ReportV2 report={report} exposure={exposure} exposureSource="mock" earnCta={earnCta} supplierCta={supplierOnly ? earnCta : undefined} onAccelerate={accCta} physical={q.physical} />
