@@ -81,7 +81,7 @@ export function fridayView(r: FridayReport, calc: KitCalcResult, o: { brand: str
     categoryLabel: o.categoryLabel,
     ltvGp,
     gpPerOrder: lt?.gp_per_order_usd ? [lt.gp_per_order_usd.low, lt.gp_per_order_usd.high] : null,
-    ltvNote: lt ? `${lt.label} · ${lt.formula}` : "Friday returned no LTV",
+    ltvNote: lt ? `${lt.label} · ${lt.formula}` : "No LTV yet",
     scale: calc.scale,
     revenueOpp: calc.revenueOppUsd,
     gpOpp: ltvGp ? [Math.round(nc[0] * ltvGp[0]), Math.round(nc[1] * ltvGp[1])] : null,

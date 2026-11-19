@@ -2380,7 +2380,7 @@ ${flightTimelineHtml(price(look), price(seat))}
 <section class="band" id="categories"><div class="wrap"><p class="kicker">The network</p><h2>A growing network of private hubs.</h2>
 <p class="open-count"><strong>Limited early placements</strong> · We curate placements as each hub launches. Want a premium slot or something custom? Ask below.</p>
 ${sharedSeatsHtml()}
-<ul class="cat-strip" data-testid="network-hubs"><li><span style="min-height:0">Integrity Fitness</span></li><li><span style="min-height:0">DR-HO'S physio</span></li><li><span style="min-height:0">More hubs launching</span></li></ul>
+<ul class="cat-strip" data-testid="network-hubs"><li><span style="min-height:0">DR-HO'S physio</span></li><li><span style="min-height:0">More hubs launching</span></li></ul>
 </div></section>
 
 <section class="band" id="buy"><div class="wrap"><div class="buy">

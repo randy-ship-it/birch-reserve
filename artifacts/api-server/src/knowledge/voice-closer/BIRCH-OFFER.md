@@ -58,7 +58,7 @@ Categories (companion lock):
 7. Men’s health  
 8. Diagnostics / services  
 
-Network: listed Scale Health hubs (live proof below) plus a launching cohort of brand hubs. Named logos (not reach numbers): DR-HO’S · Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery.
+Network: listed Scale Health hubs (live proof below) plus a launching cohort of brand hubs. Named logos (not reach numbers): DR-HO’S · Kalaya · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery.
 
 ## Live proof
 

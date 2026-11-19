@@ -243,7 +243,7 @@ test("buycalc HTML is one short, clean buy path with broad network copy and no p
   assert.doesNotMatch(html, /minimum goes up/);
   assert.doesNotMatch(html, /today's minimum/);
   const strip = html.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
-  assert.match(strip, /Integrity Fitness/);
+  assert.match(strip, /DR-HO'S physio/); assert.doesNotMatch(strip, /Integrity/i);
   assert.doesNotMatch(html, /Scale Health/);
   assert.match(strip, /More hubs launching/);
   const closed = renderBuycalcHtml({ seatsOpen: 0, seatsTotal: 8 });

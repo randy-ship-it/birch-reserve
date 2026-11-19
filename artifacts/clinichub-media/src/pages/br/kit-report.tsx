@@ -70,10 +70,10 @@ export default function BrKitReport() {
       <div className="container mx-auto px-4 py-8 md:py-12">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Private link · not indexed</p>
         <h1 className="font-display text-4xl md:text-6xl">Your report and media kit</h1>
-        {state === "loading" ? <p className="mt-6 flex items-center gap-2"><Loader2 className="size-4 animate-spin" />Loading from Friday…</p> : null}
+        {state === "loading" ? <p className="mt-6 flex items-center gap-2"><Loader2 className="size-4 animate-spin" />Loading your report…</p> : null}
         {state === "draft" ? <p className="mt-6" data-testid="kit-report-draft">This kit is still a draft. Finish it on <a href="/brand-kit" className="underline">your kit page</a>.</p> : null}
         {state === "missing" ? <p className="mt-6" data-testid="kit-report-missing">We couldn't find this kit. The link may have been rotated.</p> : null}
-        {state === "error" ? <p className="mt-6">Friday is unreachable right now. Try again shortly.</p> : null}
+        {state === "error" ? <p className="mt-6">We couldn't load your report right now. Try again shortly.</p> : null}
         {report?.status?.public_mirror === "held" ? <p className="mt-6 rounded-xl bg-amber-50 p-3 text-amber-900" data-testid="kit-held">{HELD_COPY}</p> : null}
         <LeadGatesStatus gates={kitPending ? { review: "pending_review", mock: !!report?.mock } : null} testId="report-lead-gates" />
         {view && report?.status?.public_mirror !== "held" ? (
@@ -104,7 +104,7 @@ export default function BrKitReport() {
                   ))}
                 </div>
                 <button type="button" onClick={dl} data-testid="kit-report-download" className="inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-bold" style={{ background: RT.mint, color: RT.forest }}><Download className="size-4" />Download PDF + PNG</button>
-                <span className="text-xs" style={{ color: RT.mute }}>LTV and channel fit as returned by Friday{report?.mock ? " (mock on preview)" : ""}. Channel fit is subject to human confirmation.</span>
+                <span className="text-xs" style={{ color: RT.mute }}>LTV and channel fit from your report{report?.mock ? " (preview · mock data)" : ""}. Channel fit is subject to human confirmation.</span>
               </div>
               <div className="mt-4"><KitSides svgA={svgA} svgB={svgB} side={side} /></div>
             </section>

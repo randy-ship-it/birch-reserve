@@ -27,13 +27,13 @@ export default function BrIntake() {
     setMode("expanded");
     setTimeout(() => document.getElementById("my-kit")?.scrollIntoView({ behavior: "smooth" }), 50);
   };
-  usePageMeta("Get your media kit | Birch Reserve, powered by Friday", "Website + email for a quick estimate, or the full form. A two-sided media kit: your revenue opportunity and your exposure fit. Estimates only, reviewed by a person.");
+  usePageMeta("Get your media kit | Birch Reserve", "Website + email for a quick estimate, or the full form. A two-sided media kit: your revenue opportunity and your exposure fit. Estimates only, reviewed by a person.");
   return (
     <div data-testid="intake-landing">
       <MockBanner />
       <section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_55%)]">
         <div className="container mx-auto max-w-5xl px-4 pb-8 pt-10 md:pt-16">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · powered by Friday</p>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve</p>
           <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Get your media kit.</h1>
           <p className="mt-2 max-w-xl text-base text-muted-foreground">Pick your side. Advertisers get a two-sided kit: revenue opportunity and where the brand fits across the network. Publishers get what their hub could earn.</p>
           <div className="mt-6 inline-flex rounded-full bg-foreground/[0.06] p-1" role="tablist" aria-label="Intake mode" data-testid="intake-mode">

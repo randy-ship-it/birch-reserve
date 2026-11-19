@@ -85,7 +85,7 @@ export function FastReport({ q, onAddDetail }: { q: QuickResult; onAddDetail: ()
             </div>
           ))}
         </dl>
-        {q.autofill?.mock ? <p className="mt-2 text-[11px]" style={{ color: RT.mute }} data-testid="fast-autofill-mock">Preview mock: Friday's site auto-fill is not called on this preview, so every value is a default.</p> : null}
+        {q.autofill?.mock ? <p className="mt-2 text-[11px]" style={{ color: RT.mute }} data-testid="fast-autofill-mock">Preview · mock data: we don't read your site on this preview, so every value is a default.</p> : null}
         {q.fallback ? <p className="mt-2 text-[11px]" style={{ color: RT.mute }} data-testid="fast-fallback">Site auto-fill is not switched on yet, so these are defaults.</p> : null}
         <div className="mt-4 rounded-2xl p-3 text-sm" style={{ background: RT.paper, color: RT.body }} data-testid="fast-in-review">
           <strong>Your full report is in review.</strong> We sent your request to Birch Reserve. A person reviews it before the full report is released{q.held ? ", after we confirm brand ownership (usually within one business day)" : ""}.

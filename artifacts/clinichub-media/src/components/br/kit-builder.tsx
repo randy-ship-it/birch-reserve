@@ -136,7 +136,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
       setBusy("done");
     } catch (e) {
       trackIntake("advertiser", "submit_error", errorDetail((e as Error).message));
-      setErr(ERR[(e as Error).message] ?? "Couldn't reach Friday. Your inputs are saved on this device; try again.");
+      setErr(ERR[(e as Error).message] ?? "Couldn't send that. Your inputs are saved on this device; try again.");
       setBusy("error");
     }
   }
@@ -221,8 +221,8 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
           </div>
           <div className="mt-5 rounded-2xl bg-[#0b1f3a] p-4 text-white" data-testid="kit-quick" data-source={view.source}>
             <div className="flex items-center gap-2"><EstimateTag /><span className="text-xs text-white/70">GP LTV per customer</span>
-              <span data-testid="kit-source" className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${view.source === "friday" ? "bg-lime-300 text-[#0b1f3a]" : "bg-white/15 text-white"}`}>{view.source === "friday" ? (view.mock ? "From Friday · mock" : "From Friday") : "Live preview"}</span>
-              <span className="ml-auto"><InfoPop dark title="Formula and assumptions" label="Formula" testId="kit-formula">{(view.source === "friday" ? view.formula : KIT_CALC_FORMULA).map((f) => <p key={f}>• {f}</p>)}<hr className="my-2" />{KIT_CALC_ASSUMPTIONS.map((a) => <p key={a} className="text-xs">{a}</p>)}<p className="mt-2 text-xs">While you type, numbers are a live preview. After you send, the LTV and channel fit come from Friday as returned.</p></InfoPop></span>
+              <span data-testid="kit-source" className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${view.source === "friday" ? "bg-lime-300 text-[#0b1f3a]" : "bg-white/15 text-white"}`}>{view.source === "friday" ? (view.mock ? "Preview · mock data" : "From your report") : "Live preview"}</span>
+              <span className="ml-auto"><InfoPop dark title="Formula and assumptions" label="Formula" testId="kit-formula">{(view.source === "friday" ? view.formula : KIT_CALC_FORMULA).map((f) => <p key={f}>• {f}</p>)}<hr className="my-2" />{KIT_CALC_ASSUMPTIONS.map((a) => <p key={a} className="text-xs">{a}</p>)}<p className="mt-2 text-xs">While you type, numbers are a live preview. After you send, the LTV and channel fit come from your report.</p></InfoPop></span>
             </div>
             <p className="mt-1 font-display text-3xl tabular-nums text-lime-200" data-testid="kit-ltv">{ltv ? `${$(ltv[0])}–${$(ltv[1])}` : "Needs inputs"}</p>
             <p className="text-xs text-white/70">Revenue opportunity {$(view.revenueOpp[0])}–{$(view.revenueOpp[1])} from a {$(spend)} USD test <EstimateTag /></p>
@@ -232,14 +232,14 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
           {step === "contact" && !report && !held ? (
             <div className="mt-4 grid gap-2 rounded-2xl border border-foreground/15 bg-white p-4" data-testid="kit-contact">
               <p className="text-sm font-semibold">Where should we send your kit?</p>
-              <p className="text-xs text-muted-foreground">Brand-level only. Friday checks the numbers and confirms fit by hand. Nothing is booked or charged.</p>
+              <p className="text-xs text-muted-foreground">Brand-level only. A person checks the numbers and confirms fit by hand. Nothing is booked or charged.</p>
               <input data-testid="kit-website" onFocus={() => trackIntake("advertiser", "field_start", "website", { dedupe: true })} value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" autoComplete="url" className={numIn} />
               <input data-testid="kit-email" onFocus={() => trackIntake("advertiser", "field_start", "email", { dedupe: true })} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourbrand.com" autoComplete="email" className={numIn} />
               <input tabIndex={-1} aria-hidden autoComplete="off" name="company_url" value={hp} onChange={(e) => setHp(e.target.value)} className="absolute -left-[9999px] h-0 w-0 opacity-0" />
             </div>
           ) : null}
           {err ? <p className="mt-2 text-sm font-semibold text-red-700" data-testid="kit-error">{err}</p> : null}
-          {queued ? <p className="mt-3 rounded-xl bg-lime-50 p-3 text-sm" data-testid="kit-queued">Received as pending review. Your kit above is a live preview; the full report from Friday follows after review.</p> : null}
+          {queued ? <p className="mt-3 rounded-xl bg-lime-50 p-3 text-sm" data-testid="kit-queued">Received as pending review. Your kit above is a live preview; your full report follows after review.</p> : null}
           {held ? <p className="mt-3 flex gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900" data-testid="kit-held"><ShieldAlert className="size-4 shrink-0" />{HELD_COPY}</p> : null}
           <LeadGatesStatus gates={gates} testId="kit-lead-gates" />
           <IntakeWarnings testId="kit-warnings" />

@@ -24,7 +24,7 @@ Capture every call: **name · email · brand/clinic legal name · what they want
 - Jon — jon@silverbirchgrowth.com  
 - Chris — chris@alignwellness.ca  
 - Simar — SBG + Scale admin (email via Randy/Jon if not on the call)  
-- Barb — Scale Connect → Friday intake (escalate; do not invent personal cell)
+- Barb — Scale Connect → intake (escalate; do not invent personal cell)
 
 ## Book a call / Cal — HARD (2026-09-24 ~3:00pm ET)
 

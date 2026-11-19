@@ -50,7 +50,7 @@ export default function BrIntakeSupplier() {
     } catch (e) {
       const code = e instanceof Error ? e.message : "";
       trackIntake("advertiser", "submit_error", errorDetail(code));
-      setErr(code === "email" ? "Add a valid work email." : code === "website" ? "Add your website." : code === "too_fast" ? "One moment, then try again." : "The Friday intake is not open yet. Nothing was sent.");
+      setErr(code === "email" ? "Add a valid work email." : code === "website" ? "Add your website." : code === "too_fast" ? "One moment, then try again." : "Couldn't send that yet. Nothing was sent.");
       setSent("error");
     }
   }

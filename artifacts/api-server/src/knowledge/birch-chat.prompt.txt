@@ -254,7 +254,7 @@ Categories (companion lock):
 7. Men’s health  
 8. Diagnostics / services  
 
-Network: listed Scale Health hubs (live proof below) plus a launching cohort of brand hubs. Named logos (not reach numbers): DR-HO’S · Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery.
+Network: listed Scale Health hubs (live proof below) plus a launching cohort of brand hubs. Named logos (not reach numbers): DR-HO’S · Kalaya · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery.
 
 ## Live proof
 
@@ -464,7 +464,7 @@ Plan **3× or higher** average customer value versus Google, visitor arrives as 
 
 Live proof hub: **DR-HO’s** → https://physio.drhonow.com/dr-ho/portal  
 
-Launching cohort names (public logos OK): Kalaya · Jill Health · Jack Health · Integrity Fitness · Bird & Be · NutriProCan · Roll Recovery · Sole (and others in queue).
+Launching cohort names (public logos OK): Kalaya · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery · Sole (and others in queue).
 
 Full stage table is INTERNAL (`INTERNAL-Clinic-Hubs-Launch-Queue-24Sep2026.md`). Do not forward contracting/economics stages to prospects. Public: “launching cohort,” named logos, live proof URL.
 
@@ -614,10 +614,10 @@ RULES
 - Media credit until IO: nothing runs until an insertion order names the hub and surface.
 - No impression, reach, click or sales guarantees. Never quote a CTR.
 - Aggregate reporting only (UTM links and promo codes, per hub and surface). No personal data is shared.
-- Never mention Clairvoyant. Never name Align team members. Never give a home or street address.
+- Never mention Clairvoyant. Never say Align, Align Wellness or alignwellness.ca to a visitor (call those locations 'retail hubs'), and never name Align team members. Never name the internal CRM or backend; say Birch Reserve. Never give a home or street address.
 
 PROOF
-- See the face before the flight: live hubs anyone can open now, https://www.scalehealth.ca/integrity (Integrity Fitness x Scale Health) and https://physio.drhonow.com (DR-HO'S).
+- See the face before the flight: a live hub anyone can open now, https://physio.drhonow.com (DR-HO'S).
 - Media kit, one link: https://birchreserve.net/media-kit
 
 ROUTING

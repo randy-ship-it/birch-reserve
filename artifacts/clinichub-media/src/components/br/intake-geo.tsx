@@ -90,7 +90,7 @@ export function ActivationRange({ kind, block, source, testId }: { kind: "advert
   const pct = (n: number) => `${Math.min(100, Math.max(0, ((n - lo) / (hi - lo)) * 100))}%`;
   const per = block.period === "month" ? " / month" : block.period === "test" ? " per test" : "";
   const title = kind === "publisher" ? "Publisher monetization" : "Advertiser exposure value";
-  const srcLabel = source === "friday" ? "From Friday" : source === "sample" ? "Sample · example values" : "Mock · modelled until Friday sends it";
+  const srcLabel = source === "friday" ? "From your report" : source === "sample" ? "Sample · example values" : "Preview · modelled estimate";
   return (
     <section data-testid={testId ?? `activation-${kind}`} data-source={source} className="rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm">
       <div className="flex flex-wrap items-center gap-2">
@@ -171,7 +171,7 @@ export function ExposureCard({ exposure, source, testId = "exposure-card", sync 
   const [expo, setExpo] = useState<Expo>(init.expo);
   const set = (nh: Horizon, ne: Expo) => { setH(nh); setExpo(ne); if (sync) writeRangeParams(nh, ne); };
   const pos = (h === "now" ? 0 : 2) + (expo === "min" ? 0 : 1); // 0..3 along now-min → later-max
-  const srcLabel = source === "friday" ? "From Friday" : source === "sample" ? "Sample · example values" : "Mock · placeholder shares, not a forecast";
+  const srcLabel = source === "friday" ? "From your report" : source === "sample" ? "Sample · example values" : "Mock · placeholder shares, not a forecast";
   const tog = (on: boolean) => `rounded-full px-3 py-1.5 text-xs font-bold transition ${on ? "bg-foreground text-background" : "text-foreground/60"}`;
   return (
     <section data-testid={testId} data-source={source} data-h={h} data-expo={expo} className={v2 ? "mt-5 rounded-[10px] bg-[#FAF8F3] p-4 text-[#24332B]" : "rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm"}>

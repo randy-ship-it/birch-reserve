@@ -98,7 +98,7 @@ export function MockBanner() {
   if (mode !== "mock") return null;
   return (
     <div data-testid="mock-adapter-banner" className="flex items-center justify-center gap-2 bg-violet-700 px-4 py-1.5 text-center text-xs font-semibold text-white">
-      <FlaskConical className="size-3.5" aria-hidden /> Preview · Mock Friday adapter: Friday isn't connected on this server, so nothing is sent; saves stay in this browser.
+      <FlaskConical className="size-3.5" aria-hidden /> Preview · mock data: nothing is sent from this preview; saves stay in this browser.
     </div>
   );
 }
@@ -170,7 +170,7 @@ export function useAutosave(role: IntakeRole, payload: IntakePayload, enabled: b
 }
 
 export function SaveChip({ state, version }: { state: "idle" | "saving" | "saved" | "error"; version?: number }) {
-  const txt = state === "saving" ? "Saving…" : state === "saved" ? `Saved · v${version ?? 1}` : state === "error" ? "Not saved: Friday intake opens soon" : "Autosaves as you go";
+  const txt = state === "saving" ? "Saving…" : state === "saved" ? `Saved · v${version ?? 1}` : state === "error" ? "Not saved yet" : "Autosaves as you go";
   return (
     <span data-testid="save-chip" className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${state === "error" ? "bg-red-50 text-red-800" : "bg-foreground/[0.06] text-foreground/70"}`}>
       {state === "saved" ? <Check className="size-3.5" aria-hidden /> : <CloudUpload className="size-3.5" aria-hidden />} {txt}
@@ -296,7 +296,7 @@ export function ContactSubmit({ role, payload, draft, setRef, label }: { role: I
     } catch (e) {
       const c = (e as Error).message;
       trackIntake(side, "submit_error", errorDetail(c));
-      setErr(c === "email" ? "Add a valid work email." : c === "website" ? "Add your website." : c === "too_fast" ? "One moment, then try again." : "Couldn't reach Friday. Nothing was sent.");
+      setErr(c === "email" ? "Add a valid work email." : c === "website" ? "Add your website." : c === "too_fast" ? "One moment, then try again." : "Couldn't send that. Nothing was sent.");
       setState("error");
     }
   }

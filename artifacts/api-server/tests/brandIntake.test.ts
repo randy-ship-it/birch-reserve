@@ -137,8 +137,8 @@ test("kit calculator module stays framework-light (reusable by scalehealth.ca/cl
 
 test("Side B anchor hubs: proposed, pending Randy, public-OK names only", () => {
   assert.equal(ANCHOR_HUBS_STATUS, "Proposed, pending Randy's confirmation");
-  const publicNames = new Set([...BRAND_HUBS.map((h) => h.name), "Integrity Fitness", "Kalaya"]); // Kalaya public per Randy 11:34 PM
-  assert.ok(INVENTORY.line.includes("Integrity Fitness"));
+  const publicNames = new Set([...BRAND_HUBS.map((h) => h.name), "Kalaya"]); // Kalaya public per Randy 11:34 PM
+  assert.ok(!/integrity/i.test(INVENTORY.line));
   for (const h of PROPOSED_ANCHOR_HUBS) assert.ok(publicNames.has(h.name), h.name);
   assert.deepEqual(PROPOSED_ANCHOR_HUBS.map((h) => h.key), ["dr-ho", "roll-recovery", "jill-health", "jack-health", "nutriprocan", "sole", "effortless-admin", "kalaya"]);
   assert.deepEqual(EXPOSURE_CHANNELS[0]!.cpm, HUB_RATE_RANGE.cpm);

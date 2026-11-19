@@ -36,16 +36,6 @@ export const HUB_SURFACE_SHOTS = [
       { n: 3, x: 4.5, y: 93, w: 91, h: 7, label: "Native tile row", d: "Next to the Scale recovery toolkit." },
     ],
   },
-  {
-    key: "integrity",
-    hub: "Integrity Fitness hub",
-    src: "/hub-gallery/integrity.webp",
-    alt: "Integrity Fitness hub home page with numbered example placements drawn on top",
-    notes: [
-      { n: 1, x: 6, y: 21, w: 38, h: 14, label: "Hub banner", d: "Co-branded hub home, above the headline." },
-      { n: 2, x: 55, y: 80, w: 38, h: 15, label: "Native tile", d: "Beside the member benefits list." },
-    ],
-  },
 ] as const;
 export const HUB_SHOTS_FINE = "Real hub pages with example placements drawn on top. Illustrative, not live ads and not Birch results. Your IO names the hub and surface.";
 

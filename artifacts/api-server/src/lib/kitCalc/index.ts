@@ -79,7 +79,7 @@ export function repeatRange(key: string): Range {
 }
 
 export const KIT_CALC_FORMULA = [
-  "GP LTV per customer = average cart × margin band × purchases per year × 1–3 years (low with low, high with high). Same formula as Friday ltv-v1.",
+  "GP LTV per customer = average cart × margin band × purchases per year × 1–3 years (low with low, high with high).",
   "Scale visits = spend ÷ blended hub CPM × 1,000 × the ‘Browsing the hub’ CTR band (Birch modelled figures).",
   "New customers = Scale visits × your conversion scenario.",
   "Revenue opportunity = new customers × average cart × purchases per year × 1–3 years.",

@@ -4560,7 +4560,7 @@ test("availability is integer-valued and buycalc remains useful without JavaScri
   assert.doesNotMatch(html, /today's minimum/);
   // Randy, Nov 14 2026: broad network positioning, no public category grid or seat count.
   const networkStrip = html.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
-  assert.match(networkStrip, /Integrity Fitness/);
+  assert.doesNotMatch(networkStrip, /Integrity/i);
   assert.doesNotMatch(networkStrip, /Scale Health/);
   assert.match(networkStrip, /DR-HO/);
   assert.doesNotMatch(html, /seats open|Recovery hardware|Pain relief \/ topicals|Eight categories/);

@@ -195,7 +195,7 @@ const mock = {
     if (!contact.website.trim() || !/@/.test(contact.email)) throw new Error("fast_needs_website_email");
     const ref = await mock.create(payload);
     const sub = await mock.submit(ref, payload, contact);
-    return { ref: { ...ref, version: sub.version }, sub, autofill: { fields: {}, needs_input: ["company_name", "category", "geo", "avg_cart_usd"], notes: ["Preview mock: Friday's site auto-fill is not called on the preview."], mock: true }, fallback: false };
+    return { ref: { ...ref, version: sub.version }, sub, autofill: { fields: {}, needs_input: ["company_name", "category", "geo", "avg_cart_usd"], notes: ["Preview · mock data: your site is not read on the preview."], mock: true }, fallback: false };
   },
   async create(payload: IntakePayload): Promise<IntakeRef> {
     await sleep(120);

@@ -64,7 +64,7 @@ export const MOCK_SHARES = { min_share: 0.01, max_share: 0.05, placeholder: true
 const FIG = [
   { key: "hubs", unit: "page views / month", now: 700_000_000, later: 5_000_000_000, figure_now: ">700MM page views now", figure_later: ">5B page views (2027 target)" },
   { key: "street_team", unit: "homes", now: 500_000, later: 3_000_000, figure_now: "500K homes now", figure_later: "3MM+ homes later" },
-  { key: "retail", unit: "recovery customers", now: 1_000_000, later: 1_000_000, figure_now: "120+ retail locations · 1MM+ recovery customers · Canada + USA", figure_later: "120+ retail locations · 1MM+ recovery customers · Canada + USA" },
+  { key: "retail", unit: "recovery customers", now: 1_000_000, later: 1_000_000, figure_now: "120+ retail hubs · 1MM+ recovery customers · Canada + USA", figure_later: "120+ retail hubs · 1MM+ recovery customers · Canada + USA" },
   { key: "calm_joints", unit: "", now: 0, later: 0, figure_now: null, figure_later: null, needs_figure: true },
 ] as const;
 const FKEY_TO_BIRCH: Record<string, ChannelGeoKey> = { hubs: "scale-hubs", calm_joints: "calm-joints", street_team: "street-team", retail: "retail-network" };

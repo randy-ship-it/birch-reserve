@@ -14,8 +14,8 @@ import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 export const SALES_PHONE_DISPLAY = "(647) 931-6278";
 export const SALES_PHONE_HREF = "tel:+16479316278";
 export const SALES_EMAIL = "sales@silverbirchgrowth.com";
-export const LIVE_HUB_URL = "https://www.scalehealth.ca/integrity";
-export const LIVE_HUB_IMAGE = "/hub-gallery/integrity.webp";
+export const LIVE_HUB_URL = "https://physio.drhonow.com";
+export const LIVE_HUB_IMAGE = "/hub-gallery/drho.webp";
 
 type CategoryStatus = "open" | "waitlist";
 export type Availability = {
@@ -28,7 +28,7 @@ export type Availability = {
 
 /** Hub brands in the network today; more launch over time. */
 /** Live hubs anyone can open today (shown on the same pages); more launch over time. Scale Health is the business, not a hub. */
-export const NETWORK_HUBS = ["Integrity Fitness", "DR-HO'S physio"] as const;
+export const NETWORK_HUBS = ["DR-HO'S physio"] as const;
 
 export function useAvailability(): Availability | null {
   const [a, setA] = useState<Availability | null>(null);
@@ -130,18 +130,15 @@ export function FaceBeforeFlight({ compact = false }: { compact?: boolean }) {
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <a href={LIVE_HUB_URL} target="_blank" rel="noopener" data-testid="face-live-hub" className="inline-flex h-12 items-center justify-center gap-2 bg-foreground px-6 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground">
-            Open the live Integrity Fitness hub <ArrowRight className="size-4" aria-hidden />
-          </a>
-          <a href="https://physio.drhonow.com" target="_blank" rel="noopener" className="inline-flex h-12 items-center justify-center gap-2 border border-foreground/25 px-6 text-sm font-semibold transition-colors hover:border-foreground hover:bg-foreground hover:text-background">
-            Or the DR-HO'S physio hub <ArrowRight className="size-4" aria-hidden />
+            Open the live DR-HO'S physio hub <ArrowRight className="size-4" aria-hidden />
           </a>
         </div>
         <p className="mt-3 text-xs text-muted-foreground">Live hubs, shown as they are today. Your placement and hub are named on your IO before anything runs.</p>
       </div>
-      <a href={LIVE_HUB_URL} target="_blank" rel="noopener" className="group block border border-foreground/15 bg-white p-2 shadow-sm" aria-label="Open the live Integrity Fitness hub">
-        <img src={LIVE_HUB_IMAGE} alt="Integrity Fitness × Scale Health members-only hub, live" width={1440} height={900} loading="lazy" decoding="async" className="block h-auto w-full" />
+      <a href={LIVE_HUB_URL} target="_blank" rel="noopener" className="group block border border-foreground/15 bg-white p-2 shadow-sm" aria-label="Open the live DR-HO'S physio hub">
+        <img src={LIVE_HUB_IMAGE} alt="DR-HO'S physio members-only hub, live" width={1440} height={900} loading="lazy" decoding="async" className="block h-auto w-full" />
         <span className="mt-2 flex items-center justify-between px-1 pb-1 text-xs text-muted-foreground">
-          <span>scalehealth.ca/integrity · live</span>
+          <span>physio.drhonow.com · live</span>
           <span className="font-semibold text-foreground group-hover:underline">Open ↗</span>
         </span>
       </a>

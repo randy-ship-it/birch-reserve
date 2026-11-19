@@ -5,7 +5,7 @@
 **Legal opco:** Clairvoyant Holdings Inc. (**CHI**), Align Billing is a BMO nickname, not a second company.  
 **Holdco:** RDG Digital Holdings Inc. (RDGDH).  
 **CRM workspace:** `alignwellness`  
-**Team admin (Friday):** Chris · chris@alignwellness.ca  
+**Team admin (CRM):** Chris · chris@alignwellness.ca  
 
 ## Role in the system, fulfillment
 

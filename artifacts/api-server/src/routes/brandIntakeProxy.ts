@@ -266,6 +266,20 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     const out = await forward(req, res, "POST", "/api/public/brand-kit/download", req.body ?? {});
     if (out) send(res, out);
   });
+  /** Same-origin copy of the backend's analytics snippet, so no backend name appears in Birch's HTML. Cached 1h. */
+  let tjs: { at: number; body: string } | null = null;
+  router.get("/br-t.js", async (_req, res) => {
+    res.type("application/javascript").setHeader("Cache-Control", "public, max-age=3600");
+    if (tjs && Date.now() - tjs.at < 3_600_000) return void res.send(tjs.body);
+    try {
+      const r = await f("https://fridayapp.org/t.js", { signal: AbortSignal.timeout(4000) });
+      if (!r.ok) throw new Error(String(r.status));
+      tjs = { at: Date.now(), body: await r.text() };
+      res.send(tjs.body);
+    } catch {
+      res.send("/* analytics unavailable */");
+    }
+  });
   /** v1.2 §6 shared category keys (Friday's list when it serves one, else the static copy of the contract table). */
   router.get("/v1/brand-categories", async (_req, res) => {
     const p = await fridayV12();

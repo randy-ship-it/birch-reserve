@@ -19,7 +19,7 @@ const NAVY = "#0E3B2A"; // forest
 const LIME = "#BFF3D6"; // mint
 
 export type KitData = KitView;
-const srcLabel = (d: KitData) => (d.source === "sample" ? "Sample · example values" : d.source === "friday" ? (d.mock ? "From Friday (mock on preview)" : "From Friday") : "Live preview");
+const srcLabel = (d: KitData) => (d.source === "sample" ? "Sample · example values" : d.source === "friday" ? (d.mock ? "Preview · mock data" : "From your report") : "Live preview");
 const watermark = (d: KitData, dark: boolean) =>
   d.source === "sample" ? `<text x="600" y="900" text-anchor="middle" transform="rotate(-28 600 900)" font-family="${SANS}" font-size="220" font-weight="800" letter-spacing="20" fill="${dark ? "#ffffff" : NAVY}" opacity=".06">SAMPLE</text>` : "";
 
@@ -29,7 +29,7 @@ const pill = (x: number, y: number, label: string, fill = "#fde68a", color = "#7
 function header(side: "A" | "B", title: string, d: KitData, dark: boolean) {
   const fg = dark ? "#ffffff" : NAVY;
   return `
-  <text x="72" y="96" font-family="${SANS}" font-size="18" font-weight="700" letter-spacing="4" fill="${dark ? LIME : NAVY}">BIRCH RESERVE · POWERED BY FRIDAY</text>
+  <text x="72" y="96" font-family="${SANS}" font-size="18" font-weight="700" letter-spacing="4" fill="${dark ? LIME : NAVY}">BIRCH RESERVE</text>
   <text x="1128" y="96" text-anchor="end" font-family="${SANS}" font-size="18" font-weight="700" letter-spacing="3" fill="${fg}" opacity=".6">SIDE ${side}</text>
   <text x="72" y="150" font-family="${SANS}" font-size="22" fill="${fg}" opacity=".75">Prepared for ${esc(d.brand || "your brand")} · ${esc(d.categoryLabel)}</text>
   <text x="72" y="238" font-family="${SERIF}" font-size="78" fill="${fg}">${esc(title)}</text>
