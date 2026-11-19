@@ -261,7 +261,7 @@ export function CostSide({ m, extra }: { m: ReportModel; extra?: ReactNode }) {
           ) : null}
           <p>A $1,000 test buys about {views ? `${k(views.low)}–${k(views.high)}` : "—"} views on display, or {clicks ? `${Math.round(clicks.low)}–${Math.round(clicks.high)}` : "—"} clicks on CPC. Views = budget ÷ CPM × 1,000; clicks = budget ÷ CPC.</p>
           {m.dop && !m.dop.needs_input ? <p>Revenue opportunity from Scale demand = Scale demand orders a year in your category × a capture share of {pct(m.dop.capture_share?.min)}–{pct(m.dop.capture_share?.max)} (placeholder) × your average cart. Canada orders only.</p> : null}
-          <p style={{ color: RT.mute }}>Network figures are reported figures and targets, not guarantees. No CTR or ROAS is promised.</p>
+          <p style={{ color: RT.mute }}>Network figures are reported figures and targets, not promises of any result.</p>
         </EstimatePop>
       </div>
       <RangeBar label="Cost per 1,000 views (CPM)" range={m.cpm} unit="CPM" axisMax={axis(m.cpm, 40)} note="Display on your best-fit placements." />

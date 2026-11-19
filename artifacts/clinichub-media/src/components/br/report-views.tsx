@@ -186,7 +186,7 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
               <p><strong>Performance-only</strong> (pay on results, no CPC/CPM) uses the lower half of that range ({pct(s.min)}–{pct(s.mid)}). You pay on results, not for ad space.</p>
               {tier === "accelerate" ? <p><strong>Accelerate</strong> adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}), plus the display views a $1,000 test buys at rate-card CPM (budget ÷ CPM × 1,000).</p> : <p><strong>Accelerate</strong> (optional) adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}). Switch to With Accelerate to see how it is sized.</p>}
               <p>12 months = the monthly figure × 12 for page views. Customers and homes are an audience in reach, so they are not multiplied.</p>
-              <p style={{ color: RT.mute }}>Network figures as reported by Scale Health; targets are goals. Estimates in USD where money is shown. Not a forecast, not a guarantee. No CTR or ROAS is promised.</p>
+              <p style={{ color: RT.mute }}>Network figures as reported by Scale Health; targets are goals. Estimates in USD where money is shown. Not a forecast or a promise of any result.</p>
             </EstimatePop>
           </span>
         </div>

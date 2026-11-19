@@ -142,7 +142,7 @@ export const PUBLISHER_ASSUMPTIONS = [
   `Views: the network median partner hub (modelled), scaled by your hub-size slider.`,
   `Sell-through: ${SELL_ASSUMPTION_PCT}% of available space is sold (a planning assumption, not a delivery commitment).`,
   `At ramp = the low end of each published starter range. Normalized = the top of the same published range. No later-rate numbers are published.`,
-  `CPC mode uses the midpoint of each placement's benchmark CTR band. Ranges, not promises.`,
+  `CPC mode uses the midpoint of each placement's modelled engagement range. Ranges, not promises.`,
   `Your payout: ${PAYOUT.basePct}% of media revenue. Tier breakpoints are not set yet (placeholder tiers).`,
   `Transactions (bookings, products) use only the numbers you enter. Leave them at 0 to skip.`,
   `Estimates only. Not a guarantee of views, clicks, sales or payouts. Payouts follow the hub agreement.`,
