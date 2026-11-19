@@ -42,12 +42,26 @@ export function fridayBrandConfig(env: Env = process.env): { base: string; key: 
   return { base, key, org: env.FRIDAY_WORKSPACE?.trim() || "birchreserve" };
 }
 
-/** The visitor's IP as seen by Birch's edge (first value only), or null when it is not a valid IPv4/IPv6. */
+/**
+ * The visitor's IP as seen by Birch's edge (first value only), or null when it is not a valid IPv4/IPv6.
+ * Sanitized (v1.4 r3 §1, Friday rate-limits per end-user on it): one value, no port, no brackets, no zone id,
+ * IPv4-mapped IPv6 unwrapped, max 45 chars, and it must parse as an IP. Anything else is dropped, never forwarded.
+ * Vercel's own header wins, then x-real-ip, then x-forwarded-for (both set by the edge, not by the browser).
+ */
+export function sanitizeIp(raw: string | undefined | null): string | null {
+  let v = (raw ?? "").split(",")[0]!.trim().slice(0, 64);
+  const br = /^\[([0-9a-f:.]+)\](?::\d{1,5})?$/i.exec(v);
+  if (br) v = br[1]!;
+  else if (/^\d{1,3}(?:\.\d{1,3}){3}:\d{1,5}$/.test(v)) v = v.replace(/:\d+$/, "");
+  v = v.replace(/%[\w.-]+$/, "").replace(/^::ffff:(?=\d{1,3}(?:\.\d{1,3}){3}$)/i, "");
+  return v.length <= 45 && isIP(v) ? v : null;
+}
 export function clientIp(req: Request): string | null {
-  const first = (v: string | undefined) => v?.split(",")[0]?.trim();
-  const c = first(req.get("x-vercel-forwarded-for")) || first(req.get("x-real-ip")) || first(req.get("x-forwarded-for")) || req.ip || "";
-  const ip = c.replace(/^::ffff:/i, "");
-  return isIP(ip) ? ip : null;
+  for (const h of ["x-vercel-forwarded-for", "x-real-ip", "x-forwarded-for"]) {
+    const v = req.get(h);
+    if (v && v.trim()) return sanitizeIp(v);
+  }
+  return sanitizeIp(req.ip);
 }
 
 /**
@@ -104,7 +118,8 @@ export function fridayHeaders(cfg: { key: string; org: string }, req: Request): 
   const h: Record<string, string> = { "Content-Type": "application/json", "X-Intake-Secret": cfg.key, "X-Org-Id": cfg.org };
   const edit = req.get("x-edit-token");
   if (edit && TOKEN_RE.test(edit)) h["X-Edit-Token"] = edit;
-  // v1.2 §3: Friday rate-limits per visitor via X-Client-IP (server-to-server only; one IP, validated).
+  // v1.2 §3 / v1.4 r3 §1: Friday rate-limits per end-user via X-Client-IP, on EVERY forward (server-to-server only;
+  // one sanitized IP; the browser can't set it because Birch builds these headers itself).
   const ip = clientIp(req);
   if (ip) h["X-Client-IP"] = ip;
   return h;
@@ -215,7 +230,10 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       const r = await f(`${cfg.base}${path}`, { method, headers: fridayHeaders(cfg, req), body: payload === undefined ? undefined : JSON.stringify(payload), signal: AbortSignal.timeout(10_000) });
       const text = await r.text();
       const retry = r.headers.get("retry-after");
-      if (retry) res.setHeader("Retry-After", retry);
+      if (retry && /^[\w ,:+-]{1,40}$/.test(retry)) res.setHeader("Retry-After", retry);
+      // v1.4 r3 G7: the contract version rides on every brand-intake response; pass it to the page (safe, no ids).
+      const contract = r.headers.get("x-brand-intake-contract");
+      if (contract && /^[\w.-]{1,32}$/.test(contract)) res.setHeader("X-Brand-Intake-Contract", contract);
       log("brand-intake forward", { path: path.replace(/\/[A-Za-z0-9_-]{8,}(?=\/|\?|$)/g, "/:x"), status: r.status }); // never log tokens or the secret
       return { status: r.status, text };
     } catch {
@@ -227,29 +245,44 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
    * Contract version: v1.2 is detected by its public GET /api/public/brand-categories (cached 5 min). On strict v1
    * the body is downgraded before sending (toV1Body). No retry-without-geo path any more (v1.2 §7).
    */
-  let probe: { at: number; v12: boolean; categories: unknown } | null = null;
-  async function fridayV12(): Promise<{ v12: boolean; categories: unknown }> {
+  /**
+   * v1.4 r3 G7: the same probe also carries `contract_version` and `capabilities[]`. Prod fridayapp.org answers 404
+   * today (Friday #213/#216 not live), so it stays strict v1 there: same downgrade as before.
+   */
+  type Probe = { at: number; v12: boolean; categories: unknown; contract: string | null; caps: Set<string> };
+  let probe: Probe | null = null;
+  async function fridayV12(): Promise<Probe> {
     if (probe && Date.now() - probe.at < 5 * 60_000) return probe;
     const cfg = fridayBrandConfig(env);
     let v12 = false;
     let categories: unknown = null;
+    let contract: string | null = null;
+    const caps = new Set<string>();
     if (cfg) {
       try {
         const r = await f(`${cfg.base}/api/public/brand-categories`, { method: "GET", headers: { Accept: "application/json" }, signal: AbortSignal.timeout(5_000) });
         if (r.ok) {
-          const d = (await r.json().catch(() => null)) as { categories?: unknown } | null;
+          const d = (await r.json().catch(() => null)) as { categories?: unknown; contract_version?: unknown; capabilities?: unknown } | null;
           if (d && Array.isArray(d.categories)) (v12 = true), (categories = d);
+          if (d && typeof d.contract_version === "string" && /^[\w.-]{1,32}$/.test(d.contract_version)) contract = d.contract_version;
+          if (d && Array.isArray(d.capabilities)) for (const c of d.capabilities) if (typeof c === "string" && /^[\w.-]{1,48}$/.test(c)) caps.add(c);
         }
       } catch {
         /* treat as v1 */
       }
     }
-    probe = { at: Date.now(), v12, categories };
+    probe = { at: Date.now(), v12, categories, contract, caps };
     return probe;
   }
   async function shaped(body: unknown): Promise<unknown> {
-    const b = markTest(body ?? {}) as Record<string, unknown>;
-    return (await fridayV12()).v12 ? b : toV1Body(b);
+    const b = { ...(markTest(body ?? {}) as Record<string, unknown>) };
+    const p = await fridayV12();
+    // r3 G3: strict bodies reject unknown keys, so if_version/if_saved_at only go where the backend says it reads them.
+    if (!p.caps.has("v1.4.if_version")) {
+      delete b.if_version;
+      delete b.if_saved_at;
+    }
+    return p.v12 ? b : toV1Body(b);
   }
   const send = (res: Response, out: { status: number; text: string }) => res.status(out.status).type("application/json").send(publicGates(out.text || "{}"));
   /** BR leads mirror of partial + submitted intakes (same pipeline as full submissions). Never throws, never blocks. */
@@ -365,7 +398,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
   router.get("/v1/brand-categories", async (_req, res) => {
     const p = await fridayV12();
     res.setHeader("Cache-Control", "public, max-age=300");
-    res.json(p.v12 && p.categories ? p.categories : { categories: FRIDAY_CATEGORIES, source: "static" });
+    res.json(p.v12 && p.categories ? p.categories : { categories: FRIDAY_CATEGORIES, source: "static", contract_version: null, capabilities: [] });
   });
   router.get("/v1/brand-report/:token", async (req, res) => {
     const token = String(req.params.token);

@@ -18,8 +18,8 @@ import { FRIDAY_CATEGORIES } from "../../../../api-server/src/lib/kitCalc/friday
 import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 import type { Country } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import type { FridayReport } from "@/lib/fridayBrandIntake";
-import { buildPatch, afterSave, clone, fieldMark, getPath, parsePrefillHash, prefillLink, setPath, slugify, type FieldMark, type PrefillFields, type PrefillRef } from "@/lib/prefillDraft";
-import { PREVIEW_LABEL, asPreview, draftReport, forgetPrefillRef, loadPrefillRef, prefillApi, prefillMode, savePrefillRef, seedMockDraft, takeEarlyHash, EARLY_HASH_KEY, type DraftMeta, type MockState, type PrefillError } from "@/lib/prefillApi";
+import { buildPatch, afterSave, clone, fieldMark, getPath, parsePrefillHash, prefillLink, rebase, setPath, slugify, type FieldMark, type PrefillFields, type PrefillRef } from "@/lib/prefillDraft";
+import { PREVIEW_LABEL, PrefillFail, asPreview, draftReport, forgetPrefillRef, loadPrefillRef, prefillApi, prefillMode, savePrefillRef, seedMockDraft, takeEarlyHash, EARLY_HASH_KEY, type DraftMeta, type MockState, type PrefillError, type StaleData } from "@/lib/prefillApi";
 
 // Capture the private key before anything else on the page can read the address bar.
 const EARLY_HASH = takeEarlyHash();
@@ -28,12 +28,14 @@ const NAVY = "#0b1f3a";
 const input = "h-11 w-full min-w-0 rounded-xl border border-foreground/15 bg-white px-3 text-base outline-none transition focus:border-[#0b1f3a] focus:ring-2 focus:ring-lime-300";
 const lab = "text-[11px] font-bold uppercase tracking-wide text-foreground/55";
 const ERR_COPY: Record<PrefillError, string> = {
-  // A re-issued link (rotate) and a bad key get the same 404 from the backend; the likeliest reason is a newer link.
-  not_found: "This link has been replaced with a newer one, so it doesn't open anything any more. Use the newest link we sent you, or ask us for a fresh one.",
-  link_revoked: "This link was turned off. Ask us for a fresh one.",
-  link_expired: "This link has expired. Ask us for a fresh one.",
+  // r3 G1: 410 link_replaced / link_expired / link_revoked each get their own words; 404 = a key that never worked.
+  not_found: "Check you opened the whole link we sent, or ask us for a fresh one.",
+  link_replaced: "This link has been replaced with a newer one, so it doesn't open anything any more. Use the newest link we sent you, or ask us for a fresh one.",
+  link_revoked: "We switched it off. Ask us for a fresh one if you still need it.",
+  link_expired: "Draft links stop working after a while to keep them private. Ask us for a fresh one.",
   unavailable: "We can't load your draft right now. Please try again in a minute.",
-  rate_limited: "Too many tries. Please wait a minute.",
+  rate_limited: "Too many tries right now. We'll try again shortly.",
+  stale: "Updated elsewhere. Review changes.",
   individual_data: "Please keep it to business-level details (no customer names or contacts).",
   email: "Use a valid work email.",
   website: "Add your website.",
@@ -45,6 +47,22 @@ const ERR_COPY: Record<PrefillError, string> = {
   brand_contact_only: "Use the brand's own email here, not a staff address.",
   needs_website: "Add the brand's website to see the draft preview.",
 };
+const HEAD: Partial<Record<PrefillError, string>> = {
+  not_found: "This link doesn't work.",
+  link_replaced: "This link has been replaced.",
+  link_expired: "This link has expired.",
+  link_revoked: "This link was turned off.",
+  rate_limited: "One moment.",
+};
+const LINK_DEAD = new Set<PrefillError>(["not_found", "link_replaced", "link_expired", "link_revoked"]);
+const codeOf = (e: unknown): PrefillError => ((e as Error)?.message as PrefillError) in ERR_COPY ? ((e as Error).message as PrefillError) : "unavailable";
+const retryOf = (e: unknown) => (e instanceof PrefillFail && e.retryAfter ? e.retryAfter : 30);
+const fmtDate = (iso: string) => {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? null : d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+};
+/** The link this tab adopted (kept across a rate-limit retry). */
+let ADOPTED: { slug: string; ref: PrefillRef } | null = null;
 const MARKETS: Array<{ key: string; label: string; c: Country[] }> = [
   { key: "CA", label: "Canada", c: ["CA"] },
   { key: "US", label: "USA", c: ["US"] },
@@ -78,7 +96,7 @@ function Field({ label, mark, children, testId }: { label: string; mark: FieldMa
 const seg = (on: boolean) => `h-10 rounded-xl px-3 text-sm font-bold transition ${on ? "bg-[#0b1f3a] text-white shadow" : "bg-white text-foreground/75 ring-1 ring-foreground/15 hover:ring-foreground/40"}`;
 
 type Load = { state: "loading" } | { state: "error"; error: PrefillError } | { state: "missing" } | { state: "ready" };
-type Save = "idle" | "saving" | "saved" | "error";
+type Save = "idle" | "saving" | "saved" | "error" | "waiting";
 
 export default function BrIntakePrefill() {
   const params = useParams<{ slug: string }>();
@@ -100,21 +118,28 @@ export default function BrIntakePrefill() {
   // Draft preview (v1.4 r2 §2): from the SAVED answers; re-fetched after each autosave.
   const [preview, setPreview] = useState<FridayReport | null>(null);
   const [previewTick, setPreviewTick] = useState(0);
+  const [loadTick, setLoadTick] = useState(0);
+  const [saveTick, setSaveTick] = useState(0);
+  const [retryIn, setRetryIn] = useState(0);
+  const [elsewhere, setElsewhere] = useState(false); // r3 G3: someone saved from another link; we merged
+  const curRef = useRef<PrefillFields>({});
+  curRef.current = cur;
 
   usePageMeta("Your Monetization Kit draft | Birch Reserve", "A drafted Monetization Kit for your brand. Fix anything, then confirm. Estimates in USD, reviewed by a person.");
 
   // Adopt the link (fragment → this browser), then read the saved answers back.
   useEffect(() => {
-    let r = parsePrefillHash(EARLY_HASH);
+    let r = (ADOPTED?.slug === slug ? ADOPTED.ref : null) ?? parsePrefillHash(EARLY_HASH);
     const qs = new URLSearchParams(window.location.search);
     const st = qs.get("mockstate") as MockState | null;
     if (r) savePrefillRef(slug, r);
     else if (!(mode === "mock" && st)) r = loadPrefillRef(slug); // a QA mockstate always seeds its own link
     if (!r && mode === "mock") {
-      r = seedMockDraft(slug, st && ["staff", "expired", "revoked", "replaced"].includes(st) ? st : "ok");
-      if (st !== "staff" && st !== "replaced") savePrefillRef(slug, r);
+      r = seedMockDraft(slug, st && ["staff", "expired", "revoked", "replaced", "invalid", "busy"].includes(st) ? st : "ok");
+      if (st !== "staff" && st !== "replaced" && st !== "invalid") savePrefillRef(slug, r);
     }
     if (!r) return void setLoad({ state: "missing" });
+    ADOPTED = { slug, ref: r };
     setRef(r);
     prefillApi()
       .get(r)
@@ -126,13 +151,18 @@ export default function BrIntakePrefill() {
         if (d.meta.status !== "draft") setConfirmed({ version: d.meta.version, report: null, held: false });
         setLoad({ state: "ready" });
       })
-      .catch((e: Error) => {
-        const code = (e.message as PrefillError) || "unavailable";
-        if (code === "not_found" || code === "link_revoked" || code === "link_expired") forgetPrefillRef(slug);
-        setLoad({ state: "error", error: code in ERR_COPY ? code : "unavailable" });
+      .catch((e: unknown) => {
+        const code = codeOf(e);
+        if (LINK_DEAD.has(code)) forgetPrefillRef(slug), (ADOPTED = null);
+        setLoad({ state: "error", error: code });
+        // r3 G9: 429 → wait Retry-After, then try again by itself.
+        if (code === "rate_limited") {
+          setRetryIn(retryOf(e));
+          setTimeout(() => setLoadTick((n) => n + 1), retryOf(e) * 1000);
+        }
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug]);
+  }, [slug, loadTick]);
 
   // A link pasted into this same tab (hash-only navigation): move the key out of the bar and reload once.
   useEffect(() => {
@@ -172,26 +202,70 @@ export default function BrIntakePrefill() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref, confirmed?.version]);
 
+  /**
+   * r3 G3: a 409 stale carries the fresh answers. Re-apply this tab's unsaved edits on top (they win), take
+   * everything else from the other link, and say so in plain words. The next autosave resends with the fresh rev.
+   */
+  const adoptStale = (st: StaleData, base: PrefillFields) => {
+    const m = rebase(base, curRef.current, st.fields);
+    setInitial((i) => m.elsewhere.reduce((acc, p) => setPath(acc, p, clone(getPath(st.fields, p))), i));
+    setBaseline(clone(st.fields));
+    setCur(m.fields);
+    setMeta((x) => (x ? { ...x, rev: st.rev, saved_at: st.saved_at, ...(st.markers !== undefined ? { markers: st.markers } : {}), ...(st.expires_at !== undefined ? { expires_at: st.expires_at } : {}) } : x));
+    if (m.elsewhere.length || m.conflicts.length) setElsewhere(true);
+    setPreviewTick((n) => n + 1);
+  };
+  const fail = (e: unknown, base: PrefillFields) => {
+    const code = codeOf(e);
+    if (code === "stale" && e instanceof PrefillFail && e.stale) return void adoptStale(e.stale, base);
+    if (LINK_DEAD.has(code)) {
+      forgetPrefillRef(slug);
+      ADOPTED = null;
+      return void setLoad({ state: "error", error: code });
+    }
+    if (code === "rate_limited") {
+      // r3 G9: wait Retry-After, then save again by itself. Nothing typed is lost meanwhile.
+      const secs = retryOf(e);
+      setSave("waiting");
+      setRetryIn(secs);
+      setTimeout(() => setSaveTick((n) => n + 1), secs * 1000);
+      return;
+    }
+    setSave("error");
+    setErr(ERR_COPY[code]);
+  };
+
   // Autosave: only after a real edit, only the changed keys (full blocks). Untouched form → no request at all.
   const patch = useMemo(() => buildPatch(baseline, cur), [baseline, cur]);
   useEffect(() => {
-    if (!ref || load.state !== "ready" || !patch || busy || meta?.can_edit === false) return;
+    if (!ref || load.state !== "ready" || !patch || busy || meta?.can_edit === false || save === "waiting") return;
+    const sentFrom = baseline;
+    const sent = cur;
     const t = setTimeout(async () => {
       setSave("saving");
       try {
-        const m = await prefillApi().save(ref, patch);
-        setBaseline((b) => afterSave(b, patch));
-        setMeta((x) => (x ? { ...x, saved_at: m.saved_at } : x));
+        const m = await prefillApi().save(ref, patch, meta?.rev);
+        if (m.fields) {
+          // r3 G5: the PATCH echo is the new baseline (no extra read). Edits typed while it was in flight are kept.
+          const echo = m.fields;
+          setBaseline(clone(echo));
+          setCur((now) => rebase(sent, now, echo).fields);
+        } else setBaseline((b) => afterSave(b, patch)); // older backend: no echo
+        setMeta((x) => (x ? { ...x, saved_at: m.saved_at, rev: m.rev ?? x.rev, ...(m.markers !== undefined ? { markers: m.markers } : {}), ...(m.expires_at !== undefined ? { expires_at: m.expires_at } : {}) } : x));
         setSave("saved");
         setPreviewTick((n) => n + 1);
       } catch (e) {
-        setSave("error");
-        const code = (e as Error).message as PrefillError;
-        setErr(ERR_COPY[code] ?? ERR_COPY.unavailable);
+        if (codeOf(e) !== "rate_limited") setSave("idle");
+        fail(e, sentFrom);
       }
     }, 900);
     return () => clearTimeout(t);
-  }, [patch, ref, load.state, busy]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patch, ref, load.state, busy, saveTick, save === "waiting"]);
+  useEffect(() => {
+    if (save === "waiting" && saveTick) setSave("idle");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saveTick]);
 
   const [changedAfter, setChangedAfter] = useState(false); // edits after a confirm → show the draft estimate again
   const edit = (fn: (c: PrefillFields) => PrefillFields) => {
@@ -229,22 +303,33 @@ export default function BrIntakePrefill() {
     // v1.4 §4: an email already on file is enough; otherwise the brand adds one here.
     if (email.trim() ? !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim()) : !meta?.email_on_file) return void setErr(email.trim() ? ERR_COPY.email : ERR_COPY.confirm_needs_email);
     setBusy(true);
+    const base = baseline;
     try {
       const body = buildPatch(baseline, cur) ?? {};
-      const res = await prefillApi().confirm(ref, body, { email: email.trim(), website: cur.website ?? "", elapsed_ms: Date.now() - started.current });
-      setBaseline((b) => afterSave(b, body));
+      const res = await prefillApi().confirm(ref, body, { email: email.trim(), website: cur.website ?? "", elapsed_ms: Date.now() - started.current }, meta?.rev);
+      if (res.fields) {
+        const echo = res.fields;
+        setBaseline(clone(echo));
+        setCur((now) => rebase(cur, now, echo).fields);
+      } else setBaseline((b) => afterSave(b, body));
       const next = { ...ref, version: res.version };
       setRef(next);
       savePrefillRef(slug, next);
-      setMeta((m) => (m ? { ...m, status: res.status, version: res.version, email_on_file: true } : m));
+      // r3 G6: version N + public_mirror from the confirm response; a confirmed brand link stops expiring.
+      setMeta((m) => (m ? { ...m, status: res.status, version: res.version, rev: res.rev ?? m.rev, email_on_file: true, expires_at: null, ...(res.markers !== undefined ? { markers: res.markers } : {}) } : m));
       setConfirmed({ version: res.version, report: null, held: res.public_mirror === "held" });
       setChangedAfter(false);
       // Stacked on phones: bring the recalibrated report into view.
       if (window.innerWidth < 1024) setTimeout(() => document.getElementById("prefill-report")?.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
       setSave("saved");
     } catch (e) {
-      const code = (e as Error).message as PrefillError;
-      setErr(ERR_COPY[code] ?? ERR_COPY.unavailable);
+      const code = codeOf(e);
+      if (code === "stale") {
+        fail(e, base);
+        setErr("Updated elsewhere. Review the changes, then confirm again.");
+      } else if (code === "rate_limited") setErr(`Too many tries right now. Please wait ${retryOf(e)} seconds and confirm again.`);
+      else if (LINK_DEAD.has(code)) fail(e, base);
+      else setErr(ERR_COPY[code]);
     } finally {
       setBusy(false);
     }
@@ -262,9 +347,9 @@ export default function BrIntakePrefill() {
             <p className="inline-flex items-center gap-2 text-foreground/70"><Loader2 className="size-4 animate-spin" aria-hidden />Loading your draft…</p>
           ) : (
             <>
-              <h1 className="font-display text-3xl">{load.state === "missing" ? "This link is missing its private key." : load.error === "not_found" ? "This link has been replaced." : "We couldn't open this draft."}</h1>
-              <p className="mt-2 text-foreground/70" data-testid="prefill-error-copy">{load.state === "missing" ? "Open the full link you were sent, or ask us for a fresh one." : ERR_COPY[load.error]}</p>
-              <Link href="/intake" className="mt-6 inline-flex h-12 items-center rounded-full bg-lime-300 px-6 text-sm font-bold text-[#0b1f3a]">Start a new Monetization Kit</Link>
+              <h1 className="font-display text-3xl" data-testid="prefill-error-head">{load.state === "missing" ? "This link is missing its private key." : HEAD[load.error] ?? "We couldn't open this draft."}</h1>
+              <p className="mt-2 text-foreground/70" data-testid="prefill-error-copy" data-code={load.state === "error" ? load.error : "missing"}>{load.state === "missing" ? "Open the full link you were sent, or ask us for a fresh one." : load.error === "rate_limited" ? `Too many tries right now. We'll try again in ${retryIn} seconds.` : ERR_COPY[load.error]}</p>
+              {load.state === "missing" || LINK_DEAD.has(load.error) ? <Link href="/intake" className="mt-6 inline-flex h-12 items-center rounded-full bg-lime-300 px-6 text-sm font-bold text-[#0b1f3a]">Start a new Monetization Kit</Link> : null}
             </>
           )}
         </div>
@@ -272,7 +357,8 @@ export default function BrIntakePrefill() {
     );
   }
 
-  const saveText = save === "saving" ? "Saving…" : save === "saved" ? "Saved" : save === "error" ? "Not saved" : patch ? "Unsaved changes" : "Nothing changed yet";
+  const saveText = save === "saving" ? "Saving…" : save === "saved" ? "Saved" : save === "error" ? "Not saved" : save === "waiting" ? `Busy, saving again in ${retryIn}s` : patch ? "Unsaved changes" : "Nothing changed yet";
+  const expires = meta?.status === "draft" && meta.expires_at ? fmtDate(meta.expires_at) : null;
   return (
     <div data-testid="prefill-page" style={{ fontFamily: RT_SANS }}>
       <MockBanner />
@@ -285,6 +371,7 @@ export default function BrIntakePrefill() {
             <div className="min-w-0 flex-1">
               <p className="text-base font-bold leading-snug">We drafted this from what we know. Fix anything.</p>
               {isStaff ? <p className="mt-1 text-[13px] font-semibold text-lime-300" data-testid="prefill-staff-note">{readOnly ? "Staff link · read-only now: the brand has confirmed." : "Staff link · edits the draft only. The brand confirms from their own link."}</p> : null}
+              {isStaff && !readOnly && !meta?.email_on_file ? <p className="mt-1 text-[12px] text-white/75" data-testid="prefill-needs-email">No brand email on file yet. The brand will be asked for it when they confirm.</p> : null}
               <Details dark testId="prefill-banner-details" label="How we drafted it">
                 <p>From your public website and what you've told us. Fields marked <b>Drafted</b> are our guesses; change any of them and the report updates.</p>
                 <p>Nothing is published or shared until you confirm, and a person reviews it before anything runs. Every figure is an estimate in USD.</p>
@@ -303,6 +390,15 @@ export default function BrIntakePrefill() {
               {save === "saving" ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : save === "saved" ? <Check className="size-3.5 text-lime-600" aria-hidden /> : null}{saveText}
             </span>
           </div>
+          {elsewhere ? (
+            <div className="mt-3 rounded-2xl border border-amber-300 bg-amber-50 p-3 text-[13px] text-[#0b1f3a]" role="status" data-testid="pf-elsewhere">
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-bold">Updated elsewhere. Review changes.</p>
+                <button type="button" className="text-[12px] font-semibold underline" onClick={() => setElsewhere(false)} data-testid="pf-elsewhere-ok">Got it</button>
+              </div>
+              <Details testId="pf-elsewhere-details"><p>Someone saved this draft from another link while you were editing. We pulled in their answers and kept everything you typed.</p></Details>
+            </div>
+          ) : null}
           <fieldset disabled={readOnly} className="mt-3 space-y-3 disabled:opacity-70" data-testid="pf-fields">
             <Field label="Brand" mark={mark("company_name")} testId="pf-brand">
               <input className={input} value={cur.company_name ?? ""} onChange={(e) => set("company_name", e.target.value.slice(0, 120))} aria-label="Brand name" data-testid="pf-brand-input" />
@@ -375,6 +471,7 @@ export default function BrIntakePrefill() {
               {err ? <p className="mt-2 text-sm font-semibold text-red-700" role="alert" data-testid="pf-error">{err}</p> : null}
             </div>
           )}
+          {expires ? <p className="mt-3 text-[11px] text-foreground/50" data-testid="pf-expires">This private link works until {expires}.</p> : null}
           {mode === "mock" && ref ? (
             <div className="mt-3 rounded-xl border border-dashed border-violet-400 p-2 text-[11px] text-violet-800" data-testid="pf-mock-link">
               Preview only: the {isStaff ? "staff" : "brand"} copy-paste link looks like{" "}

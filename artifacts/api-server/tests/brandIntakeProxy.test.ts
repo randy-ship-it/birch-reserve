@@ -12,12 +12,12 @@ const SECRET = "test-only-not-a-real-secret-value";
 const ENV = { FRIDAY_API_URL: "https://friday.example", FRIDAY_API_KEY: SECRET } as NodeJS.ProcessEnv;
 
 /** Friday's v1.2 capability probe (GET /api/public/brand-categories) is answered here: 404 = strict v1 (live today). */
-async function serve(env: NodeJS.ProcessEnv, fetchImpl: typeof fetch, v12 = false) {
+async function serve(env: NodeJS.ProcessEnv, fetchImpl: typeof fetch, v12: boolean | Record<string, unknown> = false) {
   const app = express();
   app.set("trust proxy", false);
   const wrapped = (async (url: string, init?: RequestInit) =>
     String(url).endsWith("/api/public/brand-categories")
-      ? v12 ? new Response(JSON.stringify({ categories: [{ key: "recovery_devices", label: "Recovery Devices & Equipment" }] }), { status: 200 }) : new Response("{}", { status: 404 })
+      ? v12 ? new Response(JSON.stringify({ categories: [{ key: "recovery_devices", label: "Recovery Devices & Equipment" }], ...(typeof v12 === "object" ? v12 : {}) }), { status: 200 }) : new Response("{}", { status: 404 })
       : fetchImpl(url, init as RequestInit)) as unknown as typeof fetch;
   app.use(createBrandIntakeProxy({ env, fetchImpl: wrapped }));
   const srv = app.listen(0);
@@ -459,4 +459,68 @@ test("prefill draft preview GET (v1.4 r2): token-gated, view passed through, not
   assert.equal(calls.length, 3, "no token never reaches the backend");
   assert.equal(missing.status, 503);
   assert.equal(((await missing.json()) as { error: string }).error, "preview_unavailable");
+});
+
+/* ------------------------------ v1.4 r3 (Friday #216 @ 4908219) ------------------------------ */
+test("r3: sanitizeIp keeps one clean IP (ports, brackets, zone ids, mapped IPv4) and drops junk", async () => {
+  const { sanitizeIp } = await import("../src/routes/brandIntakeProxy");
+  assert.equal(sanitizeIp("203.0.113.7, 10.0.0.1"), "203.0.113.7");
+  assert.equal(sanitizeIp("203.0.113.7:51234"), "203.0.113.7");
+  assert.equal(sanitizeIp("[2001:db8::1]:443"), "2001:db8::1");
+  assert.equal(sanitizeIp("fe80::1%eth0"), "fe80::1");
+  assert.equal(sanitizeIp("::ffff:198.51.100.4"), "198.51.100.4");
+  for (const bad of ["not-an-ip", "1.2.3.4\r\nX-Evil: 1", "<script>", "999.1.1.1", "", "1.2.3.4.5"]) assert.equal(sanitizeIp(bad), null, bad);
+});
+
+test("r3: X-Client-IP (sanitized) rides on EVERY forward to Friday; a browser-sent X-Client-IP is ignored", async () => {
+  const seen: Array<{ url: string; h: Record<string, string> }> = [];
+  const f = (async (url: string, init: RequestInit) => (seen.push({ url, h: init.headers as Record<string, string> }), new Response(JSON.stringify({ ok: true, id: "bi_abc12345", status: "draft", version: 0 }), { status: 200 }))) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  const tok = { "x-edit-token": "t".repeat(24), "x-forwarded-for": "198.51.100.9:4431, 10.0.0.1", "x-client-ip": "6.6.6.6", "content-type": "application/json" };
+  await realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: tok, body: "{}" });
+  await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { method: "PATCH", headers: tok, body: "{}" });
+  await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { headers: tok });
+  await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/preview?view=brand`, { headers: tok });
+  await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/kit`, { method: "POST", headers: tok, body: "{}" });
+  await realFetch(`${s.base}/v1/brand-kit/download`, { method: "POST", headers: tok, body: "{}" });
+  await realFetch(`${s.base}/v1/brand-report/${"r".repeat(24)}?view=brand`, { headers: tok });
+  s.close();
+  assert.equal(seen.length, 7);
+  for (const c of seen) assert.equal(c.h["X-Client-IP"], "198.51.100.9", c.url);
+});
+
+test("r3 G7/G9: contract header and Retry-After pass through to the page; 410s are passed, not turned into 503", async () => {
+  const f = (async (url: string) =>
+    String(url).includes("bi_gone1234")
+      ? new Response(JSON.stringify({ ok: false, error: "link_replaced" }), { status: 410, headers: { "x-brand-intake-contract": "1.4-prefill" } })
+      : new Response(JSON.stringify({ ok: false, error: "rate_limited" }), { status: 429, headers: { "retry-after": "17", "x-brand-intake-contract": "1.4-prefill" } })) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  const h = { "x-edit-token": "t".repeat(24) };
+  const lim = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { headers: h });
+  const gone = await realFetch(`${s.base}/v1/brand-intake/bi_gone1234`, { headers: h });
+  s.close();
+  assert.equal(lim.status, 429);
+  assert.equal(lim.headers.get("retry-after"), "17");
+  assert.equal(lim.headers.get("x-brand-intake-contract"), "1.4-prefill");
+  assert.equal(gone.status, 410);
+  assert.equal(((await gone.json()) as { error: string }).error, "link_replaced");
+});
+
+test("r3 G3/G7: if_version reaches Friday only when the probe lists v1.4.if_version; strict v1 never sees it", async () => {
+  const run = async (probe: boolean | Record<string, unknown>) => {
+    const bodies: Array<Record<string, unknown>> = [];
+    const f = (async (_u: string, init: RequestInit) => (bodies.push(JSON.parse(String(init.body))), new Response("{}", { status: 200 }))) as unknown as typeof fetch;
+    const s = await serve(ENV, f, probe);
+    await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { method: "PATCH", headers: { "content-type": "application/json", "x-edit-token": "t".repeat(24) }, body: JSON.stringify({ company_name: "Northline", if_version: 4, if_saved_at: "2026-11-19T18:00:00Z" }) });
+    s.close();
+    return bodies[0]!;
+  };
+  const v1 = await run(false);
+  assert.ok(!("if_version" in v1) && !("if_saved_at" in v1) && !("company_name" in v1));
+  const v12 = await run(true);
+  assert.ok(!("if_version" in v12));
+  assert.equal(v12.company_name, "Northline");
+  const v14 = await run({ contract_version: "1.4-prefill", capabilities: ["v1.4.if_version", "v1.4.patch_echo"] });
+  assert.equal(v14.if_version, 4);
+  assert.equal(v14.if_saved_at, "2026-11-19T18:00:00Z");
 });

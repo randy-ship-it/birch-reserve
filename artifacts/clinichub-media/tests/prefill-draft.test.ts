@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { afterSave, buildPatch, clone, dirtyKeys, fieldMark, fromEditLink, linkHasPii, parsePrefillHash, pickFields, prefillLink, setPath, slugify, type PrefillFields } from "../src/lib/prefillDraft.ts";
+import { afterSave, buildPatch, clone, dirtyKeys, fieldMark, fromEditLink, leafPaths, linkHasPii, parsePrefillHash, pickFields, prefillLink, rebase, setPath, slugify, type PrefillFields } from "../src/lib/prefillDraft.ts";
 
 const DRAFT: PrefillFields = {
   company_name: "Northline Recovery",
@@ -121,4 +121,47 @@ test("the staff tool's /brand-kit#edit= link converts to the brand's /intake/b/<
   assert.match(out, /^https:\/\/birchreserve\.net\/intake\/b\/roll-recovery#edit=/);
   assert.deepEqual(parsePrefillHash(out.slice(out.indexOf("#"))), ref);
   assert.equal(fromEditLink("https://birchreserve.net/brand-kit", "x"), null);
+});
+
+test("r3 G2: a native /intake/b/<slug>#edit= link passes through fromEditLink untouched", () => {
+  const ref = { id: "bi_abc12345", editToken: "e".repeat(24), reportToken: "r".repeat(24), version: 0 };
+  const native = prefillLink("northline-recovery", ref);
+  assert.equal(fromEditLink(native, "anything-else"), native);
+  assert.equal(fromEditLink("https://birchreserve.net/intake/b/northline-recovery#edit=junk", "x"), null);
+});
+
+test("r3 G4: dotted leaf paths, with whole-replace objects and each reach metric as one leaf", () => {
+  const f: PrefillFields = { roles: ["supplier"], calculator: { avg_cart_usd: 120, repeat: { a: 1 } }, profile: { gender: { f: 60 }, reach: { metrics: { web_visitors: { value: 1, period: "per month" } } } }, geo: { sells: ["CA"], hub_audience: { x: 1 } } };
+  assert.deepEqual(leafPaths(f).sort(), ["calculator.avg_cart_usd", "calculator.repeat", "geo.hub_audience", "geo.sells", "profile.gender", "profile.reach.metrics.web_visitors", "roles"]);
+  const m = { fields: ["calculator.avg_cart_usd", "profile.reach.metrics.web_visitors"], edited: ["calculator.orders_per_month"] };
+  const init: PrefillFields = { calculator: { avg_cart_usd: 120, orders_per_month: 900 }, profile: { reach: { metrics: { web_visitors: { value: 5 } } } } };
+  assert.equal(fieldMark(init, init, "calculator.avg_cart_usd", m), "drafted");
+  assert.equal(fieldMark(init, init, "calculator.orders_per_month", m), null);
+  assert.equal(fieldMark(init, init, "profile.reach.metrics.web_visitors.value", m), "drafted");
+});
+
+test("r3 G3: a stale save rebases: the user's unsaved edits win, the other link's changes come in", () => {
+  const base: PrefillFields = { company_name: "Northline", calculator: { avg_cart_usd: 120, orders_per_month: 1800 }, blurb: "old" };
+  const mine = setPath(setPath(base, "calculator.avg_cart_usd", 150), "blurb", undefined);
+  const theirs: PrefillFields = { company_name: "Northline Recovery", calculator: { avg_cart_usd: 130, orders_per_month: 2000 }, blurb: "old" };
+  const r = rebase(base, mine, theirs);
+  assert.equal(r.fields.calculator?.avg_cart_usd, 150); // mine
+  assert.equal(r.fields.calculator?.orders_per_month, 2000); // theirs
+  assert.equal(r.fields.company_name, "Northline Recovery"); // theirs
+  assert.equal(r.fields.blurb, undefined); // my clear kept
+  assert.deepEqual(r.conflicts, ["calculator.avg_cart_usd"]);
+  assert.deepEqual(r.elsewhere.sort(), ["calculator.orders_per_month", "company_name"]);
+  // Re-saving sends only my edits on top of theirs.
+  const p = buildPatch(theirs, r.fields)!;
+  assert.deepEqual(Object.keys(p).sort(), ["blurb", "calculator"]);
+});
+
+test("r3 G5: re-baselining on the PATCH echo keeps edits typed while the save was in flight", () => {
+  const sent: PrefillFields = { calculator: { avg_cart_usd: 150 }, blurb: "a" };
+  const now: PrefillFields = { calculator: { avg_cart_usd: 150 }, blurb: "ab" };
+  const echo: PrefillFields = { calculator: { avg_cart_usd: 150, orders_per_month: 1800 }, blurb: "a" };
+  const r = rebase(sent, now, echo);
+  assert.equal(r.fields.blurb, "ab");
+  assert.deepEqual(buildPatch(echo, r.fields), { blurb: "ab" });
+  assert.equal(buildPatch(echo, rebase(sent, sent, echo).fields), null); // nothing new → no PATCH
 });

@@ -24,7 +24,7 @@ test("a partial edit saves only that block, whole: other prefilled fields surviv
   await expect(page.getByTestId("prefill-save")).toHaveAttribute("data-state", "saved");
   const r = await only(page);
   expect(r.patches).toHaveLength(1);
-  expect(Object.keys(r.patches[0]!)).toEqual(["calculator"]);
+  expect(Object.keys(r.patches[0]!)).toEqual(["calculator", "if_version"]); // r3 G3: save rev rides along
   expect(r.fields.calculator).toEqual({ avg_cart_usd: 120, orders_per_month: 2500, purchases_per_year: 2, margin_band: "50_70" });
   expect(r.fields.profile.interests).toBe("Recovery Devices");
   expect(r.fields.company_name).toBe("Northline Recovery");
@@ -93,9 +93,9 @@ test("draft preview carries no fit adjectives (numeric scores only)", async ({ p
 
 test("expired / revoked / missing key: plain copy, no form", async ({ page }) => {
   await page.goto("/intake/b/kalaya?mock=1&mockstate=expired");
-  await expect(page.getByTestId("prefill-error-copy")).toContainText("expired");
+  await expect(page.getByTestId("prefill-error-head")).toHaveText("This link has expired.");
   await page.goto("/intake/b/roll-recovery?mock=1&mockstate=revoked");
-  await expect(page.getByTestId("prefill-error-copy")).toContainText("turned off");
+  await expect(page.getByTestId("prefill-error-head")).toHaveText("This link was turned off.");
   await expect(page.getByTestId("prefill-form")).toHaveCount(0);
 });
 
@@ -121,4 +121,82 @@ test("confirm without an email on file asks for one; nothing is submitted", asyn
   await page.getByTestId("pf-confirm-btn").click();
   await expect(page.getByTestId("pf-error")).toContainText("work email");
   expect((await only(page)).meta.version).toBe(0);
+});
+
+/* ------------------------------ v1.4 r3 (Friday #216 @ 4908219) ------------------------------ */
+test("r3 G1: 404 = invalid, 410 replaced / expired / revoked each get their own screen", async ({ page }) => {
+  const cases: Array<[string, string, RegExp]> = [
+    ["invalid", "This link doesn't work.", /whole link/],
+    ["replaced", "This link has been replaced.", /replaced with a newer one/],
+    ["expired", "This link has expired.", /stop working after a while/],
+    ["revoked", "This link was turned off.", /switched it off/],
+  ];
+  for (const [st, head, body] of cases) {
+    await page.goto(`/intake/b/roll-recovery?mock=1&mockstate=${st}`);
+    await expect(page.getByTestId("prefill-error-head")).toHaveText(head);
+    await expect(page.getByTestId("prefill-error-copy")).toContainText(body);
+    await expect(page.getByTestId("prefill-form")).toHaveCount(0);
+  }
+});
+
+test("r3 G1: drafts show the link's expiry in small print; it goes once the brand confirms", async ({ page }) => {
+  await page.goto("/intake/b/northline-recovery?mock=1");
+  await expect(page.getByTestId("pf-expires")).toContainText(/This private link works until \w+ \d{1,2}, 20\d\d\./);
+  await page.waitForTimeout(2600);
+  await page.getByTestId("pf-email").fill("ops@northlinerecovery.example");
+  await page.getByTestId("pf-confirm-btn").click();
+  await expect(page.getByTestId("prefill-report-label")).toContainText("Confirmed · version 1");
+  await expect(page.getByTestId("pf-expires")).toHaveCount(0);
+  expect((await only(page)).meta).toMatchObject({ expires_at: null });
+});
+
+test("r3 G3: a save after another link saved gets stale → merged, the user's edit kept, plain notice, resent", async ({ page }) => {
+  await page.goto("/intake/b/northline-recovery?mock=1");
+  await expect(page.getByTestId("pf-brand-input")).toHaveValue("Northline Recovery");
+  // Another link (e.g. staff) saves in between: rev moves, orders and the blurb change.
+  await page.evaluate(() => {
+    const all = JSON.parse(localStorage.getItem("br_prefill_mock_v1")!);
+    const r = Object.values(all)[0] as any;
+    r.fields.calculator.orders_per_month = 2400;
+    r.fields.blurb = "Updated by staff.";
+    r.meta.rev += 1;
+    localStorage.setItem("br_prefill_mock_v1", JSON.stringify(all));
+  });
+  await page.getByTestId("pf-aov-input").fill("175");
+  await expect(page.getByTestId("pf-elsewhere")).toContainText("Updated elsewhere. Review changes.");
+  await expect(page.getByTestId("pf-orders-input")).toHaveValue("2400");
+  await expect(page.getByTestId("pf-aov-input")).toHaveValue("175");
+  await expect(page.getByTestId("prefill-save")).toHaveAttribute("data-state", "saved");
+  const r = await only(page);
+  expect(r.fields.calculator).toMatchObject({ avg_cart_usd: 175, orders_per_month: 2400 });
+  expect(r.fields.blurb).toBe("Updated by staff.");
+  expect(r.patches).toHaveLength(1); // the stale try wrote nothing; the resend did
+  expect(r.patches[0]!.if_version).toBe(2);
+});
+
+test("r3 G5: the PATCH echo is the new baseline: the next edit sends only itself, no read-back in between", async ({ page }) => {
+  await page.goto("/intake/b/northline-recovery?mock=1");
+  await expect(page.getByTestId("pf-brand-input")).toHaveValue("Northline Recovery");
+  const reads0 = Number(await page.evaluate(() => localStorage.getItem("br_prefill_mock_reads")));
+  await page.getByTestId("pf-orders-input").fill("2500");
+  await expect(page.getByTestId("prefill-save")).toHaveAttribute("data-state", "saved");
+  await page.getByTestId("pf-brand-input").fill("Northline Recovery Co");
+  await expect(page.getByTestId("prefill-save")).toHaveAttribute("data-state", "saved");
+  await page.waitForTimeout(1200);
+  const r = await only(page);
+  expect(r.patches.map((p) => Object.keys(p).filter((k) => k !== "if_version"))).toEqual([["calculator"], ["company_name"]]);
+  expect(r.patches.map((p) => p.if_version)).toEqual([1, 2]);
+  expect(Number(await page.evaluate(() => localStorage.getItem("br_prefill_mock_reads")))).toBe(reads0); // no read-back after saves
+});
+
+test("r3 G9: a 429 shows a plain wait and retries by itself after Retry-After", async ({ page }) => {
+  await page.goto("/intake/b/northline-recovery?mock=1&mockstate=busy");
+  await expect(page.getByTestId("prefill-error-head")).toHaveText("One moment.");
+  await expect(page.getByTestId("prefill-error-copy")).toContainText("try again in 2 seconds");
+  await expect(page.getByTestId("pf-brand-input")).toHaveValue("Northline Recovery", { timeout: 6000 });
+});
+
+test("r3 G10: the staff link says when there's no brand email yet", async ({ page }) => {
+  await page.goto("/intake/b/northline-recovery?mock=1&mockstate=staff");
+  await expect(page.getByTestId("prefill-needs-email")).toContainText("No brand email on file yet");
 });

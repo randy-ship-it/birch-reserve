@@ -12,8 +12,9 @@
  *
  * Link: /intake/b/<slug>#edit=<base64url {i, e, r, v}>. The slug is the brand's public name only (no people, no
  * emails). The edit token lives in the #fragment: browsers never send it to a server or in a Referer, and the page
- * strips it from the address bar on load. Unguessable (backend-minted). Lost links are re-issued by the backend's
- * rotate (the old key then gets 404 and the page says the link was replaced).
+ * strips it from the address bar on load. Unguessable (backend-minted). v1.4 r3: staff-draft links expire after
+ * 30 days (410 link_expired), a rotated one answers 410 link_replaced, a turned-off one 410 link_revoked; an unknown
+ * key stays 404 (invalid). Friday now stores /intake/b/<slug>#edit= links natively (G2).
  */
 
 /** Editable fields the read-back GET returns (BIRCH-CONTRACT.md §2). Everything is optional. */
@@ -120,6 +121,48 @@ export function setPath<T extends object>(o: T, path: string, value: unknown): T
   }
   return { ...src, [head!]: setPath(isObj(src[head!]) ? (src[head!] as object) : {}, rest.join("."), value) } as T;
 }
+/**
+ * v1.4 r3 §1 (G4): markers are dotted leaf paths. These objects are replaced whole, so they count as one leaf.
+ * Each reach metric (profile.reach.metrics.<name>) is one leaf too.
+ */
+const WHOLE = new Set(["profile.gender", "calculator.repeat", "geo.hub_audience"]);
+const isWhole = (p: string) => WHOLE.has(p) || /^profile\.reach\.metrics\.[^.]+$/.test(p);
+export function leafPaths(o: unknown, prefix = ""): string[] {
+  if (!isObj(o) || (prefix && isWhole(prefix))) return prefix ? [prefix] : [];
+  const out: string[] = [];
+  for (const [k, v] of Object.entries(o)) if (v !== undefined) out.push(...leafPaths(v, prefix ? `${prefix}.${k}` : k));
+  return out;
+}
+function prune<T>(o: T): T {
+  if (!isObj(o)) return o;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(o)) {
+    const p = isObj(v) ? prune(v) : v;
+    if (p === undefined || (isObj(p) && !Object.keys(p).length)) continue;
+    out[k] = p;
+  }
+  return out as T;
+}
+/**
+ * 3-way rebase (G3/G5): start from `theirs` (what the backend now holds) and re-apply every leaf the user changed
+ * between `base` and `mine`. Unsaved edits are never lost; `conflicts` are leaves both sides changed differently
+ * (the user's value wins), `elsewhere` are leaves only the other side changed.
+ */
+export function rebase(base: PrefillFields, mine: PrefillFields, theirs: PrefillFields): { fields: PrefillFields; conflicts: string[]; elsewhere: string[] } {
+  let out = clone(theirs) as PrefillFields;
+  const conflicts: string[] = [];
+  const elsewhere: string[] = [];
+  const paths = [...new Set([...leafPaths(base), ...leafPaths(mine), ...leafPaths(theirs)])];
+  for (const p of paths) {
+    const b = getPath(base, p), m = getPath(mine, p), t = getPath(theirs, p);
+    const mineChanged = !deepEqual(b, m), theirsChanged = !deepEqual(b, t);
+    if (mineChanged) {
+      out = setPath(out, p, clone(m));
+      if (theirsChanged && !deepEqual(m, t)) conflicts.push(p);
+    } else if (theirsChanged) elsewhere.push(p);
+  }
+  return { fields: prune(out), conflicts, elsewhere };
+}
 const filled = (v: unknown) => !(v === undefined || v === null || v === "" || (Array.isArray(v) && !v.length) || (isObj(v) && !Object.keys(v).length));
 export type FieldMark = "drafted" | "edited" | "added" | null;
 /** "drafted" = we filled it and it's unchanged; "edited" = we filled it and the brand changed it; "added" = brand filled a blank. */
@@ -161,12 +204,15 @@ export function parsePrefillHash(hash: string): PrefillRef | null {
 }
 /**
  * A brand or staff link copied from Friday's staff page (/birch/prefill-links, approver session only; the create
- * response no longer carries links) → this brand's /intake/b/<slug> link. Same key, pure, no network, nothing stored.
+ * response carries no links). r3: a no-op passthrough for /intake/b/<slug>#edit= links. Pure, no network.
  */
 export function fromEditLink(editLink: string, slug: string, origin = "https://birchreserve.net"): string | null {
   const i = editLink.indexOf("#");
   const ref = i >= 0 ? parsePrefillHash(editLink.slice(i)) : null;
-  return ref ? prefillLink(slug, ref, origin) : null;
+  if (!ref) return null;
+  // r3 (G2): Friday stores /intake/b/<slug>#edit= links natively, so these pass through untouched.
+  if (/^(?:https?:\/\/[^/]+)?\/intake\/b\/[a-z0-9-]+\/?#/i.test(editLink)) return editLink;
+  return prefillLink(slug, ref, origin); // links issued before r3 (/brand-kit#edit=): same key, our path
 }
 /** Nothing that looks like a person's contact may ride in the link (path or fragment). */
 export function linkHasPii(link: string): boolean {
