@@ -104,8 +104,9 @@ test("fallback FAQ answers the five buyer questions usefully, in USD, with no ba
     assert.match(a.text, /https:\/\/birchreserve\.net\/buycalc|physio\.drhonow\.com/);
   }
   const general = birchFaqAnswer([{ role: "user", content: "hello" }]);
-  assert.match(general.text, /\$490 USD/);
-  assert.match(general.text, /buycalc#request/);
+  // 2026-11-19: the general fallback no longer pitches the $490 reserve or a checkout link.
+  assert.doesNotMatch(general.text, /\$490|buycalc/);
+  assert.match(general.text, /place ads, or earn with us/);
 });
 
 test("area lock is a launch price, never a deposit, everywhere the chat and phone agent read (Randy, Nov 17 2026)", async () => {
@@ -133,4 +134,99 @@ test("area lock is a launch price, never a deposit, everywhere the chat and phon
   }
   assert.doesNotMatch(prompt, /same-day/i);
   assert.match(prompt, /within 1 business day/);
+});
+
+test("2026-11-19: suppliers and hubs knowledge, no Publisher label, no 42 brands / 20MM orders", () => {
+  const p = buildBirchChatSystemPrompt({ checkout: live, pagePath: "/intake" });
+  assert.match(p, /performance-only/i);
+  assert.match(p, /no CPC and no CPM/);
+  assert.match(p, /35% of media revenue, escalating by tier/);
+  assert.match(p, /Max exposure/);
+  assert.match(p, /Scale Hubs/);
+  assert.match(p, /Calm Joints/);
+  assert.match(p, /Street Team/);
+  assert.match(p, /500K to 1MM homes/);
+  assert.match(p, /Retail Network/);
+  assert.match(p, /200\+ locations across Canada/);
+  assert.match(p, /100\+ providers/);
+  assert.match(p, /300\+ by year-end/);
+  assert.match(p, /Wednesday, December 9, 11 AM to 12 PM ET/);
+  assert.match(p, /display and CPC ad space/);
+  assert.match(p, /Monetization Kit form on this page|form on this page/);
+  assert.doesNotMatch(p, /\bAlign\b|MedVibe|Clairvoyant|Integrity Fitness/i);
+  // Left out until Randy confirms: brand fee template, phone bonus, hub launcher, 42 brands / 20MM orders.
+  assert.doesNotMatch(p, /10% on post-purchase|~35%|about 35%|\$500 CAD|42 brands|20MM orders/);
+  assert.doesNotMatch(p, /\u2014|\u2013/);
+});
+
+test("page notes differ per page and stop pitching the reserve everywhere", () => {
+  const intake = buildBirchChatSystemPrompt({ checkout: live, pagePath: "/intake" });
+  const home = buildBirchChatSystemPrompt({ checkout: live, pagePath: "/" });
+  const kit = buildBirchChatSystemPrompt({ checkout: live, pagePath: "/media-kit" });
+  assert.match(intake, /Monetization Kit form \(\/intake\)/);
+  assert.match(home, /place ads or earn with us/);
+  assert.match(kit, /advertiser evaluating rates/);
+  const p = buildBirchChatSystemPrompt({ checkout: live });
+  assert.match(p, /Never put a checkout link on every reply/);
+  assert.doesNotMatch(p, /sharp media seller/);
+});
+
+test("reply guard blocks Align, MedVibe, Friday, Uber/gig/marketplace and Publisher; allows the public 35% line", () => {
+  assert.equal(findBannedContent("Align is not listed among our hubs."), "align");
+  assert.equal(findBannedContent("Align hubs are great."), "align");
+  assert.equal(findBannedContent("We work with MedVibe."), "medvibe");
+  assert.equal(findBannedContent("Friday App tracks it."), "friday");
+  assert.equal(findBannedContent("We are the Uber for clinics."), "uber_gig");
+  assert.equal(findBannedContent("It's a gig platform."), "uber_gig");
+  assert.equal(findBannedContent("We are a marketplace."), "uber_gig");
+  assert.equal(findBannedContent("Sign up as a publisher."), "publisher_label");
+  assert.equal(findBannedContent("Clairvoyant owns it."), "clairvoyant");
+  // Allowed
+  assert.equal(findBannedContent("Hubs earn 35% of media revenue, escalating by tier."), null);
+  assert.equal(findBannedContent("Align your brand with the right hubs."), null);
+  assert.equal(findBannedContent("Retail hubs in Canada and the USA."), null);
+  // Still blocked
+  assert.equal(findBannedContent("Birch keeps 65% to Birch."), "revenue_split");
+});
+
+test("faq fallback: performance-only, CPM, Dec 9, Align, hub earn", () => {
+  const ask = (q: string) => birchFaqAnswer([{ role: "user", content: q }]);
+  assert.match(ask("What does performance-only mean").text, /no CPC and no CPM/);
+  assert.match(ask("Do advertisers pay CPM?").text, /display and CPC ad space/);
+  assert.match(ask("What's Dec 9?").text, /December 9, 11 AM to 12 PM ET/);
+  const a = ask("Is Align a hub?").text;
+  assert.match(a, /retail hubs/);
+  assert.equal(findBannedContent(a), null);
+  assert.match(ask("How does a physio group earn?").text, /35% of media revenue/);
+});
+
+test("talk track: performance-first, honest early-hub observation, fit review, non-salesy", () => {
+  const p = buildBirchChatSystemPrompt({ checkout: live, pagePath: "/intake" });
+  assert.match(p, /genuinely happy to do/);
+  assert.match(p, /start on performance and upgrade to display and CPC later/);
+  assert.match(p, /take display and CPC on that hub early/);
+  assert.match(p, /brokerages tend to take that space/);
+  assert.match(p, /never to push a decision/);
+  assert.match(p, /lean, private-channel media/);
+  assert.match(p, /Every brand applies for a hub, but we don't force one/);
+  assert.match(p, /review their supply and fit and offer display and CPC on other hubs/);
+  assert.match(p, /no urgency, no scarcity/);
+  assert.doesNotMatch(p, /\u2014|\u2013/);
+});
+
+test("faq talk track answers: unsure brand and no-hub-fit brand pass the guard, no counts or guarantees", () => {
+  const ask = (q: string) => birchFaqAnswer([{ role: "user", content: q }]);
+  const unsure = ask("We're not sure we should buy a placement yet.");
+  assert.equal(unsure.intent, "unsure");
+  assert.match(unsure.text, /start on performance/);
+  assert.match(unsure.text, /No pressure/);
+  const nofit = ask("Our products don't really fit a recovery hub. What then?");
+  assert.equal(nofit.intent, "no_hub_fit");
+  assert.match(nofit.text, /we don't force one/);
+  assert.match(nofit.text, /display and CPC on other hubs/);
+  for (const a of [unsure, nofit]) {
+    assert.equal(findBannedContent(a.text), null);
+    assert.doesNotMatch(a.text, /\bguarantee|\bopen\b|not taken|\$490|buycalc|\b0\b|\u2014|\u2013/i);
+    assert.equal((a.text.match(/https:\/\//g) ?? []).length, 1);
+  }
 });

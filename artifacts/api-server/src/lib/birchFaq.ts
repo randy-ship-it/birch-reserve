@@ -51,6 +51,27 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
       text: `Thanks${c.name ? `, ${c.name.split(" ")[0]}` : ""}. I've sent your call-back request to the Birch team${c.best_time ? ` for ${c.best_time}` : ""}. They'll reach you at ${c.phone || c.email}. If you'd rather not wait, call ${BIRCH_SALES_PHONE}.`,
     };
   }
+  if (/not sure|unsure|on the fence|hesitant|worried|too risky|try (it )?first|start (small|on performance)|prove it|want to (buy|reserve) but/.test(t)) {
+    return { intent: "unsure", callback: null, text: `That's fine, and performance-only is something we're happy to do. If you're not sure about a placement, you can start on performance, where you pay on results with no CPC or CPM, and upgrade to display and CPC later. One honest observation: brands whose category closely matches a hub's audience tend to take display and CPC on that hub early, because marketing inside the purchase experience to a close audience works well, and pricing is likely to rise once results start coming in. No pressure either way. The Monetization Kit at https://birchreserve.net/intake shows where you'd fit.` };
+  }
+  if (/(doesn'?t|don'?t|does not|do not|not)( really| quite)? (fit|match)|not (a )?(recovery|health|wellness)|wrong audience|different audience|no hub for/.test(t)) {
+    return { intent: "no_hub_fit", callback: null, text: `Every brand applies for a hub, but we don't force one. If a hub doesn't fit your customers, for example the recovery audience, we review your supply and fit and offer display and CPC on other hubs to build your audience instead. It's lean, private-channel media and we want you to get the best performance we can. The Monetization Kit at https://birchreserve.net/intake is the place to start.` };
+  }
+  if (/\balign\b|retail (hub|chain|network)|which retail/.test(t)) {
+    return { intent: "retail_hubs", callback: null, text: `Birch Reserve has a Retail Network of retail hubs in Canada and the USA. We don't name individual retail operators here, so the team can confirm specifics for your question.` };
+  }
+  if (/performance[- ]only/.test(t)) {
+    return { intent: "performance_only", callback: null, text: `Performance-only is the supplier option on the Monetization Kit: you pay on results, with no CPC and no CPM. Advertisers buying display space pay on a CPM or CPC basis instead.` };
+  }
+  if (/\b(cpm|cpc)\b/.test(t) && /(advertiser|pay|vs|or|do you|does)/.test(t)) {
+    return { intent: "cpm_cpc", callback: null, text: `Yes. We sell display and CPC ad space, with modelled starter ranges on the media kit (${KIT}). Performance-only, which pays on results with no CPC or CPM, is the separate supplier option on the Monetization Kit.` };
+  }
+  if (/dec(ember)?\.? ?(9|ninth)|founders/.test(t)) {
+    return { intent: "founders", callback: null, text: `It's the Founders session on Wednesday, December 9, 11 AM to 12 PM ET, to see how brands monetize with us. The Zoom link is to come.` };
+  }
+  if (/how .*(earn|make money|get paid)|what (do|does) (a )?hubs? (earn|get)|hub payout|\bpayout\b/.test(t)) {
+    return { intent: "hub_earn", callback: null, text: `Hubs earn 35% of media revenue, escalating by tier. Tier steps aren't published yet. The Monetization Kit at https://birchreserve.net/intake shows your estimate, and a person at Birch Reserve reviews it.` };
+  }
   if (/\bcad\b|canadian|canada|currency|us dollars|\busd\b|exchange rate/.test(t)) {
     return { intent: "currency", callback: null, text: `Prices are in USD for every buyer, including Canadian brands: $190 USD for the 7-day look and $490 USD to reserve. The currency you see on the Stripe checkout is the currency you're charged. Start at ${BUY}, or ask us anything first at ${REQ}.` };
   }
@@ -103,6 +124,6 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
   return {
     intent: "general",
     callback: null,
-    text: `Birch Reserve sells display space inside private, members-only health and wellness hubs, right after a member books or buys. Reserve for $490 USD or take a 7-day look for $190 USD at ${BUY}. Not ready? Send a quick question with no card at ${REQ}, or call ${BIRCH_SALES_PHONE}.`,
+    text: `Birch Reserve sells display space inside private, members-only health and wellness hubs, and lets suppliers and hubs earn with us through the Monetization Kit. What are you looking to do: place ads, or earn with us? You can also call ${BIRCH_SALES_PHONE}.`,
   };
 }

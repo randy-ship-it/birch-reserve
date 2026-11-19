@@ -74,7 +74,14 @@ export type DiscoveryChipId =
   | "how_seats"
   | "hold_190"
   | "live_hub"
-  | "talk_human";
+  | "talk_human"
+  | "kit_performance"
+  | "kit_hub_earn"
+  | "kit_after_submit"
+  | "cpm_cpc"
+  | "channels"
+  | "earn_with_us"
+  | "place_ads";
 
 /** Live proof of a Scale Health hub surface (public). */
 export const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal" as const;
@@ -83,8 +90,17 @@ export const LIVE_HUB_PROOF_DISPLAY = "the live DR-HO hub" as const;
 /** Quiet display placement example (not hero; no reach claim). */
 export const WEPRIZE_EXAMPLE_URL = "https://weprize.net" as const;
 
-export const SMART_OPENER =
-  "Hey! Birch Q&A Squirrel here. Want to see what a $490 reserve gets you across our hub network?" as const;
+export const SMART_OPENER = "Hi. Placing ads, or earning with us?" as const;
+
+/** Page-aware opener (suppliers and hubs on /intake, advertisers on /media-kit, general elsewhere). */
+export function openerForPath(path?: string): string {
+  const p = path ?? "";
+  if (p.startsWith("/intake")) {
+    return "Hi. Questions about the Monetization Kit, performance-only terms or what a hub earns? Ask away.";
+  }
+  if (p.startsWith("/media-kit")) return "Hi. Ask me about rates, channels or placements.";
+  return SMART_OPENER;
+}
 
 /** Teaser bubble shown beside the full-body figure (closed state). */
 export const TEASER_TEXT = "Got a brand to place? Ask me." as const;
@@ -116,6 +132,38 @@ export const SUGGESTION_CHIPS: ReadonlyArray<{
     message: "I’d like to talk to a human.",
   },
 ] as const;
+
+type SiteChip = { id: DiscoveryChipId; label: string; message: string };
+
+const HUMAN_CHIP: SiteChip = { id: "talk_human", label: "Talk to a human", message: "I’d like to talk to a human." };
+
+const INTAKE_CHIPS: ReadonlyArray<SiteChip> = [
+  { id: "kit_performance", label: "What's performance-only?", message: "What does performance-only mean?" },
+  { id: "kit_hub_earn", label: "What do hubs earn?", message: "What does a hub earn?" },
+  { id: "kit_after_submit", label: "What happens after I submit?", message: "What happens after I submit the form?" },
+  HUMAN_CHIP,
+];
+
+const MEDIA_KIT_CHIPS: ReadonlyArray<SiteChip> = [
+  { id: "cpm_cpc", label: "CPM vs CPC", message: "Do advertisers pay CPM or CPC?" },
+  { id: "channels", label: "Channels", message: "What channels do you have?" },
+  { id: "hold_190", label: "Reserve space", message: "I want to reserve display space. How do I buy?" },
+  HUMAN_CHIP,
+];
+
+const HOME_CHIPS: ReadonlyArray<SiteChip> = [
+  { id: "place_ads", label: "Place ads", message: "I want to place ads." },
+  { id: "earn_with_us", label: "Earn with us", message: "I want to earn with you as a supplier or hub." },
+  { id: "live_hub", label: "See a live hub", message: "Can I see a live hub?" },
+  HUMAN_CHIP,
+];
+
+export function chipsForPath(path?: string): ReadonlyArray<SiteChip> {
+  const p = path ?? "";
+  if (p.startsWith("/intake")) return INTAKE_CHIPS;
+  if (p.startsWith("/media-kit")) return MEDIA_KIT_CHIPS;
+  return HOME_CHIPS;
+}
 
 const BUY_INTENT =
   /\b(buy|purchase|checkout|pay|card|hold\s*\$?190|reserve\s*\$?490|lock\s+(the\s+)?seat|get\s+(the\s+)?seat)\b/i;
