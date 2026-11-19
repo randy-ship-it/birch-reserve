@@ -13,6 +13,7 @@ type Summary = {
   by_channel: Array<{ channel: string; share: number; click: number; arrival: number }>;
   by_path: Array<{ path: string; share: number; click: number; arrival: number }>;
   by_ref: Array<{ ref: string; arrival: number; click: number }>;
+  by_src?: Array<{ src: string; share: number; click: number; arrival: number }>;
   recent: Array<{ at: string; kind: string; channel: string; path: string; ref: string | null; utm: string | null; referrer_host: string | null; share_id: string | null }>;
 };
 const fmt = (iso: string) => new Date(iso).toLocaleString("en-CA", { timeZone: "America/Toronto", dateStyle: "medium", timeStyle: "short" }) + " ET";
@@ -67,6 +68,11 @@ export default function ShareEventsPage() {
               <h2 className="font-display text-2xl">By placement / ref</h2>
               <table className="mt-2 w-full text-sm"><thead><tr><th className={th}>ref</th><th className={th}>Clicks</th><th className={th}>Arrivals</th></tr></thead>
                 <tbody>{data.by_ref.map((r) => <tr key={r.ref} className="border-t border-foreground/10"><td className="py-2 pr-3 font-mono text-xs">{r.ref}</td><td className={td}>{r.click}</td><td className={td}>{r.arrival}</td></tr>)}</tbody></table>
+            </section>
+            <section className="rounded-2xl border border-foreground/10 bg-white p-4 lg:col-span-2" data-testid="share-by-src">
+              <h2 className="font-display text-2xl">By host / source</h2>
+              <table className="mt-2 w-full text-sm"><thead><tr><th className={th}>Source</th><th className={th}>Shares</th><th className={th}>Clicks</th><th className={th}>Arrivals</th></tr></thead>
+                <tbody>{(data.by_src ?? []).map((r) => <tr key={r.src} className="border-t border-foreground/10"><td className="py-2 pr-3 font-mono text-xs">{r.src}</td><td className={td}>{r.share}</td><td className={td}>{r.click}</td><td className={td}>{r.arrival}</td></tr>)}</tbody></table>
             </section>
             <section className="rounded-2xl border border-foreground/10 bg-white p-4 lg:col-span-2" data-testid="share-by-path">
               <h2 className="font-display text-2xl">By page</h2>

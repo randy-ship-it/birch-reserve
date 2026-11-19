@@ -9,15 +9,37 @@ export const safeSharePath = (p: string) => {
   return /^\/kit\/r\//.test(path) ? "/kit/r/report" : path;
 };
 
-function send(body: Record<string, unknown>): void {
+function send(body0: Record<string, unknown>): void {
   if (typeof window === "undefined") return;
   try {
+    const src = mirrorSource();
+    const body = src ? { ...body0, src } : body0;
     const json = JSON.stringify(body);
     if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function" && navigator.sendBeacon("/v1/share-events", new Blob([json], { type: "application/json" }))) return;
     void fetch("/v1/share-events", { method: "POST", headers: { "content-type": "application/json" }, body: json, keepalive: true, credentials: "omit" }).catch(() => undefined);
   } catch {
     /* tracking must never break the page */
   }
+}
+
+/**
+ * Mirror source (SCALE-MIRROR.md): the intake served under another host (a Scale-side domain pointed at this
+ * project, or a proxy that adds ?src=scale_mirror). birchreserve.net, Vercel previews and localhost are not mirrors.
+ */
+const SRC_OK = /^[a-z0-9_]{2,32}$/;
+export function mirrorSource(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const q = new URLSearchParams(window.location.search).get("src");
+    if (q && SRC_OK.test(q)) sessionStorage.setItem("br_src", q);
+    const saved = sessionStorage.getItem("br_src");
+    if (saved && SRC_OK.test(saved)) return saved;
+  } catch {
+    /* ignore */
+  }
+  const h = window.location.hostname.toLowerCase();
+  if (/(^|\.)birchreserve\.net$/.test(h) || h.endsWith(".vercel.app") || h === "localhost" || /^127\./.test(h)) return null;
+  return /scale/.test(h) ? "scale_mirror" : "mirror";
 }
 
 export const newShareId = () => Array.from(crypto.getRandomValues(new Uint8Array(10)), (b) => (b % 36).toString(36)).join("");
@@ -29,6 +51,10 @@ export function shareUrl(channel: ShareChannel, sid: string, href = typeof windo
   u.hash = "";
   u.searchParams.set("ref", `share_${channel}`);
   u.searchParams.set("sid", sid);
+  // Host-aware: a share from the mirror stays on the mirror host and keeps its source tag.
+  const src = mirrorSource();
+  if (src) u.searchParams.set("src", src);
+  else u.searchParams.delete("src");
   return u.toString();
 }
 
@@ -48,8 +74,8 @@ export function logArrival(): void {
   const q = new URLSearchParams(window.location.search);
   const ref = q.get("ref");
   const utm = q.get("utm_source");
-  if (!ref && !utm) return;
-  const key = `${window.location.pathname}?${ref}|${utm}|${q.get("sid")}`;
+  if (!ref && !utm && !mirrorSource()) return;
+  const key = `${window.location.pathname}?${ref}|${utm}|${q.get("sid")}|${mirrorSource()}`;
   if (arrived === key) return;
   arrived = key;
   try {

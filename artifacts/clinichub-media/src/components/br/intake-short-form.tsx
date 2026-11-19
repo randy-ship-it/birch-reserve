@@ -15,7 +15,7 @@ import { ArrowRight, Check, ChevronDown, Loader2, ShieldAlert, Store, Package, P
 import type { IntakeRole } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { RETAIL_COPY } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { FRIDAY_CATEGORIES } from "../../../../api-server/src/lib/kitCalc/fridayV12";
-import { HELD_COPY, fridayIntake, reportPath, saveRef, type IntakeRef } from "@/lib/fridayBrandIntake";
+import { HELD_COPY, PARTIAL_EMAIL_RE, fridayIntake, reportPath, saveRef, type IntakeRef } from "@/lib/fridayBrandIntake";
 import { basePayload } from "@/components/br/intake-kit";
 import { LeadGatesStatus, PrimaryCta } from "@/components/br/intake-sell";
 import { DEFAULT_MARKET, MarketPicker } from "@/components/br/intake-geo";
@@ -96,6 +96,43 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
   const addHub = () => { setR((c) => ({ ...c, hub: true })); trackIntake("advertiser", "cta_click", "add_hub"); };
   const toggleCat = (k: string) => setShared((s) => ({ ...s, categories: s.categories.includes(k) ? s.categories.filter((x) => x !== k) : s.categories.length >= 3 ? s.categories : [...s.categories, k] }));
 
+  const buildPayload = () => ({
+    ...basePayload(roles[0]!),
+    roles,
+    ...(marketTouched && market.sells_in.length ? { market } : {}),
+    ...(shared.brand.trim() ? { company_name: shared.brand.trim() } : {}),
+    shared: { categories: shared.categories, skus: numOrU(shared.skus), audience_customers: numOrU(shared.audience) },
+  });
+  // Partial lead (Randy via Emma, Nov 19 2026 10:21 AM ET): once the email is valid, save what's filled in
+  // (debounced) and keep updating the SAME record. It stays "abandoned" until the final click flips it to submitted.
+  // Never without a valid email; never for the honeypot. ?mock=1 keeps it in this browser.
+  const partialRef = useRef<IntakeRef | null>(null);
+  const partialBusy = useRef<Promise<void> | null>(null);
+  const partialSig = useRef("");
+  const submitted = useRef(false);
+  const emailOk = PARTIAL_EMAIL_RE.test(email.trim());
+  const partialKey = JSON.stringify([email.trim(), website.trim(), roles, shared, marketTouched ? market : null]);
+  useEffect(() => {
+    if (!emailOk || hp || submitted.current || partialKey === partialSig.current) return;
+    const t = window.setTimeout(() => {
+      if (submitted.current) return;
+      const run = async () => {
+        await partialBusy.current;
+        if (submitted.current || partialKey === partialSig.current) return;
+        try {
+          partialRef.current = await fridayIntake().partial(partialRef.current, buildPayload(), { email: email.trim(), website: website.trim() });
+          partialSig.current = partialKey;
+          trackIntake(side, "step_complete", "partial_saved", { dedupe: true });
+        } catch {
+          /* a failed partial save never blocks the form; the final click still sends everything */
+        }
+      };
+      partialBusy.current = run();
+    }, 1200);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [partialKey, emailOk, hp]);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setErr(null);
@@ -103,16 +140,13 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
     trackIntake(side, "step_complete", "contact");
     if (r.supplier && !r.hub && !r.accelerate) trackIntake("advertiser", "submit", "supply_only");
     setBusy(true);
+    submitted.current = true;
     try {
       const api = fridayIntake();
-      const payload = {
-        ...basePayload(roles[0]!),
-        roles,
-        ...(marketTouched && market.sells_in.length ? { market } : {}),
-        ...(shared.brand.trim() ? { company_name: shared.brand.trim() } : {}),
-        shared: { categories: shared.categories, skus: numOrU(shared.skus), audience_customers: numOrU(shared.audience) },
-      };
-      const fr = await api.fast(payload, { email: email.trim(), website: website.trim(), elapsed_ms: Date.now() - t0.current });
+      const payload = buildPayload();
+      await partialBusy.current; // a partial save in flight finishes first, so the final click reuses its record
+      const contact = { email: email.trim(), website: website.trim(), elapsed_ms: Date.now() - t0.current };
+      const fr = partialRef.current ? await api.finishPartial(partialRef.current, payload, contact) : await api.fast(payload, contact);
       const { ref: next, sub, autofill } = fr;
       saveRef(roles[0]!, next);
       if (r.supplier && r.accelerate) saveRef("kit", next); // Expanded (kit builder) upgrades this same record
@@ -124,6 +158,7 @@ export function IntakeShortForm({ onExpand }: { onExpand?: (side: IntakeSide) =>
       trackIntake(side, "submit", "fast");
       trackIntake(side, "view", "quick_report");
     } catch (x) {
+      submitted.current = false;
       trackIntake(side, "submit_error", errorDetail((x as Error).message));
       setErr(ERR[(x as Error).message] ?? "Couldn't send that. Please try again.");
     } finally {

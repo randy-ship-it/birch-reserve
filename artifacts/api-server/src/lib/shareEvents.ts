@@ -29,12 +29,14 @@ export type ShareEvent = {
   utmCampaign: string | null;
   referrerHost: string | null;
   shareId: string | null;
+  src: string | null;
   createdAt: Date;
 };
 
 const KIND_SET = new Set<string>(SHARE_KINDS);
 const CHANNEL_SET = new Set<string>(SHARE_CHANNELS);
-const ALLOWED = new Set(["kind", "channel", "path", "ref", "utm_source", "utm_medium", "utm_campaign", "referrer", "sid"]);
+const ALLOWED = new Set(["kind", "channel", "path", "ref", "utm_source", "utm_medium", "utm_campaign", "referrer", "sid", "src"]);
+const SRC_RE = /^[a-z0-9_]{2,32}$/;
 const PATH_RE = /^\/[A-Za-z0-9._~/-]{0,199}$/;
 const TOKEN_RE = /^[A-Za-z0-9._-]{1,64}$/;
 const SID_RE = /^[a-z0-9]{6,24}$/;
@@ -85,8 +87,10 @@ export function parseShareEvent(body: unknown, now = new Date()): ShareEvent | n
     if (typeof r.sid !== "string" || !SID_RE.test(r.sid)) return null;
     shareId = r.sid;
   }
+  if (r.src != null && (typeof r.src !== "string" || !SRC_RE.test(r.src))) return null;
+  const src = typeof r.src === "string" ? r.src : null; // mirror host tag (SCALE-MIRROR.md), e.g. scale_mirror
   const path = /^\/kit\/r\//.test(r.path) ? "/kit/r/report" : r.path; // report tokens are never stored
-  return { kind: r.kind as ShareKind, channel, path, ref, utmSource, utmMedium, utmCampaign, referrerHost: referrerHost(r.referrer), shareId, createdAt: now };
+  return { kind: r.kind as ShareKind, channel, path, ref, utmSource, utmMedium, utmCampaign, referrerHost: referrerHost(r.referrer), shareId, src, createdAt: now };
 }
 
 /* ------------------------------------------------------------------ stores */
@@ -113,8 +117,9 @@ function ensureTable(): Promise<void> {
   tableReady ??= db
     .execute(sql`CREATE TABLE IF NOT EXISTS share_events (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), kind text NOT NULL, channel text NOT NULL, path text NOT NULL,
-      ref text, utm_source text, utm_medium text, utm_campaign text, referrer_host text, share_id text,
+      ref text, utm_source text, utm_medium text, utm_campaign text, referrer_host text, share_id text, src text,
       created_at timestamptz NOT NULL DEFAULT now());
+      ALTER TABLE share_events ADD COLUMN IF NOT EXISTS src text;
       CREATE INDEX IF NOT EXISTS share_events_created_idx ON share_events (created_at);`)
     .then(() => undefined)
     .catch((e) => {
@@ -159,6 +164,7 @@ export type ShareSummary = {
   by_channel: Array<{ channel: string; share: number; click: number; arrival: number }>;
   by_path: Array<{ path: string; share: number; click: number; arrival: number }>;
   by_ref: Array<{ ref: string; arrival: number; click: number }>;
+  by_src: Array<{ src: string; share: number; click: number; arrival: number }>;
   recent: Array<{ at: string; kind: ShareKind; channel: string; path: string; ref: string | null; utm: string | null; referrer_host: string | null; share_id: string | null }>;
 };
 
@@ -167,6 +173,7 @@ export function summarize(rows: ShareEvent[], storeName: ShareStore["name"], sin
   const ch = new Map<string, { share: number; click: number; arrival: number }>();
   const pa = new Map<string, { share: number; click: number; arrival: number }>();
   const rf = new Map<string, { arrival: number; click: number }>();
+  const sr = new Map<string, { share: number; click: number; arrival: number }>();
   const bump = <T extends Record<string, number>>(m: Map<string, T>, k: string, init: T, f: keyof T) => {
     const v = m.get(k) ?? { ...init };
     (v[f] as number) += 1;
@@ -177,6 +184,7 @@ export function summarize(rows: ShareEvent[], storeName: ShareStore["name"], sin
     bump(ch, r.channel, { share: 0, click: 0, arrival: 0 }, r.kind);
     bump(pa, r.path, { share: 0, click: 0, arrival: 0 }, r.kind);
     if (r.ref && r.kind !== "share") bump(rf, r.ref, { arrival: 0, click: 0 }, r.kind);
+    bump(sr, r.src ?? "birchreserve.net", { share: 0, click: 0, arrival: 0 }, r.kind);
   }
   const sortBy = <T extends Record<string, number>>(m: Map<string, T>) => [...m.entries()].sort((a, b) => Object.values(b[1]).reduce((x, y) => x + y, 0) - Object.values(a[1]).reduce((x, y) => x + y, 0));
   return {
@@ -186,6 +194,7 @@ export function summarize(rows: ShareEvent[], storeName: ShareStore["name"], sin
     by_channel: sortBy(ch).map(([channel, v]) => ({ channel, ...v })),
     by_path: sortBy(pa).map(([path, v]) => ({ path, ...v })),
     by_ref: sortBy(rf).map(([ref, v]) => ({ ref, ...v })),
+    by_src: sortBy(sr).map(([src, v]) => ({ src, ...v })),
     recent: rows.slice(0, 200).map((r) => ({ at: r.createdAt.toISOString(), kind: r.kind, channel: r.channel, path: r.path, ref: r.ref, utm: [r.utmSource, r.utmMedium, r.utmCampaign].filter(Boolean).join(" / ") || null, referrer_host: r.referrerHost, share_id: r.shareId })),
   };
 }

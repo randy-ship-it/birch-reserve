@@ -19,6 +19,8 @@ export const shareEventsTable = pgTable(
     utmCampaign: text("utm_campaign"),
     referrerHost: text("referrer_host"),
     shareId: text("share_id"),
+    /** Mirror host tag (e.g. scale_mirror) when the intake is served under another host. Null on birchreserve.net. */
+    src: text("src"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("share_events_created_idx").on(t.createdAt)],

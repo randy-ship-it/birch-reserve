@@ -4,6 +4,7 @@
  *   friday:  Friday's brand-report.v1 (ltv + demand_fit shown exactly as returned, never recomputed).
  * Demand reach (views → visits → customers) is Birch's own modelled math in both cases; Friday has no field for it yet.
  */
+import { visibleHubs } from "../../../api-server/src/lib/overhaul/hubMatch";
 import { CHANNEL_GEO, channelEligibility, type Eligibility, type Market } from "../../../api-server/src/lib/kitCalc/channelGeo";
 import type { KitCalcResult } from "../../../api-server/src/lib/kitCalc";
 type Range = readonly [number, number];
@@ -42,7 +43,7 @@ export function chipsFor(calc: KitCalcResult, repeatLabel: string): string[] {
   return [`Cart $${calc.inputs.aovUsd.toLocaleString("en-US")}`, `${calc.inputs.monthlyOrders.toLocaleString("en-US")} orders/mo`, `${repeatLabel}× a year`, `Margin ${calc.inputs.marginLabel}`, `Scenario ${calc.inputs.conversionPct}%`];
 }
 
-export function previewView(calc: KitCalcResult, o: { brand: string; categoryKey: string; categoryLabel: string; repeatLabel: string; mapDataUrl?: string }): KitView {
+export function previewView(calc: KitCalcResult, o: { brand: string; categoryKey: string; categoryLabel: string; repeatLabel: string; mapDataUrl?: string; domain?: string | null }): KitView {
   return {
     source: "preview",
     mock: false,
@@ -58,7 +59,7 @@ export function previewView(calc: KitCalcResult, o: { brand: string; categoryKey
     chips: chipsFor(calc, o.repeatLabel),
     formula: KIT_CALC_FORMULA.slice(0, 3),
     fitHeader: "Live preview · fit confirmed after you submit",
-    hubs: hubFit(o.categoryKey).map((h) => ({ name: h.name, status: h.live ? "Live" : "In queue", fitLabel: `${h.fit} · preview`, what: h.what })),
+    hubs: visibleHubs(hubFit(o.categoryKey), { category: o.categoryKey, domain: o.domain }).map((h) => ({ name: h.name, status: h.live ? "Live" : "In queue", fitLabel: `${h.fit} · preview`, what: h.what })),
     channels: EXPOSURE_CHANNELS.slice(1).map((c) => ({ key: c.key, name: c.name, figures: tileFigures(c.key), fitLabel: null, rateNote: c.rateNote, image: c.key === "street-team" ? "map" : undefined })),
     hubRates: { cpm: HUB_RATE_RANGE.cpm, cpc: HUB_RATE_RANGE.cpc, fitLabel: null },
     mapDataUrl: o.mapDataUrl,
@@ -89,7 +90,7 @@ export function fridayView(r: FridayReport, calc: KitCalcResult, o: { brand: str
     chips: chipsFor(calc, o.repeatLabel),
     formula: [lt?.formula ?? "", ...KIT_CALC_FORMULA.slice(1, 3)],
     fitHeader: df?.label ?? "Estimate · subject to human confirmation",
-    hubs: (df?.anchor_hubs ?? []).slice(0, 6).map((h) => ({ name: h.name, status: h.status, fitLabel: h.fit_label })),
+    hubs: visibleHubs((df?.anchor_hubs ?? []) as Array<NonNullable<typeof df>["anchor_hubs"][number] & { hidden?: boolean }>, { domain: r.brand?.domain, category: r.brand?.category ?? r.demand_opportunity?.category?.key ?? null }).slice(0, 6).map((h) => ({ name: h.name, status: h.status, fitLabel: h.fit_label })),
     channels: ["calm-joints", "street-team", "retail-network"].map((k) => {
       const c = EXPOSURE_CHANNELS.find((x) => x.key === k)!;
       return { key: k, name: fitOf(k)?.name ?? c.name, figures: k === "retail-network" ? tileFigures(k) /* fixed RETAIL_COPY */ : fridayFig(k) ?? tileFigures(k), fitLabel: fitOf(k)?.fit_label ?? null, rateNote: c.rateNote, image: k === "street-team" ? "map" : undefined };

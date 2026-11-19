@@ -1,3 +1,4 @@
+import { mirrorFrame } from "./middlewares/mirrorFrame";
 import express, { type Express } from "express";
 import { clerkMiddleware } from "@clerk/express";
 import { shareEventsRouter } from "./routes/shareEvents";
@@ -94,6 +95,7 @@ app.use(
     },
   }),
 );
+app.use(mirrorFrame());
 app.use(createBrandIntakeProxy({ log: (msg, extra) => logger.info(extra ?? {}, msg) }));
 app.use(sponsorPageRouter);
 app.use(publicPagesRouter);

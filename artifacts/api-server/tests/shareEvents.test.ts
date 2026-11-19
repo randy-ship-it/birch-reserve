@@ -51,3 +51,20 @@ test("one form: supplier + hub map to v1 keys, extras to a labelled blurb, no na
   assert.match(String(acc.blurb), /supplier \+ hub \+ Accelerate \(premium display placements\)/);
   assert.match(String(acc.blurb), /Accelerate test budget: \$1,000 test/);
 });
+
+test("share events: mirror source tag (src) is allow-listed and summarized by host", () => {
+  const m = parseShareEvent({ kind: "arrival", path: "/intake", src: "scale_mirror" })!;
+  assert.equal(m.src, "scale_mirror");
+  assert.equal(parseShareEvent({ kind: "arrival", path: "/intake", src: "https://evil" }), null);
+  const plain = parseShareEvent({ kind: "arrival", path: "/intake", ref: "share_x" })!;
+  assert.equal(plain.src, null);
+  const s = summarize([m, plain], "memory", 30);
+  assert.deepEqual(s.by_src.map((r) => [r.src, r.arrival]).sort(), [["birchreserve.net", 1], ["scale_mirror", 1]]);
+});
+
+import { mirrorFrameAncestors } from "../src/middlewares/mirrorFrame";
+test("mirror iframe allowlist: off by default, https origins only, never a wildcard", () => {
+  assert.equal(mirrorFrameAncestors(undefined), null);
+  assert.equal(mirrorFrameAncestors("*, http://x.com, javascript:alert(1)"), null);
+  assert.equal(mirrorFrameAncestors("https://scalehealth.ca, https://www.scalehealth.ca/"), "frame-ancestors 'self' https://scalehealth.ca https://www.scalehealth.ca");
+});

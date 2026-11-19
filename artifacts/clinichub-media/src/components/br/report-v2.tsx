@@ -14,6 +14,7 @@ import type { FridayReport } from "@/lib/fridayBrandIntake";
 import { fridayEligibility } from "@/lib/fridayBrandIntake";
 import { CHANNEL_TILES, PUBLISHER_SURFACES, RETAIL_COPY, anchorName } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { NEVER_HUB_NAME } from "../../../../api-server/src/lib/overhaul/hubNameFilter";
+import { visibleHubs } from "../../../../api-server/src/lib/overhaul/hubMatch";
 import { CHANNEL_GEO } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { mockExposure, readExposure, type FridayExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 import { HubView, SupplierExposureView } from "@/components/br/report-views";
@@ -49,7 +50,9 @@ export function buildModel(r: FridayReport) {
   const scored = df.filter((c) => typeof c.fit === "number").sort((a, b) => b.fit - a.fit).slice(0, 3);
   const score = scored.length ? Math.round(scored.reduce((s, c) => s + c.fit, 0) / scored.length) : null;
   const rawHubs = ((r as { hubs?: Array<{ key: string; name: string; status?: string; fit?: number; fit_label?: string; reason?: string | null; tier?: string; logo?: string }> }).hubs ?? r.demand_fit?.anchor_hubs ?? []) as Array<{ key: string; name: string; status?: string; fit?: number; fit_label?: string; reason?: string | null; tier?: string; logo?: string }>;
-  const hubs = rawHubs.map((h) => (h && h.name ? { ...h, name: anchorName(h.key, h.name) } : h)).filter((h) => h && h.name && !NEVER_HUB_NAME.test(h.name)).slice(0, 5);
+  // Hub matching rules (hubMatch.ts): conflicting hubs are flagged hidden, never shown; opposite kind first.
+  const ruled = visibleHubs(rawHubs as Array<(typeof rawHubs)[number] & { hidden?: boolean }>, { domain, category: r.brand?.category ?? r.demand_opportunity?.category?.key ?? null });
+  const hubs = ruled.map((h) => (h && h.name ? { ...h, name: anchorName(h.key, h.name) } : h)).filter((h) => h && h.name && !NEVER_HUB_NAME.test(h.name)).slice(0, 5);
   const placements = (r.placements ?? []).filter((p) => p.label);
   const cpm = r.headline?.best_fit_cpm_usd ?? avg(placements.map((p) => p.cpm_usd));
   const cpc = r.headline?.best_fit_cpc_usd ?? avg(placements.map((p) => p.cpc_usd));

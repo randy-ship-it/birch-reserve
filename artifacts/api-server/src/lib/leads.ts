@@ -30,7 +30,7 @@
 import { logger } from "./logger";
 import { applyAdditiveColumns } from "./schemaEnsure";
 
-export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture" | "checkout" | "local_biz" | "inventory_signup";
+export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture" | "checkout" | "local_biz" | "inventory_signup" | "brand_intake";
 
 /** Friday deal metadata carried on the lead (unknown keys are simply absent). */
 export type LeadMeta = {
@@ -46,8 +46,11 @@ export type LeadMeta = {
   friday_external_id?: string;
   /** QA only (X-Birch-QA + /api/launch/qa/friday-test-lead): push this is_test lead to Friday once. */
   friday_qa_ok?: boolean;
+  /** Brand intake (Monetization Kit): "abandoned" (partial lead) or "submitted". */
+  stage?: string;
+  friday_intake_id?: string;
 };
-const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id"] as const;
+const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id", "stage", "friday_intake_id"] as const;
 
 /** Keep only well-typed, non-empty keys (never empty strings). */
 export function cleanLeadMeta(raw: unknown): LeadMeta {
@@ -150,6 +153,7 @@ const ATTRIBUTION_MAX = 500;
 const SOURCE_RANK: Record<LeadSource, number> = {
   advertiser_intake: 0,
   inventory_signup: 0,
+  brand_intake: 0,
   chat_intake: 1,
   chat_callback: 2,
   voice: 2,

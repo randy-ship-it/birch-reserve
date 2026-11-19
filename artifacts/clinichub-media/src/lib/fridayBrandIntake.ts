@@ -13,6 +13,7 @@
  * /workspace/br-intake/CONTRACT-GAPS.md. Labelled MOCK when the Birch server has no Friday config: nothing leaves
  * the browser and every screen says so. Nothing is ever auto-accepted.
  */
+import { mirrorSource } from "./shareTrack";
 import { marketToFridayGeo, marketToGeographyText, splitRegions, type Eligibility, type Market } from "../../../api-server/src/lib/kitCalc/channelGeo";
 import { mockExposure, type FridayExposure } from "../../../api-server/src/lib/kitCalc/activation";
 import type { IntakePayload, IntakeRole, PubSurfaceKey } from "../../../api-server/src/lib/overhaul/brandIntake";
@@ -21,7 +22,7 @@ import { mockReport } from "./fridayMockReport";
 import { FRIDAY_CATEGORIES, V12_MARGIN, V12_REPEAT, toFridayCategory } from "../../../api-server/src/lib/kitCalc/fridayV12";
 
 
-export type IntakeRef = { id: string; editToken: string; reportToken: string; version: number; legacy?: boolean; /** Friday answered in v1.3 (submit_mode): upgrades PATCH with submit_mode "expanded". */ v13?: boolean };
+export type IntakeRef = { id: string; editToken: string; reportToken: string; version: number; legacy?: boolean; /** Started as a partial lead (email typed, not submitted yet). */ partial?: boolean; /** Friday answered in v1.3 (submit_mode): upgrades PATCH with submit_mode "expanded". */ v13?: boolean };
 /** v1.3 §1b auto-fill field: {value, source:"site_autofill", confidence 0–1, evidence}. */
 export type AutofillField<T = unknown> = { value: T; source: "site_autofill"; confidence: number; evidence?: string };
 export type Autofill = { version?: string; fetched_at?: string; fields: { company_name?: AutofillField<string>; category?: AutofillField<string>; geo?: AutofillField<{ sells?: string[]; ships?: string[] }>; avg_cart_usd?: AutofillField<number>; price_points?: AutofillField<{ currency?: string; count?: number; min?: number; median?: number; max?: number }>; product_types?: AutofillField<string[]> }; needs_input: string[]; notes?: string[]; mock?: boolean };
@@ -47,7 +48,7 @@ type LoHi = { low: number; high: number };
 /** brand-report.v1 (Friday), only the keys Birch renders. */
 export type FridayReport = {
   schema?: string;
-  brand?: { name: string; domain?: string };
+  brand?: { name: string; domain?: string; category?: string };
   version: number;
   updated: string;
   roles: string[];
@@ -234,7 +235,7 @@ export function oneFormFields(p: IntakePayload, body: Record<string, unknown>): 
 
 /* ------------------------------ mock (preview only) ------------------------------ */
 const MOCK_KEY = "br_intake_mock_v1";
-type MockRow = BrandReport & { public_mirror?: "published" | "held"; editToken: string; reportToken: string; body: Record<string, unknown>; payload: IntakePayload; events: Array<{ type: string; format?: string; at: string }>; kits: KitBody[] };
+type MockRow = BrandReport & { stage?: "abandoned" | "submitted"; public_mirror?: "published" | "held"; editToken: string; reportToken: string; body: Record<string, unknown>; payload: IntakePayload; events: Array<{ type: string; format?: string; at: string }>; kits: KitBody[] };
 const rand = (n = 18) => Array.from(crypto.getRandomValues(new Uint8Array(n)), (b) => (b % 36).toString(36)).join("");
 function mockAll(): Record<string, MockRow> {
   try {
@@ -257,6 +258,23 @@ const mock = {
   async fast(payload: IntakePayload, contact: SubmitContact): Promise<FastResult> {
     if (!contact.website.trim() || !/@/.test(contact.email)) throw new Error("fast_needs_website_email");
     const ref = await mock.create(payload);
+    const sub = await mock.submit(ref, payload, contact);
+    return { ref: { ...ref, version: sub.version }, sub, autofill: { fields: {}, needs_input: ["company_name", "category", "geo", "avg_cart_usd"], notes: ["Preview · mock data: your site is not read on the preview."], mock: true }, fallback: false };
+  },
+  /** Partial lead (valid email typed, not submitted): create once, then update the same record. Tagged abandoned. */
+  async partial(prev: IntakeRef | null, payload: IntakePayload, contact: { email: string; website: string }): Promise<IntakeRef> {
+    if (!PARTIAL_EMAIL_RE.test(contact.email.trim())) throw new Error("partial_needs_email");
+    const ref = prev ?? { ...(await mock.create(payload)), partial: true };
+    const { all, row } = mockRow(ref);
+    row.payload = payload;
+    row.body = { ...row.body, ...toFridayBody(payload, { email: contact.email, website: contact.website }), stage: "partial" };
+    row.stage = "abandoned";
+    row.updated_at = new Date().toISOString();
+    mockSave(all);
+    return ref;
+  },
+  /** Final click after a partial save: submit the SAME record (flips abandoned → submitted). */
+  async finishPartial(ref: IntakeRef, payload: IntakePayload, contact: SubmitContact): Promise<FastResult> {
     const sub = await mock.submit(ref, payload, contact);
     return { ref: { ...ref, version: sub.version }, sub, autofill: { fields: {}, needs_input: ["company_name", "category", "geo", "avg_cart_usd"], notes: ["Preview · mock data: your site is not read on the preview."], mock: true }, fallback: false };
   },
@@ -286,6 +304,7 @@ const mock = {
     row.body = { ...row.body, ...toFridayBody(payload, { ...contact, submit: true }) };
     row.version += 1;
     row.status = "submitted";
+    if (row.stage) row.stage = "submitted"; // partial lead flips to submitted on the final click
     const key = payload.role === "supplier" ? "supplier_first_look" : payload.role === "sponsor" ? "sponsor_lock" : "kit";
     row.approvals = { ...row.approvals, [key]: "pending_review" }; // never auto-accepted
     row.updated_at = new Date().toISOString();
@@ -336,6 +355,9 @@ async function j<T>(r: Response): Promise<T> {
   if (!r.ok || d.ok === false) throw new Error(d.error ?? `friday_${r.status}`);
   return d;
 }
+export const PARTIAL_EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/;
+/** Served under a mirror host (SCALE-MIRROR.md): tag the record's source (Birch strips it into the blurb). */
+const mirrorSrc = (): { src?: string } => (typeof window !== "undefined" && mirrorSource() ? { src: mirrorSource()! } : {});
 const H = (ref?: IntakeRef) => ({ "Content-Type": "application/json", ...(ref ? { "X-Edit-Token": ref.editToken } : {}) });
 const BIRCH = ""; // same origin: Birch server routes, which forward to Friday server-side
 const live = {
@@ -356,6 +378,25 @@ const live = {
     if (!d.id || !d.editToken || !d.reportToken) throw new Error("dropped");
     return { ref: { id: d.id, editToken: d.editToken, reportToken: d.reportToken, version: d.version ?? 1, v13: typeof d.submit_mode === "string" }, sub, autofill: d.autofill ?? null, fallback: false };
   },
+  /** Partial lead: POST once (stage "partial"; the Birch server requires a valid email), then PATCH the same record. */
+  async partial(prev: IntakeRef | null, payload: IntakePayload, contact: { email: string; website: string }): Promise<IntakeRef> {
+    if (!PARTIAL_EMAIL_RE.test(contact.email.trim())) throw new Error("partial_needs_email");
+    const body = { ...toFridayBody(payload, { email: contact.email.trim(), website: contact.website.trim() || undefined }), stage: "partial", ...mirrorSrc() };
+    if (prev) {
+      if (prev.legacy) return prev; // v1 not deployed: the partial stays in this browser (legacy guard)
+      const d = await j<{ version: number }>(await fetch(`${BIRCH}/v1/brand-intake/${encodeURIComponent(prev.id)}`, { method: "PATCH", headers: H(prev), body: JSON.stringify(body) }));
+      return { ...prev, version: d.version ?? prev.version };
+    }
+    const d = await j<{ id: string; editToken: string; reportToken: string; version: number; fallback?: string }>(await fetch(`${BIRCH}/v1/brand-intake`, { method: "POST", headers: H(), body: JSON.stringify(body) }));
+    if (d.fallback === "api_intake") return { id: "bi_LEGACYLEAD", editToken: "legacy-no-edit-token", reportToken: "legacy-no-report-token", version: 0, legacy: true };
+    if (!d.id) throw new Error("dropped");
+    return { id: d.id, editToken: d.editToken, reportToken: d.reportToken, version: d.version, partial: true };
+  },
+  async finishPartial(ref: IntakeRef, payload: IntakePayload, contact: SubmitContact): Promise<FastResult> {
+    const sub = await live.submit(ref, payload, contact);
+    if (ref.legacy) return { ref: { ...ref, version: Math.max(1, sub.version ?? 1) }, sub, autofill: null, fallback: true };
+    return { ref: { ...ref, version: sub.version }, sub, autofill: null, fallback: true };
+  },
   async create(payload: IntakePayload): Promise<IntakeRef> {
     const d = await j<{ id: string; editToken: string; reportToken: string; version: number; fallback?: string }>(await fetch(`${BIRCH}/v1/brand-intake`, { method: "POST", headers: H(), body: JSON.stringify(toFridayBody(payload)) }));
     emitWarnings(d);
@@ -374,9 +415,9 @@ const live = {
     // v1 not deployed: one-shot submit through the Birch server, which pushes the lead to Friday's /api/intake.
     // Already pushed once via the legacy fallback: an expanded-mode update must never create a second /api/intake lead.
     if (ref.legacy && ref.version >= 1) return { status: "submitted", version: ref.version, approvals: {} };
-    if (ref.legacy) return j(await fetch(`${BIRCH}/v1/brand-intake`, { method: "POST", headers: H(), body: JSON.stringify(toFridayBody(payload, { ...contact, submit: true })) }));
+    if (ref.legacy) return j(await fetch(`${BIRCH}/v1/brand-intake`, { method: "POST", headers: H(), body: JSON.stringify({ ...toFridayBody(payload, { ...contact, submit: true }), ...mirrorSrc() }) }));
     // v1.3 §2 upgrade: same record (editToken), submit_mode "expanded" → version N+1, same reportToken and lead.
-    const body = { ...toFridayBody(payload, { ...contact, submit: true }), ...(ref.v13 ? { submit_mode: "expanded" } : {}) };
+    const body = { ...toFridayBody(payload, { ...contact, submit: true }), ...(ref.v13 ? { submit_mode: "expanded" } : {}), ...(ref.partial ? { from_partial: true } : {}), ...mirrorSrc() };
     const d = await j<SubmitResult>(await fetch(`${BIRCH}/v1/brand-intake/${encodeURIComponent(ref.id)}`, { method: "PATCH", headers: H(ref), body: JSON.stringify(body) }));
     emitWarnings(d);
     return d;
