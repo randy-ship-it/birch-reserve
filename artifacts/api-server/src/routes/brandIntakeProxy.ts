@@ -80,6 +80,30 @@ export function stageOf(body: unknown): Stage {
   if (b.stage === "partial") return "partial"; // explicit partial wins: a partial save never submits
   return b.submit === true ? "submitted" : null;
 }
+/**
+ * Supplier hub request (/intake/supplier, Randy voice Nov 19 2026 1:37 PM ET via Emma). A supplier's submit creates
+ * their own hub record in "pending_approval": Birch Reserve (Randy or Jon) approves it before it goes live; nothing
+ * auto-publishes. brand-intake v1 has no approval field, so `hub_request` is a Birch-only key: stripped here (strict
+ * v1) and carried as a tagged first line of the v1 blurb, and as BR leads meta (intake_role / hub_status / hub_slug).
+ */
+export const HUB_PENDING_TAG = "[SUPPLIER HUB · PENDING APPROVAL]";
+export type HubRequest = { role: "supplier"; status: "pending_approval"; hub_name: string | null; hub_slug: string | null };
+const HUB_SLUG_RE = /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/;
+export function hubRequestOf(raw: unknown): HubRequest | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  if (r.role !== "supplier") return null;
+  const name = typeof r.hub_name === "string" ? r.hub_name.replace(/[\r\n"]+/g, " ").trim().slice(0, 120) || null : null;
+  const slug = typeof r.hub_slug === "string" && HUB_SLUG_RE.test(r.hub_slug) ? r.hub_slug : null;
+  return { role: "supplier", status: "pending_approval", hub_name: name, hub_slug: slug }; // status is always pending: never approved from the browser
+}
+export const hubPendingLine = (h: HubRequest) => `${HUB_PENDING_TAG} role=supplier status=pending_approval${h.hub_slug ? ` hub_slug=${h.hub_slug}` : ""}${h.hub_name ? ` hub_name="${h.hub_name}"` : ""}. Own hub created from /intake/supplier; needs Birch Reserve approval (Randy or Jon) before it goes live. Do not auto-publish.`;
+/** Read the tag back from a prepared body (BR leads mirror). */
+export function hubPendingOf(b: Record<string, unknown>): { hub_status: "pending_approval"; hub_slug?: string } | null {
+  if (typeof b.blurb !== "string" || !b.blurb.includes(HUB_PENDING_TAG)) return null;
+  const slug = /\bhub_slug=([a-z0-9-]{1,64})/.exec(b.blurb)?.[1];
+  return { hub_status: "pending_approval", ...(slug ? { hub_slug: slug } : {}) };
+}
 /** Mirror hosts (SCALE-MIRROR.md): a short, allow-listed source tag only. */
 const SRC_RE = /^[a-z0-9_]{2,32}$/;
 export function prepareStage(body: unknown): { body: Record<string, unknown>; stage: Stage; error?: string } {
@@ -87,9 +111,12 @@ export function prepareStage(body: unknown): { body: Record<string, unknown>; st
   const stage = stageOf(b);
   const fromPartial = b.from_partial === true;
   const src = typeof b.src === "string" && SRC_RE.test(b.src) ? b.src : null;
+  const hub = hubRequestOf(b.hub_request);
   delete b.stage;
   delete b.from_partial;
   delete b.src;
+  delete b.hub_request;
+  if (hub && !(typeof b.blurb === "string" && b.blurb.includes(HUB_PENDING_TAG))) b.blurb = [hubPendingLine(hub), typeof b.blurb === "string" ? b.blurb : ""].filter(Boolean).join("\n").slice(0, 6000);
   if (stage === "partial") {
     if (!legacyIntakeAllowed({ ...b, submit: true })) return { body: b, stage, error: "partial_needs_email" };
     delete b.submit;
@@ -196,7 +223,7 @@ export function publicGates(text: string): string {
   return JSON.stringify(root);
 }
 
-export type IntakeLeadEvent = { fridayId: string | null; email: string; website: string | null; stage: "partial" | "submitted"; roles: string[]; path: string };
+export type IntakeLeadEvent = { fridayId: string | null; email: string; website: string | null; stage: "partial" | "submitted"; roles: string[]; path: string; /** Supplier hub request: always pending_approval until Randy or Jon approve. */ hub?: { hub_status: "pending_approval"; hub_slug?: string } | null };
 export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fetch; log?: (msg: string, extra?: Record<string, unknown>) => void; recordLead?: (e: IntakeLeadEvent) => Promise<void> } = {}) {
   const router = Router();
   const body = json({ limit: "64kb" });
@@ -263,7 +290,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     } catch {
       /* keep id */
     }
-    void recordLead({ fridayId: fid, email: b.email.trim().toLowerCase(), website: typeof b.website === "string" ? b.website.slice(0, 200) : null, stage, roles: Array.isArray(b.roles) ? (b.roles as unknown[]).map(String).slice(0, 6) : [], path: "/intake" }).catch(() => undefined);
+    void recordLead({ fridayId: fid, email: b.email.trim().toLowerCase(), website: typeof b.website === "string" ? b.website.slice(0, 200) : null, stage, roles: Array.isArray(b.roles) ? (b.roles as unknown[]).map(String).slice(0, 6) : [], path: hubPendingOf(b) ? "/intake/supplier" : "/intake", hub: hubPendingOf(b) }).catch(() => undefined);
   }
 
   router.post("/v1/brand-intake", body, async (req, res) => {
@@ -365,7 +392,7 @@ function defaultRecordLead(env: Env) {
     if (env.VERCEL_ENV !== "production") return;
     const { upsertLeadSafe, getLeadStore } = await import("../lib/leads");
     const id = `brandintake:${e.fridayId ?? e.email}`.slice(0, 200);
-    const lead = await upsertLeadSafe({ id, source: "brand_intake", sourceRef: e.fridayId ?? e.email, email: e.email, company: e.website, need: `Monetization Kit intake (${e.roles.join(", ") || "brand"}) · ${e.stage === "partial" ? "abandoned (partial)" : "submitted"}`, pagePath: e.path, isTest: TEST_EMAIL_RE.test(e.email), meta: { stage: e.stage === "partial" ? "abandoned" : "submitted", friday_intake_id: e.fridayId ?? undefined } });
+    const lead = await upsertLeadSafe({ id, source: "brand_intake", sourceRef: e.fridayId ?? e.email, email: e.email, company: e.website, need: `${e.hub ? "Supplier hub request · pending approval (Randy or Jon) · " : ""}Monetization Kit intake (${e.roles.join(", ") || "brand"}) · ${e.stage === "partial" ? "abandoned (partial)" : "submitted"}`, pagePath: e.path, isTest: TEST_EMAIL_RE.test(e.email), meta: { stage: e.stage === "partial" ? "abandoned" : "submitted", friday_intake_id: e.fridayId ?? undefined, ...(e.hub ? { intake_role: "supplier", hub_status: e.hub.hub_status, hub_slug: e.hub.hub_slug } : {}) } });
     if (lead) await getLeadStore().markFriday(lead.id, { status: "sent", contactId: e.fridayId, dealId: null }, new Date(), false).catch(() => undefined);
   };
 }

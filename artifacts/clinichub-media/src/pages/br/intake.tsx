@@ -21,7 +21,25 @@ import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation"
 const SAMPLE_EXPOSURE = { ...mockExposure({ sells_in: ["CA", "US"], ships_to: ["CA", "US"], regions: ["ON"] }), basis: "Sample: network figures / targets × example activation shares (1%–5%)" };
 
 type Mode = "fast" | "expanded";
+
+/** /intake?role=supplier is an alias of /intake/supplier (other params and the hash are kept). Plain /intake is unchanged. */
+export function supplierAliasHref(search: string, hash = ""): string | null {
+  const q = new URLSearchParams(search);
+  if (q.get("role") !== "supplier") return null;
+  q.delete("role");
+  const rest = q.toString();
+  return `/intake/supplier${rest ? `?${rest}` : ""}${hash}`;
+}
+function SupplierAlias({ to }: { to: string }) {
+  useEffect(() => window.location.replace(to), [to]);
+  return null;
+}
 export default function BrIntake() {
+  const alias = typeof window === "undefined" ? null : supplierAliasHref(window.location.search, window.location.hash);
+  return alias ? <SupplierAlias to={alias} /> : <BrIntakeOneForm />;
+}
+
+function BrIntakeOneForm() {
   const [mode, setMode] = useState<Mode>(() => (typeof window !== "undefined" && window.location.hash === "#expanded" ? "expanded" : "fast"));
   useEffect(() => trackIntake("advertiser", "mode", mode), [mode]);
   const expand = (side: IntakeSide) => {

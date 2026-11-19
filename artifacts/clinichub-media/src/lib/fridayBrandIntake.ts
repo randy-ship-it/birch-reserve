@@ -165,6 +165,8 @@ export function toFridayBody(p: IntakePayload, extra: Partial<SubmitContact> & {
   }
   if (p.kit_calculator?.brand_label) body.company_name = p.kit_calculator.brand_label.slice(0, 120);
   oneFormFields(p, body);
+  // Supplier hub request: Birch-only key (the Birch server strips it and tags the v1 blurb). Always pending_approval.
+  if (p.hub_request?.role === "supplier") body.hub_request = { role: "supplier", status: "pending_approval", ...(p.hub_request.hub_name ? { hub_name: p.hub_request.hub_name.slice(0, 120) } : {}), ...(p.hub_request.hub_slug ? { hub_slug: p.hub_request.hub_slug.slice(0, 64) } : {}) };
   if (extra.email) body.email = extra.email;
   if (extra.website) body.website = extra.website;
   if (extra.elapsed_ms != null) body.elapsed_ms = extra.elapsed_ms;
