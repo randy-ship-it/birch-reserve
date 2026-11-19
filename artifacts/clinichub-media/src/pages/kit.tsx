@@ -107,7 +107,7 @@ export default function Kit() {
 
       <section className="border-b border-border">
         <div className="container mx-auto max-w-3xl px-6 py-12">
-          <h2 className="font-display text-2xl tracking-tight">Eight categories, early slots open</h2>
+          <h2 className="font-display text-2xl tracking-tight">Eight categories, limited early placements</h2>
           <ul className="mt-4 grid gap-2 sm:grid-cols-2">
             {CATEGORIES.map((label) => (
               <li key={label} className="border border-border px-4 py-3 text-sm">
@@ -116,7 +116,7 @@ export default function Kit() {
             ))}
           </ul>
           <p className="mt-4 text-sm text-muted-foreground">
-            Categories stay open to more than one brand; no brand gets more than 20%. Not eight websites.
+            A category can include more than one brand; no brand gets more than 20%. Not eight websites.
           </p>
         </div>
       </section>

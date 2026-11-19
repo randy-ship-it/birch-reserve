@@ -15,7 +15,7 @@ import { useState, type ReactNode } from "react";
 import { Check, Rocket, Store, Package, TrendingUp } from "lucide-react";
 import { RT, RT_SERIF, RT_SANS, RT_SHADOW } from "@/lib/reportTokens";
 import type { FridayExposure } from "../../../../api-server/src/lib/kitCalc/activation";
-import { MOCK_SHARES } from "../../../../api-server/src/lib/kitCalc/activation";
+import { MOCK_SHARES, STREET_TEAM_REACH } from "../../../../api-server/src/lib/kitCalc/activation";
 import { PUBLISHER_SURFACES, RETAIL_COPY } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import type { ReportModel } from "@/components/br/report-v2";
 import { EstimatePop } from "@/components/br/report-v2";
@@ -53,6 +53,13 @@ export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
   return ORDER.map((key) => {
     const c = ex.channels.find((x) => x.key === key);
     const n = NAMES[key]!;
+    if (key === "street_team") {
+      // Homes in reach: 500K–1MM (Ontario now), same on both tiers, never scaled by the activation share. Canada later.
+      const range = c?.eligible_now && c?.now ? llh(STREET_TEAM_REACH.low, STREET_TEAM_REACH.high) : null;
+      const later = c?.later ? llh(STREET_TEAM_REACH.high, STREET_TEAM_REACH.later_high) : null;
+      const note = !c?.eligible_now ? (c?.reason ?? "Not in your markets yet") : null;
+      return { key, name: n.name, unit: n.unit, monthly: n.monthly, geo: c?.geo_label ?? "", range, later, note };
+    }
     const base = c?.now ? c.now.min / s.min : null;
     const baseLater = c?.later ? c.later.min / s.min : null;
     const range = base && base > 0 ? llh(base * lo, base * hi) : null;

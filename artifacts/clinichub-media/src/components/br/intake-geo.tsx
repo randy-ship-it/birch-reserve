@@ -45,7 +45,7 @@ export function MarketPicker({ value, onChange, side = "advertiser", compact = f
   );
 }
 
-export const ELIG_LABEL: Record<Eligibility, string> = { now: "Available now", later: "Later", not_available: "Not in your markets yet" };
+export const ELIG_LABEL: Record<Eligibility, string> = { now: "Live now", later: "Later", not_available: "Not in your markets yet" };
 
 /** Friday's per-channel eligibility when present (v1.1), else the config. */
 export function eligibilityOf(key: (typeof CHANNEL_GEO)[number]["key"], market: Market | null | undefined, friday?: Array<{ key: string; eligibility: Eligibility }>): { e: Eligibility; source: "friday" | "config" } {

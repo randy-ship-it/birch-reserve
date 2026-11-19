@@ -305,7 +305,7 @@ export function LingerCapture() {
                     Your media kit is ready.
                   </h2>
                   <p id={descId} className="text-[14px] leading-relaxed text-slate-600">
-                    Thanks. We&apos;ll also send a short note when seats open or fill.
+                    Thanks. We&apos;ll also send a short note with placement updates.
                   </p>
                   <a
                     href={kitHref}

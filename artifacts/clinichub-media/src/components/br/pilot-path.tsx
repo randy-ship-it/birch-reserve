@@ -80,7 +80,7 @@ export function CategoryCards() {
       <div className="container mx-auto px-4 py-10 md:py-14">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">8 open categories</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">8 categories</p>
             <h2 className="font-display text-3xl md:text-5xl">Who your seat reaches.</h2>
           </div>
           <p className="max-w-sm text-xs text-muted-foreground">No reach numbers here: your IO sizes views against live hub supply. <InfoPop title="Early rate" label="Early rate" testId="early-rate-pop"><p>{EARLY_RATE_FINE}</p></InfoPop></p>

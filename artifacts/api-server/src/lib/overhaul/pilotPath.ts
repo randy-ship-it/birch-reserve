@@ -39,11 +39,11 @@ export const HUB_SURFACE_SHOTS = [
 ] as const;
 export const HUB_SHOTS_FINE = "Real hub pages with example placements drawn on top. Illustrative, not live ads and not Birch results. Your IO names the hub and surface.";
 
-export const EARLY_RATE_BADGE = "Early rate still available";
-export const EARLY_RATE_FINE = "New placements open at starter rates. They only move up once your reporting proves they work. Seats are shared, open to more than one brand.";
+export const EARLY_RATE_BADGE = "Early rate";
+export const EARLY_RATE_FINE = "New placements open at starter rates. They only move up once your reporting proves they work. Seats are shared: a category can include more than one brand.";
 
 /**
- * The 8 open categories (same list as the home category seats). No reach numbers. Links point to the nearest
+ * The 8 categories (same list as the home category seats). No reach numbers. Links point to the nearest
  * existing post: there is no category-specific Insights post yet (open question in PLAN.md).
  */
 export const CATEGORY_AUDIENCES = [

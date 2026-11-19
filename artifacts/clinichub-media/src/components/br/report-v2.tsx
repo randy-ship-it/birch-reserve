@@ -196,7 +196,7 @@ export function ChannelTilesV2({ m, map }: { m: ReportModel; map?: string }) {
             {t.image ? <img src={map ?? t.image} alt="Street team route areas shown as an area-level heat map. No homes or addresses." className="mb-3 h-28 w-full object-cover" style={{ borderRadius: 10 }} loading="lazy" /> : null}
             <div className="flex flex-wrap items-center gap-2">
               <span className={eyebrow} style={{ color: RT.mintInk }}>{t.name}</span>
-              <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={{ background: t.eligible === "now" ? RT.mint : RT.track, color: t.eligible === "now" ? RT.forest : RT.mute }}>{t.eligible === "now" ? "Available now" : t.eligible === "later" ? "Later" : "Not in your markets yet"}</span>
+              <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={{ background: t.eligible === "now" ? RT.mint : RT.track, color: t.eligible === "now" ? RT.forest : RT.mute }}>{t.eligible === "now" ? "Live now" : t.eligible === "later" ? "Later" : "Not in your markets yet"}</span>
               <span className="text-[11px]" style={{ color: RT.mute }}>{t.geo}</span>
             </div>
             {t.fig.length ? (
