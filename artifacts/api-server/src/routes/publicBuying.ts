@@ -80,6 +80,7 @@ import { logger, recordUcpProxyForwardingShape } from "../lib/logger";
 import { publicSeoTags } from "../lib/publicSeo";
 import { BUYER_COMFORT_CSS, buyerFaqHtml, flightTimelineHtml, heroInquireHtml, heroSubHtml, liveHubTalkHtml, offersSampleIoHtml, sampleIoCheckoutHtml, seeTheUnitHtml, sharedSeatsHtml } from "../lib/buyerComfortHtml";
 import { PREPAY_REFUND_CUTOFF_DAYS } from "../lib/reserveOffers";
+import { START_SMALL_CSS, startSmallHtml } from "../lib/startSmallHtml";
 import { handleUiEvent } from "../lib/uiEvents";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { PREMIUM_INQUIRE_ONLY, PREMIUM_INQUIRY_KIND, PREMIUM_INQUIRY_MESSAGE, PREMIUM_INQUIRY_PATH, isPremiumFormat } from "../lib/premiumInquireOnly";
@@ -2353,7 +2354,7 @@ function renderBuycalcHtmlUsd(input: {
 })}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>${BUYCALC_CSS}${BUYER_COMFORT_CSS}</style></head><body>
+<style>${BUYCALC_CSS}${BUYER_COMFORT_CSS}${START_SMALL_CSS}</style></head><body>
 <header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav aria-label="Buy page"><a class="tl" href="/media-kit">Media kit</a><a class="tl" href="#request">Ask about a placement</a><a class="tl tel" href="tel:+16479316278">(647) 931-6278</a>${currencyToggleHtml(currency, { sku: input.sku, format: input.format, category })}</nav></div></header>
 <main>
 <section class="hero"><div class="wrap"><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
@@ -2368,6 +2369,7 @@ ${heroInquireHtml()}</div></section>
 ${offersSampleIoHtml()}
 <!--BONUS_TIER_DRAFT-->
 </div></section>
+${currency === "usd" ? startSmallHtml() : ""}
 ${seeTheUnitHtml(price(look), price(seat))}
 
 <section class="band" id="included"><div class="wrap"><p class="kicker">What you get</p><h2>Plain terms.</h2>
