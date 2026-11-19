@@ -34,6 +34,7 @@ export const BIRCH_LINKS = {
   sampleIo: "https://birchreserve.net/sample-io",
   terms: "https://birchreserve.net/terms",
   drhoHub: "https://physio.drhonow.com",
+  soleHub: "https://www.scalehealth.ca/sole",
   scale: "https://scalehealth.ca",
 } as const;
 
@@ -59,7 +60,7 @@ export type BirchChatPromptOptions = {
 const CHIP_NOTES: Record<string, string> = {
   how_seats: `The visitor tapped "How it works". Explain the three steps (reserve, pay by card, approve the IO) in plain words, then ask what they sell.`,
   hold_190: `The visitor tapped "Reserve space". Walk them to checkout (the $490 USD reserve, or the $190 USD 7-day look as a smaller first step) and ask what they sell so you can point them to the right category.`,
-  live_hub: `The visitor tapped "See a live hub". Share ${BIRCH_LINKS.drhoHub} and ask what they would want to put in front of those members.`,
+  live_hub: `The visitor tapped "See a live hub". Share ${BIRCH_LINKS.drhoHub} (DR-HO'S) or ${BIRCH_LINKS.soleHub} (SOLE) and ask what they would want to put in front of those members.`,
   talk_human: `The visitor tapped "Talk to a human". Say you can set that up, then ask for their name and company first, one question at a time, and give ${BIRCH_SALES_PHONE} as the direct line.`,
 };
 
@@ -127,7 +128,7 @@ export function buildBirchChatSystemPrompt(opts: BirchChatPromptOptions): string
     "- Not a social feed and not an open auction. No bidding. Placements are curated hub by hub as each hub launches. Don't describe how ads are selected or matched beyond that.",
     "- Four placements in every hub: 1) Post-purchase, the thank-you page right after an order or booking (highest intent); 2) Member dashboard, the logged-in home where members track orders and plans; 3) Hub home, banner and tiles on the co-branded hub home page; 4) Product and services pages, inside product, service and booking pages. Exact position and creative are set in the insertion order (IO).",
     "- Hub verticals: Recovery, Longevity and Food.",
-    `- Live today: DR-HO'S physio (${BIRCH_LINKS.drhoHub}). Those are the ONLY live hubs. Other listed brand hubs on ${BIRCH_LINKS.hubs} are "In queue", not live; never describe a queued hub as live and don't list them. Detailed hub audiences are shown on the hubs page after the visitor registers their email.`,
+    `- Live today: DR-HO'S physio (${BIRCH_LINKS.drhoHub}) and SOLE (${BIRCH_LINKS.soleHub}). Those are the ONLY live hubs. Other listed brand hubs on ${BIRCH_LINKS.hubs} are "In queue", not live; never describe a queued hub as live and don't list them. Detailed hub audiences are shown on the hubs page after the visitor registers their email.`,
     "- Who they reach: members of these hubs, people actively buying or booking recovery, physio, fitness and wellness products and services. Do not give audience sizes, order counts, view counts or demographics beyond that.",
     "- Run by Silver Birch Growth Inc., Toronto, Ontario. Founder: Randy Gilling.",
     "",

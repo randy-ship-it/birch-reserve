@@ -14,6 +14,7 @@ export type AgentOfferKey = "hold-190" | "reserve-490";
 /** Live hubs anyone can open today (media kit, Nov 17 2026). */
 export const AGENT_LIVE_HUBS = [
   { name: "DR-HO'S physio", type: "brand hub", status: "live" },
+  { name: "SOLE", type: "brand hub", status: "live" },
 ] as const;
 
 /** The two public offers, same as the media kit. USD only. Humans pay on the Stripe-hosted /buycalc page. */

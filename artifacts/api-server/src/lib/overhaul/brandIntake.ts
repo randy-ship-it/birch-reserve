@@ -247,7 +247,7 @@ export type IntakePayload = {
 export const ANCHOR_HUBS_STATUS = "Proposed, pending Randy's confirmation" as const;
 /**
  * Anchor set (Randy, Nov 18 2026 11:34–11:35 PM ET): named publicly on birchreserve.net and in brand kits, Kalaya
- * included. Status follows the hub list: only DR-HO'S is live today; the rest are in queue. Proposed, not confirmed.
+ * included. Status follows the hub list: DR-HO'S and SOLE are live today; the rest are in queue. Proposed, not confirmed.
  * Retail locations are referred to only as "retail hubs" (Retail Network tile), never by an operator name.
  */
 export const PROPOSED_ANCHOR_HUBS = [
@@ -256,7 +256,7 @@ export const PROPOSED_ANCHOR_HUBS = [
   { key: "jill-health", name: "Jill Health", what: "Women's health, midlife and menopause", fits: ["longevity", "sleep", "supplements"], live: false },
   { key: "jack-health", name: "Jack Health", what: "Men's health and longevity", fits: ["longevity", "supplements", "fitness"], live: false },
   { key: "nutriprocan", name: "NutriProCan", what: "Nutrition and dietitian-guided eating", fits: ["supplements", "sports-nutrition", "longevity"], live: false },
-  { key: "sole", name: "SOLE", what: "Foot pain, insoles and active footwear", fits: ["recovery", "fitness"], live: false },
+  { key: "sole", name: "SOLE", what: "Foot pain, insoles and active footwear", fits: ["recovery", "fitness"], live: true },
   { key: "effortless-admin", name: "Effortless Admin", what: "Benefits and wellness admin hub", fits: ["longevity", "supplements", "sleep"], live: false },
   { key: "kalaya", name: "Kalaya", what: "Topical pain relief", fits: ["recovery", "physio", "sleep"], live: false },
 ] as const;

@@ -168,6 +168,15 @@ const radRoller: BrandFit = {
       hrefTitle: "DR-HO'S physio hub",
     },
     {
+      title: "SOLE hub",
+      status: "live",
+      imageSrc: "/hub-gallery/sole.webp",
+      imageAlt: "SOLE hub, live",
+      logoSrc: "/partner-logos/sole.png",
+      href: "https://www.scalehealth.ca/sole",
+      hrefTitle: "SOLE hub",
+    },
+    {
       title: "Calm Joints squash",
       badge: "Calm Joints",
       imageSrc: "/for-brands/hubs/cj-squash.webp",
@@ -230,9 +239,10 @@ const radRoller: BrandFit = {
     {
       status: "live",
       title: "Live recovery hubs",
-      line: "One hub anyone can open today: the DR-HO'S physio hub. It is the only hub we call live.",
+      line: "Two hubs anyone can open today: the DR-HO'S physio hub and the SOLE hub. They are the hubs we call live.",
       links: [
         { title: "DR-HO'S physio hub", href: "https://physio.drhonow.com" },
+        { title: "SOLE hub", href: "https://www.scalehealth.ca/sole" },
       ],
       strength: "strong",
     },
@@ -274,6 +284,7 @@ const radRoller: BrandFit = {
       icon: "purchase",
       links: [
         { title: "DR-HO'S physio hub", href: "https://physio.drhonow.com" },
+        { title: "SOLE hub", href: "https://www.scalehealth.ca/sole" },
       ],
     },
     {
@@ -301,7 +312,7 @@ const radRoller: BrandFit = {
   launchingBrands: [
     { name: "DR-HO'S", logoSrc: "/partner-logos/dr-ho.png", href: "https://physio.drhonow.com" },
     { name: "Roll Recovery", logoSrc: "/partner-logos/roll-recovery.png" },
-    { name: "Sole", logoSrc: "/partner-logos/sole.png" },
+    { name: "SOLE", logoSrc: "/partner-logos/sole.png", href: "https://www.scalehealth.ca/sole" },
     { name: "Jack Health", logoSrc: "/partner-logos/jack-health.png" },
     { name: "Jill Health", logoSrc: "/partner-logos/jill-health.png" },
     { name: "Bird & Be", logoSrc: "/partner-logos/bird-and-be.png" },
@@ -317,6 +328,13 @@ const radRoller: BrandFit = {
       href: "https://physio.drhonow.com",
       hrefTitle: "DR-HO'S physio hub",
     },
+    {
+      src: "/hub-gallery/sole.webp",
+      alt: "SOLE hub, live",
+      caption: "SOLE hub, live",
+      href: "https://www.scalehealth.ca/sole",
+      hrefTitle: "SOLE hub",
+    },
   ],
   sources: [
     {
@@ -329,7 +347,7 @@ const radRoller: BrandFit = {
     },
     {
       label: "Birch snapshot",
-      text: "Live hub named in the Birch media kit (DR-HO'S physio). Cataloged launching brands and Calm Joints racquet pages from the audience snapshot fed by the TAM inventory read on Nov 13, 2026. Street team footprint follows the retail hubs in the GTHA.",
+      text: "Live hubs named in the Birch media kit (DR-HO'S physio and SOLE). Cataloged launching brands and Calm Joints racquet pages from the audience snapshot fed by the TAM inventory read on Nov 13, 2026. Street team footprint follows the retail hubs in the GTHA.",
     },
   ],
 };

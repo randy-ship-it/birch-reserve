@@ -36,6 +36,17 @@ export const HUB_SURFACE_SHOTS = [
       { n: 3, x: 4.5, y: 93, w: 91, h: 7, label: "Native tile row", d: "Next to the Scale recovery toolkit." },
     ],
   },
+  {
+    key: "sole",
+    hub: "SOLE hub",
+    src: "/hub-gallery/sole.webp",
+    alt: "SOLE hub home page with numbered example placements drawn on top",
+    notes: [
+      { n: 1, x: 1, y: 13, w: 98, h: 5.5, label: "Hub banner", d: "Full-width strip under the hub header." },
+      { n: 2, x: 1, y: 80, w: 44, h: 14, label: "Native tile", d: "Under the hero, next to the member's next step." },
+      { n: 3, x: 62, y: 82, w: 34, h: 8, label: "Booking unit", d: "Inside the booking card, before the member books." },
+    ],
+  },
 ] as const;
 export const HUB_SHOTS_FINE = "Real hub pages with example placements drawn on top. Illustrative, not live ads and not Birch results. Your IO names the hub and surface.";
 

@@ -19,6 +19,7 @@ export const CREATIVE_BRIEF_HREF = "/insights/what-you-send-for-a-seat";
 export const SEE_THE_UNIT_IMAGE = "/hub-proof/see-the-unit-mock.jpg";
 export const LIVE_HUB_LINKS: BuyerLink[] = [
   { label: "DR-HO'S physio hub", href: "https://physio.drhonow.com" },
+  { label: "SOLE hub", href: "https://www.scalehealth.ca/sole" },
 ];
 
 /** 6. Early network slots strap (sits under the existing "Limited early placements" strip). */
