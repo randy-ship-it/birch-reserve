@@ -10,7 +10,7 @@ import { Link, useParams } from "wouter";
 import { Check, Loader2, Pencil, ShieldCheck, Sparkles } from "lucide-react";
 import { usePageMeta } from "@/components/br/ui";
 import { MockBanner } from "@/components/br/intake-kit";
-import { ReportV2 } from "@/components/br/report-v2";
+import { NoFitWords, ReportV2 } from "@/components/br/report-v2";
 import { Details } from "@/components/br/details";
 import { HUB_SURFACES } from "@/components/br/intake-details";
 import { RT, RT_SANS } from "@/lib/reportTokens";
@@ -19,7 +19,7 @@ import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation"
 import type { Country } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import type { FridayReport } from "@/lib/fridayBrandIntake";
 import { buildPatch, afterSave, clone, fieldMark, getPath, parsePrefillHash, prefillLink, setPath, slugify, type FieldMark, type PrefillFields, type PrefillRef } from "@/lib/prefillDraft";
-import { draftReport, forgetPrefillRef, loadPrefillRef, prefillApi, prefillMode, savePrefillRef, seedMockDraft, takeEarlyHash, EARLY_HASH_KEY, type DraftMeta, type PrefillError } from "@/lib/prefillApi";
+import { PREVIEW_LABEL, asPreview, draftReport, forgetPrefillRef, loadPrefillRef, prefillApi, prefillMode, savePrefillRef, seedMockDraft, takeEarlyHash, EARLY_HASH_KEY, type DraftMeta, type MockState, type PrefillError } from "@/lib/prefillApi";
 
 // Capture the private key before anything else on the page can read the address bar.
 const EARLY_HASH = takeEarlyHash();
@@ -28,7 +28,8 @@ const NAVY = "#0b1f3a";
 const input = "h-11 w-full min-w-0 rounded-xl border border-foreground/15 bg-white px-3 text-base outline-none transition focus:border-[#0b1f3a] focus:ring-2 focus:ring-lime-300";
 const lab = "text-[11px] font-bold uppercase tracking-wide text-foreground/55";
 const ERR_COPY: Record<PrefillError, string> = {
-  not_found: "This link is no longer valid. Ask us for a fresh one.",
+  // A re-issued link (rotate) and a bad key get the same 404 from the backend; the likeliest reason is a newer link.
+  not_found: "This link has been replaced with a newer one, so it doesn't open anything any more. Use the newest link we sent you, or ask us for a fresh one.",
   link_revoked: "This link was turned off. Ask us for a fresh one.",
   link_expired: "This link has expired. Ask us for a fresh one.",
   unavailable: "We can't load your draft right now. Please try again in a minute.",
@@ -39,6 +40,10 @@ const ERR_COPY: Record<PrefillError, string> = {
   too_fast: "One sec: give it a moment and try again.",
   invalid: "Something in the form doesn't look right. Check the fields and try again.",
   confirm_needs_email: "Add your work email to confirm.",
+  brand_token_required: "Only the brand's own link can confirm.",
+  staff_edit_closed: "The brand has confirmed, so this link can't change the answers any more.",
+  brand_contact_only: "Use the brand's own email here, not a staff address.",
+  needs_website: "Add the brand's website to see the draft preview.",
 };
 const MARKETS: Array<{ key: string; label: string; c: Country[] }> = [
   { key: "CA", label: "Canada", c: ["CA"] },
@@ -92,19 +97,22 @@ export default function BrIntakePrefill() {
   const [confirmed, setConfirmed] = useState<{ version: number; report: FridayReport | null; held: boolean } | null>(null);
   const started = useRef(Date.now());
   const [copied, setCopied] = useState(false);
+  // Draft preview (v1.4 r2 §2): from the SAVED answers; re-fetched after each autosave.
+  const [preview, setPreview] = useState<FridayReport | null>(null);
+  const [previewTick, setPreviewTick] = useState(0);
 
   usePageMeta("Your Monetization Kit draft | Birch Reserve", "A drafted Monetization Kit for your brand. Fix anything, then confirm. Estimates in USD, reviewed by a person.");
 
   // Adopt the link (fragment → this browser), then read the saved answers back.
   useEffect(() => {
     let r = parsePrefillHash(EARLY_HASH);
-    if (r) savePrefillRef(slug, r);
-    else r = loadPrefillRef(slug);
     const qs = new URLSearchParams(window.location.search);
+    const st = qs.get("mockstate") as MockState | null;
+    if (r) savePrefillRef(slug, r);
+    else if (!(mode === "mock" && st)) r = loadPrefillRef(slug); // a QA mockstate always seeds its own link
     if (!r && mode === "mock") {
-      const st = qs.get("mockstate");
-      r = seedMockDraft(slug, st === "expired" || st === "revoked" ? st : "ok");
-      savePrefillRef(slug, r);
+      r = seedMockDraft(slug, st && ["staff", "expired", "revoked", "replaced"].includes(st) ? st : "ok");
+      if (st !== "staff" && st !== "replaced") savePrefillRef(slug, r);
     }
     if (!r) return void setLoad({ state: "missing" });
     setRef(r);
@@ -142,6 +150,20 @@ export default function BrIntakePrefill() {
     return () => window.removeEventListener("hashchange", on);
   }, []);
 
+  useEffect(() => {
+    if (!ref || load.state !== "ready") return;
+    let live = true;
+    const view = (cur.roles ?? []).includes("publisher") ? "publisher" : "brand";
+    prefillApi()
+      .preview(ref, view)
+      .then((p) => live && setPreview(p))
+      .catch(() => live && setPreview(null)); // falls back to the in-browser estimate, same label
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ref?.id, ref?.editToken, load.state, previewTick]);
+
   // After a confirm (or on a link that was already confirmed), show the backend's recalibrated report.
   useEffect(() => {
     if (!ref || !confirmed || confirmed.report) return;
@@ -153,7 +175,7 @@ export default function BrIntakePrefill() {
   // Autosave: only after a real edit, only the changed keys (full blocks). Untouched form → no request at all.
   const patch = useMemo(() => buildPatch(baseline, cur), [baseline, cur]);
   useEffect(() => {
-    if (!ref || load.state !== "ready" || !patch || busy) return;
+    if (!ref || load.state !== "ready" || !patch || busy || meta?.can_edit === false) return;
     const t = setTimeout(async () => {
       setSave("saving");
       try {
@@ -161,6 +183,7 @@ export default function BrIntakePrefill() {
         setBaseline((b) => afterSave(b, patch));
         setMeta((x) => (x ? { ...x, saved_at: m.saved_at } : x));
         setSave("saved");
+        setPreviewTick((n) => n + 1);
       } catch (e) {
         setSave("error");
         const code = (e as Error).message as PrefillError;
@@ -190,14 +213,18 @@ export default function BrIntakePrefill() {
   const toggleSurface = (k: string) => set("publisher.surfaces", surfaces.includes(k) ? surfaces.filter((s) => s !== k) : [...surfaces, k]);
 
   const draft = useMemo(() => draftReport(cur), [cur]);
-  const report = confirmed?.report && !changedAfter ? confirmed.report : draft;
+  const showConfirmed = !!confirmed?.report && !changedAfter;
+  const report = showConfirmed ? confirmed!.report! : preview ?? asPreview(draft);
+  const isStaff = meta?.access === "staff";
+  const canConfirm = !!meta?.can_confirm;
+  const readOnly = meta?.can_edit === false;
   const exposure = useMemo(() => {
     const c = (cur.geo?.sells ?? []) as Country[];
     return mockExposure(c.length ? { sells_in: c, ships_to: (cur.geo?.ships ?? c) as Country[] } : undefined);
   }, [cur.geo]);
 
   const onConfirm = async () => {
-    if (!ref) return;
+    if (!ref || !meta?.can_confirm) return; // the staff link never confirms (backend: 403 brand_token_required)
     setErr(null);
     // v1.4 §4: an email already on file is enough; otherwise the brand adds one here.
     if (email.trim() ? !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim()) : !meta?.email_on_file) return void setErr(email.trim() ? ERR_COPY.email : ERR_COPY.confirm_needs_email);
@@ -235,7 +262,7 @@ export default function BrIntakePrefill() {
             <p className="inline-flex items-center gap-2 text-foreground/70"><Loader2 className="size-4 animate-spin" aria-hidden />Loading your draft…</p>
           ) : (
             <>
-              <h1 className="font-display text-3xl">{load.state === "missing" ? "This link is missing its private key." : "We couldn't open this draft."}</h1>
+              <h1 className="font-display text-3xl">{load.state === "missing" ? "This link is missing its private key." : load.error === "not_found" ? "This link has been replaced." : "We couldn't open this draft."}</h1>
               <p className="mt-2 text-foreground/70" data-testid="prefill-error-copy">{load.state === "missing" ? "Open the full link you were sent, or ask us for a fresh one." : ERR_COPY[load.error]}</p>
               <Link href="/intake" className="mt-6 inline-flex h-12 items-center rounded-full bg-lime-300 px-6 text-sm font-bold text-[#0b1f3a]">Start a new Monetization Kit</Link>
             </>
@@ -257,6 +284,7 @@ export default function BrIntakePrefill() {
             <Sparkles className="mt-0.5 size-5 shrink-0 text-lime-300 md:mt-0" aria-hidden />
             <div className="min-w-0 flex-1">
               <p className="text-base font-bold leading-snug">We drafted this from what we know. Fix anything.</p>
+              {isStaff ? <p className="mt-1 text-[13px] font-semibold text-lime-300" data-testid="prefill-staff-note">{readOnly ? "Staff link · read-only now: the brand has confirmed." : "Staff link · edits the draft only. The brand confirms from their own link."}</p> : null}
               <Details dark testId="prefill-banner-details" label="How we drafted it">
                 <p>From your public website and what you've told us. Fields marked <b>Drafted</b> are our guesses; change any of them and the report updates.</p>
                 <p>Nothing is published or shared until you confirm, and a person reviews it before anything runs. Every figure is an estimate in USD.</p>
@@ -275,7 +303,7 @@ export default function BrIntakePrefill() {
               {save === "saving" ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : save === "saved" ? <Check className="size-3.5 text-lime-600" aria-hidden /> : null}{saveText}
             </span>
           </div>
-          <div className="mt-3 space-y-3">
+          <fieldset disabled={readOnly} className="mt-3 space-y-3 disabled:opacity-70" data-testid="pf-fields">
             <Field label="Brand" mark={mark("company_name")} testId="pf-brand">
               <input className={input} value={cur.company_name ?? ""} onChange={(e) => set("company_name", e.target.value.slice(0, 120))} aria-label="Brand name" data-testid="pf-brand-input" />
             </Field>
@@ -326,8 +354,9 @@ export default function BrIntakePrefill() {
                 </Field>
               </div>
             </details>
-          </div>
+          </fieldset>
 
+          {canConfirm ? (
           <div className="mt-4 rounded-2xl p-3" style={{ background: "#f3f7e8" }} data-testid="pf-confirm">
             <label className="block">
               <span className={lab}>{meta?.email_on_file ? "Work email (optional)" : "Your work email"}</span>
@@ -340,9 +369,15 @@ export default function BrIntakePrefill() {
             {err ? <p className="mt-2 text-sm font-semibold text-red-700" role="alert" data-testid="pf-error">{err}</p> : null}
             <Details testId="pf-confirm-details"><p>Confirming updates your report on this same link. A person reviews it before anything runs. No charge, no commitment.</p></Details>
           </div>
+          ) : (
+            <div className="mt-4 rounded-2xl bg-foreground/[0.04] p-3 text-[13px] text-foreground/70" data-testid="pf-no-confirm">
+              Changes save to the draft. The brand reviews and confirms it from their own link.
+              {err ? <p className="mt-2 text-sm font-semibold text-red-700" role="alert" data-testid="pf-error">{err}</p> : null}
+            </div>
+          )}
           {mode === "mock" && ref ? (
             <div className="mt-3 rounded-xl border border-dashed border-violet-400 p-2 text-[11px] text-violet-800" data-testid="pf-mock-link">
-              Preview only: the brand's copy-paste link looks like{" "}
+              Preview only: the {isStaff ? "staff" : "brand"} copy-paste link looks like{" "}
               <button type="button" className="font-bold underline" onClick={() => { void navigator.clipboard?.writeText(prefillLink(slug, ref, window.location.origin)).then(() => setCopied(true)); }}>{copied ? "copied" : "this (copy)"}</button>
             </div>
           ) : null}
@@ -350,16 +385,19 @@ export default function BrIntakePrefill() {
 
         <div className="min-w-0 scroll-mt-20" id="prefill-report" data-testid="prefill-report">
           <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider" style={{ background: confirmed && !changedAfter ? RT.forest : RT.mint, color: confirmed && !changedAfter ? "#fff" : RT.forest }} data-testid="prefill-report-label">
-              {confirmed && !changedAfter ? `Confirmed · version ${confirmed.version}` : "Draft estimate · updates as you edit"}
+            <span className="rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider" style={{ background: showConfirmed ? RT.forest : RT.mint, color: showConfirmed ? "#fff" : RT.forest }} data-testid="prefill-report-label">
+              {showConfirmed ? `Confirmed · version ${confirmed!.version}` : PREVIEW_LABEL}
             </span>
             {confirmed?.held ? <span className="text-[12px] text-foreground/60" data-testid="prefill-held">In review: we confirm brand ownership first, usually within one business day.</span> : null}
           </div>
-          {confirmed && !dirtySinceConfirm ? <p className="mb-2 text-sm font-semibold" style={{ color: RT.forest }} data-testid="prefill-recalibrated">Report updated with your answers.</p> : null}
+          {!showConfirmed ? <Details testId="prefill-preview-details" label="About this preview"><p>Built from the answers saved so far; not confirmed by the brand. Numbers change after you confirm.</p></Details> : null}
+          {showConfirmed ? <p className="mb-2 text-sm font-semibold" style={{ color: RT.forest }} data-testid="prefill-recalibrated">{isStaff ? "Confirmed by the brand." : "Report updated with your answers."}</p> : null}
           {/* Beside the form the report column is narrower than on /intake: stack its two side cards there. */}
           <style>{`.pf-report{container-type:inline-size}@container (max-width: 960px){.pf-report .grid.items-start{grid-template-columns:minmax(0,1fr)!important}}`}</style>
           <div className="pf-report">
-          <ReportV2 report={report} compact exposure={exposure} exposureSource={confirmed?.report && !confirmed.report.mock ? "report" : "mock"} />
+          <NoFitWords.Provider value={!showConfirmed}>
+            <ReportV2 report={report} compact exposure={exposure} exposureSource={showConfirmed && !confirmed!.report!.mock ? "report" : "mock"} />
+          </NoFitWords.Provider>
           </div>
         </div>
       </div>

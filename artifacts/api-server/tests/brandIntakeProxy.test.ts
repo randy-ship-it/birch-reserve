@@ -437,3 +437,26 @@ test("prefill read-back GET before the backend ships it: generic 404 → 503 rea
   assert.equal(expired.status, 410);
   assert.equal(((await expired.json()) as { error: string }).error, "link_expired");
 });
+
+test("prefill draft preview GET (v1.4 r2): token-gated, view passed through, nothing else; missing route → preview_unavailable", async () => {
+  const calls: string[] = [];
+  let reply = () => new Response(JSON.stringify({ ok: true, draft: true, preview: { draft: true, basis: "estimated", version: null } }), { status: 200 });
+  const f = (async (url: string) => (calls.push(url), reply())) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  const h = { "x-edit-token": "t".repeat(24) };
+  const ok = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/preview?view=publisher`, { headers: h });
+  const junkView = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/preview?view=../../x`, { headers: h });
+  const noTok = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/preview`);
+  reply = () => new Response("Cannot GET", { status: 404 });
+  const missing = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/preview`, { headers: h });
+  s.close();
+  assert.equal(ok.status, 200);
+  assert.equal(ok.headers.get("cache-control"), "private, no-store");
+  assert.equal(calls[0], "https://friday.example/api/public/brand-intake/bi_abc12345/preview?view=publisher");
+  assert.equal(calls[1], "https://friday.example/api/public/brand-intake/bi_abc12345/preview");
+  assert.equal(junkView.status, 200);
+  assert.equal(noTok.status, 404);
+  assert.equal(calls.length, 3, "no token never reaches the backend");
+  assert.equal(missing.status, 503);
+  assert.equal(((await missing.json()) as { error: string }).error, "preview_unavailable");
+});

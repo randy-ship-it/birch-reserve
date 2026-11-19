@@ -11,7 +11,7 @@ test("hydrates from the read-back, marks drafted fields, and an untouched form n
   await expect(page.getByTestId("pf-brand-input")).toHaveValue("Northline Recovery");
   await expect(page.getByTestId("pf-orders-input")).toHaveValue("1800");
   await expect(page.getByTestId("pf-brand")).toHaveAttribute("data-mark", "drafted");
-  await expect(page.getByTestId("prefill-report-label")).toContainText("Draft estimate");
+  await expect(page.getByTestId("prefill-report-label")).toHaveText("Draft preview · Estimated");
   await page.waitForTimeout(1500);
   expect((await only(page)).patches).toEqual([]);
   await expect(page.getByTestId("prefill-save")).toContainText("Nothing changed yet");
@@ -61,6 +61,34 @@ test("the copy-paste link adopts the key and strips it from the address bar", as
   await page.goto(`/intake/b/northline-recovery?mock=1#edit=${frag}`);
   await expect(page.getByTestId("pf-brand-input")).toHaveValue("Northline Recovery");
   await expect.poll(() => page.url()).not.toContain("#edit=");
+});
+
+test("a re-issued (rotated) link: the old key says it was replaced, in plain words", async ({ page }) => {
+  await page.goto("/intake/b/roll-recovery?mock=1&mockstate=replaced");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("This link has been replaced.");
+  await expect(page.getByTestId("prefill-error-copy")).toContainText("replaced with a newer one");
+  await expect(page.getByTestId("prefill-form")).toHaveCount(0);
+});
+
+test("staff link: edits the draft, never shows Confirm, edits stay drafted (not brand-edited)", async ({ page }) => {
+  await page.goto("/intake/b/northline-recovery?mock=1&mockstate=staff");
+  await expect(page.getByTestId("prefill-staff-note")).toContainText("Staff link");
+  await expect(page.getByTestId("pf-confirm-btn")).toHaveCount(0);
+  await expect(page.getByTestId("pf-email")).toHaveCount(0);
+  await expect(page.getByTestId("pf-no-confirm")).toBeVisible();
+  await page.getByTestId("pf-orders-input").fill("2200");
+  await expect(page.getByTestId("prefill-save")).toHaveAttribute("data-state", "saved");
+  const r = await only(page);
+  expect(r.fields.calculator.orders_per_month).toBe(2200);
+  expect((r.meta as any).markers.edited).toEqual([]);
+  expect(r.meta.version).toBe(0);
+});
+
+test("draft preview carries no fit adjectives (numeric scores only)", async ({ page }) => {
+  await page.goto("/intake/b/northline-recovery?mock=1");
+  await expect(page.getByTestId("prefill-report-label")).toHaveText("Draft preview · Estimated");
+  const text = await page.getByTestId("prefill-report").innerText();
+  expect(text).not.toMatch(/\b(Good|Strong|Possible|Early|Likely) fit\b/);
 });
 
 test("expired / revoked / missing key: plain copy, no form", async ({ page }) => {

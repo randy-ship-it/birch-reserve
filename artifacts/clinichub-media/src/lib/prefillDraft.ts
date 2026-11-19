@@ -12,8 +12,8 @@
  *
  * Link: /intake/b/<slug>#edit=<base64url {i, e, r, v}>. The slug is the brand's public name only (no people, no
  * emails). The edit token lives in the #fragment: browsers never send it to a server or in a Referer, and the page
- * strips it from the address bar on load. Unguessable (backend-minted), revocable by rotating the edit token,
- * expiry enforced by the backend (410 link_expired).
+ * strips it from the address bar on load. Unguessable (backend-minted). Lost links are re-issued by the backend's
+ * rotate (the old key then gets 404 and the page says the link was replaced).
  */
 
 /** Editable fields the read-back GET returns (BIRCH-CONTRACT.md §2). Everything is optional. */
@@ -159,7 +159,10 @@ export function parsePrefillHash(hash: string): PrefillRef | null {
     return null;
   }
 }
-/** The staff tool's edit_link (…/brand-kit#edit=…) → this brand's /intake/b/<slug> link. Same key, no network. */
+/**
+ * A brand or staff link copied from Friday's staff page (/birch/prefill-links, approver session only; the create
+ * response no longer carries links) → this brand's /intake/b/<slug> link. Same key, pure, no network, nothing stored.
+ */
 export function fromEditLink(editLink: string, slug: string, origin = "https://birchreserve.net"): string | null {
   const i = editLink.indexOf("#");
   const ref = i >= 0 ? parsePrefillHash(editLink.slice(i)) : null;

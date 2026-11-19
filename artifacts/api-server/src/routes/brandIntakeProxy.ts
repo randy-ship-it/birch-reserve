@@ -318,11 +318,12 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
    * Until the backend serves this GET it answers with its generic 404, which is reported as readback_unavailable
    * (never as "link no longer valid").
    */
-  router.get("/v1/brand-intake/:id", async (req, res) => {
+  async function tokenGet(req: Request, res: Response, suffix: "" | "/preview") {
     const id = String(req.params.id);
     res.setHeader("Referrer-Policy", "no-referrer");
     if (!ID_RE.test(id) || !TOKEN_RE.test(req.get("x-edit-token") ?? "")) return void res.status(404).json({ ok: false, error: "not_found" });
-    const out = await forward(req, res, "GET", `/api/public/brand-intake/${encodeURIComponent(id)}`);
+    const view = suffix && VIEWS.has(String(req.query.view)) ? `?view=${String(req.query.view)}` : "";
+    const out = await forward(req, res, "GET", `/api/public/brand-intake/${encodeURIComponent(id)}${suffix}${view}`);
     if (!out) return;
     let code: unknown = null;
     try {
@@ -330,9 +331,12 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     } catch {
       /* non-JSON (route missing) */
     }
-    if (out.status === 404 && code !== "not_found") return void res.status(503).json({ ok: false, error: "readback_unavailable" });
+    if (out.status === 404 && code !== "not_found") return void res.status(503).json({ ok: false, error: suffix ? "preview_unavailable" : "readback_unavailable" });
     send(res, out);
-  });
+  }
+  router.get("/v1/brand-intake/:id", (req, res) => tokenGet(req, res, ""));
+  /** v1.4 r2 §2 draft preview (brand or staff link): computed from the saved answers; saves nothing. */
+  router.get("/v1/brand-intake/:id/preview", (req, res) => tokenGet(req, res, "/preview"));
   router.post("/v1/brand-intake/:id/kit", body, async (req, res) => {
     const id = String(req.params.id);
     if (!ID_RE.test(id)) return void res.status(404).json({ ok: false, error: "not_found" });

@@ -7,7 +7,7 @@
  * Never rendered: Friday's internal "excluded: competes" data (stripped server-side too), match results, private
  * partners. Hub names are checked against Birch's never-mention list (Kalaya is allowed; known anchors show by name).
  */
-import { useEffect, useState, type ReactNode } from "react";
+import { useContext, createContext, useEffect, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { RT, RT_SERIF, RT_SANS, RT_SHADOW, fitLabelOf, monogramBg } from "@/lib/reportTokens";
 import type { FridayReport } from "@/lib/fridayBrandIntake";
@@ -87,14 +87,17 @@ function avg(xs: Array<LoHi | null | undefined>): LoHi | null {
 const card = { background: RT.surface, border: `1px solid ${RT.line}`, borderRadius: 16, boxShadow: RT_SHADOW } as const;
 const eyebrow = "text-[11px] font-bold uppercase tracking-[0.14em]";
 
+/** Draft previews (brand-intake v1.4 §2) carry no fit adjectives: show the numeric score only. Default off. */
+export const NoFitWords = createContext(false);
 export function FitMeter({ pct, label, dark = false }: { pct: number | null; label?: string | null; dark?: boolean }) {
+  const plain = useContext(NoFitWords);
   if (pct == null) return null;
   return (
     <div className="mt-2 flex items-center gap-2" data-testid="fit-meter">
       <div className="h-1.5 w-24 overflow-hidden rounded-full" style={{ background: dark ? "rgba(255,255,255,.18)" : RT.track }}>
         <div className="h-full rounded-full" style={{ width: `${Math.max(4, Math.min(100, pct))}%`, background: dark ? RT.mint : RT.forest2 }} />
       </div>
-      <span className="text-[11px] font-semibold" style={{ color: dark ? RT.mint : RT.mintInk }}>{label ?? fitLabelOf(pct)}</span>
+      <span className="text-[11px] font-semibold" style={{ color: dark ? RT.mint : RT.mintInk }}>{plain ? `${Math.round(pct)} / 100` : label ?? fitLabelOf(pct)}</span>
     </div>
   );
 }
@@ -153,6 +156,7 @@ function FitRing({ score }: { score: number }) {
 
 /* --------------------------------- sections --------------------------------- */
 export function ReportHero({ m, sample }: { m: ReportModel; sample?: boolean }) {
+  const plain = useContext(NoFitWords);
   const top = m.hubs[0]?.name;
   const more = Math.max(0, m.hubs.length - 1);
   return (
@@ -174,8 +178,8 @@ export function ReportHero({ m, sample }: { m: ReportModel; sample?: boolean }) 
           <div className="flex items-center gap-4 p-4" style={{ background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.14)", borderRadius: 24 }} data-testid="fit-score">
             <FitRing score={m.score} />
             <div className="text-sm">
-              <p className="font-semibold">Fit score · {fitLabelOf(m.score).replace(" fit", "")}</p>
-              <ul className="mt-1 space-y-0.5">{m.top3.map((c) => <li key={c.name}><span className="font-semibold">{c.name}</span> <span className="text-white/60">· {c.label}</span></li>)}</ul>
+              <p className="font-semibold">{plain ? "Fit score" : `Fit score · ${fitLabelOf(m.score).replace(" fit", "")}`}</p>
+              <ul className="mt-1 space-y-0.5">{m.top3.map((c) => <li key={c.name}><span className="font-semibold">{c.name}</span>{plain || !c.label ? null : <span className="text-white/60"> · {c.label}</span>}</li>)}</ul>
             </div>
           </div>
         ) : null}
