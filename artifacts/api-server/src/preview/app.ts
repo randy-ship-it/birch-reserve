@@ -65,6 +65,10 @@ export function createPreviewApp(indexHtml: string): Express {
   const shells = new Set<string>([...SPA_SHELL_PATHS, "/"]);
   app.get(/.*/, (req, res) => {
     const p = normalizedPath(req.path);
+    if (p.startsWith("/intake/b/")) {
+      res.type("html").setHeader("Cache-Control", "private, no-store").setHeader("Referrer-Policy", "no-referrer").send(withRouteSeo(indexHtml, "/intake"));
+      return;
+    }
     if (p.startsWith("/kit/r/")) {
       res.type("html").setHeader("Cache-Control", "private, no-store").setHeader("Referrer-Policy", "no-referrer").send(withRouteSeo(indexHtml, "/kit/r/report"));
       return;

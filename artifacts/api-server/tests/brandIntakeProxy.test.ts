@@ -12,12 +12,12 @@ const SECRET = "test-only-not-a-real-secret-value";
 const ENV = { FRIDAY_API_URL: "https://friday.example", FRIDAY_API_KEY: SECRET } as NodeJS.ProcessEnv;
 
 /** Friday's v1.2 capability probe (GET /api/public/brand-categories) is answered here: 404 = strict v1 (live today). */
-async function serve(env: NodeJS.ProcessEnv, fetchImpl: typeof fetch, v12 = false) {
+async function serve(env: NodeJS.ProcessEnv, fetchImpl: typeof fetch, v12: boolean | Record<string, unknown> = false) {
   const app = express();
   app.set("trust proxy", false);
   const wrapped = (async (url: string, init?: RequestInit) =>
     String(url).endsWith("/api/public/brand-categories")
-      ? v12 ? new Response(JSON.stringify({ categories: [{ key: "recovery_devices", label: "Recovery Devices & Equipment" }] }), { status: 200 }) : new Response("{}", { status: 404 })
+      ? v12 ? new Response(JSON.stringify({ categories: [{ key: "recovery_devices", label: "Recovery Devices & Equipment" }], ...(typeof v12 === "object" ? v12 : {}) }), { status: 200 }) : new Response("{}", { status: 404 })
       : fetchImpl(url, init as RequestInit)) as unknown as typeof fetch;
   app.use(createBrandIntakeProxy({ env, fetchImpl: wrapped }));
   const srv = app.listen(0);
@@ -395,4 +395,132 @@ test("prepareStage: a bad src tag is dropped; plain drafts are untouched", () =>
   assert.ok(!/Source:/.test(String(prepareStage({ stage: "partial", email: "a@example.com", src: "<script>" }).body.blurb)));
   const d = prepareStage({ roles: ["brand"], blurb: "x" });
   assert.deepEqual([d.stage, d.body.blurb, d.error], [null, "x", undefined]);
+});
+
+test("prefill read-back GET: needs a valid id + X-Edit-Token, forwards the token, no-store/no-referrer", async () => {
+  const calls: Array<{ url: string; init: RequestInit }> = [];
+  const f = (async (url: string, init: RequestInit) => (calls.push({ url, init }), new Response(JSON.stringify({ ok: true, id: "bi_abc12345", status: "draft", version: 0, fields: { company_name: "Northline" } }), { status: 200 }))) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  const ok = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { headers: { "x-edit-token": "t".repeat(24) } });
+  const noTok = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`);
+  const badId = await realFetch(`${s.base}/v1/brand-intake/..%2Fadmin`, { headers: { "x-edit-token": "t".repeat(24) } });
+  const text = await ok.text();
+  s.close();
+  assert.equal(ok.status, 200);
+  assert.match(text, /Northline/);
+  assert.equal(calls.length, 1, "no token / bad id never reach the backend");
+  assert.equal(calls[0]!.url, "https://friday.example/api/public/brand-intake/bi_abc12345");
+  assert.equal(calls[0]!.init.method, "GET");
+  assert.equal((calls[0]!.init.headers as Record<string, string>)["X-Edit-Token"], "t".repeat(24));
+  assert.equal(ok.headers.get("cache-control"), "private, no-store");
+  assert.equal(ok.headers.get("referrer-policy"), "no-referrer");
+  assert.equal(noTok.status, 404);
+  assert.equal(badId.status, 404);
+  assert.ok(!text.includes(SECRET));
+});
+
+test("prefill read-back GET before the backend ships it: generic 404 → 503 readback_unavailable; a real not_found / 410 passes through", async () => {
+  let reply = new Response("Cannot GET", { status: 404 });
+  const f = (async () => reply) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  const h = { "x-edit-token": "t".repeat(24) };
+  const missing = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { headers: h });
+  reply = new Response(JSON.stringify({ ok: false, error: "not_found" }), { status: 404 });
+  const gone = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { headers: h });
+  reply = new Response(JSON.stringify({ ok: false, error: "link_expired" }), { status: 410 });
+  const expired = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { headers: h });
+  s.close();
+  assert.equal(missing.status, 503);
+  assert.equal(((await missing.json()) as { error: string }).error, "readback_unavailable");
+  assert.equal(gone.status, 404);
+  assert.equal(((await gone.json()) as { error: string }).error, "not_found");
+  assert.equal(expired.status, 410);
+  assert.equal(((await expired.json()) as { error: string }).error, "link_expired");
+});
+
+test("prefill draft preview GET (v1.4 r2): token-gated, view passed through, nothing else; missing route → preview_unavailable", async () => {
+  const calls: string[] = [];
+  let reply = () => new Response(JSON.stringify({ ok: true, draft: true, preview: { draft: true, basis: "estimated", version: null } }), { status: 200 });
+  const f = (async (url: string) => (calls.push(url), reply())) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  const h = { "x-edit-token": "t".repeat(24) };
+  const ok = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/preview?view=publisher`, { headers: h });
+  const junkView = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/preview?view=../../x`, { headers: h });
+  const noTok = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/preview`);
+  reply = () => new Response("Cannot GET", { status: 404 });
+  const missing = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/preview`, { headers: h });
+  s.close();
+  assert.equal(ok.status, 200);
+  assert.equal(ok.headers.get("cache-control"), "private, no-store");
+  assert.equal(calls[0], "https://friday.example/api/public/brand-intake/bi_abc12345/preview?view=publisher");
+  assert.equal(calls[1], "https://friday.example/api/public/brand-intake/bi_abc12345/preview");
+  assert.equal(junkView.status, 200);
+  assert.equal(noTok.status, 404);
+  assert.equal(calls.length, 3, "no token never reaches the backend");
+  assert.equal(missing.status, 503);
+  assert.equal(((await missing.json()) as { error: string }).error, "preview_unavailable");
+});
+
+/* ------------------------------ v1.4 r3 (Friday #216 @ 4908219) ------------------------------ */
+test("r3: sanitizeIp keeps one clean IP (ports, brackets, zone ids, mapped IPv4) and drops junk", async () => {
+  const { sanitizeIp } = await import("../src/routes/brandIntakeProxy");
+  assert.equal(sanitizeIp("203.0.113.7, 10.0.0.1"), "203.0.113.7");
+  assert.equal(sanitizeIp("203.0.113.7:51234"), "203.0.113.7");
+  assert.equal(sanitizeIp("[2001:db8::1]:443"), "2001:db8::1");
+  assert.equal(sanitizeIp("fe80::1%eth0"), "fe80::1");
+  assert.equal(sanitizeIp("::ffff:198.51.100.4"), "198.51.100.4");
+  for (const bad of ["not-an-ip", "1.2.3.4\r\nX-Evil: 1", "<script>", "999.1.1.1", "", "1.2.3.4.5"]) assert.equal(sanitizeIp(bad), null, bad);
+});
+
+test("r3: X-Client-IP (sanitized) rides on EVERY forward to Friday; a browser-sent X-Client-IP is ignored", async () => {
+  const seen: Array<{ url: string; h: Record<string, string> }> = [];
+  const f = (async (url: string, init: RequestInit) => (seen.push({ url, h: init.headers as Record<string, string> }), new Response(JSON.stringify({ ok: true, id: "bi_abc12345", status: "draft", version: 0 }), { status: 200 }))) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  const tok = { "x-edit-token": "t".repeat(24), "x-forwarded-for": "198.51.100.9:4431, 10.0.0.1", "x-client-ip": "6.6.6.6", "content-type": "application/json" };
+  await realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: tok, body: "{}" });
+  await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { method: "PATCH", headers: tok, body: "{}" });
+  await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { headers: tok });
+  await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/preview?view=brand`, { headers: tok });
+  await realFetch(`${s.base}/v1/brand-intake/bi_abc12345/kit`, { method: "POST", headers: tok, body: "{}" });
+  await realFetch(`${s.base}/v1/brand-kit/download`, { method: "POST", headers: tok, body: "{}" });
+  await realFetch(`${s.base}/v1/brand-report/${"r".repeat(24)}?view=brand`, { headers: tok });
+  s.close();
+  assert.equal(seen.length, 7);
+  for (const c of seen) assert.equal(c.h["X-Client-IP"], "198.51.100.9", c.url);
+});
+
+test("r3 G7/G9: contract header and Retry-After pass through to the page; 410s are passed, not turned into 503", async () => {
+  const f = (async (url: string) =>
+    String(url).includes("bi_gone1234")
+      ? new Response(JSON.stringify({ ok: false, error: "link_replaced" }), { status: 410, headers: { "x-brand-intake-contract": "1.4-prefill" } })
+      : new Response(JSON.stringify({ ok: false, error: "rate_limited" }), { status: 429, headers: { "retry-after": "17", "x-brand-intake-contract": "1.4-prefill" } })) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  const h = { "x-edit-token": "t".repeat(24) };
+  const lim = await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { headers: h });
+  const gone = await realFetch(`${s.base}/v1/brand-intake/bi_gone1234`, { headers: h });
+  s.close();
+  assert.equal(lim.status, 429);
+  assert.equal(lim.headers.get("retry-after"), "17");
+  assert.equal(lim.headers.get("x-brand-intake-contract"), "1.4-prefill");
+  assert.equal(gone.status, 410);
+  assert.equal(((await gone.json()) as { error: string }).error, "link_replaced");
+});
+
+test("r3 G3/G7: if_version reaches Friday only when the probe lists v1.4.if_version; strict v1 never sees it", async () => {
+  const run = async (probe: boolean | Record<string, unknown>) => {
+    const bodies: Array<Record<string, unknown>> = [];
+    const f = (async (_u: string, init: RequestInit) => (bodies.push(JSON.parse(String(init.body))), new Response("{}", { status: 200 }))) as unknown as typeof fetch;
+    const s = await serve(ENV, f, probe);
+    await realFetch(`${s.base}/v1/brand-intake/bi_abc12345`, { method: "PATCH", headers: { "content-type": "application/json", "x-edit-token": "t".repeat(24) }, body: JSON.stringify({ company_name: "Northline", if_version: 4, if_saved_at: "2026-11-19T18:00:00Z" }) });
+    s.close();
+    return bodies[0]!;
+  };
+  const v1 = await run(false);
+  assert.ok(!("if_version" in v1) && !("if_saved_at" in v1) && !("company_name" in v1));
+  const v12 = await run(true);
+  assert.ok(!("if_version" in v12));
+  assert.equal(v12.company_name, "Northline");
+  const v14 = await run({ contract_version: "1.4-prefill", capabilities: ["v1.4.if_version", "v1.4.patch_echo"] });
+  assert.equal(v14.if_version, 4);
+  assert.equal(v14.if_saved_at, "2026-11-19T18:00:00Z");
 });

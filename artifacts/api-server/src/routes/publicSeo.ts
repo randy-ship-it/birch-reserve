@@ -117,6 +117,23 @@ router.get("/kit/r/:token", (req, res) => {
   res.type("html").send(html);
 });
 
+// Prefilled brand intake link (PREVIEW, Nov 19 2026): /intake/b/:slug#edit=<private key>. The key is in the
+// fragment (never sent here); the page is still private: noindex, no-store, no referrer, generic /intake head.
+router.get("/intake/b/:slug", (_req, res) => {
+  let html: string;
+  try {
+    html = withRouteSeo(readSpaIndexHtml(), "/intake");
+  } catch (error) {
+    logger.error({ err: error }, "SPA shell for prefilled intake is missing");
+    res.status(500).type("text/plain").send("Page unavailable.");
+    return;
+  }
+  res.set("Cache-Control", "private, no-store");
+  res.set("Referrer-Policy", "no-referrer");
+  res.set("X-Robots-Tag", "noindex, nofollow");
+  res.type("html").send(html);
+});
+
 router.get("/for/:slug", (req, res, next) => {
   const fit = getBrandFit(String(req.params.slug ?? ""));
   if (!fit) {

@@ -33,6 +33,7 @@ import BrMediaBuyers from '@/pages/br/media-buyers';
 import BrBrandKit from '@/pages/br/brand-kit';
 import BrKitReport from '@/pages/br/kit-report';
 import BrIntake from '@/pages/br/intake';
+import BrIntakePrefill from '@/pages/br/intake-prefill';
 import ShareEventsPage from '@/pages/sales/share-events';
 import BrIntakePublisher from '@/pages/br/intake-publisher';
 import BrIntakeSupplier from '@/pages/br/intake-supplier';
@@ -303,6 +304,9 @@ function Router() {
         </Route>
         <Route path="/intake/sponsor">
           <Layout><BrIntakeSponsor /></Layout>
+        </Route>
+        <Route path="/intake/b/:slug">
+          <Layout><BrIntakePrefill /></Layout>
         </Route>
         <Route path="/intake/report">
           <Layout><BrIntakeReport /></Layout>

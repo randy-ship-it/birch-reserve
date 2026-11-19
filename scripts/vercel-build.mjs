@@ -54,6 +54,7 @@ const API_PATHS = [
   "/agencies/?",
   "/media-buyers/?",
   "/intake(?:/(?:publisher|supplier|sponsor|report))?/?",
+  "/intake/b/[^/]+/?",
   "/ai-buyers/?",
   "/terms/?",
   "/privacy/?",
