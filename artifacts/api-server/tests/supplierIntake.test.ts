@@ -101,16 +101,17 @@ test("supplier preset copy: hard rules; /intake/supplier is the shared intake, n
   assert.match(visible, /\+ Display CPM\/CPC/);
 });
 
-test("network copy (1:56 PM): supplier override only; identity without a provider", async () => {
-  const { SUPPLIER_NETWORK_COPY, applyNetworkCopy } = await import("../../clinichub-media/src/lib/networkCopy");
-  assert.equal(SUPPLIER_NETWORK_COPY.retail, "120+ retail hubs · 1MM+ recovery customers (est., growing to 300–500+ hubs) · Canada + USA");
-  assert.equal(SUPPLIER_NETWORK_COPY.tag, "retail-network estimate");
-  assert.equal(SUPPLIER_NETWORK_COPY.street, "reaches a few million doors targeted around the retail network");
-  const tiles = [{ key: "retail-network", fig: [{ v: "120+", l: "retail hubs" }], line: "x" }, { key: "street-team", fig: [{ v: "500K–1MM", l: "homes in reach" }], line: "y" }, { key: "scale-hubs", fig: [], line: "z" }];
-  assert.equal(applyNetworkCopy(tiles, null), tiles, "default pages unchanged");
-  const s = JSON.stringify(applyNetworkCopy(tiles, SUPPLIER_NETWORK_COPY));
+test("network figures (2:27 PM): shared constants site-wide, no homes figure, no override", async () => {
+  const bi = await import("../src/lib/overhaul/brandIntake");
+  const act = await import("../src/lib/kitCalc/activation");
+  assert.equal(bi.RETAIL_COPY, "120+ retail hubs · 1MM+ recovery customers (est., growing to 300–500+ hubs) · Canada + USA");
+  assert.equal(bi.RETAIL_TAG, "retail-network estimate");
+  assert.equal(bi.STREET_REACH_LINE, "reaches a few million doors targeted around the retail network");
+  const s = JSON.stringify([bi.CHANNEL_TILES, bi.EXPOSURE_CHANNELS, act]);
   assert.ok(!/500K|homes in reach/.test(s));
   assert.match(s, /growing to 300–500\+ hubs/);
   assert.match(s, /doors targeted around the retail network/);
   assert.ok(!/\bAlign\b/i.test(s));
+  const fs = await import("node:fs");
+  assert.ok(!fs.existsSync(`${process.cwd()}/../clinichub-media/src/lib/networkCopy.tsx`), "supplier-only override removed");
 });

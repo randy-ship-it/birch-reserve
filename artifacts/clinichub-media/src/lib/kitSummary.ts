@@ -7,7 +7,8 @@ import type { FridayReport } from "@/lib/fridayBrandIntake";
 import type { FridayExposure } from "../../../api-server/src/lib/kitCalc/activation";
 import { IN_LOCATION, inLocationReach, type PhysicalAnswer } from "../../../api-server/src/lib/overhaul/inLocation";
 import { buildModel } from "@/components/br/report-v2";
-import { big, channelRows, usd } from "@/components/br/report-views";
+import { STREET_ROW_NOTE as STREET_NOTE, big, channelRows, usd } from "@/components/br/report-views";
+import { STREET_REACH_FIG } from "../../../api-server/src/lib/overhaul/brandIntake";
 import type { KitCover } from "@/lib/kitRender";
 
 export function kitSummary(report: FridayReport, exposure: FridayExposure, physical: PhysicalAnswer | null | undefined, source: KitCover["source"], reportUrl?: string): KitCover & { email: { exposureMonth?: string; earningsMonth?: string } } {
@@ -21,8 +22,8 @@ export function kitSummary(report: FridayReport, exposure: FridayExposure, physi
   if (m.isPublisher && earn) headline.push({ value: usd(earn), label: "hub earnings a month, likely (USD)", sub: `${usd(earn * 12)} over 12 months` });
   if (loc) headline.push({ value: big(loc.monthlyVisits), label: "in-person visits a month at your locations", sub: IN_LOCATION.source });
   const channels: KitCover["channels"] = rows
-    .filter((r) => r.range)
-    .map((r) => ({ name: r.name, value: r.range!.low === r.range!.high ? big(r.range!.likely) : `${big(r.range!.low)}–${big(r.range!.high)}`, note: r.unit ? `${r.unit}${r.monthly ? " / month" : " in reach"}` : "" }));
+    .filter((r) => r.range || (r.key === "street_team" && r.note === STREET_NOTE))
+    .map((r) => !r.range ? { name: r.name, value: STREET_REACH_FIG.v, note: STREET_REACH_FIG.l } : ({ name: r.name, value: r.range!.low === r.range!.high ? big(r.range!.likely) : `${big(r.range!.low)}–${big(r.range!.high)}`, note: r.unit ? `${r.unit}${r.monthly ? " / month" : " in reach"}` : "" }));
   if (loc) channels.push({ name: IN_LOCATION.name, value: big(loc.monthlyVisits), note: IN_LOCATION.pricing });
   return {
     brand: m.name,

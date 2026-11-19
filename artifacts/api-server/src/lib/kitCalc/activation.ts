@@ -47,7 +47,8 @@ export type FridayExposure = { label?: string; basis?: string; markets?: string[
 
 /** Tolerant read of Friday's `exposure`; null when absent or malformed (→ labelled mock). */
 /**
- * Street Team homes in reach (Randy, Nov 19 2026 11:02 AM ET): "500K – 1MM" homes, Ontario now, Canada later.
+ * Street Team reach: shown as text only, "reaches a few million doors targeted around the retail network" (Randy,
+ * Nov 19 2026 2:27 PM ET). The numbers below are internal model inputs, never shown as a figure.
  * A reach audience, NOT scaled by the activation share (like retail customers it is "in reach", not activated).
  */
 export const STREET_TEAM_REACH = { low: 500_000, high: 1_000_000, later_high: 3_000_000 } as const;
@@ -58,7 +59,7 @@ export function readExposure(x: unknown): FridayExposure | null {
     const v = m as Partial<MinMax> | null;
     return v && typeof v.min === "number" && typeof v.max === "number" && v.min <= v.max ? { min: v.min, max: v.max } : null;
   };
-  // Street Team is homes IN REACH (Randy 11:02 AM ET): always 500K–1MM now, 1MM–3MM later, whatever share was applied upstream.
+  // Street Team is a reach audience (never scaled by the activation share); shown as text, not as a figure.
   const st = (c: { key: string }, v: MinMax | null, which: "now" | "later"): MinMax | null =>
     c.key !== "street_team" || !v ? v : which === "now" ? { min: STREET_TEAM_REACH.low, max: STREET_TEAM_REACH.high } : { min: STREET_TEAM_REACH.high, max: STREET_TEAM_REACH.later_high };
   return { ...o, channels: o.channels.filter((c) => c && typeof c.key === "string").map((c) => ({ ...c, eligible_now: !!c.eligible_now, now: st(c, mm(c.now), "now"), later: st(c, mm(c.later), "later") })) };
@@ -71,8 +72,8 @@ export function readExposure(x: unknown): FridayExposure | null {
 export const MOCK_SHARES = { min_share: 0.01, max_share: 0.05, placeholder: true } as const;
 const FIG = [
   { key: "hubs", unit: "page views / month", now: 700_000_000, later: 5_000_000_000, figure_now: ">700MM page views now", figure_later: ">5B page views (2027 target)" },
-  { key: "street_team", unit: "homes", now: 500_000, later: 3_000_000, figure_now: "500K–1MM homes in reach · Ontario now", figure_later: "3MM+ homes later · Canada" },
-  { key: "retail", unit: "recovery customers", now: 1_000_000, later: 1_000_000, figure_now: "120+ retail hubs · 1MM+ recovery customers · Canada + USA", figure_later: "120+ retail hubs · 1MM+ recovery customers · Canada + USA" },
+  { key: "street_team", unit: "homes", now: 500_000, later: 3_000_000, figure_now: "Reaches a few million doors targeted around the retail network", figure_later: "Reaches a few million doors targeted around the retail network" },
+  { key: "retail", unit: "recovery customers", now: 1_000_000, later: 1_000_000, figure_now: "120+ retail hubs · 1MM+ recovery customers (est., growing to 300–500+ hubs) · Canada + USA", figure_later: "120+ retail hubs · 1MM+ recovery customers (est., growing to 300–500+ hubs) · Canada + USA" },
   { key: "calm_joints", unit: "", now: 0, later: 0, figure_now: null, figure_later: null, needs_figure: true },
 ] as const;
 const FKEY_TO_BIRCH: Record<string, ChannelGeoKey> = { hubs: "scale-hubs", calm_joints: "calm-joints", street_team: "street-team", retail: "retail-network" };

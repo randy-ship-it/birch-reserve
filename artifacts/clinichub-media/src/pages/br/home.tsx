@@ -32,7 +32,7 @@ const FAQ = [
 
 const STATS = [
   { v: "120+", l: "retail hubs", tid: "stat-retail-hubs" },
-  { v: "1MM+", l: "recovery customers", tid: "stat-recovery-customers" },
+  { v: "1MM+", l: "recovery customers (est.)", tid: "stat-recovery-customers" },
   { v: "CA + US", l: "Canada + USA", tid: "stat-geo" },
 ];
 
@@ -71,7 +71,7 @@ function Expand({ title, sub, children, testId, open = false }: { title: string;
 }
 
 export default function BrHome() {
-  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand inside private, members-only health and wellness hubs: 120+ retail hubs, 1MM+ recovery customers, Canada + USA. Get a free Monetization Kit. Prices in USD; estimates are modelled.");
+  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand inside private, members-only health and wellness hubs: 120+ retail hubs, 1MM+ recovery customers (est., growing to 300–500+ hubs), Canada + USA. Get a free Monetization Kit. Prices in USD; estimates are modelled.");
   const price = priceLabels(useAvailability());
   return (
     <div className="w-full overflow-x-hidden bg-[#FAF8F3]" data-testid="br-home">
@@ -130,8 +130,8 @@ export default function BrHome() {
                 <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#BFF3D6]">Street Team</span>
                 <Chip>Modelled</Chip>
               </div>
-              <p className="mt-2 font-display text-[2.4rem] leading-none md:text-6xl">500K–1MM</p>
-              <p className="mt-1.5 text-sm text-white/75">homes in reach · Ontario now <ArrowRight className="ml-1 inline size-3.5 transition group-hover:translate-x-0.5" aria-hidden /></p>
+              <p className="mt-2 font-display text-[2.4rem] leading-none md:text-5xl" data-testid="home-street-figure">A few million</p>
+              <p className="mt-1.5 text-sm text-white/75">doors targeted around the retail network <ArrowRight className="ml-1 inline size-3.5 transition group-hover:translate-x-0.5" aria-hidden /></p>
             </div>
           </a>
         </div>

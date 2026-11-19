@@ -13,7 +13,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "wouter";
 import { ArrowRight, Check, ChevronDown, Loader2, ShieldAlert, Store, Package, Plus, Rocket } from "lucide-react";
 import type { IntakeRole } from "../../../../api-server/src/lib/overhaul/brandIntake";
-import { RETAIL_COPY } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { RETAIL_COPY, RETAIL_TAG } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { FRIDAY_CATEGORIES } from "../../../../api-server/src/lib/kitCalc/fridayV12";
 import { HELD_COPY, PARTIAL_EMAIL_RE, adapterMode, fridayIntake, reportPath, saveRef, type IntakeRef } from "@/lib/fridayBrandIntake";
 import { basePayload } from "@/components/br/intake-kit";
@@ -272,7 +272,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
           <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-lime-300 bg-lime-50 p-4 md:flex-row md:items-center md:justify-between" data-testid="supplier-only-note">
             <div>
               <p className="text-sm font-bold text-[#0b1f3a]">Supplier-only works. Add your hub for max exposure.</p>
-              <Details testId="supplier-only-details" className="mt-1"><p>A hub puts your products on your own shelf and pages too. Network: {RETAIL_COPY} (network figures).</p></Details>
+              <Details testId="supplier-only-details" className="mt-1"><p>A hub puts your products on your own shelf and pages too. Network: {RETAIL_COPY} ({RETAIL_TAG}).</p></Details>
             </div>
             <button type="button" onClick={addHub} data-testid="supplier-only-add-hub" className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-lime-300 hover:text-[#0b1f3a]"><Plus className="size-4" />Add my hub</button>
           </div>

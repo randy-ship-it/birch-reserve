@@ -130,9 +130,9 @@ export function kitSideB(d: KitData): string {
       <rect x="${x}" y="${y}" width="336" height="330" rx="24" fill="${NAVY}"/>${img}
       <text x="${x + 24}" y="${y + 196}" font-family="${SERIF}" font-size="32" fill="#fff">${esc(c.name)}</text>
       ${c.fitLabel ? `<rect x="${x + 16}" y="${y + 16}" width="${c.fitLabel.length * 8.4 + 28}" height="32" rx="16" fill="#fff"/><text x="${x + 30}" y="${y + 38}" font-family="${SANS}" font-size="15" font-weight="700" fill="${NAVY}">${esc(c.fitLabel)}</text>` : ""}
-      ${wrap(c.figures.join(" · ") || "Figures to come", 30)
+      ${((fig, long) => wrap(fig, long ? 34 : 30)
         .slice(0, 3)
-        .map((l, k) => `<text x="${x + 24}" y="${y + 226 + k * 22}" font-family="${SANS}" font-size="17" fill="${LIME}">${esc(l)}</text>`)
+        .map((l, k) => `<text x="${x + 24}" y="${y + 226 + k * 22}" font-family="${SANS}" font-size="${long ? 15 : 17}" fill="${LIME}">${esc(l)}</text>`))(c.figures.join(" · ") || "Figures to come", (c.figures.join(" · ") || "").length > 84)
         .join("")}
       ${foot.map((l, k) => `<text x="${x + 24}" y="${y + 296 + k * 18}" font-family="${SANS}" font-size="14" fill="#fff" opacity=".7">${esc(l)}</text>`).join("")}`;
     })
@@ -327,7 +327,7 @@ export function kitCover(c: KitCover): string {
       return `<rect x="72" y="${y}" width="1056" height="72" rx="18" fill="#ffffff" fill-opacity="${r.name === "In-location display" ? ".14" : ".06"}"/>
       <text x="104" y="${y + 45}" font-family="${SANS}" font-size="24" font-weight="700" fill="#fff">${esc(r.name)}</text>
       <text x="640" y="${y + 45}" font-family="${SERIF}" font-size="30" fill="${LIME}">${esc(r.value)}</text>
-      <text x="1096" y="${y + 45}" text-anchor="end" font-family="${SANS}" font-size="16" fill="#fff" opacity=".65">${esc(r.note.slice(0, 34))}</text>`;
+      ${r.note.length > 34 ? wrap(r.note, 26).slice(0, 2).map((l, k) => `<text x="1096" y="${y + 33 + k * 20}" text-anchor="end" font-family="${SANS}" font-size="15" fill="#fff" opacity=".65">${esc(l)}</text>`).join("") : `<text x="1096" y="${y + 45}" text-anchor="end" font-family="${SANS}" font-size="16" fill="#fff" opacity=".65">${esc(r.note)}</text>`}`;
     })
     .join("");
   const src = c.source === "sample" ? "Sample · example values" : c.source === "mock" ? "Preview · mock data" : c.source === "friday" ? "From your report" : "Quick estimate";
