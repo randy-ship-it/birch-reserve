@@ -193,7 +193,7 @@ export const RETAIL_COPY = "120+ retail hubs · 1MM+ recovery customers · Canad
 export const CHANNEL_TILES = [
   { key: "scale-hubs", name: "Scale Hubs", stats: [{ v: ">20MM", l: "unique customers" }, { v: ">700MM", l: "page views rolling out" }, { v: ">5B", l: "page views in 2027 (target)" }], line: "Private health and wellness hubs: physio, recovery, longevity and food brands." },
   { key: "calm-joints", name: "Calm Joints", stats: [] as { v: string; l: string }[], line: "Joint-pain and recovery audience channel. Figures to come." },
-  { key: "street-team", name: "Street Team", stats: [{ v: "500K", l: "high-value homes" }, { v: "3MM+", l: "homes, expanding" }], line: "Ambassador door routes, targeted by neighbourhood. Area-level only.", image: "/street-team/door-route.webp", imageNote: "Day-1 route heat map (area-level). The network-wide census map is still needed." },
+  { key: "street-team", name: "Street Team", stats: [{ v: "500K–1MM", l: "homes in reach · Ontario now" }, { v: "3MM+", l: "homes · Canada later" }], line: "Ambassador door routes, targeted by neighbourhood. Area-level only.", image: "/street-team/door-route.webp", imageNote: "Day-1 route heat map (area-level). The network-wide census map is still needed." },
   { key: "retail-network", name: "Retail Network", stats: [{ v: "120+", l: "retail hubs" }, { v: "1MM+", l: "recovery customers" }, { v: "CA + US", l: "Canada + USA" }], line: RETAIL_COPY },
 ] as const;
 
@@ -281,7 +281,7 @@ export function hubFit(categoryKey: string) {
 export const EXPOSURE_CHANNELS = [
   { key: "hubs", name: "Scale Hubs", reach: ">20MM unique customers · >700MM page views rolling out", cpm: HUB_RATE_RANGE.cpm, cpc: HUB_RATE_RANGE.cpc, rateNote: "Rate card starter range" },
   { key: "calm-joints", name: "Calm Joints", reach: "Figures to come", cpm: null, cpc: null, rateNote: "Priced by IO" },
-  { key: "street-team", name: "Street Team", reach: "500K high-value homes, expanding to 3MM+ (target)", cpm: null, cpc: null, rateNote: "Inquire: priced by route" },
+  { key: "street-team", name: "Street Team", reach: "500K–1MM homes in reach (Ontario now), 3MM+ Canada later (target)", cpm: null, cpc: null, rateNote: "Inquire: priced by route" },
   { key: "retail-network", name: "Retail Network", reach: RETAIL_COPY, cpm: null, cpc: null, rateNote: "Priced by IO" },
 ] as const;
 

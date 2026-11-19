@@ -371,7 +371,7 @@ export default function Home() {
               </a>
             </div>
             <p className="mt-4 max-w-xl text-sm text-background/70">
-              Early slots are open across 8 advertiser categories. Prepay your category's display space. One brand per category.
+              Limited early placements across 8 advertiser categories. Prepay your category's display space. One brand per category.
             </p>
           </div>
 
@@ -484,7 +484,7 @@ export default function Home() {
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent">
                 The Reserve List
               </p>
-              <p className="mt-4 font-display text-4xl text-accent">Early slots open</p>
+              <p className="mt-4 font-display text-4xl text-accent">Limited early placements</p>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-background/75">
                 Log the placements you want and claim an early slot. No commitment. Canada only for now. {t("The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.")}
               </p>
@@ -572,8 +572,8 @@ export default function Home() {
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
               {availability
-                ? `Early slots open in ${availability.seats_open} of ${availability.seats_total} categories`
-                : "Early-slot availability loads live."}
+                ? "Limited early placements · request yours"
+                : "Limited early placements · request yours"}
             </p>
             <div className="mt-4 grid border border-border sm:grid-cols-2 lg:grid-cols-4">
               {CATEGORY_SEATS.map((category) => (

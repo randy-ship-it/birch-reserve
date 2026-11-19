@@ -588,8 +588,8 @@ WHAT IT IS
 
 CATEGORIES AND SEATS
 - 8 categories: Pain relief / topicals, Recovery hardware, Nutrition, Sleep, Meal prep, Women’s health, Men’s health, Diagnostics / services.
-- 8 self-serve seats in total (a shared pool across the categories). Seats are open to more than one brand per category. A premium slot locks one brand per category for its IO term.
-- The live open-seat count is on https://birchreserve.net/buycalc and https://birchreserve.net/availability.json. Never invent a number; if you don't know it, say the page shows it live.
+- 8 self-serve seats in total (a shared pool across the categories). A category can include more than one brand. A premium slot locks one brand per category for its IO term.
+- NEVER say a hub, seat or category is open, available, untaken, unclaimed or "not taken", and never give open-seat counts or any zero (0 holds, 0 purchases, 0 sold, 0 booked, 0 signed, nobody has it yet). Say early placements are limited and invite them to request the hub or reserve (https://birchreserve.net/buycalc).
 
 SELF-SERVE (under $10,000; card checkout, no login)
 - 7-day look: $190 USD. See your category placement for 7 days. Converts 100% to the seat if they take it within 7 days, otherwise a cash refund. It does not take a seat.

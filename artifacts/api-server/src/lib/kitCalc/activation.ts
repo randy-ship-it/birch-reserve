@@ -46,6 +46,11 @@ export type ExposureChannel = { key: string; geo_label?: string; eligible_now: b
 export type FridayExposure = { label?: string; basis?: string; markets?: string[]; activation?: { min_share: number; max_share: number; placeholder?: boolean }; geo_weights?: Record<string, number | boolean>; channels: ExposureChannel[] };
 
 /** Tolerant read of Friday's `exposure`; null when absent or malformed (→ labelled mock). */
+/**
+ * Street Team homes in reach (Randy, Nov 19 2026 11:02 AM ET): "500K – 1MM" homes, Ontario now, Canada later.
+ * A reach audience, NOT scaled by the activation share (like retail customers it is "in reach", not activated).
+ */
+export const STREET_TEAM_REACH = { low: 500_000, high: 1_000_000, later_high: 3_000_000 } as const;
 export function readExposure(x: unknown): FridayExposure | null {
   const o = x as FridayExposure | null;
   if (!o || !Array.isArray(o.channels) || !o.channels.length) return null;
@@ -53,7 +58,10 @@ export function readExposure(x: unknown): FridayExposure | null {
     const v = m as Partial<MinMax> | null;
     return v && typeof v.min === "number" && typeof v.max === "number" && v.min <= v.max ? { min: v.min, max: v.max } : null;
   };
-  return { ...o, channels: o.channels.filter((c) => c && typeof c.key === "string").map((c) => ({ ...c, eligible_now: !!c.eligible_now, now: mm(c.now), later: mm(c.later) })) };
+  // Street Team is homes IN REACH (Randy 11:02 AM ET): always 500K–1MM now, 1MM–3MM later, whatever share was applied upstream.
+  const st = (c: { key: string }, v: MinMax | null, which: "now" | "later"): MinMax | null =>
+    c.key !== "street_team" || !v ? v : which === "now" ? { min: STREET_TEAM_REACH.low, max: STREET_TEAM_REACH.high } : { min: STREET_TEAM_REACH.high, max: STREET_TEAM_REACH.later_high };
+  return { ...o, channels: o.channels.filter((c) => c && typeof c.key === "string").map((c) => ({ ...c, eligible_now: !!c.eligible_now, now: st(c, mm(c.now), "now"), later: st(c, mm(c.later), "later") })) };
 }
 
 /**
@@ -63,7 +71,7 @@ export function readExposure(x: unknown): FridayExposure | null {
 export const MOCK_SHARES = { min_share: 0.01, max_share: 0.05, placeholder: true } as const;
 const FIG = [
   { key: "hubs", unit: "page views / month", now: 700_000_000, later: 5_000_000_000, figure_now: ">700MM page views now", figure_later: ">5B page views (2027 target)" },
-  { key: "street_team", unit: "homes", now: 500_000, later: 3_000_000, figure_now: "500K homes now", figure_later: "3MM+ homes later" },
+  { key: "street_team", unit: "homes", now: 500_000, later: 3_000_000, figure_now: "500K–1MM homes in reach · Ontario now", figure_later: "3MM+ homes later · Canada" },
   { key: "retail", unit: "recovery customers", now: 1_000_000, later: 1_000_000, figure_now: "120+ retail hubs · 1MM+ recovery customers · Canada + USA", figure_later: "120+ retail hubs · 1MM+ recovery customers · Canada + USA" },
   { key: "calm_joints", unit: "", now: 0, later: 0, figure_now: null, figure_later: null, needs_figure: true },
 ] as const;
@@ -84,8 +92,8 @@ export function mockExposure(market: Market | null | undefined): FridayExposure 
       return {
         key: f.key, geo_label: g.label, eligible_now: e === "now", later_option: !!g.later, unit: f.unit,
         reason: e === "now" ? null : e === "later" ? "Opens in your markets later (Canada-wide)" : "Not in your markets yet",
-        now: e === "now" && !needs ? span(f.now) : null,
-        later: e !== "not_available" && !needs ? span(f.later) : null,
+        now: e === "now" && !needs ? (f.key === "street_team" ? { min: STREET_TEAM_REACH.low, max: STREET_TEAM_REACH.high } : span(f.now)) : null,
+        later: e !== "not_available" && !needs ? (f.key === "street_team" ? { min: STREET_TEAM_REACH.high, max: STREET_TEAM_REACH.later_high } : span(f.later)) : null,
         figure_now: f.figure_now, figure_later: f.figure_later, needs_figure: needs || undefined,
       };
     }),

@@ -372,7 +372,7 @@ export function SalesConcierge({
         };
       case "media_kit":
         return {
-          text: localizeNow("The Reserve List: 8 advertiser categories inside listed Scale Health hubs, with early slots open. Not an open auction. Not a guaranteed impression buy. The $490 category prepay is media credit, not airfare."),
+          text: localizeNow("The Reserve List: 8 advertiser categories inside listed Scale Health hubs, with limited early placements. Not an open auction. Not a guaranteed impression buy. The $490 category prepay is media credit, not airfare."),
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },
