@@ -51,6 +51,12 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
       text: `Thanks${c.name ? `, ${c.name.split(" ")[0]}` : ""}. I've sent your call-back request to the Birch team${c.best_time ? ` for ${c.best_time}` : ""}. They'll reach you at ${c.phone || c.email}. If you'd rather not wait, call ${BIRCH_SALES_PHONE}.`,
     };
   }
+  if (/not sure|unsure|on the fence|hesitant|worried|too risky|try (it )?first|start (small|on performance)|prove it|want to (buy|reserve) but/.test(t)) {
+    return { intent: "unsure", callback: null, text: `That's fine, and performance-only is something we're happy to do. If you're not sure about a placement, you can start on performance, where you pay on results with no CPC or CPM, and upgrade to display and CPC later. One honest observation: brands whose category closely matches a hub's audience tend to take display and CPC on that hub early, because marketing inside the purchase experience to a close audience works well, and pricing is likely to rise once results start coming in. No pressure either way. The Monetization Kit at https://birchreserve.net/intake shows where you'd fit.` };
+  }
+  if (/(doesn'?t|don'?t|does not|do not|not)( really| quite)? (fit|match)|not (a )?(recovery|health|wellness)|wrong audience|different audience|no hub for/.test(t)) {
+    return { intent: "no_hub_fit", callback: null, text: `Every brand applies for a hub, but we don't force one. If a hub doesn't fit your customers, for example the recovery audience, we review your supply and fit and offer display and CPC on other hubs to build your audience instead. It's lean, private-channel media and we want you to get the best performance we can. The Monetization Kit at https://birchreserve.net/intake is the place to start.` };
+  }
   if (/\balign\b|retail (hub|chain|network)|which retail/.test(t)) {
     return { intent: "retail_hubs", callback: null, text: `Birch Reserve has a Retail Network of retail hubs in Canada and the USA. We don't name individual retail operators here, so the team can confirm specifics for your question.` };
   }

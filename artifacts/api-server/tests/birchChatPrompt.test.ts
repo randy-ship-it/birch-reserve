@@ -199,3 +199,34 @@ test("faq fallback: performance-only, CPM, Dec 9, Align, hub earn", () => {
   assert.equal(findBannedContent(a), null);
   assert.match(ask("How does a physio group earn?").text, /35% of media revenue/);
 });
+
+test("talk track: performance-first, honest early-hub observation, fit review, non-salesy", () => {
+  const p = buildBirchChatSystemPrompt({ checkout: live, pagePath: "/intake" });
+  assert.match(p, /genuinely happy to do/);
+  assert.match(p, /start on performance and upgrade to display and CPC later/);
+  assert.match(p, /take display and CPC on that hub early/);
+  assert.match(p, /brokerages tend to take that space/);
+  assert.match(p, /never to push a decision/);
+  assert.match(p, /lean, private-channel media/);
+  assert.match(p, /Every brand applies for a hub, but we don't force one/);
+  assert.match(p, /review their supply and fit and offer display and CPC on other hubs/);
+  assert.match(p, /no urgency, no scarcity/);
+  assert.doesNotMatch(p, /\u2014|\u2013/);
+});
+
+test("faq talk track answers: unsure brand and no-hub-fit brand pass the guard, no counts or guarantees", () => {
+  const ask = (q: string) => birchFaqAnswer([{ role: "user", content: q }]);
+  const unsure = ask("We're not sure we should buy a placement yet.");
+  assert.equal(unsure.intent, "unsure");
+  assert.match(unsure.text, /start on performance/);
+  assert.match(unsure.text, /No pressure/);
+  const nofit = ask("Our products don't really fit a recovery hub. What then?");
+  assert.equal(nofit.intent, "no_hub_fit");
+  assert.match(nofit.text, /we don't force one/);
+  assert.match(nofit.text, /display and CPC on other hubs/);
+  for (const a of [unsure, nofit]) {
+    assert.equal(findBannedContent(a.text), null);
+    assert.doesNotMatch(a.text, /\bguarantee|\bopen\b|not taken|\$490|buycalc|\b0\b|\u2014|\u2013/i);
+    assert.equal((a.text.match(/https:\/\//g) ?? []).length, 1);
+  }
+});
