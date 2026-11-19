@@ -8,8 +8,7 @@ import { resolve } from "node:path";
 import { HUB_PENDING_TAG, createBrandIntakeProxy, hubPendingOf, hubRequestOf, prepareStage, type IntakeLeadEvent } from "../src/routes/brandIntakeProxy";
 import { cleanLeadMeta } from "../src/lib/leads";
 import { toFridayBody } from "../../clinichub-media/src/lib/fridayBrandIntake";
-import { brandFromParam, hubSlugOf, SUPPLIER_FEES } from "../../clinichub-media/src/pages/br/intake-supplier";
-import { supplierAliasHref } from "../../clinichub-media/src/pages/br/intake";
+import { brandFromParam, hubSlugOf, levelOf, presetOf, rolesForLevel, SUPPLIER_FEES } from "../../clinichub-media/src/components/br/supplier-mode";
 
 const ENV = { FRIDAY_API_URL: "https://friday.example", FRIDAY_API_KEY: "test-only-not-a-real-secret-value" } as NodeJS.ProcessEnv;
 const HUB = { role: "supplier", status: "pending_approval", hub_name: "Crossover Symmetry", hub_slug: "crossover-symmetry" };
@@ -77,20 +76,27 @@ test("brand prefill, slug, alias, fees", () => {
   assert.equal(brandFromParam("Crossover Symmetry"), "Crossover Symmetry");
   assert.equal(brandFromParam(null), "");
   assert.equal(hubSlugOf("Crossover Symmetry"), "crossover-symmetry");
-  assert.equal(supplierAliasHref("?role=supplier&brand=crossover-symmetry"), "/intake/supplier?brand=crossover-symmetry");
-  assert.equal(supplierAliasHref("?role=supplier"), "/intake/supplier");
-  assert.equal(supplierAliasHref(""), null, "plain /intake unchanged");
-  assert.equal(supplierAliasHref("?resume=demo&mock=1"), null);
+  assert.equal(presetOf("?role=supplier&brand=crossover-symmetry"), "supplier");
+  assert.equal(presetOf(""), undefined, "plain /intake unchanged");
+  assert.equal(presetOf("?resume=demo&mock=1"), undefined);
+  // exposure ladder: performance only → + own hub → + CPM/CPC display (Accelerate); supplier always on
+  assert.deepEqual([1, 2, 3].map((l) => rolesForLevel(l as 1 | 2 | 3)), [{ supplier: true, hub: false, accelerate: false }, { supplier: true, hub: true, accelerate: false }, { supplier: true, hub: true, accelerate: true }]);
+  assert.deepEqual([levelOf({ hub: false, accelerate: false }), levelOf({ hub: true, accelerate: false }), levelOf({ hub: true, accelerate: true })], [1, 2, 3]);
   assert.equal(SUPPLIER_FEES.standUpUsd, 5000);
   assert.deepEqual(SUPPLIER_FEES.lines.map((l) => l.v), ["10%", "~35%"]);
 });
 
-test("supplier page copy: hard rules", () => {
-  const c = readFileSync(resolve(process.cwd(), "../clinichub-media/src/pages/br/intake-supplier.tsx"), "utf8");
+test("supplier preset copy: hard rules; /intake/supplier is the shared intake, not a separate form", () => {
+  const page = readFileSync(resolve(process.cwd(), "../clinichub-media/src/pages/br/intake-supplier.tsx"), "utf8");
+  assert.match(page, /<BrIntake preset="supplier" \/>/);
+  assert.match(readFileSync(resolve(process.cwd(), "../clinichub-media/src/components/br/intake-short-form.tsx"), "utf8"), /preset\?: IntakePreset/);
+  const c = readFileSync(resolve(process.cwd(), "../clinichub-media/src/components/br/supplier-mode.tsx"), "utf8");
   const visible = c.replace(/\/\*\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
   for (const bad of [/\bAlign\b/i, /clairvoyant/i, /alset/i, /80 locations/i, /medvibe/i, /friday/i, /integrity/i, /signed partners/i, /\bpublisher\b(?!")/i, /\badvertiser\b(?!")/i, /\bCAD\b/, /guarantee/i, /\bROAS\b/, /\bCTR\b/, /\bdeposit\b/i, /not taken/i, /\b0 (sold|signed|holds?)\b/i]) {
     assert.ok(!bad.test(visible.replace(/fridayIntake|fridayBrandIntake|fridayV12|FRIDAY_CATEGORIES|"advertiser"|"publisher"/g, "")), `found ${bad}`);
   }
   assert.match(visible, /Your hub is created and goes live once our team approves it\./);
-  assert.match(visible, /RETAIL_COPY/);
+  assert.match(visible, /Performance only/);
+  assert.match(visible, /\+ Own hub/);
+  assert.match(visible, /\+ Display CPM\/CPC/);
 });

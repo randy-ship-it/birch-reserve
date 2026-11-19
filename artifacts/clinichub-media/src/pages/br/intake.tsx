@@ -17,29 +17,21 @@ import { sampleReport } from "@/lib/fridayMockReport";
 import { RT, RT_SANS, RT_SERIF } from "@/lib/reportTokens";
 import { TwoLane, openLane } from "@/components/br/two-lane";
 import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
+import { brandFromUrl, presetOf, type IntakePreset } from "@/components/br/supplier-mode";
+import { RETAIL_COPY } from "../../../../api-server/src/lib/overhaul/brandIntake";
 
 const SAMPLE_EXPOSURE = { ...mockExposure({ sells_in: ["CA", "US"], ships_to: ["CA", "US"], regions: ["ON"] }), basis: "Sample: network figures / targets × example activation shares (1%–5%)" };
 
 type Mode = "fast" | "expanded";
 
-/** /intake?role=supplier is an alias of /intake/supplier (other params and the hash are kept). Plain /intake is unchanged. */
-export function supplierAliasHref(search: string, hash = ""): string | null {
-  const q = new URLSearchParams(search);
-  if (q.get("role") !== "supplier") return null;
-  q.delete("role");
-  const rest = q.toString();
-  return `/intake/supplier${rest ? `?${rest}` : ""}${hash}`;
-}
-function SupplierAlias({ to }: { to: string }) {
-  useEffect(() => window.location.replace(to), [to]);
-  return null;
-}
-export default function BrIntake() {
-  const alias = typeof window === "undefined" ? null : supplierAliasHref(window.location.search, window.location.hash);
-  return alias ? <SupplierAlias to={alias} /> : <BrIntakeOneForm />;
-}
-
-function BrIntakeOneForm() {
+/**
+ * preset "supplier" = the same page + one form opened supplier-first (/intake/supplier, or /intake?role=supplier):
+ * supplier hero, exposure ladder, quiet fees; the agency lanes stay on the default page. No preset = unchanged.
+ */
+export default function BrIntake({ preset: forced }: { preset?: IntakePreset } = {}) {
+  const preset = forced ?? (typeof window === "undefined" ? undefined : presetOf(window.location.search));
+  const sup = preset === "supplier";
+  const brand = useMemo(() => (sup ? brandFromUrl() : ""), [sup]);
   const [mode, setMode] = useState<Mode>(() => (typeof window !== "undefined" && window.location.hash === "#expanded" ? "expanded" : "fast"));
   useEffect(() => trackIntake("advertiser", "mode", mode), [mode]);
   const expand = (side: IntakeSide) => {
@@ -52,18 +44,29 @@ function BrIntakeOneForm() {
     r.roles = ["supplier", "publisher"];
     return r;
   }, []);
-  usePageMeta("Get your Monetization Kit | Birch Reserve", "One short form for suppliers and hubs. See your hub earnings and your supplier exposure on performance-only terms (pay on results), side by side. Estimates in USD, reviewed by a person.");
+  usePageMeta(sup ? "Supplier intake · Max your exposure | Birch Reserve" : "Get your Monetization Kit | Birch Reserve", sup ? "Suppliers start performance-only: no setup fee, no monthly fee, you approve every placement. Max your exposure with your own hub or CPM/CPC display." : "One short form for suppliers and hubs. See your hub earnings and your supplier exposure on performance-only terms (pay on results), side by side. Estimates in USD, reviewed by a person.");
   return (
     <div data-testid="intake-landing">
       <MockBanner />
       <section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_55%)]">
         <div className="container mx-auto max-w-5xl px-4 pb-8 pt-8 md:pt-14">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · Monetization Kit</p>
-          <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Get your Monetization Kit.</h1>
-          <p className="mt-2 max-w-2xl text-base text-muted-foreground">Reserve space now, book a big block, or get your free kit.</p>
-          <div className="mt-5"><TwoLane /></div>
-          <div className="mt-6 flex items-center gap-3" data-testid="kit-divider"><span className="h-px flex-1 bg-foreground/15" /><span className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Or get your free Monetization Kit</span><span className="h-px flex-1 bg-foreground/15" /></div>
-          <div className="mt-3">{mode === "fast" ? <IntakeShortForm onExpand={expand} /> : null}</div>
+          {sup ? (
+            <div data-testid="supplier-hero">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · For suppliers</p>
+              <h1 className="font-display text-4xl leading-[1.02] md:text-6xl" data-testid="supplier-h1">{brand ? `${brand}, start performance-only.` : "Start performance-only."}</h1>
+              <p className="mt-2 max-w-2xl text-base text-muted-foreground">No setup fee, no monthly fee. Max your exposure with your own hub or CPM/CPC display.</p>
+              <p className="mt-3 inline-flex items-start gap-2 rounded-2xl bg-white/80 px-3 py-1.5 text-[12px] font-semibold text-[#0b1f3a] ring-1 ring-foreground/10" data-testid="supplier-network"><span>{RETAIL_COPY} <span className="font-normal text-foreground/50">· network figures</span></span></p>
+            </div>
+          ) : (
+            <>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · Monetization Kit</p>
+              <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Get your Monetization Kit.</h1>
+              <p className="mt-2 max-w-2xl text-base text-muted-foreground">Reserve space now, book a big block, or get your free kit.</p>
+              <div className="mt-5"><TwoLane /></div>
+              <div className="mt-6 flex items-center gap-3" data-testid="kit-divider"><span className="h-px flex-1 bg-foreground/15" /><span className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Or get your free Monetization Kit</span><span className="h-px flex-1 bg-foreground/15" /></div>
+            </>
+          )}
+          <div className={sup ? "mt-5" : "mt-3"}>{mode === "fast" ? <IntakeShortForm onExpand={expand} preset={preset} /> : null}</div>
           <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <ShareBar testId="share-bar-intake" />
             {mode === "fast" ? (
@@ -84,13 +87,13 @@ function BrIntakeOneForm() {
         <h2 className="mt-3 text-3xl md:text-5xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you get.</h2>
         <Details testId="sample-details"><p>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range in USD, not a result or a guarantee.</p></Details>
         <div className="mt-4"><ReportV2 report={sample} sample compact exposure={SAMPLE_EXPOSURE} exposureSource="sample" /></div>
-        <div className="mt-6 flex flex-col gap-3 rounded-3xl bg-[#0b1f3a] p-5 text-white md:flex-row md:items-center md:justify-between md:p-6" data-testid="two-lane-foot">
+        {sup ? null : <div className="mt-6 flex flex-col gap-3 rounded-3xl bg-[#0b1f3a] p-5 text-white md:flex-row md:items-center md:justify-between md:p-6" data-testid="two-lane-foot">
           <p className="font-display text-2xl leading-tight md:text-3xl">Ready to run?</p>
           <div className="flex flex-col gap-2 sm:flex-row">
             <button type="button" onClick={() => openLane({ lane: "card" })} className="inline-flex h-12 items-center justify-center rounded-full bg-lime-300 px-6 text-sm font-bold text-[#0b1f3a]" data-testid="two-lane-foot-card">Reserve space (card)</button>
             <button type="button" onClick={() => openLane({ lane: "block" })} className="inline-flex h-12 items-center justify-center rounded-full px-6 text-sm font-bold text-white ring-1 ring-white/40" data-testid="two-lane-foot-block">Big block / agency (IO + cheque)</button>
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );
