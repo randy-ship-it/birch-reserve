@@ -96,7 +96,7 @@ export function PrimeHero() {
           Reserve a share of display space across our growing network of private, members-only hubs: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, with more on the way. Placements are curated as each hub launches.
         </p>
         <div className="mt-6" data-testid="prime-kit-cta">
-          <KitCta placement="hero_home" size="lg" sub="Free · website + email · hub earnings and supplier exposure, estimated" />
+          <KitCta placement="hero_home_network" size="lg" sub="Free · website + email · hub earnings and supplier exposure, estimated" />
         </div>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
           <a href={RESERVE_HREF} data-testid="prime-cta-seat" className="inline-flex h-14 items-center justify-center gap-2 bg-accent px-6 text-base font-semibold text-accent-foreground transition-colors hover:bg-background hover:text-foreground">

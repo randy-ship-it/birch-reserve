@@ -72,7 +72,7 @@ export function IntakeDetails({ intake: intakeRef, payload, roles, shared, onSav
       setBusy(false);
     }
   };
-  const prefilled = [shared.brand && `Brand: ${shared.brand}`, shared.categories.length && `${shared.categories.length} categories`, shared.skus && `${shared.skus} SKUs`, shared.audience && `${shared.audience} customers`].filter(Boolean) as string[];
+  const prefilled = [shared.brand && `Brand: ${shared.brand}`, shared.categories.length && `${shared.categories.length} ${shared.categories.length === 1 ? "category" : "categories"}`, shared.skus && `${shared.skus} SKUs`, shared.audience && `${shared.audience} customers`].filter(Boolean) as string[];
   return (
     <section className="rounded-3xl bg-white p-5 shadow-xl md:p-6" style={{ border: `1px solid ${RT.line}` }} data-testid="intake-details">
       <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: RT.mintInk }}>Optional · 2 minutes · updates the same request</p>
