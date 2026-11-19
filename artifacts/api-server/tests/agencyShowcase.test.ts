@@ -162,7 +162,8 @@ test("start small (Nov 19 2026): $190 / $490 / starter block / $1K–$5K agency 
   for (const t of [html, src]) {
     assert.doesNotMatch(t, /exclusiv|not taken|\bavailable\b|\bopen\b|\b0 (purchases|holds|signed)\b|guarantee(d)? (views|impressions)|CTR|ROAS|\bCAD\b|Friday|\bAlign\b|Clairvoyant|80 locations|10\s*[–-]\s*12|\b12%/i);
   }
-  for (const p of ["home", "audiences", "media-kit", "agencies"]) {
+  // Home stays condensed (#163, Randy t226u); its cards link to /intake, where the two-lane reserve lives.
+  for (const p of ["audiences", "media-kit", "agencies"]) {
     assert.match(read(`../clinichub-media/src/pages/br/${p}.tsx`), new RegExp(`<StartSmall page="${p}"`));
   }
   assert.doesNotMatch(read("../clinichub-media/src/pages/br/audiences.tsx"), /<Eyebrow>Start now<\/Eyebrow>/);

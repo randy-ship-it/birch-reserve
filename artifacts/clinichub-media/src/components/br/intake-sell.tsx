@@ -4,6 +4,7 @@
  * strong primary CTA. Only a generic review state is shown (Friday's hub-partner match is internal only and never rendered).
  * No approval controls on Birch.
  */
+import { openLane } from "@/components/br/two-lane";
 import { Details } from "@/components/br/details";
 import { ArrowRight, Clock, FlaskConical, Store, Megaphone } from "lucide-react";
 import type { IntakeRole } from "../../../../api-server/src/lib/overhaul/brandIntake";
@@ -49,10 +50,10 @@ export function PrimaryCta({ side, where, tone = "light", secondary = true }: { 
     <div data-testid={`primary-cta-${where}`} data-side={side} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
       {kind === "look" ? (
         <>
-          <a href={LOOK_HREF} data-testid="primary-cta-look" onClick={() => { trackIntake(side, "cta_click", "look_190"); trackCta("cta_hold_190", { offer: "hold-190" }); }} className={`${big} bg-lime-300 text-[#0b1f3a] shadow-lime-500/30 hover:bg-[#0b1f3a] hover:text-white`}>
+          <a href={LOOK_HREF} data-testid="primary-cta-look" onClick={(e) => { if (openLane({ lane: "card", sku: "hold-190" })) { e.preventDefault(); return; } trackIntake(side, "cta_click", "look_190"); trackCta("cta_hold_190", { offer: "hold-190" }); }} className={`${big} bg-lime-300 text-[#0b1f3a] shadow-lime-500/30 hover:bg-[#0b1f3a] hover:text-white`}>
             Start the $190 USD look <ArrowRight className="size-5" />
           </a>
-          {secondary ? <a href={RESERVE_HREF} data-testid="primary-cta-reserve" onClick={() => { trackIntake(side, "cta_click", "reserve_490"); trackCta("cta_reserve_490", { offer: "reserve-490" }); }} className={`text-sm font-semibold underline ${sub}`}>or reserve for $490 USD</a> : null}
+          {secondary ? <a href={RESERVE_HREF} data-testid="primary-cta-reserve" onClick={(e) => { if (openLane({ lane: "card", sku: "reserve-490" })) { e.preventDefault(); return; } trackIntake(side, "cta_click", "reserve_490"); trackCta("cta_reserve_490", { offer: "reserve-490" }); }} className={`text-sm font-semibold underline ${sub}`}>or reserve for $490 USD</a> : null}
         </>
       ) : (
         <a href={where === "done" ? "/intake/publisher" : "/intake/publisher#publisher-contact-submit"} data-testid="primary-cta-publisher" onClick={() => trackIntake(side, "cta_click", where === "done" ? "publisher_payout" : "send_for_review")} className={`${big} bg-lime-300 text-[#0b1f3a] shadow-lime-500/30 hover:bg-[#0b1f3a] hover:text-white`}>

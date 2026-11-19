@@ -19,6 +19,8 @@ export const INTAKE_DETAILS = [
   "fast", "expanded", "quick_report", "add_detail", "update",
   // simplified intake (Randy voice, Nov 19 2026 8:30 AM ET): supply-only choice, "Add a hub too", hub details
   "supply_only", "add_hub", "hub_details", "accelerate", "partial_saved", "locations", "kit_email", "resume",
+  // two-lane conversion layer (Randy t227u, Nov 19 2026): card reserve + big block / agency IO
+  "lane_card", "lane_block", "agency_test", "big_block", "io_pdf",
   // formats / errors
   "pdf", "png", "too_fast", "invalid_email", "invalid_website", "rate_limited", "unreachable",
 ] as const;
