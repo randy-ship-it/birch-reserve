@@ -81,6 +81,23 @@ test("brand-intake-v1 not deployed (404) → lead still pushed to Friday /api/in
   }
 });
 
+test("v1 404 on a draft (no email) never pushes an anonymous lead", async () => {
+  let pushed = 0;
+  globalThis.fetch = (async () => (pushed++, new Response("{}", { status: 201 }))) as unknown as typeof fetch;
+  try {
+    const f = (async () => new Response("{}", { status: 404 })) as unknown as typeof fetch;
+    const s = await serve(ENV, f);
+    const r = await realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ roles: ["brand"] }) });
+    const d = await r.json();
+    s.close();
+    assert.equal(r.status, 202);
+    assert.deepEqual([d.fallback, d.lead, d.draft], ["api_intake", false, "local"]);
+    assert.equal(pushed, 0);
+  } finally {
+    globalThis.fetch = realFetch;
+  }
+});
+
 test("the secret's env names never appear in client sources; the browser only calls same-origin /v1 routes", () => {
   const root = resolve(process.cwd(), "../clinichub-media/src");
   const walk = (d: string): string[] => readdirSync(d).flatMap((n) => (statSync(join(d, n)).isDirectory() ? walk(join(d, n)) : /\.(ts|tsx)$/.test(n) ? [join(d, n)] : []));

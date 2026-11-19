@@ -41,6 +41,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
   const [busy, setBusy] = useState<"idle" | "busy" | "done" | "error">("idle");
   const [err, setErr] = useState<string | null>(null);
   const [held, setHeld] = useState(false);
+  const [queued, setQueued] = useState(false);
   const [report, setReport] = useState<FridayReport | null>(null);
   const [map, setMap] = useState<string | undefined>();
   const t0 = useRef(Date.now());
@@ -99,6 +100,10 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
       }
       const rep = await api.reportView(next.reportToken, "brand");
       if (rep?.ready) setReport(rep.report);
+      else {
+        setQueued(true); // received by Friday; the full report is released once Friday's kit report is live
+        await exportKit(null);
+      }
       setBusy("done");
     } catch (e) {
       setErr(ERR[(e as Error).message] ?? "Couldn't reach Friday. Your inputs are saved on this device; try again.");
@@ -202,6 +207,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
             </div>
           ) : null}
           {err ? <p className="mt-2 text-sm font-semibold text-red-700" data-testid="kit-error">{err}</p> : null}
+          {queued ? <p className="mt-3 rounded-xl bg-lime-50 p-3 text-sm" data-testid="kit-queued">Received as pending review. Your kit above is a live preview; the full report from Friday follows after review.</p> : null}
           {held ? <p className="mt-3 flex gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900" data-testid="kit-held"><ShieldAlert className="size-4 shrink-0" />{HELD_COPY}</p> : null}
           <button type="button" data-testid="kit-download" onClick={getKit} disabled={busy === "busy"} className="mt-5 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 text-base font-bold text-accent-foreground shadow-lg shadow-lime-500/20 transition hover:bg-foreground hover:text-background">
             {busy === "busy" ? <Loader2 className="size-5 animate-spin" /> : busy === "done" ? <Check className="size-5" /> : <Download className="size-5" />} {busy === "done" ? "Kit downloaded (PDF + PNG)" : step === "contact" && !report ? "Get my kit" : "Download my kit"}

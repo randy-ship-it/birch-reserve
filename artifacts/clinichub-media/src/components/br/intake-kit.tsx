@@ -253,7 +253,6 @@ export function ContactSubmit({ role, payload, draft, setRef, label }: { role: I
     try {
       const api = fridayIntake();
       const r = draft ?? (await api.create(payload));
-      if (r.legacy) return setState("done");
       const res = await api.submit(r, payload, { email: email.trim(), website: website.trim(), elapsed_ms: Date.now() - t0.current });
       const next = { ...r, version: res.version };
       saveRef(role, next);

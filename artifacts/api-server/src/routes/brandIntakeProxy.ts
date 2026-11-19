@@ -18,8 +18,9 @@
  *   FRIDAY_WORKSPACE Friday org id (default "birchreserve")
  * Unset → 503 {error:"friday_not_configured"}; the client then uses its labelled preview mock.
  *
- * Belt and braces: if Friday answers 404 on the v1 create/submit route (brand-intake-v1 not deployed yet), the
- * submission is pushed to Friday's existing POST /api/intake (lib/overhaul/fridayIntake.ts) so the lead still lands.
+ * Belt and braces: if Friday answers 404 on the v1 create route (brand-intake-v1 not deployed yet), a SUBMISSION
+ * (submit:true + email) is pushed to Friday's existing POST /api/intake (lib/overhaul/fridayIntake.ts) so the lead
+ * still lands. Drafts without contact details are never pushed (the client keeps them locally).
  */
 import { Router, json, type Request, type Response } from "express";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
@@ -98,8 +99,15 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     const out = await forward(req, res, "POST", "/api/public/brand-intake", req.body ?? {});
     if (!out) return;
     if (out.status === 404) {
-      const r = await sendIntake(legacyLead(req.body ?? {}, "/intake"), env);
-      res.status(r.status === "sent" ? 202 : 503).json({ ok: r.status === "sent", fallback: "api_intake", lead: r.status === "sent", error: r.status === "sent" ? undefined : "intake_failed" });
+      // v1 not deployed. Drafts (no email yet) stay in the browser; only a submission with contact details is
+      // pushed to /api/intake, so autosave never creates anonymous leads.
+      const b = (req.body ?? {}) as Record<string, unknown>;
+      if (b.submit !== true || typeof b.email !== "string") {
+        res.status(202).json({ ok: true, fallback: "api_intake", lead: false, draft: "local" });
+        return;
+      }
+      const r = await sendIntake(legacyLead(b, "/intake"), env);
+      res.status(r.status === "sent" ? 202 : 503).json({ ok: r.status === "sent", fallback: "api_intake", lead: r.status === "sent", status: "submitted", version: 1, approvals: {}, error: r.status === "sent" ? undefined : "intake_failed" });
       return;
     }
     send(res, out);
@@ -109,7 +117,6 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     if (!ID_RE.test(id)) return void res.status(404).json({ ok: false, error: "not_found" });
     const out = await forward(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, req.body ?? {});
     if (!out) return;
-    if (out.status === 404 && (req.body as Record<string, unknown>)?.submit === true) await sendIntake(legacyLead(req.body ?? {}, "/intake"), env);
     send(res, out);
   });
   router.post("/v1/brand-intake/:id/kit", body, async (req, res) => {

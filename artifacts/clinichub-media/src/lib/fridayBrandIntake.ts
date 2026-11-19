@@ -204,16 +204,21 @@ const live = {
     return { id: d.id, editToken: d.editToken, reportToken: d.reportToken, version: d.version };
   },
   async update(ref: IntakeRef, payload: IntakePayload): Promise<IntakeRef> {
+    if (ref.legacy) return ref; // v1 not deployed: the draft stays in this browser until submit
     const d = await j<{ version: number }>(await fetch(`${BIRCH}/v1/brand-intake/${encodeURIComponent(ref.id)}`, { method: "PATCH", headers: H(ref), body: JSON.stringify(toFridayBody(payload)) }));
     return { ...ref, version: d.version };
   },
   async submit(ref: IntakeRef, payload: IntakePayload, contact: SubmitContact): Promise<SubmitResult> {
+    // v1 not deployed: one-shot submit through the Birch server, which pushes the lead to Friday's /api/intake.
+    if (ref.legacy) return j(await fetch(`${BIRCH}/v1/brand-intake`, { method: "POST", headers: H(), body: JSON.stringify(toFridayBody(payload, { ...contact, submit: true })) }));
     return j(await fetch(`${BIRCH}/v1/brand-intake/${encodeURIComponent(ref.id)}`, { method: "PATCH", headers: H(ref), body: JSON.stringify(toFridayBody(payload, { ...contact, submit: true })) }));
   },
   async kit(ref: IntakeRef, kit: KitBody): Promise<{ status: "pending_review" }> {
+    if (ref.legacy) throw new Error("not_submitted");
     return j(await fetch(`${BIRCH}/v1/brand-intake/${encodeURIComponent(ref.id)}/kit`, { method: "POST", headers: H(ref), body: JSON.stringify(kit) }));
   },
   async download(reportToken: string, format: "pdf" | "png"): Promise<void> {
+    if (reportToken.startsWith("legacy-")) return;
     await fetch(`${BIRCH}/v1/brand-kit/download`, { method: "POST", headers: H(), body: JSON.stringify({ reportToken, format }) });
   },
   async report(reportToken: string): Promise<BrandReport | null> {
@@ -227,6 +232,7 @@ const live = {
 
 Object.assign(live, {
   async reportView(reportToken: string, view: ReportView): Promise<ReportResult | null> {
+    if (reportToken.startsWith("legacy-")) return { ready: false };
     const r = await fetch(`${BIRCH}/v1/brand-report/${encodeURIComponent(reportToken)}?view=${view}`, { cache: "no-store", referrerPolicy: "no-referrer" });
     if (r.status === 404) return null;
     if (r.status === 202) return { ready: false };

@@ -39,10 +39,6 @@ export function IntakeShortForm() {
       const api = fridayIntake();
       const payload = { ...basePayload(roles[0]!), roles };
       const ref = await api.create(payload); // brand-intake-v1 POST → draft lead in Friday
-      if (ref.legacy) {
-        setDone({ ref, held: false });
-        return;
-      }
       const sub = await api.submit(ref, payload, { email: email.trim(), website: website.trim(), elapsed_ms: Date.now() - t0.current }); // → submitted lead, Randy emailed by Friday
       const next = { ...ref, version: sub.version };
       saveRef(roles[0]!, next);
