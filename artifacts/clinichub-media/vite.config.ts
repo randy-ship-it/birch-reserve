@@ -64,6 +64,20 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, 'dist/public'),
     emptyOutDir: true,
   },
+  // Scale mirror (api-server/src/middlewares/mirrorHost.ts): built files referenced from JS resolve through
+  // window.__BR_MIRROR.base (/intake/_m) when the page is served under scalehealth.ca/intake, and CSS references are
+  // relative to the stylesheet. On birchreserve.net the base is empty, so every URL is exactly what it was.
+  experimental: {
+    renderBuiltUrl(filename, { hostType }) {
+      if (hostType === 'js') {
+        return {
+          runtime: `((typeof window!=="undefined"&&window.__BR_MIRROR&&window.__BR_MIRROR.base)||"")+${JSON.stringify(basePath.replace(/\/$/, '') + '/' + filename)}`,
+        };
+      }
+      if (hostType === 'css') return { relative: true };
+      return basePath.replace(/\/$/, '') + '/' + filename;
+    },
+  },
   server: {
     port,
     strictPort: true,

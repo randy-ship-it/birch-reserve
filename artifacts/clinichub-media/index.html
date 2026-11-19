@@ -54,7 +54,8 @@
     <script>
       (function () {
         try {
-          if ("serviceWorker" in navigator && navigator.serviceWorker.getRegistrations) {
+          // Never touch service workers on a mirror host (scalehealth.ca/intake shares the Scale origin).
+          if (!window.__BR_MIRROR && "serviceWorker" in navigator && navigator.serviceWorker.getRegistrations) {
             navigator.serviceWorker.getRegistrations().then(function (regs) {
               regs.forEach(function (r) { r.unregister(); });
             }).catch(function () {});

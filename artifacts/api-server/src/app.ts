@@ -1,4 +1,5 @@
 import { mirrorFrame } from "./middlewares/mirrorFrame";
+import { mirrorHost } from "./middlewares/mirrorHost";
 import express, { type Express } from "express";
 import { clerkMiddleware } from "@clerk/express";
 import { shareEventsRouter } from "./routes/shareEvents";
@@ -36,6 +37,9 @@ const app: Express = express();
 // hop so req.ip uses the rightmost forwarded address and ignores caller-added
 // entries farther to the left.
 app.set("trust proxy", (_address: string, hop: number) => hop === 0);
+
+// Scale mirror (scalehealth.ca/intake): strip /intake/_m and shape the mirror shell. No-op on birchreserve.net.
+app.use(mirrorHost());
 
 // ── Standard middleware ───────────────────────────────────────────────────────
 app.use(

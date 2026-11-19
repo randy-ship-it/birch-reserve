@@ -29,6 +29,9 @@ function send(body0: Record<string, unknown>): void {
 const SRC_OK = /^[a-z0-9_]{2,32}$/;
 export function mirrorSource(): string | null {
   if (typeof window === "undefined") return null;
+  // Served through the Scale proxy (scalehealth.ca/intake): the server tags the shell (middlewares/mirrorHost.ts).
+  const boot = (window as { __BR_MIRROR?: { src?: string } }).__BR_MIRROR?.src;
+  if (boot && SRC_OK.test(boot)) return boot;
   try {
     const q = new URLSearchParams(window.location.search).get("src");
     if (q && SRC_OK.test(q)) sessionStorage.setItem("br_src", q);
@@ -96,4 +99,14 @@ export function logArrival(): void {
     referrer: document.referrer || undefined,
     sid: sid && /^[a-z0-9]{6,24}$/.test(sid) ? sid : undefined,
   });
+}
+
+/**
+ * A link that leaves /intake. On the Scale mirror it goes to the same page on birchreserve.net (the mirror only
+ * carries /intake); everywhere else it is unchanged.
+ */
+export function birchHref(path: string): string {
+  if (typeof window === "undefined") return path;
+  const m = (window as { __BR_MIRROR?: { href?: (u: string) => string } }).__BR_MIRROR;
+  return m && typeof m.href === "function" ? m.href(path) : path;
 }

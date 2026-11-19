@@ -1,0 +1,91 @@
+/**
+ * Scale mirror by proxy (Randy via Emma, Nov 19 2026 4:44 PM ET): scalehealth.ca/intake is the same live /intake,
+ * served through a Vercel external rewrite on the Scale project. Not a fork: one deployment, one form.
+ *
+ * The Scale side only forwards its /intake namespace:
+ *   /intake          -> https://birchreserve.net/intake?br_mirror=scale
+ *   /intake/:path*   -> https://birchreserve.net/intake/:path*?br_mirror=scale
+ * so everything the page loads has to live under /intake on the mirror too. Two pieces do that:
+ *
+ * 1. MIRROR_PREFIX (/intake/_m): any Birch path is also served at /intake/_m/<path> (assets, /v1 + /api calls, public
+ *    images, the kit PDF). The prefix is stripped here (and in the Vercel routes, scripts/vercel-build.mjs), so it
+ *    works on birchreserve.net itself as well. It never collides with Scale's own /assets or /api routes.
+ * 2. Mirror mode: an /intake page requested with ?br_mirror=<known tag> gets a small boot script at the top of <head>
+ *    (window.__BR_MIRROR) that routes same-origin fetch / beacon / XHR / src attributes through the prefix, sends
+ *    links that leave /intake to birchreserve.net, and tags the source (scale_mirror) for share + intake tracking.
+ *    Root-relative src/href in the shell are prefixed on the server. Canonical stays https://birchreserve.net/…
+ *
+ * Without the query tag nothing changes: birchreserve.net serves byte-identical HTML.
+ */
+import type { NextFunction, Request, Response } from "express";
+import { PUBLIC_SITE_ORIGIN } from "../lib/publicSeo";
+
+export const MIRROR_PREFIX = "/intake/_m";
+/** br_mirror tag -> source tag recorded on share events and intake records. */
+export const MIRROR_TAGS: Readonly<Record<string, string>> = { scale: "scale_mirror" };
+const MIRROR_PAGE_RE = /^\/intake(?:\/(?:publisher|supplier|sponsor|report))?\/?$/;
+
+/** Strip /intake/_m from a request URL. Returns null when the URL is not prefixed. */
+export function stripMirrorPrefix(url: string): string | null {
+  if (url !== MIRROR_PREFIX && !url.startsWith(`${MIRROR_PREFIX}/`) && !url.startsWith(`${MIRROR_PREFIX}?`)) return null;
+  const rest = url.slice(MIRROR_PREFIX.length);
+  return rest.startsWith("/") ? rest : `/${rest}`;
+}
+
+/** The boot script. Kept tiny and dependency-free; runs before the freshness check and the bundle. */
+export function mirrorBootScript(src: string): string {
+  const cfg = JSON.stringify({ base: MIRROR_PREFIX, src, home: PUBLIC_SITE_ORIGIN });
+  return `<script>(function(){var M=window.__BR_MIRROR=${cfg};var B=M.base,O=location.origin;
+function rel(u){if(typeof u!=="string")return null;if(u.indexOf(O+"/")===0)u=u.slice(O.length);return u.charAt(0)==="/"&&u.charAt(1)!=="/"?u:null}
+function own(p){return p==="/intake"||p.indexOf("/intake/")===0||p.indexOf("/intake?")===0||p.indexOf("/intake#")===0}
+function fix(u){var p=rel(u);return p===null||own(p)?u:B+p}
+M.fix=fix;M.href=function(u){var p=rel(u);return p===null||own(p)?u:M.home+p};
+var f=window.fetch;if(f)window.fetch=function(i,o){try{if(typeof i==="string")i=fix(i);else if(i instanceof URL)i=fix(i.href);else if(i&&i.url&&rel(i.url)!==null&&!own(rel(i.url)))i=new Request(fix(i.url),i)}catch(e){}return f.call(this,i,o)};
+var sb=navigator.sendBeacon;if(sb)navigator.sendBeacon=function(u,d){return sb.call(navigator,fix(String(u)),d)};
+var xo=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u){arguments[1]=fix(String(u));return xo.apply(this,arguments)};
+var sa=Element.prototype.setAttribute,A={src:1,srcset:1,poster:1,"data-src":1};
+Element.prototype.setAttribute=function(n,v){var t=this.tagName;if(typeof v==="string"){var k=String(n).toLowerCase();if(A[k])v=k==="srcset"?v.replace(/(^|,\\s*)(\\/[^\\/\\s][^\\s,]*)/g,function(_,a,p){return a+fix(p)}):fix(v);else if(k==="href"&&(t==="LINK"||t==="IMAGE"||t==="USE"))v=fix(v)}return sa.call(this,n,v)};
+["src"].forEach(function(p){[HTMLImageElement,HTMLScriptElement,HTMLSourceElement,HTMLVideoElement,HTMLAudioElement,HTMLIFrameElement].forEach(function(C){var d=C&&Object.getOwnPropertyDescriptor(C.prototype,p);if(d&&d.set)Object.defineProperty(C.prototype,p,{configurable:true,enumerable:d.enumerable,get:d.get,set:function(v){d.set.call(this,typeof v==="string"?fix(v):v)}})})});
+var ps=history.pushState,rs=history.replaceState;function nav(o){return function(s,t,u){if(u!=null){var p=rel(String(u));if(p!==null&&!own(p)){location.href=M.home+p;return}}return o.apply(history,arguments)}}history.pushState=nav(ps);history.replaceState=nav(rs);
+document.addEventListener("click",function(e){if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;var a=e.target&&e.target.closest&&e.target.closest("a[href]");if(!a||a.hasAttribute("download"))return;var p=rel(a.getAttribute("href"));if(p===null||own(p))return;e.preventDefault();e.stopPropagation();if(a.target==="_blank")window.open(M.home+p,"_blank","noopener");else location.href=M.home+p},true);
+var wo=window.open;window.open=function(u){if(typeof u==="string")arguments[0]=M.href(u);return wo.apply(window,arguments)};
+})();</script>`;
+}
+
+/** Rewrite the shell for the mirror: boot script first, root-relative assets through the prefix, links to Birch. */
+export function mirrorHtml(html: string, src: string): string {
+  const pre = (v: string) => (v.startsWith("/") && !v.startsWith("//") && !/^\/intake(?:[/?#]|$)/.test(v) ? `${MIRROR_PREFIX}${v}` : v);
+  let out = html.replace(/<(script|link|img|source|video|iframe)\b[^>]*>/gi, (tag) =>
+    tag.replace(/\s(src|href|poster)="([^"]*)"/gi, (_m, k: string, v: string) => ` ${k}="${pre(v)}"`),
+  );
+  out = out.replace(/<a\b[^>]*>/gi, (tag) =>
+    tag.replace(/\shref="(\/(?!\/)[^"]*)"/i, (m, v: string) => (/^\/intake(?:[/?#]|$)/.test(v) ? m : ` href="${PUBLIC_SITE_ORIGIN}${v}"`)),
+  );
+  const boot = mirrorBootScript(src);
+  return /<head[^>]*>/i.test(out) ? out.replace(/<head[^>]*>/i, (h) => `${h}\n${boot}`) : `${boot}${out}`;
+}
+
+export function mirrorTagOf(req: Request): string | null {
+  const raw = req.query?.br_mirror;
+  const tag = typeof raw === "string" ? raw.toLowerCase() : "";
+  return Object.prototype.hasOwnProperty.call(MIRROR_TAGS, tag) ? MIRROR_TAGS[tag]! : null;
+}
+
+export function mirrorHost() {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const stripped = stripMirrorPrefix(req.url);
+    if (stripped !== null) req.url = stripped;
+    if (req.method !== "GET" && req.method !== "HEAD") return next();
+    const src = MIRROR_PAGE_RE.test(req.path) ? mirrorTagOf(req) : null;
+    if (!src) return next();
+    const send = res.send.bind(res);
+    res.send = ((body: unknown) => {
+      const html = typeof body === "string" ? body : Buffer.isBuffer(body) && /html/i.test(String(res.getHeader("Content-Type") ?? "")) ? body.toString("utf8") : null;
+      if (html === null || !/<\/head>/i.test(html)) return send(body as never);
+      // The mirror shell differs from Birch's: never share it from a cache.
+      res.setHeader("Cache-Control", "private, no-store, max-age=0");
+      return send(mirrorHtml(html, src));
+    }) as Response["send"];
+    next();
+  };
+}

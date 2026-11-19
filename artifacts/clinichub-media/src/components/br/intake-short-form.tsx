@@ -23,6 +23,7 @@ import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { errorDetail, fieldStart, trackIntake, type IntakeSide } from "@/lib/intakeTrack";
 import { reviewGates, type LeadGates } from "@/lib/fridayBrandIntake";
 import { savePrefill } from "@/lib/intakePrefill";
+import { birchHref } from "@/lib/shareTrack";
 import { FastReport, type QuickResult } from "@/components/br/fast-report";
 import { numOrU, type SharedAnswers } from "@/components/br/intake-details";
 import { Details } from "@/components/br/details";
@@ -237,7 +238,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
           trackIntake(side, "cta_click", "add_detail");
           trackIntake(side, "mode", "expanded");
           if (onExpand) onExpand(side);
-          else window.location.assign("/brand-kit#my-kit");
+          else window.location.assign(birchHref("/brand-kit#my-kit"));
         }}
       />
       </>
