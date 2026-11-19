@@ -50,6 +50,7 @@ const API_PATHS = [
   "/for(?:/.*)?",
   "/mediakit/?",
   "/agencies/?",
+  "/media-buyers/?",
   "/ai-buyers/?",
   "/terms/?",
   "/privacy/?",

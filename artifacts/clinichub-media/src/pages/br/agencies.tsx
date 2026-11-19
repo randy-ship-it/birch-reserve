@@ -22,6 +22,7 @@ const FORWARD_KIT = [
   { href: "/sample-io", t: "Sample IO", d: "What your client signs before anything runs." },
   { href: "/audiences", t: "Audience insights", d: "Who the hubs reach. Measured, modelled and estimated figures, labelled." },
   { href: "/terms", t: "Terms", d: "Credit, refunds and cancellation in writing." },
+  { href: "/media-buyers", t: "For media buyers", d: "How Birch fits next to programmatic, paid social and retail media." },
 ];
 
 export default function BrAgencies() {
@@ -89,6 +90,9 @@ export default function BrAgencies() {
           <Cta href="#talk" testId="goal-cta-io">Send the brief · get a draft IO</Cta>
           <Cta href={RESERVE_HREF} variant="line" testId="goal-cta-reserve">Reserve for a client · $490 USD</Cta>
         </div>
+        <p className="mt-4 text-sm text-muted-foreground" data-testid="agency-media-buyers-link">
+          Client already runs display, retargeting or paid social? <a className="underline underline-offset-2" href="/media-buyers#display-mix">See how Birch sits next to that mix</a>.
+        </p>
       </Section>
       <Section tone="soft">
         <div data-testid="agency-why-now">

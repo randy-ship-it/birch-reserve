@@ -313,6 +313,9 @@ export default function BrMediaKit() {
               ))}
             </ul>
             <SampleIoLink className="mt-3" />
+            <p className="mt-3 text-sm" data-testid="mk-media-buyers-link">
+              Already running display or paid social? <a className="underline underline-offset-2" href="/media-buyers">How Birch fits your mix</a>.
+            </p>
           </div>
         </div>
       </Block>

@@ -29,6 +29,7 @@ import BrPublishStudios from '@/pages/br/publish-studios';
 import BrHubs from '@/pages/br/hubs';
 import BrMediaKit from '@/pages/br/media-kit';
 import BrAgencies from '@/pages/br/agencies';
+import BrMediaBuyers from '@/pages/br/media-buyers';
 import BrAiBuyers from '@/pages/br/ai-buyers';
 import BrAudiences from '@/pages/br/audiences';
 import BrSampleProfile from '@/pages/br/sample-profile';
@@ -279,6 +280,9 @@ function Router() {
         </Route>
         <Route path="/agencies">
           <Layout><BrAgencies /></Layout>
+        </Route>
+        <Route path="/media-buyers">
+          <Layout><BrMediaBuyers /></Layout>
         </Route>
         <Route path="/for/:slug">
           <Layout><BrForBrand /></Layout>
