@@ -220,6 +220,6 @@ test("hero path picks: existing terms word for word, no turnaround promise, no r
   assert.ok(pp.REPORTING.commitment.startsWith("Pilot reporting commitment"));
   assert.equal(pp.THREE_STEPS.sampleIoHref, "/sample-io");
   assert.equal(pp.AGENT_LINE.text, "Your AI agent can quote a seat and hand off to checkout.");
-  for (const f of ["pages/br/home.tsx", "pages/br/media-buyers.tsx", "pages/br/agencies.tsx"]) assert.match(web(f), /PilotHero|KitEntry/, f);
+  for (const f of ["pages/br/home.tsx", "pages/br/media-buyers.tsx", "pages/br/agencies.tsx"]) assert.match(web(f), /PilotHero|KitEntry|KitCta/, f);
   assert.match(web("pages/br/media-kit.tsx"), /KitBuilder/);
 });
