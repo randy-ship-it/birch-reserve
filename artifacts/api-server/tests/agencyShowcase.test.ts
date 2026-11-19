@@ -147,3 +147,24 @@ test("home (Nov 18 2026): one FAQPage for the page, not two", () => {
   assert.equal((home.match(/"FAQPage"/g) ?? []).length, 1);
   assert.match(home, /\[\.\.\.TRUST_FAQ, \.\.\.FAQ\]/);
 });
+
+test("start small (Nov 19 2026): $190 / $490 / starter block / $1K–$5K agency tiers, refundable deposit, no zero-demand or exclusive wording", async () => {
+  const { startSmallHtml, START_SMALL_BLOCK_USD } = await import("../src/lib/startSmallHtml");
+  const html = startSmallHtml();
+  for (const k of ["look", "seat", "block", "agency"]) assert.match(html, new RegExp(`data-testid="start-small-${k}"`));
+  assert.match(html, /Start small from \$190\. Fully refundable deposit\./);
+  assert.match(html, /\$190 USD/); assert.match(html, /\$490 USD/); assert.match(html, /\$1K–\$5K USD/);
+  assert.equal(START_SMALL_BLOCK_USD, 400);
+  assert.match(html, /data-pick-sku="hold-190"/); assert.match(html, /data-pick-sku="reserve-490"/);
+  assert.equal((html.match(/Deposit collected at confirmation/g) ?? []).length, 2);
+  assert.match(html, /<details><summary>Refund terms<\/summary>/);
+  const src = read("../clinichub-media/src/components/br/start-small.tsx");
+  for (const t of [html, src]) {
+    assert.doesNotMatch(t, /exclusiv|not taken|\bavailable\b|\bopen\b|\b0 (purchases|holds|signed)\b|guarantee(d)? (views|impressions)|CTR|ROAS|\bCAD\b|Friday|\bAlign\b|Clairvoyant|80 locations|10\s*[–-]\s*12|\b12%/i);
+  }
+  // Home stays condensed (#163, Randy t226u); its cards link to /intake, where the two-lane reserve lives.
+  for (const p of ["audiences", "media-kit", "agencies"]) {
+    assert.match(read(`../clinichub-media/src/pages/br/${p}.tsx`), new RegExp(`<StartSmall page="${p}"`));
+  }
+  assert.doesNotMatch(read("../clinichub-media/src/pages/br/audiences.tsx"), /<Eyebrow>Start now<\/Eyebrow>/);
+});

@@ -80,6 +80,7 @@ import { logger, recordUcpProxyForwardingShape } from "../lib/logger";
 import { publicSeoTags } from "../lib/publicSeo";
 import { BUYER_COMFORT_CSS, buyerFaqHtml, flightTimelineHtml, heroInquireHtml, heroSubHtml, liveHubTalkHtml, offersSampleIoHtml, sampleIoCheckoutHtml, seeTheUnitHtml, sharedSeatsHtml } from "../lib/buyerComfortHtml";
 import { PREPAY_REFUND_CUTOFF_DAYS } from "../lib/reserveOffers";
+import { START_SMALL_CSS, startSmallHtml } from "../lib/startSmallHtml";
 import { handleUiEvent } from "../lib/uiEvents";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { PREMIUM_INQUIRE_ONLY, PREMIUM_INQUIRY_KIND, PREMIUM_INQUIRY_MESSAGE, PREMIUM_INQUIRY_PATH, isPremiumFormat } from "../lib/premiumInquireOnly";
@@ -2353,7 +2354,7 @@ function renderBuycalcHtmlUsd(input: {
 })}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>${BUYCALC_CSS}${BUYER_COMFORT_CSS}</style></head><body>
+<style>${BUYCALC_CSS}${BUYER_COMFORT_CSS}${START_SMALL_CSS}</style></head><body>
 <header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav aria-label="Buy page"><a class="tl" href="/media-kit">Media kit</a><a class="tl" href="#request">Ask about a placement</a><a class="tl tel" href="tel:+16479316278">(647) 931-6278</a>${currencyToggleHtml(currency, { sku: input.sku, format: input.format, category })}</nav></div></header>
 <main>
 <section class="hero"><div class="wrap"><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
@@ -2368,6 +2369,7 @@ ${heroInquireHtml()}</div></section>
 ${offersSampleIoHtml()}
 <!--BONUS_TIER_DRAFT-->
 </div></section>
+${currency === "usd" ? startSmallHtml() : ""}
 ${seeTheUnitHtml(price(look), price(seat))}
 
 <section class="band" id="included"><div class="wrap"><p class="kicker">What you get</p><h2>Plain terms.</h2>
@@ -2429,6 +2431,7 @@ form.addEventListener("submit",async function(e){e.preventDefault();if(!form.rep
 var rq=document.getElementById("catreq"),rm=document.getElementById("r-message"),rs=document.getElementById("r-submit");
 document.querySelectorAll("[data-request-category]").forEach(function(a){a.addEventListener("click",function(e){e.preventDefault();rq.elements.category.value=a.getAttribute("data-request-category");document.getElementById("request").scrollIntoView({behavior:"smooth",block:"start"});setTimeout(function(){document.getElementById("r-brand").focus({preventScroll:true})},400)})});
 rq.addEventListener("submit",async function(e){e.preventDefault();if(!rq.reportValidity())return;rs.disabled=true;rm.textContent="Sending…";var d=Object.fromEntries(new FormData(rq));d.path="/buycalc";try{var q=new URLSearchParams(location.search);d.utm={utm_source:q.get("utm_source")||"",utm_medium:q.get("utm_medium")||"",utm_campaign:q.get("utm_campaign")||""}}catch(_){}try{var r=await fetch("/v1/category-request",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(d)});var o=await r.json().catch(function(){return{}});if(r.ok&&o.ok){rm.textContent="Got it. Your request is in. We'll reply to "+d.email+" shortly. No card was charged.";rq.querySelectorAll("input,select,textarea,button").forEach(function(el){el.disabled=true});return}rm.textContent=o.error||"We could not send that. Call (647) 931-6278 or email sales@silverbirchgrowth.com.";rs.disabled=false}catch(err){rm.textContent="We could not send that. Call (647) 931-6278 or email sales@silverbirchgrowth.com.";rs.disabled=false}});
+try{var pf=JSON.parse(sessionStorage.getItem("br_quick_reserve")||"null");if(pf&&typeof pf==="object"){if(typeof pf.brand==="string"&&!form.elements.brand.value)form.elements.brand.value=pf.brand.slice(0,160);if(typeof pf.email==="string"&&!form.elements.email.value)form.elements.email.value=pf.email.slice(0,320);sessionStorage.removeItem("br_quick_reserve")}}catch(_){}
 refresh();if(location.hash==="#reserve"&&/[?&]format=/.test(location.search)){setTimeout(function(){document.getElementById("f-brand").focus({preventScroll:true})},350)}})();
 </script></body></html>`;
 }

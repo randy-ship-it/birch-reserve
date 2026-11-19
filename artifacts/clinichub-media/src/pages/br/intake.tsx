@@ -15,6 +15,7 @@ import { ShareBar } from "@/components/br/share-bar";
 import { Details } from "@/components/br/details";
 import { sampleReport } from "@/lib/fridayMockReport";
 import { RT, RT_SANS, RT_SERIF } from "@/lib/reportTokens";
+import { TwoLane, openLane } from "@/components/br/two-lane";
 import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 
 const SAMPLE_EXPOSURE = { ...mockExposure({ sells_in: ["CA", "US"], ships_to: ["CA", "US"], regions: ["ON"] }), basis: "Sample: network figures / targets × example activation shares (1%–5%)" };
@@ -41,8 +42,10 @@ export default function BrIntake() {
         <div className="container mx-auto max-w-5xl px-4 pb-8 pt-8 md:pt-14">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · Monetization Kit</p>
           <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Get your Monetization Kit.</h1>
-          <p className="mt-2 max-w-2xl text-base text-muted-foreground">One short form. Your exposure and earnings, side by side.</p>
-          <div className="mt-5">{mode === "fast" ? <IntakeShortForm onExpand={expand} /> : null}</div>
+          <p className="mt-2 max-w-2xl text-base text-muted-foreground">Reserve space now, book a big block, or get your free kit.</p>
+          <div className="mt-5"><TwoLane /></div>
+          <div className="mt-6 flex items-center gap-3" data-testid="kit-divider"><span className="h-px flex-1 bg-foreground/15" /><span className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Or get your free Monetization Kit</span><span className="h-px flex-1 bg-foreground/15" /></div>
+          <div className="mt-3">{mode === "fast" ? <IntakeShortForm onExpand={expand} /> : null}</div>
           <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <ShareBar testId="share-bar-intake" />
             {mode === "fast" ? (
@@ -63,6 +66,13 @@ export default function BrIntake() {
         <h2 className="mt-3 text-3xl md:text-5xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you get.</h2>
         <Details testId="sample-details"><p>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range in USD, not a result or a guarantee.</p></Details>
         <div className="mt-4"><ReportV2 report={sample} sample compact exposure={SAMPLE_EXPOSURE} exposureSource="sample" /></div>
+        <div className="mt-6 flex flex-col gap-3 rounded-3xl bg-[#0b1f3a] p-5 text-white md:flex-row md:items-center md:justify-between md:p-6" data-testid="two-lane-foot">
+          <p className="font-display text-2xl leading-tight md:text-3xl">Ready to run?</p>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <button type="button" onClick={() => openLane({ lane: "card" })} className="inline-flex h-12 items-center justify-center rounded-full bg-lime-300 px-6 text-sm font-bold text-[#0b1f3a]" data-testid="two-lane-foot-card">Reserve space (card)</button>
+            <button type="button" onClick={() => openLane({ lane: "block" })} className="inline-flex h-12 items-center justify-center rounded-full px-6 text-sm font-bold text-white ring-1 ring-white/40" data-testid="two-lane-foot-block">Big block / agency (IO + cheque)</button>
+          </div>
+        </div>
       </div>
     </div>
   );

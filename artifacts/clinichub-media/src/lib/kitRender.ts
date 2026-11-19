@@ -217,7 +217,7 @@ function b64ToBytes(b64: string): Uint8Array {
 }
 
 /** Minimal PDF: one full-bleed JPEG per page (3:4 page, 612×816 pt). */
-export function pdfFromJpegs(pages: Array<{ jpeg: Uint8Array; w: number; h: number }>): Blob {
+export function pdfFromJpegs(pages: Array<{ jpeg: Uint8Array; w: number; h: number }>, title = "Birch Reserve Monetization Kit"): Blob {
   const enc = new TextEncoder();
   const chunks: Uint8Array[] = [];
   const offsets: number[] = [];
@@ -255,18 +255,18 @@ export function pdfFromJpegs(pages: Array<{ jpeg: Uint8Array; w: number; h: numb
   const xref = len;
   push(`xref\n0 ${total}\n0000000000 65535 f \n`);
   for (let i = 1; i < total; i++) push(`${String(offsets[i]).padStart(10, "0")} 00000 n \n`);
-  push(`trailer\n<< /Size ${total} /Root 1 0 R /Info << /Title (Birch Reserve Monetization Kit) /Producer (Birch Reserve) >> >>\nstartxref\n${xref}\n%%EOF`);
+  push(`trailer\n<< /Size ${total} /Root 1 0 R /Info << /Title (${title.replace(/[()\\]/g, "")}) /Producer (Birch Reserve) >> >>\nstartxref\n${xref}\n%%EOF`);
   return new Blob(chunks as BlobPart[], { type: "application/pdf" });
 }
 
-export async function kitPdfBlob(sides: string[]): Promise<Blob> {
+export async function kitPdfBlob(sides: string[], title?: string): Promise<Blob> {
   const pages = [];
   for (const s of sides) {
     const c = await svgToCanvas(s, 1.5);
     const b64 = c.toDataURL("image/jpeg", 0.92).split(",")[1]!;
     pages.push({ jpeg: b64ToBytes(b64), w: c.width, h: c.height });
   }
-  return pdfFromJpegs(pages);
+  return pdfFromJpegs(pages, title);
 }
 
 export function saveBlob(blob: Blob, name: string) {
