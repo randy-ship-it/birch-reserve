@@ -86,6 +86,8 @@ export type Segment = {
   profileBasis: Basis;
   intent: "Very high" | "High" | "Building";
   fits: string;
+  /** Nov 19 2026: key into MARKET_CONTEXT shown on the segment card as cited, population-level context (never Birch reach). */
+  marketKey?: string;
 };
 
 export const SEGMENTS: Segment[] = [
@@ -100,6 +102,7 @@ export const SEGMENTS: Segment[] = [
     profileBasis: "modelled",
     intent: "Very high",
     fits: "Recovery tools, heat and cold, braces, footwear, topicals",
+    marketKey: "chronic-pain",
   },
   {
     key: "longevity",
@@ -112,6 +115,7 @@ export const SEGMENTS: Segment[] = [
     profileBasis: "modelled",
     intent: "High",
     fits: "Supplements with an NPN, testing, wearables, nutrition",
+    marketKey: "age-65-ca",
   },
   {
     key: "sleep",
@@ -125,6 +129,7 @@ export const SEGMENTS: Segment[] = [
     profileBasis: "modelled",
     intent: "Building",
     fits: "Sleep devices, mattresses and bedding, sleep-friendly supplements",
+    marketKey: "sleep-65-ca",
   },
   {
     key: "physio",
@@ -136,6 +141,7 @@ export const SEGMENTS: Segment[] = [
     profileBasis: "modelled",
     intent: "Very high",
     fits: "Braces, TENS, heat, mobility tools, recovery footwear",
+    marketKey: "chronic-pain",
   },
   {
     key: "racquet",
@@ -259,6 +265,34 @@ export const MARKET_CONTEXT: Array<{ key: string; pillar: string; stat: string; 
     url: "https://experienceispa.com/press-releases/powered-by-the-industry-it-serves-ispas-2026-big-five-statistics-show-steady-gains-and-enduring-strength/",
     year: "2026",
   },
+  // Nov 19 2026 daily scan: Sleep (65+, screens before bed) and Medi/Spa (med spa patients). Same rules: cited, dated, population-level.
+  {
+    key: "sleep-65-ca",
+    pillar: "Sleep",
+    stat: "55%",
+    line: "of Canadian adults aged 65 and older met the 7 to 8 hour sleep recommendation in 2020 (vs 77% of adults 18 to 64); 29% slept longer and 15% slept less.",
+    source: "Statistics Canada, Health Reports: Sleep behaviours among Canadian adults (Canadian Community Health Survey 2020)",
+    url: "https://www150.statcan.gc.ca/n1/pub/82-003-x/2022003/article/00001-eng.htm",
+    year: "2022",
+  },
+  {
+    key: "screens-before-sleep",
+    pillar: "Sleep",
+    stat: "68% / 60%",
+    line: "of Canadian adults aged 18 to 64 and 65 and older used an electronic device in the 30 minutes before falling asleep.",
+    source: "Statistics Canada, The Daily: Health Reports, March 2022",
+    url: "https://www150.statcan.gc.ca/n1/daily-quotidien/220316/dq220316d-eng.htm",
+    year: "2022",
+  },
+  {
+    key: "medspa-us",
+    pillar: "Medi/Spa (in queue)",
+    stat: "73%",
+    line: "of US medical spa patients were repeat patients in 2023 (up from 65%), spending an average of $527 USD per visit across 10,488 med spas.",
+    source: "American Med Spa Association, 2024 Medical Spa State of the Industry Executive Summary",
+    url: "https://www.americanmedspa.org/news/2024-medical-spa-state-of-the-industry-executive-report-recap/",
+    year: "2024",
+  },
 ];
 
 export const SOURCES: Array<{ basis: Basis; source: string; what: string }> = [
@@ -266,8 +300,20 @@ export const SOURCES: Array<{ basis: Basis; source: string; what: string }> = [
   { basis: "measured", source: "Live hub inventory", what: "The launch brands and Calm Joints racquet pages listed on this page." },
   { basis: "modelled", source: "TAM feed (scalehealth.ca/tam)", what: "Orders a year, age band, gender skew, mobile share and stated intents by category, modelled from launch-partner customers." },
   { basis: "estimated", source: "Channel benchmarks", what: "Click-through bands by moment. Ranges, not promises." },
-  { basis: "estimated", source: "Public research (Health Canada, Statistics Canada, CRN, AAFC, APPA)", what: "Population-level market context per pillar, linked to each source. Not Birch audience sizes or delivery." },
+  { basis: "estimated", source: "Public research (Health Canada, Statistics Canada, CRN, AAFC, APPA, ISPA, AmSpa)", what: "Population-level market context per pillar, linked to each source. Not Birch audience sizes or delivery." },
 ];
+
+/** Nov 19 2026: the cited market-context line for a segment card, if any. */
+export function segmentContext(s: Pick<Segment, "marketKey">) {
+  return s.marketKey ? MARKET_CONTEXT.find((m) => m.key === s.marketKey) : undefined;
+}
+
+/** Nov 19 2026: /match?audience=<segment key> prefill. Unknown keys return null (no prefill). */
+export function matchPrefill(key: string | null | undefined): { key: string; name: string; blurb: string } | null {
+  const s = SEGMENTS.find((x) => x.key === key);
+  if (!s) return null;
+  return { key: s.key, name: s.name, blurb: `Customers like your "${s.name}" audience. We sell: ` };
+}
 
 export function fmtOrdersShort(n: number): string {
   if (n >= 1_000_000) return `~${(n / 1_000_000).toFixed(1)}MM`;
