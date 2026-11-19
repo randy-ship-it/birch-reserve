@@ -91,36 +91,50 @@ export function kitSideA(d: KitData): string {
 </svg>`;
 }
 
+/**
+ * Side B layout flows top to bottom (hotfix Nov 19 2026, Randy 10:02 AM ET): the hub grid is at most two rows of three,
+ * and the rate banner, the channel headings (each on its own line) and the channel cards are placed below whatever the
+ * grid used, so nothing overlaps at any hub count. Long hub descriptions are clipped to one line inside the card.
+ */
+const clip = (s: string, max: number) => (s.length > max ? `${s.slice(0, max - 1).trimEnd()}…` : s);
 export function kitSideB(d: KitData): string {
-  const hubs = d.hubs;
+  const hubs = d.hubs.slice(0, 6);
+  const HUB_Y = 420, CARD_H = 196, PITCH = 216;
+  const rows = Math.max(1, Math.ceil(hubs.length / 3));
   const hubCards = hubs
     .map((h, i) => {
       const x = 72 + (i % 3) * 356;
-      const y = 420 + Math.floor(i / 3) * 196;
+      const y = HUB_Y + Math.floor(i / 3) * PITCH;
       const likely = /good|likely|strong/i.test(h.fitLabel);
-      return `<g><rect x="${x}" y="${y}" width="336" height="176" rx="24" fill="#fff" stroke="${NAVY}" stroke-opacity="${likely ? 0.9 : 0.15}" stroke-width="${likely ? 3 : 1.5}"/>
-      <text x="${x + 24}" y="${y + 52}" font-family="${SERIF}" font-size="32" fill="${NAVY}">${esc(h.name)}</text>
-      <text x="${x + 24}" y="${y + 86}" font-family="${SANS}" font-size="17" fill="${NAVY}" opacity=".7">${esc(h.what ?? h.status)}</text>
-      <rect x="${x + 24}" y="${y + 112}" width="${h.fitLabel.length * 8.6 + 32}" height="36" rx="18" fill="${likely ? LIME : "#eef2f7"}"/>
-      <text x="${x + 40}" y="${y + 136}" font-family="${SANS}" font-size="16" font-weight="700" fill="${NAVY}">${esc(h.fitLabel)}</text>
-      ${h.status === "Live" ? `<text x="${x + 312}" y="${y + 136}" text-anchor="end" font-family="${SANS}" font-size="15" font-weight="700" fill="#15803d">● Live</text>` : `<text x="${x + 312}" y="${y + 136}" text-anchor="end" font-family="${SANS}" font-size="15" fill="${NAVY}" opacity=".55">${esc(h.status)}</text>`}</g>`;
+      return `<g><rect x="${x}" y="${y}" width="336" height="${CARD_H}" rx="24" fill="#fff" stroke="${NAVY}" stroke-opacity="${likely ? 0.9 : 0.15}" stroke-width="${likely ? 3 : 1.5}"/>
+      <text x="${x + 24}" y="${y + 52}" font-family="${SERIF}" font-size="30" fill="${NAVY}">${esc(clip(h.name, 18))}</text>
+      <text x="${x + 24}" y="${y + 86}" font-family="${SANS}" font-size="17" fill="${NAVY}" opacity=".7">${esc(clip(h.what ?? h.status, 31))}</text>
+      <rect x="${x + 24}" y="${y + 108}" width="${Math.min(288, h.fitLabel.length * 8.6 + 32)}" height="36" rx="18" fill="${likely ? LIME : "#eef2f7"}"/>
+      <text x="${x + 40}" y="${y + 132}" font-family="${SANS}" font-size="16" font-weight="700" fill="${NAVY}">${esc(clip(h.fitLabel, 30))}</text>
+      ${h.status === "Live" ? `<text x="${x + 24}" y="${y + 174}" font-family="${SANS}" font-size="15" font-weight="700" fill="#15803d">● Live</text>` : `<text x="${x + 24}" y="${y + 174}" font-family="${SANS}" font-size="15" fill="${NAVY}" opacity=".55">${esc(h.status)}</text>`}</g>`;
     })
     .join("");
+  const bannerY = HUB_Y + (rows - 1) * PITCH + CARD_H + 28;
+  const h2Y = bannerY + 110 + 50;
+  const h3Y = h2Y + 34;
+  const chY = h3Y + 24;
+  const fineY = chY + 330 + 40;
   const others = d.channels;
   const chCards = others
     .map((c, i) => {
       const x = 72 + i * 356;
-      const y = 1010;
+      const y = chY;
       const img = c.key === "street-team" && d.mapDataUrl ? `<clipPath id="clip${i}"><rect x="${x}" y="${y}" width="336" height="150" rx="24"/></clipPath><image href="${d.mapDataUrl}" x="${x}" y="${y}" width="336" height="150" preserveAspectRatio="xMidYMid slice" clip-path="url(#clip${i})"/>` : `<rect x="${x}" y="${y}" width="336" height="150" rx="24" fill="url(#ch${i})"/>`;
+      const foot = wrap(c.geo ? `${c.geo} · ${c.rateNote}` : c.rateNote, 38).slice(0, 2);
       return `<defs><linearGradient id="ch${i}" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="${["#BFF3D6", "#145A3F", "#ECE8DF"][i]}"/><stop offset="1" stop-color="${NAVY}"/></linearGradient></defs>
       <rect x="${x}" y="${y}" width="336" height="330" rx="24" fill="${NAVY}"/>${img}
-      <text x="${x + 24}" y="${y + 200}" font-family="${SERIF}" font-size="32" fill="#fff">${esc(c.name)}</text>
+      <text x="${x + 24}" y="${y + 196}" font-family="${SERIF}" font-size="32" fill="#fff">${esc(c.name)}</text>
       ${c.fitLabel ? `<rect x="${x + 16}" y="${y + 16}" width="${c.fitLabel.length * 8.4 + 28}" height="32" rx="16" fill="#fff"/><text x="${x + 30}" y="${y + 38}" font-family="${SANS}" font-size="15" font-weight="700" fill="${NAVY}">${esc(c.fitLabel)}</text>` : ""}
       ${wrap(c.figures.join(" · ") || "Figures to come", 30)
         .slice(0, 3)
-        .map((l, k) => `<text x="${x + 24}" y="${y + 232 + k * 23}" font-family="${SANS}" font-size="18" fill="${LIME}">${esc(l)}</text>`)
+        .map((l, k) => `<text x="${x + 24}" y="${y + 226 + k * 22}" font-family="${SANS}" font-size="17" fill="${LIME}">${esc(l)}</text>`)
         .join("")}
-      <text x="${x + 24}" y="${y + 306}" font-family="${SANS}" font-size="16" fill="#fff" opacity=".7">${esc(c.geo ? `${c.geo} · ${c.rateNote}`.slice(0, 44) : c.rateNote)}</text>`;
+      ${foot.map((l, k) => `<text x="${x + 24}" y="${y + 296 + k * 18}" font-family="${SANS}" font-size="14" fill="#fff" opacity=".7">${esc(l)}</text>`).join("")}`;
     })
     .join("");
   return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${KIT_W}" height="${KIT_H}" viewBox="0 0 ${KIT_W} ${KIT_H}">
@@ -131,16 +145,17 @@ export function kitSideB(d: KitData): string {
   <text x="72" y="384" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing="2" fill="${NAVY}">1 · ANCHOR HUBS (UNCONFIRMED)</text>
   <text x="1128" y="384" text-anchor="end" font-family="${SANS}" font-size="16" fill="${NAVY}" opacity=".6">${esc(d.fitHeader)}</text>
   ${hubCards}
-  <rect x="72" y="824" width="1056" height="110" rx="24" fill="${NAVY}"/>
-  <text x="104" y="870" font-family="${SANS}" font-size="18" font-weight="700" letter-spacing="2" fill="${LIME}">HUB RATES · ESTIMATE</text>
-  <text x="104" y="906" font-family="${SANS}" font-size="28" font-weight="700" fill="#fff">CPM $${d.hubRates.cpm[0]}–$${d.hubRates.cpm[1]} · CPC $${d.hubRates.cpc[0].toFixed(2)}–$${d.hubRates.cpc[1].toFixed(2)} USD</text>
-  <text x="1096" y="906" text-anchor="end" font-family="${SANS}" font-size="20" fill="${LIME}">${esc(d.hubRates.fitLabel ? `Hubs: ${d.hubRates.fitLabel}` : ">20MM unique customers (network figure)")}</text>
-  <text x="72" y="990" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing="2" fill="${NAVY}">2 · CALM JOINTS + STREET TEAM   3 · RETAIL NETWORK</text>
+  <rect x="72" y="${bannerY}" width="1056" height="110" rx="24" fill="${NAVY}"/>
+  <text x="104" y="${bannerY + 46}" font-family="${SANS}" font-size="18" font-weight="700" letter-spacing="2" fill="${LIME}">HUB RATES · ESTIMATE</text>
+  <text x="104" y="${bannerY + 82}" font-family="${SANS}" font-size="28" font-weight="700" fill="#fff">CPM $${d.hubRates.cpm[0]}–$${d.hubRates.cpm[1]} · CPC $${d.hubRates.cpc[0].toFixed(2)}–$${d.hubRates.cpc[1].toFixed(2)} USD</text>
+  <text x="1096" y="${bannerY + 82}" text-anchor="end" font-family="${SANS}" font-size="20" fill="${LIME}">${esc(d.hubRates.fitLabel ? `Hubs: ${d.hubRates.fitLabel}` : ">20MM unique customers (network figure)")}</text>
+  <text x="72" y="${h2Y}" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing="2" fill="${NAVY}">2 · CALM JOINTS + STREET TEAM</text>
+  <text x="72" y="${h3Y}" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing="2" fill="${NAVY}">3 · RETAIL NETWORK</text>
   ${chCards}
   ${wrap(KIT_FIT_FINE, 120)
-    .map((l, k) => `<text x="72" y="${1410 + k * 24}" font-family="${SANS}" font-size="16" fill="${NAVY}" opacity=".7">${esc(l)}</text>`)
+    .map((l, k) => `<text x="72" y="${fineY + k * 24}" font-family="${SANS}" font-size="16" fill="${NAVY}" opacity=".7">${esc(l)}</text>`)
     .join("")}
-  <text x="72" y="1540" font-family="${SANS}" font-size="15" fill="${NAVY}" opacity=".55">Rates: Birch rate card starter ranges (illustrative 2026 planning estimates). Street Team image: day-1 route areas, area-level only.</text>
+  <text x="72" y="1570" font-family="${SANS}" font-size="15" fill="${NAVY}" opacity=".55">Rates: Birch rate card starter ranges (illustrative 2026 planning estimates). Street Team image: day-1 route areas, area-level only.</text>
 </svg>`;
 }
 
