@@ -85,23 +85,17 @@ export function QuestionsBrandsAsk() {
 type PulseEvent = { who: string; region: string | null; action: string; ago: string; age_h?: number };
 type Feed = { show: boolean; events: PulseEvent[] };
 const DISMISS_KEY = "br_pulse_dismissed";
-const COUNT_KEY = "br_pulse_shown";
-// Soft cadence (Randy t295u): first after ~15s, then every 45–90s, each visible ~5s, at most 6 per session.
-const FIRST_MS = 15000;
+// Cadence (Randy, Nov 20 4:27 PM): first after ~2s, then every 10–15s, each visible ~5s, no session cap.
+const FIRST_MS = 2000;
 const SHOW_MS = 5000;
-const MAX_PER_SESSION = 6;
-const gap = () => 45000 + Math.round(Math.random() * 45000);
-const shownSoFar = () => {
-  try {
-    return Number(window.sessionStorage.getItem(COUNT_KEY) ?? "0") || 0;
-  } catch {
-    return 0;
-  }
-};
-/** Weighted pick, newest favoured (half-weight every ~2 weeks), never the same event twice in a row or repeated in a session. */
-function pickNext(events: PulseEvent[], used: Set<number>): number {
-  const pool = events.map((e, i) => ({ i, w: Math.pow(0.5, (e.age_h ?? i * 24) / (24 * 14)) })).filter((x) => !used.has(x.i));
-  const list = pool.length ? pool : events.map((_, i) => ({ i, w: 1 }));
+const gap = () => 10000 + Math.round(Math.random() * 5000);
+/** Weighted pick, newest favoured (half-weight every ~2 weeks). Cycles the whole pool before repeating, never the same event twice in a row. */
+function pickNext(events: PulseEvent[], used: Set<number>, last: number): number {
+  if (used.size >= events.length) used.clear();
+  const all = events.map((e, i) => ({ i, w: Math.pow(0.5, (e.age_h ?? i * 24) / (24 * 14)) }));
+  let list = all.filter((x) => !used.has(x.i) && x.i !== last);
+  if (!list.length) list = all.filter((x) => x.i !== last);
+  if (!list.length) list = all;
   let r = Math.random() * list.reduce((a, x) => a + x.w, 0);
   for (const x of list) {
     r -= x.w;
@@ -145,24 +139,19 @@ export function ActivityPulse() {
     if (!feed || off) return;
     let t: number;
     const used = new Set<number>();
+    let last = -1;
     const show = () => {
-      const n = shownSoFar();
-      if (n >= MAX_PER_SESSION) return;
-      const next = pickNext(feed.events, used);
+      const next = pickNext(feed.events, used, last);
       used.add(next);
+      last = next;
       setI(next);
       setVisible(true);
-      try {
-        window.sessionStorage.setItem(COUNT_KEY, String(n + 1));
-      } catch {
-        /* private mode */
-      }
       t = window.setTimeout(() => {
         setVisible(false);
-        if (n + 1 < MAX_PER_SESSION) t = window.setTimeout(show, gap());
+        t = window.setTimeout(show, gap());
       }, SHOW_MS);
     };
-    if (shownSoFar() < MAX_PER_SESSION) t = window.setTimeout(show, FIRST_MS);
+    t = window.setTimeout(show, FIRST_MS);
     return () => window.clearTimeout(t);
   }, [feed, off]);
   if (off || !feed) return null;
