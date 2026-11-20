@@ -169,6 +169,8 @@ export default function BrMediaKit() {
 
         </div>
       </section>
+      {/* Mobile: the live feed sits in the gap below the first section (Randy, Nov 20 4:54 PM). */}
+      <div className="px-4 py-3 md:hidden"><ActivityPulse mode="inline" /></div>
 
       {/* Next step: live-hub mock beside $190/$490 + mid-tier bridge (Randy review, Nov 20 2026) */}
       <section className="scroll-mt-20 border-b border-border/70 bg-secondary/40" data-testid="mk-next-step">
@@ -184,7 +186,7 @@ export default function BrMediaKit() {
           <QuestionsBrandsAsk />
         </div>
       </section>
-      <ActivityPulse />
+      <ActivityPulse desktopOnly />
 
       {/* Download my kit: personalized two-sided kit (preview, Nov 18 2026) */}
       <KitBuilder />

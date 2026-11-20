@@ -67,6 +67,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
               <p className="mt-2 max-w-2xl text-base text-muted-foreground">Reserve space now, book a big block, or get your free kit.</p>
               <div className="mt-5"><TwoLane /></div>
               <div className="mt-6 flex items-center gap-3" data-testid="kit-divider"><span className="h-px flex-1 bg-foreground/15" /><span className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Or get your free Monetization Kit</span><span className="h-px flex-1 bg-foreground/15" /></div>
+              <ActivityPulse mode="inline" className="mt-3" />
             </>
           )}
           <div className={sup ? "mt-5" : "mt-3"}>{mode === "fast" ? <IntakeShortForm onExpand={expand} preset={preset} /> : null}</div>
@@ -98,7 +99,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
           </div>
         )}
       </div>
-      {sup ? null : <ActivityPulse />}
+      {sup ? null : <ActivityPulse desktopOnly />}
     </div>
   );
 }

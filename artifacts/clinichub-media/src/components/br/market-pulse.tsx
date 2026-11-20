@@ -115,7 +115,7 @@ function overlapsControl(box: HTMLElement | null): boolean {
   if (!r.width) return false;
   const pad = 6;
   for (const el of Array.from(document.querySelectorAll<HTMLElement>(INTERACTIVE))) {
-    if (box.contains(el) || el.closest("[data-testid=activity-pulse],[data-testid=activity-pulse-on]")) continue;
+    if (box.contains(el) || el.closest("[data-testid^=activity-pulse]")) continue;
     const o = el.getBoundingClientRect();
     if (!o.width || !o.height || o.bottom < 0 || o.top > window.innerHeight) continue;
     if (o.left < r.right + pad && o.right > r.left - pad && o.top < r.bottom + pad && o.bottom > r.top - pad) {
@@ -143,7 +143,13 @@ const readOff = () => {
  * button or a sticky bar, and comes back once the page scrolls clear. "Hide activity" or the X turns it off for good
  * (localStorage); a tiny "Activity" pill turns it back on.
  */
-export function ActivityPulse() {
+/**
+ * mode "fixed" (default): side toast. desktopOnly hides it below md, for pages that also place an inline instance.
+ * mode "inline" (mobile, Randy Nov 20 4:54 PM): sits in a divider gap between sections, in the page flow, so it never
+ * covers a card, CTA, form, squirrel or call button. Shown below md only.
+ */
+export function ActivityPulse({ mode = "fixed", desktopOnly = false, className = "" }: { mode?: "fixed" | "inline"; desktopOnly?: boolean; className?: string } = {}) {
+  const inline = mode === "inline";
   const [feed, setFeed] = useState<Feed | null>(null);
   const [i, setI] = useState(-1);
   const [fading, setFading] = useState(false);
@@ -196,7 +202,7 @@ export function ActivityPulse() {
     };
   }, [feed, off, reduced]);
   useEffect(() => {
-    if (!feed) return;
+    if (!feed || inline) return;
     let raf = 0;
     const check = () => {
       raf = 0;
@@ -215,7 +221,7 @@ export function ActivityPulse() {
       window.removeEventListener("resize", schedule);
       if (raf) window.cancelAnimationFrame(raf);
     };
-  }, [feed, off, i]);
+  }, [feed, off, i, inline]);
   if (!feed) return null;
   const setOffPersist = (v: boolean) => {
     setOff(v);
@@ -226,10 +232,12 @@ export function ActivityPulse() {
       /* private mode */
     }
   };
-  const pos = "fixed left-2 top-[38%] z-40 md:left-4 md:top-1/2";
+  const pos = inline
+    ? `flex justify-center md:hidden ${className}`
+    : `fixed left-2 top-[38%] z-40 md:left-4 md:top-1/2 ${desktopOnly ? "max-md:hidden" : ""} ${className}`;
   if (off) {
     return (
-      <div ref={boxRef} className={`${pos} transition-opacity duration-300 ${blocked ? "pointer-events-none opacity-0" : "opacity-70 hover:opacity-100"}`} data-testid="activity-pulse-on">
+      <div ref={boxRef} className={`${pos} transition-opacity duration-300 ${blocked ? "pointer-events-none opacity-0" : "opacity-70 hover:opacity-100"}`} data-testid={inline ? "activity-pulse-on-inline" : "activity-pulse-on"}>
         <button type="button" onClick={() => setOffPersist(false)} tabIndex={blocked ? -1 : 0} className="flex items-center gap-1 rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-medium shadow-sm ring-1 ring-foreground/5 backdrop-blur" style={{ color: NAVY }} aria-label="Turn recent activity back on" data-testid="activity-pulse-turn-on">
           <span className="inline-flex size-1.5 rounded-full bg-lime-500/70" aria-hidden />
           Activity
@@ -242,13 +250,14 @@ export function ActivityPulse() {
   return (
     <div
       ref={boxRef}
-      className={`${pos} flex justify-start transition-opacity duration-300 motion-reduce:transition-none md:max-w-sm ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
-      data-testid="activity-pulse"
+      className={`${pos} ${inline ? "" : "flex justify-start"} transition-opacity duration-300 motion-reduce:transition-none md:max-w-sm ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
+      data-testid={inline ? "activity-pulse-inline" : "activity-pulse"}
+      data-mode={mode}
       data-visible={visible ? "1" : "0"}
       data-blocked={blocked ? "1" : "0"}
       aria-hidden={visible ? undefined : true}
     >
-      <div className="flex w-[15.5rem] max-w-[calc(100vw-1rem)] items-center gap-2 rounded-xl bg-white/80 px-3 py-1.5 shadow-sm ring-1 ring-foreground/5 backdrop-blur md:w-[22rem]" role="status" aria-live="off">
+      <div className={`flex ${inline ? "w-full max-w-md" : "w-[15.5rem] max-w-[calc(100vw-1rem)]"} items-center gap-2 rounded-xl bg-white/80 px-3 py-1.5 shadow-sm ring-1 ring-foreground/5 backdrop-blur md:w-[22rem]`} role="status" aria-live="off">
         <span className="inline-flex size-1.5 shrink-0 rounded-full bg-lime-500/70" aria-hidden />
         <span className={`min-w-0 flex-1 text-[11px] leading-snug opacity-80 transition-opacity ease-out motion-reduce:transition-none md:text-[12px] ${fading ? "opacity-0" : ""}`} style={{ color: NAVY, transitionDuration: `${FADE_MS}ms` }} data-testid="activity-pulse-text">
           <span className="mr-1 inline-block h-2.5 w-10 rounded-full bg-foreground/15 align-middle blur-[2px]" aria-hidden data-testid="activity-pulse-blur" />
