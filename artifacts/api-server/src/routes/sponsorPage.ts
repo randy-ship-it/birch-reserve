@@ -94,7 +94,7 @@ form.dep input,form.dep select{width:100%;padding:10px;border:1px solid #b9c1c9;
 .mf{font-weight:600;color:#071A39}
 .ok{background:#BFF3D6;color:#0B6B43;font-weight:600;padding:8px 14px;border-radius:8px;margin:12px 0}.urg{font-weight:600;color:#3b4a12}
 form.dep.wide{max-width:none}.dep .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.dep .row{grid-template-columns:1fr}}
-label.pack{cursor:pointer}label.pack.on{border:2px solid #071A39}.amt small{font-size:.9rem}.sr{position:absolute;opacity:0;width:1px;height:1px}
+.lede{font-size:1.05rem;margin:.2em 0 1em}.boxes{margin-top:18px;border-top:1px solid #ccd2d8}.boxes details{border-bottom:1px solid #ccd2d8;padding:14px 0}.boxes summary{cursor:pointer;font:400 1.25rem Fraunces,serif;list-style:none;display:flex;justify-content:space-between}.boxes summary::-webkit-details-marker{display:none}.boxes summary::after{content:"+";font-size:1.5rem;line-height:1}.boxes details[open] summary::after{content:"\\2212"}.stats.pay .btn{display:inline-block;margin-top:10px}label.pack{cursor:pointer}label.pack.on{border:2px solid #071A39}.amt small{font-size:.9rem}.sr{position:absolute;opacity:0;width:1px;height:1px}
 </style></head><body>
 <header><a href="/"><strong>BIRCH RESERVE</strong></a><nav><a href="/sponsor?currency=${currency}">Sponsor</a><a href="/kit?currency=${currency}">Marketing kit</a><a href="/terms">Terms</a><span class="cur">Prices in ${currency.toUpperCase()}${PUBLIC_CAD_ENABLED ? ` · <a href="?currency=${other}">Show ${other.toUpperCase()}</a>` : ""}</span></nav></header>
 <main>${body}</main>
@@ -142,7 +142,7 @@ export function sponsorHtml(_currency: Currency, opts: SponsorPageOpts = {}): st
   const val = (v?: string) => (v ? ` value="${esc(v)}"` : "");
   const tiers = DEPOSIT_TIERS.map((t) => {
     const credit = Math.round(t.usd * (1 + t.bonusPct / 100));
-    return `<label class="card pack${t.key === picked ? " on" : ""}" data-testid="pack-${t.key}"><input type="radio" name="tier" value="${t.key}"${t.key === picked ? " checked" : ""} class="sr"><strong>${esc(t.label)}</strong><span class="amt">${money(t.usd, currency)}</span><span>+${t.bonusPct}% bonus media credit: ${money(credit, currency)} to spend.</span><button type="button" class="btn" data-tier="${t.key}">Prepay ${money(t.usd, currency).replace(/ USD$/, "")}</button></label>`;
+    return `<label class="card pack${t.key === picked ? " on" : ""}" data-testid="pack-${t.key}"><input type="radio" name="tier" value="${t.key}"${t.key === picked ? " checked" : ""} class="sr"><strong>${esc(t.label)}</strong><span class="amt">${money(t.usd, currency)}</span><span>+${t.bonusPct}% bonus: ${money(credit, currency)} credit</span><button type="button" class="btn" data-tier="${t.key}">Prepay ${money(t.usd, currency).replace(/ USD$/, "")}</button></label>`;
   }).join("");
   const payout: PayoutRegion = opts.payout ?? "ca";
   const ladder = SMB_LADDER.map((r) => `<tr><td>${r.customers} activated customers</td><td class="n">${payoutAmount(r.cashCad, payout)} cash</td><td class="n">${payoutAmount(r.creditCad, payout)} ad credit</td></tr>`).join("");
@@ -153,36 +153,39 @@ export function sponsorHtml(_currency: Currency, opts: SponsorPageOpts = {}): st
         ? `<p class="draft" data-testid="sponsor-cancelled">Checkout cancelled. No charge was made.</p>`
         : "";
   return `${status}${open ? "" : `<p class="draft" data-testid="sponsor-inquiry">Card checkout for packs is paused right now. Send the form and we'll confirm by email within 1 business day. No charge today.</p>`}
-<h1>Sponsorship packs. Card now, insertion order before anything runs.</h1>
-<p>Prepay media credit for display across our private health and wellness hubs. Bigger packs get more bonus media credit. Your insertion order names the hub, placement and dates before anything runs, and the pack is fully refundable until 14 days before that launch date.</p>
-<p class="urg" data-testid="sponsor-urgency">${esc(URGENCY_LINE)}</p>
+<h1>Prepay ad credit. Up to 15% bonus.</h1>
+<p class="lede">Insertion order before anything runs. <span data-testid="sponsor-urgency">${esc(URGENCY_LINE)}</span></p>
 <form class="dep wide" id="prepay" data-testid="sponsor-prepay-form">
 <div class="cards">${tiers}</div>
 <div class="row"><label>Brand<input name="brand" required maxlength="160" autocomplete="organization"${val(pf.company)}></label>
 <label>Work email<input name="email" type="email" required autocomplete="email"${val(pf.email)}></label></div>
-<label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the <a href="#terms-pack">sponsorship pack terms</a>.</label>
-<p class="fine">${esc(CARRY_OVER_CLAUSE)}</p>
+<label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the <a href="#terms-pack" data-open="terms-pack">pack terms</a>.</label>
 <p id="msg" role="status" class="fine"></p>
 </form>
-${statsStrip()}
-<h2>How a pack works</h2>
-<ol class="steps">
+<div class="stats pay" data-testid="payout-key-figures">
+<div class="stat"><span class="fine">Clinics and studios earn</span><b>${payoutAmount(SMB_LADDER[0]!.cashCad, payout)}</b>cash, or ${payoutAmount(SMB_LADDER[0]!.creditCad, payout, true)} in ad credit<br><a class="btn" href="https://scalehealth.ca/clinichubs">Open a Clinic Hub</a></div>
+</div>
+<div class="boxes">
+<details><summary>How it works</summary><ol class="steps">
 <li><strong>Prepay</strong><br>Pick a pack. Stripe hosts the card payment.</li>
 <li><strong>Sign an insertion order</strong><br>It names each hub, placement and date. Nothing runs before it.</li>
 <li><strong>Your ad runs</strong><br>A person approves your ad. Clicks go to your site with your UTMs.</li>
 <li><strong>Draw down</strong><br>Credit comes off at the rate card as your ad runs. Reporting is aggregate.</li>
-</ol>
-<h2>Where your credit runs</h2>
+</ol></details>
+<details><summary>Where your credit runs</summary>
 <p>Live partner brand hubs plus our clinic hub network: physio, mobility, gym and studio members who buy and book through their clinic's hub.</p>
 ${hubPackageTable(currency)}
-<h2>Clinics and studios: get paid to activate your customers</h2>
+<p class="fine">Aggregate reporting only. No impression guarantees. Any view figure is a modelled estimate, not a delivery promise. Nothing runs until an insertion order names the hub.</p></details>
+<details data-testid="payout-table-box"><summary>Clinic payout table</summary>
 <p>Open a Clinic Hub at <a href="https://scalehealth.ca/clinichubs">scalehealth.ca/clinichubs</a> and activate your audience: email, text, a link on your website, at checkout and on social media. When they buy or book through your hub, you earn a cash bonus, or a bigger bonus as Birch Reserve ad credit to promote your own business.</p>
 <div class="tw"><table><thead><tr><th>Milestone (first 90 days live)</th><th class="n">Cash</th><th class="n">Or ad credit</th></tr></thead><tbody>${ladder}</tbody></table></div>
-<p class="fine" data-testid="payout-currency-note">${payout === "us" ? esc(payoutUsNote()) : "Payouts are set and paid in CAD."}</p>
-<p class="fine">Proposal. An activated customer is a unique customer of your business who completes a paid order or booking through your Clinic Hub and does not refund or charge back. The 90-day clock starts once we see real traffic or transactions; bonuses are credited when it ends. Self-purchases (you, your staff or your own accounts) are excluded. One bonus per business per year, top milestone only. Refunded or charged-back orders are reversed. Ad credit has no cash value and expires 12 months after it lands.</p>
-<h2 id="terms-pack">Sponsorship pack terms</h2>
+<p class="fine">Proposal. An activated customer is a unique customer of your business who completes a paid order or booking through your Clinic Hub and does not refund or charge back. The 90-day clock starts once we see real traffic or transactions; bonuses are credited when it ends. Self-purchases (you, your staff or your own accounts) are excluded. One bonus per business per year, top milestone only. Refunded or charged-back orders are reversed. Ad credit has no cash value and expires 12 months after it lands.</p></details>
+<details><summary>Paid in CAD</summary><p class="fine" data-testid="payout-currency-note">${payout === "us" ? esc(payoutUsNote()) : "Payouts are set and paid in CAD."}</p></details>
+<details id="terms-pack"><summary>Pack terms</summary>
+<p class="fine">${esc(CARRY_OVER_CLAUSE)}</p>
 <ul data-testid="sponsor-pack-terms">${SPONSOR_PACK_TERMS.map((t) => `<li>${esc(t)}</li>`).join("")}<li>${esc(CARRY_OVER_CLAUSE)}</li></ul>
-<p class="fine">Full terms: <a href="/terms">/terms</a>. Questions: <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></p>
+<p class="fine">Full terms: <a href="/terms">/terms</a>. Questions: <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></p></details>
+</div>
 <script>
 (function(){
 var msg=document.getElementById('msg');var f=document.getElementById('prepay');
@@ -191,6 +194,7 @@ function pick(k){f.querySelectorAll('label.pack').forEach(function(l){var r=l.qu
 f.querySelectorAll('label.pack input').forEach(function(r){r.addEventListener('change',function(){pick(r.value)})});
 f.querySelectorAll('button[data-tier]').forEach(function(b){b.addEventListener('click',function(e){e.preventDefault();var k=b.getAttribute('data-tier');pick(k);var d={currency:'usd',tier:k,brand:f.brand.value.trim(),email:f.email.value.trim(),agree:document.getElementById('terms').checked};if(!d.brand||!d.email||!d.agree){msg.textContent='Add your brand and work email, and tick the terms box, then press Prepay again.';(d.brand?(d.email?document.getElementById('terms'):f.email):f.brand).focus();return}go(d)})});
 f.addEventListener('submit',function(e){e.preventDefault()});
+function op(){var h=location.hash.slice(1);var d=h&&document.getElementById(h);if(d&&d.tagName==='DETAILS')d.open=true}op();window.addEventListener('hashchange',op);document.querySelectorAll('[data-open]').forEach(function(a){a.addEventListener('click',function(){var d=document.getElementById(a.getAttribute('data-open'));if(d)d.open=true})});
 if(location.hash==='#prepay'){f.scrollIntoView({block:'start'})}
 })();
 </script>`;
