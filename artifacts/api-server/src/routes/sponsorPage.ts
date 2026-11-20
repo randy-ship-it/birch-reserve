@@ -9,6 +9,7 @@
  * is refused unless SPONSOR_DEPOSITS_LIVE=true, so a preview can only ever
  * create test-mode sessions. All impression figures are modelled.
  */
+import { birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { getStripeClient } from "../lib/stripeClient";
 import { logger } from "../lib/logger";
@@ -250,7 +251,7 @@ export function buildDepositSession(body: DepositRequest, origin: string):
       customer_creation: "always",
       line_items: [{ quantity: 1, price_data: { currency, unit_amount: amountCents, product_data: { name: "Birch Reserve sponsorship credit", description: `Prepaid display credit${bonusPct ? ` (+${bonusPct}% bonus credit)` : ""}. Spends down on live hubs under an insertion order that names the hubs; unused credit refundable or extendable.` } } }],
       metadata,
-      payment_intent_data: { description: `Birch Reserve sponsorship credit · ${brand}`, metadata },
+      payment_intent_data: { ...birchPaymentIntentBrand(`Sponsorship credit · ${brand}`), metadata },
       success_url: `${origin}/sponsor?deposit=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/sponsor?deposit=cancelled`,
     },

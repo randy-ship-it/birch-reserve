@@ -78,6 +78,8 @@ const API_PATHS = [
   "/recovery-device-advertising/?",
   "/post-purchase-ads-health-brands/?",
   "/health-wellness-retail-media-canada/?",
+  // Self-serve buy (server-rendered).
+  "/buy/?",
   // Blog (server-rendered).
   "/blog(?:/[a-z0-9-]+)?/?",
 ];

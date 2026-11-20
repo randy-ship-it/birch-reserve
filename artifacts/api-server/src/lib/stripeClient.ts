@@ -308,6 +308,11 @@ function appendCheckoutSessionFormBody(
       }
     },
   );
+  const pid = params.payment_intent_data;
+  if (pid?.statement_descriptor_suffix) {
+    body.set("payment_intent_data[statement_descriptor_suffix]", pid.statement_descriptor_suffix);
+  }
+  if (pid?.description) body.set("payment_intent_data[description]", pid.description);
   if (params.success_url) body.set("success_url", params.success_url);
   if (params.cancel_url) body.set("cancel_url", params.cancel_url);
   body.set(

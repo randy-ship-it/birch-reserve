@@ -31,6 +31,7 @@ export const PUBLIC_SITEMAP_PATHS = [
   "/marketplace",
   "/insights",
   "/buycalc",
+  "/buy",
   "/advertise/brands",
   "/advertise/local",
   "/publish/brands",

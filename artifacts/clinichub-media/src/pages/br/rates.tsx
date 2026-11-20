@@ -1,4 +1,5 @@
 import { ChannelBenchmarks, MetaHook, PackPicker, ProveItLadder, RateCardV2, ScenarioCalculator, SeatCtas } from "@/components/br/pricing";
+import { BuyCta } from "@/components/br/buy-cta";
 import { Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
 import { RATE_SURFACES } from "../../../../api-server/src/lib/overhaul/pricing";
 
@@ -28,7 +29,8 @@ export default function BrRates() {
         <Eyebrow>Rates</Eyebrow>
         <H1>Starting-at rates for every hub surface.</H1>
         <Lede>Five surfaces, display or CPC. Start at starter rates, see the reporting, and only pay more once a placement proves it works.</Lede>
-        <SeatCtas className="mt-8" />
+        <BuyCta placement="rates" className="mt-8" />
+        <SeatCtas className="mt-6" />
       </Section>
       <Section tone="ink">
         <MetaHook />

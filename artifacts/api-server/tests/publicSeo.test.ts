@@ -244,7 +244,9 @@ test("buycalc HTML is one short, clean buy path with broad network copy and no p
   assert.doesNotMatch(html, /today's minimum/);
   const strip = html.match(/<ul class="cat-strip"[^>]*>[\s\S]*?<\/ul>/)?.[0] ?? "";
   assert.match(strip, /DR-HO'S physio/); assert.doesNotMatch(strip, /Integrity/i);
-  assert.doesNotMatch(html, /Scale Health/);
+  // Randy, Nov 19 2026 10:13 PM: the one checkout line names Scale Health; nothing else on /buycalc does.
+  assert.match(html, /Buy Scale Health ads through Birch Reserve\. Want to upload your ad too\? <a href="\/buy">/);
+  assert.doesNotMatch(html.split("Buy Scale Health ads through Birch Reserve.").join(""), /Scale Health/);
   assert.match(strip, /More hubs launching/);
   const closed = renderBuycalcHtml({ seatsOpen: 0, seatsTotal: 8 });
   assert.doesNotMatch(closed, /0 of 8|seats open/);

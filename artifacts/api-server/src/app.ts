@@ -11,6 +11,7 @@ import publicBuyingRouter from "./routes/publicBuying";
 import publicPagesRouter from "./routes/publicPages";
 import advertiserGuidesRouter from "./routes/advertiserGuides";
 import blogRouter from "./routes/blog";
+import buyRouter, { buyStaffRouter } from "./routes/buy";
 import sponsorPageRouter from "./routes/sponsorPage";
 import { createOverhaulRouter } from "./routes/overhaul";
 import { createBrandIntakeProxy } from "./routes/brandIntakeProxy";
@@ -109,6 +110,8 @@ app.use(sponsorPageRouter);
 app.use(publicPagesRouter);
 app.use(advertiserGuidesRouter);
 app.use(blogRouter);
+// Self-serve buy (/buy + /v1/buy/*). Own body parsers (raw image upload); before the global 32kb JSON parser.
+app.use(buyRouter);
 app.use(publicSeoRouter);
 app.use(indexNowKeyRouter);
 app.use(opsBulletinRouter);
@@ -178,6 +181,8 @@ app.post("/api/launch/randy-chat", requireHuman());
 app.use(publicBuyingRouter);
 // Share + referral tracking (Nov 19 2026): public POST /v1/share-events, staff-only GET /api/sales/share-events.
 app.use(shareEventsRouter);
+// /buy staff review (Clerk + sales staff): orders and held creatives.
+app.use(buyStaffRouter);
 app.use("/api", router);
 
 export default app;

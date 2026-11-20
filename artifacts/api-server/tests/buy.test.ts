@@ -1,0 +1,195 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import express from "express";
+import type { AddressInfo } from "node:net";
+import { deflateSync } from "node:zlib";
+import buyRouter, { renderBuyPage } from "../src/routes/buy";
+import {
+  BUY_FORMATS, BUY_PATH, BUY_PLANS, BUY_TAGLINE, CREATIVE_MAX_BYTES, checkCreative, domainCheck, parseAccount,
+  resetBuyLimitsForTests, setBuyStoreForTests, memoryBuyStore, signToken, sniffImage, validPick, verifyToken, findPlan, findFormat, isProductionRuntime, buyStore,
+} from "../src/lib/buyFlow";
+import { CHECKOUT_TAGLINE, STATEMENT_DESCRIPTOR_SUFFIX, birchPaymentIntentBrand } from "../src/lib/checkoutCopy";
+import { PUBLIC_RESERVE_OFFERS, reserveCheckoutLineItem } from "../src/lib/reserveOffers";
+import { PUBLIC_SITEMAP_PATHS } from "../src/lib/publicSeo";
+import { buildAreaLockSession } from "../src/lib/overhaul/checkout";
+
+// Copy rules (Randy, Nov 2026). Kalaya is allowed.
+const BANNED = [
+  /\bFriday\b/, /\bAlign\b/, /Clairvoyant/i, /Alset/i, /80 locations/i, /MedVibe/i, /signed partners/i, /Integrity Fitness/i,
+  /\bPublisher\b/, /\bCAD\b|C\$/, /guarantee(d)? (results|reach|impressions|roi|leads|views)/i, /\bROAS\b/, /\bCTR\b/,
+  /\b(not taken|unclaimed|is open|are open|still open|open now|0 (hubs|brands|spots|seats))\b/i, /\bseats? left\b/i, /—/,
+];
+const visible = (html: string) => html.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<style[\s\S]*?<\/style>/g, "");
+
+/** Minimal valid PNG of w×h (one IDAT of zeros). */
+function png(w: number, h: number): Buffer {
+  const crc = (b: Buffer) => {
+    let c = ~0;
+    for (const x of b) {
+      c ^= x;
+      for (let k = 0; k < 8; k++) c = (c >>> 1) ^ (0xedb88320 & -(c & 1));
+    }
+    return ~c >>> 0;
+  };
+  const chunk = (type: string, data: Buffer) => {
+    const t = Buffer.from(type, "ascii");
+    const len = Buffer.alloc(4); len.writeUInt32BE(data.length);
+    const c = Buffer.alloc(4); c.writeUInt32BE(crc(Buffer.concat([t, data])));
+    return Buffer.concat([len, t, data, c]);
+  };
+  const ihdr = Buffer.alloc(13); ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4); ihdr[8] = 8; ihdr[9] = 2;
+  const raw = Buffer.alloc((w * 3 + 1) * h);
+  return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk("IHDR", ihdr), chunk("IDAT", deflateSync(raw)), chunk("IEND", Buffer.alloc(0))]);
+}
+function jpegHeader(w: number, h: number): Buffer {
+  const sof = Buffer.from([0xff, 0xc0, 0x00, 0x11, 0x08, h >> 8, h & 255, w >> 8, w & 255, 0x03, 1, 0x22, 0, 2, 0x11, 1, 3, 0x11, 1]);
+  return Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]), Buffer.from("JFIF\0\x01\x01\0\0\x01\0\x01\0\0", "binary"), sof, Buffer.alloc(32)]);
+}
+
+test("page: Randy's line is the headline, copy rules hold, three steps, honeypot, USD, no counts", () => {
+  for (const live of [true, false]) {
+    const html = renderBuyPage({ checkoutLive: live });
+    assert.match(html, new RegExp(`<h1>${BUY_TAGLINE.replace(".", "\\.")}</h1>`));
+    assert.match(html, /<link rel="canonical" href="https:\/\/birchreserve\.net\/buy" \/>/);
+    assert.match(html, /id="s1"[\s\S]*id="s2"[\s\S]*id="s3"/);
+    assert.match(html, /name="fax"/);
+    assert.match(html, /reviewed before it runs/i);
+    assert.match(html, /USD/);
+    for (const re of BANNED) assert.doesNotMatch(visible(html), re, `${re}`);
+    assert.doesNotMatch(visible(html), /\b0\s+(placements|hubs|brands)/i);
+  }
+  assert.ok((PUBLIC_SITEMAP_PATHS as readonly string[]).includes(BUY_PATH));
+});
+
+test("slots: card plans only on self-serve spots, exclusive anywhere; prices come from the live offers", () => {
+  for (const o of PUBLIC_RESERVE_OFFERS) assert.ok(BUY_PLANS.some((p) => p.key === o.sku && p.price === `$${o.dueTodayUsd}`), o.sku);
+  const prem = BUY_FORMATS.find((f) => f.premium)!;
+  const self = BUY_FORMATS.find((f) => !f.premium)!;
+  assert.equal(validPick(findPlan("reserve-490"), prem), false);
+  assert.equal(validPick(findPlan("reserve-490"), self), true);
+  assert.equal(validPick(findPlan("exclusive"), prem), true);
+  assert.equal(validPick(findPlan("nope"), self), false);
+  assert.equal(validPick(findPlan("hold-190"), findFormat("motion_15s")), false);
+});
+
+test("account: validation and a soft email-vs-website check (flag, never block)", () => {
+  assert.equal(domainCheck("jo@acme.com", "acme.com"), "match");
+  assert.equal(domainCheck("jo@mail.acme.com", "shop.acme.com"), "match");
+  assert.equal(domainCheck("jo@acme.co.uk", "acme.co.uk"), "match");
+  assert.equal(domainCheck("jo@other.com", "acme.com"), "mismatch");
+  assert.equal(domainCheck("jo@gmail.com", "acme.com"), "free_email");
+  const ok = parseAccount({ name: "Jo Doe", email: "Jo@Acme.com", company: "Acme", website: "www.acme.com/shop" });
+  assert.ok(ok.ok && ok.value.website === "https://acme.com" && ok.value.email === "jo@acme.com");
+  const gm = parseAccount({ name: "Jo Doe", email: "jo@gmail.com", company: "Acme", website: "acme.com" });
+  assert.ok(gm.ok && gm.value.domainCheck === "free_email");
+  for (const bad of [{}, { name: "J", email: "jo@acme.com", company: "Acme", website: "acme.com" }, { name: "Jo", email: "nope", company: "Acme", website: "acme.com" }, { name: "Jo", email: "jo@acme.com", company: "Acme", website: "javascript:alert(1)" }]) {
+    assert.equal(parseAccount(bad).ok, false);
+  }
+});
+
+test("tokens: signed, typed, expiring, tamper-proof", () => {
+  const t = signToken("acct", { e: "jo@acme.com", id: "x" });
+  assert.equal(verifyToken<{ e: string }>("acct", t)?.e, "jo@acme.com");
+  assert.equal(verifyToken("crv", t), null);
+  const [b, m] = t.split(".");
+  const forged = Buffer.from(JSON.stringify({ k: "acct", x: Date.now() + 1e6, e: "evil@x.com", id: "x" })).toString("base64url");
+  assert.equal(verifyToken("acct", `${forged}.${m}`), null);
+  assert.equal(verifyToken("acct", `${b}.${m}x`), null);
+  assert.equal(verifyToken("acct", signToken("acct", { id: "x" }, -1)), null);
+});
+
+test("creative: type from bytes, size and pixel limits", () => {
+  assert.deepEqual(sniffImage(png(600, 400)), { mime: "image/png", width: 600, height: 400 });
+  assert.deepEqual(sniffImage(jpegHeader(1200, 628)), { mime: "image/jpeg", width: 1200, height: 628 });
+  assert.equal(sniffImage(Buffer.from("<svg xmlns='http://www.w3.org/2000/svg'></svg>                ")), null);
+  assert.equal(checkCreative(png(600, 400)).ok, true);
+  assert.equal(checkCreative(png(100, 100)).ok, false);
+  assert.equal(checkCreative(png(5000, 300)).ok, false);
+  assert.equal(checkCreative(Buffer.alloc(CREATIVE_MAX_BYTES + 1)).ok, false);
+  assert.equal(checkCreative(Buffer.from("MZ executable pretending to be a png....")).ok, false);
+});
+
+test("stripe: descriptor suffix fits Stripe's rules with the BIRCHRSV prefix; line items carry the tagline", () => {
+  assert.match(STATEMENT_DESCRIPTOR_SUFFIX, /^[A-Z0-9 ]*[A-Z][A-Z0-9 ]*$/);
+  assert.ok(`BIRCHRSV* ${STATEMENT_DESCRIPTOR_SUFFIX}`.length <= 22);
+  assert.doesNotMatch(STATEMENT_DESCRIPTOR_SUFFIX, /BIRCH/);
+  const pid = birchPaymentIntentBrand("7-day category look");
+  assert.equal(pid.statement_descriptor_suffix, "SCALE ADS");
+  assert.ok(pid.description.startsWith(CHECKOUT_TAGLINE));
+  for (const o of PUBLIC_RESERVE_OFFERS) {
+    const li = reserveCheckoutLineItem(o) as { price_data?: { product_data: { description: string } } };
+    if (li.price_data) assert.ok(li.price_data.product_data.description.startsWith(CHECKOUT_TAGLINE));
+  }
+  assert.equal(typeof buildAreaLockSession, "function");
+});
+
+test("store: previews and tests never use the production database", () => {
+  delete process.env.VERCEL_ENV;
+  assert.equal(isProductionRuntime(), false);
+  assert.equal(buyStore().name, "memory");
+});
+
+test("routes: account → upload → order (card hands back the /v1/checkout body; exclusive goes to invoice)", async () => {
+  const store = memoryBuyStore();
+  setBuyStoreForTests(store);
+  resetBuyLimitsForTests();
+  const app = express();
+  app.use(buyRouter);
+  const server = app.listen(0);
+  const { port } = server.address() as AddressInfo;
+  const base = `http://127.0.0.1:${port}`;
+  const UA = { "user-agent": "Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/130 Safari/537.36" };
+  const json = (p: string, body: unknown, h: Record<string, string> = {}) => fetch(base + p, { method: "POST", headers: { ...UA, "content-type": "application/json", ...h }, body: JSON.stringify(body) });
+  try {
+    const page = await fetch(`${base}/buy`);
+    assert.equal(page.status, 200);
+    assert.match(page.headers.get("content-type") ?? "", /text\/html/);
+
+    assert.equal((await json("/v1/buy/account", { name: "Jo", email: "jo@acme.com", company: "Acme", website: "acme.com" }, { "user-agent": "curl/8" })).status, 403);
+    const hp = await (await json("/v1/buy/account", { name: "Jo", email: "jo@acme.com", company: "Acme", website: "acme.com", fax: "x" })).json() as { account: string };
+    assert.equal((await fetch(`${base}/v1/buy/creative`, { method: "POST", headers: { ...UA, "content-type": "image/png", "x-buy-account": hp.account }, body: png(600, 400) })).status, 401);
+
+    const a = await json("/v1/buy/account", { name: "QA Test", email: "qa+buy@acme.com", company: "Acme", website: "https://acme.com" });
+    assert.equal(a.status, 200);
+    const acct = (await a.json()) as { account: string; domain_check: string };
+    assert.equal(acct.domain_check, "match");
+
+    const noAcct = await fetch(`${base}/v1/buy/creative`, { method: "POST", headers: { ...UA, "content-type": "image/png" }, body: png(600, 400) });
+    assert.equal(noAcct.status, 401);
+    const bad = await fetch(`${base}/v1/buy/creative`, { method: "POST", headers: { ...UA, "content-type": "image/png", "x-buy-account": acct.account }, body: Buffer.from("not an image at all, just text....") });
+    assert.equal(bad.status, 400);
+    const big = await fetch(`${base}/v1/buy/creative`, { method: "POST", headers: { ...UA, "content-type": "image/png", "x-buy-account": acct.account }, body: Buffer.alloc(CREATIVE_MAX_BYTES + 4096) });
+    assert.equal(big.status, 413);
+    const up = await fetch(`${base}/v1/buy/creative`, { method: "POST", headers: { ...UA, "content-type": "image/png", "x-buy-account": acct.account }, body: png(600, 400) });
+    assert.equal(up.status, 200);
+    const crv = (await up.json()) as { creative: string; width: number };
+    assert.equal(crv.width, 600);
+    const cid = verifyToken<{ id: string }>("crv", crv.creative)!.id;
+    assert.ok(await store.getCreative(cid));
+
+    assert.equal((await json("/v1/buy/order", { account: acct.account, creative: crv.creative, plan: "reserve-490", format: "post_checkout", terms: true })).status, 400);
+    assert.equal((await json("/v1/buy/order", { account: acct.account, creative: crv.creative, plan: "reserve-490", format: "member_hub" })).status, 400);
+    const other = (await (await json("/v1/buy/account", { name: "Al Bee", email: "al@other.com", company: "Other", website: "other.com" })).json()) as { account: string };
+    assert.equal((await json("/v1/buy/order", { account: other.account, creative: crv.creative, plan: "reserve-490", format: "member_hub", terms: true })).status, 400);
+
+    const card = await json("/v1/buy/order", { account: acct.account, creative: crv.creative, plan: "reserve-490", format: "member_hub", terms: true });
+    assert.equal(card.status, 200);
+    const co = (await card.json()) as { next: string; checkout: Record<string, string> };
+    assert.equal(co.next, "checkout");
+    assert.deepEqual(Object.keys(co.checkout).sort(), ["brand", "currency", "email", "format_pref", "idempotency_key", "sku", "website_url"]);
+    assert.equal(co.checkout.sku, "reserve-490");
+    assert.equal(co.checkout.currency, "usd");
+
+    const inv = await json("/v1/buy/order", { account: acct.account, creative: crv.creative, plan: "exclusive", format: "post_checkout", terms: true });
+    assert.equal(((await inv.json()) as { next: string }).next, "invoice");
+    assert.equal((await store.listOrders(10)).length, 2);
+    assert.ok((await store.listOrders(10)).every((o) => o.reviewStatus === "pending_review"));
+
+    let last = 200;
+    for (let i = 0; i < 6; i++) last = (await json("/v1/buy/order", { account: acct.account, creative: crv.creative, plan: "hold-190", format: "member_hub", terms: true })).status;
+    assert.equal(last, 429);
+  } finally {
+    server.close();
+    setBuyStoreForTests(null);
+  }
+});
