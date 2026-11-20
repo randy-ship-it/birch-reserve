@@ -11,6 +11,8 @@ import {
   TWO_LANE_CATEGORIES,
   agencyCashLabel,
   agencyTestLeadPayload,
+  agencyPrepayLeadPayload,
+  clampAgencyBudget,
   bandAmountLabel,
   blockLeadPayload,
   draftRef,
@@ -106,4 +108,18 @@ test("lane analytics events are on the fixed list", () => {
   for (const d of ["lane_card", "lane_block", "agency_test", "big_block", "io_pdf", "look_190", "reserve_490"]) {
     assert.ok(isIntakeEvent(`intake.advertiser.cta_click.${d}`), d);
   }
+});
+
+test("prepay a client test budget: stays in the live $1K–$5K band, 10% agency cash, pre-filled IO on /v1/leads", () => {
+  assert.equal(clampAgencyBudget(200), 1_000);
+  assert.equal(clampAgencyBudget(99_000), 5_000);
+  assert.equal(clampAgencyBudget("abc"), 1_000);
+  const p = agencyPrepayLeadPayload({ email: " a@agency.com ", agency: "Acme Media", client: "Calm Co", budgetUsd: 2_500, where: "media_kit" }, "BR-IO-20261120-CALMCO", "/media-kit");
+  assert.equal(p.kind, "agency_inquiry");
+  assert.equal(p.email, "a@agency.com");
+  assert.equal(p.fields.budget_usd, "2500");
+  assert.equal(p.fields.agency_cash, "$250 USD");
+  assert.equal(p.fields.draft_ref, "BR-IO-20261120-CALMCO");
+  for (const k of Object.keys(p.fields)) assert.match(k, /^[a-z_]{2,40}$/);
+  assert.doesNotMatch(p.message, /guarantee|CAD/i);
 });

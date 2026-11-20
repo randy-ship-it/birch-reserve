@@ -262,12 +262,14 @@ details{margin:14px 0 0;font-size:.86rem;color:#4d5b6a}details summary{cursor:po
 footer{border-top:1px solid #d8dccf;margin-top:30px;padding:20px 0 36px;font-size:.84rem;color:#4d5b6a}
 @media(max-width:760px){header nav a[href^=tel]{display:none}.picks{grid-template-columns:1fr 1fr}.plans{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.prog li span{display:none}.prog li.on span{display:inline}.card{padding:18px}}`;
 
-export function renderBuyPage(opts: { checkoutLive: boolean }): string {
+export function renderBuyPage(opts: { checkoutLive: boolean; plan?: unknown }): string {
+  // ?plan= preselects a plan (deep links from the kit / media kit). Unknown values keep the default.
+  const pre = findPlan(opts.plan)?.key ?? BUY_PLANS[0]!.key;
   const formats = BUY_FORMATS.map(
     (f, i) => `<label class="pick" data-premium="${f.premium ? 1 : 0}"><input type="radio" name="format" value="${f.key}"${i === 0 ? " checked" : ""}>${MOCK[f.key] ?? ""}<strong>${esc(f.label)}</strong><small>${esc(f.hint)}</small></label>`,
   ).join("");
   const plans = BUY_PLANS.map(
-    (p, i) => `<label class="pick" data-pay="${p.pay}"><input type="radio" name="plan" value="${p.key}"${i === 0 ? " checked" : ""}><span class="price">${esc(p.price)}</span><strong>${esc(p.name)}</strong><small>${esc(p.line)}</small><span class="tag">${p.pay === "card" ? "Card" : "Invoice"}</span></label>`,
+    (p) => `<label class="pick" data-pay="${p.pay}"><input type="radio" name="plan" value="${p.key}"${p.key === pre ? " checked" : ""}><span class="price">${esc(p.price)}</span><strong>${esc(p.name)}</strong><small>${esc(p.line)}</small><span class="tag">${p.pay === "card" ? "Card" : "Invoice"}</span></label>`,
   ).join("");
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(TITLE)} | Birch Reserve</title><meta name="description" content="${esc(DESCRIPTION)}">
@@ -331,9 +333,9 @@ if(/[?&]checkout=cancelled/.test(location.search))msg($("s1-msg"),"Checkout was 
 </script></body></html>`;
 }
 
-router.get(["/buy", "/buy/"], (_req, res): void => {
+router.get(["/buy", "/buy/"], (req, res): void => {
   res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
-  res.type("html").send(renderBuyPage({ checkoutLive: isReserveCheckoutConfigured() }));
+  res.type("html").send(renderBuyPage({ checkoutLive: isReserveCheckoutConfigured(), plan: req.query.plan }));
 });
 
 export default router;

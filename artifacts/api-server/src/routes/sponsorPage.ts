@@ -13,6 +13,7 @@ import { birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { getStripeClient } from "../lib/stripeClient";
 import { logger } from "../lib/logger";
+import { PUBLIC_CAD_ENABLED } from "../lib/currency";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
 import {
   CUSTOM_MAX,
@@ -37,6 +38,8 @@ function esc(value: string): string {
 }
 
 export function pickCurrency(req: Request): Currency {
+  // USD only until the CAD checkout is tested (Randy, Nov 16 2026), same switch as /buycalc.
+  if (!PUBLIC_CAD_ENABLED) return "usd";
   const q = String(req.query.currency ?? "").toLowerCase();
   if (q === "cad" || q === "usd") return q;
   const cookie = /(?:^|;\s*)br_currency=(cad|usd)/i.exec(req.headers.cookie ?? "");
@@ -84,7 +87,7 @@ form.dep{display:grid;gap:10px;max-width:520px;border:1px solid #ccd2d8;border-r
 form.dep input,form.dep select{width:100%;padding:10px;border:1px solid #b9c1c9;border-radius:8px;font:inherit}
 .cur{display:inline-flex;gap:8px;font-size:.88rem}
 </style></head><body>
-<header><a href="/"><strong>BIRCH RESERVE</strong></a><nav><a href="/sponsor?currency=${currency}">Sponsor</a><a href="/kit?currency=${currency}">Marketing kit</a><a href="/terms">Terms</a><span class="cur">Prices in ${currency.toUpperCase()} · <a href="?currency=${other}">Show ${other.toUpperCase()}</a></span></nav></header>
+<header><a href="/"><strong>BIRCH RESERVE</strong></a><nav><a href="/sponsor?currency=${currency}">Sponsor</a><a href="/kit?currency=${currency}">Marketing kit</a><a href="/terms">Terms</a><span class="cur">Prices in ${currency.toUpperCase()}${PUBLIC_CAD_ENABLED ? ` · <a href="?currency=${other}">Show ${other.toUpperCase()}</a>` : ""}</span></nav></header>
 <main>${body}</main>
 <footer class="fine">${esc(SELLER)} · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></footer>
 </body></html>`;
