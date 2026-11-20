@@ -156,7 +156,7 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
     <section data-testid="fast-report" className="space-y-4" style={{ fontFamily: RT_SANS }}>
       <div className="rounded-3xl bg-white p-5 shadow-xl md:p-6" style={{ border: `1px solid ${RT.line}` }}>
         <span className="rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider" style={{ background: RT.goldBg, color: RT.gold, border: `1px solid ${RT.goldLine}` }} data-testid="fast-label">Quick estimate from your website + defaults</span>
-        <h2 className="mt-3 text-3xl md:text-4xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Here's your quick estimate for {name ?? q.host}.</h2>
+        <h2 className="mt-3 text-3xl [overflow-wrap:anywhere] md:text-4xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Here's your quick estimate for {name ?? q.host}.</h2>
         <dl className="mt-3 grid gap-x-6 gap-y-1 text-[13px] md:grid-cols-2" data-testid="fast-values">
           {rows.map((r) => (
             <div key={r.k} className="flex flex-wrap items-baseline gap-1" style={{ color: RT.mute }}>
