@@ -74,11 +74,7 @@ export function AnnotatedHubMock({ brand = "" }: { brand?: string }) {
         ))}
       </div>
       <div className="relative">
-        <HubMock brand={brand} logo={null} hub={hub} category="Your category" />
-        {/* Numbered pins line up with the legend below. */}
-        <span className="absolute bottom-[38%] right-[52%] grid size-7 place-items-center rounded-full bg-lime-300 text-xs font-black text-[#0b1f3a] shadow-lg ring-2 ring-white" aria-hidden>1</span>
-        <span className="absolute left-3 top-14 grid size-7 place-items-center rounded-full bg-lime-300 text-xs font-black text-[#0b1f3a] shadow-lg ring-2 ring-white" aria-hidden>2</span>
-        <span className="absolute bottom-2 right-2 grid size-7 place-items-center rounded-full bg-lime-300 text-xs font-black text-[#0b1f3a] shadow-lg ring-2 ring-white" aria-hidden>3</span>
+        <HubMock brand={brand} logo={null} hub={hub} category="Your category" pins />
       </div>
       <ol className="mt-3 grid gap-2 sm:grid-cols-3" data-testid="annotated-hub-legend">
         {notes.map((x) => (
@@ -188,20 +184,20 @@ export function MidTier({ where, compact = false }: { where: string; compact?: b
         <article className={card} data-testid="mid-tier-agency">
           <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">Agency client test</p>
           <p className="mt-1 font-display text-3xl leading-none">$1K–$5K <span className="text-base">USD</span></p>
-          <p className="mt-2 text-[13px] text-white/75">One IO per client. <b className="text-lime-300">{AGENCY_TEST.cashPct}% cash</b> to the agency. {AGENCY_REPORTING_LINE}.</p>
-          <button type="button" onClick={() => setAgencyOpen((v) => !v)} aria-expanded={agencyOpen} className="mt-auto inline-flex h-11 items-center justify-center gap-2 rounded-full bg-lime-300 px-4 pt-0 text-sm font-bold text-[#0b1f3a] hover:bg-white sm:mt-4" data-testid="mid-tier-agency-cta">Prepay a client test budget <ArrowRight className="size-4" /></button>
+          <p className="mb-4 mt-2 text-[13px] text-white/75">One IO per client. <b className="text-lime-300">{AGENCY_TEST.cashPct}% cash</b> to the agency. {AGENCY_REPORTING_LINE}.</p>
+          <button type="button" onClick={() => setAgencyOpen((v) => !v)} aria-expanded={agencyOpen} className="mt-auto inline-flex h-11 items-center justify-center gap-2 rounded-full bg-lime-300 px-4 pt-0 text-sm font-bold text-[#0b1f3a] hover:bg-white" data-testid="mid-tier-agency-cta">Prepay a client test budget <ArrowRight className="size-4" /></button>
         </article>
         <article className={card} data-testid="mid-tier-sponsor">
           <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">Sponsorship credit</p>
           <p className="mt-1 font-display text-3xl leading-none">$1.5K–$6K <span className="text-base">USD</span></p>
-          <p className="mt-2 text-[13px] text-white/75">{tiers} bonus credit. Spends down on live hubs under your IO.</p>
-          <a href={withUtm("/sponsor?currency=usd", where, "sponsor")} className="mt-auto inline-flex h-11 items-center justify-center gap-2 rounded-full px-4 text-sm font-bold text-white ring-1 ring-white/40 hover:bg-white hover:text-[#0b1f3a] sm:mt-4" data-testid="mid-tier-sponsor-cta">Pick a sponsorship tier <ArrowRight className="size-4" /></a>
+          <p className="mb-4 mt-2 text-[13px] text-white/75">{tiers} bonus credit. Spends down on live hubs under your IO.</p>
+          <a href={withUtm("/sponsor?currency=usd", where, "sponsor")} className="mt-auto inline-flex h-11 items-center justify-center gap-2 rounded-full px-4 text-sm font-bold text-white ring-1 ring-white/40 hover:bg-white hover:text-[#0b1f3a]" data-testid="mid-tier-sponsor-cta">Pick a sponsorship tier <ArrowRight className="size-4" /></a>
         </article>
         <article className={card} data-testid="mid-tier-block">
           <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">Starter view block</p>
           <p className="mt-1 font-display text-3xl leading-none">From {fmtUsd(STARTER_BLOCK.startingUsd)} <span className="text-base">USD</span></p>
-          <p className="mt-2 text-[13px] text-white/75">100K modelled views on one hub surface at the starter rate.</p>
-          <a href={withUtm("/?inquire=pack&block=100000&surfaces=landing#quick-buy", where, "block")} className="mt-auto inline-flex h-11 items-center justify-center gap-2 rounded-full px-4 text-sm font-bold text-white ring-1 ring-white/40 hover:bg-white hover:text-[#0b1f3a] sm:mt-4" data-testid="mid-tier-block-cta">Request a block <ArrowRight className="size-4" /></a>
+          <p className="mb-4 mt-2 text-[13px] text-white/75">100K modelled views on one hub surface at the starter rate.</p>
+          <a href={withUtm("/?inquire=pack&block=100000&surfaces=landing#quick-buy", where, "block")} className="mt-auto inline-flex h-11 items-center justify-center gap-2 rounded-full px-4 text-sm font-bold text-white ring-1 ring-white/40 hover:bg-white hover:text-[#0b1f3a]" data-testid="mid-tier-block-cta">Request a block <ArrowRight className="size-4" /></a>
         </article>
       </div>
       {agencyOpen ? <div className="mt-4 rounded-2xl bg-white/[0.06] p-4 ring-1 ring-lime-300/50" data-testid="mid-tier-agency-panel"><AgencyPrepayForm where={where} dark /></div> : null}

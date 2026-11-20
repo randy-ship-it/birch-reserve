@@ -100,7 +100,7 @@ function Chips({ items, dark }: { items: readonly string[]; dark?: boolean }) {
 }
 
 /** Live-looking mock of the buyer's square card on a live hub surface. Logo stays in this browser (object URL). */
-export function HubMock({ brand, logo, hub, category }: { brand: string; logo: string | null; hub: "drho" | "sole"; category: string }) {
+export function HubMock({ brand, logo, hub, category, pins = false }: { brand: string; logo: string | null; hub: "drho" | "sole"; category: string; pins?: boolean }) {
   const name = brand.trim() || "Your brand";
   const hubName = hub === "drho" ? "DR-HO'S physio" : "SOLE";
   const surface = hub === "drho" ? "Booking confirmation" : "Hub home";
@@ -115,6 +115,7 @@ export function HubMock({ brand, logo, hub, category }: { brand: string; logo: s
         <img src={hub === "drho" ? LIVE_HUB_IMAGE : SOLE_HUB_IMAGE} alt={`${hubName} live hub`} className="absolute inset-0 size-full object-cover object-top" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent" />
         <div className="absolute bottom-3 right-3 w-[52%] max-w-[230px] rounded-xl bg-white p-3 shadow-2xl ring-2 ring-lime-300" data-testid="hub-mock-card">
+          {pins ? <><span className="absolute grid size-6 place-items-center rounded-full bg-lime-300 text-[11px] font-black text-[#0b1f3a] shadow-lg ring-2 ring-white -left-3 -top-3" aria-hidden>1</span><span className="absolute grid size-6 place-items-center rounded-full bg-lime-300 text-[11px] font-black text-[#0b1f3a] shadow-lg ring-2 ring-white -bottom-3 -right-2" aria-hidden>3</span></> : null}
           <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-foreground/45">Featured · {surface}</p>
           <div className="mt-2 flex items-center gap-2">
             {logo ? (
@@ -130,6 +131,7 @@ export function HubMock({ brand, logo, hub, category }: { brand: string; logo: s
           <span className="mt-2 inline-flex h-7 w-full items-center justify-center rounded-full bg-lime-300 text-[11px] font-bold text-[#0b1f3a]">Shop the offer</span>
         </div>
         <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]">Mock · live hub</span>
+        {pins ? <span className="absolute grid size-6 place-items-center rounded-full bg-lime-300 text-[11px] font-black text-[#0b1f3a] shadow-lg ring-2 ring-white left-3 top-12" aria-hidden>2</span> : null}
       </div>
     </figure>
   );
