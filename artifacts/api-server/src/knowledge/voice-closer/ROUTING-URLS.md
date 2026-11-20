@@ -29,7 +29,7 @@ Method: load the page, wait for network idle, then compare title + h1/h2 text vs
 
 | URL | Result | Evidence | Routable |
 |---|---|---|---|
-| https://birchreserve.net | verified | h1 "Eight category seats inside closed recovery hubs." | yes |
+| https://birchreserve.net | verified | h1 (retired Nov 2026; seat counts no longer published) | yes |
 | https://birchreserve.net/kit | verified | h1 "Display beside the product they already trust." | yes |
 | https://scalehealth.ca | verified | h1 "The digital layer for health & recovery." | yes |
 | https://scalehealth.ca/clinichubs | verified | title "For Studios & Gyms", h1 "Support your members beyond the workout." | yes |

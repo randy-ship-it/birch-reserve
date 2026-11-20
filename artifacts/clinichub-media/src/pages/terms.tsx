@@ -15,8 +15,8 @@ export default function Terms() {
           this page. Public prices are $190 USD (
           <span className="text-foreground">hold-190</span>, a 7-day category
           look that does not lock a category) and $490 USD (
-          <span className="text-foreground">reserve-490</span>, one of 8 shared
-          self-serve category seats; it does not lock the category). For now every public checkout is
+          <span className="text-foreground">reserve-490</span>, a shared
+          self-serve category reserve; it does not lock the category). For now every public checkout is
           in USD, including for buyers in Canada. The currency you see at checkout is the currency you are charged.
         </p>
         <p>
@@ -36,7 +36,7 @@ export default function Terms() {
           public sample is <Link href="/sample-io" className="text-foreground underline">/sample-io</Link>.
         </p>
         <p>
-          8 brand categories across hubs, not eight websites. Self-serve seats are a shared pool of 8 seats, open to more than one brand per category, and do not give category exclusivity. Only a premium slot ($25,000 to $50,000 USD, inquire only, set on an insertion order) locks one brand per category for its term. Reporting is aggregate only. No PHI. No clinical pixels.
+          8 brand categories across hubs, not eight websites. reserve-490 is a shared self-serve category reserve; it does not lock the category. More than one brand can reserve in a category. Only a premium slot ($25,000 to $50,000 USD, inquire only, set on an insertion order) locks one brand per category for its term. Reporting is aggregate only. No PHI. No clinical pixels.
         </p>
         <p>
           Checkout is Stripe-hosted. Silver Birch Growth Inc. does not store
