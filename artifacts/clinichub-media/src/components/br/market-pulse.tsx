@@ -87,10 +87,11 @@ type PulseEvent = { who: string; region: string | null; action: string; ago: str
 type Feed = { show: boolean; events: PulseEvent[] };
 const OFF_KEY = "br_pulse_off"; // localStorage: "1" = visitor turned the feed off (persists across visits)
 // Fast feed (Randy, Nov 20 4:52 PM): one toast, content swaps every 1–1.5s with a quick crossfade; first after ~2s.
-// prefers-reduced-motion: slower (every 4s) and no fade or movement.
+// Randy (voice 5:16 PM): ~3-4s per item with a gentle ~500ms fade, first item ~2s after load.
+// prefers-reduced-motion: slower (every 6s) and no fade or movement.
 const FIRST_MS = 2000;
-const swapMs = (reduced: boolean) => (reduced ? 4000 : 1000 + Math.round(Math.random() * 500));
-const FADE_MS = 160;
+const swapMs = (reduced: boolean) => (reduced ? 6000 : 3000 + Math.round(Math.random() * 1000));
+const FADE_MS = 500;
 const INTERACTIVE = "a,button,input,select,textarea,label,form,[role=button],[role=link],[role=dialog],iframe";
 
 /** Weighted pick, newest favoured (half-weight every ~2 weeks). Cycles the whole pool before repeating, never the same event twice in a row. */
@@ -109,6 +110,28 @@ function pickNext(events: PulseEvent[], used: Set<number>, last: number): number
 }
 
 /** True when the box sits over any visible control (CTA, form field, chat squirrel, call button, sticky bar). */
+function overlapsText(box: HTMLElement | null): boolean {
+  if (!box) return false;
+  const b = box.getBoundingClientRect();
+  for (const n of Array.from(document.querySelectorAll("h1, h2, h3, p, img, svg, [data-testid=kit-divider]"))) {
+    if (box.contains(n)) continue;
+    const r = n.getBoundingClientRect();
+    if (!r.width || !r.height) continue;
+    // Use the text's real extent, not the full-width block box.
+    const rr = n instanceof HTMLElement && /^(H1|H2|H3|P)$/.test(n.tagName) ? textRect(n) ?? r : r;
+    if (rr.left < b.right && rr.right > b.left && rr.top < b.bottom && rr.bottom > b.top) return true;
+  }
+  return false;
+}
+function textRect(n: HTMLElement): DOMRect | null {
+  const range = document.createRange();
+  range.selectNodeContents(n);
+  const rects = Array.from(range.getClientRects()).filter((r) => r.width && r.height);
+  if (!rects.length) return null;
+  const l = Math.min(...rects.map((r) => r.left)), t = Math.min(...rects.map((r) => r.top));
+  const rgt = Math.max(...rects.map((r) => r.right)), btm = Math.max(...rects.map((r) => r.bottom));
+  return new DOMRect(l, t, rgt - l, btm - t);
+}
 function overlapsControl(box: HTMLElement | null): boolean {
   if (!box) return false;
   const r = box.getBoundingClientRect();
@@ -221,6 +244,19 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, className =
         if (!overlapsControl(el)) {
           setBlocked(false);
           return;
+        }
+      }
+      // Desktop pages whose form fills the mid-height edges (intake): the empty top-right corner under the nav,
+      // outside the form column, as long as it covers no control and no heading or copy.
+      if (desktop) {
+        for (const top of ["96px", "120px"]) {
+          el.style.top = top;
+          el.style.left = "auto";
+          el.style.right = "1rem";
+          if (!overlapsControl(el) && !overlapsText(el)) {
+            setBlocked(false);
+            return;
+          }
         }
       }
       el.style.top = slots[0]![0];
