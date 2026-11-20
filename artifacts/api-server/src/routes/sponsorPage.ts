@@ -9,7 +9,9 @@
  * is refused unless SPONSOR_DEPOSITS_LIVE=true, so a preview can only ever
  * create test-mode sessions. All impression figures are modelled.
  */
-import { MODELLED_FOOTER } from "../lib/overhaul/pilotPath";
+import { MODELLED_FOOTER, URGENCY_LINE } from "../lib/overhaul/pilotPath";
+import { CARRY_OVER_CLAUSE, SPONSOR_PACK_TERMS, SPONSOR_TERMS_VERSION, customLineItem, packLineItem } from "../lib/sponsorTerms";
+import { openPrefill } from "../lib/buyFlow";
 import { birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { getStripeClient } from "../lib/stripeClient";
@@ -89,6 +91,9 @@ form.dep input,form.dep select{width:100%;padding:10px;border:1px solid #b9c1c9;
 .cur{display:inline-flex;gap:8px;font-size:.88rem}
 .mc{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;background:#FFF4DB;border:1px solid #F1D58F;color:#8A5A00;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;vertical-align:middle}
 .mf{font-weight:600;color:#071A39}
+.ok{background:#BFF3D6;color:#0B6B43;font-weight:600;padding:8px 14px;border-radius:8px;margin:12px 0}.urg{font-weight:600;color:#3b4a12}
+form.dep.wide{max-width:none}.dep .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.dep .row{grid-template-columns:1fr}}
+label.pack{cursor:pointer}label.pack.on{border:2px solid #071A39}.amt small{font-size:.9rem}.sr{position:absolute;opacity:0;width:1px;height:1px}
 </style></head><body>
 <header><a href="/"><strong>BIRCH RESERVE</strong></a><nav><a href="/sponsor?currency=${currency}">Sponsor</a><a href="/kit?currency=${currency}">Marketing kit</a><a href="/terms">Terms</a><span class="cur">Prices in ${currency.toUpperCase()}${PUBLIC_CAD_ENABLED ? ` · <a href="?currency=${other}">Show ${other.toUpperCase()}</a>` : ""}</span></nav></header>
 <main>${body}</main>
@@ -115,37 +120,54 @@ function hubPackageTable(currency: Currency): string {
 <p class="fine mf">${MODELLED_FOOTER}</p>`;
 }
 
-function sponsorHtml(currency: Currency): string {
+/** Sponsor deposits open a real Checkout only when switched on (and, for a live key, explicitly allowed). */
+export function sponsorDepositsOpen(env: NodeJS.ProcessEnv = process.env): boolean {
+  const key = env.STRIPE_SECRET_KEY?.trim() ?? "";
+  // STRIPE_CHECKOUT_DISABLED=true is the site-wide card kill switch (same as /buy and the home CTAs).
+  if (env.SPONSOR_DEPOSITS_ENABLED !== "true" || !key || env.STRIPE_CHECKOUT_DISABLED === "true") return false;
+  return !key.startsWith("sk_live_") || env.SPONSOR_DEPOSITS_LIVE === "true";
+}
+
+export type SponsorPageOpts = { open?: boolean; pack?: string | null; prefill?: { email?: string; company?: string } | null; status?: string | null };
+
+/** /sponsor (Randy, Nov 20 2026 audit #6): three packs, each "Prepay $X". USD only. */
+export function sponsorHtml(_currency: Currency, opts: SponsorPageOpts = {}): string {
+  const currency: Currency = "usd";
+  const open = opts.open ?? false;
+  const picked = DEPOSIT_TIERS.find((t) => t.key === opts.pack)?.key ?? DEPOSIT_TIERS[1]!.key;
+  const pf = opts.prefill ?? {};
+  const val = (v?: string) => (v ? ` value="${esc(v)}"` : "");
   const tiers = DEPOSIT_TIERS.map((t) => {
-    const amount = currency === "cad" ? t.cad : t.usd;
-    const credit = Math.round(amount * (1 + t.bonusPct / 100));
-    return `<div class="card"><strong>${esc(t.label)}</strong><span class="amt">${money(amount, currency)}</span><span>Becomes ${money(credit, currency)} in sponsorship credit (+${t.bonusPct}%).</span><span class="fine">Spends down on live hubs over 6 months. Unused credit: refund or extend.</span><button type="button" data-tier="${t.key}">Deposit ${money(amount, currency)}</button></div>`;
+    const credit = Math.round(t.usd * (1 + t.bonusPct / 100));
+    return `<label class="card pack${t.key === picked ? " on" : ""}" data-testid="pack-${t.key}"><input type="radio" name="tier" value="${t.key}"${t.key === picked ? " checked" : ""} class="sr"><strong>${esc(t.label)}</strong><span class="amt">${money(t.usd, currency)} <small>USD</small></span><span>+${t.bonusPct}% bonus media credit: ${money(credit, currency)} USD to spend.</span><button type="button" class="btn" data-tier="${t.key}">Prepay ${money(t.usd, currency)}</button></label>`;
   }).join("");
-  const min = currency === "cad" ? CUSTOM_MIN.cad : CUSTOM_MIN.usd;
-  const max = currency === "cad" ? CUSTOM_MAX.cad : CUSTOM_MAX.usd;
   const ladder = SMB_LADDER.map((r) => `<tr><td>${r.customers} activated customers</td><td class="n">$${fmt(r.cashCad)} CAD cash</td><td class="n">$${fmt(r.creditCad)} CAD ad credit</td></tr>`).join("");
-  return `<p class="draft">Online payment opens soon. Reserve by inquiry today and we'll confirm within 1 business day.</p>
-<h1>Sponsor the hubs now. Run your ads when you're ready.</h1>
-<p>Put cash on account today as sponsorship credit. The named hubs are live inventory: your credit spends down on them over the 6 months after it lands, at the published rate card, under an insertion order that names the hubs. Unused credit can be refunded, or extended month by month at the same rate. 3x more inventory is in queue by year end, and we take deposits for it too.</p>
-${statsStrip()}
-<h2>How a sponsorship works</h2>
-<ol class="steps">
-<li><strong>Deposit</strong><br>Pick a tier or enter an amount. Stripe hosts the payment. Your balance shows as sponsorship credit.</li>
-<li><strong>Pick hubs and slots</strong><br>When you're ready, choose launching partner brand hubs, our clinic hub network, or both.</li>
-<li><strong>Sign an insertion order</strong><br>The order names each hub, slot and month. Nothing runs before it.</li>
-<li><strong>Draw down</strong><br>Credit comes off at the rate card as your ad runs. You get a monthly statement with your balance.</li>
-</ol>
-<h2>Deposit tiers</h2>
+  const status =
+    opts.status === "success"
+      ? `<p class="ok" data-testid="sponsor-paid">Payment received. We'll email your insertion order to sign within 1 business day. Nothing runs before it.</p>`
+      : opts.status === "cancelled"
+        ? `<p class="draft" data-testid="sponsor-cancelled">Checkout cancelled. No charge was made.</p>`
+        : "";
+  return `${status}${open ? "" : `<p class="draft" data-testid="sponsor-inquiry">Card checkout for packs is paused right now. Send the form and we'll confirm by email within 1 business day. No charge today.</p>`}
+<h1>Sponsorship packs. Card now, insertion order before anything runs.</h1>
+<p>Prepay media credit for display across our private health and wellness hubs. Bigger packs get more bonus media credit. Your insertion order names the hub, placement and dates before anything runs, and the pack is fully refundable until 14 days before that launch date.</p>
+<p class="urg" data-testid="sponsor-urgency">${esc(URGENCY_LINE)}</p>
+<form class="dep wide" id="prepay" data-testid="sponsor-prepay-form">
 <div class="cards">${tiers}</div>
-<h3>Or choose your own amount</h3>
-<form class="dep" id="deposit">
-<label>Amount (${currency.toUpperCase()}, ${money(min, currency)} to ${money(max, currency)})<input name="amount" type="number" min="${min}" max="${max}" step="10" value="${min}"></label>
-<label>Brand<input name="brand" required maxlength="160"></label>
-<label>Work email<input name="email" type="email" required></label>
-<label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the sponsorship terms below.</label>
-<button class="btn" type="submit">Deposit and open my credit</button>
+<div class="row"><label>Brand<input name="brand" required maxlength="160" autocomplete="organization"${val(pf.company)}></label>
+<label>Work email<input name="email" type="email" required autocomplete="email"${val(pf.email)}></label></div>
+<label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the <a href="#terms-pack">sponsorship pack terms</a>.</label>
+<p class="fine">${esc(CARRY_OVER_CLAUSE)}</p>
 <p id="msg" role="status" class="fine"></p>
 </form>
+${statsStrip()}
+<h2>How a pack works</h2>
+<ol class="steps">
+<li><strong>Prepay</strong><br>Pick a pack. Stripe hosts the card payment.</li>
+<li><strong>Sign an insertion order</strong><br>It names each hub, placement and date. Nothing runs before it.</li>
+<li><strong>Your ad runs</strong><br>A person approves your ad. Clicks go to your site with your UTMs.</li>
+<li><strong>Draw down</strong><br>Credit comes off at the rate card as your ad runs. Reporting is aggregate.</li>
+</ol>
 <h2>Where your credit runs</h2>
 <p>Live partner brand hubs plus our clinic hub network: physio, mobility, gym and studio members who buy and book through their clinic's hub.</p>
 ${hubPackageTable(currency)}
@@ -153,22 +175,18 @@ ${hubPackageTable(currency)}
 <p>Open a Clinic Hub at <a href="https://scalehealth.ca/clinichubs">scalehealth.ca/clinichubs</a> and activate your audience: email, text, a link on your website, at checkout and on social media. When they buy or book through your hub, you earn a cash bonus, or a bigger bonus as Birch Reserve ad credit to promote your own business.</p>
 <div class="tw"><table><thead><tr><th>Milestone (first 90 days live)</th><th class="n">Cash</th><th class="n">Or ad credit</th></tr></thead><tbody>${ladder}</tbody></table></div>
 <p class="fine">Proposal. An activated customer is a unique customer of your business who completes a paid order or booking through your Clinic Hub and does not refund or charge back. The 90-day clock starts once we see real traffic or transactions; bonuses are credited when it ends. Self-purchases (you, your staff or your own accounts) are excluded. One bonus per business per year, top milestone only. Refunded or charged-back orders are reversed. Ad credit has no cash value and expires 12 months after it lands.</p>
-<h2>Sponsorship terms</h2>
-<ul>
-<li>Your deposit is a prepaid credit for Birch Reserve display placements. It is not an impression guarantee and not a fee.</li>
-<li>The named hubs are live inventory. Credit spends down over the 6 months after it lands, only for placements that ran under an insertion order naming the hub, slot and month, at the rate card in force when the order is issued.</li>
-<li>Bonus credit (+5%, +10% or +15%) is used after your paid credit and has no cash value.</li>
-<li>Unused paid credit at the end of the spend-down: take a refund, or extend the spend-down month by month at the same rate. After an insertion order, cancellation and makegoods follow IAB terms.</li>
-<li>Reporting is aggregate only. No patient data, no clinical pixels.</li>
-</ul>
-<p class="fine">Questions: <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></p>
+<h2 id="terms-pack">Sponsorship pack terms</h2>
+<ul data-testid="sponsor-pack-terms">${SPONSOR_PACK_TERMS.map((t) => `<li>${esc(t)}</li>`).join("")}<li>${esc(CARRY_OVER_CLAUSE)}</li></ul>
+<p class="fine">Full terms: <a href="/terms">/terms</a>. Questions: <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></p>
 <script>
 (function(){
-var cur=${JSON.stringify(currency)};var msg=document.getElementById('msg');var f=document.getElementById('deposit');
-function go(body){msg.textContent='Opening secure checkout…';fetch('/v1/sponsor/deposit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){if(x.ok&&x.j.url){location.href=x.j.url}else{msg.textContent=x.j.message||x.j.error||'Reserve by inquiry: email sales@silverbirchgrowth.com and we will confirm within 1 business day.'}}).catch(function(){msg.textContent='Network error. Email sales@silverbirchgrowth.com.'})}
-function base(){return{currency:cur,brand:f.brand.value,email:f.email.value,agree:document.getElementById('terms').checked}}
-document.querySelectorAll('button[data-tier]').forEach(function(b){b.addEventListener('click',function(){var d=base();d.tier=b.getAttribute('data-tier');if(!d.brand||!d.email||!d.agree){msg.textContent='Add your brand, work email and agree to the terms below, then pick a tier.';f.scrollIntoView({behavior:'smooth'});return}go(d)})});
-f.addEventListener('submit',function(e){e.preventDefault();var d=base();d.amount=Number(f.amount.value);go(d)});
+var msg=document.getElementById('msg');var f=document.getElementById('prepay');
+function go(body){msg.textContent='Opening secure checkout…';fetch('/v1/sponsor/deposit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){if(x.ok&&x.j.url){location.href=x.j.url}else{msg.textContent=x.j.message||x.j.error||'Email sales@silverbirchgrowth.com and we will confirm within 1 business day.'}}).catch(function(){msg.textContent='Network error. Email sales@silverbirchgrowth.com.'})}
+function pick(k){f.querySelectorAll('label.pack').forEach(function(l){var r=l.querySelector('input');var on=r.value===k;r.checked=on;l.classList.toggle('on',on)})}
+f.querySelectorAll('label.pack input').forEach(function(r){r.addEventListener('change',function(){pick(r.value)})});
+f.querySelectorAll('button[data-tier]').forEach(function(b){b.addEventListener('click',function(e){e.preventDefault();var k=b.getAttribute('data-tier');pick(k);var d={currency:'usd',tier:k,brand:f.brand.value.trim(),email:f.email.value.trim(),agree:document.getElementById('terms').checked};if(!d.brand||!d.email||!d.agree){msg.textContent='Add your brand and work email, and tick the terms box, then press Prepay again.';(d.brand?(d.email?document.getElementById('terms'):f.email):f.brand).focus();return}go(d)})});
+f.addEventListener('submit',function(e){e.preventDefault()});
+if(location.hash==='#prepay'){f.scrollIntoView({block:'start'})}
 })();
 </script>`;
 }
@@ -203,8 +221,18 @@ ${statsStrip()}
 
 router.get(["/sponsor", "/sponsor/"], (req: Request, res: Response) => {
   const currency = pickCurrency(req);
-  res.set("Cache-Control", "private, no-cache");
-  res.type("html").send(shell("Sponsor the hubs — Birch Reserve", "Sponsorship credit for display across live partner brand hubs and our clinic hub network.", "/sponsor", currency, sponsorHtml(currency)));
+  // ?pf= carries kit details sealed by POST /v1/buy/prefill (same token as /buy). Never cache a prefilled page.
+  const prefill = openPrefill(req.query.pf);
+  if (prefill) {
+    res.set("Cache-Control", "private, no-store");
+    res.set("X-Robots-Tag", "noindex");
+    res.set("Referrer-Policy", "no-referrer");
+  } else {
+    res.set("Cache-Control", "private, no-cache");
+  }
+  const status = req.query.deposit === "success" ? "success" : req.query.deposit === "cancelled" ? "cancelled" : null;
+  const pack = typeof req.query.pack === "string" ? req.query.pack : null;
+  res.type("html").send(shell("Sponsorship packs — Birch Reserve", "Prepay a $1,500, $3,000 or $6,000 USD sponsorship pack with up to 15% bonus media credit. Card now, insertion order before anything runs.", "/sponsor", currency, sponsorHtml(currency, { open: sponsorDepositsOpen(), pack, prefill, status })));
 });
 
 router.get(["/kit", "/kit/"], (req: Request, res: Response) => {
@@ -219,7 +247,8 @@ export type DepositRequest = { tier?: string; amount?: number; currency?: string
 export function buildDepositSession(body: DepositRequest, origin: string):
   | { ok: false; error: string }
   | { ok: true; amountCents: number; currency: Currency; params: Record<string, unknown> } {
-  const currency: Currency = body.currency === "cad" ? "cad" : "usd";
+  // USD only (Randy HARD rule, Nov 20 2026), whatever the page sent.
+  const currency = "usd" as Currency;
   const brand = String(body.brand ?? "").trim().slice(0, 160);
   const email = String(body.email ?? "").trim().slice(0, 200);
   if (!brand || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok: false, error: "Add your brand and a work email." };
@@ -247,7 +276,7 @@ export function buildDepositSession(body: DepositRequest, origin: string):
     bonus_pct: String(bonusPct),
     credit_cents: String(creditCents),
     brand,
-    terms_version: "sponsor-draft-2026-11-12",
+    terms_version: SPONSOR_TERMS_VERSION,
   };
   return {
     ok: true,
@@ -257,9 +286,10 @@ export function buildDepositSession(body: DepositRequest, origin: string):
       mode: "payment",
       customer_email: email,
       customer_creation: "always",
-      line_items: [{ quantity: 1, price_data: { currency, unit_amount: amountCents, product_data: { name: "Birch Reserve sponsorship credit", description: `Prepaid display credit${bonusPct ? ` (+${bonusPct}% bonus credit)` : ""}. Spends down on live hubs under an insertion order that names the hubs; unused credit refundable or extendable.` } } }],
+      line_items: [{ quantity: 1, price_data: { currency, unit_amount: amountCents, product_data: tierKey === "custom" ? customLineItem(amount) : packLineItem({ usd: amount, bonusPct }) } }],
       metadata,
-      payment_intent_data: { ...birchPaymentIntentBrand(`Sponsorship credit · ${brand}`), metadata },
+      payment_intent_data: { ...birchPaymentIntentBrand(`Sponsorship pack · ${brand}`), metadata },
+      custom_text: { submit: { message: "Card now. Nothing runs until you sign an insertion order. Refundable until 14 days before the IO launch date." } },
       success_url: `${origin}/sponsor?deposit=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/sponsor?deposit=cancelled`,
     },
@@ -267,10 +297,7 @@ export function buildDepositSession(body: DepositRequest, origin: string):
 }
 
 router.post("/v1/sponsor/deposit", express.json({ limit: "8kb" }), async (req: Request, res: Response) => {
-  const key = process.env.STRIPE_SECRET_KEY?.trim() ?? "";
-  const enabled = process.env.SPONSOR_DEPOSITS_ENABLED === "true";
-  const liveAllowed = process.env.SPONSOR_DEPOSITS_LIVE === "true";
-  if (!enabled || !key || (key.startsWith("sk_live_") && !liveAllowed)) {
+  if (!sponsorDepositsOpen()) {
     const b = (req.body ?? {}) as Record<string, unknown>;
     const email = typeof b.email === "string" ? b.email.trim().slice(0, 320) : "";
     let stored = "skipped";
@@ -278,7 +305,11 @@ router.post("/v1/sponsor/deposit", express.json({ limit: "8kb" }), async (req: R
       const friday = await sendIntake({ kind: "deposit_interest", email, company: typeof b.brand === "string" ? b.brand.slice(0, 160) : undefined, path: "/sponsor", meta: { tier: String(b.tier ?? ""), amount: String(b.amount ?? ""), currency: String(b.currency ?? ""), checkout_open: false } }).catch(() => ({ status: "failed" }));
       stored = friday.status;
     }
-    res.status(200).json({ held: true, message: "Reserved by inquiry. We'll confirm within 1 business day. No charge today.", stored });
+    if (stored === "skipped") {
+      res.status(400).json({ error: "Add your brand and a work email." });
+      return;
+    }
+    res.status(200).json({ held: true, message: "Got it. We'll confirm by email within 1 business day. No charge today.", stored });
     return;
   }
   const built = buildDepositSession(req.body ?? {}, `https://${req.headers.host ?? "birchreserve.net"}`);
