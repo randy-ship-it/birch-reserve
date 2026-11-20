@@ -16,7 +16,7 @@
  * Store: production (VERCEL_ENV=production) writes buy_creatives / buy_orders in Postgres (created on first use,
  * additive). Every other environment keeps them in this instance's memory, so preview QA never writes prod data.
  */
-import { createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import { PUBLIC_RESERVE_OFFERS } from "./reserveOffers";
 import { PREMIUM_INQUIRE_ONLY } from "./premiumInquireOnly";
 import { FixedWindowLimiter } from "./rateLimit";
@@ -163,6 +163,51 @@ export function verifyToken<T extends Record<string, unknown>>(kind: "acct" | "c
 }
 
 export type AccountClaims = { e: string; n: string; c: string; w: string; d: DomainCheck; id: string };
+/* ------------------------------------------------------------------ kit -> /buy prefill */
+/**
+ * Post-kit checkout prefill (Randy, Nov 20 2026 9:47 AM ET). The kit already has brand, email and website, so /buy
+ * step 1 opens filled in. The values travel as an ENCRYPTED short-lived token (AES-256-GCM, key from SESSION_SECRET),
+ * so the email is never readable in a URL, a log line or analytics. Nothing is stored server-side.
+ */
+export type BuyPrefill = { name?: string; email?: string; company?: string; website?: string };
+export const PREFILL_TTL_MS = 2 * 3600_000;
+const prefillKey = () => createHash("sha256").update(`${secret()}:prefill`).digest();
+
+export function parsePrefill(body: unknown): BuyPrefill {
+  const r = (body && typeof body === "object" && !Array.isArray(body) ? body : {}) as Record<string, unknown>;
+  const out: BuyPrefill = {};
+  const name = clean(r.name, 120);
+  const email = clean(r.email, 200).toLowerCase();
+  const company = clean(r.company, 160);
+  const host = websiteHost(clean(r.website, 300));
+  if (name.length >= 2) out.name = name;
+  if (EMAIL_RE.test(email)) out.email = email;
+  if (company.length >= 2) out.company = company;
+  if (host) out.website = host;
+  return out;
+}
+
+export function sealPrefill(p: BuyPrefill, now = Date.now(), ttlMs = PREFILL_TTL_MS): string {
+  const iv = randomBytes(12);
+  const c = createCipheriv("aes-256-gcm", prefillKey(), iv);
+  const enc = Buffer.concat([c.update(JSON.stringify({ x: now + ttlMs, ...p }), "utf8"), c.final()]);
+  return b64u(Buffer.concat([iv, c.getAuthTag(), enc]));
+}
+
+export function openPrefill(token: unknown, now = Date.now()): BuyPrefill | null {
+  if (typeof token !== "string" || token.length < 40 || token.length > 2000) return null;
+  try {
+    const raw = Buffer.from(token, "base64url");
+    const d = createDecipheriv("aes-256-gcm", prefillKey(), raw.subarray(0, 12));
+    d.setAuthTag(raw.subarray(12, 28));
+    const j = JSON.parse(Buffer.concat([d.update(raw.subarray(28)), d.final()]).toString("utf8")) as BuyPrefill & { x?: number };
+    if (typeof j.x !== "number" || j.x < now) return null;
+    return parsePrefill(j);
+  } catch {
+    return null;
+  }
+}
+
 export function accountToken(a: BuyAccount): string {
   return signToken("acct", { e: a.email, n: a.name, c: a.company, w: a.website, d: a.domainCheck, id: randomUUID() });
 }
@@ -350,6 +395,7 @@ export const buyLimiters = {
   creativeAccount: new FixedWindowLimiter({ max: 5, windowMs: W }),
   orderIp: new FixedWindowLimiter({ max: 8, windowMs: W }),
   orderEmail: new FixedWindowLimiter({ max: 4, windowMs: W }),
+  prefillIp: new FixedWindowLimiter({ max: 30, windowMs: W }),
 };
 export function resetBuyLimitsForTests(): void {
   for (const l of Object.values(buyLimiters)) l.reset();

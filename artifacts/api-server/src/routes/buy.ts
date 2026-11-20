@@ -11,7 +11,7 @@ import { randomUUID } from "node:crypto";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import {
   BUY_FORMATS, BUY_PATH, BUY_PLANS, BUY_TAGLINE, CREATIVE_MAX_BYTES, CREATIVE_MIN_PX, CREATIVE_TYPES,
-  accountToken, buyLimiters, buyStore, checkCreative, findFormat, findPlan, parseAccount, signToken, validPick, verifyToken,
+  accountToken, buyLimiters, buyStore, openPrefill, parsePrefill, sealPrefill, checkCreative, findFormat, findPlan, parseAccount, signToken, validPick, verifyToken,
   type AccountClaims, type CreativeClaims,
 } from "../lib/buyFlow";
 import { isBotUserAgent, HONEYPOT_FIELD } from "../lib/publicGuards";
@@ -69,6 +69,20 @@ router.post("/v1/buy/account", express.json({ limit: "8kb" }), (req, res): void 
     domain_check: a.domainCheck,
     note: a.domainCheck === "match" ? null : "We'll confirm your company with a quick check before anything runs.",
   });
+});
+
+/* ------------------------------------------------------------------ kit prefill */
+// The kit posts what it already has; /buy?pf=<token> opens step 1 filled in. Encrypted token, nothing stored.
+router.post("/v1/buy/prefill", express.json({ limit: "4kb" }), (req, res): void => {
+  noStore(res);
+  if (!guard(req, res)) return;
+  if (limited(res, buyLimiters.prefillIp.hit(ipOf(req)))) return;
+  const p = parsePrefill(req.body);
+  if (!Object.keys(p).length) {
+    res.status(400).json({ error: "Nothing to prefill." });
+    return;
+  }
+  res.json({ ok: true, pf: sealPrefill(p) });
 });
 
 /* ------------------------------------------------------------------ step 2 */
@@ -262,7 +276,9 @@ details{margin:14px 0 0;font-size:.86rem;color:#4d5b6a}details summary{cursor:po
 footer{border-top:1px solid #d8dccf;margin-top:30px;padding:20px 0 36px;font-size:.84rem;color:#4d5b6a}
 @media(max-width:760px){header nav a[href^=tel]{display:none}.picks{grid-template-columns:1fr 1fr}.plans{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.prog li span{display:none}.prog li.on span{display:inline}.card{padding:18px}}`;
 
-export function renderBuyPage(opts: { checkoutLive: boolean; plan?: unknown }): string {
+export function renderBuyPage(opts: { checkoutLive: boolean; plan?: unknown; prefill?: import("../lib/buyFlow").BuyPrefill | null }): string {
+  const pf = opts.prefill ?? {};
+  const val = (v?: string) => (v ? ` value="${esc(v)}"` : "");
   // ?plan= preselects a plan (deep links from the kit / media kit). Unknown values keep the default.
   const pre = findPlan(opts.plan)?.key ?? BUY_PLANS[0]!.key;
   const formats = BUY_FORMATS.map(
@@ -280,11 +296,11 @@ ${publicSeoTags(BUY_PATH, TITLE, DESCRIPTION)}
 <section class="hero"><h1>${esc(BUY_TAGLINE)}</h1><p class="lede">3 steps · about 2 minutes · USD</p>
 <ol class="prog" id="prog"><li class="on" data-s="1"><b>1</b><span>Your account</span></li><li data-s="2"><b>2</b><span>Your ad</span></li><li data-s="3"><b>3</b><span>Where it shows</span></li></ol></section>
 
-<form class="card" id="s1" novalidate autocomplete="on"><h2>1 · Your account</h2>
-<div class="g2"><div><label for="b-name">Your name</label><input type="text" id="b-name" name="name" required maxlength="120" autocomplete="name"></div>
-<div><label for="b-email">Work email</label><input type="email" id="b-email" name="email" required maxlength="200" autocomplete="email" inputmode="email"></div>
-<div><label for="b-company">Company</label><input type="text" id="b-company" name="company" required maxlength="160" autocomplete="organization"></div>
-<div><label for="b-web">Company website</label><input type="text" id="b-web" name="website" required maxlength="300" placeholder="yourbrand.com" autocomplete="url" inputmode="url"></div></div>
+<form class="card" id="s1" novalidate autocomplete="on"><h2>1 · Your account</h2>${opts.prefill ? `<p class="msg ok" id="s1-pf">Filled in from your kit. Check it, add your name, and continue.</p>` : ""}
+<div class="g2"><div><label for="b-name">Your name</label><input type="text" id="b-name" name="name" required maxlength="120" autocomplete="name"${val(pf.name)}></div>
+<div><label for="b-email">Work email</label><input type="email" id="b-email" name="email" required maxlength="200" autocomplete="email" inputmode="email"${val(pf.email)}></div>
+<div><label for="b-company">Company</label><input type="text" id="b-company" name="company" required maxlength="160" autocomplete="organization"${val(pf.company)}></div>
+<div><label for="b-web">Company website</label><input type="text" id="b-web" name="website" required maxlength="300" placeholder="yourbrand.com" autocomplete="url" inputmode="url"${val(pf.website)}></div></div>
 <div class="hp" aria-hidden="true"><label for="b-fax">Fax</label><input type="text" id="b-fax" name="fax" tabindex="-1" autocomplete="off"></div>
 <button class="btn" id="s1-go" type="submit">Continue</button><p class="msg" id="s1-msg" role="status" aria-live="polite"></p></form>
 
@@ -334,8 +350,14 @@ if(/[?&]checkout=cancelled/.test(location.search))msg($("s1-msg"),"Checkout was 
 }
 
 router.get(["/buy", "/buy/"], (req, res): void => {
-  res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
-  res.type("html").send(renderBuyPage({ checkoutLive: isReserveCheckoutConfigured(), plan: req.query.plan }));
+  const prefill = openPrefill(req.query.pf);
+  // A prefilled page carries the visitor's details: never cache it anywhere.
+  if (req.query.pf !== undefined) {
+    res.setHeader("Cache-Control", "private, no-store");
+    res.setHeader("X-Robots-Tag", "noindex");
+    res.setHeader("Referrer-Policy", "no-referrer");
+  } else res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
+  res.type("html").send(renderBuyPage({ checkoutLive: isReserveCheckoutConfigured(), plan: req.query.plan, prefill }));
 });
 
 export default router;
