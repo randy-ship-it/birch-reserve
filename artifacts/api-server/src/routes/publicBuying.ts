@@ -1,5 +1,6 @@
 import { CHECKOUT_TAGLINE, birchCheckoutCustomText, birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import { HERO_MOCK_CSS, heroMockHtml } from "../lib/heroMock";
+import { URGENCY_LINE } from "../lib/overhaul/pilotPath";
 import { llmsTxt } from "../lib/overhaul/seo";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -496,8 +497,7 @@ export async function categoryStatuses(seatsOpen?: number): Promise<Array<{ slug
 }
 
 /** Public, count-free availability line (Randy, Nov 20 2026): no open/held/paid numbers. */
-export const PUBLIC_AVAILABILITY_NOTE =
-  "Early rate · first-mover priority on reporting for the first brands in each category";
+export const PUBLIC_AVAILABILITY_NOTE = URGENCY_LINE;
 
 const PUBLIC_BRAND_DESCRIPTION =
   "Reserve a share of display space across a growing network of private health and wellness hubs. Placements curated as hubs launch, no bidding. Fully refundable until 14 days before launch. Your payment is display credit.";

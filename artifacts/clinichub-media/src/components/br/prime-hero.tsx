@@ -13,7 +13,7 @@ import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
  */
 
 /** Count-free urgency line (Randy, Nov 20 2026). Never pair with open/held/paid numbers. */
-export const EARLY_RATE_LINE = "Early rate · first-mover priority on reporting for the first brands in each category";
+export const EARLY_RATE_LINE = "Early rate for pilot brands · first in each category get first-mover priority on pilot reporting.";
 
 export const SALES_PHONE_DISPLAY = "(647) 931-6278";
 export const SALES_PHONE_HREF = "tel:+16479316278";
