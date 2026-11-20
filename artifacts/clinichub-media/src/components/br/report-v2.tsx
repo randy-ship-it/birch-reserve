@@ -378,11 +378,12 @@ export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposur
 }
 
 /** The full report body on the design system's paper background. */
-export function ReportV2({ report, sample, map, costExtra, earnCta, supplierCta, compact, exposure, exposureSource, onAccelerate, physical }: { report: FridayReport; sample?: boolean; map?: string; costExtra?: ReactNode; earnCta?: ReactNode; supplierCta?: ReactNode; compact?: boolean; exposure?: FridayExposure; exposureSource?: "report" | "mock" | "sample"; onAccelerate?: ReactNode; physical?: PhysicalAnswer | null }) {
+export function ReportV2({ report, sample, map, costExtra, earnCta, supplierCta, compact, exposure, exposureSource, onAccelerate, physical, afterHero }: { afterHero?: ReactNode; report: FridayReport; sample?: boolean; map?: string; costExtra?: ReactNode; earnCta?: ReactNode; supplierCta?: ReactNode; compact?: boolean; exposure?: FridayExposure; exposureSource?: "report" | "mock" | "sample"; onAccelerate?: ReactNode; physical?: PhysicalAnswer | null }) {
   const m = buildModel(report);
   return (
     <div data-testid={sample ? "report-v2-sample" : "report-v2"} className="space-y-8 p-3 md:p-6" style={{ background: RT.paper, borderRadius: 24 }}>
       <ReportHero m={m} sample={sample} />
+      {afterHero}
       <ChannelTilesV2 m={m} map={map} />
       {compact ? null : <HubCards m={m} />}
       <TwoSides m={m} costExtra={costExtra} earnCta={earnCta} supplierCta={supplierCta} exposure={exposure} exposureSource={exposureSource} onAccelerate={onAccelerate} physical={physical} />

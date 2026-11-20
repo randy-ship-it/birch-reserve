@@ -203,3 +203,38 @@ test("page: ?plan= preselects a known plan; unknown keeps the default", () => {
   assert.equal(checked(renderBuyPage({ checkoutLive: true, plan: "exclusive" })), "exclusive");
   assert.equal(checked(renderBuyPage({ checkoutLive: true, plan: "<x>" })), "reserve-490");
 });
+
+// Nov 20 2026 (Randy): post-kit checkout prefill. Encrypted token, email never readable in the URL.
+import { openPrefill as _open, sealPrefill as _seal, parsePrefill as _parse } from "../src/lib/buyFlow";
+test("kit prefill: sealed token round-trips, hides the email, expires, rejects tampering", () => {
+  const p = _parse({ name: "Sam Lee", email: "Sam@Acme.com", company: "Acme", website: "acme.com", junk: "x" });
+  assert.deepEqual(p, { name: "Sam Lee", email: "sam@acme.com", company: "Acme", website: "acme.com" });
+  const t = _seal(p, 1_000);
+  assert.doesNotMatch(Buffer.from(t, "base64url").toString("latin1"), /acme/i, "email/brand not readable");
+  assert.deepEqual(_open(t, 2_000), p);
+  assert.equal(_open(t, 1_000 + 3 * 3600_000), null, "expired");
+  const bad = t.slice(0, -2) + (t.endsWith("A") ? "BB" : "AA");
+  assert.equal(_open(bad, 2_000), null, "tampered");
+  assert.equal(_open("nope", 2_000), null);
+});
+
+test("kit prefill: /buy?pf= fills step 1, no-store, and the POST endpoint seals", async () => {
+  const html = renderBuyPage({ checkoutLive: true, plan: "hold-190", prefill: { email: "sam@acme.com", company: "Acme <b>", website: "acme.com" } });
+  assert.match(html, /id="b-email"[^>]*value="sam@acme\.com"/);
+  assert.match(html, /id="b-company"[^>]*value="Acme &lt;b&gt;"/);
+  assert.match(html, /Filled in from your kit/);
+  assert.doesNotMatch(renderBuyPage({ checkoutLive: true }), /Filled in from your kit|value="sam/);
+  const app = express(); app.use(buyRouter);
+  const srv = app.listen(0); const port = (srv.address() as AddressInfo).port;
+  try {
+    const ua = { "user-agent": "Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/131 Safari/537.36", "content-type": "application/json" };
+    const r = await fetch(`http://127.0.0.1:${port}/v1/buy/prefill`, { method: "POST", headers: ua, body: JSON.stringify({ email: "sam@acme.com", company: "Acme", website: "acme.com" }) });
+    assert.equal(r.status, 200);
+    const { pf } = (await r.json()) as { pf: string };
+    const g = await fetch(`http://127.0.0.1:${port}/buy?plan=hold-190&pf=${pf}`, { headers: ua });
+    assert.match(g.headers.get("cache-control") ?? "", /no-store/);
+    assert.match(await g.text(), /id="b-email"[^>]*value="sam@acme\.com"/);
+    const e = await fetch(`http://127.0.0.1:${port}/v1/buy/prefill`, { method: "POST", headers: ua, body: "{}" });
+    assert.equal(e.status, 400);
+  } finally { srv.close(); }
+});

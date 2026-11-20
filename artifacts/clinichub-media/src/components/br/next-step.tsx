@@ -244,3 +244,67 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
     </section>
   );
 }
+
+/* ------------------------------------------------------------------ post-kit (Randy, Nov 20 2026 9:47 AM ET) */
+export type KitPrefill = { brand?: string | null; email?: string | null; website?: string | null };
+
+/** Same-origin navigation that also works on the scalehealth.ca mirror (its boot shim maps paths to birchreserve.net). */
+function goTo(path: string) {
+  const m = (window as { __BR_MIRROR?: { href?: (u: string) => string } }).__BR_MIRROR;
+  window.location.assign(m?.href ? m.href(path) : path);
+}
+
+/**
+ * Kit details -> encrypted /buy prefill token (POST /v1/buy/prefill), then /buy?plan=…&pf=<token>.
+ * The email never goes in the URL. If the token call fails, the plain /buy link still works.
+ */
+export async function openPrefilledBuy(plan: "hold-190" | "reserve-490", kit: KitPrefill, where: string): Promise<void> {
+  const base = withUtm(`/buy?plan=${plan}`, where, plan === "hold-190" ? "look" : "reserve");
+  try {
+    const r = await fetch("/v1/buy/prefill", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: kit.email ?? "", company: kit.brand ?? "", website: kit.website ?? "" }) });
+    const j = (await r.json().catch(() => ({}))) as { pf?: string };
+    goTo(r.ok && j.pf ? `${base}&pf=${encodeURIComponent(j.pf)}` : base);
+  } catch {
+    goTo(base);
+  }
+}
+
+/** Post-kit next step: right under the kit's headline numbers. Mock left, button right; mobile sticky bar. */
+export function PostKitNext({ kit, where = "post_kit" }: { kit: KitPrefill; where?: string }) {
+  const [busy, setBusy] = useState<"" | "hold-190" | "reserve-490">("");
+  const go = (plan: "hold-190" | "reserve-490") => (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(plan);
+    trackCta(plan === "hold-190" ? "cta_hold_190" : "cta_reserve_490", { offer: plan });
+    void openPrefilledBuy(plan, kit, where).finally(() => setBusy(""));
+  };
+  const brand = (kit.brand ?? "").trim();
+  return (
+    <section className="rounded-3xl bg-white p-4 md:p-6" data-testid="post-kit-next" data-where={where}>
+      <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">Your kit is ready. See your ad live.</h2>
+      <div className="mt-4 grid items-center gap-5 md:grid-cols-[1.2fr_1fr]">
+        <AnnotatedHubMock brand={brand} />
+        <div>
+          <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={go("hold-190")} className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-7 text-lg font-bold text-white hover:bg-[#13305a] md:w-auto" data-testid="post-kit-look">
+            {busy === "hold-190" ? <Loader2 className="size-5 animate-spin" /> : null}Start the $190 look <ArrowRight className="size-5" />
+          </a>
+          <p className="mt-3 text-sm">
+            <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={go("reserve-490")} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="post-kit-reserve">or reserve $490 as media credit</a>
+          </p>
+          <p className="mt-3 text-[13px] text-foreground/70" data-testid="post-kit-prefill-line">
+            {brand ? `Prefilled for ${brand}. ` : "Prefilled from your kit. "}100% credit toward $490 within 7 days, otherwise refunded.
+          </p>
+        </div>
+      </div>
+      <div className="mt-6"><MidTier where={where} /></div>
+      {/* Mobile: one sticky bar for the two card offers. Sits above the chat/voice dock row. */}
+      <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-foreground/10 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 shadow-[0_-8px_24px_-12px_rgba(7,26,57,0.35)] backdrop-blur md:hidden" data-testid="post-kit-sticky">
+        <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={go("hold-190")} className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-[#0b1f3a] text-sm font-bold text-white" data-testid="post-kit-sticky-look">$190 look</a>
+        <span aria-hidden className="text-foreground/40">·</span>
+        <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={go("reserve-490")} className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-[#0b1f3a] text-sm font-bold text-[#0b1f3a]" data-testid="post-kit-sticky-reserve">$490 reserve</a>
+      </div>
+      <div className="h-16 md:hidden" aria-hidden />
+    </section>
+  );
+}
