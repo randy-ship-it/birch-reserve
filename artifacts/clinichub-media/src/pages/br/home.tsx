@@ -5,6 +5,7 @@
  * FAQs and terms stay on the page but collapsed (native <details>), and the full detail lives on the linked pages.
  * Visual language matches /intake and the kit report (lime wash, navy cards, lime pills, report serif/forest).
  */
+import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPath";
 import type { ReactNode } from "react";
 import { ArrowRight, BookOpen, Building2, ChevronDown, FileText, Handshake, LayoutGrid, Package, Sparkles, Store, Users } from "lucide-react";
 import { DoorRoute } from "@/components/br/door-route";
@@ -14,7 +15,7 @@ import { KitCta } from "@/components/br/kit-cta";
 import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BuyCta } from "@/components/br/buy-cta";
-import { AnnotatedHubMock, MidTier, MODELLED_PLAN_LABEL } from "@/components/br/next-step";
+import { AnnotatedHubMock, MidTier } from "@/components/br/next-step";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { INVENTORY, PUBLISHER_INCENTIVE } from "../../../../api-server/src/lib/overhaul/model";
 import { DOOR_ROUTE } from "../../../../api-server/src/lib/doorRoute";
@@ -117,7 +118,7 @@ export default function BrHome() {
             <div className="flex flex-wrap items-center gap-2">
               <Store className="size-4 text-lime-300" aria-hidden />
               <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Retail network</span>
-              <Chip>Estimate</Chip>
+              <Chip>Modelled</Chip>
             </div>
             <ul className="mt-5 flex flex-wrap justify-between gap-x-6 gap-y-4 md:justify-start md:gap-x-8">
               {STATS.map((s) => (
@@ -141,7 +142,7 @@ export default function BrHome() {
             </div>
           </a>
         </div>
-        <p className="mt-2 text-[12px] text-foreground/60" data-testid="home-stats-label">{MODELLED_PLAN_LABEL}. Network figures and targets, not measured delivery.</p>
+        <p className="mt-2 text-[12px] text-foreground/60" data-testid="home-stats-label">{MODELLED_FOOTER}</p>
       </section>
 
       {/* 2b. Mid-tier bridge: from a $490 test to real spend (Randy review, Nov 20 2026). */}
