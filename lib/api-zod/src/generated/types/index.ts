@@ -29,6 +29,8 @@ export * from './advertiserIntakeReviewReceiptReviewStatus';
 export * from './advertiserIntakeReviewUpdate';
 export * from './advertiserIntakeReviewUpdateReviewStatus';
 export * from './birchReserveAvailability';
+export * from './birchReserveAvailabilityAvailability';
+export * from './birchReserveAvailabilityCategoriesItem';
 export * from './birchReserveAvailabilityCurrency';
 export * from './birchReserveAvailabilityInventoryModel';
 export * from './birchReserveAvailabilityPrices';

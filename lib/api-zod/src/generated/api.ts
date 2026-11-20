@@ -414,14 +414,6 @@ export const GetBirchReserveCatalogResponse = zod.object({
 export const getBirchReserveAvailabilityResponseSkusMin = 2;
 export const getBirchReserveAvailabilityResponseSkusMax = 2;
 
-export const getBirchReserveAvailabilityResponseSeatsTotalMultipleOf = 1;
-
-export const getBirchReserveAvailabilityResponseSeatsPaidMultipleOf = 1;
-
-export const getBirchReserveAvailabilityResponseSeatsHeldMultipleOf = 1;
-
-export const getBirchReserveAvailabilityResponseSeatsOpenMultipleOf = 1;
-
 
 
 export const GetBirchReserveAvailabilityResponse = zod.object({
@@ -430,10 +422,13 @@ export const GetBirchReserveAvailabilityResponse = zod.object({
   "default_sku": zod.enum(['hold-190', 'reserve-490']),
   "skus": zod.array(zod.enum(['hold-190', 'reserve-490'])).min(getBirchReserveAvailabilityResponseSkusMin).max(getBirchReserveAvailabilityResponseSkusMax),
   "inventory_model": zod.enum(['shared_reserve_pool']),
-  "seats_total": zod.number().multipleOf(getBirchReserveAvailabilityResponseSeatsTotalMultipleOf),
-  "seats_paid": zod.number().multipleOf(getBirchReserveAvailabilityResponseSeatsPaidMultipleOf),
-  "seats_held": zod.number().multipleOf(getBirchReserveAvailabilityResponseSeatsHeldMultipleOf),
-  "seats_open": zod.number().multipleOf(getBirchReserveAvailabilityResponseSeatsOpenMultipleOf),
+  "availability": zod.enum(['limited_early_placements']).describe('Count-free availability. Seat counts are never published.'),
+  "availability_note": zod.string(),
+  "accepting_reservations": zod.boolean().optional(),
+  "categories": zod.array(zod.object({
+  "slug": zod.string().optional(),
+  "label": zod.string().optional()
+})).optional(),
   "next_window": zod.string(),
   "formats_live": zod.array(zod.string()),
   "checkout": zod.string(),

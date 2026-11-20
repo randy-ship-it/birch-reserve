@@ -12,6 +12,9 @@ import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
  * the buyer's checkout currency (CAD in Canada, USD elsewhere).
  */
 
+/** Count-free urgency line (Randy, Nov 20 2026). Never pair with open/held/paid numbers. */
+export const EARLY_RATE_LINE = "Early rate · first-mover priority on reporting for the first brands in each category";
+
 export const SALES_PHONE_DISPLAY = "(647) 931-6278";
 export const SALES_PHONE_HREF = "tel:+16479316278";
 export const SALES_EMAIL = "sales@silverbirchgrowth.com";
@@ -21,11 +24,8 @@ export const SOLE_HUB_URL = "https://www.scalehealth.ca/sole";
 export const SOLE_HUB_IMAGE = "/hub-gallery/sole.webp";
 export const LIVE_HUB_IMAGE = "/hub-gallery/drho.webp";
 
-type CategoryStatus = "open" | "waitlist";
 export type Availability = {
-  seatsOpen: number;
-  seatsTotal: number;
-  categories: Array<{ slug: string; label: string; status: CategoryStatus }>;
+  categories: Array<{ slug: string; label: string }>;
   seatLabel: string;
   lookLabel: string;
 };
@@ -41,12 +41,10 @@ export function useAvailability(): Availability | null {
     fetch("/availability.json", { signal: ctrl.signal, cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
-        if (!d || typeof d.seats_open !== "number" || typeof d.seats_total !== "number") return;
+        if (!d || typeof d !== "object" || !d.prices) return;
         const cur = String(d.currency ?? "USD").toUpperCase();
         const label = (sku: string, fb: string) => d.prices?.[sku]?.[cur]?.label ?? fb;
         setA({
-          seatsOpen: d.seats_open,
-          seatsTotal: d.seats_total,
           categories: Array.isArray(d.categories) ? d.categories : [],
           seatLabel: label("reserve-490", "$490 USD"),
           lookLabel: label("hold-190", "$190 USD"),

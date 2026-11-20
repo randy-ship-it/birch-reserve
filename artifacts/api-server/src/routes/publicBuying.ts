@@ -494,6 +494,10 @@ export async function categoryStatuses(seatsOpen?: number): Promise<Array<{ slug
   return BUYCALC_CATEGORIES.map((c) => ({ slug: c.slug, label: c.label, status: open > 0 ? "open" : "waitlist" }));
 }
 
+/** Public, count-free availability line (Randy, Nov 20 2026): no open/held/paid numbers. */
+export const PUBLIC_AVAILABILITY_NOTE =
+  "Early rate · first-mover priority on reporting for the first brands in each category";
+
 const PUBLIC_BRAND_DESCRIPTION =
   "Reserve a share of display space across a growing network of private health and wellness hubs. Placements curated as hubs launch, no bidding. Fully refundable until 14 days before launch. Your payment is display credit.";
 
@@ -622,8 +626,12 @@ async function sendAvailabilityJson(
     default_sku: DEFAULT_RESERVE_OFFER.sku,
     skus: PUBLIC_RESERVE_OFFERS.map((offer) => offer.sku),
     inventory_model: "shared_reserve_pool",
-    ...counts,
-    categories: await categoryStatuses(counts.seats_open),
+    // HARD rule (Randy): never publish seat counts, open/held/paid numbers or "open"
+    // category statuses. Counts stay internal (checkout still enforces the cap).
+    availability: "limited_early_placements",
+    availability_note: PUBLIC_AVAILABILITY_NOTE,
+    accepting_reservations: counts.seats_open > 0,
+    categories: BUYCALC_CATEGORIES.map((c) => ({ slug: c.slug, label: c.label })),
     window: "rolling",
     formats: FORMATS,
     formats_live: FORMATS,
