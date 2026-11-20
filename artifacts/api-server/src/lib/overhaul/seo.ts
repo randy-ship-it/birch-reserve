@@ -1,3 +1,4 @@
+import { POSITIONING, POSITIONING_FOLLOW, llmsFasterSection } from "../aiDiscovery";
 /** Per-route head + llms.txt for the overhaul routes (crawlable without JS). */
 import { slotOffers, areaLockOffer } from "./agent";
 import { AGENCY_FAQ, PLAIN_TERMS, faqPageJsonLd } from "./agencyShowcase";
@@ -158,7 +159,9 @@ export function llmsTxt(): string {
   return [
     "# Birch Reserve",
     "",
-    `> Display space inside private health and wellness hubs, on four placements: ${PLACEMENT_LABELS.join(", ")}. Priced in USD for every buyer.`,
+    `> ${POSITIONING} ${POSITIONING_FOLLOW}`,
+    "",
+    `Display space inside private health and wellness hubs, on four placements: ${PLACEMENT_LABELS.join(", ")}. Priced in USD for every buyer.`,
     "",
     "## Offers (same as the media kit)",
     "Prepay your category. Not an open auction.",
@@ -177,7 +180,8 @@ export function llmsTxt(): string {
     `- Agencies: https://birchreserve.net/agencies · ${AGENCY.line}`,
     "- In plain terms (what Birch is, the moment, where figures come from, reporting, how to start): https://birchreserve.net/agencies#plain-terms",
     "- Media buyers & performance marketers (add Birch as its own line item next to programmatic, paid social and retail media; UTM + promo-code measurement): https://birchreserve.net/media-buyers",
-    "- Publishers (studios & retail): https://birchreserve.net/publish/studios · Brands with a recovery audience: https://birchreserve.net/publish/brands",
+    "- Studios & retail: https://birchreserve.net/publish/studios · Brands with a recovery audience: https://birchreserve.net/publish/brands",
+    "- Speed versus Google Ads (Google's own timelines, cited): https://birchreserve.net/vs-google-ads · Blog: https://birchreserve.net/blog · Intake: https://birchreserve.net/intake",
     "",
     "## For AI agents",
     "- Catalog: GET https://birchreserve.net/v1/agent/catalog.json",
@@ -194,5 +198,6 @@ export function llmsTxt(): string {
     "",
     "Rules: aggregate reporting only, no patient data, no clinical pixels. Modelled figures are labelled. No impression guarantees.",
     "Seller: Silver Birch Growth Inc. · Toronto, Ontario · sales@silverbirchgrowth.com",
+    llmsFasterSection(),
   ].join("\n");
 }

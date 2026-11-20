@@ -9,7 +9,7 @@ import { PUBLIC_OG_IMAGE, PUBLIC_SITE_ORIGIN, publicSeoTags } from "../lib/publi
 
 const router: IRouter = Router();
 
-function esc(value: string): string {
+export function esc(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
 
@@ -58,7 +58,7 @@ article ul{padding-left:0;list-style:none}article li{position:relative;padding-l
 @media(max-width:560px){.loop::after{display:none}nav.tn{gap:10px}}
 footer{border-top:1px solid #d8dccf;margin-top:48px;padding:24px 0 40px;font-size:.9rem;color:#4d5b6a}footer a{color:#24364f}`;
 
-function shell(path: string, title: string, description: string, body: string, jsonLd: unknown, ogType: "article" | "website"): string {
+export function shell(path: string, title: string, description: string, body: string, jsonLd: unknown, ogType: "article" | "website"): string {
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(description)}">
