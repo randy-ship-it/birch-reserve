@@ -94,6 +94,7 @@ export function PrimeHero() {
         <h1 className="mt-3 max-w-4xl font-display text-[2.2rem] leading-[1.03] tracking-tight md:text-[4rem]" data-testid="prime-h1">
           Put your brand inside private health and wellness hubs.
         </h1>
+        <p className="mt-3 font-display text-xl text-accent md:text-3xl" data-testid="prime-positioning">Buy Scale Health ads through Birch Reserve. The faster way to buy ads.</p>
         <p className="mt-3 font-display text-xl text-background/80 md:text-3xl" data-testid="prime-scarcity">A growing network. Limited early placements. No bidding.</p>
         <p className="mt-4 max-w-3xl text-base leading-relaxed text-background/80" data-testid="prime-what">
           Reserve a share of display space across our growing network of private, members-only hubs: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, with more on the way. Placements are curated as each hub launches.

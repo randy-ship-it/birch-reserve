@@ -12,6 +12,9 @@ import type { ReserveCurrency } from "./reserveOffers";
 
 export const PUBLIC_SITE_ORIGIN = "https://birchreserve.net";
 
+/** One positioning line, used site-wide (Randy, Nov 19 2026). */
+export const POSITIONING_LINE = "Buy Scale Health ads through Birch Reserve.";
+
 /** Existing Birch mark, served from this site. */
 export const PUBLIC_OG_IMAGE = `${PUBLIC_SITE_ORIGIN}/og-birch-reserve.png`;
 
@@ -59,6 +62,8 @@ export const PUBLIC_SITEMAP_PATHS = [
   "/blog/do-things-that-dont-scale-distribution",
   "/blog/brand-and-activation-balance",
   "/blog/mental-and-physical-availability",
+  // Speed vs Google Ads (server-rendered, Nov 19 2026; routes/aiDiscovery.ts).
+  "/vs-google-ads",
 ] as const;
 
 /**
@@ -231,7 +236,7 @@ export function withRouteSeo(html: string, pathname: string): string {
   const meta = OVERHAUL_ROUTES[normalizedPath(pathname)];
   if (meta) {
     const t = escapeAttr(meta.title);
-    const d = escapeAttr(meta.description);
+    const d = escapeAttr(meta.description.startsWith(POSITIONING_LINE) ? meta.description : `${POSITIONING_LINE} ${meta.description}`);
     next = replaceTag(next, /<title>[\s\S]*?<\/title>/i, `<title>${t}</title>`);
     next = replaceTag(next, /<meta\s+name="description"[^>]*>/i, `<meta name="description" content="${d}" />`);
     next = replaceTag(next, /<meta\s+property="og:title"[^>]*>/i, `<meta property="og:title" content="${t}" />`);
