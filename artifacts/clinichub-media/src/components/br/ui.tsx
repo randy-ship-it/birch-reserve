@@ -1,4 +1,5 @@
 import { type MouseEvent, type ReactNode, useEffect, useState } from "react";
+import { skinText } from "@/lib/siteSkin";
 import { ArrowRight } from "lucide-react";
 import { getAttribution } from "@/lib/attribution";
 
@@ -98,9 +99,9 @@ export function useOverhaulStatus(): OverhaulStatus | null {
 /** Simple per-page <title>/<meta description> for the SPA; the server also rewrites the head for crawlers. */
 export function usePageMeta(title: string, description: string) {
   useEffect(() => {
-    document.title = title;
+    document.title = skinText(title);
     const m = document.querySelector('meta[name="description"]');
-    if (m) m.setAttribute("content", description);
+    if (m) m.setAttribute("content", skinText(description));
   }, [title, description]);
 }
 

@@ -10,6 +10,8 @@ import { LingerCapture } from '@/components/linger-capture';
 import { CurrencyToggle } from '@/components/currency-toggle';
 import { KitCta, StickyKitCta, intakeHref } from '@/components/br/kit-cta';
 import { logArrival, logCtaClick } from '@/lib/shareTrack';
+import { isScaleSkin } from '@/lib/siteSkin';
+import { ScaleFooter, ScaleHeader } from '@/components/scale-chrome';
 
 const NAV_GROUPS = [
   {
@@ -67,6 +69,23 @@ export function Layout({ children }: { children: ReactNode }) {
   // Share + referral arrivals (?ref=… / utm_*): logged once per page load (lib/shareTrack.ts).
   useEffect(() => logArrival(), [location]);
 
+
+  // Scale skin (scalehealth.ca/intake): Scale's own header + footer around the unchanged intake (lib/siteSkin.ts).
+  if (isScaleSkin()) {
+    return (
+      <div className="min-h-[100dvh] flex flex-col bg-background text-foreground font-sans" data-skin-root="scale">
+        <ScaleHeader />
+        <main className="flex-1 flex flex-col pt-16 print:pt-0">{children}</main>
+        <ScaleFooter />
+        <div className="print:hidden">
+          <RandyChat />
+          <HearRandyElevenLabs />
+          <LingerCapture />
+        </div>
+        <StickyKitCta path={location} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background text-foreground font-sans">
