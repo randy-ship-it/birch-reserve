@@ -5,7 +5,7 @@
  * and renders nothing when the server says show:false (fewer than 3 real events in the window). Never padded.
  * Shared by birchreserve.net and the Scale mirror (scalehealth.ca/intake): no site name in the copy.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Activity, Apple, Bed, Brain, ChevronDown, Dumbbell, HeartPulse, Microscope, Soup, X } from "lucide-react";
 import { STARTER_BLOCK } from "@/components/br/start-small";
 import { AGENCY_TEST } from "../../../../api-server/src/lib/twoLane";
@@ -82,13 +82,17 @@ export function QuestionsBrandsAsk() {
   );
 }
 
+const FEED_URL = "/v1/activity-pulse";
 type PulseEvent = { who: string; region: string | null; action: string; ago: string; age_h?: number };
 type Feed = { show: boolean; events: PulseEvent[] };
-const DISMISS_KEY = "br_pulse_dismissed";
-// Cadence (Randy, Nov 20 4:27 PM): first after ~2s, then every 10–15s, each visible ~5s, no session cap.
+const OFF_KEY = "br_pulse_off"; // localStorage: "1" = visitor turned the feed off (persists across visits)
+// Fast feed (Randy, Nov 20 4:52 PM): one toast, content swaps every 1–1.5s with a quick crossfade; first after ~2s.
+// prefers-reduced-motion: slower (every 4s) and no fade or movement.
 const FIRST_MS = 2000;
-const SHOW_MS = 5000;
-const gap = () => 10000 + Math.round(Math.random() * 5000);
+const swapMs = (reduced: boolean) => (reduced ? 4000 : 1000 + Math.round(Math.random() * 500));
+const FADE_MS = 160;
+const INTERACTIVE = "a,button,input,select,textarea,label,form,[role=button],[role=link],[role=dialog],iframe";
+
 /** Weighted pick, newest favoured (half-weight every ~2 weeks). Cycles the whole pool before repeating, never the same event twice in a row. */
 function pickNext(events: PulseEvent[], used: Set<number>, last: number): number {
   if (used.size >= events.length) used.clear();
@@ -104,28 +108,52 @@ function pickNext(events: PulseEvent[], used: Set<number>, last: number): number
   return list[list.length - 1]!.i;
 }
 
+/** True when the box sits over any visible control (CTA, form field, chat squirrel, call button, sticky bar). */
+function overlapsControl(box: HTMLElement | null): boolean {
+  if (!box) return false;
+  const r = box.getBoundingClientRect();
+  if (!r.width) return false;
+  const pad = 6;
+  for (const el of Array.from(document.querySelectorAll<HTMLElement>(INTERACTIVE))) {
+    if (box.contains(el) || el.closest("[data-testid=activity-pulse],[data-testid=activity-pulse-on]")) continue;
+    const o = el.getBoundingClientRect();
+    if (!o.width || !o.height || o.bottom < 0 || o.top > window.innerHeight) continue;
+    if (o.left < r.right + pad && o.right > r.left - pad && o.top < r.bottom + pad && o.bottom > r.top - pad) {
+      const cs = window.getComputedStyle(el);
+      if (cs.visibility !== "hidden" && cs.display !== "none" && Number(cs.opacity) > 0.05) return true;
+    }
+  }
+  return false;
+}
+
+const readOff = () => {
+  try {
+    return typeof window !== "undefined" && window.localStorage.getItem(OFF_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
 /**
- * Side toast at mid-height (Randy Nov 20 4:31 PM: left edge, upper-middle on mobile, clear of the squirrel, call button and sticky bar) (Randy t294u): "[blurred] · Physio clinic, Ontario · asked about hosting a hub · 2d ago".
- * The blurred "name" is a fixed placeholder shape, never a real name: the API carries no names (lib/activityPulse.ts),
- * so there is nothing in the HTML or JSON to un-blur. Real events only: show:false, an error or an empty list renders
- * nothing. Non-blocking (only the toast takes pointer events), dismissible for the session, soft fade (t295u cadence
- * above); prefers-reduced-motion drops the movement and keeps a short opacity fade.
+ * Live activity feed (Randy t294u–t295u, Nov 20 4:52 PM): ONE small toast at the left edge (mid-height on desktop,
+ * upper-middle on mobile) whose line swaps every 1–1.5s with a quick crossfade: "[blurred] · Physio clinic, Ontario ·
+ * is exploring hosting a hub · 2d ago". The blurred "name" is a fixed placeholder shape, never a real name: the API
+ * carries no names (lib/activityPulse.ts). Real events only: show:false, an error or an empty list renders nothing.
+ * The toast steps aside (fades out, no clicks) whenever it would sit over a CTA, form field, the squirrel, the call
+ * button or a sticky bar, and comes back once the page scrolls clear. "Hide activity" or the X turns it off for good
+ * (localStorage); a tiny "Activity" pill turns it back on.
  */
 export function ActivityPulse() {
   const [feed, setFeed] = useState<Feed | null>(null);
-  const [i, setI] = useState(0);
-  const [visible, setVisible] = useState(false);
-  const [off, setOff] = useState(() => {
-    try {
-      return typeof window !== "undefined" && window.sessionStorage.getItem(DISMISS_KEY) === "1";
-    } catch {
-      return false;
-    }
-  });
+  const [i, setI] = useState(-1);
+  const [fading, setFading] = useState(false);
+  const [blocked, setBlocked] = useState(false);
+  const [off, setOff] = useState(readOff);
+  const boxRef = useRef<HTMLDivElement | null>(null);
+  const reduced = useMemo(() => typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches, []);
   useEffect(() => {
-    if (off) return;
     let live = true;
-    fetch("/v1/activity-pulse", { headers: { Accept: "application/json" } })
+    fetch(FEED_URL, { headers: { Accept: "application/json" } })
       .then((r) => (r.ok ? r.json() : null))
       .then((d: Feed | null) => {
         if (live && d && d.show === true && Array.isArray(d.events) && d.events.length) setFeed(d);
@@ -134,53 +162,105 @@ export function ActivityPulse() {
     return () => {
       live = false;
     };
-  }, [off]);
+  }, []);
   useEffect(() => {
     if (!feed || off) return;
     let t: number;
+    let f: number;
     const used = new Set<number>();
     let last = -1;
-    const show = () => {
-      const next = pickNext(feed.events, used, last);
-      used.add(next);
-      last = next;
-      setI(next);
-      setVisible(true);
-      t = window.setTimeout(() => {
-        setVisible(false);
-        t = window.setTimeout(show, gap());
-      }, SHOW_MS);
+    const next = () => {
+      const n = pickNext(feed.events, used, last);
+      used.add(n);
+      last = n;
+      return n;
     };
-    t = window.setTimeout(show, FIRST_MS);
-    return () => window.clearTimeout(t);
-  }, [feed, off]);
-  if (off || !feed) return null;
-  const e = feed.events[i % feed.events.length]!;
-  const close = () => {
-    setOff(true);
+    const tick = () => {
+      if (reduced) setI(next());
+      else {
+        setFading(true);
+        f = window.setTimeout(() => {
+          setI(next());
+          setFading(false);
+        }, FADE_MS);
+      }
+      t = window.setTimeout(tick, swapMs(reduced));
+    };
+    t = window.setTimeout(() => {
+      setI(next());
+      t = window.setTimeout(tick, swapMs(reduced));
+    }, FIRST_MS);
+    return () => {
+      window.clearTimeout(t);
+      window.clearTimeout(f);
+    };
+  }, [feed, off, reduced]);
+  useEffect(() => {
+    if (!feed) return;
+    let raf = 0;
+    const check = () => {
+      raf = 0;
+      setBlocked(overlapsControl(boxRef.current));
+    };
+    const schedule = () => {
+      if (!raf) raf = window.requestAnimationFrame(check);
+    };
+    schedule();
+    const iv = window.setInterval(schedule, 700);
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.clearInterval(iv);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, [feed, off, i]);
+  if (!feed) return null;
+  const setOffPersist = (v: boolean) => {
+    setOff(v);
     try {
-      window.sessionStorage.setItem(DISMISS_KEY, "1");
+      if (v) window.localStorage.setItem(OFF_KEY, "1");
+      else window.localStorage.removeItem(OFF_KEY);
     } catch {
       /* private mode */
     }
   };
+  const pos = "fixed left-2 top-[38%] z-40 md:left-4 md:top-1/2";
+  if (off) {
+    return (
+      <div ref={boxRef} className={`${pos} transition-opacity duration-300 ${blocked ? "pointer-events-none opacity-0" : "opacity-70 hover:opacity-100"}`} data-testid="activity-pulse-on">
+        <button type="button" onClick={() => setOffPersist(false)} tabIndex={blocked ? -1 : 0} className="flex items-center gap-1 rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-medium shadow-sm ring-1 ring-foreground/5 backdrop-blur" style={{ color: NAVY }} aria-label="Turn recent activity back on" data-testid="activity-pulse-turn-on">
+          <span className="inline-flex size-1.5 rounded-full bg-lime-500/70" aria-hidden />
+          Activity
+        </button>
+      </div>
+    );
+  }
+  const visible = i >= 0 && !blocked;
+  const e = feed.events[Math.max(0, i) % feed.events.length]!;
   return (
     <div
-      className={`pointer-events-none fixed left-2 top-[38%] z-40 flex justify-start transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-opacity motion-reduce:duration-300 motion-reduce:transform-none md:left-4 md:top-1/2 md:max-w-sm ${visible ? "translate-x-0 opacity-100" : "-translate-x-1.5 opacity-0"}`}
+      ref={boxRef}
+      className={`${pos} flex justify-start transition-opacity duration-300 motion-reduce:transition-none md:max-w-sm ${visible ? "opacity-100" : "pointer-events-none opacity-0"}`}
       data-testid="activity-pulse"
       data-visible={visible ? "1" : "0"}
+      data-blocked={blocked ? "1" : "0"}
       aria-hidden={visible ? undefined : true}
     >
-      <div className={`flex max-w-[calc(100vw-8.5rem)] items-center gap-2.5 rounded-xl bg-white/80 px-3 py-2 shadow-sm ring-1 ring-foreground/5 backdrop-blur md:max-w-sm ${visible ? "pointer-events-auto" : ""}`} role="status" aria-live="polite">
+      <div className="flex w-[15.5rem] max-w-[calc(100vw-1rem)] items-center gap-2 rounded-xl bg-white/80 px-3 py-1.5 shadow-sm ring-1 ring-foreground/5 backdrop-blur md:w-[22rem]" role="status" aria-live="off">
         <span className="inline-flex size-1.5 shrink-0 rounded-full bg-lime-500/70" aria-hidden />
-        <span className="min-w-0 text-[12px] leading-snug opacity-80" style={{ color: NAVY }}>
-          <span className="mr-1 inline-block h-2.5 w-12 rounded-full bg-foreground/15 align-middle blur-[2px]" aria-hidden data-testid="activity-pulse-blur" />
+        <span className={`min-w-0 flex-1 text-[11px] leading-snug opacity-80 transition-opacity ease-out motion-reduce:transition-none md:text-[12px] ${fading ? "opacity-0" : ""}`} style={{ color: NAVY, transitionDuration: `${FADE_MS}ms` }} data-testid="activity-pulse-text">
+          <span className="mr-1 inline-block h-2.5 w-10 rounded-full bg-foreground/15 align-middle blur-[2px]" aria-hidden data-testid="activity-pulse-blur" />
           <span className="sr-only">Someone</span>
           <span className="font-medium" data-testid="activity-pulse-who">· {e.who}{e.region ? `, ${e.region}` : ""}</span>
           <span data-testid="activity-pulse-line"> · {e.action}</span>
           <span className="text-foreground/45"> · {e.ago}</span>
+          <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className="ml-1.5 whitespace-nowrap text-[10px] text-foreground/40 underline underline-offset-2 hover:text-foreground/70" data-testid="activity-pulse-hide">
+            Hide activity
+          </button>
         </span>
-        <button type="button" onClick={close} tabIndex={visible ? 0 : -1} className="-mr-1 shrink-0 rounded-full p-1 text-foreground/30 hover:text-foreground/70" aria-label="Dismiss recent activity" data-testid="activity-pulse-close">
+        <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className="-mr-1 shrink-0 self-start rounded-full p-1 text-foreground/30 hover:text-foreground/70" aria-label="Turn off recent activity" data-testid="activity-pulse-close">
           <X className="size-3" />
         </button>
       </div>
