@@ -57,6 +57,9 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
   if (/anyone else|who else|other brands?|competitor|already (in|taken|booked)|someone else/.test(t)) {
     return { intent: "competition", callback: null, text: `We don't share who has reserved or how much space is taken. The $490 USD reserve is a shared category reserve, so it isn't exclusive; owning your category is a premium slot ($25,000 to $50,000 USD, inquire only). Early placements are limited, so reserving now gets you in as hubs launch: ${BUY}` };
   }
+  if (/\b(how (long|soon|quickly|fast)|when)\b.*\b(live|run|running|start|launch|show|showing|appear|up)\b|\b(go|goes|going) live\b|turnaround|lead time/.test(t)) {
+    return { intent: "timing", callback: null, text: `There's no fixed go-live time. After checkout a person reviews your ad, and we reply within 1 business day with the insertion order naming the hub, placement and launch date. Your ad runs from that launch date once you approve the IO; nothing runs before that. The quickest first step is the $190 USD 7-day look: ${BUY}` };
+  }
   if (/how (does|do|would) (it|this|birch|the reserve)( \w+)? work|how it works|what happens (after|next|when)|the process/.test(t)) {
     return { intent: "how", callback: null, text: `Three steps: reserve your space for $490 USD (or take a $190 USD 7-day look first), pay by card on the Stripe checkout with no login, then approve the insertion order that names the hub and placement. Nothing runs before you approve it, and the full amount is media credit. Start at ${BUY}` };
   }

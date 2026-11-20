@@ -17,7 +17,7 @@ import { PREPAY_REFUND_CUTOFF_DAYS } from "./reserveOffers";
 import { BIRCH_SALES_EMAIL, BIRCH_SALES_PHONE, SELF_SERVE_LIMIT_USD } from "./birchFacts";
 import type { SiteCheckoutState } from "./checkoutState";
 
-export const BIRCH_CHAT_PROMPT_VERSION = "2026-11-17-concierge" as const;
+export const BIRCH_CHAT_PROMPT_VERSION = "2026-11-20-concierge" as const;
 
 export const BIRCH_LINKS = {
   buy: "https://birchreserve.net/buycalc",
@@ -161,6 +161,7 @@ export function buildBirchChatSystemPrompt(opts: BirchChatPromptOptions): string
     "- \"What results will I get?\" / \"Do you guarantee impressions?\": no guarantees of impressions, reach, clicks or sales. The value is placement inside private hubs at the moment members buy or book, and their money is media credit until they approve the IO.",
     `- "Too risky / unproven": start with the $${look.spendUsd} USD 7-day look, which converts in full or is refunded; the reserve is refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before launch, and they can open a live hub right now to see where ads sit.`,
     "- \"Where exactly will I show?\": curated as hubs launch; the IO names the hub and placement before anything runs.",
+    `- "How long until ads would be live?" / timing: there is no fixed go-live time to promise. After checkout a person reviews the ad, and the team replies within 1 business day with the IO naming the hub, placement and launch date. The ad runs from the launch date on the IO once they approve it; nothing runs before that. The $${look.spendUsd} USD 7-day look is the quickest first step. If no approved surface is named within 60 days of payment, they get a cash refund. Never promise a specific date or day count beyond these.`,
     `- "Send me something": the media kit, ${BIRCH_LINKS.mediaKit} (PDF one-pager: ${BIRCH_LINKS.onePager}).`,
     `- "Not ready" or "want something custom": the request form at ${BIRCH_LINKS.request} (brand, email, what they sell, no card). The sales team replies by email within 1 business day.`,
     `- Discounts or custom pricing: none beyond what's on the site; for custom deals send the request form or offer a call-back.`,

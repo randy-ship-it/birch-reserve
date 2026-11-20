@@ -23,6 +23,11 @@ import { PUBLIC_SITE_ORIGIN } from "../lib/publicSeo";
 export const MIRROR_PREFIX = "/intake/_m";
 /** br_mirror tag -> source tag recorded on share events and intake records. */
 export const MIRROR_TAGS: Readonly<Record<string, string>> = { scale: "scale_mirror" };
+/**
+ * Hosts that serve the mirror. Their pages POST to /intake/_m/api/... with their own Origin (the external rewrite
+ * forwards Host as birchreserve.net), so origin-checked routes (the site chat) must accept them.
+ */
+export const MIRROR_ORIGIN_HOSTS: ReadonlySet<string> = new Set(["scalehealth.ca", "www.scalehealth.ca"]);
 const MIRROR_PAGE_RE = /^\/intake(?:\/(?:publisher|supplier|sponsor|report))?\/?$/;
 
 /** Strip /intake/_m from a request URL. Returns null when the URL is not prefixed. */
