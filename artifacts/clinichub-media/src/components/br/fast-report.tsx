@@ -182,7 +182,7 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
         {hasKit || !oneForm ? <div className="mt-3"><PrimaryCta side={q.side} where="done" /></div> : <LaneCtas />}
       </div>
       {oneForm && q.ref && q.payload ? <IntakeDetails key={q.roles.join(",")} intake={q.ref} payload={{ ...q.payload, roles: q.roles as IntakePayload["roles"] }} roles={q.roles} shared={q.shared ?? { brand: "", categories: [], skus: "", audience: "" }} /> : null}
-      <ReportV2 report={report} exposure={exposure} exposureSource="mock" earnCta={earnCta} supplierCta={supplierOnly ? earnCta : undefined} onAccelerate={accCta} physical={q.physical} afterHero={<PostKitNext kit={{ brand: name ?? q.brand ?? null, email: q.contact?.email ?? null, website: q.contact?.website ?? q.host ?? null }} />} />
+      <ReportV2 report={report} exposure={exposure} exposureSource="mock" earnCta={earnCta} supplierCta={supplierOnly ? earnCta : undefined} onAccelerate={accCta} physical={q.physical} afterHero={<PostKitNext kit={{ brand: name ?? q.brand ?? null, label: name || q.host || null, email: q.contact?.email ?? null, website: q.contact?.website ?? q.host ?? null }} />} />
       {hasKit || !oneForm ? upgrade("bottom") : null}
     </section>
   );
