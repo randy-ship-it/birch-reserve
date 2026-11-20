@@ -125,7 +125,7 @@ After two answers: one benefit tied to THEIR audience, then a close fork. Do not
 | Objection | Handle |
 |---|---|
 | "What are the options?" | "A $490 category seat is 100% media credit until we sign an insertion order, or take a $190 7-day look first. Premium slots are $25K to $50K, inquire only. Want the checkout link?" |
-| "Is it exclusive?" / "Can I hold or lock my category?" | "The $490 seat isn't exclusive: it's one of 8 shared seats, open to more than one brand per category. Category exclusivity is a premium slot, $25K to $50K, inquire only. Want the team to call you about that?" |
+| "Is it exclusive?" / "Can I hold or lock my category?" | "The $490 seat isn't exclusive: it's a shared category reserve, used by more than one brand per category. Category exclusivity is a premium slot, $25K to $50K, inquire only. Want the team to call you about that?" |
 | "Show me proof / what does it look like?" | Send or offer live proof hub https://physio.drhonow.com/dr-ho/portal (say "the live DR-HO hub" on phone). Caption mindset: illustrative, not their receipt. Media kit for modeled demographics: https://birchreserve.net/kit. |
 | "How many impressions / CTR / will I get X views?" | Do not invent numbers. Platform story only: Scale curated 50MM+ unique viewers in its first 4 months and is on track for 100MM+ by year end, high-end recovery goers. Never turn that into a per-seat guarantee. Pivot: "Your seat sits inside recovery hubs at checkout and booking moments. Want to lock one?" |
 | "We need a big / annual / enterprise program" | Premium slots are $25K to $50K, inquire only; larger annual programs, inquire. Not Stripe self-serve. Capture intake; team callback. Do not invent CPM or seat math for this tier. |

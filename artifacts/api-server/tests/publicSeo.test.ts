@@ -487,3 +487,12 @@ test("buycalc dual sales motion (Randy, Nov 17 2026 8:56 PM ET): additive copy, 
   assert.doesNotMatch(html, /seats open|\b\d+ of \d+\b|CAD|guaranteed/i);
   assert.doesNotMatch(html, /sales@birchreserve\.net/);
 });
+
+// Nov 20 2026 (Randy): no seat counts on /terms or in published insights (rewritten on read).
+test("no seat counts: /terms copy and insight rewrite", async () => {
+  const { rewriteExclusiveInsightCopy } = await import("@workspace/db");
+  const src = await readFile(resolve("src/routes/publicPages.ts"), "utf8");
+  assert.doesNotMatch(src, /of 8 shared|pool of 8|8 seats/i);
+  assert.match(src, /reserve-490 is a shared self-serve category reserve; it does not lock the category\./);
+  assert.equal(rewriteExclusiveInsightCopy("x Eight category seats sit inside listed Scale Health hubs. y"), "x Shared category reserves sit inside listed Scale Health hubs. y");
+});

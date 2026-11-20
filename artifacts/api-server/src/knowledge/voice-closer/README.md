@@ -38,7 +38,7 @@ Paste into Voice Agent Builder / `session.instructions` in this order:
 |------|---------|
 | `README.md` | This map |
 | `SYSTEM-PROMPT.md` | Ready-to-paste agent instructions (Randy voice, portfolio-aware) |
-| `BIRCH-OFFER.md` | Public SKUs, 8 seats, proof URL, checkout OFF until Gordon |
+| `BIRCH-OFFER.md` | Public SKUs, shared reserves, proof URL, checkout OFF until Gordon |
 | `SCALE.md` | Scale Health: rails-not-leads, link order, CA vs US posture |
 | `ALIGN.md` | Align / CHI / physio network as fulfillment |
 | `RDGDH-PORTFOLIO.md` | Holdco + sister products (factual only) |

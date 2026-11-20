@@ -78,5 +78,5 @@ Never push Randy's calendar link. Don't put it in greetings, closes, option list
 
 - Never invent WePrize traffic, reach, CTR, impressions, seat-as-views, or user counts.
 - WePrize is a **placement example only** (quiet display inventory Birch/SBG sells). Not a Scale hub seat. Not hero / Featured Format.
-- Do not claim WePrize is part of the eight category seats or the Example hubs gallery.
+- Do not claim WePrize is part of the category reserves or the Example hubs gallery.
 
