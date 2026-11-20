@@ -32,7 +32,7 @@ import { birchFaqAnswer } from "../lib/birchFaq";
 import { BIRCH_SALES_PHONE } from "../lib/birchFacts";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { isTestIdentity } from "../lib/testTraffic";
-import { chatTopic, coarseRegion, recordPulse } from "../lib/activityPulse";
+import { chatTopic, coarseRegion, currentPulseThemes, recordPulse } from "../lib/activityPulse";
 
 type ChatRole = "user" | "assistant";
 
@@ -125,6 +125,7 @@ const VALID_CHIPS = new Set([
   "how_seats",
   "hold_190",
   "live_hub",
+  "asking_now",
   "talk_human",
 ]);
 /**
@@ -492,12 +493,13 @@ export const GROK_TEMPERATURE = 0.4;
 export const GROK_MAX_TOKENS = 1_500;
 
 /** Exactly what goes to xAI for one turn (exported for tests; no network). */
-export function buildGrokRequest(body: RandyChatBody, model = getGrokModel()) {
+export function buildGrokRequest(body: RandyChatBody, model = getGrokModel(), pulseThemes?: string[]) {
   const systemPrompt = buildBirchChatSystemPrompt({
     mode: body.mode,
     chipId: body.chipId,
     pagePath: body.pagePath,
     checkout: siteCheckoutState(),
+    pulseThemes,
   });
   return {
     model,
@@ -518,6 +520,7 @@ export function buildGrokRequest(body: RandyChatBody, model = getGrokModel()) {
 async function callGrok(body: RandyChatBody, apiKey: string): Promise<string> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), PROVIDER_TIMEOUT_MS);
+  const themes = await currentPulseThemes().catch(() => [] as string[]);
 
   try {
     const response = await fetch(`${XAI_BASE}/chat/completions`, {
@@ -526,7 +529,7 @@ async function callGrok(body: RandyChatBody, apiKey: string): Promise<string> {
         "content-type": "application/json",
         authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify(buildGrokRequest(body)),
+      body: JSON.stringify(buildGrokRequest(body, undefined, themes)),
       signal: controller.signal,
     });
 

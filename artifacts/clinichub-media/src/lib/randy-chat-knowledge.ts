@@ -74,6 +74,7 @@ export type DiscoveryChipId =
   | "how_seats"
   | "hold_190"
   | "live_hub"
+  | "asking_now"
   | "talk_human";
 
 /** Live proof of a Scale Health hub surface (public). */
@@ -109,6 +110,11 @@ export const SUGGESTION_CHIPS: ReadonlyArray<{
     id: "live_hub",
     label: "See a live hub",
     message: "Can I see a live hub?",
+  },
+  {
+    id: "asking_now",
+    label: "What are brands asking?",
+    message: "What are the most common questions people are asking right now?",
   },
   {
     id: "talk_human",

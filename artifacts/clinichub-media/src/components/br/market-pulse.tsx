@@ -105,7 +105,7 @@ function pickNext(events: PulseEvent[], used: Set<number>, last: number): number
 }
 
 /**
- * Uniform bottom toast (left, clear of the call button and the mobile sticky bar) (Randy t294u): "[blurred] · Physio clinic, Ontario · asked about hosting a hub · 2d ago".
+ * Side toast at mid-height (Randy Nov 20 4:31 PM: left edge, upper-middle on mobile, clear of the squirrel, call button and sticky bar) (Randy t294u): "[blurred] · Physio clinic, Ontario · asked about hosting a hub · 2d ago".
  * The blurred "name" is a fixed placeholder shape, never a real name: the API carries no names (lib/activityPulse.ts),
  * so there is nothing in the HTML or JSON to un-blur. Real events only: show:false, an error or an empty list renders
  * nothing. Non-blocking (only the toast takes pointer events), dismissible for the session, soft fade (t295u cadence
@@ -166,7 +166,7 @@ export function ActivityPulse() {
   };
   return (
     <div
-      className={`pointer-events-none fixed left-3 bottom-24 z-40 flex justify-start transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-opacity motion-reduce:duration-300 motion-reduce:transform-none md:bottom-5 md:left-24 md:max-w-sm ${visible ? "translate-y-0 opacity-100" : "translate-y-1.5 opacity-0"}`}
+      className={`pointer-events-none fixed left-2 top-[38%] z-40 flex justify-start transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-opacity motion-reduce:duration-300 motion-reduce:transform-none md:left-4 md:top-1/2 md:max-w-sm ${visible ? "translate-x-0 opacity-100" : "-translate-x-1.5 opacity-0"}`}
       data-testid="activity-pulse"
       data-visible={visible ? "1" : "0"}
       aria-hidden={visible ? undefined : true}

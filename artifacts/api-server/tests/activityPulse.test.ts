@@ -65,3 +65,15 @@ test("instantly ingest keeps positive or curious replies only, stores no free te
   assert.doesNotMatch(JSON.stringify(f), /Jane|Studio X|@|Thursday/);
   setPulseStoreForTests(null);
 });
+
+test("chat 'what are people asking' uses aggregate themes only", async () => {
+  const { pulseThemes } = await import("../src/lib/activityPulse");
+  const { buildBirchChatSystemPrompt } = await import("../src/lib/birchChatPrompt");
+  const themes = pulseThemes(PULSE_SEED, Date.parse("2026-11-21T00:00:00Z"));
+  assert.ok(themes.length >= 4);
+  assert.ok(themes.includes("booking a quick intro call"));
+  const p = buildBirchChatSystemPrompt({ checkout: { reserve: true, areaLock: false } as never, chipId: "asking_now", pulseThemes: themes });
+  assert.match(p, /WHAT PEOPLE ARE ASKING/);
+  assert.match(p, /never give counts/);
+  assert.match(p, /What are brands asking/);
+});

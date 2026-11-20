@@ -27,24 +27,24 @@ export const PULSE_ACTIONS = {
   chat_reporting: "asked the site chat about reporting",
   chat_question: "asked the site chat a question",
   // Seeded from real inbox replies (lib/activityPulseSeed.ts).
-  hub_hosting: "asked about hosting a hub",
-  provider_agreement: "asked for the provider agreement",
-  fee_structure: "asked about the fee structure",
-  fees_markets: "asked about fees and markets",
-  hub_members: "asked about hub membership",
-  how_it_works: "asked how it works",
-  program_summary: "asked for a program summary",
-  call_booked: "set up an intro call",
-  agency_partnership: "replied about a media-buying partnership",
+  hub_hosting: "is exploring hosting a hub for their patients",
+  provider_agreement: "requested our provider agreement to review",
+  fee_structure: "asked how the fee structure works",
+  fees_markets: "asked about fees and the markets we reach",
+  hub_members: "asked about the members inside our hubs",
+  how_it_works: "wanted to know how it works",
+  program_summary: "asked for a program overview",
+  call_booked: "lined up an intro call with our team",
+  agency_partnership: "replied about partnering on media buying",
   // t295u: more real inbox replies, plus the keys the Instantly ingest (lib/pulseIngest.ts) can assign.
-  placements_interest: "wants to learn more about hub placements",
-  placements_team: "looped in their placements lead",
-  examples_shared: "shared our placement examples with their team",
+  placements_interest: "wants to learn more about placements in our recovery hubs",
+  placements_team: "brought their placements lead into the conversation",
+  examples_shared: "is sharing our placement examples with their team",
   canada_shipping: "is lining up easier shipping to Canada",
   samples_coming: "is lining up samples so we can try them before listing",
   samples_confirmed: "confirmed samples are on the way, so we can try before listing",
-  concept_interest: "called the concept interesting, with real potential",
-  passed_along: "passed our note to the right person",
+  concept_interest: "said the concept has lots of potential",
+  passed_along: "passed our note to their partnerships contact",
   ask_performance: "asked how placements perform",
   ask_display: "asked about display placements",
   ask_cpc: "asked about CPC and CPM pricing",
@@ -212,4 +212,38 @@ export async function pulseFeed(now = Date.now()): Promise<PulseFeed> {
     live = [];
   }
   return toFeed([...live.map((e) => ({ ...e, source: e.src === "instantly" || e.src === "inbox" ? ("inbox" as const) : ("site" as const) })), ...PULSE_SEED.map((e) => ({ ...e, source: "inbox" as const }))], now);
+}
+
+/** Themes behind the real events (for the chat's "what are people asking" answer). No counts, no names. */
+const THEME_OF: Partial<Record<PulseAction, string>> = {
+  hub_hosting: "hosting a hub for their patients or members", provider_agreement: "hosting a hub for their patients or members", hub_members: "who the members inside the hubs are", chat_hub: "hosting a hub for their patients or members",
+  samples_coming: "sending samples so we can try products before listing", samples_confirmed: "sending samples so we can try products before listing",
+  ask_cpc: "pricing: CPC, CPM and the fee structure", fee_structure: "pricing: CPC, CPM and the fee structure", fees_markets: "pricing: CPC, CPM and the fee structure", chat_pricing: "pricing: CPC, CPM and the fee structure",
+  ask_display: "which placements and display surfaces they can use", placements_interest: "which placements and display surfaces they can use", placement_question: "which placements and display surfaces they can use", examples_shared: "which placements and display surfaces they can use", placements_team: "which placements and display surfaces they can use", chat_mock: "seeing a mock of their card on a live hub",
+  ask_performance: "how placements perform and what reporting shows", chat_reporting: "how placements perform and what reporting shows",
+  how_it_works: "how the program works end to end", program_summary: "how the program works end to end", chat_question: "how the program works end to end",
+  call_booked: "booking a quick intro call", canada_shipping: "shipping into Canada", agency_partnership: "agency and media-buying partnerships",
+};
+export function pulseThemes(rows: Array<Pick<PulseEvent, "action" | "createdAt">>, now = Date.now()): string[] {
+  const score = new Map<string, number>();
+  for (const r of rows) {
+    const t = THEME_OF[r.action];
+    if (!t || now - r.createdAt.getTime() > PULSE_WINDOW_DAYS * 864e5) continue;
+    score.set(t, (score.get(t) ?? 0) + Math.pow(0.5, (now - r.createdAt.getTime()) / (14 * 864e5)));
+  }
+  return [...score.entries()].sort((a, b) => b[1] - a[1]).map(([t]) => t);
+}
+let themeCache: { at: number; themes: string[] } | null = null;
+/** Current themes from live events + seed, cached 5 min. Never throws. */
+export async function currentPulseThemes(now = Date.now()): Promise<string[]> {
+  if (themeCache && now - themeCache.at < 300000) return themeCache.themes;
+  let live: PulseEvent[] = [];
+  try {
+    live = await pulseStore().list(PULSE_WINDOW_DAYS, 200);
+  } catch {
+    live = [];
+  }
+  const themes = pulseThemes([...live, ...PULSE_SEED], now);
+  themeCache = { at: now, themes };
+  return themes;
 }
