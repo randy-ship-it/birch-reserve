@@ -24,7 +24,7 @@ type Status = "idle" | "submitting" | "ok" | "error";
 
 const PAGE_TITLE = "List inventory | Birch Reserve";
 const PAGE_DESCRIPTION =
-  "Tell us what unused digital space you can sell. Birch matches brand buyers. Separate from early-placement checkout.";
+  "Tell us what unused digital space you can sell. Birch matches brand buyers. Separate from the category reserve checkout.";
 
 export default function SellAdsPage() {
   useEffect(() => {
@@ -118,7 +118,7 @@ export default function SellAdsPage() {
       <p className="mt-4 text-base leading-relaxed text-muted-foreground">
         If you run a health or recovery site, email list, SMS list, or waiting-room screen with
         idle inventory, tell us what you have. Birch brings brand buyers. This is not the $490
-        early-placement checkout.
+        category reserve checkout.
       </p>
       <p className="mt-3 text-sm text-muted-foreground">
         Want ads plus product transactions in a free hub? That path is{" "}
@@ -137,7 +137,7 @@ export default function SellAdsPage() {
         <div className="mt-10 rounded-md border border-border bg-card p-6" role="status">
           <p className="font-medium">Thanks. We logged your inventory for the Birch team.</p>
           <p className="mt-2 text-sm text-muted-foreground">
-            Expect a reply at the email you gave. Early placements for advertisers stay at{" "}
+            Expect a reply at the email you gave. Placements for advertisers stay at{" "}
             <Link href="/buycalc" className="underline underline-offset-2">
               /buycalc
             </Link>{" "}

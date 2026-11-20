@@ -50,11 +50,11 @@ export const HUB_SURFACE_SHOTS = [
 ] as const;
 export const HUB_SHOTS_FINE = "Real hub pages with example placements drawn on top. Illustrative, not live ads and not Birch results. Your IO names the hub and surface.";
 
-export const EARLY_RATE_BADGE = "Early rate";
+export const EARLY_RATE_BADGE = "Starter rate";
 /** Audit #5 (Randy, Nov 20 2026): footer under every block with a "Modelled" chip. */
 export const MODELLED_FOOTER = "Modelled planning estimate, not a delivery promise. Reporting is aggregate only.";
 /** Audit #4 (Randy, Nov 20 2026): the one urgency line. Once per block, above the button, never next to numbers. */
-export const URGENCY_LINE = "Early rate for pilot brands · first in each category get first-mover priority on pilot reporting.";
+export const URGENCY_LINE = "Prepaid credit keeps today's rate for its term. Rates step up only after reporting shows a placement performs.";
 export const EARLY_RATE_FINE = "New placements open at starter rates. They only move up once your reporting proves they work. Seats are shared: a category can include more than one brand.";
 
 /**
@@ -77,7 +77,7 @@ export const REPORTING = {
   title: "What your report looks like.",
   metrics: ["Views", "Clicks", "UTM visits", "Promo redemptions"],
   aggregate: "Aggregate only: totals per hub and per surface. Never who saw your card.",
-  commitment: "Pilot reporting commitment: first advertisers get an aggregate dashboard.",
+  commitment: "Every advertiser gets aggregate reporting per hub and surface.",
   href: SAMPLE_REPORT_HREF,
 } as const;
 

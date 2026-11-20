@@ -13,7 +13,7 @@ import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
  */
 
 /** Count-free urgency line (Randy, Nov 20 2026). Never pair with open/held/paid numbers. */
-export const EARLY_RATE_LINE = "Early rate for pilot brands · first in each category get first-mover priority on pilot reporting.";
+export const EARLY_RATE_LINE = "Prepaid credit keeps today's rate for its term. Rates step up only after reporting shows a placement performs.";
 
 export const SALES_PHONE_DISPLAY = "(647) 931-6278";
 export const SALES_PHONE_HREF = "tel:+16479316278";
@@ -61,7 +61,7 @@ export function priceLabels(a: Availability | null): { seat: string; look: strin
   return { seat: a?.seatLabel ?? "$490 USD", look: a?.lookLabel ?? "$190 USD" };
 }
 
-/** The network strip: hub names and limited early access. No category grid, no seat counts. */
+/** The network strip: hub names and curated placements. No category grid, no seat counts. */
 export function AvailabilityStrip({ dark = false }: { a?: Availability | null; dark?: boolean }) {
   return (
     <div data-testid="avail-strip">
@@ -70,7 +70,7 @@ export function AvailabilityStrip({ dark = false }: { a?: Availability | null; d
           <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#3b9b00] opacity-60" />
           <span className="relative inline-flex size-2.5 rounded-full bg-[#3b9b00]" />
         </span>
-        <span data-testid="avail-count"><strong className={dark ? "text-accent" : ""}>Limited early placements</strong> · curated as hubs launch</span>
+        <span data-testid="avail-count"><strong className={dark ? "text-accent" : ""}>Curated placements</strong> · placed by hand, hub by hub</span>
       </p>
       <ul className="mt-3 flex flex-wrap gap-2" data-testid="network-hubs">
         {NETWORK_HUBS.map((h) => (
@@ -93,7 +93,7 @@ export function PrimeHero() {
           Put your brand inside private health and wellness hubs.
         </h1>
         <p className="mt-3 font-display text-xl text-accent md:text-3xl" data-testid="prime-positioning">Buy Scale Health ads through Birch Reserve. The faster way to buy ads.</p>
-        <p className="mt-3 font-display text-xl text-background/80 md:text-3xl" data-testid="prime-scarcity">A growing network. Limited early placements. No bidding.</p>
+        <p className="mt-3 font-display text-xl text-background/80 md:text-3xl" data-testid="prime-scarcity">A growing network. Curated placements. No bidding.</p>
         <p className="mt-4 max-w-3xl text-base leading-relaxed text-background/80" data-testid="prime-what">
           Reserve a share of display space across our growing network of private, members-only hubs: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, with more on the way. Placements are curated as each hub launches.
         </p>

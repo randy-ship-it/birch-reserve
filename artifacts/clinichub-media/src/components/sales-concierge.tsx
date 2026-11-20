@@ -163,7 +163,7 @@ export function SalesConcierge({
     window.setTimeout(() => {
       setIsTyping(false);
       appendAdvisorMessage("Got it. How can I help you today?", [
-        { label: "Claim an early slot", action: () => handleIntent("interested"), primary: true },
+        { label: "Claim a slot", action: () => handleIntent("interested"), primary: true },
         { label: "Just learn", action: () => handleIntent("learning") },
         { label: "Ask a typed question", action: handleAskQuestion }
       ]);
@@ -172,11 +172,11 @@ export function SalesConcierge({
 
   const handleIntent = (selectedIntent: string) => {
       if (selectedIntent === 'interested') {
-      appendUserMessage("Claim an early slot");
+      appendUserMessage("Claim a slot");
       setIsTyping(true);
       window.setTimeout(() => {
         setIsTyping(false);
-        appendAdvisorMessage(localizeNow("Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 category prepay is 100% media credit. Nothing runs until an insertion order names the surface."), [
+        appendAdvisorMessage(localizeNow("Start on the Reserve List at https://birchreserve.net/inventory and claim a slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 category prepay is 100% media credit. Nothing runs until an insertion order names the surface."), [
           { label: "Open Reservation Form", action: () => onHandoff(), primary: true },
           { label: "Compare advertising paths", action: () => handleChoosePath(true) }
         ]);
@@ -243,7 +243,7 @@ export function SalesConcierge({
         }
       ]);
 
-      appendAdvisorMessage("Would you like to claim an early slot now?", [
+      appendAdvisorMessage("Would you like to claim a slot now?", [
         { label: "Reserve first access", action: () => onHandoff(path), primary: true },
         { label: "See placement moments", action: showFormatPicker }
       ]);
@@ -339,7 +339,7 @@ export function SalesConcierge({
       case "pricing_or_availability":
       case "self_serve_purchase":
         return {
-          text: localizeNow("Start on the Reserve List at https://birchreserve.net/inventory and claim an early slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 category prepay is 100% media credit. Nothing runs until an insertion order names the surface."),
+          text: localizeNow("Start on the Reserve List at https://birchreserve.net/inventory and claim a slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 category prepay is 100% media credit. Nothing runs until an insertion order names the surface."),
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "Compare advertising paths", action: () => handleChoosePath(true) },
@@ -364,7 +364,7 @@ export function SalesConcierge({
         };
       case "audience_or_metrics":
         return {
-          text: "We do not sell a guaranteed impression count. Reserve List brands get early slots first as each category activates. We name the surface on the insertion order.",
+          text: "We do not sell a guaranteed impression count. Reserve List brands are placed as each category activates. We name the surface on the insertion order.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },
@@ -372,7 +372,7 @@ export function SalesConcierge({
         };
       case "media_kit":
         return {
-          text: localizeNow("The Reserve List: 8 advertiser categories inside listed Scale Health hubs, with limited early placements. Not an open auction. Not a guaranteed impression buy. The $490 category prepay is media credit, not airfare."),
+          text: localizeNow("The Reserve List: 8 advertiser categories inside listed Scale Health hubs, with curated placements. Not an open auction. Not a guaranteed impression buy. The $490 category prepay is media credit, not airfare."),
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },
@@ -470,7 +470,7 @@ export function SalesConcierge({
         {
           id: Date.now().toString(),
           role: "advisor",
-          text: "The live advisor is taking a pause, but you can still explore the paths or claim an early slot directly.",
+          text: "The live advisor is taking a pause, but you can still explore the paths or claim a slot directly.",
           options: [
             { label: "Reserve first access", action: onHandoff, primary: true },
             { label: "Return to advertising paths", action: () => handleChoosePath(true) }

@@ -194,7 +194,7 @@ function CardLane({ initialSku }: { initialSku: CardSku }) {
               </select>
             </label>
           </div>
-          <p className="mt-2 text-[12px] font-semibold text-foreground/60">Early placements are limited.</p>
+          <p className="mt-2 text-[12px] font-semibold text-foreground/60">Placements are curated hub by hub.</p>
           <button type="button" onClick={go} data-testid="lane-card-go" className="mt-3 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 transition hover:bg-[#0b1f3a] hover:text-white">
             <Lock className="size-4" aria-hidden /> Continue to secure checkout · {CARD_OFFERS[sku].label} <ArrowRight className="size-5" aria-hidden />
           </button>

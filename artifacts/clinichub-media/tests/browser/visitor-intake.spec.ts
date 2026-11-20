@@ -128,7 +128,7 @@ async function chooseVisitorType(
   await guide.getByRole("button", { name: visitorType, exact: true }).click();
   await expect(
     guide.getByRole("button", {
-      name: "Claim an early slot",
+      name: "Claim a slot",
       exact: true,
     }),
   ).toBeVisible();
@@ -274,7 +274,7 @@ test("Birch Guide hands a ready buyer to the reserve form", async ({ page }) => 
   );
   await guide
     .getByRole("button", {
-      name: "Claim an early slot",
+      name: "Claim a slot",
       exact: true,
     })
     .click();

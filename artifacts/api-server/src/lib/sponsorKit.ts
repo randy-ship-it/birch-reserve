@@ -149,7 +149,7 @@ export type DepositTier = { key: string; label: string; usd: number; cad: number
 export const DEPOSIT_TIERS: DepositTier[] = [
   { key: "sponsor-1500", label: "Starter sponsor", usd: 1500, cad: 2100, bonusPct: 5 },
   { key: "sponsor-3000", label: "Partner sponsor", usd: 3000, cad: 4200, bonusPct: 10 },
-  { key: "sponsor-6000", label: "Founding sponsor", usd: 6000, cad: 8400, bonusPct: 15 },
+  { key: "sponsor-6000", label: "Network sponsor", usd: 6000, cad: 8400, bonusPct: 15 },
 ];
 
 export const CUSTOM_MIN = { usd: 490, cad: 690 };

@@ -158,8 +158,8 @@ export function checkoutLockLines(state: SiteCheckoutState): string {
   );
   lines.push(
     state.deposits
-      ? "- Sponsor deposits (Starter/Partner/Founding slots) can be paid online."
-      : "- Sponsor deposits (Starter/Partner/Founding slots) are inquiry-only right now: no online payment; take intake for a team callback.",
+      ? "- Sponsor deposits (Starter/Partner/Network packs) can be paid online."
+      : "- Sponsor deposits (Starter/Partner/Network packs) are inquiry-only right now: no online payment; take intake for a team callback.",
   );
   return lines.join("\n");
 }
@@ -190,7 +190,7 @@ export function loadVoiceCloserSystemPrompt(force = false): string {
 - Public SKUs only: hold-190 ($190 USD), reserve-490 ($490 USD). Quote USD only, including to Canadian buyers, until the CAD checkout is tested (Randy, Nov 16 2026); the checkout is in USD for everyone. Never hero $899 / reserve-899.
 ${checkoutLockLines(siteCheckoutState())}
 - Routing: only URLs in the routing table above or in these locks; one per reply.
-- You handle buyers yourself: close early slots on the Reserve List (https://birchreserve.net/inventory) and the $490 category prepay, never hold or lock a category; for partnerships or bigger deals take intake in chat and say the team will call back. Offer the AI call or a callback. Never promote the calendar; https://cal.com/randy-gilling/30min only if the visitor insists on a set time.
+- You handle buyers yourself: close slots on the Reserve List (https://birchreserve.net/inventory) and the $490 category prepay, never hold or lock a category; for partnerships or bigger deals take intake in chat and say the team will call back. Offer the AI call or a callback. Never promote the calendar; https://cal.com/randy-gilling/30min only if the visitor insists on a set time.
 - In-widget voice is not live yet; reply in text.
 `;
 

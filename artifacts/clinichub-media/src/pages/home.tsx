@@ -362,7 +362,7 @@ export default function Home() {
               </a>
             </div>
             <p className="mt-4 max-w-xl text-sm text-background/70">
-              Limited early placements across 8 advertiser categories. Prepay your category's display space. One brand per category.
+              Curated placements across 8 advertiser categories. Prepay your category's display space. One brand per category.
             </p>
           </div>
 
@@ -439,7 +439,7 @@ export default function Home() {
                 Reserve before campaigns open
               </p>
               <h2 className="font-display text-3xl text-foreground">
-                Early slots across 8 advertiser categories.
+                Slots across 8 advertiser categories.
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
                 Every dollar is a 100% media credit. Delivery starts when the insertion order names the hub. Hubs are the rooms. Prepay your category and the credit is yours to use for 12 months.
@@ -475,9 +475,9 @@ export default function Home() {
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-accent">
                 The Reserve List
               </p>
-              <p className="mt-4 font-display text-4xl text-accent">Limited early placements</p>
+              <p className="mt-4 font-display text-4xl text-accent">Curated placements</p>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-background/75">
-                Log the placements you want and claim an early slot. No commitment. Canada only for now. {t("The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.")}
+                Log the placements you want and claim a slot. No commitment. Canada only for now. {t("The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.")}
               </p>
               <p className="mt-5 border-t border-background/15 pt-4 text-xs text-background/60">
                 Use an insider code, or request one on the list.
@@ -521,7 +521,7 @@ export default function Home() {
           <article className="mt-6 border border-border p-6 md:p-8" data-testid="card-enterprise">
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/60">Enterprise</p>
             <p className="mt-4 font-display text-3xl text-foreground md:text-4xl">
-              $100K–$250K+ · Coming soon / Inquire within
+              $100K–$250K+ · Inquire within
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               Multi-hub or on-prem retail hubs. Credit, not a flight. Not a self-serve Stripe SKU — inquire within.
@@ -852,7 +852,7 @@ export default function Home() {
                 <div className="border border-border/50 shadow-sm overflow-hidden aspect-[4/3] bg-muted relative">
                   <HubWalkthroughVideo testId="video-hub-walkthrough" />
                 </div>
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Live DR-HO&apos;S hub walkthrough — illustrative of early-slot placement context.</p>
+                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Live DR-HO&apos;S hub walkthrough — illustrative of placement context.</p>
                 <a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold">
                   Open the live hub <ArrowUpRight className="size-4" />
                 </a>

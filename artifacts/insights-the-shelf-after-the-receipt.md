@@ -30,7 +30,7 @@ If a brand wants flight math before an IO, they are shopping a different product
 
 ## Why the shelf matters
 
-Open-web ads interrupt people who have not decided anything. The shelf after the receipt sits next to a person who already bought, booked, or started a plan. Trust is already warm. Lock an early slot in your category before the minimum goes up. Reporting stays aggregate. No patient-level data. No clinical pixels. No open auction.
+Open-web ads interrupt people who have not decided anything. The shelf after the receipt sits next to a person who already bought, booked, or started a plan. Trust is already warm. Lock a slot in your category before the minimum goes up. Reporting stays aggregate. No patient-level data. No clinical pixels. No open auction.
 
 Care, commerce, and display stay three contracts. Scale builds the rails. Birch sells the seat. Providers joining Scale are not buying Birch inventory, and brands buying Birch are not buying patient leads.
 

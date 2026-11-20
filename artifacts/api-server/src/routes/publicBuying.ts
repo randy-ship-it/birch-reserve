@@ -2371,7 +2371,7 @@ function renderBuycalcHtmlUsd(input: {
 <main>
 <section class="hero"><div class="wrap hero-grid"><div><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
 ${heroSubHtml(price(look), price(seat))}
-<p class="avail" data-testid="buycalc-avail"><span class="dot" aria-hidden="true"></span><span><strong>Limited early placements</strong> · curated as hubs launch</span></p>
+<p class="avail" data-testid="buycalc-avail"><span class="dot" aria-hidden="true"></span><span><strong>Curated placements</strong> · placed by hand, hub by hub</span></p>
 <p class="lede">Reserve a share of display space across our growing network of private, members-only health and wellness hubs (physio, fitness and recovery today), with more launching. Your brand shows right after a member books or buys. All of it is media credit until the insertion order (IO), fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
 <div class="ctas"><a class="btn" href="/buycalc?sku=reserve-490#reserve" data-pick-sku="reserve-490">Reserve your space · ${price(seat)}</a><a class="btn line" href="/buycalc?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · ${price(look)}</a></div>
 ${heroInquireHtml()}</div>${heroMockHtml("buycalc-hero-mock")}</div></section>
@@ -2392,7 +2392,7 @@ ${seeTheUnitHtml(price(look), price(seat))}
 ${flightTimelineHtml(price(look), price(seat))}
 
 <section class="band" id="categories"><div class="wrap"><p class="kicker">The network</p><h2>A growing network of private hubs.</h2>
-<p class="open-count"><strong>Limited early placements</strong> · We curate placements as each hub launches. Want a premium slot or something custom? Ask below.</p>
+<p class="open-count"><strong>Curated placements</strong> · Placed by hand, hub by hub. Want a premium slot or something custom? Ask below.</p>
 ${sharedSeatsHtml()}
 <ul class="cat-strip" data-testid="network-hubs"><li><span style="min-height:0">DR-HO'S physio</span></li><li><span style="min-height:0">SOLE</span></li><li><span style="min-height:0">More hubs launching</span></li></ul>
 </div></section>

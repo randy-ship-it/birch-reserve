@@ -2,7 +2,7 @@
 
 CURRENT OFFER (Randy HARD 2026-11-13; overrides anything below that conflicts):
 - The BIRCH RESERVE CANONICAL OFFER FACTS (brands/birch-reserve/CANONICAL-FACTS.md, generated from the birch-reserve repo lib/birchFacts.ts) are the only source for prices, seats, categories, terms and routing.
-- Self-serve under $10,000 ($190 7-day look, $490 category seat): walk them through checkout at https://birchreserve.net/buycalc, or the request form at https://birchreserve.net/buycalc#request if they are not ready. Self-serve reserves are shared, with more than one brand per category. Early placements are limited; we don't publish counts.
+- Self-serve under $10,000 ($190 7-day look, $490 category seat): walk them through checkout at https://birchreserve.net/buycalc, or the request form at https://birchreserve.net/buycalc#request if they are not ready. Self-serve reserves are shared, with more than one brand per category. Placements are curated hub by hub; we don't publish counts.
 - $10,000+ (premium slots, $25,000 to $50,000, inquire only; a premium slot locks one brand per category for its IO term), partnerships and serious prospects: collect name, company, phone, email and best time, submit the call-back, and give (647) 931-6278. You may say or type the phone number.
 - Never call the $490 seat exclusive. Never promise impressions, reach, clicks or CTR. Modelled numbers are always called modelled. Network size: 20MM+ orders, modelled; never 8.7MM.
 - Canada only for now.
@@ -45,7 +45,7 @@ Self-serve ladder: `hold-190` $190 look · `reserve-490` $490 seat · Premium $2
 
 **Eight advertiser categories**, not eight websites.
 
-Hubs are the rooms. Self-serve reserves are shared across the categories, with more than one brand per category. Only a premium slot locks one brand per category. Early placements are limited; we don't publish counts.
+Hubs are the rooms. Self-serve reserves are shared across the categories, with more than one brand per category. Only a premium slot locks one brand per category. Placements are curated hub by hub; we don't publish counts.
 
 Categories (companion lock):
 

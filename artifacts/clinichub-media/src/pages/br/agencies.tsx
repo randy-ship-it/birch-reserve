@@ -14,7 +14,7 @@ import { StarterOffers } from "@/components/br/starter-offers";
  */
 const WHY_NOW = [
   { k: "Starter rates", t: "Rates step up only once reporting proves a placement.", d: "New placements open at starter rates. A placement's rate can step up only after campaign reporting shows it performs. Prepaid credit keeps its rate for its term." },
-  { k: "Limited early placements", t: "Curated as hubs launch.", d: "Early placements across the hub network are limited and placed by hand as each hub goes live. No bidding, no auction." },
+  { k: "Curated placements", t: "Placed by hand, hub by hub.", d: "Placements across the hub network are placed by hand on each hub. No bidding, no auction." },
   { k: "Low risk", t: "Refundable until 14 days before launch.", d: "The $490 USD reserve is 100% media credit and fully refundable until 14 days before the launch date on your insertion order. Nothing runs until the IO names the hub and surface." },
 ];
 
@@ -107,7 +107,7 @@ export default function BrAgencies() {
       <Section tone="soft">
         <div data-testid="agency-why-now">
           <Eyebrow>Why lock a client test now</Eyebrow>
-          <H2>Starter rates, while early placements last.</H2>
+          <H2>Starter rates, set per placement.</H2>
           <div className="mt-8 grid gap-px border border-foreground/15 bg-foreground/15 md:grid-cols-3">
             {WHY_NOW.map((w) => (
               <div key={w.k} className="bg-background p-6">

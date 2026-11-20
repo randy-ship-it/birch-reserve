@@ -187,7 +187,18 @@ async function openSponsorPack(key: string, where: string, kit?: KitPrefill | nu
  * Mid-tier band (Randy, Nov 20 2026 audit #6): three sponsorship packs, each "Prepay $X" (card on /sponsor, existing
  * deposit checkout), plus the agency $1K–$5K client test (pre-filled IO, no card). USD only.
  */
-export function MidTier({ where, kit }: { where: string; compact?: boolean; kit?: KitPrefill | null }) {
+/** Static annotated sample card on the live SOLE hub, beside the deposit CTAs (Randy t291u). Labelled "Illustrative mock". */
+export function DepositMock() {
+  return (
+    <figure className="w-full max-w-[300px] shrink-0" data-testid="deposit-mock">
+      <span className="mb-1.5 inline-block rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A5A00]">Illustrative mock</span>
+      <HubMock brand="" logo={null} hub="sole" category="Your category" pins badge="Illustrative mock" />
+      <figcaption className="mt-1.5 text-[11px] leading-snug text-white/70">Sample card on the live SOLE hub: <b className="text-lime-300">1</b> your card, approved by a person · <b className="text-lime-300">2</b> members-only hub · <b className="text-lime-300">3</b> UTM-tagged click to your site.</figcaption>
+    </figure>
+  );
+}
+
+export function MidTier({ where, kit, showMock = true }: { where: string; compact?: boolean; kit?: KitPrefill | null; showMock?: boolean }) {
   const [agencyOpen, setAgencyOpen] = useState(false);
   const [busy, setBusy] = useState("");
   const cardCls = "flex flex-col rounded-2xl bg-white/[0.06] p-4 ring-1 ring-white/15";
@@ -199,9 +210,15 @@ export function MidTier({ where, kit }: { where: string; compact?: boolean; kit?
   };
   return (
     <section className="rounded-3xl p-5 text-white md:p-6" style={{ background: NAVY }} data-testid="mid-tier" data-where={where}>
-      <h3 className="font-display text-2xl leading-tight md:text-3xl" data-testid="mid-tier-line">Bigger test? Prepay a sponsorship pack.</h3>
-      <p className="mt-1 text-[13px] text-white/75">Card now. Your insertion order names the hub and dates before anything runs.</p>
-      <p className="mt-2 text-[13px] font-semibold text-lime-300" data-testid="early-rate-line">{URGENCY_LINE}</p>
+      <div className={showMock ? "flex flex-col gap-4 md:flex-row md:items-start md:justify-between" : ""}>
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Next step after the look</p>
+          <h3 className="mt-1 font-display text-2xl leading-tight md:text-3xl" data-testid="mid-tier-line">Bigger test? Prepay a sponsorship pack.</h3>
+          <p className="mt-1 text-[13px] text-white/75">Card now. Your insertion order names the hub and dates before anything runs.</p>
+          <p className="mt-2 text-[13px] font-semibold text-lime-300" data-testid="early-rate-line">{URGENCY_LINE}</p>
+        </div>
+        {showMock ? <DepositMock /> : null}
+      </div>
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         {DEPOSIT_TIERS.map((t) => {
           const credit = Math.round(t.usd * (1 + t.bonusPct / 100));
@@ -282,7 +299,7 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
           </Details>
         </div>
       </div>
-      <div className="mt-6"><MidTier where={where} /></div>
+      <div className="mt-6"><MidTier where={where} showMock={!showMock} /></div>
     </section>
   );
 }
@@ -348,7 +365,7 @@ export function PostKitNext({ kit, where = "post_kit" }: { kit: KitPrefill; wher
           </p>
         </div>
       </div>
-      <div className="mt-6"><MidTier where={where} kit={kit} /></div>
+      <div className="mt-6"><MidTier where={where} kit={kit} showMock={false} /></div>
       {/* Mobile: one sticky bar for the two card offers, portalled to <body> so no transformed ancestor (Scale skin) breaks `fixed`. The chat/voice dock lifts above it (randy-chat.tsx --birch-dock-bottom). */}
       {mounted ? createPortal(
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-foreground/10 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 shadow-[0_-8px_24px_-12px_rgba(7,26,57,0.35)] backdrop-blur md:hidden" data-testid="post-kit-sticky">

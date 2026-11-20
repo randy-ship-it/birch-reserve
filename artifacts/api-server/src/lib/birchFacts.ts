@@ -28,7 +28,7 @@ export function birchCanonicalFacts(): string {
     "",
     "HOW THE INVENTORY IS SOLD (Randy, Nov 14 2026: keep it broad)",
     "- Buyers reserve a share of display space across the hub network. We do not sell a fixed list of categories or a fixed number of seats, and exactly where a brand shows is curated as hubs launch and set on the insertion order.",
-    "- Early placements are limited. Do not quote category lists, seat counts or 'seats open' numbers. Never say a hub or category is open, available, not taken or unclaimed, and never cite zero holds, purchases, sales, bookings or signings.",
+    "- Placements are curated hub by hub. Do not quote category lists, seat counts or 'seats open' numbers. Never say a hub or category is open, available, not taken or unclaimed, and never cite zero holds, purchases, sales, bookings or signings.",
     "",
     `SELF-SERVE (under $${SELF_SERVE_LIMIT_USD.toLocaleString("en-US")}; card checkout, no login)`,
     `- 7-day look: $${look.spendUsd} USD. See your placement for 7 days. Converts 100% to the reserve if they take it within 7 days, otherwise a cash refund.`,

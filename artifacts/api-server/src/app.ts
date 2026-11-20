@@ -3,6 +3,7 @@ import { mirrorHost } from "./middlewares/mirrorHost";
 import express, { type Express } from "express";
 import { clerkMiddleware } from "@clerk/express";
 import { shareEventsRouter } from "./routes/shareEvents";
+import { activityPulseRouter } from "./routes/activityPulse";
 import { publishableKeyFromHost } from "@clerk/shared/keys";
 import pinoHttp from "pino-http";
 import router from "./routes/index";
@@ -183,6 +184,8 @@ app.post("/api/launch/randy-chat", requireHuman());
 app.use(publicBuyingRouter);
 // Share + referral tracking (Nov 19 2026): public POST /v1/share-events, staff-only GET /api/sales/share-events.
 app.use(shareEventsRouter);
+// Activity pulse (Nov 20 2026): public GET /v1/activity-pulse, real anonymized events only.
+app.use(activityPulseRouter);
 // /buy staff review (Clerk + sales staff): orders and held creatives.
 app.use(buyStaffRouter);
 app.use("/api", router);
