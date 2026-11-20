@@ -15,7 +15,7 @@ import { ShareBar } from "@/components/br/share-bar";
 import { Details } from "@/components/br/details";
 import { sampleReport } from "@/lib/fridayMockReport";
 import { RT, RT_SANS, RT_SERIF } from "@/lib/reportTokens";
-import { TwoLane, openLane } from "@/components/br/two-lane";
+import { TwoLane } from "@/components/br/two-lane";
 import { NextStep } from "@/components/br/next-step";
 import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 import { brandFromUrl, presetOf, type IntakePreset } from "@/components/br/supplier-mode";
@@ -88,14 +88,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
         <h2 className="mt-3 text-3xl md:text-5xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you get.</h2>
         <Details testId="sample-details"><p>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range in USD, not a result or a guarantee.</p></Details>
         <div className="mt-4"><ReportV2 report={sample} sample compact exposure={SAMPLE_EXPOSURE} exposureSource="sample" /></div>
-        {sup ? null : <div className="mt-10" data-testid="intake-next-step"><NextStep where="intake" /></div>}
-        {sup ? null : <div className="mt-6 flex flex-col gap-3 rounded-3xl bg-[#0b1f3a] p-5 text-white md:flex-row md:items-center md:justify-between md:p-6" data-testid="two-lane-foot">
-          <p className="font-display text-2xl leading-tight md:text-3xl">Ready to run?</p>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <button type="button" onClick={() => openLane({ lane: "card" })} className="inline-flex h-12 items-center justify-center rounded-full bg-lime-300 px-6 text-sm font-bold text-[#0b1f3a]" data-testid="two-lane-foot-card">Reserve space (card)</button>
-            <button type="button" onClick={() => openLane({ lane: "block" })} className="inline-flex h-12 items-center justify-center rounded-full px-6 text-sm font-bold text-white ring-1 ring-white/40" data-testid="two-lane-foot-block">Big block / agency (IO + cheque)</button>
-          </div>
-        </div>}
+        {sup ? null : <div className="mt-10" data-testid="intake-next-step"><NextStep where="intake" yieldToPostKit /></div>}
       </div>
     </div>
   );

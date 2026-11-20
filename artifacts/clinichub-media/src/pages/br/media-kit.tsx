@@ -10,6 +10,7 @@ import { BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BUYER_FAQ_TITLE, BuyerFaq, EarlySlots, FlightTimeline, ProgramsCallout, SAMPLE_REPORT, FLIGHT_TIMELINE, SampleIoLink, SampleReport, SeeTheUnit } from "@/components/br/buyer-comfort";
 import { DoorRoute } from "@/components/br/door-route";
+import { Details } from "@/components/br/details";
 import { NextStep } from "@/components/br/next-step";
 import { KitBuilder } from "@/components/br/kit-builder";
 import { AvailabilityStrip, CategoryRequestForm, FaceBeforeFlight, FounderNote, NETWORK_HUBS, priceLabels, useAvailability } from "@/components/br/prime-hero";
@@ -188,7 +189,10 @@ export default function BrMediaKit() {
       {/* How to start */}
       <section id="start-small" className="scroll-mt-20 border-b border-border/70 bg-background">
         <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14">
-          <StartSmall page="media-kit" id="start-small-tiers" />
+          {/* Collapsed: NextStep above already shows the $190/$490 and mid-tier cards (no duplicate blocks). */}
+          <Details label="Compare every small package side by side" testId="mk-start-small-compare">
+            <StartSmall page="media-kit" id="start-small-tiers" heading={false} />
+          </Details>
         </div>
       </section>
 
