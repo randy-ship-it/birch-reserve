@@ -11,7 +11,7 @@ import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BUYER_FAQ_TITLE, BuyerFaq, EarlySlots, FlightTimeline, ProgramsCallout, SAMPLE_REPORT, FLIGHT_TIMELINE, SampleIoLink, SampleReport, SeeTheUnit } from "@/components/br/buyer-comfort";
 import { DoorRoute } from "@/components/br/door-route";
 import { Details } from "@/components/br/details";
-import { NextStep } from "@/components/br/next-step";
+import { AnnotatedHubMock, NextStep } from "@/components/br/next-step";
 import { KitBuilder } from "@/components/br/kit-builder";
 import { AvailabilityStrip, CategoryRequestForm, FaceBeforeFlight, FounderNote, NETWORK_HUBS, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import {
@@ -137,9 +137,14 @@ export default function BrMediaKit() {
       {/* Hero */}
       <section className="border-b border-border/70 bg-background">
         <div className="container mx-auto max-w-5xl px-5 pb-10 pt-10 md:px-6 md:pb-14 md:pt-16">
+          <div className="grid items-center gap-8 md:grid-cols-[1fr_1.05fr]">
+          <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Media kit · Nov 2026</p>
           <h1 className="mt-3 font-display text-[2.15rem] leading-[1.05] tracking-tight md:text-6xl">Put your brand inside private health and wellness hubs.</h1>
           <p className="mt-2 font-display text-xl text-foreground/70 md:text-2xl">A growing network. Limited early placements.</p>
+          </div>
+          <AnnotatedHubMock testId="mk-hero-mock" />
+          </div>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-foreground/80" data-testid="mk-what">
             Birch Reserve sells a share of display space across our growing network of private, members-only hubs (live today: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, with more launching): the pages members use right after they buy or book, and when they log back in. Placements are curated as each hub launches. Your payment is media credit until the insertion order. Start self-serve by reserving for {price.seat} or with a {price.look} 7-day look; premium slots are inquire-only.
           </p>
@@ -165,7 +170,7 @@ export default function BrMediaKit() {
       {/* Next step: live-hub mock beside $190/$490 + mid-tier bridge (Randy review, Nov 20 2026) */}
       <section className="scroll-mt-20 border-b border-border/70 bg-secondary/40" data-testid="mk-next-step">
         <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14">
-          <NextStep where="media_kit" />
+          <NextStep where="media_kit" showMock={false} />
         </div>
       </section>
 

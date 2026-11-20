@@ -1,4 +1,5 @@
 import { CHECKOUT_TAGLINE, birchCheckoutCustomText, birchPaymentIntentBrand } from "../lib/checkoutCopy";
+import { HERO_MOCK_CSS, heroMockHtml } from "../lib/heroMock";
 import { llmsTxt } from "../lib/overhaul/seo";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -2365,15 +2366,15 @@ function renderBuycalcHtmlUsd(input: {
 })}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>${BUYCALC_CSS}${BUYER_COMFORT_CSS}${START_SMALL_CSS}</style></head><body>
+<style>${BUYCALC_CSS}${BUYER_COMFORT_CSS}${START_SMALL_CSS}${HERO_MOCK_CSS}</style></head><body>
 <header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav aria-label="Buy page"><a class="tl" href="/media-kit">Media kit</a><a class="tl" href="#request">Ask about a placement</a><a class="tl tel" href="tel:+16479316278">(647) 931-6278</a>${currencyToggleHtml(currency, { sku: input.sku, format: input.format, category })}</nav></div></header>
 <main>
-<section class="hero"><div class="wrap"><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
+<section class="hero"><div class="wrap hero-grid"><div><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
 ${heroSubHtml(price(look), price(seat))}
 <p class="avail" data-testid="buycalc-avail"><span class="dot" aria-hidden="true"></span><span><strong>Limited early placements</strong> · curated as hubs launch</span></p>
 <p class="lede">Reserve a share of display space across our growing network of private, members-only health and wellness hubs (physio, fitness and recovery today), with more launching. Your brand shows right after a member books or buys. All of it is media credit until the insertion order (IO), fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
 <div class="ctas"><a class="btn" href="/buycalc?sku=reserve-490#reserve" data-pick-sku="reserve-490">Reserve your space · ${price(seat)}</a><a class="btn line" href="/buycalc?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · ${price(look)}</a></div>
-${heroInquireHtml()}</div></section>
+${heroInquireHtml()}</div>${heroMockHtml("buycalc-hero-mock")}</div></section>
 
 <section class="band" id="offers"><div class="wrap"><p class="kicker">Two ways in</p><h2>Pick your start.</h2>
 <div class="offers">${offerCard(look, { eyebrow: "7-day look", name: "See it before you commit", lines: ["See your placement for 7 days while you decide.", "Converts in full to the reserve within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Reserve", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the hub network. Credit lasts 12 months.`, "Placements are curated as hubs launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Reserve your space · ${price(seat)}` })}</div>

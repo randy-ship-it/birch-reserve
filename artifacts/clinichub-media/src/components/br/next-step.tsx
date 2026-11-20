@@ -56,26 +56,34 @@ export function twoSurfaceExample(creditUsd: number) {
 }
 
 /** Live-hub mock with numbered pins (DR-HO'S physio or SOLE, the two live hubs). Legend lives in an expander. */
-export function AnnotatedHubMock({ brand = "" }: { brand?: string }) {
+/** Audit #3 (Randy, Nov 20 2026): always-visible badge + pin legend + DR-HO'S/SOLE toggle. */
+export const MOCK_PINS = ["Your ad card, approved by a person", "Live members-only hub", "Clicks to your site, UTM-tagged"] as const;
+export function mockBadge(hub: "drho" | "sole"): string {
+  return `Illustrative mock · your ad on the live ${hub === "drho" ? "DR-HO'S physio" : "SOLE"} hub`;
+}
+export function AnnotatedHubMock({ brand = "", testId = "annotated-hub-mock" }: { brand?: string; testId?: string }) {
   const [hub, setHub] = useState<"drho" | "sole">("drho");
   return (
-    <div data-testid="annotated-hub-mock">
-      <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider" role="group" aria-label="Live hub">
-        {(["drho", "sole"] as const).map((h) => (
-          <button key={h} type="button" aria-pressed={hub === h} onClick={() => setHub(h)} className={`rounded-full px-3 py-1 ${hub === h ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/70 ring-1 ring-foreground/15"}`} data-testid={`annotated-hub-${h}`}>
-            {h === "drho" ? "DR-HO'S physio" : "SOLE"}
-          </button>
-        ))}
+    <div data-testid={testId}>
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <span className="rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2.5 py-1 text-[11px] font-bold text-[#8A5A00]" data-testid="mock-badge">{mockBadge(hub)}</span>
+        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider" role="group" aria-label="Live hub">
+          {(["drho", "sole"] as const).map((h) => (
+            <button key={h} type="button" aria-pressed={hub === h} onClick={() => setHub(h)} className={`rounded-full px-3 py-1 ${hub === h ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/70 ring-1 ring-foreground/15"}`} data-testid={`mock-hub-${h}`}>
+              {h === "drho" ? "DR-HO'S" : "SOLE"}
+            </button>
+          ))}
+        </div>
       </div>
-      <HubMock brand={brand} logo={null} hub={hub} category="Your category" pins />
-      <Details label="What you're looking at" testId="annotated-hub-legend">
-        <ol className="list-decimal space-y-1 pl-4">
-          <li>Your ad card. A person approves it before it runs.</li>
-          <li>{hub === "drho" ? "DR-HO'S physio" : "SOLE"}, a live members-only hub.</li>
-          <li>Clicks go to your site, tagged with your UTMs.</li>
-        </ol>
-        <p>Mock. Your IO names the exact hub and spot.</p>
-      </Details>
+      <HubMock brand={brand} logo={null} hub={hub} category="Your category" pins badge={mockBadge(hub)} />
+      <ol className="mt-2 grid gap-1 text-[12px] text-foreground/75 sm:grid-cols-3" data-testid="annotated-hub-legend">
+        {MOCK_PINS.map((p, i) => (
+          <li key={p} className="flex items-start gap-1.5">
+            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-lime-300 text-[10px] font-black text-[#0b1f3a]" aria-hidden>{i + 1}</span>
+            <span><span className="sr-only">{i + 1} </span>{p}</span>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
@@ -204,7 +212,7 @@ export function MidTier({ where }: { where: string; compact?: boolean }) {
  * mid-tier band. `yieldToPostKit`: the page-level copy on /intake hides once the post-kit copy mounts (never two on a page).
  */
 const POST_KIT_EVENT = "birch:post-kit-next" as const;
-export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = false }: { where: string; brand?: string; anchor?: boolean; yieldToPostKit?: boolean }) {
+export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = false, showMock = true }: { where: string; brand?: string; anchor?: boolean; yieldToPostKit?: boolean; showMock?: boolean }) {
   const [hidden, setHidden] = useState(false);
   useEffect(() => {
     if (where === "post_kit") {
@@ -221,9 +229,9 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
   if (hidden) return null;
   return (
     <section id={anchor ? "next-step" : undefined} className="scroll-mt-20" data-testid="next-step" data-where={where}>
-      <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">See it on a live hub first.</h2>
-      <div className="mt-4 grid items-center gap-5 md:grid-cols-[1.2fr_1fr]">
-        <AnnotatedHubMock brand={brand} />
+      <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">{showMock ? "See it on a live hub first." : "Start with a $190 look."}</h2>
+      <div className={`mt-4 grid items-center gap-5 ${showMock ? "md:grid-cols-[1.2fr_1fr]" : ""}`}>
+        {showMock ? <AnnotatedHubMock brand={brand} /> : null}
         <div>
           <p className="font-display text-5xl leading-none text-[#0b1f3a]">$190 <span className="text-lg">USD</span></p>
           <p className="mt-2 text-[15px] text-foreground/75">Your ad, live for 7 days.</p>
@@ -272,6 +280,11 @@ export async function openPrefilledBuy(plan: "hold-190" | "reserve-490", kit: Ki
 /** Post-kit next step: right under the kit's headline numbers. Mock left, button right; mobile sticky bar. */
 export function PostKitNext({ kit, where = "post_kit" }: { kit: KitPrefill; where?: string }) {
   const [busy, setBusy] = useState<"" | "hold-190" | "reserve-490">("");
+  useEffect(() => {
+    (window as unknown as Record<string, boolean>).__birchPostKit = true;
+    window.dispatchEvent(new Event(POST_KIT_EVENT));
+    return () => { (window as unknown as Record<string, boolean>).__birchPostKit = false; };
+  }, []);
   const go = (plan: "hold-190" | "reserve-490") => (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (busy) return;
