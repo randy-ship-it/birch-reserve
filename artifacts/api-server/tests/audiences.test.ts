@@ -103,3 +103,17 @@ test("market context (Nov 19 2026): Sleep 65+ and Medi/Spa added with citations;
   assert.equal(A.matchPrefill("nope"), null);
   assert.equal(A.matchPrefill(null), null);
 });
+
+test("Nov 20: racquet and MD-referral cards carry cited, population-level context; no Birch-reach claims", () => {
+  for (const k of ["pickleball-ca", "active-adults-ca", "postpartum-ca"]) assert.ok(A.MARKET_CONTEXT.some((m) => m.key === k), k);
+  assert.equal(new Set(A.MARKET_CONTEXT.map((m) => m.key)).size, A.MARKET_CONTEXT.length);
+  const seg = (k: string) => A.SEGMENTS.find((s) => s.key === k)!;
+  assert.equal(A.segmentContext(seg("racquet"))!.key, "pickleball-ca");
+  assert.equal(A.segmentContext(seg("md-referral"))!.key, "postpartum-ca");
+  assert.ok(A.SEGMENTS.every((s) => A.segmentContext(s)), "every segment card has context");
+  for (const k of ["pickleball-ca", "active-adults-ca", "postpartum-ca"]) {
+    const m = A.MARKET_CONTEXT.find((x) => x.key === k)!;
+    assert.match(m.url, /^https:\/\/(pickleballcanada\.org|www150\.statcan\.gc\.ca|www\.canada\.ca)\//);
+    assert.doesNotMatch(m.line, /\b(our|Birch|reach|guarantee)\b/i);
+  }
+});
