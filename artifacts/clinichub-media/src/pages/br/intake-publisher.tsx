@@ -1,4 +1,5 @@
 import { KitCta } from "@/components/br/kit-cta";
+import { isScaleSkin } from "@/lib/siteSkin";
 import { ShareBar } from "@/components/br/share-bar";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -207,7 +208,7 @@ export default function BrIntakePublisher() {
         <MarketPicker value={market} onChange={touch(setMarket)} side="publisher" />
         <ActivationRange kind="publisher" {...pickActivation(undefined, publisherActivation({ on, mode, sizeX, conversionPct: conv, valuePerConversionUsd: value }))} />
       </section>
-      <section className="container mx-auto px-4 pb-8"><ContactSubmit role="publisher" payload={payload} draft={ref} setRef={setRef} label="Send to Birch" /></section>
+      <section className="container mx-auto px-4 pb-8"><ContactSubmit role="publisher" payload={payload} draft={ref} setRef={setRef} label={isScaleSkin() ? "Send to Scale Health" : "Send to Birch"} /></section>
       <ChannelTiles market={market} />
     </div>
   );

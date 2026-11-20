@@ -25,3 +25,21 @@ same skin, same deployment. Not a fork.
 
 - The private report (`/kit/r/<token>`) and every non-intake page open on birchreserve.net.
 - Clerk does not load on the mirror host (no sign-in on /intake); the page does not depend on it.
+
+## Scale skin (Randy, Nov 20 2026 8:20 AM ET)
+
+scalehealth.ca/intake must look and feel like Scale Health but stay the same intake. Still one deployment, one form:
+
+- `MIRROR_SKINS` (`middlewares/mirrorHost.ts`) maps `scale_mirror` -> `scale`. The boot script puts `skin: "scale"` on
+  `window.__BR_MIRROR` and `data-skin="scale"` on `<html>` before the bundle runs (no Birch flash). `scaleHead()` swaps
+  the title / og:title / twitter:title brand name, theme colour and favicon, and loads Plus Jakarta Sans.
+- Client: `lib/siteSkin.ts` (`isScaleSkin()`, `skinText()`). `Layout` renders `components/scale-chrome.tsx` (Scale's
+  header + footer, links back to scalehealth.ca with `data-mirror-keep`) instead of Birch's. `usePageMeta` and the
+  few visible "Birch Reserve" review lines go through `skinText()`.
+- Colours and type: unlayered `html[data-skin="scale"]` block at the end of `src/index.css` (Scale palette, lime ramp ->
+  Scale green, Plus Jakarta Sans). Never applies on birchreserve.net.
+- Assets: `attached_assets/brand/scalehealth-logo-srgb-v2.png` and `public/brand/scale/favicon.svg` are byte copies of
+  scalehealthnew `public/home-assets/scalehealth-logo-srgb-v2.png` and `public/favicon.svg`; `tests/mirrorHost.test.ts`
+  pins their git blob ids.
+- Rule: the skin may change chrome, colours, type and the brand NAME only. Fields, logic, payloads, endpoints and
+  tracking must stay shared. Never fork intake components per site.

@@ -318,3 +318,62 @@
   }
 }
 
+
+/*
+ * Scale skin (scalehealth.ca/intake, Randy Nov 20 2026): same intake, Scale Health look. data-skin="scale" is set on <html>
+ * by the mirror boot script (api-server middlewares/mirrorHost.ts) before the bundle runs, so there is no Birch flash.
+ * Unlayered on purpose: these win over every layered utility. Never applies on birchreserve.net (no data-skin).
+ * Palette and type match scalehealth.ca: Plus Jakarta Sans, ink #0d1426, page #f9fafb, Scale green #1d875c + emerald.
+ */
+html[data-skin="scale"] {
+  --background: 210 20% 98%;
+  --foreground: 223 49% 10%;
+  --card: 0 0% 100%;
+  --card-foreground: 223 49% 10%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 223 49% 10%;
+  --primary: 223 49% 10%;
+  --primary-foreground: 210 20% 98%;
+  --secondary: 220 14% 96%;
+  --secondary-foreground: 223 49% 10%;
+  --muted: 220 14% 96%;
+  --muted-foreground: 220 9% 40%;
+  --border: 220 13% 89%;
+  --input: 220 13% 89%;
+  --card-border: 220 13% 89%;
+  --popover-border: 220 13% 89%;
+  --accent: 156 65% 32%;
+  --accent-foreground: 0 0% 100%;
+  --ring: 156 65% 32%;
+  /* Birch's lime ramp -> Scale's emerald/green ramp (every bg-/text-/ring-lime-* utility reads these). */
+  --color-lime-50: oklch(0.979 0.021 166.113);
+  --color-lime-100: oklch(0.95 0.052 163.051);
+  --color-lime-200: oklch(0.905 0.093 164.15);
+  --color-lime-300: oklch(0.765 0.177 163.223);
+  --color-lime-400: oklch(0.765 0.177 163.223);
+  --color-lime-500: oklch(0.696 0.17 162.48);
+  --color-lime-600: #1d875c;
+  --color-lime-700: oklch(0.508 0.118 165.612);
+  color-scheme: light;
+}
+html[data-skin="scale"] body,
+html[data-skin="scale"] .font-sans,
+html[data-skin="scale"] .font-serif,
+html[data-skin="scale"] .font-display,
+html[data-skin="scale"] [style*="Iowan Old Style"],
+html[data-skin="scale"] [style*="Segoe UI"] {
+  font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif !important;
+}
+html[data-skin="scale"] .font-display {
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+/* Lime hero washes -> Scale's soft green wash. */
+html[data-skin="scale"] [class*="_#ecfccb_"] {
+  background-image: radial-gradient(ellipse at top left, oklch(0.95 0.052 163.051 / 0.7) 0%, transparent 55%) !important;
+}
+html[data-skin="scale"] [fill="#d9f99d"] { fill: oklch(0.905 0.093 164.15); }
+html[data-skin="scale"] [stroke="#d9f99d"] { stroke: oklch(0.905 0.093 164.15); }
+html[data-skin="scale"] [stop-color="#d9f99d"] { stop-color: oklch(0.905 0.093 164.15); }
+html[data-skin="scale"] [fill="#a3e635"] { fill: #1d875c; }

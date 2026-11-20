@@ -8,6 +8,7 @@
  *   optional here and asked ONCE for both sides. Role-specific detail comes after the submit (IntakeDetails), prefilled,
  *   updating the same record. Friday is contacted only on the final click (server routes add the secret).
  */
+import { skinText } from "@/lib/siteSkin";
 import { IntakeWarnings } from "@/components/br/intake-warnings";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "wouter";
@@ -247,7 +248,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
     return (
       <div data-testid="intake-short-done" className="rounded-3xl border border-foreground/10 bg-white p-6 shadow-xl">
         <p className="inline-flex items-center gap-2 rounded-full bg-lime-200 px-3 py-1 text-xs font-bold uppercase tracking-wider"><Check className="size-3.5" />Received · pending review</p>
-        <h2 className="mt-3 font-display text-3xl">Thanks. A person at Birch Reserve reviews every request.</h2>
+        <h2 className="mt-3 font-display text-3xl">{skinText("Thanks. A person at Birch Reserve reviews every request.")}</h2>
         <p className="mt-2 text-sm text-muted-foreground">Nothing is booked, charged or accepted automatically.</p>
         <LeadGatesStatus gates={done.gates} />
         <IntakeWarnings />
