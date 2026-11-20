@@ -7,14 +7,14 @@ test("pulse hides under 3 real events and never pads", () => {
   const f = toFeed([], Date.parse("2026-11-20T20:00:00Z"));
   assert.equal(f.show, false);
   assert.equal(f.events.length, 0);
-  assert.equal(toFeed(PULSE_SEED, Date.parse("2027-01-15T00:00:00Z")).show, false); // seed ages out of the 30-day window
+  assert.equal(toFeed(PULSE_SEED, Date.parse("2027-03-01T00:00:00Z")).show, false); // seed ages out of the 90-day window
 });
 
 test("test traffic is dropped; feed carries no names, emails or free text", async () => {
   setPulseStoreForTests(memoryPulseStore());
   await recordPulse("kit_request", "nutrition", { isTest: true });
   await recordPulse("kit_request", "nutrition", { region: "Ontario", who: "Jane Doe" });
-  const f = await pulseFeed(Date.parse("2026-11-20T20:00:00Z"));
+  const f = await pulseFeed(Date.now() + 60000);
   const json = JSON.stringify(f);
   assert.equal(f.show, true);
   assert.doesNotMatch(json, /@|Jane|Doe|http/);
@@ -26,4 +26,42 @@ test("test traffic is dropped; feed carries no names, emails or free text", asyn
 test("chat topic is a fixed key", () => {
   assert.equal(chatTopic("How much is a view block?"), "chat_pricing");
   assert.equal(chatTopic("hello"), "chat_question");
+});
+
+test("instantly ingest keeps positive or curious replies only, stores no free text, dedupes", async () => {
+  const { classifyReply, ingestInstantly, whoForCampaign } = await import("../src/lib/pulseIngest");
+  assert.equal(classifyReply("Thanks, samples are on the way this week."), "samples_confirmed");
+  assert.equal(classifyReply("What CPM do you charge for the hub screens?"), "ask_cpc");
+  assert.equal(classifyReply("How do placements perform for brands like ours?"), "ask_performance");
+  assert.equal(classifyReply("Sounds great, Tuesday works for me for a call."), "call_booked");
+  assert.equal(classifyReply("Interesting concept, lots of potential here."), "compliment");
+  assert.equal(classifyReply("Not interested, please remove me."), null);
+  assert.equal(classifyReply("Thank you for contacting us, we received your message."), null);
+  assert.equal(classifyReply("ok"), null);
+  assert.equal(classifyReply("Thanks for reaching out! We've received your message and will get back to you within 1 business day."), null);
+  assert.equal(classifyReply("Thanks for reaching out- we can set up some time to chat further."), "call_booked");
+  assert.equal(whoForCampaign("Providers CA curation v1"), "Physio clinic");
+  assert.equal(whoForCampaign("Untitled Campaign"), null);
+  setPulseStoreForTests(memoryPulseStore());
+  const now = Date.parse("2026-11-21T12:00:00Z");
+  const fetcher = async (path: string) =>
+    path.startsWith("/campaigns")
+      ? { items: [{ id: "c1", name: "Cold-75 FR (QC)" }, { id: "c2", name: "Untitled Campaign" }] }
+      : {
+          items: [
+            { id: "e1", campaign_id: "c1", from_address_email: "owner@studio.example", timestamp_email: "2026-11-21T10:00:00Z", subject: "Re: hub", body: { text: "Jane here at Studio X. Sounds great, happy to book a call Thursday." } },
+            { id: "e2", campaign_id: "c2", from_address_email: "pal@friend.example", timestamp_email: "2026-11-21T09:00:00Z", body: { text: "Sounds great, call me" } },
+            { id: "e3", campaign_id: "c1", from_address_email: "x@y.example", timestamp_email: "2026-11-21T08:00:00Z", body: { text: "Pas intéressé, merci" } },
+          ],
+        };
+  const r1 = await ingestInstantly({ fetcher, now });
+  const r2 = await ingestInstantly({ fetcher, now });
+  assert.deepEqual(r1, { ok: true, fetched: 3, appended: 1, skipped: 2 });
+  assert.equal(r2.ok, true);
+  const f = await pulseFeed(now);
+  const ingested = f.events.filter((e) => e.who === "Studio");
+  assert.equal(ingested.length, 1);
+  assert.equal(ingested[0]!.region, "Quebec");
+  assert.doesNotMatch(JSON.stringify(f), /Jane|Studio X|@|Thursday/);
+  setPulseStoreForTests(null);
 });

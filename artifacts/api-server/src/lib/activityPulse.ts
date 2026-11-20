@@ -36,15 +36,29 @@ export const PULSE_ACTIONS = {
   program_summary: "asked for a program summary",
   call_booked: "set up an intro call",
   agency_partnership: "replied about a media-buying partnership",
+  // t295u: more real inbox replies, plus the keys the Instantly ingest (lib/pulseIngest.ts) can assign.
+  placements_interest: "wants to learn more about hub placements",
+  placements_team: "looped in their placements lead",
+  examples_shared: "shared our placement examples with their team",
+  canada_shipping: "is lining up easier shipping to Canada",
+  samples_coming: "is lining up samples so we can try them before listing",
+  samples_confirmed: "confirmed samples are on the way, so we can try before listing",
+  concept_interest: "called the concept interesting, with real potential",
+  passed_along: "passed our note to the right person",
+  ask_performance: "asked how placements perform",
+  ask_display: "asked about display placements",
+  ask_cpc: "asked about CPC and CPM pricing",
+  compliment: "said the concept sounds promising",
 } as const;
 export type PulseAction = keyof typeof PULSE_ACTIONS;
 
 export const PULSE_MIN_EVENTS = 3;
-export const PULSE_WINDOW_DAYS = 30;
-export const PULSE_LIMIT = 12;
+export const PULSE_WINDOW_DAYS = 90;
+/** Events sent to the browser; the toast rotates through them weighted toward the newest. */
+export const PULSE_LIMIT = 40;
 
 /** Fixed "who" labels. Anything else is dropped to the generic label; the store never keeps free text. */
-export const PULSE_WHO = ["Health and wellness brand", "Site visitor", "Physio clinic", "Studio", "Agency", "Sleep brand", "Recovery equipment brand", "Pain relief brand", "Supplement distributor", "Beverage brand", "Recovery hardware brand", "Nutrition brand"] as const;
+export const PULSE_WHO = ["Health and wellness brand", "Site visitor", "Physio clinic", "Studio", "Agency", "Sleep brand", "Recovery equipment brand", "Pain relief brand", "Supplement distributor", "Beverage brand", "Recovery hardware brand", "Nutrition brand", "Snack bar brand", "Wellness product maker", "Golf club", "Venue"] as const;
 
 /** Short public label for a category key or label. Unknown or "other" → null (shown as a health and wellness brand). */
 export function pulseCategoryLabel(raw: unknown): string | null {
@@ -76,7 +90,7 @@ export function chatTopic(text: string): PulseAction {
   return "chat_question";
 }
 
-export type PulseEvent = { action: PulseAction; category: string | null; who?: string | null; region?: string | null; src: string | null; createdAt: Date };
+export type PulseEvent = { action: PulseAction; category: string | null; who?: string | null; region?: string | null; src: string | null; createdAt: Date; srcId?: string | null };
 export type PulseStore = { name: "postgres" | "memory"; add(e: PulseEvent): Promise<void>; list(sinceDays: number, limit: number): Promise<PulseEvent[]> };
 
 export function memoryPulseStore(): PulseStore {
@@ -84,6 +98,7 @@ export function memoryPulseStore(): PulseStore {
   return {
     name: "memory",
     async add(e) {
+      if (e.srcId && rows.some((r) => r.srcId === e.srcId)) return;
       rows.push(e);
       if (rows.length > 500) rows.splice(0, rows.length - 500);
     },
@@ -106,6 +121,8 @@ function ensureTable(): Promise<void> {
       created_at timestamptz NOT NULL DEFAULT now());
       ALTER TABLE activity_pulse_events ADD COLUMN IF NOT EXISTS who text;
       ALTER TABLE activity_pulse_events ADD COLUMN IF NOT EXISTS region text;
+      ALTER TABLE activity_pulse_events ADD COLUMN IF NOT EXISTS src_id text;
+      CREATE UNIQUE INDEX IF NOT EXISTS activity_pulse_events_src_id_idx ON activity_pulse_events (src_id) WHERE src_id IS NOT NULL;
       CREATE INDEX IF NOT EXISTS activity_pulse_events_created_idx ON activity_pulse_events (created_at);`))
     .then(() => undefined)
     .catch((e) => {
@@ -121,7 +138,7 @@ export function postgresPulseStore(): PulseStore {
     async add(e) {
       await ensureTable();
       const db = await getDb();
-      await db.execute(sql`INSERT INTO activity_pulse_events (action, category, who, region, src) VALUES (${e.action}, ${e.category}, ${e.who ?? null}, ${e.region ?? null}, ${e.src})`);
+      await db.execute(sql`INSERT INTO activity_pulse_events (action, category, who, region, src, src_id, created_at) VALUES (${e.action}, ${e.category}, ${e.who ?? null}, ${e.region ?? null}, ${e.src}, ${e.srcId ?? null}, ${e.createdAt.toISOString()}::timestamptz) ON CONFLICT DO NOTHING`);
     },
     async list(sinceDays, limit) {
       await ensureTable();
@@ -146,12 +163,16 @@ export function setPulseStoreForTests(s: PulseStore | null): void {
 }
 
 /** Record one real event. Callers pass isTest for QA traffic; it is dropped here. Never throws. */
-export async function recordPulse(action: PulseAction, category: unknown, opts: { isTest?: boolean; src?: string | null; who?: string | null; region?: string | null } = {}): Promise<void> {
+export const allowedWho = (w: unknown): string | null => (typeof w === "string" && (PULSE_WHO as readonly string[]).includes(w) ? w : null);
+export const allowedRegion = (r: unknown): string | null => (typeof r === "string" && (Object.values(CA_REGIONS).includes(r) || r === "US" || r === "Canada") ? r : null);
+export const isPulseAction = (a: unknown): a is PulseAction => typeof a === "string" && Object.prototype.hasOwnProperty.call(PULSE_ACTIONS, a);
+
+export async function recordPulse(action: PulseAction, category: unknown, opts: { isTest?: boolean; src?: string | null; who?: string | null; region?: string | null; at?: Date; srcId?: string | null } = {}): Promise<void> {
   if (opts.isTest) return;
-  const who = opts.who && (PULSE_WHO as readonly string[]).includes(opts.who) ? opts.who : null;
-  const region = opts.region && (Object.values(CA_REGIONS).includes(opts.region) || opts.region === "US" || opts.region === "Canada") ? opts.region : null;
+  const who = allowedWho(opts.who);
+  const region = allowedRegion(opts.region);
   try {
-    await pulseStore().add({ action, category: pulseCategoryLabel(category), who, region, src: opts.src ?? null, createdAt: new Date() });
+    await pulseStore().add({ action, category: pulseCategoryLabel(category), who, region, src: opts.src ?? null, createdAt: opts.at ?? new Date(), srcId: opts.srcId ?? null });
   } catch {
     /* the pulse is decorative; a failed write never blocks the real request */
   }
@@ -166,7 +187,7 @@ export function relTime(ms: number): string {
   return d === 1 ? "yesterday" : `${d}d ago`;
 }
 
-export type PulseFeedEvent = { who: string; region: string | null; action: string; ago: string; source: "site" | "inbox" };
+export type PulseFeedEvent = { who: string; region: string | null; action: string; ago: string; age_h: number; source: "site" | "inbox" };
 export type PulseFeed = { show: boolean; window_days: number; events: PulseFeedEvent[]; counts: { this_week: number; window: number } };
 
 const whoOf = (r: PulseEvent) => r.who ?? (r.category ? `${r.category} brand` : r.action.startsWith("chat_") ? "Site visitor" : "Health and wellness brand");
@@ -179,16 +200,16 @@ export function toFeed(rows: Array<PulseEvent & { source?: "site" | "inbox" }>, 
     show: true,
     window_days: PULSE_WINDOW_DAYS,
     counts,
-    events: inWindow.slice(0, PULSE_LIMIT).map((r) => ({ who: whoOf(r), region: r.region ?? null, action: PULSE_ACTIONS[r.action], ago: relTime(now - r.createdAt.getTime()), source: r.source ?? "site" })),
+    events: inWindow.slice(0, PULSE_LIMIT).map((r) => ({ who: whoOf(r), region: r.region ?? null, action: PULSE_ACTIONS[r.action], ago: relTime(now - r.createdAt.getTime()), age_h: Math.round((now - r.createdAt.getTime()) / 36e5), source: r.source ?? "site" })),
   };
 }
 
 export async function pulseFeed(now = Date.now()): Promise<PulseFeed> {
   let live: PulseEvent[] = [];
   try {
-    live = await pulseStore().list(PULSE_WINDOW_DAYS, 50);
+    live = await pulseStore().list(PULSE_WINDOW_DAYS, 200);
   } catch {
     live = [];
   }
-  return toFeed([...live.map((e) => ({ ...e, source: "site" as const })), ...PULSE_SEED.map((e) => ({ ...e, source: "inbox" as const }))], now);
+  return toFeed([...live.map((e) => ({ ...e, source: e.src === "instantly" || e.src === "inbox" ? ("inbox" as const) : ("site" as const) })), ...PULSE_SEED.map((e) => ({ ...e, source: "inbox" as const }))], now);
 }

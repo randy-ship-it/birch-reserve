@@ -7,6 +7,10 @@
     {
       "path": "/api/cron/splash-expiry",
       "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/pulse-ingest",
+      "schedule": "17 * * * *"
     }
   ]
 }

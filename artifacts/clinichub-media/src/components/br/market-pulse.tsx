@@ -82,17 +82,40 @@ export function QuestionsBrandsAsk() {
   );
 }
 
-type PulseEvent = { who: string; region: string | null; action: string; ago: string };
+type PulseEvent = { who: string; region: string | null; action: string; ago: string; age_h?: number };
 type Feed = { show: boolean; events: PulseEvent[] };
 const DISMISS_KEY = "br_pulse_dismissed";
-const SHOW_MS = 7000;
-const gap = () => 20000 + Math.round(Math.random() * 20000); // every ~20–40s
+const COUNT_KEY = "br_pulse_shown";
+// Soft cadence (Randy t295u): first after ~15s, then every 45–90s, each visible ~5s, at most 6 per session.
+const FIRST_MS = 15000;
+const SHOW_MS = 5000;
+const MAX_PER_SESSION = 6;
+const gap = () => 45000 + Math.round(Math.random() * 45000);
+const shownSoFar = () => {
+  try {
+    return Number(window.sessionStorage.getItem(COUNT_KEY) ?? "0") || 0;
+  } catch {
+    return 0;
+  }
+};
+/** Weighted pick, newest favoured (half-weight every ~2 weeks), never the same event twice in a row or repeated in a session. */
+function pickNext(events: PulseEvent[], used: Set<number>): number {
+  const pool = events.map((e, i) => ({ i, w: Math.pow(0.5, (e.age_h ?? i * 24) / (24 * 14)) })).filter((x) => !used.has(x.i));
+  const list = pool.length ? pool : events.map((_, i) => ({ i, w: 1 }));
+  let r = Math.random() * list.reduce((a, x) => a + x.w, 0);
+  for (const x of list) {
+    r -= x.w;
+    if (r <= 0) return x.i;
+  }
+  return list[list.length - 1]!.i;
+}
 
 /**
  * Uniform bottom toast (left, clear of the call button and the mobile sticky bar) (Randy t294u): "[blurred] · Physio clinic, Ontario · asked about hosting a hub · 2d ago".
  * The blurred "name" is a fixed placeholder shape, never a real name: the API carries no names (lib/activityPulse.ts),
  * so there is nothing in the HTML or JSON to un-blur. Real events only: show:false, an error or an empty list renders
- * nothing. Non-blocking (only the toast takes pointer events), dismissible for the session, slide + fade.
+ * nothing. Non-blocking (only the toast takes pointer events), dismissible for the session, soft fade (t295u cadence
+ * above); prefers-reduced-motion drops the movement and keeps a short opacity fade.
  */
 export function ActivityPulse() {
   const [feed, setFeed] = useState<Feed | null>(null);
@@ -121,17 +144,25 @@ export function ActivityPulse() {
   useEffect(() => {
     if (!feed || off) return;
     let t: number;
-    let n = 0;
+    const used = new Set<number>();
     const show = () => {
-      setI(n % feed.events.length);
-      n += 1;
+      const n = shownSoFar();
+      if (n >= MAX_PER_SESSION) return;
+      const next = pickNext(feed.events, used);
+      used.add(next);
+      setI(next);
       setVisible(true);
+      try {
+        window.sessionStorage.setItem(COUNT_KEY, String(n + 1));
+      } catch {
+        /* private mode */
+      }
       t = window.setTimeout(() => {
         setVisible(false);
-        t = window.setTimeout(show, gap());
+        if (n + 1 < MAX_PER_SESSION) t = window.setTimeout(show, gap());
       }, SHOW_MS);
     };
-    t = window.setTimeout(show, 6000);
+    if (shownSoFar() < MAX_PER_SESSION) t = window.setTimeout(show, FIRST_MS);
     return () => window.clearTimeout(t);
   }, [feed, off]);
   if (off || !feed) return null;
@@ -146,25 +177,22 @@ export function ActivityPulse() {
   };
   return (
     <div
-      className={`pointer-events-none fixed left-3 bottom-24 z-40 flex justify-start transition-all duration-500 ease-out motion-reduce:transition-none md:bottom-5 md:left-24 md:max-w-md ${visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+      className={`pointer-events-none fixed left-3 bottom-24 z-40 flex justify-start transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-opacity motion-reduce:duration-300 motion-reduce:transform-none md:bottom-5 md:left-24 md:max-w-sm ${visible ? "translate-y-0 opacity-100" : "translate-y-1.5 opacity-0"}`}
       data-testid="activity-pulse"
       data-visible={visible ? "1" : "0"}
       aria-hidden={visible ? undefined : true}
     >
-      <div className={`flex max-w-[calc(100vw-8.5rem)] items-center gap-3 rounded-2xl bg-white/95 px-3.5 py-2.5 shadow-lg ring-1 ring-foreground/10 backdrop-blur md:max-w-md ${visible ? "pointer-events-auto" : ""}`} role="status" aria-live="polite">
-        <span className="relative flex size-2 shrink-0" aria-hidden>
-          <span className="absolute inline-flex size-full rounded-full bg-lime-400 opacity-60 motion-safe:animate-ping" />
-          <span className="relative inline-flex size-2 rounded-full bg-lime-500" />
-        </span>
-        <span className="min-w-0 text-[13px] leading-snug" style={{ color: NAVY }}>
-          <span className="mr-1 inline-block h-3 w-16 rounded-full bg-foreground/25 align-middle blur-[2px]" aria-hidden data-testid="activity-pulse-blur" />
+      <div className={`flex max-w-[calc(100vw-8.5rem)] items-center gap-2.5 rounded-xl bg-white/80 px-3 py-2 shadow-sm ring-1 ring-foreground/5 backdrop-blur md:max-w-sm ${visible ? "pointer-events-auto" : ""}`} role="status" aria-live="polite">
+        <span className="inline-flex size-1.5 shrink-0 rounded-full bg-lime-500/70" aria-hidden />
+        <span className="min-w-0 text-[12px] leading-snug opacity-80" style={{ color: NAVY }}>
+          <span className="mr-1 inline-block h-2.5 w-12 rounded-full bg-foreground/15 align-middle blur-[2px]" aria-hidden data-testid="activity-pulse-blur" />
           <span className="sr-only">Someone</span>
-          <span className="font-semibold" data-testid="activity-pulse-who">· {e.who}{e.region ? `, ${e.region}` : ""}</span>
+          <span className="font-medium" data-testid="activity-pulse-who">· {e.who}{e.region ? `, ${e.region}` : ""}</span>
           <span data-testid="activity-pulse-line"> · {e.action}</span>
-          <span className="text-foreground/50"> · {e.ago}</span>
+          <span className="text-foreground/45"> · {e.ago}</span>
         </span>
-        <button type="button" onClick={close} tabIndex={visible ? 0 : -1} className="-mr-1 shrink-0 rounded-full p-1 text-foreground/40 hover:text-foreground/80" aria-label="Dismiss recent activity" data-testid="activity-pulse-close">
-          <X className="size-3.5" />
+        <button type="button" onClick={close} tabIndex={visible ? 0 : -1} className="-mr-1 shrink-0 rounded-full p-1 text-foreground/30 hover:text-foreground/70" aria-label="Dismiss recent activity" data-testid="activity-pulse-close">
+          <X className="size-3" />
         </button>
       </div>
     </div>
