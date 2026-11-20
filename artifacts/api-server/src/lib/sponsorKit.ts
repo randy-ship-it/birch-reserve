@@ -122,7 +122,7 @@ export const HUBS: Hub[] = [
   { key: "roll-recovery", name: "Roll Recovery", kind: "brand", status: "In queue", url: "https://scalehealth.ca/roll-recovery", category: "Recovery hardware", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
   { key: "nutriprocan", name: "NutriProCan", kind: "brand", status: "In queue", url: "https://scalehealth.ca/nutriprocan", category: "Nutrition", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
   { key: "sole", name: "SOLE", kind: "brand", status: "Live inventory", url: "https://www.scalehealth.ca/sole", category: "Footwear and insoles", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "clinic-network", name: "Clinic hub network (pooled)", kind: "clinic", status: "Onboarding", url: "https://scalehealth.ca/clinichubs", category: "Physio, mobility, gym and studio members", basis: "TAM feed provider-network row", views: CLINIC_NETWORK },
+  { key: "clinic-network", name: "Clinic hub network", kind: "clinic", status: "Onboarding", url: "https://scalehealth.ca/clinichubs", category: "Physio, mobility, gym and studio members", basis: "TAM feed provider-network row", views: CLINIC_NETWORK },
 ];
 
 /** A sponsor buys one of five rotating positions (20% share of voice) at the low end of availability (75%). */

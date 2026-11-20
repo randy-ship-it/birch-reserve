@@ -17,6 +17,7 @@ import express, { Router, type IRouter, type Request, type Response } from "expr
 import { getStripeClient } from "../lib/stripeClient";
 import { logger } from "../lib/logger";
 import { PUBLIC_CAD_ENABLED } from "../lib/currency";
+import { payoutAmount, payoutRegionForCountry, payoutUsNote, type PayoutRegion } from "../lib/payoutCurrency";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
 import {
   CUSTOM_MAX,
@@ -128,7 +129,9 @@ export function sponsorDepositsOpen(env: NodeJS.ProcessEnv = process.env): boole
   return !key.startsWith("sk_live_") || env.SPONSOR_DEPOSITS_LIVE === "true";
 }
 
-export type SponsorPageOpts = { open?: boolean; pack?: string | null; prefill?: { email?: string; company?: string } | null; status?: string | null };
+export type SponsorPageOpts = {
+  /** Payout display region from x-vercel-ip-country. Default CA (CAD). */
+  payout?: PayoutRegion; open?: boolean; pack?: string | null; prefill?: { email?: string; company?: string } | null; status?: string | null };
 
 /** /sponsor (Randy, Nov 20 2026 audit #6): three packs, each "Prepay $X". USD only. */
 export function sponsorHtml(_currency: Currency, opts: SponsorPageOpts = {}): string {
@@ -141,7 +144,8 @@ export function sponsorHtml(_currency: Currency, opts: SponsorPageOpts = {}): st
     const credit = Math.round(t.usd * (1 + t.bonusPct / 100));
     return `<label class="card pack${t.key === picked ? " on" : ""}" data-testid="pack-${t.key}"><input type="radio" name="tier" value="${t.key}"${t.key === picked ? " checked" : ""} class="sr"><strong>${esc(t.label)}</strong><span class="amt">${money(t.usd, currency)}</span><span>+${t.bonusPct}% bonus media credit: ${money(credit, currency)} to spend.</span><button type="button" class="btn" data-tier="${t.key}">Prepay ${money(t.usd, currency).replace(/ USD$/, "")}</button></label>`;
   }).join("");
-  const ladder = SMB_LADDER.map((r) => `<tr><td>${r.customers} activated customers</td><td class="n">$${fmt(r.cashCad)} CAD cash</td><td class="n">$${fmt(r.creditCad)} CAD ad credit</td></tr>`).join("");
+  const payout: PayoutRegion = opts.payout ?? "ca";
+  const ladder = SMB_LADDER.map((r) => `<tr><td>${r.customers} activated customers</td><td class="n">${payoutAmount(r.cashCad, payout)} cash</td><td class="n">${payoutAmount(r.creditCad, payout)} ad credit</td></tr>`).join("");
   const status =
     opts.status === "success"
       ? `<p class="ok" data-testid="sponsor-paid">Payment received. We'll email your insertion order to sign within 1 business day. Nothing runs before it.</p>`
@@ -174,6 +178,7 @@ ${hubPackageTable(currency)}
 <h2>Clinics and studios: get paid to activate your customers</h2>
 <p>Open a Clinic Hub at <a href="https://scalehealth.ca/clinichubs">scalehealth.ca/clinichubs</a> and activate your audience: email, text, a link on your website, at checkout and on social media. When they buy or book through your hub, you earn a cash bonus, or a bigger bonus as Birch Reserve ad credit to promote your own business.</p>
 <div class="tw"><table><thead><tr><th>Milestone (first 90 days live)</th><th class="n">Cash</th><th class="n">Or ad credit</th></tr></thead><tbody>${ladder}</tbody></table></div>
+<p class="fine" data-testid="payout-currency-note">${payout === "us" ? esc(payoutUsNote()) : "Payouts are set and paid in CAD."}</p>
 <p class="fine">Proposal. An activated customer is a unique customer of your business who completes a paid order or booking through your Clinic Hub and does not refund or charge back. The 90-day clock starts once we see real traffic or transactions; bonuses are credited when it ends. Self-purchases (you, your staff or your own accounts) are excluded. One bonus per business per year, top milestone only. Refunded or charged-back orders are reversed. Ad credit has no cash value and expires 12 months after it lands.</p>
 <h2 id="terms-pack">Sponsorship pack terms</h2>
 <ul data-testid="sponsor-pack-terms">${SPONSOR_PACK_TERMS.map((t) => `<li>${esc(t)}</li>`).join("")}<li>${esc(CARRY_OVER_CLAUSE)}</li></ul>
@@ -221,6 +226,9 @@ ${statsStrip()}
 
 router.get(["/sponsor", "/sponsor/"], (req: Request, res: Response) => {
   const currency = pickCurrency(req);
+  // The payout table varies by visitor country, so no shared cache may serve one country's copy to another.
+  const payout = payoutRegionForCountry(req.headers["x-vercel-ip-country"]);
+  res.vary("x-vercel-ip-country");
   // ?pf= carries kit details sealed by POST /v1/buy/prefill (same token as /buy). Never cache a prefilled page.
   const prefill = openPrefill(req.query.pf);
   if (prefill) {
@@ -232,7 +240,7 @@ router.get(["/sponsor", "/sponsor/"], (req: Request, res: Response) => {
   }
   const status = req.query.deposit === "success" ? "success" : req.query.deposit === "cancelled" ? "cancelled" : null;
   const pack = typeof req.query.pack === "string" ? req.query.pack : null;
-  res.type("html").send(shell("Sponsorship packs — Birch Reserve", "Prepay a $1,500, $3,000 or $6,000 USD sponsorship pack with up to 15% bonus media credit. Card now, insertion order before anything runs.", "/sponsor", currency, sponsorHtml(currency, { open: sponsorDepositsOpen(), pack, prefill, status })));
+  res.type("html").send(shell("Sponsorship packs — Birch Reserve", "Prepay a $1,500, $3,000 or $6,000 USD sponsorship pack with up to 15% bonus media credit. Card now, insertion order before anything runs.", "/sponsor", currency, sponsorHtml(currency, { open: sponsorDepositsOpen(), pack, prefill, status, payout })));
 });
 
 router.get(["/kit", "/kit/"], (req: Request, res: Response) => {
