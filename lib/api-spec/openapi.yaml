@@ -172,7 +172,7 @@ paths:
       tags: [launch]
       servers: [{ url: / }]
       responses:
-        "200": { description: Conservative shared rolling seat availability, content: { application/json: { schema: { $ref: "#/components/schemas/BirchReserveAvailability" } } } }
+        "200": { description: Count-free availability (limited early placements) and prices, content: { application/json: { schema: { $ref: "#/components/schemas/BirchReserveAvailability" } } } }
   /v1/quote:
     get:
       operationId: getBirchReserveQuote
@@ -1452,7 +1452,7 @@ components:
     BirchReserveAvailability:
       type: object
       additionalProperties: true
-      required: [currency, default_sku, skus, inventory_model, seats_total, seats_paid, seats_held, seats_open, next_window, formats_live, checkout, last_updated]
+      required: [currency, default_sku, skus, inventory_model, availability, availability_note, next_window, formats_live, checkout, last_updated]
       properties:
         currency: { type: string, enum: [USD, CAD], description: "Currency for this response: ?currency, then the br_currency cookie, then Canada -> CAD, else USD." }
         prices: { type: object, additionalProperties: true, description: "Exact due-today price per SKU in every payable currency." }
@@ -1463,10 +1463,10 @@ components:
           maxItems: 2
           items: { $ref: "#/components/schemas/BirchReserveSku" }
         inventory_model: { type: string, enum: [shared_reserve_pool] }
-        seats_total: { type: number, multipleOf: 1 }
-        seats_paid: { type: number, multipleOf: 1 }
-        seats_held: { type: number, multipleOf: 1 }
-        seats_open: { type: number, multipleOf: 1 }
+        availability: { type: string, enum: [limited_early_placements], description: "Count-free availability. Seat counts are never published." }
+        availability_note: { type: string }
+        accepting_reservations: { type: boolean }
+        categories: { type: array, items: { type: object, additionalProperties: true, properties: { slug: { type: string }, label: { type: string } } } }
         next_window: { type: string }
         formats_live: { type: array, items: { type: string } }
         checkout: { type: string }

@@ -5,6 +5,8 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { BirchReserveAvailabilityAvailability } from './birchReserveAvailabilityAvailability';
+import type { BirchReserveAvailabilityCategoriesItem } from './birchReserveAvailabilityCategoriesItem';
 import type { BirchReserveAvailabilityCurrency } from './birchReserveAvailabilityCurrency';
 import type { BirchReserveAvailabilityInventoryModel } from './birchReserveAvailabilityInventoryModel';
 import type { BirchReserveAvailabilityPrices } from './birchReserveAvailabilityPrices';
@@ -22,10 +24,11 @@ export interface BirchReserveAvailability {
      */
   skus: BirchReserveSku[];
   inventory_model: BirchReserveAvailabilityInventoryModel;
-  seats_total: number;
-  seats_paid: number;
-  seats_held: number;
-  seats_open: number;
+  /** Count-free availability. Seat counts are never published. */
+  availability: BirchReserveAvailabilityAvailability;
+  availability_note: string;
+  accepting_reservations?: boolean;
+  categories?: BirchReserveAvailabilityCategoriesItem[];
   next_window: string;
   formats_live: string[];
   checkout: string;

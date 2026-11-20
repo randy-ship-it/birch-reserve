@@ -16,6 +16,7 @@ import {
   Zap,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { EARLY_RATE_LINE } from "@/components/br/prime-hero";
 import { SplashAdReservationDialog } from "@/components/splash-ad-reservation-dialog";
 import {
   DEFAULT_RESERVE_OFFER_KEY,
@@ -138,12 +139,7 @@ export default function Home() {
   const [selectedOffer, setSelectedOffer] = useState<ReserveOfferKey>(
     DEFAULT_RESERVE_OFFER_KEY,
   );
-  const [availability, setAvailability] = useState<{
-    seats_open: number;
-    seats_held: number;
-    seats_paid: number;
-    seats_total: number;
-  } | null>(null);
+  const [availability, setAvailability] = useState<{ prices?: unknown } | null>(null);
   const { currency } = useCurrency();
   const t = usePriceText();
   const reservePriceLabel = priceLabel("reserve-490", currency);
@@ -155,14 +151,9 @@ export default function Home() {
         !cancelled &&
         data &&
         typeof data === "object" &&
-        typeof (data as { seats_open?: unknown }).seats_open === "number"
+        (data as { prices?: unknown }).prices
       ) {
-        setAvailability(data as {
-          seats_open: number;
-          seats_held: number;
-          seats_paid: number;
-          seats_total: number;
-        });
+        setAvailability(data as { prices?: unknown });
         return true;
       }
       return false;
@@ -571,9 +562,7 @@ export default function Home() {
               Eight advertiser categories
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              {availability
-                ? "Limited early placements · request yours"
-                : "Limited early placements · request yours"}
+              {availability ? EARLY_RATE_LINE : EARLY_RATE_LINE}
             </p>
             <div className="mt-4 grid border border-border sm:grid-cols-2 lg:grid-cols-4">
               {CATEGORY_SEATS.map((category) => (

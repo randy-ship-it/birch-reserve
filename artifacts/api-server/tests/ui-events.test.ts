@@ -1051,11 +1051,9 @@ test("GET /availability.json aliases /v1/availability.json (same handler, not SP
     assert.match(alias.headers.get("content-type") ?? "", /application\/json/);
     const v1Body = JSON.parse(v1Text) as Record<string, unknown>;
     const aliasBody = JSON.parse(aliasText) as Record<string, unknown>;
-    assert.equal(v1Body.seats_total, 8);
-    assert.equal(v1Body.seats_paid, 0);
-    assert.equal(v1Body.seats_held, 0);
-    assert.equal(v1Body.seats_open, 8);
-    assert.equal(aliasBody.seats_open, v1Body.seats_open);
+    for (const k of ["seats_total", "seats_paid", "seats_held", "seats_open"]) assert.equal(k in v1Body, false, k);
+    assert.equal(v1Body.availability, "limited_early_placements");
+    assert.equal(aliasBody.availability, v1Body.availability);
     assert.equal(aliasBody.inventory_model, v1Body.inventory_model);
     assert.equal(aliasBody.default_sku, v1Body.default_sku);
     assert.deepEqual(aliasBody.formats, v1Body.formats);

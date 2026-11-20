@@ -433,6 +433,22 @@ export const BirchReserveAvailabilityInventoryModel = {
   shared_reserve_pool: 'shared_reserve_pool',
 } as const;
 
+/**
+ * Count-free availability. Seat counts are never published.
+ */
+export type BirchReserveAvailabilityAvailability = typeof BirchReserveAvailabilityAvailability[keyof typeof BirchReserveAvailabilityAvailability];
+
+
+export const BirchReserveAvailabilityAvailability = {
+  limited_early_placements: 'limited_early_placements',
+} as const;
+
+export type BirchReserveAvailabilityCategoriesItem = {
+  slug?: string;
+  label?: string;
+  [key: string]: unknown;
+ };
+
 export interface BirchReserveAvailability {
   /** Currency for this response: ?currency, then the br_currency cookie, then Canada -> CAD, else USD. */
   currency: BirchReserveAvailabilityCurrency;
@@ -445,10 +461,11 @@ export interface BirchReserveAvailability {
      */
   skus: BirchReserveSku[];
   inventory_model: BirchReserveAvailabilityInventoryModel;
-  seats_total: number;
-  seats_paid: number;
-  seats_held: number;
-  seats_open: number;
+  /** Count-free availability. Seat counts are never published. */
+  availability: BirchReserveAvailabilityAvailability;
+  availability_note: string;
+  accepting_reservations?: boolean;
+  categories?: BirchReserveAvailabilityCategoriesItem[];
   next_window: string;
   formats_live: string[];
   checkout: string;

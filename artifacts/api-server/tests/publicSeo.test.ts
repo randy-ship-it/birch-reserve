@@ -299,10 +299,11 @@ test("availability and buycalc stay up when Postgres cannot answer the seat quer
   assert.equal(availability.status, 200);
   assert.match(availability.headers.get("content-type") ?? "", /application\/json/);
   const body = (await availability.json()) as Record<string, unknown>;
-  assert.equal(body.seats_total, 8);
-  assert.equal(body.seats_paid, 0);
-  assert.equal(body.seats_held, 0);
-  assert.equal(body.seats_open, 8);
+  // HARD rule: no public seat counts or "open" statuses.
+  for (const k of ["seats_total", "seats_paid", "seats_held", "seats_open"]) assert.equal(k in body, false, k);
+  assert.equal(body.availability, "limited_early_placements");
+  assert.equal(body.accepting_reservations, true);
+  assert.doesNotMatch(JSON.stringify(body), /"open"|seats_|unclaimed|not taken/);
   assert.equal(body.currency, "USD");
   assert.equal(body.default_sku, "reserve-490");
   assert.equal(body.inventory_model, "shared_reserve_pool");

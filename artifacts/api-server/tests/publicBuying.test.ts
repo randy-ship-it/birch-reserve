@@ -32,6 +32,7 @@ import {
 } from "../src/routes/publicBuying";
 import {
   cleanupSplashReservations,
+  getSplashSeatCounts,
   markSplashReservationPaidFromSession,
 } from "../src/lib/splashReservationLifecycle";
 import { getPayableReserveOffer, getPublicReserveOfferBySku } from "../src/lib/reserveOffers";
@@ -4240,10 +4241,8 @@ test("public idempotency keys cannot be reused across canonical tiers", async ()
 
 test("canonical tiers draw from one shared eight-seat inventory pool", async () => {
   const previousTotal = process.env.SEATS_TOTAL;
-  const current = (await (await fetch(`${origin}/v1/availability.json`)).json()) as {
-    seats_paid: number;
-    seats_held: number;
-  };
+  // Counts are internal-only now (never in public JSON).
+  const current = await getSplashSeatCounts();
   process.env.SEATS_TOTAL = String(current.seats_paid + current.seats_held + 1);
   const requests = ["reserve-490", "reserve-490", "hold-190"].map((sku) =>
     fetch(`${origin}/v1/checkout`, {
@@ -4537,8 +4536,9 @@ test("availability is integer-valued and buycalc remains useful without JavaScri
   const availability = (await (
     await fetch(`${origin}/v1/availability.json`)
   ).json()) as Record<string, unknown>;
-  assert.equal(Number.isInteger(availability.seats_open), true);
-  assert.equal(Number.isInteger(availability.seats_held), true);
+  assert.equal("seats_open" in availability, false);
+  assert.equal("seats_held" in availability, false);
+  assert.equal(availability.availability, "limited_early_placements");
 
   const response = await fetch(`${origin}/buycalc`);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html/);
@@ -4613,9 +4613,7 @@ test("an expired public hold returns its seat and receipt reports it as recycled
 });
 
 test("concurrent buyers cannot both claim the final open seat", async () => {
-  const initial = (await (
-    await fetch(`${origin}/v1/availability.json`)
-  ).json()) as Record<string, number>;
+  const initial = await getSplashSeatCounts();
   const previousTotal = process.env.SEATS_TOTAL;
   process.env.SEATS_TOTAL = String(initial.seats_paid + initial.seats_held + 1);
   const payload = () => ({
