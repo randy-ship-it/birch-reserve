@@ -10,6 +10,7 @@ import { BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BUYER_FAQ_TITLE, BuyerFaq, EarlySlots, FlightTimeline, ProgramsCallout, SAMPLE_REPORT, FLIGHT_TIMELINE, SampleIoLink, SampleReport, SeeTheUnit } from "@/components/br/buyer-comfort";
 import { DoorRoute } from "@/components/br/door-route";
+import { NextStep } from "@/components/br/next-step";
 import { KitBuilder } from "@/components/br/kit-builder";
 import { AvailabilityStrip, CategoryRequestForm, FaceBeforeFlight, FounderNote, NETWORK_HUBS, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import {
@@ -157,6 +158,13 @@ export default function BrMediaKit() {
             <MediaKitPdfLink variant="line" testId="mk-pdf-hero" className="w-full sm:w-auto" />
           </div>
 
+        </div>
+      </section>
+
+      {/* Next step: live-hub mock beside $190/$490 + mid-tier bridge (Randy review, Nov 20 2026) */}
+      <section className="scroll-mt-20 border-b border-border/70 bg-secondary/40" data-testid="mk-next-step">
+        <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14">
+          <NextStep where="media_kit" />
         </div>
       </section>
 

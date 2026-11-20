@@ -19,6 +19,7 @@ import { CHANNEL_GEO } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { mockExposure, readExposure, type FridayExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 import { HubView, SupplierExposureView } from "@/components/br/report-views";
 import { Details } from "@/components/br/details";
+import { MODELLED_PLAN_LABEL, PlanChip } from "@/components/br/modelled";
 import type { PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
 
 const FKEY: Record<string, string> = { hubs: "scale-hubs", calm_joints: "calm-joints", street_team: "street-team", retail: "retail-network" };
@@ -189,6 +190,7 @@ export function ChannelTilesV2({ m, map }: { m: ReportModel; map?: string }) {
     <section data-testid="report-tiles" style={{ fontFamily: RT_SANS, color: RT.body }}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="text-[24px] md:text-[28px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Where you fit</h2>
+        <PlanChip />
       </div>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         {m.tiles.map((t) => (
@@ -203,6 +205,9 @@ export function ChannelTilesV2({ m, map }: { m: ReportModel; map?: string }) {
               <dl className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
                 {t.fig.map((f) => <div key={f.l}><dd className="text-[34px] leading-none" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{f.v}</dd><dt className="mt-1 text-[12px]" style={{ color: RT.mute }}>{f.l}</dt></div>)}
               </dl>
+              ) : null}
+            {t.fig.length ? (
+              <p className="mt-2 text-[11px] font-semibold" style={{ color: RT.mute }} data-testid={`v2-tile-${t.key}-plan`}>{MODELLED_PLAN_LABEL}</p>
             ) : <p className="mt-3 text-[34px] leading-none" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Figures to come</p>}
             <FitMeter pct={t.fit} label={t.fitLabel} />
             <Details label="About this channel" testId={`v2-tile-${t.key}-details`}><p>{t.line}</p></Details>
@@ -355,7 +360,7 @@ export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposur
     return (
       <section data-testid="report-two-sides" data-first={sides[0]} data-sides={sides.join(",")} data-accelerate={m.isAccelerate ? "true" : "false"} style={{ fontFamily: RT_SANS }}>
         <h2 className="text-[26px] md:text-[34px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{m.isSupplier && m.isPublisher ? "Both answers from one form: your exposure + your hub earnings" : m.isSupplier ? "Your supplier exposure" : "Your hub: max exposure + earnings"}</h2>
-        <p className="text-[13px]" style={{ color: RT.mute }}>Estimates in USD.</p>
+        <p className="text-[13px]" style={{ color: RT.mute }} data-testid="two-sides-plan">Estimates in USD. {MODELLED_PLAN_LABEL}.</p>
         <div className={`mt-4 grid items-start gap-4 ${sides.length > 1 ? "lg:grid-cols-2" : ""}`}>
           {m.isSupplier ? <SupplierExposureView key="sup" m={m} exposure={ex} source={src} cta={supplierCta} onAccelerate={onAccelerate} physical={physical} /> : null}
           {m.isPublisher ? <HubView key="hub" m={m} exposure={ex} cta={earnCta} physical={physical} /> : null}

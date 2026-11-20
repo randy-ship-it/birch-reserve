@@ -5,6 +5,7 @@
  * labelled. Friday's full report is reviewed by a person first. Birch never fetches the brand's site itself.
  */
 import { LaneCtas } from "@/components/br/two-lane";
+import { NextStep } from "@/components/br/next-step";
 import { ArrowRight, Download, Loader2, Mail, Plus, Rocket, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Details } from "@/components/br/details";
@@ -182,6 +183,7 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
       </div>
       {oneForm && q.ref && q.payload ? <IntakeDetails key={q.roles.join(",")} intake={q.ref} payload={{ ...q.payload, roles: q.roles as IntakePayload["roles"] }} roles={q.roles} shared={q.shared ?? { brand: "", categories: [], skus: "", audience: "" }} /> : null}
       <ReportV2 report={report} exposure={exposure} exposureSource="mock" earnCta={earnCta} supplierCta={supplierOnly ? earnCta : undefined} onAccelerate={accCta} physical={q.physical} />
+      <div className="rounded-3xl bg-white p-4 md:p-6" data-testid="post-kit-next"><NextStep where="post_kit" brand={q.brand ?? ""} anchor={false} /></div>
       {hasKit || !oneForm ? upgrade("bottom") : null}
     </section>
   );

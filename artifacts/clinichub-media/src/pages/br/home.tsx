@@ -14,6 +14,7 @@ import { KitCta } from "@/components/br/kit-cta";
 import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BuyCta } from "@/components/br/buy-cta";
+import { MidTier, MODELLED_PLAN_LABEL } from "@/components/br/next-step";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { INVENTORY, PUBLISHER_INCENTIVE } from "../../../../api-server/src/lib/overhaul/model";
 import { DOOR_ROUTE } from "../../../../api-server/src/lib/doorRoute";
@@ -137,6 +138,12 @@ export default function BrHome() {
             </div>
           </a>
         </div>
+        <p className="mt-2 text-[12px] text-foreground/60" data-testid="home-stats-label">{MODELLED_PLAN_LABEL}. Network figures and targets, not measured delivery.</p>
+      </section>
+
+      {/* 2b. Mid-tier bridge: from a $490 test to real spend (Randy review, Nov 20 2026). */}
+      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-mid-tier">
+        <MidTier where="home" compact />
       </section>
 
       {/* 3. Two ways in (same cards as the intake). */}

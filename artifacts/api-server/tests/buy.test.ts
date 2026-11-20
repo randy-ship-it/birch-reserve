@@ -195,3 +195,11 @@ test("routes: account → upload → order (card hands back the /v1/checkout bod
     setBuyStoreForTests(null);
   }
 });
+
+test("page: ?plan= preselects a known plan; unknown keeps the default", () => {
+  const checked = (html: string) => /name="plan" value="([^"]+)" checked/.exec(html)?.[1];
+  assert.equal(checked(renderBuyPage({ checkoutLive: true })), "reserve-490");
+  assert.equal(checked(renderBuyPage({ checkoutLive: true, plan: "hold-190" })), "hold-190");
+  assert.equal(checked(renderBuyPage({ checkoutLive: true, plan: "exclusive" })), "exclusive");
+  assert.equal(checked(renderBuyPage({ checkoutLive: true, plan: "<x>" })), "reserve-490");
+});

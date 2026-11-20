@@ -151,3 +151,40 @@ export function agencyTestLeadPayload(input: { email: string; agency: string; cl
     fields: { lane: "agency_test", budget: "$1,000–$5,000 USD", client: input.client.trim(), agency: input.agency.trim() },
   };
 }
+
+/**
+ * "Prepay a client test budget" (Randy review, Nov 20 2026): one short form -> the existing /v1/leads premium/agency
+ * pipeline as a pre-filled IO request. Budget stays inside the live $1K–$5K agency client test band. No card, no new price.
+ */
+export function clampAgencyBudget(n: unknown): number {
+  const v = Math.round(Number(n));
+  if (!Number.isFinite(v)) return AGENCY_TEST.lowUsd;
+  return Math.min(AGENCY_TEST.highUsd, Math.max(AGENCY_TEST.lowUsd, v));
+}
+
+export function agencyPrepayLeadPayload(
+  input: { email: string; agency: string; client: string; budgetUsd: number; where: string },
+  ref: string,
+  path = "/intake",
+) {
+  const budget = clampAgencyBudget(input.budgetUsd);
+  const cash = Math.round((budget * AGENCY_CASH_PCT) / 100);
+  const client = input.client.trim() || "a client";
+  return {
+    kind: "agency_inquiry" as const,
+    email: input.email.trim(),
+    company: input.agency.trim() ? `${input.agency.trim()} for ${client}` : client,
+    message: `Prepay a client test budget: ${fmt(budget)} USD for ${client} (from ${input.where}). Pre-filled IO request ${ref}. ${AGENCY_CASH_PCT}% of media spend (${fmt(cash)} USD) to the agency of record. No card charged.`,
+    path,
+    fields: {
+      lane: "agency_prepay",
+      budget: `${fmt(budget)} USD`,
+      budget_usd: String(budget),
+      agency_cash: `${fmt(cash)} USD`,
+      client: input.client.trim(),
+      agency: input.agency.trim(),
+      draft_ref: ref,
+      where: input.where.slice(0, 40),
+    },
+  };
+}
