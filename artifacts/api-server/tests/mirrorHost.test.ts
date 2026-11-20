@@ -66,3 +66,12 @@ test("Scale assets are byte-identical copies of silverbirchgrowth/scalehealthnew
   // scalehealthnew main 43048bfd: public/favicon.svg
   assert.equal(blob("artifacts/clinichub-media/public/brand/scale/favicon.svg"), "48d4a36c7ccf58d96af84652ee961f35f76c565b");
 });
+
+test("mirror links: DOM <a href> that leave /intake are rewritten to Birch; absolute + data-mirror-keep links stay", () => {
+  const out = mirrorHtml("<html><head></head><body></body></html>", "scale_mirror");
+  assert.match(out, /function raw\(v\)/, "raw-relative check exists");
+  assert.match(out, /MutationObserver/, "dynamic links are rewritten as React renders them");
+  assert.match(out, /attributeFilter:\["href"\]/);
+  assert.match(out, /hasAttribute\("data-mirror-keep"\)\|\|a\.hasAttribute\("download"\)\)return;var p=raw/);
+  assert.match(out, /var p=raw\(a\.getAttribute\("href"\)\);if\(p===null\|\|own\(p\)\)return;e\.preventDefault/, "click handler ignores absolute same-origin links");
+});
