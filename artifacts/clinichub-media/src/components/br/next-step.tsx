@@ -12,10 +12,9 @@
  * Refund wording is the live /terms line for the $490 reserve; everything else says the IO sets the terms.
  * Copy rules: no counts, never "open/available/unclaimed", no impression/CTR/ROAS guarantees, modelled figures labelled.
  */
-import { useState, type FormEvent } from "react";
-import { ArrowRight, Check, CreditCard, Loader2, Sparkles } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
+import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { Details } from "@/components/br/details";
-import { EARLY_RATE_LINE } from "@/components/br/prime-hero";
 import { HubMock, twoLaneMock } from "@/components/br/two-lane";
 import { STARTER_BLOCK } from "@/components/br/start-small";
 import { trackCta } from "@/lib/track-cta";
@@ -56,35 +55,27 @@ export function twoSurfaceExample(creditUsd: number) {
   });
 }
 
-/** Live-hub mock with numbered callouts. Pick DR-HO'S physio or SOLE (the two live hubs). */
+/** Live-hub mock with numbered pins (DR-HO'S physio or SOLE, the two live hubs). Legend lives in an expander. */
 export function AnnotatedHubMock({ brand = "" }: { brand?: string }) {
   const [hub, setHub] = useState<"drho" | "sole">("drho");
-  const notes = [
-    { n: 1, t: "Your ad card", d: "Logo, one line, one button. A person approves it before it runs." },
-    { n: 2, t: hub === "drho" ? "DR-HO'S physio, live hub" : "SOLE, live hub", d: "Members-only. They come here to book and buy." },
-    { n: 3, t: "Clicks go to your site", d: "Tagged with your UTMs or a promo code." },
-  ];
   return (
     <div data-testid="annotated-hub-mock">
-      <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-foreground/55" role="group" aria-label="Live hub">
+      <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider" role="group" aria-label="Live hub">
         {(["drho", "sole"] as const).map((h) => (
           <button key={h} type="button" aria-pressed={hub === h} onClick={() => setHub(h)} className={`rounded-full px-3 py-1 ${hub === h ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/70 ring-1 ring-foreground/15"}`} data-testid={`annotated-hub-${h}`}>
             {h === "drho" ? "DR-HO'S physio" : "SOLE"}
           </button>
         ))}
       </div>
-      <div className="relative">
-        <HubMock brand={brand} logo={null} hub={hub} category="Your category" pins />
-      </div>
-      <ol className="mt-3 grid gap-2 sm:grid-cols-3" data-testid="annotated-hub-legend">
-        {notes.map((x) => (
-          <li key={x.n} className="flex gap-2 text-[12px] leading-snug text-foreground/70">
-            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-lime-300 text-[10px] font-black text-[#0b1f3a]">{x.n}</span>
-            <span><b className="block text-[#0b1f3a]">{x.t}</b>{x.d}</span>
-          </li>
-        ))}
-      </ol>
-      <p className="mt-1 text-[11px] text-foreground/50">Mock of the card on a live hub. The IO names the exact hub and spot.</p>
+      <HubMock brand={brand} logo={null} hub={hub} category="Your category" pins />
+      <Details label="What you're looking at" testId="annotated-hub-legend">
+        <ol className="list-decimal space-y-1 pl-4">
+          <li>Your ad card. A person approves it before it runs.</li>
+          <li>{hub === "drho" ? "DR-HO'S physio" : "SOLE"}, a live members-only hub.</li>
+          <li>Clicks go to your site, tagged with your UTMs.</li>
+        </ol>
+        <p>Mock. Your IO names the exact hub and spot.</p>
+      </Details>
     </div>
   );
 }
@@ -138,7 +129,7 @@ export function AgencyPrepayForm({ where, dark = false }: { where: string; dark?
       </div>
       <input tabIndex={-1} aria-hidden autoComplete="off" name="company_url" value={hp} onChange={(e) => setHp(e.target.value)} className="absolute -left-[9999px] h-0 w-0 opacity-0" />
       <button type="submit" disabled={state === "busy"} className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-lime-300 px-5 text-sm font-bold text-[#0b1f3a] hover:bg-white" data-testid="agency-prepay-send">
-        {state === "busy" ? <Loader2 className="size-4 animate-spin" /> : null}Prepay a client test budget · get the IO <ArrowRight className="size-4" />
+        {state === "busy" ? <Loader2 className="size-4 animate-spin" /> : null}Get a pre-filled IO <ArrowRight className="size-4" />
       </button>
       <p className={`text-[12px] ${dark ? "text-white/65" : "text-foreground/60"}`}>
         {fmtUsd(b)} USD budget · agency earns <b>{fmtUsd(cash)} USD</b> cash ({AGENCY_TEST.cashPct}%). No card today: we send a pre-filled IO to sign.
@@ -168,68 +159,85 @@ function TwoSurfaceExample({ dark = false }: { dark?: boolean }) {
   );
 }
 
-/** Mid-tier band: the bridge from a $490 test to real spend. */
-export function MidTier({ where, compact = false }: { where: string; compact?: boolean }) {
+/** Mid-tier band: three compact cards (price, one line, one button). Details live in one expander. */
+export function MidTier({ where }: { where: string; compact?: boolean }) {
   const [agencyOpen, setAgencyOpen] = useState(false);
-  const tiers = DEPOSIT_TIERS.map((t) => `${fmtUsd(t.usd)} (+${t.bonusPct}%)`).join(" · ");
-  const card = "flex flex-col rounded-2xl bg-white/[0.06] p-4 ring-1 ring-white/15";
+  const cardCls = "flex flex-col rounded-2xl bg-white/[0.06] p-4 ring-1 ring-white/15";
+  const ghost = "mt-auto inline-flex h-10 items-center justify-center gap-1.5 rounded-full px-4 text-sm font-bold text-white ring-1 ring-white/40 hover:bg-white hover:text-[#0b1f3a]";
+  const cards = [
+    { k: "agency", eyebrow: "Agency client test", price: "$1K–$5K", line: `${AGENCY_TEST.cashPct}% cash to the agency.`, cta: "Prepay a test" },
+    { k: "sponsor", eyebrow: "Sponsorship credit", price: "$1.5K–$6K", line: "Up to +15% bonus credit.", cta: "Pick a tier", href: withUtm("/sponsor?currency=usd", where, "sponsor") },
+    { k: "block", eyebrow: "View block", price: `From ${fmtUsd(STARTER_BLOCK.startingUsd)}`, line: "100K modelled views.", cta: "Request a block", href: withUtm("/?inquire=pack&block=100000&surfaces=landing#quick-buy", where, "block") },
+  ];
   return (
-    <section className="rounded-3xl p-5 text-white md:p-7" style={{ background: NAVY }} data-testid="mid-tier" data-where={where}>
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Bigger test, still low risk</span>
-        <span className="inline-flex items-center gap-1 rounded-full bg-lime-300 px-2.5 py-0.5 text-[11px] font-bold text-[#0b1f3a]" data-testid="early-rate-line"><Sparkles className="size-3" aria-hidden />{EARLY_RATE_LINE}</span>
+    <section className="rounded-3xl p-5 text-white md:p-6" style={{ background: NAVY }} data-testid="mid-tier" data-where={where}>
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300" data-testid="early-rate-line">Early rate · first-mover priority on reporting</p>
+      <h3 className="mt-1 font-display text-2xl leading-tight md:text-3xl" data-testid="mid-tier-line">Bigger test? Prepay media credit.</h3>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        {cards.map((c) => (
+          <article key={c.k} className={cardCls} data-testid={`mid-tier-${c.k}`}>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">{c.eyebrow}</p>
+            <p className="mt-1 font-display text-3xl leading-none">{c.price} <span className="text-sm">USD</span></p>
+            <p className="mb-3 mt-1.5 text-[13px] text-white/75">{c.line}</p>
+            {c.href ? (
+              <a href={c.href} className={ghost} data-testid={`mid-tier-${c.k}-cta`}>{c.cta} <ArrowRight className="size-4" /></a>
+            ) : (
+              <button type="button" onClick={() => setAgencyOpen((v) => !v)} aria-expanded={agencyOpen} className="mt-auto inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-lime-300 px-4 text-sm font-bold text-[#0b1f3a] hover:bg-white" data-testid={`mid-tier-${c.k}-cta`}>{c.cta} <ArrowRight className="size-4" /></button>
+            )}
+          </article>
+        ))}
       </div>
-      <h3 className="mt-2 font-display text-2xl leading-tight md:text-3xl" data-testid="mid-tier-line">{MID_TIER_LINE}</h3>
-      <div className={`mt-4 grid gap-3 ${compact ? "md:grid-cols-3" : "md:grid-cols-3"}`}>
-        <article className={card} data-testid="mid-tier-agency">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">Agency client test</p>
-          <p className="mt-1 font-display text-3xl leading-none">$1K–$5K <span className="text-base">USD</span></p>
-          <p className="mb-4 mt-2 text-[13px] text-white/75">One IO per client. <b className="text-lime-300">{AGENCY_TEST.cashPct}% cash</b> to the agency. {AGENCY_REPORTING_LINE}.</p>
-          <button type="button" onClick={() => setAgencyOpen((v) => !v)} aria-expanded={agencyOpen} className="mt-auto inline-flex h-11 items-center justify-center gap-2 rounded-full bg-lime-300 px-4 pt-0 text-sm font-bold text-[#0b1f3a] hover:bg-white" data-testid="mid-tier-agency-cta">Prepay a client test budget <ArrowRight className="size-4" /></button>
-        </article>
-        <article className={card} data-testid="mid-tier-sponsor">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">Sponsorship credit</p>
-          <p className="mt-1 font-display text-3xl leading-none">$1.5K–$6K <span className="text-base">USD</span></p>
-          <p className="mb-4 mt-2 text-[13px] text-white/75">{tiers} bonus credit. Spends down on live hubs under your IO.</p>
-          <a href={withUtm("/sponsor?currency=usd", where, "sponsor")} className="mt-auto inline-flex h-11 items-center justify-center gap-2 rounded-full px-4 text-sm font-bold text-white ring-1 ring-white/40 hover:bg-white hover:text-[#0b1f3a]" data-testid="mid-tier-sponsor-cta">Pick a sponsorship tier <ArrowRight className="size-4" /></a>
-        </article>
-        <article className={card} data-testid="mid-tier-block">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">Starter view block</p>
-          <p className="mt-1 font-display text-3xl leading-none">From {fmtUsd(STARTER_BLOCK.startingUsd)} <span className="text-base">USD</span></p>
-          <p className="mb-4 mt-2 text-[13px] text-white/75">100K modelled views on one hub surface at the starter rate.</p>
-          <a href={withUtm("/?inquire=pack&block=100000&surfaces=landing#quick-buy", where, "block")} className="mt-auto inline-flex h-11 items-center justify-center gap-2 rounded-full px-4 text-sm font-bold text-white ring-1 ring-white/40 hover:bg-white hover:text-[#0b1f3a]" data-testid="mid-tier-block-cta">Request a block <ArrowRight className="size-4" /></a>
-        </article>
-      </div>
-      {agencyOpen ? <div className="mt-4 rounded-2xl bg-white/[0.06] p-4 ring-1 ring-lime-300/50" data-testid="mid-tier-agency-panel"><AgencyPrepayForm where={where} dark /></div> : null}
-      <p className="mt-4 text-[13px] text-white/75" data-testid="mid-tier-refund">{MID_TIER_REFUND}</p>
-      <p className="mt-1 text-[13px] text-white/75">Premium, one brand per category: $25K–$50K, inquire only. <a href={withUtm("/buy?plan=exclusive", where, "exclusive")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-exclusive">Request an invoice</a></p>
-      <Details dark label="What a $1.5K–$5K credit looks like across two surfaces" testId="mid-tier-two-surface"><TwoSurfaceExample dark /></Details>
+      {agencyOpen ? <div className="mt-3 rounded-2xl bg-white/[0.06] p-4 ring-1 ring-lime-300/50" data-testid="mid-tier-agency-panel"><AgencyPrepayForm where={where} dark /></div> : null}
+      <Details dark label="Agency terms, refunds and a $1.5K–$5K example" testId="mid-tier-details">
+        <p data-testid="mid-tier-agency-terms">{MID_TIER_LINE} One IO per client. {AGENCY_REPORTING_LINE}.</p>
+        <p data-testid="mid-tier-refund">{MID_TIER_REFUND}</p>
+        <p>Premium, one brand per category: $25K–$50K, inquire only. <a href={withUtm("/buy?plan=exclusive", where, "exclusive")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-exclusive">Request an invoice</a></p>
+        <TwoSurfaceExample dark />
+      </Details>
+      <p className="mt-2 text-[10px] text-white/50">{MODELLED_PLAN_LABEL}.</p>
     </section>
   );
 }
 
-/** Next step after the kit: annotated live-hub mock beside the $190 / $490 CTAs, then the mid-tier band. */
-export function NextStep({ where, brand = "", anchor = true }: { where: string; brand?: string; anchor?: boolean }) {
-  const cta = "flex items-center gap-3 rounded-2xl p-4 text-left transition";
+/**
+ * Next step after the kit: live-hub mock beside ONE primary button ($190 look) and a text link ($490), then the
+ * mid-tier band. `yieldToPostKit`: the page-level copy on /intake hides once the post-kit copy mounts (never two on a page).
+ */
+const POST_KIT_EVENT = "birch:post-kit-next" as const;
+export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = false }: { where: string; brand?: string; anchor?: boolean; yieldToPostKit?: boolean }) {
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => {
+    if (where === "post_kit") {
+      (window as unknown as Record<string, boolean>).__birchPostKit = true;
+      window.dispatchEvent(new Event(POST_KIT_EVENT));
+      return () => { (window as unknown as Record<string, boolean>).__birchPostKit = false; };
+    }
+    if (!yieldToPostKit) return;
+    if ((window as unknown as Record<string, boolean>).__birchPostKit) setHidden(true);
+    const on = () => setHidden(true);
+    window.addEventListener(POST_KIT_EVENT, on);
+    return () => window.removeEventListener(POST_KIT_EVENT, on);
+  }, [where, yieldToPostKit]);
+  if (hidden) return null;
   return (
     <section id={anchor ? "next-step" : undefined} className="scroll-mt-20" data-testid="next-step" data-where={where}>
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Your next step</p>
-      <h2 className="mt-1 font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">See it on a live hub. Then lock it in.</h2>
-      <div className="mt-4 grid items-start gap-5 md:grid-cols-[1.15fr_1fr]">
+      <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">See it on a live hub first.</h2>
+      <div className="mt-4 grid items-center gap-5 md:grid-cols-[1.2fr_1fr]">
         <AnnotatedHubMock brand={brand} />
-        <div className="grid gap-3">
-          <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={() => trackCta("cta_hold_190", { offer: "hold-190" })} className={`${cta} bg-white ring-1 ring-foreground/15 hover:ring-[#0b1f3a]`} data-testid="next-step-look">
-            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-lime-100"><CreditCard className="size-5 text-[#0b1f3a]" /></span>
-            <span className="min-w-0"><span className="block text-lg font-extrabold text-[#0b1f3a]">Start with the $190 look</span><span className="block text-[13px] text-foreground/65">See your card on a live hub for 7 days. 100% credit if you reserve within 7 days, otherwise a cash refund.</span></span>
-            <ArrowRight className="ml-auto size-5 shrink-0 text-[#0b1f3a]" />
+        <div>
+          <p className="font-display text-5xl leading-none text-[#0b1f3a]">$190 <span className="text-lg">USD</span></p>
+          <p className="mt-2 text-[15px] text-foreground/75">Your ad, live for 7 days.</p>
+          <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={() => trackCta("cta_hold_190", { offer: "hold-190" })} className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 hover:bg-[#0b1f3a] hover:text-white sm:w-auto" data-testid="next-step-look">
+            Start the $190 look <ArrowRight className="size-5" />
           </a>
-          <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })} className={`${cta} bg-[#0b1f3a] text-white ring-2 ring-lime-300`} data-testid="next-step-reserve">
-            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-lime-300"><CreditCard className="size-5 text-[#0b1f3a]" /></span>
-            <span className="min-w-0"><span className="block text-lg font-extrabold">Reserve $490 as media credit</span><span className="block text-[13px] text-white/70">All $490 is media credit. Fully refundable until 14 days before the launch date in your IO.</span></span>
-            <ArrowRight className="ml-auto size-5 shrink-0" />
-          </a>
-          <p className="text-[12px] text-foreground/60">Card checkout by Stripe. Upload your ad on the same page. A person approves every order before it runs.</p>
-          <p className="rounded-xl bg-lime-50 px-3 py-2 text-[12px] font-semibold text-[#0b1f3a]" data-testid="next-step-agency-line">Agencies: {AGENCY_TEST.cashPct}% of media spend paid to you in cash · {AGENCY_REPORTING_LINE}.</p>
+          <p className="mt-3 text-sm">
+            <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="next-step-reserve">or reserve $490 as media credit</a>
+          </p>
+          <Details label="Refunds, checkout and agencies" testId="next-step-details">
+            <p>$190: 100% credit if you reserve within 7 days, otherwise a cash refund. $490: fully refundable until 14 days before the launch date in your IO.</p>
+            <p>Card checkout by Stripe. Upload your ad on the same page. A person approves every order before it runs.</p>
+            <p data-testid="next-step-agency-line">Agencies: {AGENCY_TEST.cashPct}% of media spend paid in cash · {AGENCY_REPORTING_LINE}.</p>
+          </Details>
         </div>
       </div>
       <div className="mt-6"><MidTier where={where} /></div>

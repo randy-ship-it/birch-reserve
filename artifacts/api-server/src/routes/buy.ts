@@ -277,7 +277,7 @@ ${publicSeoTags(BUY_PATH, TITLE, DESCRIPTION)}
 <link rel="icon" href="/favicon.svg"><style>${CSS}</style></head><body>
 <header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav><a href="/rates">Rates</a><a href="/media-kit">Media kit</a><a href="tel:+16479316278">(647) 931-6278</a></nav></div></header>
 <main class="wrap">
-<section class="hero"><h1>${esc(BUY_TAGLINE)}</h1><p class="lede">Three steps. About two minutes. Prices in USD.</p>
+<section class="hero"><h1>${esc(BUY_TAGLINE)}</h1><p class="lede">3 steps · about 2 minutes · USD</p>
 <ol class="prog" id="prog"><li class="on" data-s="1"><b>1</b><span>Your account</span></li><li data-s="2"><b>2</b><span>Your ad</span></li><li data-s="3"><b>3</b><span>Where it shows</span></li></ol></section>
 
 <form class="card" id="s1" novalidate autocomplete="on"><h2>1 · Your account</h2>
