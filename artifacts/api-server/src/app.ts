@@ -24,6 +24,7 @@ import publicSeoRouter, { unknownDocument } from "./routes/publicSeo";
 import { indexNowKeyRouter } from "./routes/indexNow";
 import { opsBulletinRouter } from "./routes/opsBulletin";
 import splashExpiryCronRouter from "./routes/splashExpiryCron";
+import { pulseIngestRouter } from "./routes/pulseIngest";
 import { logger } from "./lib/logger";
 import { uiEventsJsonParser } from "./lib/uiEvents";
 import { handleStripeWebhook } from "./routes/splashAdReservations";
@@ -121,6 +122,9 @@ app.use(opsBulletinRouter);
 app.use(publicBuyingRouter);
 // Before Clerk so a missing Clerk key cannot block splash expiry.
 app.use(splashExpiryCronRouter);
+// Activity pulse ingest (t295u): hourly Instantly cron + secret-gated append for the daily inbox routine.
+app.use("/v1/activity-pulse/append", express.json({ limit: "64kb" }));
+app.use(pulseIngestRouter);
 // Unknown public pages 404 with the SPA shell. Must stay ahead of Clerk so a
 // missing key cannot turn /reserve into a 500. /api, /v1, and /ucp fall through.
 app.use(unknownDocument);

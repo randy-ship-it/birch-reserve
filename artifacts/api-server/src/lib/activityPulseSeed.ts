@@ -4,6 +4,10 @@
  * No names, companies, emails, domains or quotes. Declines, auto-replies, bounces, vendors, signed agreements and
  * internal mail were left out. Every row maps to one real message; nothing is invented. Rows age out of the 30-day
  * window on their own; new site events (lib/activityPulse.ts) append automatically.
+ *
+ * t295u (Nov 20 2026): widened to every readable source over 90 days (Scale inbox, Birch/SBG inbox, Instantly unibox
+ * across all 16 campaigns). Same rules. 20 rows total, each one real message; the count is not padded. New Instantly
+ * replies append hourly through /api/cron/pulse-ingest (lib/pulseIngest.ts).
  */
 import type { PulseEvent } from "./activityPulse";
 
@@ -11,6 +15,14 @@ type Seed = Pick<PulseEvent, "action" | "who" | "region"> & { at: string };
 
 const SEED: Seed[] = [
   { at: "2026-11-20T19:00:00Z", who: "Agency", region: "Canada", action: "agency_partnership" },
+  { at: "2026-11-20T16:00:00Z", who: "Recovery equipment brand", region: "US", action: "call_booked" },
+  { at: "2026-11-16T16:00:00Z", who: "Sleep brand", region: "US", action: "placements_team" },
+  { at: "2026-11-13T13:00:00Z", who: "Sleep brand", region: "US", action: "placements_interest" },
+  { at: "2026-11-11T20:00:00Z", who: "Recovery hardware brand", region: "US", action: "canada_shipping" },
+  { at: "2026-11-10T23:00:00Z", who: "Recovery hardware brand", region: "US", action: "examples_shared" },
+  { at: "2026-11-02T23:00:00Z", who: "Snack bar brand", region: "US", action: "samples_coming" },
+  { at: "2026-10-24T13:00:00Z", who: "Wellness product maker", region: "Ontario", action: "concept_interest" },
+  { at: "2026-10-13T13:00:00Z", who: "Golf club", region: "Ontario", action: "passed_along" },
   { at: "2026-11-20T17:00:00Z", who: "Sleep brand", region: "US", action: "hub_members" },
   { at: "2026-11-19T16:00:00Z", who: "Recovery equipment brand", region: "US", action: "fees_markets" },
   { at: "2026-11-19T15:00:00Z", who: "Beverage brand", region: null, action: "how_it_works" },
