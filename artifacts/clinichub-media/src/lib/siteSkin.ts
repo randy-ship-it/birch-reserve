@@ -26,3 +26,6 @@ export const skinText = (s: string) => (isScaleSkin() ? s.replace(/Birch Reserve
 /** Scale Health's public site (header/footer links on the Scale skin). Links carry data-mirror-keep so the mirror
  *  boot script leaves them on scalehealth.ca instead of sending them to birchreserve.net. */
 export const SCALE_HOME = "https://www.scalehealth.ca";
+
+/** Chat name on the Scale skin (Randy, Nov 20 2026 9:34 AM ET). birchreserve.net keeps "Birch Q&A Squirrel". */
+export const SCALE_SQUIRREL_NAME = "Scale Squirrel";

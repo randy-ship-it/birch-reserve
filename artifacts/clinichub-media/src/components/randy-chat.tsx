@@ -54,10 +54,14 @@ import {
 import { RichText } from "@/components/randy-rich-text";
 import { SQUIRREL_STYLES, SquirrelBadge } from "@/components/birch-squirrel";
 import { BIRCH_SQUIRREL } from "@/lib/birch-squirrel-config";
+import { SCALE_SQUIRREL_NAME, isScaleSkin, siteName } from "@/lib/siteSkin";
 
 const PANEL_SHADOW =
   "shadow-[0_32px_80px_-24px_rgba(7,26,57,0.45),0_10px_28px_-10px_rgba(7,26,57,0.22)]";
-const SQUIRREL_NAME = BIRCH_SQUIRREL.name;
+// Scale mirror (scalehealth.ca/intake): "Scale Squirrel" + "Scale Health". The skin is set by the mirror boot script
+// before the bundle loads, so reading it at module load is safe. birchreserve.net is unchanged.
+const SQUIRREL_NAME = isScaleSkin() ? SCALE_SQUIRREL_NAME : BIRCH_SQUIRREL.name;
+const OPENER = isScaleSkin() ? SMART_OPENER.replace(BIRCH_SQUIRREL.name, SCALE_SQUIRREL_NAME) : SMART_OPENER;
 const DISMISS_KEY = "birch:randy-figure-dismissed";
 
 const FIGURE_STYLES = `
@@ -237,7 +241,7 @@ export function RandyChat() {
 
   const ensureThread = useCallback(() => {
     if (messagesRef.current.length === 0) {
-      setThread([{ id: "opener", role: "randy", text: SMART_OPENER }]);
+      setThread([{ id: "opener", role: "randy", text: OPENER }]);
     }
   }, [setThread]);
 
@@ -783,7 +787,7 @@ export function RandyChat() {
               type="button"
               onClick={() => openWidget({ reason: "launcher", mode: "chat" })}
               className="bsq-btn randy-lift block rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-              aria-label={`${SQUIRREL_NAME}: ask about Birch Reserve category seats and pricing`}
+              aria-label={`${SQUIRREL_NAME}: ask about ${siteName()} category seats and pricing`}
               title={SQUIRREL_NAME}
               data-testid="button-open-randy-chat"
             >
@@ -820,7 +824,7 @@ export function RandyChat() {
               className={`fixed inset-x-0 bottom-0 z-[65] flex h-[calc(100dvh-150px)] flex-col rounded-t-3xl border border-black/5 bg-white/95 text-slate-900 backdrop-blur-xl md:inset-x-auto md:bottom-6 md:right-6 md:h-[min(640px,calc(100dvh-3rem))] md:w-[400px] md:rounded-3xl ${PANEL_SHADOW}`}
               role="dialog"
               aria-modal="false"
-              aria-label={`${SQUIRREL_NAME}, Birch Reserve`}
+              aria-label={`${SQUIRREL_NAME}, ${siteName()}`}
               data-testid="dialog-randy-chat"
             >
               {/* Grab handle (mobile) */}
@@ -834,7 +838,7 @@ export function RandyChat() {
                   {headAvatar("lg")}
                   <div className="min-w-0 leading-tight">
                     <h3 className="truncate font-display text-[17px] font-semibold tracking-tight text-slate-900">{SQUIRREL_NAME}</h3>
-                    <p className="truncate text-[12px] text-slate-500">Birch Reserve</p>
+                    <p className="truncate text-[12px] text-slate-500">{siteName()}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
