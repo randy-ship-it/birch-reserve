@@ -8,7 +8,7 @@ import {
   BUY_FORMATS, BUY_PATH, BUY_PLANS, BUY_TAGLINE, CREATIVE_MAX_BYTES, checkCreative, domainCheck, parseAccount,
   resetBuyLimitsForTests, setBuyStoreForTests, memoryBuyStore, signToken, sniffImage, validPick, verifyToken, findPlan, findFormat, isProductionRuntime, buyStore,
 } from "../src/lib/buyFlow";
-import { CHECKOUT_TAGLINE, STATEMENT_DESCRIPTOR_SUFFIX, birchPaymentIntentBrand } from "../src/lib/checkoutCopy";
+import { CHECKOUT_TAGLINE, STATEMENT_DESCRIPTOR_SUFFIX, birchCheckoutCustomText, birchPaymentIntentBrand } from "../src/lib/checkoutCopy";
 import { PUBLIC_RESERVE_OFFERS, reserveCheckoutLineItem } from "../src/lib/reserveOffers";
 import { PUBLIC_SITEMAP_PATHS } from "../src/lib/publicSeo";
 import { buildAreaLockSession } from "../src/lib/overhaul/checkout";
@@ -120,6 +120,8 @@ test("stripe: descriptor suffix fits Stripe's rules with the BIRCHRSV prefix; li
     const li = reserveCheckoutLineItem(o) as { price_data?: { product_data: { description: string } } };
     if (li.price_data) assert.ok(li.price_data.product_data.description.startsWith(CHECKOUT_TAGLINE));
   }
+  assert.ok(birchCheckoutCustomText().submit.message.startsWith(CHECKOUT_TAGLINE));
+  assert.ok(birchCheckoutCustomText().submit.message.length <= 1200);
   assert.equal(typeof buildAreaLockSession, "function");
 });
 

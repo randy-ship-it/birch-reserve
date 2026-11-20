@@ -1,4 +1,4 @@
-import { birchPaymentIntentBrand } from "../lib/checkoutCopy";
+import { birchCheckoutCustomText, birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { ReplitConnectors } from "@replit/connectors-sdk";
 import {
@@ -803,6 +803,7 @@ router.post(
           success_url: `${baseUrl}/api/launch/splash/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${baseUrl}/?reserve=cancelled`,
           allow_promotion_codes: false,
+          custom_text: birchCheckoutCustomText(),
         },
         checkoutIdempotencyKey: `public-reserve:${reservation.id}`,
         checkoutAttemptStartedAt: new Date(),
@@ -1379,6 +1380,7 @@ router.post("/launch/splash/checkout", async (req, res): Promise<void> => {
       success_url: `${baseUrl}/splash/activation?token=${encodeURIComponent(parsed.data.activationToken)}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/splash/activation?token=${encodeURIComponent(parsed.data.activationToken)}&cancelled=1`,
       allow_promotion_codes: false,
+      custom_text: birchCheckoutCustomText(),
     };
     const checkoutIdempotencyKey = `splash-ad-checkout:${checkoutReservation.id}:${nextAttempt}`;
     const checkoutAttemptStartedAt = new Date();

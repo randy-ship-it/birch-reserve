@@ -18,3 +18,8 @@ export function birchPaymentIntentBrand(detail?: string): { statement_descriptor
   const d = detail?.trim();
   return { statement_descriptor_suffix: STATEMENT_DESCRIPTOR_SUFFIX, description: d ? `${CHECKOUT_TAGLINE} ${d}`.slice(0, 1000) : CHECKOUT_TAGLINE };
 }
+
+/** Text Stripe Checkout shows above the Pay button (custom_text.submit). Our copy, not the Stripe Product's. */
+export function birchCheckoutCustomText(): { submit: { message: string } } {
+  return { submit: { message: `${CHECKOUT_TAGLINE} Your ad is reviewed by a person before it runs.` } };
+}

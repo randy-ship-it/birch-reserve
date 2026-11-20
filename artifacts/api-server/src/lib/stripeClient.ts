@@ -313,6 +313,8 @@ function appendCheckoutSessionFormBody(
     body.set("payment_intent_data[statement_descriptor_suffix]", pid.statement_descriptor_suffix);
   }
   if (pid?.description) body.set("payment_intent_data[description]", pid.description);
+  const submitText = (params.custom_text as { submit?: { message?: string } } | undefined)?.submit?.message;
+  if (submitText) body.set("custom_text[submit][message]", submitText);
   if (params.success_url) body.set("success_url", params.success_url);
   if (params.cancel_url) body.set("cancel_url", params.cancel_url);
   body.set(
