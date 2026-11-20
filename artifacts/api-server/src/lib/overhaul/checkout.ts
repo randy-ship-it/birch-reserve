@@ -1,4 +1,5 @@
 /** Pure Stripe Checkout param builders for the overhaul (area lock). Deposits reuse buildDepositSession. */
+import { birchPaymentIntentBrand } from "../checkoutCopy";
 import { AREA_LOCK, quoteAreaLock, type Currency } from "./model";
 
 export type AreaCheckoutRequest = {
@@ -66,7 +67,7 @@ export function buildAreaLockSession(body: AreaCheckoutRequest, origin: string):
         },
       ],
       metadata,
-      payment_intent_data: { description: `Birch Reserve area lock · ${business} · ${q.area.area}`, metadata },
+      payment_intent_data: { ...birchPaymentIntentBrand(`Area lock · ${business} · ${q.area.area}`), metadata },
       success_url: `${origin}/advertise/local?lock=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/advertise/local?lock=cancelled&postal=${encodeURIComponent(q.area.code)}`,
     },

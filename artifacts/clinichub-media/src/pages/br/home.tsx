@@ -13,6 +13,7 @@ import { MediaKitPdfLink, ProofStrip, SalesContact, TRUST_FAQ, TrustBand, TrustF
 import { KitCta } from "@/components/br/kit-cta";
 import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
+import { BuyCta } from "@/components/br/buy-cta";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { INVENTORY, PUBLISHER_INCENTIVE } from "../../../../api-server/src/lib/overhaul/model";
 import { DOOR_ROUTE } from "../../../../api-server/src/lib/doorRoute";
@@ -95,7 +96,8 @@ export default function BrHome() {
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · Health &amp; wellness hubs</p>
           <h1 className="mt-2 font-display text-[2.6rem] leading-[1.02] text-[#0b1f3a] md:text-7xl">Put your brand inside private wellness hubs.</h1>
           <p className="mt-3 max-w-xl text-base text-muted-foreground md:text-lg">One free kit: your exposure and your hub earnings, side by side.</p>
-          <div className="mt-6" data-testid="home-kit-cta">
+          <BuyCta placement="hero_home" className="mt-6" />
+          <div className="mt-4" data-testid="home-kit-cta">
             <KitCta placement="hero_home" size="lg" testId="home-cta-kit" sub={null} />
           </div>
           <p className="mt-3 text-[13px] text-foreground/60">

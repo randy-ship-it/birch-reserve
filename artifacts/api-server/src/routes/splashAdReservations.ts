@@ -1,3 +1,4 @@
+import { birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { ReplitConnectors } from "@replit/connectors-sdk";
 import {
@@ -791,6 +792,7 @@ router.post(
             checkoutAttempt: "1",
           },
           payment_intent_data: {
+            ...birchPaymentIntentBrand(offer.name),
             metadata: {
               reservationId: reservation.id,
               offerKey: offer.offerKey,
@@ -1366,6 +1368,7 @@ router.post("/launch/splash/checkout", async (req, res): Promise<void> => {
         checkoutAttempt: String(nextAttempt),
       },
       payment_intent_data: {
+        ...birchPaymentIntentBrand(checkoutOffer.name),
         metadata: {
           reservationId: checkoutReservation.id,
           offerKey: checkoutOffer.offerKey,

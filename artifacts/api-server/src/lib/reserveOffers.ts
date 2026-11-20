@@ -1,3 +1,5 @@
+import { CHECKOUT_TAGLINE } from "./checkoutCopy";
+
 export const RESERVE_CURRENCY = "usd" as const;
 
 /** Currencies a public buyer can pay in. USD is the default for everyone not in Canada. */
@@ -324,7 +326,7 @@ export function reserveCheckoutLineItem(
       unit_amount: offerAmountCents(offer, currency),
       product_data: {
         name: `Birch Reserve — ${offer.name}`,
-        description: offerScope(offer, currency),
+        description: `${CHECKOUT_TAGLINE} ${offerScope(offer, currency)}`,
         metadata: {
           sku: offer.sku,
           offerKey: offer.offerKey,
