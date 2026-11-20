@@ -13,7 +13,7 @@ import { CHANNEL_TILES, CHANNEL_TILES_FINE, CHANNEL_TILES_LABEL, INTAKE_TERMS_VE
 import { loadPrefill } from "@/lib/intakePrefill";
 import { adapterMode, onAdapterModeChange, fridayIntake, loadRef, saveRef, type IntakeRef } from "@/lib/fridayBrandIntake";
 
-export function EstimateTag({ children = "Estimate" }: { children?: ReactNode }) {
+export function EstimateTag({ children = "Modelled" }: { children?: ReactNode }) {
   return (
     <span data-testid="estimate-tag" className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wider text-amber-900 ring-1 ring-amber-300">
       {children}

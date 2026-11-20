@@ -9,6 +9,7 @@
  * is refused unless SPONSOR_DEPOSITS_LIVE=true, so a preview can only ever
  * create test-mode sessions. All impression figures are modelled.
  */
+import { MODELLED_FOOTER } from "../lib/overhaul/pilotPath";
 import { birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { getStripeClient } from "../lib/stripeClient";
@@ -86,6 +87,8 @@ tr.hub td{background:#f6f4ec;font-weight:600}
 form.dep{display:grid;gap:10px;max-width:520px;border:1px solid #ccd2d8;border-radius:14px;padding:18px;background:#fff}
 form.dep input,form.dep select{width:100%;padding:10px;border:1px solid #b9c1c9;border-radius:8px;font:inherit}
 .cur{display:inline-flex;gap:8px;font-size:.88rem}
+.mc{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;background:#FFF4DB;border:1px solid #F1D58F;color:#8A5A00;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;vertical-align:middle}
+.mf{font-weight:600;color:#071A39}
 </style></head><body>
 <header><a href="/"><strong>BIRCH RESERVE</strong></a><nav><a href="/sponsor?currency=${currency}">Sponsor</a><a href="/kit?currency=${currency}">Marketing kit</a><a href="/terms">Terms</a><span class="cur">Prices in ${currency.toUpperCase()}${PUBLIC_CAD_ENABLED ? ` · <a href="?currency=${other}">Show ${other.toUpperCase()}</a>` : ""}</span></nav></header>
 <main>${body}</main>
@@ -105,10 +108,11 @@ function hubPackageTable(currency: Currency): string {
   const rows = HUBS.map((hub) => {
     const core = SLOTS.filter((s) => s.core);
     const imps = core.reduce((acc, s) => acc + sponsorImpressions(hub, s), 0);
-    return `<tr><td><a href="${esc(hub.url)}">${esc(hub.name)}</a><div class="fine">${esc(hub.category)}</div></td><td>${esc(hub.status)}</td><td class="n">${fmt(imps)}</td><td class="n">${price(corePackageUsd(hub), currency)}</td></tr>`;
+    return `<tr><td><a href="${esc(hub.url)}">${esc(hub.name)}</a><div class="fine">${esc(hub.category)}</div></td><td>${esc(hub.status)}</td><td class="n"><span class="mc">Modelled</span>${fmt(imps)}</td><td class="n">${price(corePackageUsd(hub), currency)}</td></tr>`;
   }).join("");
   return `<div class="tw"><table><thead><tr><th>Hub</th><th>Status</th><th class="n">Modelled impressions / mo</th><th class="n">Core package / mo</th></tr></thead><tbody>${rows}</tbody></table></div>
-<p class="fine">Core package = thank-you after buy or book, member dashboard tile and hub hero banner, as one of five rotating sponsors (20% share of voice) at 75% availability. Impressions are modelled. Full slot-by-slot pricing is in the <a href="/kit?currency=${currency}">marketing kit</a>.</p>`;
+<p class="fine">Core package = thank-you after buy or book, member dashboard tile and hub hero banner, as one of five rotating sponsors (20% share of voice) at 75% availability. Impressions are modelled. Full slot-by-slot pricing is in the <a href="/kit?currency=${currency}">marketing kit</a>.</p>
+<p class="fine mf">${MODELLED_FOOTER}</p>`;
 }
 
 function sponsorHtml(currency: Currency): string {
@@ -171,7 +175,7 @@ f.addEventListener('submit',function(e){e.preventDefault();var d=base();d.amount
 
 function kitHtml(currency: Currency): string {
   const rows = HUBS.map((hub) => {
-    const slotRows = SLOTS.map((s) => `<tr><td>${esc(s.label)}${s.core ? "" : ' <span class="fine">(partner approval per send)</span>'}</td><td class="n">${fmt(sponsorImpressions(hub, s))}</td><td class="n">${price(s.cpmUsd, currency)}</td><td class="n">${price(slotPriceUsd(hub, s), currency)}</td></tr>`).join("");
+    const slotRows = SLOTS.map((s) => `<tr><td>${esc(s.label)}${s.core ? "" : ' <span class="fine">(partner approval per send)</span>'}</td><td class="n"><span class="mc">Modelled</span>${fmt(sponsorImpressions(hub, s))}</td><td class="n">${price(s.cpmUsd, currency)}</td><td class="n">${price(slotPriceUsd(hub, s), currency)}</td></tr>`).join("");
     return `<tr class="hub"><td colspan="4"><a href="${esc(hub.url)}">${esc(hub.name)}</a> · ${esc(hub.status)} · ${esc(hub.category)} <span class="fine">· basis: ${esc(hub.basis)} · core package ${price(corePackageUsd(hub), currency)}/mo</span></td></tr>${slotRows}`;
   }).join("");
   const slotDefs = SLOTS.map((s) => `<tr><td>${esc(s.label)}</td><td>${esc(s.where)}</td><td>${esc(s.size)}</td><td class="n">${price(s.cpmUsd, currency)}</td><td class="fine">${esc(s.comp)}</td></tr>`).join("");
@@ -185,10 +189,11 @@ ${statsStrip()}
 <h2>Per-hub inventory and pricing</h2>
 <div class="tw"><table><thead><tr><th>Slot</th><th class="n">Modelled impressions / mo</th><th class="n">CPM</th><th class="n">Price / mo</th></tr></thead><tbody>${rows}</tbody></table></div>
 <p class="fine">Per sponsor: one of five rotating positions (20% share of voice) at 75% availability. Hubs without their own feed row use the network median partner until their feed lands. Core package floor is ${price(190, currency)}/mo. Prices draw down from your <a href="/sponsor?currency=${currency}">sponsorship credit</a>.</p>
+<p class="fine mf">${MODELLED_FOOTER}</p>
 <h2>Ways to buy</h2>
 <ul>
 <li>Sponsorship credit: ${DEPOSIT_TIERS.map((t) => `${price(t.usd, currency)} (+${t.bonusPct}% credit)`).join(" · ")} or your own amount. <a href="/sponsor?currency=${currency}">Sponsor</a></li>
-<li>7-day category look: ${price(190, currency)} · Lock your category: ${price(490, currency)}. <a href="/buycalc">Calculator</a></li>
+<li>7-day look: ${price(190, currency)} · Shared category reserve: ${price(490, currency)} (does not lock the category). <a href="/buycalc">Calculator</a></li>
 <li>Multi-hub or annual programs: book a call at <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></li>
 </ul>
 <h2>What to send</h2>

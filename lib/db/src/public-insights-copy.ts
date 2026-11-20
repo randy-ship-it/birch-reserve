@@ -653,6 +653,9 @@ const EXCLUSIVE_INSIGHT_REWRITES: ReadonlyArray<readonly [string, string]> = [
   // Nov 20 2026 (Randy): no seat counts anywhere. Published rows live in the DB, so rewrite on read.
   ["Eight category seats sit inside listed Scale Health hubs.", "Shared category reserves sit inside listed Scale Health hubs."],
   ["It does not consume one of the eight seats.", "It does not use a category reserve."],
+  // reserve-490 does not lock the category (terms, Nov 20 2026).
+  ["The $190 look does not burn a seat.", "The $190 look does not use a category reserve."],
+  [" before you lock the category.", " before you reserve."],
   ["Book a call — multi-hub, exclusive, or on-prem Align surfaces.", "Book a call — multi-hub or on-prem Align surfaces."],
   // Nov 12 2026: no Align references in public copy.
   ["Book a call — multi-hub or on-prem Align surfaces.", "Book a call — multi-hub or custom packages."],

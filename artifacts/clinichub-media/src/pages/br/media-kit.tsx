@@ -1,4 +1,6 @@
 import { StartSmall } from "@/components/br/start-small";
+import { EstimateTag } from "@/components/br/intake-kit";
+import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPath";
 import { KitCta } from "@/components/br/kit-cta";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { Check, Mail, Phone } from "lucide-react";
@@ -259,7 +261,7 @@ export default function BrMediaKit() {
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-foreground/55">{MEDIA_KIT_OFFERS.seat.name}</p>
                 <p className="mt-1 font-display text-4xl leading-none">{usd(MEDIA_KIT_OFFERS.seat.spendUsd)} <span className="text-lg">USD</span></p>
-                <p className="mt-1 text-xs text-muted-foreground">Reserves your share of the network. Fully refundable until 14 days before launch. <Tag>Modelled</Tag> Modelled estimate, not a guarantee: about {impr(seatEx.imprLo)}–{impr(seatEx.imprHi)} impressions at {cpm}.</p>
+                <p className="mt-1 text-xs text-muted-foreground">Reserves your share of the network. Fully refundable until 14 days before launch. <EstimateTag /> Modelled estimate, not a guarantee: about {impr(seatEx.imprLo)}–{impr(seatEx.imprHi)} impressions at {cpm}.</p>
               </div>
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -276,7 +278,7 @@ export default function BrMediaKit() {
             <p className="mt-3 text-sm text-background/80">Exclusivity, a larger display share and priority placement. No card purchase — we reply with an insertion order. Term is set on the IO.</p>
             <ul className="mt-4 space-y-2 text-sm text-background/85">
               <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />Exclusivity for the term on the IO</li>
-              <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden /><span><Tag tone="lime">Modelled</Tag> Modelled estimate, not a guarantee: about {impr(premLo.imprLo)}–{impr(premHi.imprHi)} impressions at {cpm}</span></li>
+              <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden /><span><EstimateTag /> Modelled estimate, not a guarantee: about {impr(premLo.imprLo)}–{impr(premHi.imprHi)} impressions at {cpm}</span></li>
               <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />{UPGRADE_PATH_LINE}</li>
             </ul>
             <div className="mt-6">
@@ -287,14 +289,14 @@ export default function BrMediaKit() {
 
         <ProgramsCallout />
 
-        <h3 className="mt-8 flex items-center gap-2 font-display text-xl">The math <Tag>Modelled</Tag></h3>
+        <h3 className="mt-8 flex items-center gap-2 font-display text-xl">The math <EstimateTag /></h3>
         <div className="mt-3 divide-y divide-border border-y border-border text-sm" data-testid="mk-math">
           {MEDIA_KIT_EXAMPLES.map((e) => (
             <div key={e.spend} className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-0.5 py-3 sm:grid-cols-[9rem_1fr_auto]">
               <span className="font-semibold">You prepay {usdK(e.spend)} USD</span>
               <span className="text-right text-foreground/80 sm:text-left"><strong>{usd(e.credit)} USD</strong> media credit</span>
               <span className="col-span-2 text-muted-foreground sm:col-span-1 sm:text-right">
-                at ${MEDIA_KIT_CPM.lo}–{MEDIA_KIT_CPM.hi} CPM ≈ {impr(e.imprLo)}–{impr(e.imprHi)} impressions (modelled)
+                <EstimateTag /> at ${MEDIA_KIT_CPM.lo}–{MEDIA_KIT_CPM.hi} CPM ≈ {impr(e.imprLo)}–{impr(e.imprHi)} impressions
               </span>
             </div>
           ))}
@@ -302,6 +304,7 @@ export default function BrMediaKit() {
         <p className="mt-3 text-xs text-muted-foreground">
           All prices in USD. Effective {cpm} and every impression figure above are modelled estimates, not a guarantee. Impressions = credit ÷ CPM × 1,000. Final rate, currency and term are set on your IO. Premium is inquire-only.
         </p>
+        <p className="mt-2 text-xs font-semibold text-foreground/70" data-testid="mk-modelled-footer">{MODELLED_FOOTER}</p>
       </Block>
 
       {/* Sample report layout (buyer comfort, Nov 17 2026) */}
