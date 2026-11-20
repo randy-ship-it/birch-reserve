@@ -7,7 +7,7 @@ import {
   findBannedContent,
   softenReply,
 } from "../src/lib/birchChatPrompt";
-import { buildGrokRequest, GROK_MAX_TOKENS, GROK_TEMPERATURE } from "../src/routes/randyChat";
+import { buildGrokRequest, GROK_MAX_TOKENS, GROK_TEMPERATURE, requestIsAllowed } from "../src/routes/randyChat";
 import { birchFaqAnswer } from "../src/lib/birchFaq";
 
 const live = { reserve: true, areaLock: false, deposits: false };
@@ -133,4 +133,31 @@ test("area lock is a launch price, never a deposit, everywhere the chat and phon
   }
   assert.doesNotMatch(prompt, /same-day/i);
   assert.match(prompt, /within 1 business day/);
+});
+
+// Nov 20 2026 8:28 AM ET: "How long until ads would be live." on scalehealth.ca/intake got the error card (403 Origin not allowed).
+const fakeReq = (origin: string | undefined, host = "birchreserve.net") => ({
+  get: (h: string) => (h.toLowerCase() === "origin" ? origin : h.toLowerCase() === "host" ? host : undefined),
+}) as unknown as Parameters<typeof requestIsAllowed>[0];
+
+test("chat origin check: the scalehealth.ca/intake mirror is allowed, strangers are not", () => {
+  assert.equal(requestIsAllowed(fakeReq("https://www.scalehealth.ca")), true);
+  assert.equal(requestIsAllowed(fakeReq("https://scalehealth.ca")), true);
+  assert.equal(requestIsAllowed(fakeReq("https://birchreserve.net")), true);
+  assert.equal(requestIsAllowed(fakeReq(undefined)), true);
+  assert.equal(requestIsAllowed(fakeReq("https://evil.example")), false);
+  assert.equal(requestIsAllowed(fakeReq("https://scalehealth.ca.evil.example")), false);
+  assert.equal(requestIsAllowed(fakeReq("https://notscalehealth.ca")), false);
+});
+
+test("timing question: prompt and FAQ fallback answer it without dates, counts or guarantees", () => {
+  const p = buildBirchChatSystemPrompt({ checkout: live });
+  assert.match(p, /How long until ads would be live/);
+  assert.match(p, /launch date on the IO/);
+  const faq = birchFaqAnswer([{ role: "user", content: "How long until ads would be live." }]);
+  assert.equal(faq.intent, "timing");
+  assert.equal(findBannedContent(faq.text), null);
+  assert.doesNotMatch(faq.text, /guarantee|\bopen\b|seats? (left|remaining)|\b\d+ (seats|categories)\b|CAD/i);
+  assert.match(faq.text, /USD/);
+  assert.equal(birchFaqAnswer([{ role: "user", content: "How long until I get a refund?" }]).intent, "refund");
 });

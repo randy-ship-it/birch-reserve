@@ -27,6 +27,7 @@ import { captureChatLead } from "../lib/leadCapture";
 import { hasValidQaHeader } from "../lib/testTraffic";
 import { FRIENDLY_429, LIMITS, limiter } from "../lib/rateLimit";
 import { attributionFrom } from "../lib/publicGuards";
+import { MIRROR_ORIGIN_HOSTS } from "../middlewares/mirrorHost";
 import { birchFaqAnswer } from "../lib/birchFaq";
 import { BIRCH_SALES_PHONE } from "../lib/birchFacts";
 import { sendSalesAlert } from "../lib/salesAlert";
@@ -188,7 +189,12 @@ function isAiDisabled(): boolean {
   return process.env["RANDY_CHAT_AI_DISABLED"] === "true";
 }
 
-function requestIsAllowed(req: Request): boolean {
+/**
+ * Same-site check for the chat routes. Nov 20 2026: the scalehealth.ca/intake mirror (#170) sends Origin
+ * https://www.scalehealth.ca while the proxied Host is birchreserve.net, so mirror visitors got 403 "Origin not
+ * allowed." and the widget showed "Sorry, I couldn't get a reply just now". Mirror hosts are allowed explicitly.
+ */
+export function requestIsAllowed(req: Pick<Request, "get">): boolean {
   const origin = req.get("origin");
   if (!origin) return true;
 
@@ -199,6 +205,7 @@ function requestIsAllowed(req: Request): boolean {
       originHost === requestHost ||
       originHost === "birchreserve.net" ||
       originHost === "www.birchreserve.net" ||
+      MIRROR_ORIGIN_HOSTS.has(originHost) ||
       originHost.endsWith(".replit.dev") ||
       originHost.endsWith(".replit.app")
     );
