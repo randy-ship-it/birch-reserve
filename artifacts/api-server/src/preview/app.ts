@@ -6,6 +6,7 @@
 import express, { type Express } from "express";
 import { createOverhaulRouter } from "../routes/overhaul";
 import { createBrandIntakeProxy } from "../routes/brandIntakeProxy";
+import { mirrorHost } from "../middlewares/mirrorHost";
 import { createAgentRouter } from "../routes/agent";
 import sponsorPageRouter from "../routes/sponsorPage";
 import { getStripeClient } from "../lib/stripeClient";
@@ -17,6 +18,7 @@ import { llmsTxt } from "../lib/overhaul/seo";
 export function createPreviewApp(indexHtml: string): Express {
   const app = express();
   app.set("trust proxy", true);
+  app.use(mirrorHost());
   app.use((_req, res, next) => {
     res.setHeader("X-Robots-Tag", "noindex"); // preview host only
     next();

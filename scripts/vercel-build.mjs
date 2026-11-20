@@ -190,6 +190,11 @@ await writeFile(
 );
 
 const routes = [
+  // Scale mirror (artifacts/api-server/src/middlewares/mirrorHost.ts): every path is also served at /intake/_m/<path>,
+  // so scalehealth.ca can forward only its /intake namespace. Static files resolve through the filesystem check;
+  // everything else falls through to the function, which strips the same prefix.
+  { src: "^/intake/_m/?$", dest: "/api" },
+  { src: "^/intake/_m/(.+)$", dest: "/$1", check: true },
   // The home page is served by the function so its Offer JSON-LD matches the visitor's currency.
   { src: "^/$", dest: "/api" },
   { handle: "filesystem" },
