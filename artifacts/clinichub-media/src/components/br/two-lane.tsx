@@ -100,7 +100,7 @@ function Chips({ items, dark }: { items: readonly string[]; dark?: boolean }) {
 }
 
 /** Live-looking mock of the buyer's square card on a live hub surface. Logo stays in this browser (object URL). */
-export function HubMock({ brand, logo, hub, category, pins = false }: { brand: string; logo: string | null; hub: "drho" | "sole"; category: string; pins?: boolean }) {
+export function HubMock({ brand, logo, hub, category, pins = false, badge }: { brand: string; logo: string | null; hub: "drho" | "sole"; category: string; pins?: boolean; badge?: string }) {
   const name = brand.trim() || "Your brand";
   const hubName = hub === "drho" ? "DR-HO'S physio" : "SOLE";
   const surface = hub === "drho" ? "Booking confirmation" : "Hub home";
@@ -130,7 +130,7 @@ export function HubMock({ brand, logo, hub, category, pins = false }: { brand: s
           </div>
           <span className="mt-2 inline-flex h-7 w-full items-center justify-center rounded-full bg-lime-300 text-[11px] font-bold text-[#0b1f3a]">Shop the offer</span>
         </div>
-        <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]">Mock · live hub</span>
+        {badge ? null : <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]">Mock · live hub</span>}
         {pins ? <span className="absolute grid size-6 place-items-center rounded-full bg-lime-300 text-[11px] font-black text-[#0b1f3a] shadow-lg ring-2 ring-white left-3 top-12" aria-hidden>2</span> : null}
       </div>
     </figure>

@@ -14,7 +14,7 @@ import { KitCta } from "@/components/br/kit-cta";
 import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BuyCta } from "@/components/br/buy-cta";
-import { MidTier, MODELLED_PLAN_LABEL } from "@/components/br/next-step";
+import { AnnotatedHubMock, MidTier, MODELLED_PLAN_LABEL } from "@/components/br/next-step";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { INVENTORY, PUBLISHER_INCENTIVE } from "../../../../api-server/src/lib/overhaul/model";
 import { DOOR_ROUTE } from "../../../../api-server/src/lib/doorRoute";
@@ -93,9 +93,10 @@ export default function BrHome() {
 
       {/* 1. Hero: one line + the kit CTA. */}
       <section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]" data-testid="home-hero">
-        <div className="container mx-auto max-w-5xl px-4 pb-8 pt-10 md:pb-12 md:pt-16">
+        <div className="container mx-auto grid max-w-6xl items-center gap-8 px-4 pb-8 pt-10 md:grid-cols-[1fr_1.05fr] md:pb-12 md:pt-14">
+          <div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · Health &amp; wellness hubs</p>
-          <h1 className="mt-2 font-display text-[2.6rem] leading-[1.02] text-[#0b1f3a] md:text-7xl">Put your brand inside private wellness hubs.</h1>
+          <h1 className="mt-2 font-display text-[2.6rem] leading-[1.02] text-[#0b1f3a] md:text-6xl">Put your brand inside private wellness hubs.</h1>
           <p className="mt-3 max-w-xl text-base text-muted-foreground md:text-lg">One free kit: your exposure and your hub earnings, side by side.</p>
           <BuyCta placement="hero_home" className="mt-6" />
           <div className="mt-4" data-testid="home-kit-cta">
@@ -104,6 +105,8 @@ export default function BrHome() {
           <p className="mt-3 text-[13px] text-foreground/60">
             or <a href={LOOK_HREF} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-look">start with a {price.look} 7-day look</a>
           </p>
+          </div>
+          <AnnotatedHubMock testId="home-hero-mock" />
         </div>
       </section>
 
