@@ -204,9 +204,21 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, className =
   useEffect(() => {
     if (!feed || inline) return;
     let raf = 0;
+    // Try a few left-edge heights (mid, lower, upper) and use the first one clear of every control.
     const check = () => {
       raf = 0;
-      setBlocked(overlapsControl(boxRef.current));
+      const el = boxRef.current;
+      if (!el) return;
+      const slots = window.innerWidth >= 768 ? ["50%", "72%", "30%", "84%"] : ["38%", "62%", "24%"];
+      for (const top of slots) {
+        el.style.top = top;
+        if (!overlapsControl(el)) {
+          setBlocked(false);
+          return;
+        }
+      }
+      el.style.top = slots[0]!;
+      setBlocked(true);
     };
     const schedule = () => {
       if (!raf) raf = window.requestAnimationFrame(check);
