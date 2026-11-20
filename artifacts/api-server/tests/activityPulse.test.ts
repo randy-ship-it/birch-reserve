@@ -77,3 +77,12 @@ test("chat 'what are people asking' uses aggregate themes only", async () => {
   assert.match(p, /never give counts/);
   assert.match(p, /What are brands asking/);
 });
+
+test("launch events: highlighted kind, 180-day window, no names", async () => {
+  const f = toFeed(PULSE_SEED.map((e) => ({ ...e, source: "inbox" as const })), Date.parse("2026-11-21T00:00:00Z"));
+  const launches = f.events.filter((e) => e.kind === "launch");
+  assert.equal(launches.length, 2);
+  assert.ok(launches.every((e) => /^New (physio|recovery) hub$/.test(e.who) && e.action === "launched"));
+  assert.match(launches.find((e) => e.who === "New physio hub")!.ago, /mo ago$/);
+  assert.doesNotMatch(JSON.stringify(f), /DR-HO|SOLE|Align|Clairvoyant/i);
+});
