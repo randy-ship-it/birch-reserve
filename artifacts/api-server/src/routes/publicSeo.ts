@@ -18,8 +18,10 @@ import {
   sitemapXml,
   withNotFoundDocument,
   withLocalizedOffer,
+  withPayoutRegion,
   withRouteSeo,
 } from "../lib/publicSeo";
+import { payoutRegionForCountry } from "../lib/payoutCurrency";
 import { currencyCookieHeader, decideCurrency } from "../lib/currency";
 import { getBrandFit } from "../lib/overhaul/brandFits";
 
@@ -82,20 +84,22 @@ router.get("/", (req, res) => {
   res.setHeader("Vary", "Cookie, x-vercel-ip-country");
   res.set("Cache-Control", "private, max-age=0, must-revalidate");
   if (decision.source === "query") res.append("Set-Cookie", currencyCookieHeader(decision.currency));
-  res.type("html").send(withLocalizedOffer(html, decision.currency));
+  res.type("html").send(withPayoutRegion(withLocalizedOffer(html, decision.currency), payoutRegionForCountry(req.headers["x-vercel-ip-country"])));
 });
 
 for (const path of SPA_SHELL_PATHS) {
-  router.get(path, (_req, res) => {
+  router.get(path, (req, res) => {
     let html: string;
     try {
-      html = withRouteSeo(readSpaIndexHtml(), path);
+      html = withPayoutRegion(withRouteSeo(readSpaIndexHtml(), path), payoutRegionForCountry(req.headers["x-vercel-ip-country"]));
     } catch (error) {
       logger.error({ err: error, path }, "SPA shell for public SEO is missing");
       res.status(500).type("text/plain").send("Page unavailable.");
       return;
     }
-    res.set("Cache-Control", "public, max-age=0, must-revalidate");
+    // Payout figures vary by visitor country: never let a shared cache reuse one country's shell.
+    res.vary("x-vercel-ip-country");
+    res.set("Cache-Control", "private, max-age=0, must-revalidate");
     res.type("html").send(html);
   });
 }

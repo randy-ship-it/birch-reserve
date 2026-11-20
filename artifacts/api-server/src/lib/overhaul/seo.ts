@@ -33,7 +33,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
     jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/publish/brands": { title: "Publish · Brands | Birch Reserve", description: "Brands with a recovery audience can apply for a co-branded hub. Otherwise, inquire about display or CPC-only opportunities outside hubs." },
-  "/publish/studios": { title: "Publish · Studios & retail | Birch Reserve", description: `Activate your hub with pre-built monetizations and our marketplace. Earn $${PUBLISHER_INCENTIVE.cashCad} cash or $${PUBLISHER_INCENTIVE.creditCad}+ in ad credit.` },
+  "/publish/studios": { title: "Publish · Studios & retail | Birch Reserve", description: `Activate your hub with pre-built monetizations and our marketplace. Earn $${PUBLISHER_INCENTIVE.cashCad} CAD cash or $${PUBLISHER_INCENTIVE.creditCad}+ CAD in ad credit.` },
   "/match": { title: "Match your audience | Birch Reserve", description: "Enter your website and a short note. See how well your audience matches the Scale Activity launch audience profile, as a clean % with three reasons." },
   "/hubs": { title: "Hubs | Birch Reserve", description: "Live today: DR-HO'S physio and SOLE. More brand hubs are in queue. Register your email to see audience, placements and modelled views." },
   "/media-kit": {

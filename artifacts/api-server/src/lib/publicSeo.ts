@@ -325,3 +325,13 @@ export function withLocalizedOffer(html: string, currency: ReserveCurrency): str
   });
   return next;
 }
+
+/**
+ * Payout currency for SPA pages (CAD default, approximate USD for US visitors). The function writes the
+ * region into the document head before first paint, so the client renders the right figures with no
+ * flicker. Only US gets a tag; the absence of one means CAD.
+ */
+export function withPayoutRegion(html: string, region: "ca" | "us"): string {
+  if (region !== "us") return html;
+  return html.replace(/<\/head>/i, `<script>window.__BR_PAYOUT_REGION__="us";</script></head>`);
+}
