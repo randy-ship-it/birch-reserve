@@ -153,6 +153,7 @@ export const SEGMENTS: Segment[] = [
     profileBasis: "modelled",
     intent: "High",
     fits: "Electrolytes, recovery hardware, compression, court footwear",
+    marketKey: "pickleball-ca",
   },
   {
     key: "md-referral",
@@ -164,6 +165,7 @@ export const SEGMENTS: Segment[] = [
     profileBasis: "estimated",
     intent: "High",
     fits: "Pelvic-floor and postpartum care, nutrition, mobility, sleep",
+    marketKey: "postpartum-ca",
   },
 ];
 
@@ -293,6 +295,34 @@ export const MARKET_CONTEXT: Array<{ key: string; pillar: string; stat: string; 
     url: "https://www.americanmedspa.org/news/2024-medical-spa-state-of-the-industry-executive-report-recap/",
     year: "2024",
   },
+  // Nov 20 2026 daily scan: Racquet (pickleball participation), Fitness (activity guideline), MD-referral (postpartum). Same rules: cited, dated, population-level.
+  {
+    key: "pickleball-ca",
+    pillar: "Racquet & active sports",
+    stat: "1.8 million",
+    line: "Canadians play pickleball (est. 2026), up 14% in a year; 48% play for health and fitness.",
+    source: "Pickleball Canada, Pickleball in Canada 2026 Survey (Canadian research firm, 2,000 households)",
+    url: "https://pickleballcanada.org/pickleball-in-canada-2026-survey/",
+    year: "2026",
+  },
+  {
+    key: "active-adults-ca",
+    pillar: "Fitness",
+    stat: "46%",
+    line: "of Canadian adults (18 to 79) met the 150 minutes a week activity guideline in 2022 to 2024 (53% of men, 39% of women), measured by accelerometer.",
+    source: "Statistics Canada, The Daily: Canadian Health Measures Survey, cycle 7 (2022 to 2024)",
+    url: "https://www150.statcan.gc.ca/n1/daily-quotidien/251017/dq251017b-eng.htm",
+    year: "2025",
+  },
+  {
+    key: "postpartum-ca",
+    pillar: "MD-referral (postpartum)",
+    stat: "53% to 79%",
+    line: "of women in Canada have some form of laceration in a vaginal birth; 3.4% of all who gave birth called urinary incontinence \u201ca great deal of a problem\u201d in the first 3 months.",
+    source: "Public Health Agency of Canada, Postpartum Health in Canada infographic (Family-Centred Maternity and Newborn Care guidelines)",
+    url: "https://www.canada.ca/en/public-health/services/publications/healthy-living/infographic-postpartum-health-canada.html",
+    year: "2024",
+  },
 ];
 
 export const SOURCES: Array<{ basis: Basis; source: string; what: string }> = [
@@ -300,7 +330,7 @@ export const SOURCES: Array<{ basis: Basis; source: string; what: string }> = [
   { basis: "measured", source: "Live hub inventory", what: "The launch brands and Calm Joints racquet pages listed on this page." },
   { basis: "modelled", source: "TAM feed (scalehealth.ca/tam)", what: "Orders a year, age band, gender skew, mobile share and stated intents by category, modelled from launch-partner customers." },
   { basis: "estimated", source: "Channel benchmarks", what: "Click-through bands by moment. Ranges, not promises." },
-  { basis: "estimated", source: "Public research (Health Canada, Statistics Canada, CRN, AAFC, APPA, ISPA, AmSpa)", what: "Population-level market context per pillar, linked to each source. Not Birch audience sizes or delivery." },
+  { basis: "estimated", source: "Public research (Health Canada, Statistics Canada, PHAC, CRN, AAFC, APPA, ISPA, AmSpa, Pickleball Canada)", what: "Population-level market context per pillar, linked to each source. Not Birch audience sizes or delivery." },
 ];
 
 /** Nov 19 2026: the cited market-context line for a segment card, if any. */
