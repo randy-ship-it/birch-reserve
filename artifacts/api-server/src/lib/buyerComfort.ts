@@ -22,10 +22,10 @@ export const LIVE_HUB_LINKS: BuyerLink[] = [
   { label: "SOLE hub", href: "https://www.scalehealth.ca/sole" },
 ];
 
-/** 6. Early network slots strap (sits under the existing "Limited early placements" strip). */
+/** 6. Curated network strap (sits under the existing "Curated placements" strip). */
 export const EARLY_SLOTS = {
-  label: "Early network slots",
-  line: "We're curating the network hub by hub. Early buyers take shared category seats as each hub launches, at starter rates. Every seat is shared, not exclusive.",
+  label: "Curated network",
+  line: "We're curating the network hub by hub. Brands take shared category seats as each hub launches, at starter rates. Every seat is shared, not exclusive.",
 } as const;
 
 /**

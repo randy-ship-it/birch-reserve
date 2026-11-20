@@ -18,6 +18,7 @@ import { sendIntake, type IntakeKind } from "../lib/overhaul/fridayIntake";
 import { PREMIUM_INQUIRY_MESSAGE, isPremiumOffer } from "../lib/premiumInquireOnly";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { isTestIdentity } from "../lib/testTraffic";
+import { coarseRegion, recordPulse } from "../lib/activityPulse";
 import { MEDIA_KIT_CATEGORIES } from "../lib/overhaul/mediaKit";
 
 export type CreateSession = (params: Record<string, unknown>) => Promise<{ url: string | null; livemode: boolean }>;
@@ -346,6 +347,9 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
         : sendIntake({ kind: "category_request", email, company: brand, message: notes || undefined, path: page, meta: { category: label }, utm: utmOf(body) }),
     ]);
     log("category_request", { alert: alert.status, friday: friday.status, test: isTest });
+    if (!isTest && (alert.status === "sent" || friday.status === "sent") && !/@(silverbirchgrowth\.com|scalehealth\.ca|birchreserve\.net|example\.(com|org))$/.test(email)) {
+      void recordPulse("placement_question", label, { region: coarseRegion((h) => req.get(h)) });
+    }
     if (alert.status !== "sent" && friday.status !== "sent") {
       res.status(502).json({ error: "We could not send that. Call (647) 931-6278 or email sales@silverbirchgrowth.com." });
       return;

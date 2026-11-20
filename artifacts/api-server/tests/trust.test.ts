@@ -101,6 +101,6 @@ test("sample report is labelled Sample and privacy note is aggregate-only", () =
   assert.match(trust, /data-testid="sample-report-badge"/);
   assert.match(trust, /Sample layout only/);
   assert.match(trust, /No personal data, names, contact details or health information is shared with brands/);
-  assert.match(trust, /coming soon/i);
+  assert.doesNotMatch(trust, /coming soon/i);
   assert.match(trust, /10% of media spend, paid in cash/);
 });

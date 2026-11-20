@@ -22,6 +22,7 @@ import { requireSalesStaff } from "../lib/salesStaffAccess";
 import { publicSeoTags } from "../lib/publicSeo";
 import { FRIENDLY_429 } from "../lib/rateLimit";
 import { logger } from "../lib/logger";
+import { coarseRegion, recordPulse } from "../lib/activityPulse";
 import { isReserveCheckoutConfigured } from "../lib/checkoutState";
 
 const router: IRouter = Router();
@@ -157,6 +158,7 @@ router.post("/v1/buy/order", express.json({ limit: "16kb" }), async (req, res): 
   if (limited(res, buyLimiters.orderIp.hit(ipOf(req)), buyLimiters.orderEmail.hit(acct.e))) return;
   const orderId = randomUUID();
   const isTest = isTestIdentity({ email: acct.e, name: acct.n });
+  void recordPulse("buy_order", null, { isTest: isTest || hasValidQaHeader(req) || /@(silverbirchgrowth\.com|scalehealth\.ca|birchreserve\.net|example\.(com|org))$/i.test(acct.e), region: coarseRegion((h) => req.get(h)) });
   try {
     await buyStore().putOrder({ id: orderId, accountId: acct.id, name: acct.n, email: acct.e, company: acct.c, website: acct.w, domainCheck: acct.d, plan: plan!.key, format: format!.key, creativeId: crv.id, reviewStatus: "pending_review", ip: ipOf(req), createdAt: new Date() });
   } catch (err) {

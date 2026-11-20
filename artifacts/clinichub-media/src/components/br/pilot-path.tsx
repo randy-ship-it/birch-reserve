@@ -83,7 +83,7 @@ export function CategoryCards() {
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">8 categories</p>
             <h2 className="font-display text-3xl md:text-5xl">Who your seat reaches.</h2>
           </div>
-          <p className="max-w-sm text-xs text-muted-foreground">No reach numbers here: your IO sizes views against live hub supply. <InfoPop title="Early rate" label="Early rate" testId="early-rate-pop"><p>{EARLY_RATE_FINE}</p></InfoPop></p>
+          <p className="max-w-sm text-xs text-muted-foreground">No reach numbers here: your IO sizes views against live hub supply. <InfoPop title="Starter rate" label="Starter rate" testId="early-rate-pop"><p>{EARLY_RATE_FINE}</p></InfoPop></p>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {CATEGORY_AUDIENCES.map((c) => (

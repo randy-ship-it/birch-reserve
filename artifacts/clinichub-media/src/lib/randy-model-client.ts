@@ -122,7 +122,7 @@ async function stubRandyReply(
 
   if (req.mode === "hear") {
     return {
-      text: "Voice is coming soon. Keep chatting here, or tap Call for the live line.",
+      text: "Voice isn't on this page. Keep chatting here, or tap Call for the live line.",
       source: "stub",
       offerHandoff: true,
     };

@@ -32,6 +32,7 @@ import { birchFaqAnswer } from "../lib/birchFaq";
 import { BIRCH_SALES_PHONE } from "../lib/birchFacts";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { isTestIdentity } from "../lib/testTraffic";
+import { chatTopic, coarseRegion, recordPulse } from "../lib/activityPulse";
 
 type ChatRole = "user" | "assistant";
 
@@ -620,6 +621,11 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
 
   ensureTranscriptSweepTimer();
   maybeSweepTranscripts();
+  // Activity pulse: one event per chat, on the visitor's first message. Topic key only; the text is never stored.
+  {
+    const users = body.messages.filter((m) => m.role === "user");
+    if (!qa && users.length === 1 && typeof users[0]!.content === "string") void recordPulse(chatTopic(users[0]!.content), null, { region: coarseRegion((h) => req.get(h)) });
+  }
 
   if (isAiDisabled()) {
     if (body.sessionId) {

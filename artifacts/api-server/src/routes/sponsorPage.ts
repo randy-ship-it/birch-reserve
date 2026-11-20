@@ -16,6 +16,8 @@ import { birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { getStripeClient } from "../lib/stripeClient";
 import { logger } from "../lib/logger";
+import { coarseRegion, recordPulse } from "../lib/activityPulse";
+import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
 import { PUBLIC_CAD_ENABLED } from "../lib/currency";
 import { payoutAmount, payoutRegionForCountry, payoutUsNote, type PayoutRegion } from "../lib/payoutCurrency";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
@@ -331,6 +333,8 @@ router.post("/v1/sponsor/deposit", express.json({ limit: "8kb" }), async (req: R
   }
   try {
     const session = await getStripeClient().checkout.sessions.create(built.params as never);
+    const em = String((req.body as Record<string, unknown> | undefined)?.email ?? "").trim().toLowerCase();
+    if (session.livemode) void recordPulse("sponsor_checkout", null, { isTest: hasValidQaHeader(req) || isTestIdentity({ email: em }) || /@(silverbirchgrowth\.com|scalehealth\.ca|birchreserve\.net|example\.(com|org))$/.test(em), region: coarseRegion((h) => req.get(h)) });
     res.json({ url: session.url, livemode: session.livemode });
   } catch (err) {
     logger.warn({ err }, "sponsor deposit session failed");

@@ -24,6 +24,8 @@
  */
 import { Router, json, type Request, type Response } from "express";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
+import { coarseRegion, recordPulse } from "../lib/activityPulse";
+import { isTestIdentity } from "../lib/testTraffic";
 import { isIP } from "node:net";
 import { FRIDAY_CATEGORIES, toV1Body } from "../lib/kitCalc/fridayV12";
 import { NEVER_HUB_NAME } from "../lib/overhaul/hubNameFilter";
@@ -281,7 +283,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
   const send = (res: Response, out: { status: number; text: string }) => res.status(out.status).type("application/json").send(publicGates(out.text || "{}"));
   /** BR leads mirror of partial + submitted intakes (same pipeline as full submissions). Never throws, never blocks. */
   const recordLead = opts.recordLead ?? defaultRecordLead(env);
-  function noteLead(b: Record<string, unknown>, stage: Stage, out: { status: number; text: string }, id?: string) {
+  function noteLead(b: Record<string, unknown>, stage: Stage, out: { status: number; text: string }, id?: string, region: string | null = null) {
     if (!stage || out.status >= 300 || typeof b.email !== "string") return;
     let fid: string | null = id ?? null;
     try {
@@ -289,6 +291,14 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       if (typeof d.id === "string" && ID_RE.test(d.id)) fid = d.id;
     } catch {
       /* keep id */
+    }
+    // Activity pulse (lib/activityPulse.ts): a real, submitted brand-side kit request. Category only; no identity.
+    const roles = Array.isArray(b.roles) ? (b.roles as unknown[]).map(String) : [];
+    if (stage === "submitted" && !hubPendingOf(b) && (!roles.length || roles.includes("supplier") || roles.includes("kit"))) {
+      const sp = b.sponsor as { categories?: unknown } | undefined;
+      const cat = b.category ?? (Array.isArray(sp?.categories) ? sp!.categories[0] : null);
+      const email = b.email.trim().toLowerCase();
+      void recordPulse("kit_request", cat, { isTest: TEST_EMAIL_RE.test(email) || isTestIdentity({ email }) || /@(silverbirchgrowth\.com|scalehealth\.ca|birchreserve\.net|example\.(com|org))$/.test(email), src: typeof b.src === "string" ? b.src : null, region });
     }
     void recordLead({ fridayId: fid, email: b.email.trim().toLowerCase(), website: typeof b.website === "string" ? b.website.slice(0, 200) : null, stage, roles: Array.isArray(b.roles) ? (b.roles as unknown[]).map(String).slice(0, 6) : [], path: hubPendingOf(b) ? "/intake/supplier" : "/intake", hub: hubPendingOf(b) }).catch(() => undefined);
   }
@@ -323,7 +333,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       res.status(r.status === "sent" ? 202 : 503).json({ ok: r.status === "sent", fallback: "api_intake", lead: r.status === "sent", status: "submitted", version: 1, approvals: {}, error: r.status === "sent" ? undefined : "intake_failed" });
       return;
     }
-    noteLead(eff, prep.stage, out);
+    noteLead(eff, prep.stage, out, undefined, coarseRegion((h) => req.get(h)));
     send(res, out);
   });
   router.patch("/v1/brand-intake/:id", body, async (req, res) => {

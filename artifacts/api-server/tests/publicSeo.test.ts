@@ -231,7 +231,7 @@ test("buycalc HTML is one short, clean buy path with broad network copy and no p
   assert.equal((html.match(/fully refundable until 14 days before your launch date/gi) ?? []).length, 2);
   assert.doesNotMatch(html, /The zone is locked by the buyer/);
   assert.match(html, /Put your brand inside private health and wellness hubs\. No bidding\./);
-  assert.match(html, /Limited early placements/);
+  assert.match(html, /Curated placements/);
   assert.doesNotMatch(html, /seats open|8 categories|Eight categories|Recovery hardware|One of 8/i);
   assert.match(html, /id="catreq"/);
   assert.match(html, /href="tel:\+16479316278"/);
@@ -313,7 +313,7 @@ test("availability and buycalc stay up when Postgres cannot answer the seat quer
   assert.equal(buy.status, 200);
   assert.match(buy.headers.get("content-type") ?? "", /^text\/html/);
   const html = await buy.text();
-  assert.match(html, /Limited early placements/);
+  assert.match(html, /Curated placements/);
   assert.match(html, /The insertion order names the hub and placement before anything runs\./);
   assert.doesNotMatch(html, /sh-proof|is the stamp|Copy quote JSON/);
   assert.doesNotMatch(html, /The zone is locked by the buyer/);

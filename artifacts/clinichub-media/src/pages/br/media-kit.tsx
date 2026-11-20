@@ -1,4 +1,5 @@
 import { StartSmall } from "@/components/br/start-small";
+import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAsk } from "@/components/br/market-pulse";
 import { EstimateTag } from "@/components/br/intake-kit";
 import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPath";
 import { KitCta } from "@/components/br/kit-cta";
@@ -69,7 +70,7 @@ const RULES = [
 ];
 
 const HOW_TO_START = [
-  { n: "1", t: "Reserve your space", d: "Get a share of display space across our growing hub network. Early placements are limited." },
+  { n: "1", t: "Reserve your space", d: "Get a share of display space across our growing hub network. Placements are curated hub by hub." },
   { n: "2", t: "Pay by card", d: "$490 USD reserves your space, or take a $190 USD 7-day look first. Stripe checkout, no login." },
   { n: "3", t: "Approve the IO", d: "We send an insertion order naming the hub and surface. Nothing runs before you approve it." },
 ];
@@ -143,7 +144,7 @@ export default function BrMediaKit() {
           <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Media kit · Nov 2026</p>
           <h1 className="mt-3 font-display text-[2.15rem] leading-[1.05] tracking-tight md:text-6xl">Put your brand inside private health and wellness hubs.</h1>
-          <p className="mt-2 font-display text-xl text-foreground/70 md:text-2xl">A growing network. Limited early placements.</p>
+          <p className="mt-2 font-display text-xl text-foreground/70 md:text-2xl">A growing network. Curated placements.</p>
           </div>
           <AnnotatedHubMock testId="mk-hero-mock" />
           </div>
@@ -175,6 +176,15 @@ export default function BrMediaKit() {
           <NextStep where="media_kit" showMock={false} />
         </div>
       </section>
+
+      {/* Categories we serve + Questions brands ask (Randy t291u, Nov 20 2026) */}
+      <section className="border-b border-border/70 bg-background" data-testid="mk-market-signals">
+        <div className="container mx-auto max-w-5xl space-y-8 px-5 py-10 md:px-6 md:py-14">
+          <CategoriesWeServe />
+          <QuestionsBrandsAsk />
+        </div>
+      </section>
+      <ActivityPulse />
 
       {/* Download my kit: personalized two-sided kit (preview, Nov 18 2026) */}
       <KitBuilder />

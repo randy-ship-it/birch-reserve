@@ -901,7 +901,7 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.match(home, /See the Reserve List/);
   // Randy Nov 19 2026: never show open-seat counts or zero demand; neutral scarcity copy only.
   assert.doesNotMatch(home, /Early slots open|seats_open\} of/);
-  assert.match(home, /Limited early placements/);
+  assert.match(home, /Curated placements/);
   assert.match(home, /No brand gets more than 20% of a category's digital real estate\./);
   assert.doesNotMatch(home, /Hold a category for 7 days — \$190/);
   assert.doesNotMatch(home, /One brand per aisle/);

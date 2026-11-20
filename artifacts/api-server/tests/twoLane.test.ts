@@ -101,7 +101,7 @@ test("visitor copy rules: no zero-demand words, no Publisher/sponsor/advertiser 
   const mine = (UI + IO).replace(/\/\*\*[\s\S]*?\*\//g, "");
   assert.doesNotMatch(mine, /\bCTR\b|\bROAS\b|guarantee/i);
   assert.doesNotMatch(visible, /Integrity|Align|Clairvoyant|Friday/);
-  assert.match(UI, /Early placements are limited\./);
+  assert.match(UI, /Placements are curated hub by hub\./);
 });
 
 test("lane analytics events are on the fixed list", () => {

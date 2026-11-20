@@ -33,7 +33,7 @@ export const TRUST_FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "How often will we get reports?",
-    a: "Campaign results are reported per hub and surface from your UTM links and promo codes. A regular reporting schedule and a self-serve dashboard are coming soon; the schedule will be confirmed on your insertion order.",
+    a: "Campaign results are reported per hub and surface from your UTM links and promo codes. Reports are sent on a regular schedule, confirmed on your insertion order.",
   },
 ];
 
@@ -42,13 +42,13 @@ const HOW_STEPS = [
   { n: "2", t: "Pick how to start", d: "A $190 USD 7-day look, a $490 USD reserve, or an inquiry for premium slots (including post-purchase and larger commitments)." },
   { n: "3", t: "The insertion order names the hub", d: "Nothing runs until an insertion order names the hub and surface. Your payment is media credit, not a live flight and not an impression guarantee." },
   { n: "4", t: "Credit spends down over 6 months", d: "Credit draws down on live hubs after your deposit lands. Unused credit can be refunded or extended month by month." },
-  { n: "5", t: "We report what ran", d: "Views, clicks, UTM-tagged visits and promo-code redemptions, per hub and surface. Aggregate only. A self-serve dashboard is coming soon." },
+  { n: "5", t: "We report what ran", d: "Views, clicks, UTM-tagged visits and promo-code redemptions, per hub and surface. Aggregate only. Reports go out on the schedule your insertion order sets." },
 ];
 
 const YOU_GET = [
   { t: "A placement in a private member experience", d: "Ads run inside co-branded hubs, not on the open web. Every brand is hand-picked to fit the audience." },
   { t: "Media credit toward display or CPC", d: "The $190 USD look and the $490 USD seat are 100% media credit (the look credits over if you convert within 7 days)." },
-  { t: "Aggregate campaign reporting", d: "Your UTMs on every placement, an optional promo code, and results per hub and surface. A reporting dashboard is coming soon." },
+  { t: "Aggregate campaign reporting", d: "Your UTMs on every placement, an optional promo code, and results per hub and surface. Reports go out on the schedule your IO sets." },
   { t: "Agency cash, if you place a client", d: "The agency of record earns 10% of media spend, paid in cash." },
 ];
 
@@ -241,7 +241,7 @@ export function SampleReport() {
         </table>
       </div>
       <p className="border-t border-border px-4 py-3 text-xs leading-relaxed text-muted-foreground md:px-5">
-        Sample layout only. These figures are illustrative and are not a real campaign. Your report will show what actually delivered, per hub and surface, from your UTMs and promo codes. Aggregate reporting only; no personal data is shared with brands. A self-serve dashboard is coming soon.
+        Sample layout only. These figures are illustrative and are not a real campaign. Your report will show what actually delivered, per hub and surface, from your UTMs and promo codes. Aggregate reporting only; no personal data is shared with brands. Reports go out on the schedule your insertion order sets.
       </p>
     </div>
   );

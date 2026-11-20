@@ -16,6 +16,7 @@ import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BuyCta } from "@/components/br/buy-cta";
 import { AnnotatedHubMock, MidTier } from "@/components/br/next-step";
+import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAsk } from "@/components/br/market-pulse";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { INVENTORY, PUBLISHER_INCENTIVE } from "../../../../api-server/src/lib/overhaul/model";
 import { DOOR_ROUTE } from "../../../../api-server/src/lib/doorRoute";
@@ -149,6 +150,13 @@ export default function BrHome() {
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-mid-tier">
         <MidTier where="home" compact />
       </section>
+
+      {/* 2c. Categories we serve + Questions brands ask (Randy t291u, Nov 20 2026). Evergreen, answered against /terms. */}
+      <section className="container mx-auto max-w-5xl space-y-8 px-4 pb-10" data-testid="home-market-signals">
+        <CategoriesWeServe />
+        <QuestionsBrandsAsk />
+      </section>
+      <ActivityPulse />
 
       {/* 3. Two ways in (same cards as the intake). */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-ways">

@@ -9,7 +9,7 @@ export const SCALE_HUBS_ARTICLE = {
   authorName: "Birch Reserve Editorial",
   topic: "Closed-hub advertising",
   summary:
-    "Brand display works differently when it sits after a purchase or booking inside a listed recovery hub. Birch Reserve sells early category slots on those hubs—Hold $190 or Reserve $490—not guaranteed impressions on the open web.",
+    "Brand display works differently when it sits after a purchase or booking inside a listed recovery hub. Birch Reserve sells category slots on those hubs—Hold $190 or Reserve $490—not guaranteed impressions on the open web.",
   publishedAt: new Date("2026-09-24T16:00:00.000Z"),
   body: `# After the booking: why category seats beat open-web noise
 
@@ -23,7 +23,7 @@ Public offers (USD):
 
 Hold $190 — seven-day category look. Does not take a category seat. Convert to the full reserve within seven days and the Hold becomes 100% media credit; otherwise cash refund.
 
-Reserve $490 — locks in an early category slot among eight brand categories before the minimum goes up. 100% media credit toward flight. An insertion order names the surface before anything runs. Credit expires at twelve months.
+Reserve $490 — locks in a category slot among eight brand categories before the minimum goes up. 100% media credit toward flight. An insertion order names the surface before anything runs. Credit expires at twelve months.
 
 Book a call — multi-hub or custom packages.
 
@@ -33,7 +33,7 @@ Reporting is aggregate only. No patient-level data. No clinical pixels. No open 
 
 Scale Health builds the rails: clinic hubs, booking, and partner fulfillment. Birch Reserve is a separate commercial product—category display on those hubs after the customer is already inside. Providers who join Scale are not buying Birch categories, and brands who buy Birch categories are not buying patient leads. Care, commerce, and display stay three contracts.
 
-Useful mental model: the hub earns trust; Birch lets a fitting brand show up in that trusted context with an early category slot. The insertion order—not a media plan of guaranteed impressions—is what names where the unit runs.
+Useful mental model: the hub earns trust; Birch lets a fitting brand show up in that trusted context with a category slot. The insertion order—not a media plan of guaranteed impressions—is what names where the unit runs.
 
 ## What we do not claim
 
@@ -41,7 +41,7 @@ We do not sell guaranteed impression counts, CTR floors, or “how many people w
 
 ## Practical next step
 
-If the category fits a recovery or wellness brand that already belongs beside booking and plan moments, start with Hold $190 to look without taking a category seat, or Reserve $490 to lock in an early slot before the minimum goes up. Custom or multi-hub work goes to Book a call with Silver Birch Growth.
+If the category fits a recovery or wellness brand that already belongs beside booking and plan moments, start with Hold $190 to look without taking a category seat, or Reserve $490 to lock in a slot before the minimum goes up. Custom or multi-hub work goes to Book a call with Silver Birch Growth.
 
 Seller: Silver Birch Growth Inc., Toronto · randy@silverbirchgrowth.com · https://birchreserve.net
 `,
@@ -65,13 +65,13 @@ That is the whole point.
 
 Hold $190 is a seven-day category look. It does not take a category seat. Convert to the full reserve within seven days and the Hold becomes 100% media credit. Otherwise cash refund.
 
-Reserve $490 locks in an early category slot among eight brand categories before the minimum goes up. Again, 100% media credit. Credit expires at twelve months.
+Reserve $490 locks in a category slot among eight brand categories before the minimum goes up. Again, 100% media credit. Credit expires at twelve months.
 
 Neither amount is “run my ad tomorrow.” Both are credit toward a unit that only runs after the paperwork names where it lives.
 
 ## The three steps after you pay
 
-1. Pay $190 for a look or $490 for an early category slot. That money is 100% media credit.
+1. Pay $190 for a look or $490 for a category slot. That money is 100% media credit.
 2. An insertion order names the hub. Nothing runs before step 2.
 3. The unit sits after checkout, on a plan, or at a booking inside that named hub. Not in a stranger’s feed.
 
@@ -79,7 +79,7 @@ If a brand wants flight math before an IO, they are shopping a different product
 
 ## Why the shelf matters
 
-Open-web ads interrupt people who have not decided anything. The shelf after the receipt sits next to a person who already bought, booked, or started a plan. Trust is already warm. Lock an early slot in your category before the minimum goes up. Reporting stays aggregate. No patient-level data. No clinical pixels. No open auction.
+Open-web ads interrupt people who have not decided anything. The shelf after the receipt sits next to a person who already bought, booked, or started a plan. Trust is already warm. Lock a slot in your category before the minimum goes up. Reporting stays aggregate. No patient-level data. No clinical pixels. No open auction.
 
 Care, commerce, and display stay three contracts. Scale builds the rails. Birch sells the category slot. Providers joining Scale are not buying Birch inventory, and brands buying Birch are not buying patient leads.
 
@@ -89,7 +89,7 @@ No guaranteed impression counts. No CTR floors. No “how many people will see t
 
 ## Practical next step
 
-If your category belongs beside recovery checkout and booking moments, start at https://birchreserve.net. Hold $190 to look. Reserve $490 to lock in an early slot before the minimum goes up. Multi-hub work is a call with Silver Birch Growth.
+If your category belongs beside recovery checkout and booking moments, start at https://birchreserve.net. Hold $190 to look. Reserve $490 to lock in a slot before the minimum goes up. Multi-hub work is a call with Silver Birch Growth.
 
 Seller: Silver Birch Growth Inc., Toronto · randy@silverbirchgrowth.com · https://birchreserve.net
 `,
@@ -650,6 +650,15 @@ export function rewriteAlignNetworkCopy(text: string): string {
  * insights. Published rows live in the DB, so rewrite on read; seed copy above is clean.
  */
 const EXCLUSIVE_INSIGHT_REWRITES: ReadonlyArray<readonly [string, string]> = [
+  // Nov 20 2026 (Randy t291u): no "early" / empty-inventory phrasing in published rows. Rewrite on read.
+  ["Birch Reserve sells early category slots on those hubs", "Birch Reserve sells category slots on those hubs"],
+  ["locks in an early category slot", "locks in a category slot"],
+  ["lock in an early category slot", "lock in a category slot"],
+  ["an early category slot", "a category slot"],
+  ["early category slots", "category slots"],
+  ["Lock an early slot", "Lock a slot"],
+  ["lock in an early slot", "lock in a slot"],
+  ["an early slot", "a slot"],
   // Nov 20 2026 (Randy): no seat counts anywhere. Published rows live in the DB, so rewrite on read.
   ["Eight category seats sit inside listed Scale Health hubs.", "Shared category reserves sit inside listed Scale Health hubs."],
   ["It does not consume one of the eight seats.", "It does not use a category reserve."],
@@ -659,20 +668,20 @@ const EXCLUSIVE_INSIGHT_REWRITES: ReadonlyArray<readonly [string, string]> = [
   ["Book a call — multi-hub, exclusive, or on-prem Align surfaces.", "Book a call — multi-hub or on-prem Align surfaces."],
   // Nov 12 2026: no Align references in public copy.
   ["Book a call — multi-hub or on-prem Align surfaces.", "Book a call — multi-hub or custom packages."],
-  ["show up in that trusted context with category exclusivity.", "show up in that trusted context with an early category slot."],
-  ["Category exclusivity keeps the aisle clean.", "Lock an early slot in your category before the minimum goes up."],
+  ["show up in that trusted context with category exclusivity.", "show up in that trusted context with a category slot."],
+  ["Category exclusivity keeps the aisle clean.", "Lock a slot in your category before the minimum goes up."],
   ["Multi-hub or exclusive work is a call with Silver Birch Growth.", "Multi-hub work is a call with Silver Birch Growth."],
-  ["Reserve $490 to lock the aisle.", "Reserve $490 to lock in an early slot before the minimum goes up."],
+  ["Reserve $490 to lock the aisle.", "Reserve $490 to lock in a slot before the minimum goes up."],
   ["why exclusive categories beat open-web noise", "why category seats beat open-web noise"],
-  ["Birch Reserve sells exclusive brand categories on those hubs", "Birch Reserve sells early category slots on those hubs"],
+  ["Birch Reserve sells exclusive brand categories on those hubs", "Birch Reserve sells category slots on those hubs"],
   ["What a Birch Reserve exclusive category actually is", "What a Birch Reserve seat actually is"],
   ["Paying for a Birch exclusive category is media credit", "Paying for a Birch category seat is media credit"],
   ["Does not take an exclusive category.", "Does not take a category seat."],
   ["does not take an exclusive category", "does not take a category seat"],
   ["without taking an exclusive category", "without taking a category seat"],
-  ["locks your exclusive category among eight brand categories", "locks in an early category slot among eight brand categories before the minimum goes up"],
-  ["lock your exclusive category among eight brand categories", "lock in an early category slot among eight brand categories before the minimum goes up"],
-  ["$490 for an exclusive category", "$490 for an early category slot"],
+  ["locks your exclusive category among eight brand categories", "locks in a category slot among eight brand categories before the minimum goes up"],
+  ["lock your exclusive category among eight brand categories", "lock in a category slot among eight brand categories before the minimum goes up"],
+  ["$490 for an exclusive category", "$490 for a category slot"],
   ["Birch sells the exclusive category.", "Birch sells the category slot."],
 ];
 
@@ -685,7 +694,7 @@ export function rewriteExclusiveInsightCopy(text: string): string {
 }
 
 const PUBLIC_OFFER_SENTENCE =
-  "Public offers are Hold $190 for a seven-day category look that does not take a category seat, or Reserve $490 to lock in an early category slot among eight brand categories before the minimum goes up. Both amounts are media credit, and the insertion order names the surface before anything runs.";
+  "Public offers are Hold $190 for a seven-day category look that does not take a category seat, or Reserve $490 to lock in a category slot among eight brand categories before the minimum goes up. Both amounts are media credit, and the insertion order names the surface before anything runs.";
 
 const LEGACY_DISPLAY_RESERVE_SENTENCE =
   /The first Display Reserve is deliberately concrete:\s*a fixed \$899(?:\.00)?\s*USD reservation for eight seats, with a media credit and a final insertion order\./g;

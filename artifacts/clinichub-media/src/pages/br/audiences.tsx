@@ -275,10 +275,10 @@ export default function BrAudiences() {
 
       {/* Region + arrival (measured) */}
       <Section>
-        <Eyebrow>Early network signals</Eyebrow>
+        <Eyebrow>Network signals</Eyebrow>
         <H2>What the hubs are already telling us.</H2>
         <p className="mt-4 max-w-2xl text-muted-foreground">
-          Measured on our own hubs over the {AUDIENCE_SNAPSHOT.measuredWindow}. Shares only, aggregated and de-identified. The network is early and these shift as launches go live.
+          Measured on our own hubs over the {AUDIENCE_SNAPSHOT.measuredWindow}. Shares only, aggregated and de-identified. These shift as launches go live.
         </p>
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           <div className="border border-foreground/15 bg-white p-6" data-testid="region-mix">
