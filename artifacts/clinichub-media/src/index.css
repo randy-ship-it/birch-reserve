@@ -327,24 +327,28 @@
  */
 html[data-skin="scale"] {
   --background: 210 20% 98%;
-  --foreground: 223 49% 10%;
+  --foreground: 224 50% 10%;
   --card: 0 0% 100%;
-  --card-foreground: 223 49% 10%;
+  --card-foreground: 224 50% 10%;
   --popover: 0 0% 100%;
-  --popover-foreground: 223 49% 10%;
-  --primary: 223 49% 10%;
+  --popover-foreground: 224 50% 10%;
+  --primary: 224 50% 10%;
   --primary-foreground: 210 20% 98%;
-  --secondary: 220 14% 96%;
-  --secondary-foreground: 223 49% 10%;
-  --muted: 220 14% 96%;
-  --muted-foreground: 220 9% 40%;
-  --border: 220 13% 89%;
-  --input: 220 13% 89%;
-  --card-border: 220 13% 89%;
-  --popover-border: 220 13% 89%;
+  --secondary: 214 15% 94%;
+  --secondary-foreground: 224 50% 10%;
+  --muted: 214 15% 94%;
+  --muted-foreground: 215 16% 45%;
+  --border: 214 20% 90%;
+  --input: 214 20% 90%;
+  --card-border: 214 20% 90%;
+  --popover-border: 214 20% 90%;
   --accent: 156 65% 32%;
   --accent-foreground: 0 0% 100%;
   --ring: 156 65% 32%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --color-amber-100: #fff9e8;
+  --color-amber-900: oklch(55.5% .163 48.998);
   /* Birch's lime ramp -> Scale's emerald/green ramp (every bg-/text-/ring-lime-* utility reads these). */
   --color-lime-50: oklch(0.979 0.021 166.113);
   --color-lime-100: oklch(0.95 0.052 163.051);
@@ -377,3 +381,141 @@ html[data-skin="scale"] [fill="#d9f99d"] { fill: oklch(0.905 0.093 164.15); }
 html[data-skin="scale"] [stroke="#d9f99d"] { stroke: oklch(0.905 0.093 164.15); }
 html[data-skin="scale"] [stop-color="#d9f99d"] { stop-color: oklch(0.905 0.093 164.15); }
 html[data-skin="scale"] [fill="#a3e635"] { fill: #1d875c; }
+
+html[data-skin="scale"] [fill="#0b1f3a"] { fill: #0d1426; }
+html[data-skin="scale"] [stroke="#0b1f3a"] { stroke: #0d1426; }
+html[data-skin="scale"] [stop-color="#0b1f3a"] { stop-color: #0d1426; }
+html[data-skin="scale"] [stop-color="#99f6e4"] { stop-color: #bfe8d4; }
+html[data-skin="scale"] [stop-color="#d9f99d"] { stop-color: #bfe8d4; }
+/* Inline-style literals (set from JSX, serialised by the browser as rgb()). Palette: ink #0d1426, dark #0b0f1d, soft green #e7f7ef, emerald #34d399. */
+html[data-skin="scale"] [style*="rgb(11, 31, 58)"] { background: #0d1426 !important; }
+html[data-skin="scale"] [style*="rgb(190, 242, 100)"] { color: #34d399 !important; }
+html[data-skin="scale"] [style*="rgb(243, 251, 246)"] { background: #e7f7ef !important; }
+/* BEGIN scale-skin-generated (scripts/gen-scale-skin-css.mjs) */
+html[data-skin="scale"] .border-\[\#0A1D56\]\/10{border-color:color-mix(in oklab,#0d1426 10%,transparent)}
+html[data-skin="scale"] .border-\[\#0A1D56\]\/15{border-color:color-mix(in oklab,#0d1426 15%,transparent)}
+html[data-skin="scale"] .border-\[\#0A1D56\]\/20{border-color:color-mix(in oklab,#0d1426 20%,transparent)}
+html[data-skin="scale"] .border-\[\#0A1D56\]\/25{border-color:color-mix(in oklab,#0d1426 25%,transparent)}
+html[data-skin="scale"] .border-\[\#0b1f3a\]{border-color:#0d1426}
+html[data-skin="scale"] .border-\[\#0b1f3a\]\/10{border-color:color-mix(in oklab,#0d1426 10%,transparent)}
+html[data-skin="scale"] .border-\[\#0b1f3a\]\/25{border-color:color-mix(in oklab,#0d1426 25%,transparent)}
+html[data-skin="scale"] .border-\[\#8fd6a5\]{border-color:#bfe8d4}
+html[data-skin="scale"] .border-\[\#8fd6a5\]\/30{border-color:color-mix(in oklab,#bfe8d4 30%,transparent)}
+html[data-skin="scale"] .border-\[\#8fd6a5\]\/35{border-color:color-mix(in oklab,#bfe8d4 35%,transparent)}
+html[data-skin="scale"] .border-\[\#9D4EDD\]{border-color:#1d875c}
+html[data-skin="scale"] .border-\[\#9bbbea\]\/30{border-color:color-mix(in oklab,#c9cfd8 30%,transparent)}
+html[data-skin="scale"] .border-\[\#C8F55A\]{border-color:#34d399}
+html[data-skin="scale"] .border-\[\#D3D9D6\]{border-color:#e0e5eb}
+html[data-skin="scale"] .border-\[\#F1D58F\]{border-color:#e3b84f}
+html[data-skin="scale"] .border-\[\#e87979\]\/35{border-color:color-mix(in oklab,#ef4444 35%,transparent)}
+html[data-skin="scale"] .bg-\[\#0b1f3a\]{background-color:#0d1426}
+html[data-skin="scale"] .bg-\[\#0b1f3a\]\/70{background-color:color-mix(in oklab,#0d1426 70%,transparent)}
+html[data-skin="scale"] .bg-\[\#0b1f3a\]\/95{background-color:color-mix(in oklab,#0d1426 95%,transparent)}
+html[data-skin="scale"] .bg-\[\#0b151c\]{background-color:#0d1426}
+html[data-skin="scale"] .bg-\[\#1f8a4c\]{background-color:#1d875c}
+html[data-skin="scale"] .bg-\[\#3b9b00\]{background-color:#1d875c}
+html[data-skin="scale"] .bg-\[\#8fd6a5\]{background-color:#bfe8d4}
+html[data-skin="scale"] .bg-\[\#8fd6a5\]\/10{background-color:color-mix(in oklab,#bfe8d4 10%,transparent)}
+html[data-skin="scale"] .bg-\[\#9bbbea\]\/10{background-color:color-mix(in oklab,#c9cfd8 10%,transparent)}
+html[data-skin="scale"] .bg-\[\#101c25\]{background-color:#0d1426}
+html[data-skin="scale"] .bg-\[\#14232d\]{background-color:#0d1426}
+html[data-skin="scale"] .bg-\[\#BFF3D6\]{background-color:#bfe8d4}
+html[data-skin="scale"] .bg-\[\#C8F55A\]{background-color:#34d399}
+html[data-skin="scale"] .bg-\[\#FAF8F3\]{background-color:#f9fafb}
+html[data-skin="scale"] .bg-\[\#FFF4DB\]{background-color:#fff9e8}
+html[data-skin="scale"] .bg-\[\#e87979\]{background-color:#ef4444}
+html[data-skin="scale"] .bg-\[\#e87979\]\/10{background-color:color-mix(in oklab,#ef4444 10%,transparent)}
+html[data-skin="scale"] .bg-\[\#ecfccb\]{background-color:#e7f7ef}
+html[data-skin="scale"] .bg-\[\#f7f5f0\]{background-color:#f9fafb}
+html[data-skin="scale"] .bg-\[\#faf6ff\]{background-color:#f9fafb}
+html[data-skin="scale"] .bg-\[radial-gradient\(ellipse_at_top\,_\#ecfccb_0\%\,_transparent_55\%\)\]{background-image:radial-gradient(ellipse at top,#e7f7ef 0%,transparent 55%)}
+html[data-skin="scale"] .bg-\[radial-gradient\(ellipse_at_top\,_\#fef9c3_0\%\,_transparent_55\%\)\]{background-image:radial-gradient(ellipse at top,#e7f7ef 0%,transparent 55%)}
+html[data-skin="scale"] .bg-\[radial-gradient\(ellipse_at_top_left\,_\#ecfccb_0\%\,_transparent_50\%\)\]{background-image:radial-gradient(ellipse at top left,#e7f7ef 0%,transparent 50%)}
+html[data-skin="scale"] .bg-\[radial-gradient\(ellipse_at_top_left\,_\#ecfccb_0\%\,_transparent_55\%\)\]{background-image:radial-gradient(ellipse at top left,#e7f7ef 0%,transparent 55%)}
+html[data-skin="scale"] .bg-\[radial-gradient\(ellipse_at_top_left\,_\#ecfccb_0\%\,_transparent_60\%\)\]{background-image:radial-gradient(ellipse at top left,#e7f7ef 0%,transparent 60%)}
+html[data-skin="scale"] .from-\[\#0E3B2A\]{--tw-gradient-from: #0b1d16;--tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position))}
+html[data-skin="scale"] .from-\[\#0b1f3a\]{--tw-gradient-from: #0d1426;--tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position))}
+html[data-skin="scale"] .from-\[\#BFF3D6\]{--tw-gradient-from: #bfe8d4;--tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position))}
+html[data-skin="scale"] .via-\[\#0E3B2A\]\/60{--tw-gradient-via: color-mix(in oklab, #0b1d16 60%, transparent);--tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-via-stops)}
+html[data-skin="scale"] .via-\[\#0b1f3a\]\/70{--tw-gradient-via: color-mix(in oklab, #0d1426 70%, transparent);--tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-via-stops)}
+html[data-skin="scale"] .to-\[\#0E3B2A\]{--tw-gradient-to: #0b1d16;--tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position))}
+html[data-skin="scale"] .to-\[\#0b1f3a\]\/70{--tw-gradient-to: color-mix(in oklab, #0d1426 70%, transparent);--tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position))}
+html[data-skin="scale"] .text-\[\#0A1D56\]{color:#0d1426}
+html[data-skin="scale"] .text-\[\#0A1D56\]\/65{color:color-mix(in oklab,#0d1426 65%,transparent)}
+html[data-skin="scale"] .text-\[\#0A1D56\]\/70{color:color-mix(in oklab,#0d1426 70%,transparent)}
+html[data-skin="scale"] .text-\[\#0B1A13\]{color:#0d1426}
+html[data-skin="scale"] .text-\[\#0B6B43\]{color:#1d875c}
+html[data-skin="scale"] .text-\[\#0b1f3a\]{color:#0d1426}
+html[data-skin="scale"] .text-\[\#0b1f3a\]\/60{color:color-mix(in oklab,#0d1426 60%,transparent)}
+html[data-skin="scale"] .text-\[\#0b1f3a\]\/65{color:color-mix(in oklab,#0d1426 65%,transparent)}
+html[data-skin="scale"] .text-\[\#0b1f3a\]\/70{color:color-mix(in oklab,#0d1426 70%,transparent)}
+html[data-skin="scale"] .text-\[\#0b1f3a\]\/80{color:color-mix(in oklab,#0d1426 80%,transparent)}
+html[data-skin="scale"] .text-\[\#1c0909\]{color:#0d1426}
+html[data-skin="scale"] .text-\[\#2f6b00\]{color:#1d875c}
+html[data-skin="scale"] .text-\[\#5E6B64\]{color:#607085}
+html[data-skin="scale"] .text-\[\#8A5A00\]{color:#b45309}
+html[data-skin="scale"] .text-\[\#8fd6a5\]{color:#bfe8d4}
+html[data-skin="scale"] .text-\[\#9D4EDD\]{color:#1d875c}
+html[data-skin="scale"] .text-\[\#9cabb4\]{color:#c9cfd8}
+html[data-skin="scale"] .text-\[\#071A39\]{color:#0d1426}
+html[data-skin="scale"] .text-\[\#07130d\]{color:#0b1d16}
+html[data-skin="scale"] .text-\[\#24332B\]{color:#0d1426}
+html[data-skin="scale"] .text-\[\#70818b\]{color:#607085}
+html[data-skin="scale"] .text-\[\#82929c\]{color:#607085}
+html[data-skin="scale"] .text-\[\#788791\]{color:#607085}
+html[data-skin="scale"] .text-\[\#BFF3D6\]{color:#bfe8d4}
+html[data-skin="scale"] .text-\[\#C8F55A\]{color:#34d399}
+html[data-skin="scale"] .text-\[\#a8e8b9\]{color:#bfe8d4}
+html[data-skin="scale"] .text-\[\#aab7bf\]{color:#c9cfd8}
+html[data-skin="scale"] .text-\[\#b42318\]{color:#b91c1c}
+html[data-skin="scale"] .text-\[\#bfd2f0\]{color:#c9cfd8}
+html[data-skin="scale"] .text-\[\#c1cbd1\]{color:#c9cfd8}
+html[data-skin="scale"] .text-\[\#e87979\]{color:#ef4444}
+html[data-skin="scale"] .text-\[\#edf1ee\]{color:#f9fafb}
+html[data-skin="scale"] .text-\[\#f4f0e8\]{color:#f9fafb}
+html[data-skin="scale"] .accent-\[\#0b1f3a\]{accent-color:#0d1426}
+html[data-skin="scale"] .ring-\[\#0b1f3a\]\/10{--tw-ring-color: color-mix(in oklab, #0d1426 10%, transparent)}
+html[data-skin="scale"] .ring-\[\#0b1f3a\]\/30{--tw-ring-color: color-mix(in oklab, #0d1426 30%, transparent)}
+html[data-skin="scale"] .placeholder\:text-\[\#788791\]::placeholder{color:#607085}
+@media (hover:hover) {html[data-skin="scale"] .hover\:border-\[\#0b1f3a\]:hover{border-color:#0d1426}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:border-\[\#e87979\]:hover{border-color:#ef4444}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:border-\[\#e87979\]\/30:hover{border-color:color-mix(in oklab,#ef4444 30%,transparent)}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:bg-\[\#0b1f3a\]:hover{background-color:#0d1426}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:bg-\[\#176f4b\]:hover{background-color:#1d875c}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:bg-\[\#13305a\]:hover{background-color:#0b0f1d}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:bg-\[\#a8e8b9\]:hover{background-color:#bfe8d4}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:bg-\[\#e87979\]\/10:hover{background-color:color-mix(in oklab,#ef4444 10%,transparent)}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:bg-\[\#ff8f8f\]:hover{background-color:#ef4444}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:text-\[\#0b1f3a\]:hover{color:#0d1426}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:text-\[\#8fd6a5\]:hover{color:#bfe8d4}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:text-\[\#a8e8b9\]:hover{color:#bfe8d4}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:text-\[\#e87979\]:hover{color:#ef4444}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:text-\[\#f4f0e8\]:hover{color:#f9fafb}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:text-\[\#ff8f8f\]:hover{color:#ef4444}
+}
+@media (hover:hover) {html[data-skin="scale"] .hover\:ring-\[\#0b1f3a\]:hover{--tw-ring-color: #0d1426}
+}
+html[data-skin="scale"] .focus\:border-\[\#0b1f3a\]:focus{border-color:#0d1426}
+html[data-skin="scale"] .focus\:border-\[\#8fd6a5\]:focus{border-color:#bfe8d4}
+html[data-skin="scale"] .focus\:ring-\[\#8fd6a5\]:focus{--tw-ring-color: #bfe8d4}
+html[data-skin="scale"] .focus-visible\:ring-\[\#8fd6a5\]:focus-visible{--tw-ring-color: #bfe8d4}
+html[data-skin="scale"] .\[\&_\.recharts-cartesian-grid_line\[stroke\=\'\#ccc\'\]\]\:stroke-border\/50 .recharts-cartesian-grid line[stroke="#ccc"]{stroke:hsl(var(--border))}
+@supports (color: color-mix(in lab,red,red)) {html[data-skin="scale"] .\[\&_\.recharts-cartesian-grid_line\[stroke\=\'\#ccc\'\]\]\:stroke-border\/50 .recharts-cartesian-grid line[stroke="#ccc"]{stroke:color-mix(in oklab,hsl(var(--border)) 50%,transparent)}
+}
+html[data-skin="scale"] .\[\&_\.recharts-polar-grid_\[stroke\=\'\#ccc\'\]\]\:stroke-border .recharts-polar-grid [stroke="#ccc"]{stroke:hsl(var(--border))}
+html[data-skin="scale"] .\[\&_\.recharts-reference-line_\[stroke\=\'\#ccc\'\]\]\:stroke-border .recharts-reference-line [stroke="#ccc"]{stroke:hsl(var(--border))}
+/* END scale-skin-generated */
