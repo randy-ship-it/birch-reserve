@@ -12,7 +12,9 @@
  * Refund wording is the live /terms line for the $490 reserve; everything else says the IO sets the terms.
  * Copy rules: no counts, never "open/available/unclaimed", no impression/CTR/ROAS guarantees, modelled figures labelled.
  */
+import { URGENCY_LINE } from "../../../../api-server/src/lib/overhaul/pilotPath";
 import { useEffect, useState, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { Details } from "@/components/br/details";
 import { HubMock, twoLaneMock } from "@/components/br/two-lane";
@@ -179,8 +181,8 @@ export function MidTier({ where }: { where: string; compact?: boolean }) {
   ];
   return (
     <section className="rounded-3xl p-5 text-white md:p-6" style={{ background: NAVY }} data-testid="mid-tier" data-where={where}>
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300" data-testid="early-rate-line">Early rate · first-mover priority on reporting</p>
-      <h3 className="mt-1 font-display text-2xl leading-tight md:text-3xl" data-testid="mid-tier-line">Bigger test? Prepay media credit.</h3>
+      <h3 className="font-display text-2xl leading-tight md:text-3xl" data-testid="mid-tier-line">Bigger test? Prepay media credit.</h3>
+      <p className="mt-1 text-[13px] font-semibold text-lime-300" data-testid="early-rate-line">{URGENCY_LINE}</p>
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         {cards.map((c) => (
           <article key={c.k} className={cardCls} data-testid={`mid-tier-${c.k}`}>
@@ -254,7 +256,7 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
 }
 
 /* ------------------------------------------------------------------ post-kit (Randy, Nov 20 2026 9:47 AM ET) */
-export type KitPrefill = { brand?: string | null; email?: string | null; website?: string | null };
+export type KitPrefill = { brand?: string | null; email?: string | null; website?: string | null; /** What the kit headline calls them (brand, else the site host). */ label?: string | null };
 
 /** Same-origin navigation that also works on the scalehealth.ca mirror (its boot shim maps paths to birchreserve.net). */
 function goTo(path: string) {
@@ -280,7 +282,9 @@ export async function openPrefilledBuy(plan: "hold-190" | "reserve-490", kit: Ki
 /** Post-kit next step: right under the kit's headline numbers. Mock left, button right; mobile sticky bar. */
 export function PostKitNext({ kit, where = "post_kit" }: { kit: KitPrefill; where?: string }) {
   const [busy, setBusy] = useState<"" | "hold-190" | "reserve-490">("");
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
+    setMounted(true);
     (window as unknown as Record<string, boolean>).__birchPostKit = true;
     window.dispatchEvent(new Event(POST_KIT_EVENT));
     return () => { (window as unknown as Record<string, boolean>).__birchPostKit = false; };
@@ -293,12 +297,14 @@ export function PostKitNext({ kit, where = "post_kit" }: { kit: KitPrefill; wher
     void openPrefilledBuy(plan, kit, where).finally(() => setBusy(""));
   };
   const brand = (kit.brand ?? "").trim();
+  const label = (kit.label ?? "").trim() || brand;
   return (
     <section className="rounded-3xl bg-white p-4 md:p-6" data-testid="post-kit-next" data-where={where}>
       <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">Your kit is ready. See your ad live.</h2>
       <div className="mt-4 grid items-center gap-5 md:grid-cols-[1.2fr_1fr]">
         <AnnotatedHubMock brand={brand} />
         <div>
+          <p className="mb-3 text-[13px] font-semibold text-[#0b1f3a]" data-testid="post-kit-urgency">{URGENCY_LINE}</p>
           <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={go("hold-190")} className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-7 text-lg font-bold text-white hover:bg-[#13305a] md:w-auto" data-testid="post-kit-look">
             {busy === "hold-190" ? <Loader2 className="size-5 animate-spin" /> : null}Start the $190 look <ArrowRight className="size-5" />
           </a>
@@ -306,17 +312,20 @@ export function PostKitNext({ kit, where = "post_kit" }: { kit: KitPrefill; wher
             <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={go("reserve-490")} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="post-kit-reserve">or reserve $490 as media credit</a>
           </p>
           <p className="mt-3 text-[13px] text-foreground/70" data-testid="post-kit-prefill-line">
-            {brand ? `Prefilled for ${brand}. ` : "Prefilled from your kit. "}100% credit toward $490 within 7 days, otherwise refunded.
+            {label ? `Prefilled for ${label}. ` : "Prefilled from your kit. "}100% credit toward $490 within 7 days, otherwise refunded.
           </p>
         </div>
       </div>
       <div className="mt-6"><MidTier where={where} /></div>
-      {/* Mobile: one sticky bar for the two card offers. Sits above the chat/voice dock row. */}
+      {/* Mobile: one sticky bar for the two card offers, portalled to <body> so no transformed ancestor (Scale skin) breaks `fixed`. The chat/voice dock lifts above it (randy-chat.tsx --birch-dock-bottom). */}
+      {mounted ? createPortal(
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-foreground/10 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 shadow-[0_-8px_24px_-12px_rgba(7,26,57,0.35)] backdrop-blur md:hidden" data-testid="post-kit-sticky">
         <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={go("hold-190")} className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-[#0b1f3a] text-sm font-bold text-white" data-testid="post-kit-sticky-look">$190 look</a>
         <span aria-hidden className="text-foreground/40">·</span>
         <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={go("reserve-490")} className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-[#0b1f3a] text-sm font-bold text-[#0b1f3a]" data-testid="post-kit-sticky-reserve">$490 reserve</a>
-      </div>
+      </div>,
+        document.body,
+      ) : null}
       <div className="h-16 md:hidden" aria-hidden />
     </section>
   );
