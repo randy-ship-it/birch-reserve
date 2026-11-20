@@ -111,6 +111,8 @@ export default function BrHome() {
           <AnnotatedHubMock testId="home-hero-mock" />
         </div>
       </section>
+      {/* Mobile: the live feed sits in the gap between the hero and the stats (Randy, Nov 20 4:54 PM). */}
+      <div className="container mx-auto max-w-5xl px-4 pb-6 md:hidden"><ActivityPulse mode="inline" /></div>
 
       {/* 2. Big numbers. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-stats">
@@ -156,7 +158,7 @@ export default function BrHome() {
         <CategoriesWeServe />
         <QuestionsBrandsAsk />
       </section>
-      <ActivityPulse />
+      <ActivityPulse desktopOnly />
 
       {/* 3. Two ways in (same cards as the intake). */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-ways">
