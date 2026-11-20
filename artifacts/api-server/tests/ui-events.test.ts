@@ -1087,7 +1087,9 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.equal(terms.status, 200);
     assert.match(terms.headers.get("content-type") ?? "", /text\/html/);
     assert.match(termsHtml, /<h1>Terms of sale<\/h1>/);
-    assert.match(termsHtml, /counsel stamps this page/);
+    // Nov 20 2026 (Randy): terms stand as written; the draft note is gone and pack terms + carry-over are in.
+    assert.doesNotMatch(termsHtml, /counsel stamps/);
+    assert.match(termsHtml, /counts in full toward any sponsorship pack bought within 30 days/);
     assert.match(termsHtml, /hold-190/);
     assert.match(termsHtml, /reserve-490/);
     assert.doesNotMatch(termsHtml, /id="root"/);

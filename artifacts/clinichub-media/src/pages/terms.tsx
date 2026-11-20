@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { SELLER_IDENTITY } from "@/lib/seller-identity";
+import { CARRY_OVER_CLAUSE, SPONSOR_PACK_TERMS } from "../../../api-server/src/lib/sponsorTerms";
 
 export default function Terms() {
   return (
@@ -10,9 +11,7 @@ export default function Terms() {
       <p className="mt-6 text-sm text-muted-foreground">{SELLER_IDENTITY}</p>
       <div className="mt-10 space-y-6 text-base leading-relaxed text-muted-foreground">
         <p>
-          Birch Reserve is operated by Silver Birch Growth Inc. These terms are
-          a draft. They are not in force for a live card until counsel stamps
-          this page. Public prices are $190 USD (
+          Birch Reserve is operated by Silver Birch Growth Inc. Public prices are $190 USD (
           <span className="text-foreground">hold-190</span>, a 7-day category
           look that does not lock a category) and $490 USD (
           <span className="text-foreground">reserve-490</span>, a shared
@@ -37,6 +36,13 @@ export default function Terms() {
         </p>
         <p>
           8 brand categories across hubs, not eight websites. reserve-490 is a shared self-serve category reserve; it does not lock the category. More than one brand can reserve in a category. Only a premium slot ($25,000 to $50,000 USD, inquire only, set on an insertion order) locks one brand per category for its term. Reporting is aggregate only. No PHI. No clinical pixels.
+        </p>
+        <h2 id="sponsorship-packs" className="pt-4 font-display text-2xl text-foreground">Sponsorship packs</h2>
+        <ul className="list-disc space-y-2 pl-5" data-testid="terms-sponsor-packs">
+          {SPONSOR_PACK_TERMS.map((t) => <li key={t}>{t}</li>)}
+        </ul>
+        <p id="carry-over" data-testid="terms-carry-over">
+          <strong className="text-foreground">Carry-over.</strong> {CARRY_OVER_CLAUSE}
         </p>
         <p>
           Checkout is Stripe-hosted. Silver Birch Growth Inc. does not store

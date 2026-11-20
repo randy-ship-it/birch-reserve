@@ -569,6 +569,11 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
     event.type === "checkout.session.async_payment_succeeded"
   ) {
     const session = event.data.object as Stripe.Checkout.Session;
+    if (session.payment_status === "paid" && session.metadata?.kind === "sponsorship_credit") {
+      // Sponsorship pack (Nov 20 2026): no splash reservation row. Alert sales so the IO goes out (internal email only).
+      await sendPaidSalesAlertSafe(session);
+      return;
+    }
     if (session.payment_status === "paid") {
       const paid = await markSplashReservationPaidFromSession(session);
       // 7:21pm: paid checkout → Friday (never throws; Stripe still gets its 2xx).
@@ -603,11 +608,12 @@ async function sendPaidSalesAlertSafe(session: Stripe.Checkout.Session): Promise
     const amount = typeof session.amount_total === "number" ? `${(session.amount_total / 100).toFixed(2)} ${String(session.currency ?? "").toUpperCase()}` : undefined;
     await sendSalesAlert({
       event: "paid_checkout",
-      title: `PAID: ${reservation?.brandName ?? email ?? "buyer"} · ${reservation?.promotedOffer ?? session.metadata?.sku ?? "Birch seat"}`,
+      title: `PAID: ${reservation?.brandName ?? session.metadata?.brand ?? email ?? "buyer"} · ${reservation?.promotedOffer ?? session.metadata?.sku ?? (session.metadata?.kind === "sponsorship_credit" ? `sponsorship pack ${session.metadata?.tier ?? ""}`.trim() : "Birch seat")}`,
       rows: [
         ["Brand", reservation?.brandName],
         ["Email", email],
-        ["Offer", reservation?.promotedOffer ?? session.metadata?.sku],
+        ["Brand (checkout)", reservation ? undefined : session.metadata?.brand],
+        ["Offer", reservation?.promotedOffer ?? session.metadata?.sku ?? session.metadata?.tier],
         ["Amount paid", amount],
         ["Stripe session", session.id],
         ["Reservation id", reservationId],

@@ -4,7 +4,7 @@ import { extractSignals, emptySignals, scoreMatch, normalizeUrl, isPrivateAddres
 import { lookupArea, quoteAreaLock, areaLockGuaranteedViews, blendedHubCpmUsd, AREA_LOCK, BRAND_HUBS, SLOT_LADDER } from "../src/lib/overhaul/model";
 import { buildAreaLockSession, checkoutGate } from "../src/lib/overhaul/checkout";
 import { buildIntakePayload, sendIntake } from "../src/lib/overhaul/fridayIntake";
-import { buildDepositSession } from "../src/routes/sponsorPage";
+import { buildDepositSession, sponsorDepositsOpen, sponsorHtml } from "../src/routes/sponsorPage";
 
 const page = (title: string, desc: string, body: string) => `<html><head><title>${title}</title><meta name="description" content="${desc}"></head><body><h1>${title}</h1><p>${body}</p></body></html>`;
 
@@ -99,10 +99,27 @@ test("checkout gate: live key needs the live flag", () => {
 
 test("deposit ladder sessions (non-exclusive slots buy down the rate)", () => {
   assert.deepEqual(SLOT_LADDER.map((s) => s.usd), [490, 1500, 3000, 6000]);
+  // USD only (Nov 20 2026): a CAD request still charges the USD pack.
   const t = buildDepositSession({ tier: "sponsor-3000", currency: "cad", brand: "Acme", email: "a@acme.com", agree: true }, "https://birchreserve.net");
-  assert.ok(t.ok && t.amountCents === 420000);
+  assert.ok(t.ok && t.amountCents === 300000 && t.currency === "usd");
   const starter = buildDepositSession({ amount: 490, currency: "usd", brand: "Acme", email: "a@acme.com", agree: true }, "https://birchreserve.net");
   assert.ok(starter.ok && starter.amountCents === 49000);
+});
+
+test("sponsorship pack checkout: plain line item, SCALE ADS descriptor, USD, terms version (audit #6)", () => {
+  for (const [tier, usd, bonus] of [["sponsor-1500", 1500, 5], ["sponsor-3000", 3000, 10], ["sponsor-6000", 6000, 15]] as const) {
+    const r = buildDepositSession({ tier, brand: "Acme", email: "a@acme.com", agree: true }, "https://birchreserve.net");
+    assert.ok(r.ok);
+    const p = r.params as { line_items: Array<{ price_data: { currency: string; unit_amount: number; product_data: { name: string; description: string } } }>; payment_intent_data: { statement_descriptor_suffix: string }; metadata: Record<string, string> };
+    const li = p.line_items[0]!.price_data;
+    assert.equal(li.currency, "usd");
+    assert.equal(li.unit_amount, usd * 100);
+    assert.match(li.product_data.name, new RegExp(`sponsorship pack · \\$${usd.toLocaleString("en-US")} USD`));
+    assert.match(li.product_data.description, new RegExp(`plus ${bonus}% bonus media credit`));
+    assert.doesNotMatch(JSON.stringify(li), /seat|pool|sweep|draw|entry|guarantee/i);
+    assert.equal(p.payment_intent_data.statement_descriptor_suffix, "SCALE ADS");
+    assert.equal(p.metadata.terms_version, "sponsor-2026-11-20");
+  }
 });
 
 test("Friday payload: org birchreserve, tags, and skipped without env", async () => {
@@ -373,4 +390,20 @@ test("street-team door section: est. 2026 headline from the census file, inquire
   assert.doesNotMatch(comp, /<details[^>]* open/);
   assert.match(comp, /type="image\/webp"/);
   for (const f of [DOOR_ROUTE.mapWebp, DOOR_ROUTE.mapJpg]) assert.ok(existsSync(resolve(process.cwd(), "../clinichub-media/public" + f)), f);
+});
+
+test("sponsor deposits gate + /sponsor packs page (audit #6)", () => {
+  const E = (o: Record<string, string>) => o as NodeJS.ProcessEnv;
+  assert.equal(sponsorDepositsOpen(E({ SPONSOR_DEPOSITS_ENABLED: "true", STRIPE_SECRET_KEY: "sk_live_x" })), false);
+  assert.equal(sponsorDepositsOpen(E({ SPONSOR_DEPOSITS_ENABLED: "true", SPONSOR_DEPOSITS_LIVE: "true", STRIPE_SECRET_KEY: "sk_live_x" })), true);
+  assert.equal(sponsorDepositsOpen(E({ SPONSOR_DEPOSITS_ENABLED: "true", SPONSOR_DEPOSITS_LIVE: "true", STRIPE_SECRET_KEY: "sk_live_x", STRIPE_CHECKOUT_DISABLED: "true" })), false);
+  assert.equal(sponsorDepositsOpen(E({ STRIPE_SECRET_KEY: "sk_test_x" })), false);
+  const html = sponsorHtml("cad", { open: true, pack: "sponsor-6000", prefill: { email: "a@acme.com", company: "Acme <x>" } });
+  for (const n of ["1,500", "3,000", "6,000"]) assert.match(html, new RegExp(`Prepay \\$${n}`));
+  assert.match(html, /value="sponsor-6000" checked/);
+  assert.match(html, /value="Acme &lt;x&gt;"/);
+  assert.match(html, /counts in full toward any sponsorship pack bought within 30 days/);
+  assert.match(html, /refundable until 14 days before the launch date in your IO/);
+  assert.doesNotMatch(html, /CAD 1|C\$|paused right now/);
+  assert.match(sponsorHtml("usd", { open: false }), /paused right now/);
 });

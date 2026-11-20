@@ -169,42 +169,74 @@ function TwoSurfaceExample({ dark = false }: { dark?: boolean }) {
   );
 }
 
-/** Mid-tier band: three compact cards (price, one line, one button). Details live in one expander. */
-export function MidTier({ where }: { where: string; compact?: boolean }) {
+/** Pack button: /sponsor?pack=…#prepay; with kit details, the same sealed token as /buy prefills brand + email there. */
+async function openSponsorPack(key: string, where: string, kit?: KitPrefill | null): Promise<void> {
+  const base = withUtm(`/sponsor?pack=${key}`, where, key);
+  let href = `${base}#prepay`;
+  if (kit && (kit.email || kit.brand)) {
+    try {
+      const r = await fetch("/v1/buy/prefill", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: kit.email ?? "", company: kit.brand ?? "", website: kit.website ?? "" }) });
+      const j = (await r.json().catch(() => ({}))) as { pf?: string };
+      if (r.ok && j.pf) href = `${base}&pf=${encodeURIComponent(j.pf)}#prepay`;
+    } catch { /* plain link still works */ }
+  }
+  goTo(href);
+}
+
+/**
+ * Mid-tier band (Randy, Nov 20 2026 audit #6): three sponsorship packs, each "Prepay $X" (card on /sponsor, existing
+ * deposit checkout), plus the agency $1K–$5K client test (pre-filled IO, no card). USD only.
+ */
+export function MidTier({ where, kit }: { where: string; compact?: boolean; kit?: KitPrefill | null }) {
   const [agencyOpen, setAgencyOpen] = useState(false);
+  const [busy, setBusy] = useState("");
   const cardCls = "flex flex-col rounded-2xl bg-white/[0.06] p-4 ring-1 ring-white/15";
-  const ghost = "mt-auto inline-flex h-10 items-center justify-center gap-1.5 rounded-full px-4 text-sm font-bold text-white ring-1 ring-white/40 hover:bg-white hover:text-[#0b1f3a]";
-  const cards = [
-    { k: "agency", eyebrow: "Agency client test", price: "$1K–$5K", line: `${AGENCY_TEST.cashPct}% cash to the agency.`, cta: "Prepay a test" },
-    { k: "sponsor", eyebrow: "Sponsorship credit", price: "$1.5K–$6K", line: "Up to +15% bonus credit.", cta: "Pick a tier", href: withUtm("/sponsor?currency=usd", where, "sponsor") },
-    { k: "block", eyebrow: "View block", price: `From ${fmtUsd(STARTER_BLOCK.startingUsd)}`, line: "100K modelled views.", cta: "Request a block", href: withUtm("/?inquire=pack&block=100000&surfaces=landing#quick-buy", where, "block") },
-  ];
+  const prepay = (key: string) => (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(key);
+    void openSponsorPack(key, where, kit).finally(() => setBusy(""));
+  };
   return (
     <section className="rounded-3xl p-5 text-white md:p-6" style={{ background: NAVY }} data-testid="mid-tier" data-where={where}>
-      <h3 className="font-display text-2xl leading-tight md:text-3xl" data-testid="mid-tier-line">Bigger test? Prepay media credit.</h3>
-      <p className="mt-1 text-[13px] font-semibold text-lime-300" data-testid="early-rate-line">{URGENCY_LINE}</p>
+      <h3 className="font-display text-2xl leading-tight md:text-3xl" data-testid="mid-tier-line">Bigger test? Prepay a sponsorship pack.</h3>
+      <p className="mt-1 text-[13px] text-white/75">Card now. Your insertion order names the hub and dates before anything runs.</p>
+      <p className="mt-2 text-[13px] font-semibold text-lime-300" data-testid="early-rate-line">{URGENCY_LINE}</p>
       <div className="mt-4 grid gap-3 md:grid-cols-3">
-        {cards.map((c) => (
-          <article key={c.k} className={cardCls} data-testid={`mid-tier-${c.k}`}>
-            <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">{c.eyebrow}</p>
-            <p className="mt-1 font-display text-3xl leading-none">{c.price} <span className="text-sm">USD</span></p>
-            <p className="mb-3 mt-1.5 text-[13px] text-white/75">{c.line}</p>
-            {c.href ? (
-              <a href={c.href} className={ghost} data-testid={`mid-tier-${c.k}-cta`}>{c.cta} <ArrowRight className="size-4" /></a>
-            ) : (
-              <button type="button" onClick={() => setAgencyOpen((v) => !v)} aria-expanded={agencyOpen} className="mt-auto inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-lime-300 px-4 text-sm font-bold text-[#0b1f3a] hover:bg-white" data-testid={`mid-tier-${c.k}-cta`}>{c.cta} <ArrowRight className="size-4" /></button>
-            )}
-          </article>
-        ))}
+        {DEPOSIT_TIERS.map((t) => {
+          const credit = Math.round(t.usd * (1 + t.bonusPct / 100));
+          const href = `${withUtm(`/sponsor?pack=${t.key}`, where, t.key)}#prepay`;
+          return (
+            <article key={t.key} className={`${cardCls} ${t.bonusPct === 10 ? "ring-2 ring-lime-300/70" : ""}`} data-testid={`mid-tier-pack-${t.usd}`}>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">{t.label}</p>
+              <p className="mt-1 font-display text-3xl leading-none">{fmtUsd(t.usd)} <span className="text-sm">USD</span></p>
+              <p className="mb-3 mt-1.5 text-[13px] text-white/75">+{t.bonusPct}% bonus media credit · {fmtUsd(credit)} USD to spend.</p>
+              <a href={href} onClick={prepay(t.key)} className="mt-auto inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-lime-300 px-4 text-sm font-bold text-[#0b1f3a] hover:bg-white" data-testid={`mid-tier-prepay-${t.usd}`}>
+                {busy === t.key ? <Loader2 className="size-4 animate-spin" /> : null}Prepay {fmtUsd(t.usd)} <ArrowRight className="size-4" />
+              </a>
+            </article>
+          );
+        })}
       </div>
+      <article className={`${cardCls} mt-3 md:flex-row md:items-center md:justify-between md:gap-4`} data-testid="mid-tier-agency">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">Agency client test</p>
+          <p className="mt-1 font-display text-2xl leading-none">$1K–$5K <span className="text-sm">USD</span></p>
+          <p className="mt-1 text-[13px] text-white/75">{AGENCY_TEST.cashPct}% cash to the agency. Pre-filled IO, no card.</p>
+        </div>
+        <button type="button" onClick={() => setAgencyOpen((v) => !v)} aria-expanded={agencyOpen} className="mt-3 inline-flex h-10 items-center justify-center gap-1.5 rounded-full px-4 text-sm font-bold text-white ring-1 ring-white/40 hover:bg-white hover:text-[#0b1f3a] md:mt-0" data-testid="mid-tier-agency-cta">
+          Prepay a test <ArrowRight className="size-4" />
+        </button>
+      </article>
       {agencyOpen ? <div className="mt-3 rounded-2xl bg-white/[0.06] p-4 ring-1 ring-lime-300/50" data-testid="mid-tier-agency-panel"><AgencyPrepayForm where={where} dark /></div> : null}
-      <Details dark label="Agency terms, refunds and a $1.5K–$5K example" testId="mid-tier-details">
+      <p className="mt-3 text-[12px] text-white/70" data-testid="mid-tier-pack-terms">Packs: refundable until 14 days before the IO launch date. Bonus is media credit only, no cash value. No impression guarantees; reporting is aggregate. A paid $190 look or $490 reserve counts in full toward a pack within 30 days.</p>
+      <Details dark label="Agency terms, view blocks and a $1.5K–$5K example" testId="mid-tier-details">
         <p data-testid="mid-tier-agency-terms">{MID_TIER_LINE} One IO per client. {AGENCY_REPORTING_LINE}.</p>
         <p data-testid="mid-tier-refund">{MID_TIER_REFUND}</p>
+        <p>View block: from {fmtUsd(STARTER_BLOCK.startingUsd)} USD for 100K modelled views. <a href={withUtm("/?inquire=pack&block=100000&surfaces=landing#quick-buy", where, "block")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-block-cta">Request a block</a></p>
         <p>Premium, one brand per category: $25K–$50K, inquire only. <a href={withUtm("/buy?plan=exclusive", where, "exclusive")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-exclusive">Request an invoice</a></p>
         <TwoSurfaceExample dark />
       </Details>
-      <p className="mt-2 text-[10px] text-white/50">{MODELLED_PLAN_LABEL}.</p>
     </section>
   );
 }
@@ -316,7 +348,7 @@ export function PostKitNext({ kit, where = "post_kit" }: { kit: KitPrefill; wher
           </p>
         </div>
       </div>
-      <div className="mt-6"><MidTier where={where} /></div>
+      <div className="mt-6"><MidTier where={where} kit={kit} /></div>
       {/* Mobile: one sticky bar for the two card offers, portalled to <body> so no transformed ancestor (Scale skin) breaks `fixed`. The chat/voice dock lifts above it (randy-chat.tsx --birch-dock-bottom). */}
       {mounted ? createPortal(
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-foreground/10 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 shadow-[0_-8px_24px_-12px_rgba(7,26,57,0.35)] backdrop-blur md:hidden" data-testid="post-kit-sticky">
