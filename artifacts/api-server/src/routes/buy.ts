@@ -236,7 +236,7 @@ header.top{border-bottom:1px solid #d8dccf}header.top .wrap{display:flex;justify
 .prog li.on{opacity:1}.prog li.done{opacity:1}.prog li.done b{background:#071A39;color:#f8f6ef}.prog li span{white-space:nowrap}
 .card{background:#fff;border:1px solid #dfe2d8;border-radius:22px;padding:22px;margin:16px 0}.card[aria-disabled=true]{opacity:.5;pointer-events:none}
 .card h2{font-size:1.55rem;margin-bottom:12px;display:flex;align-items:center;gap:10px}.card h2 em{font-style:normal;font-size:.8rem;font-family:"IBM Plex Sans",system-ui;background:#e9efe0;border-radius:999px;padding:3px 10px;color:#24412a}
-label{display:block;font-size:.86rem;font-weight:600;margin:10px 0 4px}input[type=text],input[type=email],input[type=url]{width:100%;min-height:48px;border:1.5px solid #c9cfc2;border-radius:12px;padding:0 14px;font:inherit;background:#fbfbf8}
+label{display:block;font-size:.86rem;font-weight:600;margin:10px 0 4px}input[type=text],input[type=email]{width:100%;min-height:48px;border:1.5px solid #c9cfc2;border-radius:12px;padding:0 14px;font:inherit;background:#fbfbf8}
 input:focus{outline:3px solid #C8F55A;border-color:#071A39}.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 24px;border-radius:999px;border:0;background:#071A39;color:#f8f6ef;font:600 16px "IBM Plex Sans",system-ui;cursor:pointer;margin-top:16px;text-decoration:none}
 .btn[disabled]{opacity:.5;cursor:wait}.btn.alt{background:#C8F55A;color:#071A39}
@@ -260,7 +260,7 @@ details{margin:14px 0 0;font-size:.86rem;color:#4d5b6a}details summary{cursor:po
 .done-box{display:none;text-align:center;padding:28px 18px}.done-box.on{display:block}.done-box h2{font-size:1.8rem;margin-bottom:8px}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 footer{border-top:1px solid #d8dccf;margin-top:30px;padding:20px 0 36px;font-size:.84rem;color:#4d5b6a}
-@media(max-width:760px){.picks{grid-template-columns:1fr 1fr}.plans{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.prog li span{display:none}.prog li.on span{display:inline}.card{padding:18px}}`;
+@media(max-width:760px){header nav a[href^=tel]{display:none}.picks{grid-template-columns:1fr 1fr}.plans{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.prog li span{display:none}.prog li.on span{display:inline}.card{padding:18px}}`;
 
 export function renderBuyPage(opts: { checkoutLive: boolean }): string {
   const formats = BUY_FORMATS.map(
@@ -282,7 +282,7 @@ ${publicSeoTags(BUY_PATH, TITLE, DESCRIPTION)}
 <div class="g2"><div><label for="b-name">Your name</label><input type="text" id="b-name" name="name" required maxlength="120" autocomplete="name"></div>
 <div><label for="b-email">Work email</label><input type="email" id="b-email" name="email" required maxlength="200" autocomplete="email" inputmode="email"></div>
 <div><label for="b-company">Company</label><input type="text" id="b-company" name="company" required maxlength="160" autocomplete="organization"></div>
-<div><label for="b-web">Company website</label><input type="url" id="b-web" name="website" required maxlength="300" placeholder="yourbrand.com" autocomplete="url" inputmode="url"></div></div>
+<div><label for="b-web">Company website</label><input type="text" id="b-web" name="website" required maxlength="300" placeholder="yourbrand.com" autocomplete="url" inputmode="url"></div></div>
 <div class="hp" aria-hidden="true"><label for="b-fax">Fax</label><input type="text" id="b-fax" name="fax" tabindex="-1" autocomplete="off"></div>
 <button class="btn" id="s1-go" type="submit">Continue</button><p class="msg" id="s1-msg" role="status" aria-live="polite"></p></form>
 
