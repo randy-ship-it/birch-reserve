@@ -67,7 +67,7 @@ export function QuestionsBrandsAsk() {
   return (
     <section data-testid="questions-brands-ask" aria-labelledby="qba-h">
       <h2 id="qba-h" className="font-display text-2xl leading-tight text-[#0b1f3a] md:text-3xl">Questions brands ask</h2>
-      <div className="mt-3 grid gap-2 md:grid-cols-2">
+      <div className="mt-3 grid items-start gap-2 md:grid-cols-2">
         {BRAND_QUESTIONS.map((x) => (
           <details key={x.q} className="group rounded-2xl bg-white p-4 shadow-sm ring-1 ring-foreground/10" data-testid="brand-question">
             <summary className="flex cursor-pointer list-none items-start justify-between gap-3 text-[15px] font-bold leading-snug text-[#0b1f3a] [&::-webkit-details-marker]:hidden">
@@ -89,7 +89,7 @@ const SHOW_MS = 7000;
 const gap = () => 20000 + Math.round(Math.random() * 20000); // every ~20–40s
 
 /**
- * Uniform bottom toast (Randy t294u): "[blurred] · Physio clinic, Ontario · asked about hosting a hub · 2d ago".
+ * Uniform bottom toast (left, clear of the call button and the mobile sticky bar) (Randy t294u): "[blurred] · Physio clinic, Ontario · asked about hosting a hub · 2d ago".
  * The blurred "name" is a fixed placeholder shape, never a real name: the API carries no names (lib/activityPulse.ts),
  * so there is nothing in the HTML or JSON to un-blur. Real events only: show:false, an error or an empty list renders
  * nothing. Non-blocking (only the toast takes pointer events), dismissible for the session, slide + fade.
@@ -146,12 +146,12 @@ export function ActivityPulse() {
   };
   return (
     <div
-      className={`pointer-events-none fixed inset-x-3 bottom-4 z-40 flex justify-start transition-all duration-500 ease-out motion-reduce:transition-none md:inset-x-auto md:left-5 md:max-w-md ${visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
+      className={`pointer-events-none fixed left-3 bottom-24 z-40 flex justify-start transition-all duration-500 ease-out motion-reduce:transition-none md:bottom-5 md:left-24 md:max-w-md ${visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
       data-testid="activity-pulse"
       data-visible={visible ? "1" : "0"}
       aria-hidden={visible ? undefined : true}
     >
-      <div className={`flex max-w-[calc(100vw-6.5rem)] items-center gap-3 rounded-2xl bg-white/95 px-3.5 py-2.5 shadow-lg ring-1 ring-foreground/10 backdrop-blur md:max-w-md ${visible ? "pointer-events-auto" : ""}`} role="status" aria-live="polite">
+      <div className={`flex max-w-[calc(100vw-8.5rem)] items-center gap-3 rounded-2xl bg-white/95 px-3.5 py-2.5 shadow-lg ring-1 ring-foreground/10 backdrop-blur md:max-w-md ${visible ? "pointer-events-auto" : ""}`} role="status" aria-live="polite">
         <span className="relative flex size-2 shrink-0" aria-hidden>
           <span className="absolute inline-flex size-full rounded-full bg-lime-400 opacity-60 motion-safe:animate-ping" />
           <span className="relative inline-flex size-2 rounded-full bg-lime-500" />
