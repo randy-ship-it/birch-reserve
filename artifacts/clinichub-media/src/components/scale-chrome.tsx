@@ -44,7 +44,7 @@ export function ScaleHeader() {
         <a
           href={intakeHref("nav_mobile")}
           onClick={() => logCtaClick("nav_mobile")}
-          className="inline-flex min-h-11 shrink-0 items-center rounded-lg bg-[#1d875c] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#176f4b]"
+          className="inline-flex min-h-11 shrink-0 items-center rounded-[10px] bg-[#1d875c] px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#176f4b]"
           data-testid="nav-kit-cta"
         >
           Get my kit
