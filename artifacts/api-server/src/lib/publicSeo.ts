@@ -51,6 +51,14 @@ export const PUBLIC_SITEMAP_PATHS = [
   "/recovery-device-advertising",
   "/post-purchase-ads-health-brands",
   "/health-wellness-retail-media-canada",
+  // Blog (server-rendered, Nov 19 2026; lib/blogPosts.ts).
+  "/blog",
+  "/blog/paid-ads-are-fuel-not-a-fix",
+  "/blog/every-channel-wears-out",
+  "/blog/product-channel-fit",
+  "/blog/do-things-that-dont-scale-distribution",
+  "/blog/brand-and-activation-balance",
+  "/blog/mental-and-physical-availability",
 ] as const;
 
 /**

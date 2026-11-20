@@ -78,6 +78,8 @@ const API_PATHS = [
   "/recovery-device-advertising/?",
   "/post-purchase-ads-health-brands/?",
   "/health-wellness-retail-media-canada/?",
+  // Blog (server-rendered).
+  "/blog(?:/[a-z0-9-]+)?/?",
 ];
 
 // Real client routes that stay on the static shell. Anything else that misses
