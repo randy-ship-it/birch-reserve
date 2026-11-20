@@ -1,4 +1,4 @@
-import { CHECKOUT_TAGLINE, birchPaymentIntentBrand } from "../lib/checkoutCopy";
+import { CHECKOUT_TAGLINE, birchCheckoutCustomText, birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import { llmsTxt } from "../lib/overhaul/seo";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -1065,6 +1065,7 @@ async function handleMachineCheckout(
     success_url: `${baseUrl}/success?order=${reservation.id}&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${baseUrl}/buycalc?checkout=cancelled`,
     allow_promotion_codes: false,
+    custom_text: birchCheckoutCustomText(),
   };
   const checkoutIdempotencyKey = `birch-reserve-v1:${reservation.id}:${nextAttempt}`;
   const checkoutAttemptStartedAt = new Date();
