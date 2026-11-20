@@ -1,4 +1,5 @@
 /** Shared bits for the Birch brand intake (preview). Mobile-first; fine print lives in popovers. */
+import { skinText } from "@/lib/siteSkin";
 import { CHANNEL_GEO, type Eligibility, type Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { EligChip, eligibilityOf } from "@/components/br/intake-geo";
 import { CtaBand, LeadGatesStatus, PrimaryCta, sideOf } from "@/components/br/intake-sell";
@@ -304,7 +305,7 @@ export function ContactSubmit({ role, payload, draft, setRef, label }: { role: I
     <div id={`${role}-contact-submit`} data-testid={`${role}-contact-submit`} className="scroll-mt-32 rounded-2xl border border-foreground/15 bg-white p-4">
       {state === "done" ? (
         <div>
-          <p data-testid={`${role}-pending-review`} className="text-sm">Received as <strong>pending approval</strong>. A person at Birch Reserve reviews every request; nothing is accepted automatically and nothing is booked or charged.</p>
+          <p data-testid={`${role}-pending-review`} className="text-sm">Received as <strong>pending approval</strong>. A person at {skinText("Birch Reserve")} reviews every request; nothing is accepted automatically and nothing is booked or charged.</p>
           <LeadGatesStatus gates={gates} testId={`${role}-lead-gates`} />
           {side === "advertiser" ? <div className="mt-4"><PrimaryCta side="advertiser" where="done" /></div> : null}
         </div>

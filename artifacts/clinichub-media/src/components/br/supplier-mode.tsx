@@ -6,6 +6,7 @@
  * - Own hub = pending approval (Birch Reserve: Randy or Jon) before it goes live. Never auto-publish.
  * - Fees kept quiet: chips + "How fees work" expander; $5,000 stand-up fee struck through (waived before 2027). USD.
  */
+import { skinText } from "@/lib/siteSkin";
 import { BadgeCheck, Check, Clock, Package, Rocket, Store } from "lucide-react";
 import { Details } from "@/components/br/details";
 
@@ -118,7 +119,7 @@ export function SupplierDone({ brand, level }: { brand: string; level: Level }) 
       ) : null}
       <div className="pointer-events-none mt-4" aria-disabled><ExposureLadder level={level} onPick={() => undefined} /></div>
       <Details testId="supplier-pending-details">
-        <p>Birch Reserve reviews every request{hub ? " and every new hub before it goes live" : ""}. Nothing is published, booked or charged automatically, and you approve every placement.</p>
+        <p>{skinText("Birch Reserve")} reviews every request{hub ? " and every new hub before it goes live" : ""}. Nothing is published, booked or charged automatically, and you approve every placement.</p>
       </Details>
     </div>
   );
