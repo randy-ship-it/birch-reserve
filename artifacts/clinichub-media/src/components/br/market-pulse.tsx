@@ -83,7 +83,7 @@ export function QuestionsBrandsAsk() {
 }
 
 const FEED_URL = "/v1/activity-pulse";
-type PulseEvent = { who: string; region: string | null; action: string; ago: string; age_h?: number };
+type PulseEvent = { who: string; region: string | null; action: string; ago: string; age_h?: number; kind?: "launch" };
 type Feed = { show: boolean; events: PulseEvent[] };
 const OFF_KEY = "br_pulse_off"; // localStorage: "1" = visitor turned the feed off (persists across visits)
 // Fast feed (Randy, Nov 20 4:52 PM): one toast, content swaps every 1–1.5s with a quick crossfade; first after ~2s.
@@ -281,11 +281,23 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, className =
         <span className="inline-flex size-1.5 shrink-0 rounded-full bg-lime-500/70" aria-hidden />
         {/* One text flow (no flex gaps between fragments), left-aligned, normal spacing, so it wraps naturally on phones. */}
         <span className={`block min-w-0 flex-1 whitespace-normal text-left text-[11px] font-normal normal-case tracking-normal opacity-80 transition-opacity ease-out [hyphens:none] [text-align-last:auto] [word-spacing:normal] motion-reduce:transition-none md:text-[12px] ${fading ? "opacity-0" : ""}`} style={{ color: NAVY, lineHeight: 1.35, transitionDuration: `${FADE_MS}ms` }} data-testid="activity-pulse-text">
-          <span className="mr-1 inline-block h-2.5 w-10 rounded-full bg-foreground/15 align-[-1px] blur-[2px]" aria-hidden data-testid="activity-pulse-blur" />
-          <span className="sr-only">Someone </span>
-          <span className="font-medium" data-testid="activity-pulse-who">{e.who}{e.region ? `, ${e.region}` : ""}</span>
-          {" · "}
-          <span data-testid="activity-pulse-line">{e.action}</span>
+          {e.kind === "launch" ? (
+            <>
+              {/* Launch highlight (Randy Nov 20 5:24 PM): small accent badge, place type only, never a business name. */}
+              <span className="mr-1 inline-block rounded-full bg-lime-400/80 px-1.5 align-[1px] text-[9px] font-semibold uppercase leading-[1.5] tracking-normal text-[#0b1f3a]" data-testid="activity-pulse-badge">New hub</span>
+              <span className="font-medium" data-testid="activity-pulse-who">{e.who}{e.region ? `, ${e.region}` : ""}</span>
+              {" "}
+              <span data-testid="activity-pulse-line">{e.action}</span>
+            </>
+          ) : (
+            <>
+              <span className="mr-1 inline-block h-2.5 w-10 rounded-full bg-foreground/15 align-[-1px] blur-[2px]" aria-hidden data-testid="activity-pulse-blur" />
+              <span className="sr-only">Someone </span>
+              <span className="font-medium" data-testid="activity-pulse-who">{e.who}{e.region ? `, ${e.region}` : ""}</span>
+              {" · "}
+              <span data-testid="activity-pulse-line">{e.action}</span>
+            </>
+          )}
           {" · "}
           <span className="text-foreground/45">{e.ago}</span>
           <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className="mt-0.5 block text-left text-[10px] leading-tight text-foreground/40 underline underline-offset-2 hover:text-foreground/70" data-testid="activity-pulse-hide">

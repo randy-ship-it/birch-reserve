@@ -49,7 +49,12 @@ export const PULSE_ACTIONS = {
   ask_display: "asked about display placements",
   ask_cpc: "asked about CPC and CPM pricing",
   compliment: "said the concept sounds promising",
+  // Confirmed launches (Randy Nov 20 5:24 PM): shown as "New physio hub launched", highlighted, 180-day window.
+  location_launched: "launched",
 } as const;
+/** Launch events: highlighted on the site and kept for LAUNCH_WINDOW_DAYS instead of the 90-day window. */
+export const LAUNCH_ACTIONS: ReadonlySet<string> = new Set(["location_launched"]);
+export const LAUNCH_WINDOW_DAYS = 180;
 export type PulseAction = keyof typeof PULSE_ACTIONS;
 
 export const PULSE_MIN_EVENTS = 3;
@@ -58,7 +63,7 @@ export const PULSE_WINDOW_DAYS = 90;
 export const PULSE_LIMIT = 40;
 
 /** Fixed "who" labels. Anything else is dropped to the generic label; the store never keeps free text. */
-export const PULSE_WHO = ["Health and wellness brand", "Site visitor", "Physio clinic", "Studio", "Agency", "Sleep brand", "Recovery equipment brand", "Pain relief brand", "Supplement distributor", "Beverage brand", "Recovery hardware brand", "Nutrition brand", "Snack bar brand", "Wellness product maker", "Golf club", "Venue"] as const;
+export const PULSE_WHO = ["Health and wellness brand", "Site visitor", "Physio clinic", "Studio", "Agency", "Sleep brand", "Recovery equipment brand", "Pain relief brand", "Supplement distributor", "Beverage brand", "Recovery hardware brand", "Nutrition brand", "Snack bar brand", "Wellness product maker", "Golf club", "Venue", "New physio hub", "New recovery hub", "New Pilates studio", "New physio clinic", "New stretch studio"] as const;
 
 /** Short public label for a category key or label. Unknown or "other" → null (shown as a health and wellness brand). */
 export function pulseCategoryLabel(raw: unknown): string | null {
@@ -184,23 +189,27 @@ export function relTime(ms: number): string {
   const h = Math.round(m / 60);
   if (h < 24) return `${h}h ago`;
   const d = Math.round(h / 24);
-  return d === 1 ? "yesterday" : `${d}d ago`;
+  if (d === 1) return "yesterday";
+  if (d < 14) return `${d}d ago`;
+  if (d < 60) return `${Math.round(d / 7)}w ago`;
+  return `${Math.round(d / 30)}mo ago`;
 }
 
-export type PulseFeedEvent = { who: string; region: string | null; action: string; ago: string; age_h: number; source: "site" | "inbox" };
+export type PulseFeedEvent = { who: string; region: string | null; action: string; ago: string; age_h: number; source: "site" | "inbox"; kind?: "launch" };
 export type PulseFeed = { show: boolean; window_days: number; events: PulseFeedEvent[]; counts: { this_week: number; window: number } };
 
 const whoOf = (r: PulseEvent) => r.who ?? (r.category ? `${r.category} brand` : r.action.startsWith("chat_") ? "Site visitor" : "Health and wellness brand");
 
 export function toFeed(rows: Array<PulseEvent & { source?: "site" | "inbox" }>, now = Date.now()): PulseFeed {
-  const inWindow = rows.filter((r) => now - r.createdAt.getTime() <= PULSE_WINDOW_DAYS * 864e5 && r.createdAt.getTime() <= now).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  const windowMs = (r: PulseEvent) => (LAUNCH_ACTIONS.has(r.action) ? LAUNCH_WINDOW_DAYS : PULSE_WINDOW_DAYS) * 864e5;
+  const inWindow = rows.filter((r) => now - r.createdAt.getTime() <= windowMs(r) && r.createdAt.getTime() <= now).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   const counts = { this_week: inWindow.filter((r) => now - r.createdAt.getTime() <= 7 * 864e5).length, window: inWindow.length };
   if (inWindow.length < PULSE_MIN_EVENTS) return { show: false, window_days: PULSE_WINDOW_DAYS, events: [], counts };
   return {
     show: true,
     window_days: PULSE_WINDOW_DAYS,
     counts,
-    events: inWindow.slice(0, PULSE_LIMIT).map((r) => ({ who: whoOf(r), region: r.region ?? null, action: PULSE_ACTIONS[r.action], ago: relTime(now - r.createdAt.getTime()), age_h: Math.round((now - r.createdAt.getTime()) / 36e5), source: r.source ?? "site" })),
+    events: inWindow.slice(0, PULSE_LIMIT).map((r) => ({ who: whoOf(r), region: r.region ?? null, action: PULSE_ACTIONS[r.action], ago: relTime(now - r.createdAt.getTime()), age_h: Math.round((now - r.createdAt.getTime()) / 36e5), source: r.source ?? "site", ...(LAUNCH_ACTIONS.has(r.action) ? { kind: "launch" as const } : {}) })),
   };
 }
 

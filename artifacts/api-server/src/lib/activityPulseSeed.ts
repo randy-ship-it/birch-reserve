@@ -8,12 +8,17 @@
  * t295u (Nov 20 2026): widened to every readable source over 90 days (Scale inbox, Birch/SBG inbox, Instantly unibox
  * across all 16 campaigns). Same rules. 20 rows total, each one real message; the count is not padded. New Instantly
  * replies append hourly through /api/cron/pulse-ingest (lib/pulseIngest.ts).
+ *
+ * Launches (Randy Nov 20 5:24 PM): only launches confirmed in the inboxes (read-only), shown as place type only, never a
+ * business name. City is left blank where the source does not confirm one. 180-day window for this type.
  */
 import type { PulseEvent } from "./activityPulse";
 
 type Seed = Pick<PulseEvent, "action" | "who" | "region"> & { at: string };
 
 const SEED: Seed[] = [
+  { at: "2026-10-24T02:00:00Z", who: "New recovery hub", region: null, action: "location_launched" },
+  { at: "2026-06-25T21:00:00Z", who: "New physio hub", region: null, action: "location_launched" },
   { at: "2026-11-20T19:00:00Z", who: "Agency", region: "Canada", action: "agency_partnership" },
   { at: "2026-11-20T16:00:00Z", who: "Recovery equipment brand", region: "US", action: "call_booked" },
   { at: "2026-11-16T16:00:00Z", who: "Sleep brand", region: "US", action: "placements_team" },
