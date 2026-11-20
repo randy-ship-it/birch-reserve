@@ -139,7 +139,7 @@ export function sponsorHtml(_currency: Currency, opts: SponsorPageOpts = {}): st
   const val = (v?: string) => (v ? ` value="${esc(v)}"` : "");
   const tiers = DEPOSIT_TIERS.map((t) => {
     const credit = Math.round(t.usd * (1 + t.bonusPct / 100));
-    return `<label class="card pack${t.key === picked ? " on" : ""}" data-testid="pack-${t.key}"><input type="radio" name="tier" value="${t.key}"${t.key === picked ? " checked" : ""} class="sr"><strong>${esc(t.label)}</strong><span class="amt">${money(t.usd, currency)} <small>USD</small></span><span>+${t.bonusPct}% bonus media credit: ${money(credit, currency)} USD to spend.</span><button type="button" class="btn" data-tier="${t.key}">Prepay ${money(t.usd, currency)}</button></label>`;
+    return `<label class="card pack${t.key === picked ? " on" : ""}" data-testid="pack-${t.key}"><input type="radio" name="tier" value="${t.key}"${t.key === picked ? " checked" : ""} class="sr"><strong>${esc(t.label)}</strong><span class="amt">${money(t.usd, currency)}</span><span>+${t.bonusPct}% bonus media credit: ${money(credit, currency)} to spend.</span><button type="button" class="btn" data-tier="${t.key}">Prepay ${money(t.usd, currency).replace(/ USD$/, "")}</button></label>`;
   }).join("");
   const ladder = SMB_LADDER.map((r) => `<tr><td>${r.customers} activated customers</td><td class="n">$${fmt(r.cashCad)} CAD cash</td><td class="n">$${fmt(r.creditCad)} CAD ad credit</td></tr>`).join("");
   const status =
