@@ -43,7 +43,7 @@ export const MIRROR_SKINS: Readonly<Record<string, "scale">> = { scale_mirror: "
 /** Scale's own icon (copied byte-for-byte from silverbirchgrowth/scalehealthnew public/favicon.svg). */
 export const SCALE_FAVICON = "/brand/scale/favicon.svg";
 const SCALE_FONT_HREF = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap";
-const MIRROR_PAGE_RE = /^\/intake(?:\/(?:publisher|supplier|sponsor|gtm|street-team|report|reel))?\/?$/;
+export const MIRROR_PAGE_RE = /^\/intake(?:\/(?:publisher|supplier|sponsor|gtm|street-team|report|reel|activate))?\/?$/;
 
 /** Strip /intake/_m from a request URL. Returns null when the URL is not prefixed. */
 export function stripMirrorPrefix(url: string): string | null {
