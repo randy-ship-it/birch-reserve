@@ -7,7 +7,7 @@
  */
 import { Tam2027 } from "@/components/br/inventory-plan";
 import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPath";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { ArrowRight, BookOpen, Building2, ChevronDown, FileText, Handshake, LayoutGrid, Package, Sparkles, Store, Users } from "lucide-react";
 import { DoorRoute } from "@/components/br/door-route";
 import { FounderNote, priceLabels, useAvailability } from "@/components/br/prime-hero";
@@ -81,6 +81,15 @@ export default function BrHome() {
   useAttention({ audience: "[data-testid=home-stats]", hubs: "#proof-live", ladder: "[data-testid=home-offer-stairs]", street: "[data-testid=home-street-team]", details: "#more", end: "[data-testid=home-close]" });
   usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand inside private, members-only health and wellness hubs: 700MM+ captive page views activating, 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 2MM+ homes reached by 2027. Get a free Monetization Kit. Prices in USD; figures are based on signed partnership contracts: reach and audience, not delivered impressions.");
   const price = priceLabels(useAvailability());
+  // Phones: the floating chat + voice buttons stay out of the hero preview until the visitor scrolls past it.
+  useEffect(() => {
+    const hero = document.querySelector("[data-testid=home-hero]");
+    if (!hero || typeof IntersectionObserver === "undefined") return;
+    const root = document.documentElement;
+    const io = new IntersectionObserver(([en]) => root.classList.toggle("br-hero-in-view", Boolean(en?.isIntersecting)), { threshold: 0.05 });
+    io.observe(hero);
+    return () => { io.disconnect(); root.classList.remove("br-hero-in-view"); };
+  }, []);
   return (
     <div className="w-full overflow-x-hidden bg-[#FAF8F3]" data-testid="br-home">
       <JsonLd
@@ -97,6 +106,7 @@ export default function BrHome() {
         }}
       />
 
+      <style>{`@media (max-width: 767px){html.br-hero-in-view .birch-dock-squirrel,html.br-hero-in-view elevenlabs-convai{visibility:hidden!important;pointer-events:none!important}}`}</style>
       {/* 1. Hero: one line + the kit CTA. */}
       <section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]" data-testid="home-hero">
         <div className="container mx-auto grid max-w-6xl gap-x-8 gap-y-5 px-4 pb-8 pt-10 md:grid-cols-[1fr_1.05fr] md:grid-rows-[auto_auto] md:content-center md:pb-12 md:pt-14">

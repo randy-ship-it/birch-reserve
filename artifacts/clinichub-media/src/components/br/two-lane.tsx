@@ -118,9 +118,9 @@ export function HubMock({ brand, logo, hub, category, pins = false, badge }: { b
       <div className="relative aspect-[16/10] w-full">
         <img src={H.img} alt={`${hubName} live hub`} width={1440} height={900} decoding="async" className="absolute inset-0 size-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
-        <div className={`absolute ${H.card.pos} w-[42cqw] rounded-[1.6cqw] bg-white p-[2.2cqw] shadow-2xl ring-2 ring-lime-300`} style={H.card.scale ? { transform: `scale(${H.card.scale})`, transformOrigin: H.card.origin === "br" ? "bottom right" : "bottom left" } : undefined} data-testid="hub-mock-card">
+        <div className={`absolute ${H.card.pos} w-[42cqw] max-md:w-[60cqw] rounded-[1.6cqw] bg-white p-[2.2cqw] shadow-2xl ring-2 ring-lime-300`} style={H.card.scale ? { transform: `scale(${H.card.scale})`, transformOrigin: H.card.origin === "br" ? "bottom right" : "bottom left" } : undefined} data-testid="hub-mock-card">
           {pins ? <><span className={`${pinCls} -left-3 -top-3`} aria-hidden>1</span><span className={`${pinCls} -bottom-3 ${H.card.pin3 === "bl" ? "-left-3" : "-right-3"}`} aria-hidden>3</span></> : null}
-          <p className="text-[max(7px,1.7cqw)] font-bold uppercase tracking-[0.16em] text-foreground/45">Featured · {surface}</p>
+          <p className="truncate text-[max(7px,1.7cqw)] font-bold uppercase tracking-[0.12em] text-foreground/45">Featured · {surface}</p>
           <div className="mt-[1.4cqw] flex items-center gap-[1.6cqw]">
             {logo ? (
               <img src={logo} alt="" className="size-[max(24px,7.5cqw)] shrink-0 rounded-lg object-contain ring-1 ring-foreground/10" />
