@@ -172,6 +172,10 @@ export default function BrMediaKit() {
             <Cta href="#request" variant="line" testId="mk-request-hero" className="w-full sm:w-auto">Ask about a placement</Cta>
             <MediaKitPdfLink variant="line" testId="mk-pdf-hero" className="w-full sm:w-auto" />
           </div>
+          <p className="mt-4 text-sm" data-testid="mk-reel-link">
+            <a href="/reel" className="font-semibold underline underline-offset-4 hover:no-underline">Watch how the ad system works</a>
+            <span className="text-foreground/60"> · 50-second walkthrough</span>
+          </p>
 
         </div>
       </section>

@@ -208,7 +208,7 @@ const routes = [
   { src: "^/intake/_m/(.+)$", dest: "/$1", check: true },
   // The home page is served by the function so its Offer JSON-LD matches the visitor's currency.
   { src: "^/$", dest: "/api" },
-  // Unlisted reel page (static, noindex).
+  // Public reel page (static): Scale Health ad system walkthrough.
   { src: "^/reel/?$", dest: "/reel/index.html", check: true },
   { handle: "filesystem" },
   ...API_PATHS.map((src) => ({ src, dest: "/api" })),
