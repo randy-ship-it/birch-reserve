@@ -38,7 +38,8 @@ export function buildExclusiveReserveSession(body: ReserveRequest, origin: strin
       mode: "payment",
       customer_email: email,
       customer_creation: "always",
-      line_items: [{
+      // Live Price (Stripe product "Exclusive display reserve ($1,900 CAD)") when STRIPE_PRICE_EXCLUSIVE_1900_CAD is set; inline CAD price_data otherwise.
+      line_items: [process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD?.trim() ? { price: process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD.trim(), quantity: 1 } : {
         quantity: 1,
         price_data: {
           currency: EXCLUSIVE_RESERVE.currency,
