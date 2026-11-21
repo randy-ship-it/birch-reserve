@@ -19,7 +19,10 @@ import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BuyCta } from "@/components/br/buy-cta";
 import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
-import { AnnotatedHubMock, MidTier } from "@/components/br/next-step";
+import { MidTier } from "@/components/br/next-step";
+import { SeeYourAd } from "@/components/br/see-your-ad";
+import { OfferStairs } from "@/components/br/offer-stairs";
+import { trackAttn, useAttention } from "@/lib/attention";
 import { ActivityPulse, CategoryStrip, QuestionsBrandsAskCompact } from "@/components/br/market-pulse";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { INVENTORY, PUBLISHER_INCENTIVE } from "../../../../api-server/src/lib/overhaul/model";
@@ -75,6 +78,7 @@ function Expand({ title, sub, children, testId, open = false }: { title: string;
 }
 
 export default function BrHome() {
+  useAttention({ audience: "[data-testid=home-stats]", hubs: "#proof-live", ladder: "[data-testid=home-offer-stairs]", street: "[data-testid=home-street-team]", details: "#more", end: "[data-testid=home-close]" });
   usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand inside private, members-only health and wellness hubs: 700MM+ captive page views activating, 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 2MM+ homes reached by 2027. Get a free Monetization Kit. Prices in USD; figures are based on signed partnership contracts: reach and audience, not delivered impressions.");
   const price = priceLabels(useAvailability());
   return (
@@ -95,28 +99,28 @@ export default function BrHome() {
 
       {/* 1. Hero: one line + the kit CTA. */}
       <section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]" data-testid="home-hero">
-        <div className="container mx-auto grid max-w-6xl items-center gap-8 px-4 pb-8 pt-10 md:grid-cols-[1fr_1.05fr] md:pb-12 md:pt-14">
-          <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · Health &amp; wellness hubs</p>
-          <h1 className="mt-2 font-display text-[2.6rem] leading-[1.02] text-[#0b1f3a] md:text-6xl">Put your brand inside private wellness hubs.</h1>
-          <p className="mt-3 max-w-xl text-base text-muted-foreground md:text-lg">One free kit: your exposure and your hub earnings, side by side.</p>
-          <BuyCta placement="hero_home" className="mt-6" />
+        <div className="container mx-auto grid max-w-6xl gap-x-8 gap-y-5 px-4 pb-8 pt-10 md:grid-cols-[1fr_1.05fr] md:grid-rows-[auto_auto] md:content-center md:pb-12 md:pt-14">
+          <div className="md:col-start-1 md:row-start-1 md:self-end">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · Private wellness hubs</p>
+          <h1 className="mt-2 font-display text-[2.6rem] leading-[1.02] text-[#0b1f3a] md:text-6xl">See your brand inside a live wellness hub.</h1>
+          <p className="mt-3 max-w-xl text-base text-muted-foreground md:text-lg">Type your name. Your ad card lands on a real hub, right here.</p>
+          </div>
+          <div className="order-3 md:order-none md:col-start-1 md:row-start-2 md:self-start">
+          <BuyCta placement="hero_home" className="mt-0" onClick={() => trackAttn("hero_cta.buy")} />
           <div className="mt-4" data-testid="home-kit-cta">
-            <KitCta placement="hero_home" size="lg" testId="home-cta-kit" sub={null} />
+            <KitCta placement="hero_home" size="md" testId="home-cta-kit" sub={null} onClick={() => trackAttn("hero_cta.kit")} />
           </div>
           <p className="mt-3 text-[13px] text-foreground/60">
-            or <a href={LOOK_HREF} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-look">start with a {price.look} 7-day look</a>
+            or <a href={LOOK_HREF} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-look" onClick={() => trackAttn("hero_cta.look")}>start with a {price.look} 7-day look</a>
           </p>
           </div>
-          <AnnotatedHubMock testId="home-hero-mock" />
+          <div className="order-2 md:order-none md:col-start-2 md:row-span-2 md:row-start-1 md:self-center"><SeeYourAd testId="home-hero-mock" /></div>
         </div>
       </section>
       {/* Light continuous category strip under the hero (Randy Nov 21 10:20 AM). */}
       <div className="container mx-auto max-w-6xl px-4 pb-5"><CategoryStrip testId="home-category-strip" /></div>
       {/* Mobile: the live feed sits in the gap between the hero and the stats (Randy, Nov 20 4:54 PM). */}
       <div className="container mx-auto max-w-5xl px-4 pb-6 md:hidden"><ActivityPulse mode="inline" /></div>
-      {/* Compact "Questions brands ask" next to the kit CTA (Randy Nov 21 10:20 AM): 6 one-line answers, checked against /terms. */}
-      <div className="container mx-auto max-w-5xl px-4 pb-10"><QuestionsBrandsAskCompact testId="home-questions-compact" /></div>
 
       {/* 2. Big numbers. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-stats">
@@ -144,9 +148,17 @@ export default function BrHome() {
         <p className="mt-2 text-[12px] text-foreground/60" data-testid="home-stats-label">{MODELLED_FOOTER}</p>
       </section>
 
-      {/* 2b. Mid-tier bridge: from a $490 test to real spend (Randy review, Nov 20 2026). */}
-      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-mid-tier">
-        <MidTier where="home" compact />
+      {/* 4. Live hubs as visual cards. */}
+      <section className="container mx-auto max-w-5xl px-4 pb-10" id="proof-live" data-testid="live-hub-thumbs">
+        <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Live and activating hubs</h2>
+        <div className="mt-4"><LiveHubGrid /></div>
+        <HubFunnel />
+      </section>
+
+      {/* 2b. Offer ladder, rising order. The longer mid-tier detail lives in "The details" below. */}
+      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-offer-stairs">
+        <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Start small. Scale when it works.</h2>
+        <div className="mt-4"><OfferStairs look={price.look} seat={price.seat} /></div>
       </section>
 
       {/* 2c. Categories + Questions brands ask moved up: strip under the hero, compact questions by the kit CTA (Nov 21). */}
@@ -185,13 +197,6 @@ export default function BrHome() {
         <p className="mt-2 text-[12px] text-foreground/55">Most brands are both. One form covers both views.</p>
       </section>
 
-      {/* 4. Live hubs as visual cards. */}
-      <section className="container mx-auto max-w-5xl px-4 pb-10" id="proof-live" data-testid="live-hub-thumbs">
-        <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Live and activating hubs</h2>
-        <div className="mt-4"><LiveHubGrid /></div>
-        <HubFunnel />
-      </section>
-
       {/* 5. Link tiles to the deeper pages. */}
       <section className="container mx-auto max-w-5xl px-4 pb-12" data-testid="home-tiles">
         <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Go deeper</h2>
@@ -215,6 +220,14 @@ export default function BrHome() {
             <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">The details</h2>
             <MediaKitPdfLink variant="line" testId="home-media-kit-pdf" />
           </div>
+
+          <Expand title="Questions brands ask" sub="Six short answers" testId="home-questions-expand">
+            <div className="p-5 md:p-6"><QuestionsBrandsAskCompact testId="home-questions-compact" /></div>
+          </Expand>
+
+          <Expand title="Bigger budgets" sub="Agency client tests and sponsorship credit" testId="home-mid-tier">
+            <div className="p-5 md:p-6"><MidTier where="home" compact /></div>
+          </Expand>
 
           <Expand title="Pricing" sub={UPGRADE_PATH_LINE} testId="home-packages">
             <div className="grid gap-3 p-5 md:grid-cols-2 md:p-6">
@@ -270,6 +283,14 @@ export default function BrHome() {
             <a href="/terms" className="inline-flex items-center gap-1 text-sm text-foreground/60 underline underline-offset-4"><FileText className="size-4" aria-hidden />Terms</a>
           </div>
           <p className="text-[12px] text-foreground/50">Prices in USD. Audience and reach figures are based on signed partnership contracts, not measured delivery.</p>
+        </div>
+      </section>
+
+      {/* Ends on the payoff: one line, one CTA. */}
+      <section className="bg-[#0b1f3a] py-12 text-white md:py-16" data-testid="home-close">
+        <div className="container mx-auto flex max-w-5xl flex-col items-start justify-between gap-5 px-4 md:flex-row md:items-center">
+          <p className="font-display text-3xl leading-tight md:text-4xl">Your brand, on a live hub.</p>
+          <KitCta placement="close_home" size="lg" testId="home-close-kit" sub={null} onClick={() => trackAttn("hero_cta.kit")} />
         </div>
       </section>
 
