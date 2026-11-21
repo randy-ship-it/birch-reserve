@@ -133,24 +133,24 @@ export function PrimeHero() {
 
 export function FaceBeforeFlight({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={`grid gap-6 ${compact ? "" : "lg:grid-cols-[1fr_1.1fr] lg:items-center"}`} data-testid="face-before-flight">
+    <div className={`grid gap-6 ${compact ? "" : "lg:grid-cols-[minmax(0,24rem)_1fr] lg:items-start lg:gap-8"}`} data-testid="face-before-flight">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Proof</p>
-        <h2 className="mt-2 font-display text-[1.9rem] leading-tight tracking-tight md:text-5xl">See the face before the flight.</h2>
-        <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
+        <h2 className="mt-1 font-display text-[1.75rem] leading-tight tracking-tight md:text-3xl">See the face before the flight.</h2>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
           Open a hub that is live and activating right now. This is the private, members-only experience your brand sits inside: placements curated hub by hub, next to the brand members already trust. No feed, no auction.
         </p>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <a href={LIVE_HUB_URL} target="_blank" rel="noopener" data-testid="face-live-hub" className="inline-flex h-12 items-center justify-center gap-2 bg-foreground px-6 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground">
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <a href={LIVE_HUB_URL} target="_blank" rel="noopener" data-testid="face-live-hub" className="inline-flex h-11 items-center justify-center gap-2 bg-foreground px-4 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground">
             Open the DR-HO'S physio hub <ArrowRight className="size-4" aria-hidden />
           </a>
-          <a href={SOLE_HUB_URL} target="_blank" rel="noopener" data-testid="face-live-hub-sole" className="inline-flex h-12 items-center justify-center gap-2 border border-foreground px-6 text-sm font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background">
+          <a href={SOLE_HUB_URL} target="_blank" rel="noopener" data-testid="face-live-hub-sole" className="inline-flex h-11 items-center justify-center gap-2 border border-foreground px-4 text-sm font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background">
             Open the SOLE hub <ArrowRight className="size-4" aria-hidden />
           </a>
         </div>
         <p className="mt-3 text-xs text-muted-foreground">Hubs that are live and activating, shown as they are today. Your placement and hub are named on your IO before anything runs.</p>
       </div>
-      <div data-testid="live-hub-thumbs"><LiveHubGrid /><HubFunnel /></div>
+      <div data-testid="live-hub-thumbs"><LiveHubGrid dense={!compact} /><HubFunnel compact={!compact} /></div>
     </div>
   );
 }

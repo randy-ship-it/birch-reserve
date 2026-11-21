@@ -24,15 +24,15 @@ export function HubThumb({ h, className = "" }: { h: LiveHubTile; className?: st
 }
 
 /** 2x2 grid of the live hubs (or 1 column on phones). */
-export function LiveHubGrid({ light = true }: { light?: boolean }) {
+export function LiveHubGrid({ light = true, dense = false }: { light?: boolean; dense?: boolean }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2" data-testid="live-hub-grid">
+    <div className={`grid gap-3 sm:grid-cols-2 ${dense ? "xl:grid-cols-4" : ""}`} data-testid="live-hub-grid">
       {LIVE_HUB_TILES.map((h) => (
         <a key={h.tid} href={h.href} target="_blank" rel="noopener" data-testid={h.tid} className={`group block overflow-hidden rounded-2xl border shadow-sm transition hover:shadow-lg ${light ? "border-[#0b1f3a]/10 bg-white" : "border-foreground/15 bg-white"}`} aria-label={`Visit the ${h.name} hub`}>
           <HubThumb h={h} />
-          <span className="flex items-center justify-between gap-3 px-4 py-3">
+          <span className={`flex items-center justify-between gap-3 ${dense ? "px-3 py-2" : "px-4 py-3"}`}>
             <span className="min-w-0">
-              <span className="flex flex-wrap items-center gap-2 font-bold text-[#0b1f3a]">{h.name} <span className="rounded-full bg-lime-200 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#0b1f3a]">Live · activating</span></span>
+              <span className={`flex flex-wrap items-center gap-x-2 gap-y-0.5 font-bold text-[#0b1f3a] ${dense ? "text-sm" : ""}`}>{h.name} <span className="whitespace-nowrap rounded-full bg-lime-200 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#0b1f3a]">{dense ? "Live" : "Live · activating"}</span></span>
               <span className="block truncate text-xs text-foreground/55">{h.host}</span>
             </span>
             <span className="shrink-0 text-sm font-semibold text-[#0b1f3a] group-hover:underline">Visit ↗</span>
@@ -50,7 +50,21 @@ const SOON_TINT = ["from-rose-200 to-orange-100", "from-emerald-200 to-teal-100"
  * Funnel: the 4 live hubs sit at the narrow, solid bottom; rows widen upward toward "20+ more hubs coming".
  * Placeholders are abstract, blurred category cards with no names. Wording is "coming" / "activating" only.
  */
-export function HubFunnel() {
+export function HubFunnel({ compact = false }: { compact?: boolean }) {
+  if (compact) {
+    // One row: the live four are already shown above, so only the pipeline line remains (no pyramid, no dead space).
+    return (
+      <div className="mt-4 flex flex-wrap items-center gap-2" data-testid="hub-funnel" aria-label="Four hubs live and activating, 20 plus more hubs coming">
+        <p className="mr-1 text-base font-bold text-[#0b1f3a]" data-testid="hub-funnel-count">20+ more hubs coming</p>
+        <ul className="flex flex-wrap gap-1.5" data-testid="hub-funnel-soon">
+          {SOON.map((c, i) => (
+            <li key={c} className={`rounded-full bg-gradient-to-br ${SOON_TINT[i]} px-2.5 py-1 text-[12px] font-semibold text-[#0b1f3a]/80`}>{c}</li>
+          ))}
+        </ul>
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#0b1f3a]/55">Coming soon</span>
+      </div>
+    );
+  }
   return (
     <div className="mx-auto mt-8 max-w-3xl" data-testid="hub-funnel" aria-label="Four hubs live and activating, 20 plus more hubs coming">
       <p className="mb-2 text-center font-display text-2xl font-bold text-[#0b1f3a] md:text-3xl" data-testid="hub-funnel-count">20+ more hubs coming</p>

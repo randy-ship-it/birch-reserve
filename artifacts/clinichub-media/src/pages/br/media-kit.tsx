@@ -218,7 +218,7 @@ export default function BrMediaKit() {
 
       {/* Proof */}
       <section id="proof" className="scroll-mt-20 border-b border-border/70 bg-background">
-        <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14">
+        <div className="container mx-auto px-5 py-8 md:px-6 md:py-10">
           <FaceBeforeFlight />
         </div>
       </section>

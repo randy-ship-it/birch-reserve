@@ -154,18 +154,26 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
   return (
     <section id={id} data-testid="kit-builder" className="scroll-mt-20 border-b border-border/70 bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_50%)]">
       {showMockBanner ? <MockBanner /> : null}
-      <div className="container mx-auto grid gap-6 px-4 py-10 md:py-14 lg:grid-cols-[minmax(0,26rem)_1fr]">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Your personalized Monetization Kit</p>
-          <h2 className="font-display text-4xl leading-[1.02] md:text-5xl">Get my Monetization Kit</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Four quick numbers. A two-sided kit: your revenue opportunity and your exposure opportunity.</p>
-          <div className="mt-2"><SaveChip state={state} version={ref?.version} /></div>
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <label className="col-span-2">
+      <div className="container mx-auto px-4 py-8 md:py-10">
+        {/* Tight layout (Randy, Nov 21 2026 4:15 PM ET: "horrendous use of space. Tighten."): inputs | results | kit preview on wide screens. */}
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Your personalized Monetization Kit</p>
+            <h2 className="font-display text-3xl leading-[1.05] md:text-4xl">Get my Monetization Kit</h2>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-sm text-muted-foreground">Four quick numbers. Side A: your revenue opportunity. Side B: your exposure.</p>
+            <SaveChip state={state} version={ref?.version} />
+          </div>
+        </div>
+        <div className="mt-5 grid gap-6 lg:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)_minmax(0,1.1fr)]">
+        <div className="lg:row-span-2 xl:row-span-1" data-testid="kit-inputs">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
+            <label>
               <span className={lab}>Brand (optional)</span>
               <input data-testid="kit-brand" value={brand} maxLength={40} onChange={(e) => tap(setBrand)(e.target.value)} placeholder="Your brand" className={numIn} />
             </label>
-            <label className="col-span-2">
+            <label>
               <span className={lab}>Category</span>
               <select data-testid="kit-category" value={cat} onChange={(e) => tap(setCat)(e.target.value)} className={numIn}>
                 {cats.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}
@@ -220,13 +228,15 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
               </select>
             </label>
           </div>
-          <div className="mt-5 rounded-2xl bg-[#0b1f3a] p-4 text-white" data-testid="kit-quick" data-source={view.source === "friday" ? "report" : view.source}>
+        </div>
+        <div className="self-start lg:col-start-2 lg:row-start-1 xl:sticky xl:top-20 xl:col-start-2" data-testid="kit-results">
+          <div className="rounded-2xl bg-[#0b1f3a] p-4 text-white" data-testid="kit-quick" data-source={view.source === "friday" ? "report" : view.source}>
             <div className="flex flex-wrap items-center gap-2"><EstimateTag /><span className="text-xs text-white/70">GP LTV per customer</span>
               <span data-testid="kit-source" className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${view.source === "friday" ? "bg-lime-300 text-[#0b1f3a]" : "bg-white/15 text-white"}`}>{view.source === "friday" ? (view.mock ? "Preview · mock data" : "From your report") : "Live preview"}</span>
               <span className="ml-auto"><InfoPop dark title="Formula and assumptions" label="Formula" testId="kit-formula">{(view.source === "friday" ? view.formula : KIT_CALC_FORMULA).map((f) => <p key={f}>• {f}</p>)}<hr className="my-2" />{KIT_CALC_ASSUMPTIONS.map((a) => <p key={a} className="text-xs">{a}</p>)}<p className="mt-2 text-xs">While you type, numbers are a live preview. After you send, the LTV and channel fit come from your report.</p></InfoPop></span>
             </div>
             <p className="mt-1 font-display text-3xl tabular-nums text-lime-200" data-testid="kit-ltv">{ltv ? `${$(ltv[0])}–${$(ltv[1])}` : "Needs inputs"}</p>
-            <p className="text-xs text-white/70">Revenue opportunity {$(view.revenueOpp[0])}–{$(view.revenueOpp[1])} from a {$(spend)} USD test <EstimateTag /></p>
+            <p className="text-xs text-white/70">Revenue opportunity {$(view.revenueOpp[0])}–{$(view.revenueOpp[1])} from a {$(spend)} USD test</p>
             {view.source === "friday" ? <p className="mt-1 text-[11px] text-lime-200/90">Channel fit: {view.fitHeader}</p> : null}
           </div>
           <div className="mt-3"><ExposureCard exposure={expo.ex} source={expo.source} testId="kit-exposure" /></div>
@@ -244,7 +254,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
           {held ? <p className="mt-3 flex gap-2 rounded-xl bg-amber-50 p-3 text-sm text-amber-900" data-testid="kit-held"><ShieldAlert className="size-4 shrink-0" />{HELD_COPY}</p> : null}
           <LeadGatesStatus gates={gates} testId="kit-lead-gates" />
           <IntakeWarnings testId="kit-warnings" />
-          <button type="button" data-testid="kit-download" onClick={getKit} disabled={busy === "busy"} className="mt-5 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 text-base font-bold text-accent-foreground shadow-lg shadow-lime-500/20 transition hover:bg-foreground hover:text-background">
+          <button type="button" data-testid="kit-download" onClick={getKit} disabled={busy === "busy"} className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 text-base font-bold text-accent-foreground shadow-lg shadow-lime-500/20 transition hover:bg-foreground hover:text-background">
             {busy === "busy" ? <Loader2 className="size-5 animate-spin" /> : busy === "done" ? <Check className="size-5" /> : <Download className="size-5" />} {busy === "done" ? "Monetization Kit downloaded (PDF + PNG)" : step === "contact" && !report ? "Get my Monetization Kit" : "Download my Monetization Kit"}
           </button>
           {busy === "done" || queued || held ? <div className="mt-4" data-testid="kit-next-cta"><PrimaryCta side="advertiser" where="kit" /></div> : null}
@@ -257,7 +267,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
           ) : null}
           <p className="mt-2 text-[11px] text-muted-foreground">PDF + PNG. Estimates only. Anchor hubs are proposed and unconfirmed. <InfoPop title="Fit and figures" label="Fine print" testId="kit-fine"><p>{KIT_FIT_FINE}</p><p>Channel fit is subject to human confirmation. No checkout here. Prices, refunds and the prepaid + IO rules are on /media-kit and /terms.</p></InfoPop></p>
         </div>
-        <div>
+        <div className="self-start lg:col-start-2 lg:row-start-2 xl:sticky xl:top-20 xl:col-start-3 xl:row-start-1" data-testid="kit-preview">
           <div className="mb-3 inline-flex rounded-full bg-foreground/[0.06] p-1" role="tablist">
             {(["a", "b"] as const).map((s) => (
               <button key={s} role="tab" aria-selected={side === s} data-testid={`kit-side-tab-${s}`} onClick={() => setSide(s)} className={`rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider ${side === s ? "bg-foreground text-background" : "text-foreground/60"}`}>
@@ -265,18 +275,20 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
               </button>
             ))}
           </div>
-          <KitSides svgA={svgA} svgB={svgB} side={side} />
+          <KitSides svgA={svgA} svgB={svgB} side={side} single />
+        </div>
         </div>
       </div>
     </section>
   );
 }
 
-export function KitSides({ svgA, svgB, side }: { svgA: string; svgB: string; side: "a" | "b" }) {
+export function KitSides({ svgA, svgB, side, single = false }: { svgA: string; svgB: string; side: "a" | "b"; single?: boolean }) {
+  const both = single ? "" : "xl:block";
   return (
-    <div className="grid gap-4 xl:grid-cols-2">
-      <div data-testid="kit-side-a" className={`${side === "a" ? "block" : "hidden"} overflow-hidden rounded-2xl shadow-2xl xl:block [&>svg]:h-auto [&>svg]:w-full`} dangerouslySetInnerHTML={{ __html: svgA }} />
-      <div data-testid="kit-side-b" className={`${side === "b" ? "block" : "hidden"} overflow-hidden rounded-2xl shadow-2xl xl:block [&>svg]:h-auto [&>svg]:w-full`} dangerouslySetInnerHTML={{ __html: svgB }} />
+    <div className={`grid gap-4 ${single ? "" : "xl:grid-cols-2"}`}>
+      <div data-testid="kit-side-a" className={`${side === "a" ? "block" : "hidden"} overflow-hidden rounded-2xl shadow-xl ${both} [&>svg]:h-auto [&>svg]:w-full`} dangerouslySetInnerHTML={{ __html: svgA }} />
+      <div data-testid="kit-side-b" className={`${side === "b" ? "block" : "hidden"} overflow-hidden rounded-2xl shadow-xl ${both} [&>svg]:h-auto [&>svg]:w-full`} dangerouslySetInnerHTML={{ __html: svgB }} />
     </div>
   );
 }
