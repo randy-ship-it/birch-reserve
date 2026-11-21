@@ -321,10 +321,12 @@ function appendCheckoutSessionFormBody(
   (params.discounts ?? []).forEach((d, i) => {
     if (d.coupon) body.set(`discounts[${i}][coupon]`, d.coupon);
   });
-  body.set(
-    "allow_promotion_codes",
-    params.allow_promotion_codes === true ? "true" : "false",
-  );
+  if (!params.discounts?.length) {
+    body.set(
+      "allow_promotion_codes",
+      params.allow_promotion_codes === true ? "true" : "false",
+    );
+  }
   return body;
 }
 

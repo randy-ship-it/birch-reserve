@@ -24,9 +24,10 @@ test("STREET100 takes $100 off $190 and $490, server-validated, never below the 
   assert.equal(await streetNetDiscount({ email: "jane@acme.com", currency: "cad", amountCents: 27000, code: "street100" }), null);
   assert.equal(await streetNetDiscount({ email: "jane@acme.com", currency: "usd", amountCents: 12000, code: "street100" }), null);
   assert.equal(await streetNetDiscount({ email: "", currency: "usd", amountCents: 19000, code: "street100" }), null);
-  const req = await withStreetNet({ mode: "payment", metadata: { sku: "hold-190" } }, 19000, "usd", "jane@acme.com", "street100");
+  const req = await withStreetNet({ mode: "payment", allow_promotion_codes: false, metadata: { sku: "hold-190" } }, 19000, "usd", "jane@acme.com", "street100");
   assert.deepEqual(req.discounts, [{ coupon: "street100-usd-10000:10000" }]);
   assert.equal(req.metadata?.promo_net_cents, "10000");
+  assert.equal("allow_promotion_codes" in req, false);
   assert.equal(expectedAmountTotal({ metadata: { promo_net_cents: "10000" } }, 19000), 9000);
   assert.equal(expectedAmountTotal({ metadata: {} }, 19000), 19000);
   assert.equal(expectedAmountTotal({ metadata: { promo_net_cents: "99999" } }, 19000), 19000);

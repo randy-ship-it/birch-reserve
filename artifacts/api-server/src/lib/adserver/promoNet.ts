@@ -39,7 +39,9 @@ export async function withStreetNet(req: Stripe.Checkout.SessionCreateParams, am
   try {
     const d = await streetNetDiscount({ email, currency, amountCents, code });
     if (!d) return req;
-    return { ...req, discounts: [{ coupon: d.couponId }], metadata: { ...(req.metadata ?? {}), promo: d.code, promo_net_cents: String(d.cents) } };
+    // Stripe rejects discounts together with allow_promotion_codes, even when it is false.
+    const { allow_promotion_codes: _drop, ...rest } = req;
+    return { ...rest, discounts: [{ coupon: d.couponId }], metadata: { ...(req.metadata ?? {}), promo: d.code, promo_net_cents: String(d.cents) } };
   } catch {
     return req;
   }
