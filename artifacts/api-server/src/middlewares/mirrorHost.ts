@@ -43,7 +43,7 @@ export const MIRROR_SKINS: Readonly<Record<string, "scale">> = { scale_mirror: "
 /** Scale's own icon (copied byte-for-byte from silverbirchgrowth/scalehealthnew public/favicon.svg). */
 export const SCALE_FAVICON = "/brand/scale/favicon.svg";
 const SCALE_FONT_HREF = "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap";
-const MIRROR_PAGE_RE = /^\/intake(?:\/(?:publisher|supplier|sponsor|gtm|street-team|report))?\/?$/;
+const MIRROR_PAGE_RE = /^\/intake(?:\/(?:publisher|supplier|sponsor|gtm|street-team|report|reel))?\/?$/;
 
 /** Strip /intake/_m from a request URL. Returns null when the URL is not prefixed. */
 export function stripMirrorPrefix(url: string): string | null {
@@ -97,6 +97,8 @@ export function scaleHead(html: string): string {
   const rename = (v: string) => v.replace(/Birch Reserve/g, "Scale Health");
   let out = html.replace(/<title>([^<]*)<\/title>/i, (_m, t: string) => `<title>${rename(t)}</title>`);
   out = out.replace(/<meta\b[^>]*(?:property|name)="(?:og:title|twitter:title|og:site_name)"[^>]*>/gi, (tag) => rename(tag));
+  // Scale-branded share card for the reel page (scalehealth.ca/intake/reel).
+  out = out.replace(/\/reel\/og-reel\.png/g, "/reel/og-reel-scale.png");
   out = out.replace(/<meta name="theme-color" content="[^"]*"\s*\/?>/i, '<meta name="theme-color" content="#0d1426" />');
   out = out.replace(/<link\b[^>]*rel="icon"[^>]*>/gi, `<link rel="icon" type="image/svg+xml" href="${MIRROR_PREFIX}${SCALE_FAVICON}" />`);
   out = out.replace(/<\/head>/i, `<link href="${SCALE_FONT_HREF}" rel="stylesheet">\n</head>`);

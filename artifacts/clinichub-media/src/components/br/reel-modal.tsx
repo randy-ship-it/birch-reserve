@@ -79,7 +79,7 @@ export default function ReelModal({ open, onOpenChange }: { open: boolean; onOpe
           </div>
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[11px] leading-snug text-white/70">
             <span>Example brand and figures, labelled EXAMPLE. Not results. Prices in USD.</span>
-            <a href="/reel" className="font-semibold text-white underline underline-offset-4 hover:no-underline" data-testid="reel-modal-full-page">Open full page ↗</a>
+            <a href={scale ? "/intake/reel" : "/reel"} className="font-semibold text-white underline underline-offset-4 hover:no-underline" data-testid="reel-modal-full-page">Open full page ↗</a>
           </div>
         </D.Content>
       </D.Portal>

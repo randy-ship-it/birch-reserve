@@ -190,12 +190,12 @@ export const CHANNEL_TILES_LABEL = "Network figures / targets";
 /** Retail Network copy, exactly, everywhere (Friday report-design-system v2 copy rules; Randy Nov 18 2026). */
 /** Retail network line (Randy, Nov 19 2026 2:27 PM ET via Emma): a retail-network estimate, site-wide. */
 export const RETAIL_COPY = "200+ locations, 500+ soon · 1MM+ captive recovery consumers · Canada + USA";
-export const RETAIL_TAG = "private retail network of fitness & recovery retailers";
+export const RETAIL_TAG = "private network of digital and brick-and-mortar fitness & recovery retailers";
 /** Randy Nov 21 1:00 PM: one audience framing, three channels, sitewide (AUDIENCE_CHANNELS). Plan figures, not delivered impressions. */
 export const AUDIENCE_CHANNELS = [
   { key: "scale-hubs", name: "Branded ScaleHealth.ca hubs", v: "700MM+", l: "captive page views activating", detail: "Private, members-only hubs on ScaleHealth.ca where recovery and wellness customers already shop and book care." },
-  { key: "retail-network", name: "Private retail network", v: "200+", l: "locations · 500+ soon · 1MM+ captive recovery consumers", detail: "Our private network of fitness & recovery retailers, in Canada and the USA." },
-  { key: "calm-street", name: "Calm Joints + Street Team Ambassadors", v: "2MM+", l: "homes reached by 2027", detail: "Our owned digital clinic Calm Joints, plus Street Team Ambassadors on the ground." },
+  { key: "retail-network", name: "Private retail network", v: "200+", l: "locations · 500+ soon · 1MM+ captive recovery consumers", detail: "Our private network of digital and brick-and-mortar fitness & recovery retailers, in Canada and the USA." },
+  { key: "calm-street", name: "Calm Joints + Street Team Ambassadors", v: "2MM+", l: "homes reached by 2027", detail: "Our owned digital clinic Calm Joints, plus Street Team Ambassadors doing on-site product sampling and door-to-door." },
 ] as const;
 export const AUDIENCE_LINE = "700MM+ captive page views activating · 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers · 2MM+ homes reached by 2027";
 export const AUDIENCE_FINE = "Audience and reach figures are based on signed partnership contracts. Reach and audience, not delivered impressions, and not a guarantee of views, clicks or results. 2MM+ homes by 2027 is the Calm Joints and Street Team target.";
@@ -207,7 +207,7 @@ export const STREET_REACH_SENTENCE = "Calm Joints and our Street Team Ambassador
 export const CHANNEL_TILES = [
   { key: "scale-hubs", name: "Branded ScaleHealth.ca hubs", stats: [{ v: "700MM+", l: "captive page views activating" }], line: "Private health and wellness hubs: physio, recovery, longevity and food brands." },
   { key: "calm-joints", name: "Calm Joints", stats: [] as { v: string; l: string }[], line: "Our owned digital clinic. Its reach is counted with the Street Team: 2MM+ homes by 2027." },
-  { key: "street-team", name: "Calm Joints + Street Team", stats: [{ v: STREET_REACH_FIG.v, l: STREET_REACH_FIG.l }], line: "Street Team Ambassadors on the ground, targeted by neighbourhood. Area-level only.", image: "/street-team/door-route.webp", imageNote: "Day-1 route heat map (area-level). The network-wide census map is still needed." },
+  { key: "street-team", name: "Calm Joints + Street Team", stats: [{ v: STREET_REACH_FIG.v, l: STREET_REACH_FIG.l }], line: "Street Team Ambassadors: on-site product sampling and door-to-door, targeted by neighbourhood. Area-level only.", image: "/street-team/door-route.webp", imageNote: "Day-1 route heat map (area-level). The network-wide census map is still needed." },
   { key: "retail-network", name: "Private retail network", stats: [{ v: "200+", l: "locations (500+ soon)" }, { v: "1MM+", l: "captive recovery consumers" }, { v: "CA + US", l: "Canada + USA" }], line: `${RETAIL_COPY} · ${RETAIL_TAG}` },
 ] as const;
 

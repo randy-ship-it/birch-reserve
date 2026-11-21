@@ -57,7 +57,7 @@ const API_PATHS = [
   "/mediakit/?",
   "/agencies/?",
   "/media-buyers/?",
-  "/intake(?:/(?:publisher|supplier|sponsor|gtm|street-team|report))?/?",
+  "/intake(?:/(?:publisher|supplier|sponsor|gtm|street-team|report|reel))?/?",
   "/street-team/?",
   "/partners/?",
   "/ai-buyers/?",
