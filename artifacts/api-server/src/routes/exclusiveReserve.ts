@@ -6,7 +6,7 @@
  * SPONSOR_DEPOSITS_LIVE=true, so a preview with a test key only ever makes test sessions.
  */
 import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
-import { promoMetadata } from "../lib/adserver/promoContext";
+import { promoMetadata, withScaleReturn } from "../lib/adserver/promoContext";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { getStripeClient } from "../lib/stripeClient";
 import { logger } from "../lib/logger";
@@ -105,7 +105,7 @@ router.post("/v1/exclusive/reserve", express.json({ limit: "8kb" }), async (req:
     return;
   }
   try {
-    const session = await getStripeClient().checkout.sessions.create({ ...built.params, metadata: { ...(built.params.metadata ?? {}), ...promoMetadata() } } as never);
+    const session = await getStripeClient().checkout.sessions.create({ ...withScaleReturn(req, built.params), metadata: { ...(built.params.metadata ?? {}), ...promoMetadata() } } as never);
     res.json({ url: session.url, livemode: session.livemode });
   } catch (err) {
     logger.warn({ err: err instanceof Error ? err.message : String(err) }, "exclusive reserve session failed");

@@ -93,3 +93,18 @@ test("any Birch page opened through /intake/_m with the Scale tag gets the mirro
     srv.close();
   }
 });
+
+test("checkout started from the Scale mirror returns to scalehealth.ca/intake/_m, Birch checkout is unchanged", async () => {
+  const { withScaleReturn, returnBaseOf, mirrorPathOf } = await import("../src/lib/adserver/promoContext");
+  const mk = (h: Record<string, string>, q: Record<string, string> = {}) => ({ get: (k: string) => h[k.toLowerCase()], query: q }) as never;
+  const p = { success_url: "https://birchreserve.net/success?order=o1&session_id={CHECKOUT_SESSION_ID}", cancel_url: "https://birchreserve.net/buycalc?checkout=cancelled" };
+  const scale = withScaleReturn(mk({ origin: "https://www.scalehealth.ca" }), p);
+  assert.equal(scale.success_url, "https://www.scalehealth.ca/intake/_m/success?order=o1&session_id={CHECKOUT_SESSION_ID}");
+  assert.equal(scale.cancel_url, "https://www.scalehealth.ca/intake/_m/buycalc?checkout=cancelled");
+  assert.equal(withScaleReturn(mk({}, { br_mirror: "scale" }), p).cancel_url, "https://scalehealth.ca/intake/_m/buycalc?checkout=cancelled");
+  assert.deepEqual(withScaleReturn(mk({ origin: "https://birchreserve.net" }), p), p);
+  assert.equal(returnBaseOf(mk({ origin: "https://scalehealth.ca" }), "https://birchreserve.net"), "https://scalehealth.ca/intake/_m");
+  assert.equal(returnBaseOf(mk({}), "https://birchreserve.net"), "https://birchreserve.net");
+  assert.equal(mirrorPathOf(mk({ origin: "https://scalehealth.ca" }), "/?reserve=confirmed"), "/intake/_m/?reserve=confirmed");
+  assert.equal(mirrorPathOf(mk({}), "/?reserve=confirmed"), "/?reserve=confirmed");
+});

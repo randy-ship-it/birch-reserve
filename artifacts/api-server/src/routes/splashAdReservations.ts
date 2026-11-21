@@ -1,4 +1,5 @@
 import { expectedAmountTotal, withStreetNet } from "../lib/adserver/promoNet";
+import { returnBaseOf, mirrorPathOf } from "../lib/adserver/promoContext";
 import { birchCheckoutCustomText, birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { ReplitConnectors } from "@replit/connectors-sdk";
@@ -817,8 +818,8 @@ router.post(
               checkoutAttempt: "1",
             },
           },
-          success_url: `${baseUrl}/api/launch/splash/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${baseUrl}/?reserve=cancelled`,
+          success_url: `${returnBaseOf(req, baseUrl)}/api/launch/splash/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${returnBaseOf(req, baseUrl)}/?reserve=cancelled`,
           allow_promotion_codes: false,
           custom_text: birchCheckoutCustomText(),
         },
@@ -989,7 +990,7 @@ router.get(
     const sessionId =
       typeof req.query.session_id === "string" ? req.query.session_id : "";
     if (!sessionId.startsWith("cs_")) {
-      res.redirect("/?reserve=verification-pending");
+      res.redirect(mirrorPathOf(req, "/?reserve=verification-pending"));
       return;
     }
 
@@ -997,7 +998,7 @@ router.get(
       const session = await retrieveStripeCheckoutSession(sessionId);
       if (session.payment_status === "paid") {
         await markSplashReservationPaidFromSession(session);
-        res.redirect("/?reserve=confirmed");
+        res.redirect(mirrorPathOf(req, "/?reserve=confirmed"));
         return;
       }
     } catch (error) {
@@ -1006,7 +1007,7 @@ router.get(
         "Unable to confirm returning Stripe checkout",
       );
     }
-    res.redirect("/?reserve=verification-pending");
+    res.redirect(mirrorPathOf(req, "/?reserve=verification-pending"));
   },
 );
 
@@ -1394,8 +1395,8 @@ router.post("/launch/splash/checkout", async (req, res): Promise<void> => {
           checkoutAttempt: String(nextAttempt),
         },
       },
-      success_url: `${baseUrl}/splash/activation?token=${encodeURIComponent(parsed.data.activationToken)}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/splash/activation?token=${encodeURIComponent(parsed.data.activationToken)}&cancelled=1`,
+      success_url: `${returnBaseOf(req, baseUrl)}/splash/activation?token=${encodeURIComponent(parsed.data.activationToken)}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${returnBaseOf(req, baseUrl)}/splash/activation?token=${encodeURIComponent(parsed.data.activationToken)}&cancelled=1`,
       allow_promotion_codes: false,
       custom_text: birchCheckoutCustomText(),
     };
