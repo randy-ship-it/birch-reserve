@@ -11,6 +11,7 @@
  * on-screen. Any future buyer email must go through sendBuyerEmail so Reply-To is enforced.
  */
 import { BR_MARK_CID, BR_MARK_PNG_BASE64 } from "./emailBrandMark";
+import { SCALE_LOGO_CID, SCALE_LOGO_PNG_BASE64 } from "./emailScaleMark";
 export const DEFAULT_BIRCH_REPLY_TO = "sales@silverbirchgrowth.com";
 export const RESEND_ENDPOINT = "https://api.resend.com/emails";
 
@@ -55,6 +56,9 @@ function withBrandMark(mail: SiteMail): NonNullable<SiteMail["attachments"]> {
   const list = [...(mail.attachments ?? [])];
   if (mail.html?.includes(`cid:${BR_MARK_CID}`) && !list.some((a) => a.content_id === BR_MARK_CID)) {
     list.push({ filename: "birch-reserve.png", content: BR_MARK_PNG_BASE64, content_id: BR_MARK_CID, content_type: "image/png" });
+  }
+  if (mail.html?.includes(`cid:${SCALE_LOGO_CID}`) && !list.some((a) => a.content_id === SCALE_LOGO_CID)) {
+    list.push({ filename: "scalehealth.png", content: SCALE_LOGO_PNG_BASE64, content_id: SCALE_LOGO_CID, content_type: "image/png" });
   }
   return list;
 }

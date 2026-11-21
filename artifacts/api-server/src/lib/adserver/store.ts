@@ -408,6 +408,17 @@ export async function setCreativeAlt(id: string, alt: string, actor: string): Pr
   return rows.length > 0;
 }
 /** True the first time a key is claimed (audit-backed one-shot for replays and one-off sends). */
+/** The campaign a paid Checkout Session opened (order_ref = session id), or null. */
+export async function campaignByOrderRef(orderRef: string): Promise<Campaign | null> {
+  const p = await db();
+  const { rows } = await p.query(`SELECT * FROM ${S()}.ad_campaigns WHERE order_ref = $1`, [orderRef]);
+  return rows[0] ? toCampaign(rows[0]) : null;
+}
+/** Give a claimOnce key back (the guarded step failed, so a later replay may try again). */
+export async function releaseOnce(key: string): Promise<void> {
+  const p = await db();
+  await p.query(`DELETE FROM ${S()}.ad_once WHERE key = $1`, [key]);
+}
 export async function claimOnce(key: string, actor: string): Promise<boolean> {
   const p = await db();
   await p.query(`CREATE TABLE IF NOT EXISTS ${S()}.ad_once (key text PRIMARY KEY, actor text, at timestamptz NOT NULL DEFAULT now())`);
