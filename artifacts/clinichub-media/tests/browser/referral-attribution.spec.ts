@@ -24,7 +24,7 @@ const HOSTS: Host[] = [
 async function startCheckout(page: Page, email: string): Promise<string> {
   // The page's own fetch: the same wrapped path the buy / buycalc buttons use (promo header + Scale mirror routing).
   const out = await page.evaluate(async (em) => {
-    const r = await fetch("/v1/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sku: "hold-190", brand: "QA Referral Test", email: em, website_url: "https://example.com", currency: "usd", idempotency_key: `qa-ref-${Date.now()}-${Math.random().toString(36).slice(2, 8)}` }) });
+    const r = await fetch("/v1/checkout", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sku: "hold-190", brand: "QA Referral Test", email: em, website_url: "https://example.com", format_pref: "recovery_plan", currency: "usd", idempotency_key: `qa-ref-${Date.now()}-${Math.random().toString(36).slice(2, 8)}` }) });
     return { status: r.status, body: await r.json().catch(() => ({})) };
   }, email);
   expect(out.status, JSON.stringify(out.body)).toBeLessThan(300);
