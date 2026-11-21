@@ -66,15 +66,15 @@ export const FORM_JS = `(function(){
   document.addEventListener("click",function(e){var c=e.target.closest("[data-copy]");if(!c)return;var el=document.querySelector(c.getAttribute("data-copy"));if(!el)return;try{navigator.clipboard.writeText(el.textContent);toast("Copied")}catch(x){}});
 })();`;
 
-export function shell(o: { title: string; nav?: string; right?: string; body: string; robots?: string }): string {
+export function shell(o: { title: string; nav?: string; right?: string; body: string; robots?: string; brand?: string; home?: string; head?: string; footer?: string }): string {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(o.title)}</title><meta name="robots" content="${o.robots ?? "noindex,nofollow"}"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
+<title>${esc(o.title)}</title><meta name="robots" content="${o.robots ?? "noindex,nofollow"}">${o.head ?? ""}<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>${CSS}</style></head><body>
-<header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE<span>${esc(o.nav ?? "")}</span></a>${o.right ?? ""}</div></header>
+<header class="top"><div class="wrap"><a class="logo" href="${esc(o.home ?? "/")}">${esc(o.brand ?? "BIRCH RESERVE")}<span>${esc(o.nav ?? "")}</span></a>${o.right ?? ""}</div></header>
 <main class="wrap">${o.body}</main>
-<footer class="wrap fine">Birch Reserve, a Silver Birch Growth company · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · Aggregate reporting only. No impression guarantees.</footer>
+<footer class="wrap fine">${o.footer ?? `Birch Reserve, a Silver Birch Growth company · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · Aggregate reporting only. No impression guarantees.`}</footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div><script>${FORM_JS}</script></body></html>`;
 }
 

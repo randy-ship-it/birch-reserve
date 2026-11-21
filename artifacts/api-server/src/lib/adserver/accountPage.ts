@@ -6,6 +6,8 @@ import { ALERT_CATEGORIES, adsAlertEmailEnabled, adsLoginEmailEnabled, placement
 import { flightProgress, pacingState, type Campaign } from "./engine";
 import type { Creative, Totals } from "./store";
 import { esc, fmtDate, fmtInt, fmtMoney, fmtPct, shell, sparkline } from "./ui";
+import { CREATIVE_UPLOAD_JS, creativeFields } from "./creativeUploadJs";
+import { findFormat, formatsForPlacement } from "./creativeSpec";
 
 export function loginPage(o: { message?: string; error?: string; sent?: boolean } = {}): string {
   const emailOn = adsLoginEmailEnabled();
@@ -73,10 +75,10 @@ ${promoCamp ? `<p class="fine" style="margin:6px 0 0">${esc(regularRateSummary()
 <div class="fine">Bought: <b>${esc(placementLabel(c.primaryPlacement))}</b> · ${c.pricing.toUpperCase()}${c.allowSubstitute ? "<br>Can also run on equal-or-lower-rate placements on your hubs, so your credit keeps pacing. Each placement is charged at its own card rate." : ""}${c.rateMultiplierBps !== 10000 ? `<br>Your rate: ${(100 - c.rateMultiplierBps / 100).toFixed(0)}% below card` : ""}</div></div>
 <ol class="steps">${steps.map((s, i) => `<li class="${s.done ? "done" : ""}"><b>${s.done ? "✓" : i + 1}</b><span>${s.text}</span></li>`).join("")}</ol>
 ${delivery}
-${approved ? "" : `<details class="ed"${pending ? "" : " open"}><summary>Upload a creative</summary><form class="f" data-post="/account/creative?campaign=${esc(c.id)}" data-reload>
-<label>Image (PNG, JPG, WebP or GIF, at least 300px wide, up to 2 MB)<input type="file" name="file" accept="image/png,image/jpeg,image/webp,image/gif" required></label>
-<label>Alt text (what the image says)<input name="alt" maxlength="200" placeholder="e.g. 20% off recovery bundles"></label><button type="submit">Send for review</button></form>
-<p class="fine">Every creative is reviewed by a person before it runs. Sizes that fit most slots: 1200×300, 728×90, 656×280, 600×400, 300×250.</p></details>`}
+${v.creatives.length ? `<div class="fine" style="margin-top:8px">Your creatives: ${v.creatives.slice(0, 6).map((x) => `<span class="chip c-${esc(x.status)}">${esc(x.status)}</span> ${esc(findFormat(x.format)?.label ?? (x.kind === "video" ? "Video" : "Image"))} ${x.width}×${x.height}`).join(" · ")}</div>` : ""}
+${approved ? "" : `<details class="ed"${pending ? "" : " open"}><summary>Upload a creative</summary><form class="f" data-creative-upload="/account/creative?campaign=${esc(c.id)}" data-variant-base="/account/creative/">
+${creativeFields()}<button type="submit">Send for review</button></form>
+<p class="fine">Still: JPG, PNG, WebP or AVIF, up to 2 MB. Video: MP4 or WebM, 3–15 s, up to 4 MB. Best sizes for <b>${esc(placementLabel(c.primaryPlacement))}</b>: ${formatsForPlacement(c.primaryPlacement).map((f) => `${esc(f.label)} ${f.upload[0]}×${f.upload[1]}`).join(" · ")}. <a href="/ads/specs">All specs and templates</a>. A person reviews every creative.</p></details>`}
 </article>`;
 }
 
@@ -131,7 +133,7 @@ ${PROMO_SCRIPT_TAG}
   return shell({
     title: "Your ads · Birch Reserve",
     nav: "Your ads",
-    right: `<nav class="tabs"><a href="#more">Top up</a><a href="#hubs">Hubs</a><a href="#alerts">Alerts</a><a href="#tracking">Tracking</a><form data-post="/account/logout" style="display:inline"><button class="ghost sm" type="submit">Sign out ${esc(v.email)}</button></form></nav>`,
-    body,
+    right: `<nav class="tabs"><a href="#more">Top up</a><a href="#hubs">Hubs</a><a href="#alerts">Alerts</a><a href="#tracking">Tracking</a><a href="/ads/specs">Specs</a><form data-post="/account/logout" style="display:inline"><button class="ghost sm" type="submit">Sign out ${esc(v.email)}</button></form></nav>`,
+    body: `${body}<script>${CREATIVE_UPLOAD_JS}</script>`,
   });
 }

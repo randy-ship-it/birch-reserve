@@ -17,13 +17,15 @@ Positioning: Randy voice, Nov 21 2026 1:41 PM.
 | Buyer dashboard `/account` | `src/lib/adserver/accountPage.ts` |
 | Emails | `src/lib/adserver/mail.ts`; every site email uses `src/lib/emailLayout.ts` (/intake design tokens, inline logo `cid:br-mark`) |
 | Hub slot on scalehealth.ca | scalehealthnew `src/components/BirchAdSlot.tsx` (flag `VITE_BIRCH_ADS`), mounted on `/sole` |
-| Tests | `artifacts/api-server/tests/adserver.test.ts`, `promo.test.ts` (PGlite) |
+| Creative specs (formats, upload checks, templates) | `src/lib/adserver/creativeSpec.ts`; browser side `creativeUploadJs.ts`; pages `specsPage.ts` (`/ads/specs`, `/ads/hub-kit`). See [CREATIVE-SPECS.md](CREATIVE-SPECS.md) |
+| Hub drop-in kit | [HUB-DROP-IN.md](HUB-DROP-IN.md), public handoff `/ads/hub-kit` |
+| Tests | `artifacts/api-server/tests/adserver.test.ts`, `creativeSpec.test.ts`, `promo.test.ts` (PGlite) |
 
 ## Flows
 1. **Inventory**: admin onboards a hub on contract (`POST /ads/admin/hubs`, contract ref required) → `ad_hubs` → slots `<hub>.landing … <hub>.post_purchase` become sellable at card rates. Going live triggers new-hub alerts (once per subscriber).
 2. **Sell**: `/buy` ($190 look / $490 reserve / exclusive) → Stripe Checkout → `POST /api/stripe/webhook` (`checkout.session.completed`, paid) → `draftCampaignFromCheckoutSafe` → `ad_campaigns` + credit line in `ad_ledger` (idempotent on `order_ref`). Promo codes (STREET100) create a $0 promo-credit campaign. Admin can draft manual campaigns (pick seller).
-3. **Creative**: buyer uploads (`/buy` or `/account/creative`) → `ad_creatives` pending → admin approves/rejects (a reason is required) → activate the campaign.
-4. **Serve / track**: hub page loads `/ads/embed.js`, which calls `/v1/ads/serve`, `/v1/ads/v` (viewable 50%/1s) and `/v1/ads/c` (click → landing with `br_click`). Conversions go through `/v1/ads/px` (pixel) or `/v1/ads/postback`. Events are stored in `ad_events`; charges are hourly bucket lines in `ad_ledger` with `partner` per slot. DNT/GPC are honoured, and no cookies are set.
+3. **Creative**: buyer uploads (`/buy` or `/account/creative`) → `creativeSpec.checkUpload` (type sniffed from bytes, weight, size, ratio → `format`, video length/codec/fast start, colour, alt/headline/CTA) → `ad_creatives` pending. The uploader's browser then sends WebP/AVIF sizes or a video poster (`/account/creative/:id/variant`, checked by `checkVariant`) → `ad_creative_variants`. Admin approves/rejects (a reason is required; a video needs a poster) → activate the campaign.
+4. **Serve / track**: hub page loads `/ads/embed.js` (v2: `<picture>` with WebP/AVIF `srcset`, or muted looping video with poster; `data-br-format` limits formats via `fmt=`; `?br_ads=test` on the page = test mode), which calls `/v1/ads/serve` (prefers a creative whose format fits the placement), `/v1/ads/v` (viewable 50%/1s) and `/v1/ads/c` (click → landing with `br_click`). Conversions go through `/v1/ads/px` (pixel) or `/v1/ads/postback`. Events are stored in `ad_events`; charges are hourly bucket lines in `ad_ledger` with `partner` per slot. DNT/GPC are honoured, and no cookies are set.
 5. **Royalties / payouts**: charged (collected) revenue → Birch override off the top (rate depends on the sales channel, below) → hub 35% of net (dated rates `ad_rate_history`, optional per-hub tiers) → override pool split to `ad_override_recipients` → Birch/SBG keeps the rest. Promo delivery earns nothing. Lines are **held** until the hub gate passes (`ad_hub_gates`: live + transactions + audience, or override with a note). Approve freezes into `ad_payouts`; "Pay" builds a batch + Stripe-ready CSV (no Connect accounts yet) and then you mark it paid with a reference. No money moves automatically.
 6. **Friday**: `/api/cron/ads-friday` syncs campaigns to Friday.
 
@@ -55,7 +57,7 @@ Every rate is dated (`effective_at`, next full hour or a date you pick) and neve
 Open decision: recipients currently share the channel's pool, so they earn less on Scale direct and internal sales. If Randy wants recipients to earn only on brokerage, scope them per campaign or add a channel filter.
 
 ## Tables (all additive)
-`ad_campaigns` (incl. `seller`, `internal`, `order_kind`, `is_test`), `ad_creatives`, `ad_events`, `ad_ledger` (incl. `channel`), `ad_channel_rates`, `ad_hubs`, `ad_partners` (legacy shares), `ad_rate_history`, `ad_override_recipients`, `ad_hub_gates`, `ad_settings` (payout timing), `ad_payouts`, `ad_alert_prefs`, `ad_hub_alerts_sent`, `ad_audit`, `ad_promo_codes`, `ad_promo_redemptions`, `ad_street_members`, `ad_street_qrs`, `ad_street_events`.
+`ad_campaigns` (incl. `seller`, `internal`, `order_kind`, `is_test`), `ad_creatives` (incl. `kind`, `format`, `duration_ms`, `headline`, `cta`, `warnings`), `ad_creative_variants`, `ad_events`, `ad_ledger` (incl. `channel`), `ad_channel_rates`, `ad_hubs`, `ad_partners` (legacy shares), `ad_rate_history`, `ad_override_recipients`, `ad_hub_gates`, `ad_settings` (payout timing), `ad_payouts`, `ad_alert_prefs`, `ad_hub_alerts_sent`, `ad_audit`, `ad_promo_codes`, `ad_promo_redemptions`, `ad_street_members`, `ad_street_qrs`, `ad_street_events`.
 
 ## Env vars (birch-reserve project; names only)
 | Var | Purpose |
@@ -70,7 +72,14 @@ Open decision: recipients currently share the channel's pool, so they earn less 
 | `CRON_SECRET` | cron auth |
 | scalehealthnew: `VITE_BIRCH_ADS` | `on` shows the hub slot |
 
+## Creative bytes
+`/v1/ads/cr/:id` (original) and `/v1/ads/crv/:id` (variant/poster) serve from Postgres `bytea` with HTTP Range (206) for
+Safari/iOS video. Approved: public, CORS, cached a day. Pending/rejected: owner or admin only. Uploads go through the
+Vercel function, so files stay under its 4.5 MB body limit (images 2 MB, video 4 MB).
+
 ## Known gaps (Nov 21 2026)
+- Responsive variants and video posters are made in the uploader's browser (canvas). Server-side transcoding (sharp /
+  ffmpeg) isn't bundled into the function; a /buy upload that's attached later has no variants until re-uploaded.
 - Reporting: `seller` is stored and shown on campaigns and in the campaigns CSV, but statements and summaries don't split by seller yet.
 - Scale-direct campaigns are created by an admin only (no Scale-branded checkout); they share the Birch admin UI and allowlist.
 - Code and project names still say "birch" (repo, Vercel project, `/ads/admin` on birchreserve.net). Moving the core under a Scale domain would be a hosting change, not a data change.
