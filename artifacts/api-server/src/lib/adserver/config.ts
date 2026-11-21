@@ -24,12 +24,14 @@ export type AdSlot = {
   cpmUsd: number; // rate-card starter CPM (USD)
   cpcUsd: number; // rate-card starter CPC (USD)
   live: boolean; // live hubs serve; queued hubs are listed but never fill
+  test?: boolean; // QA hub: serves test campaigns on test requests only, never real buyers
+  contractRef?: string | null; // set when the hub was onboarded on contract in /ads/admin
 };
 
 const SURFACE = new Map(RATE_SURFACES.map((s) => [s.key, s] as const));
 
 /** Live inventory follows the kit's hub status ("Live inventory"). Everything else is listed, not served. */
-export const AD_SLOTS: readonly AdSlot[] = HUBS.flatMap((h) =>
+const STATIC_SLOTS: readonly AdSlot[] = HUBS.flatMap((h) =>
   RATE_SURFACES.map((s) => ({
     key: `${h.key}.${s.key}`,
     hub: h.key,
@@ -44,6 +46,26 @@ export const AD_SLOTS: readonly AdSlot[] = HUBS.flatMap((h) =>
     live: h.status === "Live inventory",
   })),
 );
+
+/** Live slot list: static kit hubs plus hubs onboarded on contract (ad_hubs, store.ts). Mutated in place so every importer sees updates. */
+export const AD_SLOTS: AdSlot[] = [...STATIC_SLOTS];
+
+export type ContractHub = { key: string; name: string; category: string; url: string; partner: string; contractRef: string; status: "live" | "paused"; isTest: boolean };
+
+/** A hub on contract gets one slot per rate-card placement at card rates. Same key as a kit hub overrides it (e.g. a queued hub signing). */
+export function setContractHubs(hubs: readonly ContractHub[]): void {
+  const byKey = new Map(hubs.map((h) => [h.key, h] as const));
+  const next: AdSlot[] = STATIC_SLOTS.filter((s) => !byKey.has(s.hub)).map((s) => ({ ...s }));
+  for (const h of hubs) {
+    for (const r of RATE_SURFACES) {
+      next.push({
+        key: `${h.key}.${r.key}`, hub: h.key, hubName: h.name, hubCategory: h.category, hubUrl: h.url, partner: h.partner || h.name,
+        placement: r.key, label: `${h.name} · ${r.label}`, cpmUsd: r.cpmStarter[0], cpcUsd: r.cpcStarter[0], live: h.status === "live", test: h.isTest, contractRef: h.contractRef,
+      });
+    }
+  }
+  AD_SLOTS.splice(0, AD_SLOTS.length, ...next);
+}
 
 export const findSlot = (key: unknown): AdSlot | null => (typeof key === "string" ? AD_SLOTS.find((s) => s.key === key) ?? null : null);
 export const placementRate = (p: Placement): { cpmUsd: number; cpcUsd: number } => {

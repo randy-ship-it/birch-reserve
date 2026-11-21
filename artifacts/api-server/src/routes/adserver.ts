@@ -96,7 +96,8 @@ router.get("/ads/px.js", (_req, res) => {
   cors(res);
   res.set("Cache-Control", "public, max-age=300").type("application/javascript").send(PIXEL_JS);
 });
-router.get(["/ads/docs", "/ads/docs/"], (req, res) => {
+router.get(["/ads/docs", "/ads/docs/"], async (req, res) => {
+  await store.db().catch(() => undefined); // include hubs onboarded on contract
   res.set("Cache-Control", "public, max-age=300").type("html").send(docsPage(origin(req)));
 });
 router.get(["/ads", "/ads/"], (_req, res) => res.redirect(302, "/ads/docs"));
@@ -366,6 +367,7 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
       store.totalsByCampaign("all"), store.listCreatives({}), store.bySlotFor("all", 30), store.ledger({ limit: 300 }), store.royalties(6), store.partnerShares(),
       store.alertSubscribers(), store.auditLog(80), store.totalsByCampaign("all", 1), buyStore().listOrders(50).catch(() => []),
     ]);
+    const [hubs, testRoyalties] = await Promise.all([store.listContractHubs(), store.royalties(6, { testOnly: true })]);
     const byC = new Map<string, typeof creatives>();
     for (const cr of creatives) byC.set(cr.campaignId, [...(byC.get(cr.campaignId) ?? []), cr]);
     const brand = new Map(campaigns.map((c) => [c.id, c.brand]));
@@ -376,7 +378,7 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
         who, campaigns: campaigns.map((c) => ({ c, t: totals.get(c.id) ?? { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 } })),
         pending: creatives.filter((x) => x.status === "pending" && ids.includes(x.campaignId)).map((x) => ({ ...x, brand: brand.get(x.campaignId) ?? "" })),
         creativesByCampaign: byC, slotTotals, ledger: led, royalties: roy, shares, alerts, audit, day: dayT, friday: fridayReady(), schema: store.adSchema(),
-        promoHtml: await promoPanels(),
+        promoHtml: await promoPanels(), hubs, testRoyalties,
         orders: orders.map((o) => ({ id: o.id, at: o.createdAt, email: o.email, company: o.company, plan: o.plan, format: o.format, creativeId: o.creativeId })),
       }),
     );
@@ -600,7 +602,12 @@ router.post("/ads/admin/creatives/:id/status", json, (req, res) =>
       res.status(400).json({ message: "Bad status." });
       return;
     }
-    const ok = await store.setCreativeStatus(String(req.params.id), to, who);
+    const reason = str((req.body as Record<string, unknown> | undefined)?.reason, 300);
+    if (to === "rejected" && !reason) {
+      res.status(400).json({ message: "Add a reason. The buyer sees it on their dashboard." });
+      return;
+    }
+    const ok = await store.setCreativeStatus(String(req.params.id), to, who, to === "rejected" ? reason : null);
     res.status(ok ? 200 : 404).json({ message: ok ? (to === "approved" ? "Approved." : "Rejected.") : "Not found." });
   }),
 );
@@ -631,6 +638,98 @@ router.post("/ads/admin/payouts/approve", json, (req, res) =>
   }),
 );
 
+/* Hub inventory on contract (Randy voice Nov 21 12:44): a signed hub becomes sellable placements at card rates. */
+router.post("/ads/admin/hubs", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const key = str(b.key, 41).toLowerCase();
+    const name = str(b.name, 80);
+    const category = str(b.category, 80);
+    const url = str(b.url, 300);
+    const contractRef = str(b.contractRef, 160);
+    let okUrl = false;
+    try {
+      okUrl = new URL(url).protocol === "https:";
+    } catch {
+      okUrl = false;
+    }
+    if (!/^[a-z0-9][a-z0-9-]{1,40}$/.test(key) || !name || !category || !okUrl || !contractRef) {
+      res.status(400).json({ message: "Key (lowercase letters, numbers, dashes), name, category, an https URL and the contract reference are all required." });
+      return;
+    }
+    const isTest = b.isTest === "on" || b.isTest === true;
+    await store.upsertContractHub({ key, name, category, url, partner: str(b.partner, 120) || name, contractRef, status: "live", isTest }, who);
+    res.json({ message: `${name} is on contract. Its placements are sellable now (slot keys ${key}.landing … ${key}.post_purchase).` });
+  }),
+);
+
+router.post("/ads/admin/hubs/:key/status", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const to = req.query.to === "paused" ? "paused" : req.query.to === "live" ? "live" : null;
+    if (!to) {
+      res.status(400).json({ message: "Bad status." });
+      return;
+    }
+    const ok = await store.setHubStatus(String(req.params.key), to, who);
+    res.status(ok ? 200 : 404).json({ message: ok ? `Hub ${to}.` : "Not found." });
+  }),
+);
+
+router.post("/ads/admin/hubs/:key/purge", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const ok = await store.purgeTestHub(String(req.params.key), who);
+    res.status(ok ? 200 : 400).json({ message: ok ? "Test hub deleted." : "Only test hubs can be deleted." });
+  }),
+);
+
+/* A /buy order's uploaded ad goes into the approval queue of the buyer's paid campaign. */
+router.post("/ads/admin/orders/:id/attach", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const order = (await buyStore().listOrders(500)).find((o) => o.id === String(req.params.id));
+    const c = await store.getCampaign(str((req.body as Record<string, unknown> | undefined)?.campaign, 40));
+    if (!order || !order.creativeId || !c || c.accountEmail !== order.email.toLowerCase()) {
+      res.status(400).json({ message: "Pick a campaign for the same email as the order, and the order needs an uploaded ad." });
+      return;
+    }
+    const already = (await store.listCreatives({ campaignId: c.id })).some((x) => x.sourceRef === `buy:${order.id}`);
+    if (already) {
+      res.json({ message: "Already in the approval queue." });
+      return;
+    }
+    const cr = await buyStore().getCreative(order.creativeId);
+    if (!cr) {
+      res.status(404).json({ message: "The uploaded file is no longer stored. Ask the buyer to upload it on their dashboard." });
+      return;
+    }
+    await store.addCreative({ campaignId: c.id, mime: cr.mime, width: cr.width, height: cr.height, data: cr.data, alt: `${c.brand} (sponsored)`, uploadedBy: `${who} (from /buy)`, status: "pending", sourceRef: `buy:${order.id}` });
+    res.json({ message: "Sent to the approval queue." });
+  }),
+);
+
+/* Manual payouts: record that an approved statement was paid outside this system. No money moves here. */
+router.post("/ads/admin/payouts/paid", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const ref = str(b.ref, 120);
+    if (!ref) {
+      res.status(400).json({ message: "Add the payment reference (e-transfer, cheque or wire)." });
+      return;
+    }
+    const ok = await store.markPayoutPaid(str(b.partner, 120), str(b.month, 7), str(b.currency, 3), ref, who);
+    res.status(ok ? 200 : 400).json({ message: ok ? "Recorded as paid. Nothing was sent from here." : "Only approved statements can be marked paid." });
+  }),
+);
+
 router.post("/ads/admin/friday-sync", json, (req, res) =>
   safe(res, async () => {
     const who = guard(req, res);
@@ -657,6 +756,8 @@ router.get("/ads/admin/export/:what", (req, res) =>
       rows = (await store.ledger({ limit: 50_000 })).map((l) => ({ at: l.at, campaign_id: l.campaignId, kind: l.kind, slot: l.slotKey, partner: l.partner, units: l.units, amount: (l.amountMicros / MICROS).toFixed(6), currency: l.currency, note: l.note, actor: l.actor, test: l.isTest }));
     } else if (what === "royalties") {
       rows = (await store.royalties(13)).map((r) => ({ partner: r.partner, month: r.month, currency: r.currency, delivered: (r.grossMicros / MICROS).toFixed(2), share_pct: r.shareBps === null ? "" : (r.shareBps / 100).toFixed(2), payable: r.payableMicros === null ? "" : (r.payableMicros / MICROS).toFixed(2), status: r.status, approved_by: r.approvedBy, approved_at: r.approvedAt }));
+    } else if (what === "payouts") {
+      rows = (await store.payoutRows()).map((r) => ({ partner: r.partner, month: r.month, currency: r.currency, delivered: (Number(r.gross_micros) / MICROS).toFixed(2), share_pct: (Number(r.share_bps) / 100).toFixed(2), amount_to_pay: (Number(r.payable_micros) / MICROS).toFixed(2), status: r.status, approved_by: r.approved_by, approved_at: r.approved_at, paid_ref: r.paid_ref ?? "", paid_by: r.paid_by ?? "", paid_at: r.paid_at ?? "" }));
     } else if (what === "delivery") {
       const cs = await store.listCampaigns();
       for (const c of cs) for (const d of await store.dailyFor([c.id], 400)) rows.push({ day: d.day, campaign_id: c.id, brand: c.brand, test: c.isTest, served: d.serves, viewable: d.views, clicks: d.clicks, conversions: d.convs, spend: (d.spendMicros / MICROS).toFixed(2), currency: c.currency });

@@ -3,7 +3,7 @@
  * in the same database, so preview QA never touches production delivery, ledgers or statements.
  * All DDL is additive (CREATE ... IF NOT EXISTS). Aggregate reporting only: no visitor-level rows leave this module.
  */
-import { AD_DEFAULTS, AD_SLOTS, findSlot, type Placement } from "./config";
+import { AD_DEFAULTS, AD_SLOTS, findSlot, setContractHubs, type ContractHub, type Placement } from "./config";
 import type { Campaign, CampaignStatus, Pricing } from "./engine";
 
 export type Queryable = { query: (sql: string, params?: unknown[]) => Promise<{ rows: Array<Record<string, unknown>> }> };
@@ -14,6 +14,7 @@ export function setAdPoolForTests(p: Queryable | null, schema: string | null = n
   poolOverride = p;
   schemaOverride = schema;
   ready = null;
+  invAt = 0;
 }
 
 const isProductionRuntime = () => process.env.VERCEL_ENV === "production" || (!process.env.VERCEL_ENV && process.env.NODE_ENV === "production" && process.env.ADS_STORE === "public");
@@ -84,6 +85,14 @@ const DDL = (s: string) => [
   `INSERT INTO ${s}.ad_promo_codes (code_key, code, aliases, credit_micros, notes, created_by) VALUES
     ('street100','STREET100','{streetteam100,streetteamhundred,streethundred}',100000000,'Street team: $100 USD ad credit handed out by street team members. Ad spend only, no cash value, non-transferable.','seed') ON CONFLICT DO NOTHING`,
   `INSERT INTO ${s}.ad_street_members (id, label, created_by) VALUES ('bridget','Bridget','seed'),('mona','Mona','seed') ON CONFLICT DO NOTHING`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_hubs (
+    key text PRIMARY KEY, name text NOT NULL, category text NOT NULL DEFAULT '', url text NOT NULL, partner text NOT NULL, contract_ref text NOT NULL,
+    status text NOT NULL DEFAULT 'live', is_test boolean NOT NULL DEFAULT false, created_by text, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now())`,
+  `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS review_note text`,
+  `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS source_ref text`,
+  `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS paid_ref text`,
+  `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS paid_by text`,
+  `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS paid_at timestamptz`,
   `CREATE TABLE IF NOT EXISTS ${s}.ad_audit (id bigserial PRIMARY KEY, at timestamptz NOT NULL DEFAULT now(), actor text, action text NOT NULL, target text, detail text)`,
   `INSERT INTO ${s}.ad_street_qrs (member, label, site, url, created_by) VALUES ('bridget','birch-intake','birch','https://birchreserve.net/intake?code=STREET100&st=bridget&qr=birch-intake','seed'),('bridget','scale-intake','scale','https://scalehealth.ca/intake?code=STREET100&st=bridget&qr=scale-intake','seed'),('mona','birch-intake','birch','https://birchreserve.net/intake?code=STREET100&st=mona&qr=birch-intake','seed'),('mona','scale-intake','scale','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake','seed'),('mona','scale-intake-digital','scale','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake-digital','seed') ON CONFLICT DO NOTHING`,
   `INSERT INTO ${s}.ad_audit (actor, action, target, detail) SELECT 'seed','street.qr','mona/scale-intake-digital','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake-digital (Mona digital Scale intake QR registered)' WHERE NOT EXISTS (SELECT 1 FROM ${s}.ad_audit WHERE action = 'street.qr' AND target = 'mona/scale-intake-digital')`,
@@ -99,6 +108,7 @@ export async function db(): Promise<Queryable> {
     throw e;
   });
   await ready;
+  await refreshInventory(p);
   return p;
 }
 
@@ -220,17 +230,18 @@ export async function adjustBudget(id: string, deltaMicros: number, note: string
 }
 
 /* --------------------------------------------------------------------------------------------- creatives */
-export type Creative = { id: string; campaignId: string; mime: string; width: number; height: number; bytes: number; alt: string; status: "pending" | "approved" | "rejected"; uploadedBy: string | null; createdAt: Date };
+export type Creative = { id: string; campaignId: string; mime: string; width: number; height: number; bytes: number; alt: string; status: "pending" | "approved" | "rejected"; uploadedBy: string | null; createdAt: Date; reviewNote?: string | null; sourceRef?: string | null };
 const toCreative = (r: Record<string, unknown>): Creative => ({
   id: String(r.id), campaignId: String(r.campaign_id), mime: String(r.mime), width: num(r.width), height: num(r.height), bytes: num(r.bytes),
   alt: String(r.alt ?? ""), status: String(r.status) as Creative["status"], uploadedBy: (r.uploaded_by as string) ?? null, createdAt: new Date(String(r.created_at)),
+  reviewNote: (r.review_note as string) ?? null, sourceRef: (r.source_ref as string) ?? null,
 });
 
-export async function addCreative(c: { campaignId: string; mime: string; width: number; height: number; data: Buffer; alt: string; uploadedBy: string; status?: Creative["status"] }): Promise<Creative> {
+export async function addCreative(c: { campaignId: string; mime: string; width: number; height: number; data: Buffer; alt: string; uploadedBy: string; status?: Creative["status"]; sourceRef?: string | null }): Promise<Creative> {
   const p = await db();
   const { rows } = await p.query(
-    `INSERT INTO ${S()}.ad_creatives (campaign_id, mime, width, height, bytes, data, alt, status, uploaded_by) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id, campaign_id, mime, width, height, bytes, alt, status, uploaded_by, created_at`,
-    [c.campaignId, c.mime, c.width, c.height, c.data.length, c.data, c.alt.slice(0, 200), c.status ?? "pending", c.uploadedBy],
+    `INSERT INTO ${S()}.ad_creatives (campaign_id, mime, width, height, bytes, data, alt, status, uploaded_by, source_ref) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id, campaign_id, mime, width, height, bytes, alt, status, uploaded_by, created_at, review_note, source_ref`,
+    [c.campaignId, c.mime, c.width, c.height, c.data.length, c.data, c.alt.slice(0, 200), c.status ?? "pending", c.uploadedBy, c.sourceRef ?? null],
   );
   await audit(c.uploadedBy, "creative.add", String(rows[0]!.id), c.campaignId);
   return toCreative(rows[0]!);
@@ -248,7 +259,7 @@ export async function listCreatives(opts: { campaignId?: string; status?: Creati
     params.push(opts.status);
     where.push(`status = $${params.length}`);
   }
-  const { rows } = await p.query(`SELECT id, campaign_id, mime, width, height, bytes, alt, status, uploaded_by, created_at FROM ${S()}.ad_creatives ${where.length ? `WHERE ${where.join(" AND ")}` : ""} ORDER BY created_at DESC LIMIT 500`, params);
+  const { rows } = await p.query(`SELECT id, campaign_id, mime, width, height, bytes, alt, status, uploaded_by, created_at, review_note, source_ref FROM ${S()}.ad_creatives ${where.length ? `WHERE ${where.join(" AND ")}` : ""} ORDER BY created_at DESC LIMIT 500`, params);
   return rows.map(toCreative);
 }
 
@@ -262,10 +273,10 @@ export async function creativeData(id: string): Promise<{ mime: string; data: Bu
   return { mime: String(r.mime), data: Buffer.from(raw), status: String(r.status), campaignId: String(r.campaign_id), accountEmail: String(r.account_email) };
 }
 
-export async function setCreativeStatus(id: string, status: Creative["status"], actor: string): Promise<boolean> {
+export async function setCreativeStatus(id: string, status: Creative["status"], actor: string, note: string | null = null): Promise<boolean> {
   const p = await db();
-  const { rows } = await p.query(`UPDATE ${S()}.ad_creatives SET status = $2, reviewed_by = $3, reviewed_at = now() WHERE id = $1 RETURNING id`, [id, status, actor]);
-  await audit(actor, `creative.${status}`, id);
+  const { rows } = await p.query(`UPDATE ${S()}.ad_creatives SET status = $2, reviewed_by = $3, reviewed_at = now(), review_note = $4 WHERE id = $1 RETURNING id`, [id, status, actor, note]);
+  await audit(actor, `creative.${status}`, id, note ?? undefined);
   return rows.length > 0;
 }
 
@@ -444,10 +455,10 @@ export async function ledger(opts: { campaignId?: string; limit?: number } = {})
 }
 
 /* --------------------------------------------------------------------------------------------- royalties */
-export type RoyaltyRow = { partner: string; month: string; currency: string; grossMicros: number; units: number; shareBps: number | null; payableMicros: number | null; status: "calculated" | "approved"; approvedBy: string | null; approvedAt: Date | null };
+export type RoyaltyRow = { isTest?: boolean; paidRef?: string | null; paidAt?: Date | null; paidBy?: string | null; partner: string; month: string; currency: string; grossMicros: number; units: number; shareBps: number | null; payableMicros: number | null; status: "calculated" | "approved" | "paid"; approvedBy: string | null; approvedAt: Date | null };
 
 /** Per hub partner and month, from delivered (charged) spend on that partner's slots. Test campaigns excluded. */
-export async function royalties(months = 6): Promise<RoyaltyRow[]> {
+export async function royalties(months = 6, opts: { testOnly?: boolean } = {}): Promise<RoyaltyRow[]> {
   const p = await db();
   const since = new Date();
   since.setUTCDate(1);
@@ -456,7 +467,7 @@ export async function royalties(months = 6): Promise<RoyaltyRow[]> {
   const [{ rows }, shares, approved] = await Promise.all([
     p.query(
       `SELECT partner, to_char(date_trunc('month', at), 'YYYY-MM') AS m, currency, (-sum(amount_micros))::bigint AS gross, sum(units)::int AS u
-         FROM ${S()}.ad_ledger WHERE kind = 'charge' AND is_test = false AND partner IS NOT NULL AND at >= $1 GROUP BY 1,2,3 ORDER BY 2 DESC, 1`,
+         FROM ${S()}.ad_ledger WHERE kind = 'charge' AND is_test = ${opts.testOnly ? "true" : "false"} AND partner IS NOT NULL AND at >= $1 GROUP BY 1,2,3 ORDER BY 2 DESC, 1`,
       [since.toISOString()],
     ),
     p.query(`SELECT partner, share_bps FROM ${S()}.ad_partners`),
@@ -471,8 +482,9 @@ export async function royalties(months = 6): Promise<RoyaltyRow[]> {
     const gross = num(r.gross);
     return {
       partner: String(r.partner), month: String(r.m), currency: String(r.currency), grossMicros: gross, units: num(r.u), shareBps: bps,
-      payableMicros: bps === null ? null : Math.floor((gross * bps) / 10_000), status: a ? "approved" : "calculated",
-      approvedBy: a ? String(a.approved_by) : null, approvedAt: a ? new Date(String(a.approved_at)) : null,
+      payableMicros: bps === null ? null : Math.floor((gross * bps) / 10_000), status: opts.testOnly ? "calculated" : a ? (a.status === "paid" ? "paid" : "approved") : "calculated",
+      approvedBy: a && !opts.testOnly ? String(a.approved_by) : null, approvedAt: a && !opts.testOnly ? new Date(String(a.approved_at)) : null,
+      isTest: Boolean(opts.testOnly), paidRef: a && !opts.testOnly ? ((a.paid_ref as string) ?? null) : null, paidAt: a && !opts.testOnly && a.paid_at ? new Date(String(a.paid_at)) : null, paidBy: a && !opts.testOnly ? ((a.paid_by as string) ?? null) : null,
     };
   });
 }
@@ -496,7 +508,7 @@ export async function setPartnerShare(partner: string, bps: number | null, actor
 export async function approvePayout(partner: string, month: string, currency: string, actor: string): Promise<RoyaltyRow | null> {
   const rows = await royalties(13);
   const r = rows.find((x) => x.partner === partner && x.month === month && x.currency === currency);
-  if (!r || r.shareBps === null || r.payableMicros === null || r.status === "approved") return null;
+  if (!r || r.shareBps === null || r.payableMicros === null || r.status !== "calculated") return null;
   const p = await db();
   await p.query(
     `INSERT INTO ${S()}.ad_payouts (partner, month, currency, gross_micros, share_bps, payable_micros, approved_by) VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING`,
@@ -545,3 +557,70 @@ export async function purgeTestCampaign(id: string, actor: string): Promise<bool
 }
 
 export const SLOT_KEYS = AD_SLOTS.map((s) => s.key);
+
+/* --------------------------------------------------------------------------------------------- hub inventory on contract */
+let invAt = 0;
+const INV_MS = 15_000;
+async function refreshInventory(p: Queryable, force = false): Promise<void> {
+  if (!force && Date.now() - invAt < INV_MS) return;
+  invAt = Date.now();
+  const { rows } = await p.query(`SELECT * FROM ${S()}.ad_hubs ORDER BY created_at`);
+  setContractHubs(rows.map(toHub));
+}
+const toHub = (r: Record<string, unknown>): ContractHub & { createdBy: string | null; createdAt: Date } => ({
+  key: String(r.key), name: String(r.name), category: String(r.category ?? ""), url: String(r.url), partner: String(r.partner), contractRef: String(r.contract_ref),
+  status: r.status === "paused" ? "paused" : "live", isTest: Boolean(r.is_test), createdBy: (r.created_by as string) ?? null, createdAt: new Date(String(r.created_at)),
+});
+
+export async function listContractHubs(): Promise<Array<ReturnType<typeof toHub>>> {
+  const p = await db();
+  const { rows } = await p.query(`SELECT * FROM ${S()}.ad_hubs ORDER BY created_at DESC`);
+  return rows.map(toHub);
+}
+
+/** Onboard (or update) a hub on contract: its placements become sellable at card rates. A contract reference is required. */
+export async function upsertContractHub(h: ContractHub, actor: string): Promise<void> {
+  const p = await db();
+  await p.query(
+    `INSERT INTO ${S()}.ad_hubs (key, name, category, url, partner, contract_ref, status, is_test, created_by) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+     ON CONFLICT (key) DO UPDATE SET name = EXCLUDED.name, category = EXCLUDED.category, url = EXCLUDED.url, partner = EXCLUDED.partner, contract_ref = EXCLUDED.contract_ref, status = EXCLUDED.status, updated_at = now()`,
+    [h.key, h.name, h.category, h.url, h.partner, h.contractRef, h.status, h.isTest, actor],
+  );
+  await refreshInventory(p, true);
+  await audit(actor, "hub.onboard", h.key, `${h.name} contract=${h.contractRef} status=${h.status}${h.isTest ? " TEST" : ""}`);
+}
+
+export async function setHubStatus(key: string, status: "live" | "paused", actor: string): Promise<boolean> {
+  const p = await db();
+  const { rows } = await p.query(`UPDATE ${S()}.ad_hubs SET status = $2, updated_at = now() WHERE key = $1 RETURNING key`, [key, status]);
+  await refreshInventory(p, true);
+  await audit(actor, `hub.${status}`, key);
+  return rows.length > 0;
+}
+
+/** Remove a QA hub. Refuses real hubs. Test ledger lines on it go with their test campaigns (purgeTestCampaign). */
+export async function purgeTestHub(key: string, actor: string): Promise<boolean> {
+  const p = await db();
+  const { rows } = await p.query(`DELETE FROM ${S()}.ad_hubs WHERE key = $1 AND is_test = true RETURNING key`, [key]);
+  await refreshInventory(p, true);
+  if (rows.length) await audit(actor, "hub.purge_test", key);
+  return rows.length > 0;
+}
+
+/* --------------------------------------------------------------------------------------------- manual payouts */
+/** Record that an approved statement was paid outside this system (e-transfer, cheque, wire). Records only; no money moves. */
+export async function markPayoutPaid(partner: string, month: string, currency: string, ref: string, actor: string): Promise<boolean> {
+  const p = await db();
+  const { rows } = await p.query(
+    `UPDATE ${S()}.ad_payouts SET status = 'paid', paid_ref = $4, paid_by = $5, paid_at = now() WHERE partner = $1 AND month = $2 AND currency = $3 AND status = 'approved' RETURNING partner`,
+    [partner, month, currency, ref, actor],
+  );
+  if (rows.length) await audit(actor, "payout.mark_paid", `${partner}|${month}|${currency}`, ref);
+  return rows.length > 0;
+}
+
+export async function payoutRows(): Promise<Array<Record<string, unknown>>> {
+  const p = await db();
+  const { rows } = await p.query(`SELECT * FROM ${S()}.ad_payouts ORDER BY month DESC, partner`);
+  return rows;
+}

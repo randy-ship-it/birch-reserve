@@ -198,3 +198,45 @@ test("ad creatives accept banner shapes; the /buy upload rule is unchanged", asy
   assert.equal(checkCreative(png(728, 90)).ok, false);
   assert.equal(checkCreative(png(656, 300)).ok, true);
 });
+
+test("hub on contract: becomes sellable at card rates, QA hub carries test campaigns only, reject reason, test royalty line, manual payout", async () => {
+  const db = new PGlite();
+  store.setAdPoolForTests(db as unknown as store.Queryable, "ads_hub_test");
+  resetServeCacheForTests();
+  const now = Date.now();
+  assert.equal(findSlot("calm-qa.post_purchase"), null);
+  await store.upsertContractHub({ key: "calm-qa", name: "QA Hub", category: "Recovery hardware", url: "https://example.com/qa", partner: "QA Partner", contractRef: "QA contract", status: "live", isTest: true }, "test");
+  const slot = findSlot("calm-qa.post_purchase")!;
+  assert.ok(slot && slot.live && slot.test);
+  assert.equal(slot.cpmUsd, findSlot("sole.post_purchase")!.cpmUsd);
+  // Real campaigns never fill a QA hub; test campaigns do on test requests.
+  assert.equal(eligibility(camp(), slot), null);
+  assert.equal(eligibility(camp({ isTest: true }), slot), "primary");
+  const { campaign } = await store.createCampaign({ accountEmail: "qa@birchreserve.test", brand: "QA Brand", orderRef: "promo:qa", orderKind: "promo STREET100", budgetMicros: 100_000_000, currency: "usd", primaryPlacement: "post_purchase", hubs: ["calm-qa"], isTest: true, actor: "test" });
+  const png = Buffer.from("89504e470d0a1a0a0000000d49484452000001f4000001f40806000000", "hex");
+  const bad = await store.addCreative({ campaignId: campaign.id, mime: "image/png", width: 500, height: 500, data: png, alt: "x", uploadedBy: "test" });
+  await store.setCreativeStatus(bad.id, "rejected", "test", "Logo too small");
+  assert.equal((await store.listCreatives({ campaignId: campaign.id }))[0]!.reviewNote, "Logo too small");
+  const ok = await store.addCreative({ campaignId: campaign.id, mime: "image/png", width: 500, height: 500, data: png, alt: "y", uploadedBy: "test" });
+  await store.setCreativeStatus(ok.id, "approved", "test");
+  await store.updateCampaign(campaign.id, { status: "active", flightStart: new Date(now - DAY), flightEnd: new Date(now + 30 * DAY), clickUrl: "https://example.com/offer" }, "test");
+  resetServeCacheForTests();
+  assert.equal((await serve({ slot: slot.key, ua: UA, origin: "https://birchreserve.net", now })).fill, false); // not a test request
+  const s = await serve({ slot: slot.key, ua: UA, origin: "https://birchreserve.net", test: true, now });
+  assert.equal(s.fill, true);
+  if (!s.fill) return;
+  const v = await recordView(new URL(s.view).searchParams.get("t"), UA, now + 1500);
+  assert.equal(v.billed, true);
+  assert.equal((await store.getCampaign(campaign.id))!.spentMicros, 18_000);
+  const tr = await store.royalties(1, { testOnly: true });
+  assert.equal(tr[0]!.partner, "QA Partner");
+  assert.equal(tr[0]!.shareBps, null); // pending rate until set from the contract
+  assert.equal((await store.royalties(1)).length, 0); // never in real statements
+  // Paused hub stops serving.
+  await store.setHubStatus("calm-qa", "paused", "test");
+  assert.equal(findSlot(slot.key)!.live, false);
+  assert.equal(await store.purgeTestCampaign(campaign.id, "test"), true);
+  assert.equal(await store.purgeTestHub("calm-qa", "test"), true);
+  assert.equal(findSlot(slot.key), null);
+  store.setAdPoolForTests(null);
+});
