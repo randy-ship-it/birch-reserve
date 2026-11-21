@@ -3812,9 +3812,13 @@ test("same-key retry that omits format_pref replays the stored seat instead of 4
   process.env.SEATS_TOTAL = "100";
   process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
   let creates = 0;
+  const sessionMetadata: Array<Record<string, string> | undefined> = [];
+  const piMetadata: Array<Record<string, string> | undefined> = [];
   setStripeCheckoutFunctionsForTests({
     create: async (params) => {
       creates += 1;
+      sessionMetadata.push(params.metadata as Record<string, string> | undefined);
+      piMetadata.push(params.payment_intent_data?.metadata as Record<string, string> | undefined);
       const priceData = params.line_items?.[0]?.price_data;
       return { id: `cs_test_nofmt_${randomUUID().replaceAll("-", "")}`, url: `https://checkout.stripe.test/nofmt-${creates}`, client_reference_id: params.client_reference_id, currency: priceData?.currency, amount_total: priceData?.unit_amount, metadata: params.metadata } as never;
     },
@@ -3834,6 +3838,11 @@ test("same-key retry that omits format_pref replays the stored seat instead of 4
     assert.equal(row?.adInterest, checkoutAdInterest(undefined));
     assert.notEqual(checkoutAdInterest(undefined), "post_checkout");
     assert.equal(checkoutAdInterest("member_hub"), "member_hub");
+    // Stripe audit (Nov 21 2026): the session and its PaymentIntent say the currency and the ad format that was booked.
+    assert.equal(sessionMetadata[0]?.currency, "usd");
+    assert.equal(sessionMetadata[0]?.format_pref, checkoutAdInterest(undefined));
+    assert.equal(piMetadata[0]?.currency, "usd");
+    assert.equal(piMetadata[0]?.format_pref, checkoutAdInterest(undefined));
   } finally {
     setStripeCheckoutFunctionsForTests();
     for (const [k, v] of [["STRIPE_CHECKOUT_DISABLED", prev.d], ["STRIPE_SECRET_KEY", prev.k], ["PUBLIC_BASE_URL", prev.u], ["SEATS_TOTAL", prev.t]] as const) {

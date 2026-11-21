@@ -1075,6 +1075,9 @@ async function handleMachineCheckout(
       offerKey: offer.offerKey,
       sku: offer.sku,
       checkoutAttempt: String(nextAttempt),
+      // Stripe audit (Nov 21 2026): the session says what currency and ad format were chosen, so the dashboard explains the order.
+      currency,
+      ...(isFormat(reservation.adInterest) ? { format_pref: reservation.adInterest } : {}),
     },
     payment_intent_data: {
       ...birchPaymentIntentBrand(offer.name),
@@ -1083,6 +1086,8 @@ async function handleMachineCheckout(
         offerKey: offer.offerKey,
         sku: offer.sku,
         checkoutAttempt: String(nextAttempt),
+        currency,
+        ...(isFormat(reservation.adInterest) ? { format_pref: reservation.adInterest } : {}),
       },
     },
     success_url: `${returnBaseOf(req, baseUrl)}/success?order=${reservation.id}&session_id={CHECKOUT_SESSION_ID}`,
