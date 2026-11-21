@@ -63,7 +63,7 @@ export function Tam2027({ compact = false, dark = false, testId = "tam-2027" }: 
 }
 
 export function ExclusiveReserveCard({ where, dark = true }: { where: string; dark?: boolean }) {
-  const href = `/exclusive?utm_source=birchreserve&utm_medium=next-step&utm_campaign=${encodeURIComponent(`${where}-exclusive-1900`)}`;
+  const href = `https://birchreserve.net/exclusive?utm_source=birchreserve&utm_medium=next-step&utm_campaign=${encodeURIComponent(`${where}-exclusive-1900`)}`;
   return (
     <article className={`flex flex-col gap-3 rounded-2xl p-4 md:flex-row md:items-center md:justify-between md:gap-4 ${dark ? "bg-white/[0.06] ring-1 ring-lime-300/60" : "border border-[#0b1f3a]/15 bg-white shadow-sm"}`} data-testid="exclusive-reserve-card">
       <div>
