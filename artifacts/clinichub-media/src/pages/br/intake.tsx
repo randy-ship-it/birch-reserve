@@ -4,6 +4,7 @@
  * role detail after submit on the same record. The full advertiser form stays one click away (#expanded).
  * Below: a labelled sample showing both sides (supplier exposure + hub earnings).
  */
+import { WatchHowItWorks } from "@/components/br/reel-button";
 import { isScaleSkin, skinText } from "@/lib/siteSkin";
 import { BirchAdSlot } from "@/components/br/birch-ad-slot";
 import { useEffect, useMemo, useState } from "react";
@@ -63,6 +64,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">{skinText("Birch Reserve · For suppliers")}</p>
               <h1 className="font-display text-4xl leading-[1.02] md:text-6xl" data-testid="supplier-h1">{brand ? `${brand}, start performance-only.` : "Start performance-only."}</h1>
               <p className="mt-2 max-w-2xl text-base text-muted-foreground">No setup fee, no monthly fee. Max your exposure with your own hub or CPM/CPC display.</p>
+              <div className="mt-3"><WatchHowItWorks placement="hero_intake_supplier" testId="intake-watch-reel" /></div>
               <p className="mt-3 inline-flex items-start gap-2 rounded-2xl bg-white/80 px-3 py-1.5 text-[12px] font-semibold text-[#0b1f3a] ring-1 ring-foreground/10" data-testid="supplier-network"><span>{RETAIL_COPY} <span className="font-normal text-foreground/50">· {RETAIL_TAG}</span></span></p>
             </div>
           ) : (
@@ -70,6 +72,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">{skinText("Birch Reserve · Monetization Kit")}</p>
               <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Get your free Monetization Kit.</h1>
               <p className="mt-2 max-w-2xl text-base text-muted-foreground">Reserve space now, book a big block, or get your free kit.</p>
+              <div className="mt-3"><WatchHowItWorks placement="hero_intake" testId="intake-watch-reel" /></div>
               <div className="mt-5"><TwoLane /></div>
               <div className="mt-6 flex items-center gap-3" data-testid="kit-divider"><span className="h-px flex-1 bg-foreground/15" /><span className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Or get your free Monetization Kit</span><span className="h-px flex-1 bg-foreground/15" /></div>
               <ActivityPulse mode="inline" className="mt-3" />
