@@ -7,6 +7,7 @@ import { flightProgress, pacingState, type Campaign } from "./engine";
 import type { Creative, LedgerLine, MonthSummary, PayoutSettings, RoyaltyRow, Totals } from "./store";
 import { CHANNEL_DEFAULT_BPS, CHANNEL_LABEL, gatePassed, overrideFor, ratesAt, recipientsAt, workedExample, type ChannelRateRow, type Gate, type RateRow, type RecipientRow } from "./payoutSplit";
 import { esc, fmtDate, fmtDateTime, fmtInt, fmtMoney, fmtPct, isoDay, shell } from "./ui";
+import { activationUrl } from "../overhaul/adActivation";
 
 export function adminLoginPage(error?: string): string {
   return shell({
@@ -214,7 +215,7 @@ ${x.kind === "video" && !poster ? `<form class="f" data-post="/ads/admin/creativ
   const sums = [...(v.summary ?? []).map((m) => sumRow(m)), ...(v.testSummary ?? []).map((m) => sumRow(m, true))];
   const testRoy = (v.testRoyalties ?? []).map((r) => royRow(r, true));
   const hubRows = (v.hubs ?? []).map((h) => `<tr><td><b>${esc(h.name)}</b>${h.isTest ? ` <span class="chip c-test">test</span>` : ""}<div class="fine"><code>${esc(h.key)}</code> · ${esc(h.category)}</div></td><td class="fine"><a href="${esc(h.url)}" target="_blank" rel="noopener">${esc(h.url)}</a></td><td>${esc(h.partner)}<div class="fine">rate: ${v.shares.get(h.partner) != null ? `${(v.shares.get(h.partner)! / 100).toFixed(2)}%` : "pending rate"}</div></td><td class="fine">${esc(h.contractRef)}<br>${esc(h.createdBy ?? "")} · ${fmtDate(h.createdAt)}</td><td><span class="chip ${h.status === "live" ? "c-active" : "c-paused"}">${esc(h.status)}</span></td>
-<td><form data-post="/ads/admin/hubs/${esc(h.key)}/status?to=${h.status === "live" ? "paused" : "live"}" data-reload style="display:inline"><button class="ghost sm" type="submit">${h.status === "live" ? "Pause" : "Set live"}</button></form>${h.isTest ? ` <form data-post="/ads/admin/hubs/${esc(h.key)}/purge" data-reload style="display:inline"><button class="danger sm" type="submit">Delete test hub</button></form>` : ""}</td></tr>`);
+<td><a class="ghost sm" style="text-decoration:none" data-testid="hub-activation-link" href="${esc(activationUrl({ company: h.name, hub: h.key, role: "provider" }, ""))}" target="_blank" rel="noopener">Ads-on questions</a> <form data-post="/ads/admin/hubs/${esc(h.key)}/status?to=${h.status === "live" ? "paused" : "live"}" data-reload style="display:inline"><button class="ghost sm" type="submit">${h.status === "live" ? "Pause" : "Set live"}</button></form>${h.isTest ? ` <form data-post="/ads/admin/hubs/${esc(h.key)}/purge" data-reload style="display:inline"><button class="danger sm" type="submit">Delete test hub</button></form>` : ""}</td></tr>`);
   const led = v.ledger.slice(0, 300).map((l) => `<tr><td class="fine">${fmtDateTime(l.at)}</td><td>${esc(l.kind)}${l.isTest ? ` <span class="chip c-test">test</span>` : ""}</td><td class="fine">${esc(l.campaignId.slice(0, 8))}</td><td class="fine">${esc(l.slotKey ?? "")}</td><td class="n">${l.units || ""}</td><td class="n">${fmtMoney(l.amountMicros, l.currency)}</td><td class="fine">${esc(l.note ?? "")} · ${esc(l.actor ?? "")}</td></tr>`);
   const catCount = new Map<string, number>();
   for (const a of v.alerts) for (const c of a.categories) catCount.set(c, (catCount.get(c) ?? 0) + 1);

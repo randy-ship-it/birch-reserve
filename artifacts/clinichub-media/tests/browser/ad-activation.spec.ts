@@ -36,7 +36,7 @@ for (const skin of SKINS) {
     await expect(page.getByTestId("act-exclusions")).toBeVisible();
     await page.getByTestId("act-excl-alcohol").click();
     await page.getByTestId("act-excl-gambling").click();
-    await expect(page.getByTestId("act-review-note")).toContainText("nothing runs without approval");
+    await expect(page.getByTestId("act-review-note")).toContainText("explicit approval from our team");
     await page.getByTestId("act-submit").click();
     await expect(page.getByTestId("field-error")).toContainText("confirm");
     if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/activate-${skin}-filled.png`, fullPage: true });

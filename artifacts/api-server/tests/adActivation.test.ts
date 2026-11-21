@@ -9,6 +9,9 @@ import { ACT_EXCLUSIONS, ACT_OPENNESS, ACT_REVIEW_NOTE, activationMeta, activati
 import { MemoryLeadStore, cleanLeadMeta, setLeadStoreForTests } from "../src/lib/leads";
 import { buildFridayPayload } from "../src/lib/fridayPush";
 import { activationAdminHtml, activationRollup } from "../src/lib/adserver/activationAdmin";
+import { renderKitEmail } from "../src/lib/kitEmails";
+import { partnersAdminHtml } from "../src/lib/adserver/partnersAdmin";
+import { activationUrl } from "../src/lib/overhaul/adActivation";
 import { createOverhaulRouter } from "../src/routes/overhaul";
 
 const OK = { role: "supplier", pages: "50-250", views: "25-100k", list: "1-10k", openness: "premium", exclusions: ["alcohol", "gambling"], other: "receipt inserts", ack: true };
@@ -25,8 +28,8 @@ test("parse: ranges, openness and exclusions are validated; ack required; exclus
   assert.ok(c.ok && c.v.exclusions.length === 0);
   assert.deepEqual(ACT_OPENNESS.map((o) => o.label), ["Curated health & wellness only", "Open to other premium brands (non-wellness), with category exclusions", "Open to any approved ad"]);
   assert.ok(ACT_EXCLUSIONS.some((e) => e.key === "cannabis") && ACT_EXCLUSIONS.some((e) => e.key === "competitors"));
-  assert.match(ACT_REVIEW_NOTE, /nothing runs without approval/);
-  assert.match(ACT_REVIEW_NOTE, /Randy or Jon/);
+  assert.equal(ACT_REVIEW_NOTE, "Every ad is reviewed, and nothing runs on your hubs without explicit approval from our team.");
+  assert.doesNotMatch(ACT_REVIEW_NOTE, /Randy|Jon\b/, "public note names no people");
   assert.equal(isNonCore("any"), true);
   assert.equal(isNonCore("curated"), false);
 });
@@ -122,4 +125,20 @@ test("UI wiring: asked after intake submit (not at the start), standalone page, 
   for (const t of ["Your inventory estimate", "Which ads can run on your hubs?", "Other ad data (optional)", "Pages or hub screens", "Monthly views or visitors"]) assert.ok(comp.includes(t), t);
   const app = readFileSync(resolve(process.cwd(), "../clinichub-media/src/App.tsx"), "utf8");
   assert.match(app, /path="\/intake\/activate"/);
+});
+
+test("prefilled /intake/activate link is in the kit email and the admin lead row; the page stays noindex", async () => {
+  const u = activationUrl({ email: "a+b@brand.co", company: "Brand & Co", role: "supplier" });
+  assert.equal(u, "https://birchreserve.net/intake/activate?role=supplier&email=a%2Bb%40brand.co&company=Brand+%26+Co");
+  const k = renderKitEmail({ brand: "Brand", reportUrl: "https://birchreserve.net/kit/r/t", hasPdf: false, activateUrl: u });
+  assert.match(k.html, /Next step: getting your ads turned on/);
+  assert.ok(k.html.includes("intake/activate?role=supplier"));
+  assert.ok(k.text.includes(u));
+  assert.doesNotMatch(renderKitEmail({ reportUrl: "https://x/y", hasPdf: false }).html, /intake\/activate/, "link is optional");
+  const s = new MemoryLeadStore();
+  await s.upsert({ id: "partners:z", source: "partners", sourceRef: "z", email: "p@agency.co", company: "Agency", meta: { partner_track: "media" } });
+  assert.match(partnersAdminHtml(await s.listBySource("partners", 5), ""), /data-testid="lead-activation-link"[^>]*>|intake\/activate\?role=supplier&amp;email=p%40agency.co/);
+  const seo = await import("../src/lib/publicSeo");
+  assert.ok((seo.SPA_SHELL_PATHS as readonly string[]).includes("/intake/activate"));
+  assert.ok(!(seo.PUBLIC_SITEMAP_PATHS as readonly string[]).includes("/intake/activate"));
 });

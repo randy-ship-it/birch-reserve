@@ -38,7 +38,8 @@ export const ACT_EXCLUSIONS = [
 ] as const;
 export type ActExclusion = (typeof ACT_EXCLUSIONS)[number]["key"];
 
-export const ACT_REVIEW_NOTE = "Every ad is reviewed and nothing runs without approval. No ad goes live on your hubs without our ad system plus permission from Randy or Jon.";
+/** Public copy: names no people. The internal rule (our ad system plus Randy or Jon permission) is unchanged and lives in the admin + docs. */
+export const ACT_REVIEW_NOTE = "Every ad is reviewed, and nothing runs on your hubs without explicit approval from our team.";
 export const ACT_OTHER_MAX = 300;
 /** Open to ads beyond curated health and wellness. */
 export const isNonCore = (o: string | undefined | null): boolean => o === "premium" || o === "any";
@@ -98,4 +99,15 @@ export function activationSummary(v: ActivationClean): { need: string; size: str
     size: `Pages/screens ${label(PAGES_RANGES, v.pages)} · views/mo ${label(VIEWS_RANGES, v.views)} · list ${label(LIST_RANGES, v.list)}`.slice(0, 300),
     need: [`Ad activation (${v.role}). Self-reported estimate, ranges only.`, `Ads allowed: ${open}${ex}`, v.other ? `Other ad data: ${v.other}` : ""].filter(Boolean).join("\n").slice(0, 1000),
   };
+}
+
+/** Prefilled link to the activation step (emails, admin rows). The page is noindex and sets no data on its own. */
+export function activationUrl(o: { email?: string | null; company?: string | null; role?: ActRole; hub?: string | null }, site = "https://birchreserve.net"): string {
+  const q = new URLSearchParams();
+  if (o.role) q.set("role", o.role);
+  if (o.email) q.set("email", o.email.trim().slice(0, 254));
+  if (o.company?.trim()) q.set("company", o.company.trim().slice(0, 80));
+  if (o.hub?.trim()) q.set("hub", o.hub.trim().slice(0, 64));
+  const qs = q.toString();
+  return `${site}/intake/activate${qs ? `?${qs}` : ""}`;
 }
