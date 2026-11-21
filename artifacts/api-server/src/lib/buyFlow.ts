@@ -265,12 +265,16 @@ export function sniffImage(buf: Buffer): { mime: CreativeType; width: number; he
   return null;
 }
 
-export function checkCreative(buf: Buffer): ParseResult<{ mime: CreativeType; width: number; height: number; bytes: number; sha256: string }> {
+export function checkCreative(buf: Buffer, min: { width?: number; height?: number } = {}): ParseResult<{ mime: CreativeType; width: number; height: number; bytes: number; sha256: string }> {
   if (!buf.length) return { ok: false, error: "Choose an image to upload." };
   if (buf.length > CREATIVE_MAX_BYTES) return { ok: false, error: "That file is over 2 MB. Export a smaller PNG, JPG or WebP." };
   const img = sniffImage(buf);
   if (!img) return { ok: false, error: "Use a PNG, JPG, WebP or GIF image." };
-  if (img.width < CREATIVE_MIN_PX || img.height < CREATIVE_MIN_PX) return { ok: false, error: `Image is too small. Use at least ${CREATIVE_MIN_PX} px on each side.` };
+  const minW = min.width ?? CREATIVE_MIN_PX;
+  const minH = min.height ?? CREATIVE_MIN_PX;
+  if (img.width < minW || img.height < minH) {
+    return { ok: false, error: minW === minH ? `Image is too small. Use at least ${minW} px on each side.` : `Image is too small. Use at least ${minW} px wide and ${minH} px tall.` };
+  }
   if (img.width > CREATIVE_MAX_PX || img.height > CREATIVE_MAX_PX) return { ok: false, error: `Image is too large. Keep each side under ${CREATIVE_MAX_PX} px.` };
   return { ok: true, value: { ...img, bytes: buf.length, sha256: createHash("sha256").update(buf).digest("hex") } };
 }

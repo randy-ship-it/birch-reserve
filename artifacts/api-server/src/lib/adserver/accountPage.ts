@@ -69,9 +69,9 @@ ${v.bySlot.map((r) => `<tr><td>${esc(r.slot)}</td><td class="n">${fmtInt(r.t.vie
 <ol class="steps">${steps.map((s, i) => `<li class="${s.done ? "done" : ""}"><b>${s.done ? "✓" : i + 1}</b><span>${s.text}</span></li>`).join("")}</ol>
 ${delivery}
 ${approved ? "" : `<details class="ed"${pending ? "" : " open"}><summary>Upload a creative</summary><form class="f" data-post="/account/creative?campaign=${esc(c.id)}" data-reload>
-<label>Image (PNG, JPG, WebP or GIF, at least 300px, up to 2 MB)<input type="file" name="file" accept="image/png,image/jpeg,image/webp,image/gif" required></label>
+<label>Image (PNG, JPG, WebP or GIF, at least 300px wide, up to 2 MB)<input type="file" name="file" accept="image/png,image/jpeg,image/webp,image/gif" required></label>
 <label>Alt text (what the image says)<input name="alt" maxlength="200" placeholder="e.g. 20% off recovery bundles"></label><button type="submit">Send for review</button></form>
-<p class="fine">Every creative is reviewed by a person before it runs. Sizes that fit most slots: 1200×300, 600×400, 656×280, 300×250.</p></details>`}
+<p class="fine">Every creative is reviewed by a person before it runs. Sizes that fit most slots: 1200×300, 728×90, 656×280, 600×400, 300×250.</p></details>`}
 </article>`;
 }
 
