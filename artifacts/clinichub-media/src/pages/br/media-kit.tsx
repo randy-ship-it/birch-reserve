@@ -3,6 +3,7 @@ import { StartSmall } from "@/components/br/start-small";
 import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAsk } from "@/components/br/market-pulse";
 import { EstimateTag } from "@/components/br/intake-kit";
 import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPath";
+import { GtmSetup } from "@/components/br/gtm-setup";
 import { KitCta } from "@/components/br/kit-cta";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { Check, Mail, Phone } from "lucide-react";
@@ -189,6 +190,11 @@ export default function BrMediaKit() {
         </div>
       </section>
       <ActivityPulse desktopOnly />
+
+      {/* GTM setup packages (Randy t332u, Nov 21 2026) */}
+      <section className="border-b border-border/70 bg-background" data-testid="mk-gtm-setup">
+        <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14"><GtmSetup where="media_kit" /></div>
+      </section>
 
       {/* Download my kit: personalized two-sided kit (preview, Nov 18 2026) */}
       <KitBuilder />

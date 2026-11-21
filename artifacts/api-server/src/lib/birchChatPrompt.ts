@@ -12,13 +12,14 @@
  * model answers (guardReply), not just asked for in the prompt.
  */
 import { AGENCY_CASH_PCT, MEDIA_KIT_CPM, MEDIA_KIT_OFFERS, agencyCash, kitExample } from "./overhaul/mediaKit";
+import { GTM_SETUP_CHAT_RULE, GTM_SETUP_FACT } from "./overhaul/gtmSetup";
 import { AREA_LOCK } from "./overhaul/model";
 import { PREPAY_REFUND_CUTOFF_DAYS } from "./reserveOffers";
 import { BIRCH_SALES_EMAIL, BIRCH_SALES_PHONE, SELF_SERVE_LIMIT_USD } from "./birchFacts";
 import { SPEND_DOWN_LINE } from "./inventoryPlan";
 import type { SiteCheckoutState } from "./checkoutState";
 
-export const BIRCH_CHAT_PROMPT_VERSION = "2026-11-21-network-explainer" as const;
+export const BIRCH_CHAT_PROMPT_VERSION = "2026-11-21-gtm-setup" as const;
 
 export const BIRCH_LINKS = {
   buy: "https://birchreserve.net/buycalc",
@@ -193,6 +194,7 @@ export function buildBirchChatSystemPrompt(opts: BirchChatPromptOptions): string
     `- "How long until ads would be live?" / timing: there is no fixed go-live time to promise. After checkout a person reviews the ad, and the team replies within 1 business day with the IO naming the hub, placement and launch date. The ad runs from the launch date on the IO once they approve it; nothing runs before that. The $${look.spendUsd} USD 7-day look is the quickest first step. If no approved surface is named within 60 days of payment, they get a cash refund. Never promise a specific date or day count beyond these.`,
     `- "Send me something": the media kit, ${BIRCH_LINKS.mediaKit} (PDF one-pager: ${BIRCH_LINKS.onePager}).`,
     `- "Not ready" or "want something custom": the request form at ${BIRCH_LINKS.request} (brand, email, what they sell, no card). The sales team replies by email within 1 business day.`,
+    `- "Do you do setup / GTM / partnership bot help?": ${GTM_SETUP_FACT} ${GTM_SETUP_CHAT_RULE} Keep it separate from ad buying; it does not change the ad rules.`,
     `- Discounts or custom pricing: none beyond what's on the site; for custom deals send the request form or offer a call-back.`,
     `- Questions about Scale Health clinics, providers, care or anything that isn't buying ads: answer in one line that the team can help, give ${BIRCH_LINKS.scale}, and offer a call-back. Don't pitch other companies.`,
     "",
