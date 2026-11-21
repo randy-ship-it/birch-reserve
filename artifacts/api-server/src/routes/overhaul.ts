@@ -21,6 +21,9 @@ import { isTestIdentity, isTestLead } from "../lib/testTraffic";
 import { coarseRegion, recordPulse } from "../lib/activityPulse";
 import { GTM_BOT_ALERT_TO, GTM_BOT_BUSINESS_LINE, GTM_BOT_KIND, GTM_BOT_SOURCE, GTM_BOT_STAGES, GTM_BOT_PREFS } from "../lib/overhaul/gtmBot";
 import { MEDIA_KIT_CATEGORIES } from "../lib/overhaul/mediaKit";
+import { PARTNERS_KIND, PARTNER_LIMITS, PARTNER_TRACK_KEYS, partnerTrackName, partnerTrackKey } from "../lib/overhaul/partners";
+import { upsertLeadSafe } from "../lib/leads";
+import { createHash } from "node:crypto";
 
 export type CreateSession = (params: Record<string, unknown>) => Promise<{ url: string | null; livemode: boolean }>;
 
@@ -37,7 +40,7 @@ function limited(req: Request, max: number, windowMs = 60_000): boolean {
 
 const str = (v: unknown, max = 500) => String(v ?? "").trim().slice(0, max);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const LEAD_KINDS: IntakeKind[] = ["hub_access", "cobranded_hub_inquiry", "display_cpc_inquiry", "publisher_studio", "area_lock_interest", "agency_inquiry", "deposit_interest", "premium_inquiry", "gtm_setup_inquiry", "street_team_inquiry"];
+const LEAD_KINDS: IntakeKind[] = ["hub_access", "cobranded_hub_inquiry", "display_cpc_inquiry", "publisher_studio", "area_lock_interest", "agency_inquiry", "deposit_interest", "premium_inquiry", "gtm_setup_inquiry", "street_team_inquiry", PARTNERS_KIND];
 
 function originOf(req: Request): string {
   const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "birchreserve.net");
@@ -194,6 +197,31 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     const fields = (body.fields ?? {}) as Record<string, unknown>;
     const meta: Record<string, string> = {};
     for (const [k, v] of Object.entries(fields).slice(0, 20)) if (/^[a-z_]{2,40}$/.test(k)) meta[k] = str(v, 500);
+    // Partnerships: strict server-side validation + length limits, honeypot drop, never trusts the browser's checks.
+    let partnerTrack = "";
+    if (kind === PARTNERS_KIND) {
+      if (str(body.company_url, 200) || str(fields["company_url"], 200)) {
+        res.json({ ok: true, stored: "skipped", alert: "skipped" });
+        return;
+      }
+      const L = PARTNER_LIMITS;
+      const over = (v: unknown, n: number) => String(v ?? "").trim().length > n;
+      partnerTrack = partnerTrackKey(str(meta["partner_track"], 60));
+      meta["partner_track"] = partnerTrack;
+      const bad =
+        !PARTNER_TRACK_KEYS.includes(partnerTrack) ||
+        !str(body.name, L.name) || !str(body.company, L.company) ||
+        over(body.name, L.name) || over(body.company, L.company) || over(body.email, L.email) || over(body.phone, L.phone) || over(body.website, L.website) || over(body.message, L.notes) ||
+        over(fields["region"], L.region) || over(fields["reach"], L.reach) ||
+        (str(body.phone, L.phone) !== "" && !/^[0-9+()\-.\s]{7,40}$/.test(str(body.phone, L.phone))) ||
+        // eslint-disable-next-line no-control-regex
+        /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(`${body.name}${body.company}${body.message}`);
+      if (bad) {
+        res.status(400).json({ error: "Check your track, name, company, email and phone, then try again." });
+        return;
+      }
+      for (const k of Object.keys(meta)) if (!["partner_track", "region", "reach", "offer"].includes(k)) delete meta[k];
+    }
     const leadTest = isTestLead({ email, name: str(body.name, 120), company: str(body.company, 160), test: body.test });
     const intake = {
       kind,
@@ -207,6 +235,19 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
       meta,
       utm: utmOf(body),
     };
+    // Partnerships: also store one row in the local leads store (source partners + track). Never throws.
+    let partnerLeadId: string | undefined;
+    if (kind === PARTNERS_KIND) {
+      const id = `partners:${createHash("sha256").update(`${email.toLowerCase()}|${partnerTrack}|${intake.message ?? ""}|${Date.now()}`).digest("hex").slice(0, 20)}`;
+      const lead = await upsertLeadSafe({
+        id, source: "partners", sourceRef: id,
+        name: intake.name, company: intake.company, email: email.toLowerCase(), phone: intake.phone,
+        need: [`Track: ${partnerTrackName(partnerTrack)}`, meta["region"] && `Region: ${meta["region"]}`, intake.message && `Notes: ${intake.message}`].filter(Boolean).join("\n").slice(0, 1000),
+        size: meta["reach"], pagePath: intake.path, isTest: leadTest,
+        meta: { partner_track: partnerTrack, category: partnerTrack },
+      } as Parameters<typeof upsertLeadSafe>[0]);
+      partnerLeadId = lead?.id;
+    }
     // Test submissions keep the [TEST] alert but never reach the CRM.
     const friday = leadTest ? { status: "skipped" as const, externalId: intakeExternalId(intake) } : await sendIntake(intake);
     log("lead", { kind, friday: friday.status });
@@ -216,6 +257,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
       title: `${kind.replace(/_/g, " ")}: ${str(body.company, 160) || email}`,
       rows: [
         ["Form", kind],
+        ...(partnerTrack ? [["Track", partnerTrackName(partnerTrack)]] as Array<[string, string]> : []),
         ["Company", str(body.company, 160)],
         ["Name", str(body.name, 120)],
         ["Email", email],
@@ -228,7 +270,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
       replyTo: email,
       isTest: leadTest,
     });
-    res.json({ ok: true, stored: friday.status, alert: alert.status });
+    res.json({ ok: true, stored: friday.status, alert: alert.status, ...(leadTest ? { alertId: alert.id ?? null, ...(partnerLeadId ? { leadId: partnerLeadId } : {}) } : {}) });
   });
 
   /**

@@ -39,6 +39,7 @@ export type AdminView = {
   promoHtml?: string;
   /** Referral orders + per-referrer commission (referralAdmin.ts). */
   referralHtml?: string;
+  partnersHtml?: string;
   /** Street-team / partner members, for the recipient form's Referrer scope. */
   referrers?: Array<{ id: string; label: string }>;
   hubs?: Array<{ key: string; name: string; category: string; url: string; partner: string; contractRef: string; status: string; isTest: boolean; createdBy: string | null; createdAt: Date }>;
@@ -243,6 +244,7 @@ ${payoutSettingsHtml(v, partners)}
 <p class="fine">Payouts are manual and nothing moves without your click. No Stripe connected accounts exist yet, so <b>Pay</b> builds a batch of approved lines with a Stripe-ready CSV; pay each line, then <b>Mark paid</b> with the reference. <a href="/ads/admin/export/payouts.csv">Payout CSV</a> lists every approved and paid line.</p>
 <form data-post="/ads/admin/payouts/batch"><button class="sm" type="submit">Pay: build payout batch + Stripe-ready CSV</button><pre data-out style="display:none;white-space:pre-wrap;word-break:break-all"></pre></form></section>
 ${v.referralHtml ?? ""}
+${v.partnersHtml ?? ""}
 ${v.promoHtml ?? ""}
 <section id="ledger"><h2>Ledger</h2><p class="fine">Credits, hourly charge lines per slot, and manual adjustments. <a href="/ads/admin/export/ledger.csv">CSV</a></p>
 <div class="tw"><table><thead><tr><th>When</th><th>Kind</th><th>Campaign</th><th>Slot</th><th class="n">Units</th><th class="n">Amount</th><th>Note</th></tr></thead><tbody>${led.join("") || `<tr><td colspan="7" class="muted">Empty.</td></tr>`}</tbody></table></div></section>

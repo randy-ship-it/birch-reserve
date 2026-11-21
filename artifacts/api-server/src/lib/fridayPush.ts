@@ -82,6 +82,7 @@ const SOURCE_LABEL: Record<Lead["source"], string> = {
   local_biz: "Local Biz lead",
   inventory_signup: "Birch ads-only inventory signup",
   brand_intake: "Birch Monetization Kit intake",
+  partners: "Birch partnership inquiry",
 };
 
 /** meta.source buckets Emma asked for. */
@@ -96,6 +97,7 @@ const META_SOURCE: Record<Lead["source"], "chat" | "voice" | "form" | "email_cap
   local_biz: "form",
   inventory_signup: "form",
   brand_intake: "form",
+  partners: "form",
 };
 
 /** Public SKUs only: $190 hold, $490 seat. */
@@ -306,7 +308,7 @@ export async function pushLeadToFriday(leadId: string, now: Date = new Date()): 
   try {
     const current = await store.get(leadId);
     if (!current || !leadIsActionable(current)) return undefined;
-    if (current.source === "brand_intake") {
+    if (current.source === "brand_intake" || current.source === "partners") {
       // Monetization Kit intakes already live in Friday via brand-intake v1: never re-push (no duplicate CRM lead).
       const result: FridayResult = { status: "sent", contactId: current.meta.friday_intake_id ?? null, dealId: null };
       if (current.fridayStatus !== "sent") await store.markFriday(leadId, result, now, false);
