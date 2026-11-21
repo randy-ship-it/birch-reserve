@@ -1,3 +1,4 @@
+import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
 import { KitCta } from "@/components/br/kit-cta";
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowRight, Mail, Phone } from "lucide-react";
@@ -134,34 +135,19 @@ export function FaceBeforeFlight({ compact = false }: { compact?: boolean }) {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Proof</p>
         <h2 className="mt-2 font-display text-[1.9rem] leading-tight tracking-tight md:text-5xl">See the face before the flight.</h2>
         <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-          Open a live hub right now. This is the private, members-only experience your brand sits inside: placements curated hub by hub, next to the brand members already trust. No feed, no auction.
+          Open a hub that is live and activating right now. This is the private, members-only experience your brand sits inside: placements curated hub by hub, next to the brand members already trust. No feed, no auction.
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <a href={LIVE_HUB_URL} target="_blank" rel="noopener" data-testid="face-live-hub" className="inline-flex h-12 items-center justify-center gap-2 bg-foreground px-6 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground">
-            Open the live DR-HO'S physio hub <ArrowRight className="size-4" aria-hidden />
+            Open the DR-HO'S physio hub <ArrowRight className="size-4" aria-hidden />
           </a>
           <a href={SOLE_HUB_URL} target="_blank" rel="noopener" data-testid="face-live-hub-sole" className="inline-flex h-12 items-center justify-center gap-2 border border-foreground px-6 text-sm font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background">
-            Open the live SOLE hub <ArrowRight className="size-4" aria-hidden />
+            Open the SOLE hub <ArrowRight className="size-4" aria-hidden />
           </a>
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">Live hubs, shown as they are today. Your placement and hub are named on your IO before anything runs.</p>
+        <p className="mt-3 text-xs text-muted-foreground">Hubs that are live and activating, shown as they are today. Your placement and hub are named on your IO before anything runs.</p>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2" data-testid="live-hub-thumbs">
-        {[
-          { href: LIVE_HUB_URL, img: LIVE_HUB_IMAGE, name: "DR-HO'S physio", host: "physio.drhonow.com", tid: "live-hub-drho" },
-          { href: SOLE_HUB_URL, img: SOLE_HUB_IMAGE, name: "SOLE", host: "scalehealth.ca/sole", tid: "live-hub-sole" },
-          { href: "https://www.scalehealth.ca/effortlessadmin", img: "/hub-gallery/effortless.webp", name: "Effortless Admin", host: "scalehealth.ca/effortlessadmin", tid: "live-hub-effortless" },
-          { href: "https://www.scalehealth.ca/calmjoints", img: "/hub-gallery/calmjoints.webp", name: "Calm Joints", host: "scalehealth.ca/calmjoints", tid: "live-hub-calmjoints" },
-        ].map((h) => (
-          <a key={h.tid} href={h.href} target="_blank" rel="noopener" data-testid={h.tid} className="group block border border-foreground/15 bg-white p-2 shadow-sm" aria-label={`Open the live ${h.name} hub`}>
-            <img src={h.img} alt={`${h.name} members-only hub, live`} width={1440} height={900} loading="lazy" decoding="async" className="block h-auto w-full" />
-            <span className="mt-2 flex items-center justify-between px-1 pb-1 text-xs text-muted-foreground">
-              <span>{h.host} · live</span>
-              <span className="font-semibold text-foreground group-hover:underline">Open ↗</span>
-            </span>
-          </a>
-        ))}
-      </div>
+      <div data-testid="live-hub-thumbs"><LiveHubGrid /><HubFunnel /></div>
     </div>
   );
 }
