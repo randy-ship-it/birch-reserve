@@ -250,7 +250,7 @@ export async function linkBuyOrder(c: Campaign, session: Stripe.Checkout.Session
   await store.updateCampaign(c.id, { ...(order.company ? { brand: order.company.slice(0, 160) } : {}), ...(placement ? { primaryPlacement: placement } : {}) }, "stripe-webhook");
   if (order.creativeId && !(await store.listCreatives({ campaignId: c.id })).some((x) => x.sourceRef === `buy:${order.id}`)) {
     const cr = await buyStore().getCreative(order.creativeId);
-    if (cr) await store.addCreative({ campaignId: c.id, mime: cr.mime, width: cr.width, height: cr.height, data: cr.data, alt: `${order.company || c.brand} (sponsored)`, uploadedBy: `${c.accountEmail} (from /buy)`, status: "pending", sourceRef: `buy:${order.id}`, kind: "image", format: matchFormat("image", cr.width, cr.height)?.key ?? null });
+    if (cr) await store.addCreative({ campaignId: c.id, mime: cr.mime, width: cr.width, height: cr.height, data: cr.data, alt: `${order.company || c.brand} ad`, uploadedBy: `${c.accountEmail} (from /buy)`, status: "pending", sourceRef: `buy:${order.id}`, kind: "image", format: matchFormat("image", cr.width, cr.height)?.key ?? null });
   }
   await store.audit("stripe-webhook", "buy.linked", c.id, `order ${order.id} · ${order.format} · creative ${order.creativeId ?? "none"}`);
   return order.id;

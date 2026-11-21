@@ -363,6 +363,33 @@ export async function creativeData(id: string): Promise<{ mime: string; data: Bu
   return { mime: String(r.mime), data: Buffer.from(raw), status: String(r.status), campaignId: String(r.campaign_id), accountEmail: String(r.account_email) };
 }
 
+/** Creative plus whether its campaign is a TEST campaign (QA approval guard). */
+export async function creativeTestFlag(id: string): Promise<{ isTest: boolean } | null> {
+  const p = await db();
+  const { rows } = await p.query(`SELECT c.is_test FROM ${S()}.ad_creatives cr JOIN ${S()}.ad_campaigns c ON c.id = cr.campaign_id WHERE cr.id::text = $1`, [id]);
+  return rows[0] ? { isTest: Boolean(rows[0].is_test) } : null;
+}
+export async function setCreativeAlt(id: string, alt: string, actor: string): Promise<boolean> {
+  const p = await db();
+  const { rows } = await p.query(`UPDATE ${S()}.ad_creatives SET alt = $2 WHERE id::text = $1 RETURNING id`, [id, alt]);
+  if (rows.length) await audit(actor, "creative.alt", id, alt);
+  return rows.length > 0;
+}
+/** True the first time a key is claimed (audit-backed one-shot for replays and one-off sends). */
+export async function claimOnce(key: string, actor: string): Promise<boolean> {
+  const p = await db();
+  await p.query(`CREATE TABLE IF NOT EXISTS ${S()}.ad_once (key text PRIMARY KEY, actor text, at timestamptz NOT NULL DEFAULT now())`);
+  const { rows } = await p.query(`INSERT INTO ${S()}.ad_once (key, actor) VALUES ($1, $2) ON CONFLICT (key) DO NOTHING RETURNING key`, [key, actor]);
+  return rows.length > 0;
+}
+/** Splash reservation fields for the replay's buyer confirmation (public schema table). */
+export async function reservationForConfirmation(id: string): Promise<{ email: string; offerKey: string; brandName: string | null; amountCents: number; currency: string } | null> {
+  if (!/^[0-9a-f-]{36}$/.test(id)) return null;
+  const p = await db();
+  const { rows } = await p.query(`SELECT email, offer_key, brand_name, amount_cents, currency FROM public.splash_ad_reservations WHERE id = $1`, [id]);
+  const r = rows[0];
+  return r ? { email: String(r.email).toLowerCase(), offerKey: String(r.offer_key), brandName: (r.brand_name as string) ?? null, amountCents: num(r.amount_cents), currency: String(r.currency) } : null;
+}
 export async function setCreativeStatus(id: string, status: Creative["status"], actor: string, note: string | null = null): Promise<boolean> {
   const p = await db();
   const { rows } = await p.query(`UPDATE ${S()}.ad_creatives SET status = $2, reviewed_by = $3, reviewed_at = now(), review_note = $4 WHERE id = $1 RETURNING id`, [id, status, actor, note]);
