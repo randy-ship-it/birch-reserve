@@ -224,7 +224,7 @@ function CardLane({ initialSku }: { initialSku: CardSku }) {
             <span className="text-[11px] font-bold uppercase tracking-wide text-foreground/55">Your card, on a live hub</span>
             <div className="flex max-w-full overflow-x-auto rounded-full bg-foreground/[0.05] p-0.5 [scrollbar-width:none]" role="radiogroup" aria-label="Live hub">
               {HUB_KEYS.map((h) => (
-                <button key={h} type="button" role="radio" aria-checked={hub === h} onClick={() => setHub(h)} data-testid={`lane-hub-${h}`} className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-bold ${hub === h ? "bg-[#0b1f3a] text-white" : "text-foreground/60"}`}>{HUB_MOCKS[h].tab}</button>
+                <button key={h} type="button" role="radio" aria-checked={hub === h} onClick={() => setHub(h)} data-testid={`lane-hub-${h}`} className={`inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-3.5 py-1 text-[11px] font-bold ${hub === h ? "bg-[#0b1f3a] text-white" : "text-foreground/60"}`}>{HUB_MOCKS[h].tab}</button>
               ))}
             </div>
           </div>

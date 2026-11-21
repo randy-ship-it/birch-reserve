@@ -36,11 +36,11 @@ export function CategoriesWeServe({ dark = false }: { dark?: boolean }) {
       </div>
       <ul className="-mx-4 mt-3 flex snap-x gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
         {SERVED_CATEGORIES.map((c) => (
-          <li key={c.name} className="flex min-w-[200px] snap-start items-center gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-foreground/10 md:min-w-0" data-testid="served-category">
+          <li key={c.name} className="flex min-w-[240px] snap-start items-center gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-foreground/10 md:min-w-0" data-testid="served-category">
             <span className="grid size-9 shrink-0 place-items-center rounded-full bg-lime-300 text-[#0b1f3a]"><c.icon className="size-4" aria-hidden /></span>
             <span className="min-w-0">
               <span className="block text-[14px] font-bold leading-tight text-[#0b1f3a]">{c.name}</span>
-              <span className="block truncate text-[12px] text-foreground/60">{c.sub}</span>
+              <span className="line-clamp-2 block text-[12px] leading-snug text-foreground/60">{c.sub}</span>
             </span>
           </li>
         ))}
@@ -414,11 +414,11 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, className =
           )}
           {" · "}
           <span className="text-foreground/45">{e.ago}</span>
-          <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className={`mt-0.5 ${slim ? "hidden" : "block"} text-left text-[10px] leading-tight text-foreground/40 underline underline-offset-2 hover:text-foreground/70`} data-testid="activity-pulse-hide">
+          <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className={`mt-0.5 ${slim ? "hidden" : "inline-flex"} min-h-8 items-center text-left text-[12px] leading-tight text-foreground/55 underline underline-offset-2 hover:text-foreground/70`} data-testid="activity-pulse-hide">
             Hide activity
           </button>
         </span>
-        <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className="-mr-1 shrink-0 self-start rounded-full p-1 text-foreground/30 hover:text-foreground/70" aria-label="Turn off recent activity" data-testid="activity-pulse-close">
+        <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className="-mr-2 -mt-2 grid size-10 shrink-0 place-items-center self-start rounded-full text-foreground/40 hover:text-foreground/70" aria-label="Turn off recent activity" data-testid="activity-pulse-close">
           <X className="size-3" />
         </button>
       </div>

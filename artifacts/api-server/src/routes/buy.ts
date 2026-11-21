@@ -261,9 +261,9 @@ label.f{display:block;font-size:.86rem;font-weight:600;margin:12px 0 4px}input[t
 input[aria-invalid=true]{border-color:#a12b1f;background:#fff8f6}.fe{display:block;min-height:0;font-size:.85rem;font-weight:600;color:#a12b1f;margin-top:4px}.fe:empty{display:none}
 input:focus{outline:3px solid #C8F55A;border-color:#071A39}.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
 .actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:20px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:0 28px;border-radius:999px;border:0;background:#071A39;color:#F9F8F6;font:700 17px "IBM Plex Sans",system-ui;cursor:pointer;text-decoration:none;flex:1 1 auto;max-width:420px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 24px;border-radius:6px;border:0;background:#071A39;color:#F9F8F6;font:700 16px "IBM Plex Sans",system-ui;cursor:pointer;text-decoration:none;flex:1 1 auto;max-width:420px}
 .btn[disabled]{opacity:.55;cursor:wait}.btn.alt{background:#C8F55A;color:#071A39;box-shadow:0 8px 24px rgba(159,209,58,.35)}
-.back{min-height:56px;padding:0 20px;border-radius:999px;border:1.5px solid #c9cfc2;background:#fff;font:600 15px "IBM Plex Sans",system-ui;color:#071A39;cursor:pointer}
+.back{min-height:48px;padding:0 20px;border-radius:6px;border:1.5px solid #c9cfc2;background:#fff;font:600 15px "IBM Plex Sans",system-ui;color:#071A39;cursor:pointer}
 .msg{min-height:1.4em;font-size:.92rem;margin:10px 0 0}.msg.err{color:#a12b1f;font-weight:600}.msg.ok{color:#24412a}
 .drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:2px dashed #9aa79a;border-radius:18px;min-height:150px;padding:18px;text-align:center;cursor:pointer;background:#fbfbf8;margin:0}
 .drop.over{background:#eef5e2;border-color:#071A39}.drop strong{font-size:1.05rem}.drop span{font-size:.86rem;color:#4d5b6a}.drop input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
