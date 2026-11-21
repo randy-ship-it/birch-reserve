@@ -99,6 +99,7 @@ export const SPA_SHELL_PATHS = [
   "/intake/supplier",
   "/intake/sponsor",
   "/intake/gtm",
+  "/gtm-bot",
   "/intake/street-team",
   "/street-team",
   "/intake/report",

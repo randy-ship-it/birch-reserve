@@ -15,7 +15,7 @@ const kindOf = (f: LeadField): "email" | "website" | "text" => (f.type === "emai
  * one-tap chips, and every optional field sits behind "Add details". Inline validation, autofill hints, answers
  * saved in this browser until sent, a Back button and a success panel with the next step.
  */
-export function LeadForm({ kind, fields, submitLabel, done, testId, next }: { kind: string; fields: LeadField[]; submitLabel: string; done: ReactNode; testId?: string; next?: ReactNode }) {
+export function LeadForm({ kind, fields, submitLabel, done, testId, next, endpoint = "/v1/leads" }: { endpoint?: string; kind: string; fields: LeadField[]; submitLabel: string; done: ReactNode; testId?: string; next?: ReactNode }) {
   const visible = fields.filter((f) => f.type !== "hidden");
   const hidden = fields.filter((f) => f.type === "hidden");
   const contact = visible.filter((f) => f.required && f.type !== "select" && f.type !== "textarea");
@@ -72,7 +72,7 @@ export function LeadForm({ kind, fields, submitLabel, done, testId, next }: { ki
     if (hp) return setOk(true); // honeypot: send nothing
     setBusy(true);
     try {
-      const r = await postJson<{ ok?: boolean; error?: string }>("/v1/leads", { kind, ...Object.fromEntries(CORE.map((k) => [k, (all[k] ?? "").trim()])), path: typeof window === "undefined" ? "" : window.location.pathname, fields: extra });
+      const r = await postJson<{ ok?: boolean; error?: string }>(endpoint, { kind, ...Object.fromEntries(CORE.map((k) => [k, (all[k] ?? "").trim()])), path: typeof window === "undefined" ? "" : window.location.pathname, company_url: hp, fields: extra });
       if (!r.ok) setError(r.data.error ?? "Couldn't send. Email sales@silverbirchgrowth.com.");
       else {
         saved.clear();

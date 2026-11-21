@@ -13,6 +13,7 @@
  */
 import { AGENCY_CASH_PCT, MEDIA_KIT_CPM, MEDIA_KIT_OFFERS, agencyCash, kitExample } from "./overhaul/mediaKit";
 import { GTM_SETUP_CHAT_RULE, GTM_SETUP_FACT } from "./overhaul/gtmSetup";
+import { GTM_BOT_FACT } from "./overhaul/gtmBot";
 import { STREET_TEAM_CHAT_RULE, STREET_TEAM_ONE_LINE } from "./overhaul/streetTeam";
 import { AREA_LOCK } from "./overhaul/model";
 import { PREPAY_REFUND_CUTOFF_DAYS } from "./reserveOffers";
@@ -195,6 +196,7 @@ export function buildBirchChatSystemPrompt(opts: BirchChatPromptOptions): string
     `- "How long until ads would be live?" / timing: there is no fixed go-live time to promise. After checkout a person reviews the ad, and the team replies within 1 business day with the IO naming the hub, placement and launch date. The ad runs from the launch date on the IO once they approve it; nothing runs before that. The $${look.spendUsd} USD 7-day look is the quickest first step. If no approved surface is named within 60 days of payment, they get a cash refund. Never promise a specific date or day count beyond these.`,
     `- "Send me something": the media kit, ${BIRCH_LINKS.mediaKit} (PDF one-pager: ${BIRCH_LINKS.onePager}).`,
     `- "Not ready" or "want something custom": the request form at ${BIRCH_LINKS.request} (brand, email, what they sell, no card). The sales team replies by email within 1 business day.`,
+    `- "What is the GTM bot / who built it?": ${GTM_BOT_FACT} Never name portfolio companies, never promise outcomes, never give monthly prices (say monthly ranges scoped to their needs).`,
     `- "Do you do setup / GTM / partnership bot help?": ${GTM_SETUP_FACT} ${GTM_SETUP_CHAT_RULE} Keep it separate from ad buying; it does not change the ad rules.`,
     `- "Street team / door-to-door?": ${STREET_TEAM_ONE_LINE} ${STREET_TEAM_CHAT_RULE}`,
     `- Discounts or custom pricing: none beyond what's on the site; for custom deals send the request form or offer a call-back.`,

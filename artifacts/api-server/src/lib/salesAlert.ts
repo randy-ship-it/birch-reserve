@@ -29,6 +29,10 @@ export type SalesAlert = {
   rows: Array<[string, string | number | boolean | null | undefined]>;
   replyTo?: string;
   isTest?: boolean;
+  /** Override recipients (e.g. SBG-only alerts). */
+  to?: string[];
+  /** Override the subject tag / eyebrow label (default "BIRCH <EVENT>"). */
+  tag?: string;
 };
 
 const EVENT_LABEL: Record<SalesAlertEvent, string> = {
@@ -51,7 +55,7 @@ function esc(v: string): string {
 }
 
 export function renderSalesAlert(alert: SalesAlert): Pick<SiteMail, "subject" | "text" | "html"> {
-  const tag = `${alert.isTest ? "[TEST] " : ""}[BIRCH ${EVENT_LABEL[alert.event]}]`;
+  const tag = `${alert.isTest ? "[TEST] " : ""}[${alert.tag ?? `BIRCH ${EVENT_LABEL[alert.event]}`}]`;
   const subject = `${tag} ${alert.title}`.slice(0, 200);
   const rows = alert.rows
     .filter(([, v]) => v !== undefined && v !== null && String(v).trim() !== "")
@@ -69,7 +73,7 @@ export function renderSalesAlert(alert: SalesAlert): Pick<SiteMail, "subject" | 
   const html = emailLayout({
     title: alert.title,
     preheader: `Received ${when} ET on birchreserve.net`,
-    eyebrow: `Birch ${EVENT_LABEL[alert.event].toLowerCase()}`,
+    eyebrow: alert.tag ? alert.tag.toLowerCase() : `Birch ${EVENT_LABEL[alert.event].toLowerCase()}`,
     body: [
       alert.isTest ? emailTestBanner(`<strong>TEST submission.</strong> Safe to ignore.`) : "",
       emailH1(esc(alert.title)),
@@ -84,7 +88,7 @@ export function renderSalesAlert(alert: SalesAlert): Pick<SiteMail, "subject" | 
 export type SalesAlertResult = { status: "sent" | "skipped" | "failed"; id?: string | null; to: string[] };
 
 export async function sendSalesAlert(alert: SalesAlert): Promise<SalesAlertResult> {
-  const to = salesAlertRecipients();
+  const to = alert.to?.length ? alert.to : salesAlertRecipients();
   if (process.env["SALES_ALERTS_DISABLED"] === "true") return { status: "skipped", to };
   if (!ready()) {
     logger.warn({ kind: "sales_alert", event: alert.event, reason: "resend_not_configured" }, "Sales alert not sent (no mailer)");
