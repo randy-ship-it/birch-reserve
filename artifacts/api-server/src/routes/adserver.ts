@@ -622,7 +622,8 @@ router.post("/ads/admin/creatives/:id/status", json, (req, res) =>
   safe(res, async () => {
     const who = guard(req, res);
     if (!who) return;
-    const to = req.query.to === "approved" ? "approved" : req.query.to === "rejected" ? "rejected" : null;
+    // "pending" puts a creative back in the approval queue (undo an approval made by mistake); it never activates anything.
+    const to = req.query.to === "approved" ? "approved" : req.query.to === "rejected" ? "rejected" : req.query.to === "pending" ? "pending" : null;
     if (!to) {
       res.status(400).json({ message: "Bad status." });
       return;
@@ -633,7 +634,7 @@ router.post("/ads/admin/creatives/:id/status", json, (req, res) =>
       return;
     }
     const ok = await store.setCreativeStatus(String(req.params.id), to, who, to === "rejected" ? reason : null);
-    res.status(ok ? 200 : 404).json({ message: ok ? (to === "approved" ? "Approved." : "Rejected.") : "Not found." });
+    res.status(ok ? 200 : 404).json({ message: ok ? (to === "approved" ? "Approved." : to === "pending" ? "Back in the approval queue." : "Rejected.") : "Not found." });
   }),
 );
 
