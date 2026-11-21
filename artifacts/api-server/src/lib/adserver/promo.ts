@@ -87,7 +87,7 @@ export async function validateCode(input: string, email?: string): Promise<Valid
   if (bad) return { ok: false, reason: bad, message: PROBLEM_COPY[bad] };
   if (email && validEmail(email) && (await existing(c!.codeKey, email))) return { ok: false, reason: "already", message: PROBLEM_COPY.already };
   const label = creditLabel(c!.creditMicros);
-  return { ok: true, code: c!.code, creditUsd: c!.creditMicros / MICROS, label, message: `${c!.codeKey === "street100" ? "Street 100 applied — $100 media credit. Use it to test the shelf after the receipt. " : ""}Code ${c!.code} accepted: ${label}. Ad spend only, no cash value, not transferable. ${regularRateSummary().line}` };
+  return { ok: true, code: c!.code, creditUsd: c!.creditMicros / MICROS, label, message: `${c!.codeKey === "street100" ? "Code applied — $100 media credit. Use it to test the shelf after the receipt. " : ""}Code ${c!.code} accepted: ${label}. Ad spend only, no cash value, not transferable. ${regularRateSummary().line}` };
 }
 
 /* ------------------------------------------------------------------------------------------ street team */

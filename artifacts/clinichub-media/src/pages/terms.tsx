@@ -50,7 +50,7 @@ export default function Terms() {
           <strong className="text-foreground">Spend-down.</strong> {SPEND_DOWN_TERM}
         </p>
         <p id="promo-credit" data-testid="terms-promo-credit">
-          <strong className="text-foreground">Promo credit.</strong> Promo codes (for example STREET100, $100 USD) give free ad credit: ad spend only, no cash value, not transferable, one per business. Promo credit is valued and spent at regular rate-card rates, not the lower exclusive-reserve rate, and runs under the same review and insertion-order rules as paid credit.
+          <strong className="text-foreground">Promo credit.</strong> Promo codes (street-team and partner codes, each with its own stated USD credit) give free ad credit: ad spend only, no cash value, not transferable, one per business. Promo credit is valued and spent at regular rate-card rates, not the lower exclusive-reserve rate, and runs under the same review and insertion-order rules as paid credit.
         </p>
         <h2 id="exclusive" className="pt-4 font-display text-2xl text-foreground">Exclusive display reserve ($1,900 USD or CAD)</h2>
         <ul className="list-disc space-y-2 pl-5" data-testid="terms-exclusive">

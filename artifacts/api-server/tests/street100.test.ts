@@ -40,7 +40,7 @@ test("STREET100 takes $100 off $190 and $490, server-validated, never below the 
 test("STREET100 confirmation line; internal hub-proof code is not public", async () => {
   fresh("s100_b");
   const v = await promo.validateCode("STREET100");
-  assert.ok(v.ok && v.message.startsWith("Street 100 applied — $100 media credit. Use it to test the shelf after the receipt."));
+  assert.ok(v.ok && v.message.startsWith("Code applied — $100 media credit. Use it to test the shelf after the receipt."));
   assert.equal((await promo.validateCode("HUBPROOF100")).ok, false);
   const c = await promo.claimCode({ code: "HUBPROOF100", email: "x@y.com", src: "intake" });
   assert.equal(c.ok, false);
