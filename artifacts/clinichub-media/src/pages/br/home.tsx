@@ -106,7 +106,7 @@ export default function BrHome() {
           url: "https://birchreserve.net/",
           logo: "https://birchreserve.net/logo.svg",
           parentOrganization: { "@type": "Organization", name: "Silver Birch Growth Inc." },
-          email: "sales@silverbirchgrowth.com",
+          email: "randy@scalehealth.ca",
           description: "Ad space inside co-branded Recovery Brand hubs and health & wellness business hubs. Display and CPC on post-purchase, hub home, product and services, and member dashboard pages.",
           address: { "@type": "PostalAddress", addressLocality: "Toronto", addressRegion: "ON", addressCountry: "CA" },
         }}

@@ -99,7 +99,7 @@ form.dep>button[type=submit]{justify-self:start;width:auto;max-width:100%}@media
 ${buyerHeaderHtml(path === "/sponsor" ? "sponsor" : null, currencyToggleHtml(currency, (c) => currencyHref(path, query, c)))}
 <main><div data-promo-box="success"></div>${body}</main>
 ${PROMO_SCRIPT_TAG}
-<footer class="fine">${esc(SELLER)} · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></footer>
+<footer class="fine">${esc(SELLER)} · <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a></footer>
 </body></html>`;
 }
 
@@ -193,7 +193,7 @@ ${hubPackageTable(currency)}
 <details id="terms-pack"><summary>Pack terms</summary>
 <p class="fine">${esc(CARRY_OVER_CLAUSE)}</p>
 <ul data-testid="sponsor-pack-terms">${SPONSOR_PACK_TERMS.map((t) => `<li>${esc(t)}</li>`).join("")}<li>${esc(CARRY_OVER_CLAUSE)}</li></ul>
-<p class="fine">Full terms: <a href="/terms">/terms</a>. Questions: <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></p></details>
+<p class="fine">Full terms: <a href="/terms">/terms</a>. Questions: <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a></p></details>
 </div>
 <script>
 (function(){
@@ -210,7 +210,7 @@ try{var o=JSON.parse(localStorage.getItem(KEY)||'null');if(o&&o.v&&Date.now()-o.
 label();
 ['brand','email'].forEach(function(n){f[n].addEventListener('input',function(){save();if(f[n].getAttribute('aria-invalid'))err(n,'')})});
 document.getElementById('terms').addEventListener('change',function(){if(this.checked)err('terms','')});
-function send(body){msg.textContent=OPEN?'Opening secure checkout…':'Sending…';go.disabled=true;fetch('/v1/sponsor/deposit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){if(x.ok&&x.j.url){try{localStorage.removeItem(KEY)}catch(_){}location.href=x.j.url}else if(x.ok){try{localStorage.removeItem(KEY)}catch(_){}msg.textContent=x.j.message||'Request sent. We confirm by email within 1 business day. No charge today.';f.querySelectorAll('input,button').forEach(function(el){el.disabled=true})}else{go.disabled=false;msg.textContent=x.j.message||x.j.error||'Email sales@silverbirchgrowth.com and we will confirm within 1 business day.'}}).catch(function(){go.disabled=false;msg.textContent='Network error. Press the button again, or email sales@silverbirchgrowth.com.'})}
+function send(body){msg.textContent=OPEN?'Opening secure checkout…':'Sending…';go.disabled=true;fetch('/v1/sponsor/deposit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){if(x.ok&&x.j.url){try{localStorage.removeItem(KEY)}catch(_){}location.href=x.j.url}else if(x.ok){try{localStorage.removeItem(KEY)}catch(_){}msg.textContent=x.j.message||'Request sent. We confirm by email within 1 business day. No charge today.';f.querySelectorAll('input,button').forEach(function(el){el.disabled=true})}else{go.disabled=false;msg.textContent=x.j.message||x.j.error||'Email randy@scalehealth.ca and we will confirm within 1 business day.'}}).catch(function(){go.disabled=false;msg.textContent='Network error. Press the button again, or email randy@scalehealth.ca.'})}
 f.addEventListener('submit',function(e){e.preventDefault();var d={currency:'${currency}',tier:cur(),brand:f.brand.value.trim(),email:f.email.value.trim(),agree:document.getElementById('terms').checked};var bad=null;
 if(d.brand.length<2){err('brand','Add your brand name.');bad=bad||f.brand}else err('brand','');
 if(!EM.test(d.email)){err('email',d.email?'That email looks off. Check for a typo.':'Add your work email.');bad=bad||f.email}else err('email','');
@@ -243,7 +243,7 @@ ${statsStrip()}
 <ul>
 <li>Sponsorship credit: ${DEPOSIT_TIERS.map((t) => `${money(currency === "cad" ? t.cad : t.usd, currency)} (+${t.bonusPct}% credit)`).join(" · ")} or your own amount. <a href="/sponsor">Sponsor</a></li>
 <li>${priceLadder(currency).map((s) => `${s.name}: ${s.price}`).join(" · ")} (the exclusive reserve locks a $5K–$50K ${currency.toUpperCase()} package; the shared reserve does not lock the category). <a href="/buycalc">Calculator</a> · <a href="/exclusive">Exclusive</a></li>
-<li>Multi-hub or annual programs: book a call at <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></li>
+<li>Multi-hub or annual programs: book a call at <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a></li>
 </ul>
 <h2>What to send</h2>
 <ul><li>Square still (primary creative) and optional 15-second silent motion</li><li>Destination URL and one brand category</li><li>Contact email for creative and insertion-order follow-up</li></ul>
@@ -361,7 +361,7 @@ router.post("/v1/sponsor/deposit", express.json({ limit: "8kb" }), async (req: R
     res.json({ url: session.url, livemode: session.livemode });
   } catch (err) {
     logger.warn({ err }, "sponsor deposit session failed");
-    res.status(502).json({ error: "Checkout could not open. Email sales@silverbirchgrowth.com." });
+    res.status(502).json({ error: "Checkout could not open. Email randy@scalehealth.ca." });
   }
 });
 

@@ -153,7 +153,7 @@ export function AgencyPrepayForm({ where, dark = false }: { where: string; dark?
       <p className={`text-[12px] ${dark ? "text-white/65" : "text-foreground/60"}`}>
         {fmtUsd(b)} {C} budget · agency earns <b>{fmtUsd(cash)} {C}</b> cash ({AGENCY_TEST.cashPct}%). No card today: we send a pre-filled IO to sign.
       </p>
-      {state === "error" ? <p className="text-[12px] font-semibold text-red-400" role="alert">Add a work email, or email sales@silverbirchgrowth.com.</p> : null}
+      {state === "error" ? <p className="text-[12px] font-semibold text-red-400" role="alert">Add a work email, or email randy@scalehealth.ca.</p> : null}
     </form>
   );
 }

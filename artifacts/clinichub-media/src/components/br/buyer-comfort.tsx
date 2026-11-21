@@ -71,7 +71,7 @@ export function SeeTheUnit() {
           </li>
           <li>
             A real person: <a href="tel:+16479316278" className="underline underline-offset-2">(647) 931-6278</a> or{" "}
-            <a href="mailto:sales@silverbirchgrowth.com" className="underline underline-offset-2">sales@silverbirchgrowth.com</a>.
+            <a href="mailto:randy@scalehealth.ca" className="underline underline-offset-2">randy@scalehealth.ca</a>.
           </li>
         </ul>
         <p className="mt-4 text-sm text-foreground/80">{SEE_THE_UNIT.decide}</p>

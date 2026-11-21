@@ -103,11 +103,11 @@ export function proofEmail(kind: "received" | "approved" | "rejected", hubName: 
     approved: { subject: `Your $100 ad credit is ready, ${hubName}`, h1: "Your $100 ad credit is ready.", lines: [`<b>${h}</b> is activated and your proof checked out. A $100 USD ad credit is now on your account.`, "Ad spend only, no cash value, not transferable, valid for 12 months. Sign in to see it and build your first ad."], btn: ["https://birchreserve.net/account", "See my credit"] as [string, string] },
     rejected: { subject: `About your hub proof, ${hubName}`, h1: "We couldn't approve that one yet.", lines: [`We couldn't confirm a send to 1,000 or more people for <b>${h}</b> from what we received.${note ? ` Note from our team: ${esc(note)}` : ""}`, "Reply to this email with a clearer screenshot and we'll look again."], btn: null },
   }[kind];
-  const text = `${copy.h1.replace(/<[^>]+>/g, "")}\n\n${copy.lines.map((l) => l.replace(/<[^>]+>/g, "")).join("\n\n")}\n\nBirch Reserve\nsales@silverbirchgrowth.com`;
+  const text = `${copy.h1.replace(/<[^>]+>/g, "")}\n\n${copy.lines.map((l) => l.replace(/<[^>]+>/g, "")).join("\n\n")}\n\nBirch Reserve\nrandy@scalehealth.ca`;
   const html = emailLayout({
     title: copy.subject, preheader: copy.h1, eyebrow: "Birch Reserve · Hub activation",
     body: emailH1(copy.h1) + copy.lines.map((l) => emailP(l)).join("") + (copy.btn ? emailButton(copy.btn[0], copy.btn[1]) : ""),
-    footer: "Birch Reserve · sales@silverbirchgrowth.com",
+    footer: "Birch Reserve · randy@scalehealth.ca",
   });
   return { subject: copy.subject, text, html };
 }

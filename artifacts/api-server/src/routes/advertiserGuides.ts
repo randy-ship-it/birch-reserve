@@ -48,7 +48,7 @@ ${publicSeoTags(path, title, description)}
 </head><body>
 <header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav class="tn" aria-label="Advertiser guides"><a href="${GUIDES_INDEX_PATH}">Guides</a><a href="/blog">Blog</a><a href="/media-kit">Media kit</a><a href="/buy-ads">Advertise</a></nav></div></header>
 <main class="wrap">${body}</main>
-<footer><div class="wrap">Silver Birch Growth Inc. · Toronto, Ontario · <a href="tel:+16479316278">(647) 931-6278</a> · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a><br><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="${GUIDES_INDEX_PATH}">All advertiser guides</a></div></footer>
+<footer><div class="wrap">Silver Birch Growth Inc. · Toronto, Ontario · <a href="tel:+16479316278">(647) 931-6278</a> · <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a><br><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="${GUIDES_INDEX_PATH}">All advertiser guides</a></div></footer>
 </body></html>`;
 }
 

@@ -405,8 +405,8 @@ export default function BrMediaKit() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-background/60">Talk to the founder</p>
           <h2 className="mt-2 font-display text-[1.75rem] leading-tight md:text-4xl">Randy Gilling, Founder</h2>
           <div className="mt-4 flex flex-col gap-2 text-base">
-            <a className="inline-flex min-h-11 items-center gap-2 underline-offset-4 hover:underline" href="mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve%20media%20kit" data-testid="mk-email">
-              <Mail className="size-4" aria-hidden /> sales@silverbirchgrowth.com
+            <a className="inline-flex min-h-11 items-center gap-2 underline-offset-4 hover:underline" href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20media%20kit" data-testid="mk-email">
+              <Mail className="size-4" aria-hidden /> randy@scalehealth.ca
             </a>
             <p className="text-sm text-background/75">{SALES_REPLY_LINE}</p>
             <a className="inline-flex min-h-11 items-center gap-2 underline-offset-4 hover:underline" href="tel:+16479316278" data-testid="mk-phone">

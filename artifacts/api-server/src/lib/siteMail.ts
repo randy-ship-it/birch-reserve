@@ -1,7 +1,7 @@
 /**
  * Site mail core (Resend) + Reply-To policy (Randy 7:27pm).
  *
- *   BIRCH_REPLY_TO (env, default sales@silverbirchgrowth.com): Reply-To on every
+ *   BIRCH_REPLY_TO (env, default randy@scalehealth.ca): Reply-To on every
  *   BUYER-facing email the site sends (sendBuyerEmail). Internal lead / transcript
  *   notifications keep going TO randy@ + jon@ with Reply-To = the visitor, unchanged.
  *
@@ -12,7 +12,7 @@
  */
 import { BR_MARK_CID, BR_MARK_PNG_BASE64 } from "./emailBrandMark";
 import { SCALE_LOGO_CID, SCALE_LOGO_PNG_BASE64 } from "./emailScaleMark";
-export const DEFAULT_BIRCH_REPLY_TO = "sales@silverbirchgrowth.com";
+export const DEFAULT_BIRCH_REPLY_TO = "randy@scalehealth.ca";
 export const RESEND_ENDPOINT = "https://api.resend.com/emails";
 
 const EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;

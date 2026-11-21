@@ -43,7 +43,7 @@ We do not sell guaranteed impression counts, CTR floors, or “how many people w
 
 If the category fits a recovery or wellness brand that already belongs beside booking and plan moments, start with Hold $190 to look without taking a category seat, or Reserve $490 to lock in a slot before the minimum goes up. Custom or multi-hub work goes to Book a call with Silver Birch Growth.
 
-Seller: Silver Birch Growth Inc., Toronto · randy@silverbirchgrowth.com · https://birchreserve.net
+Seller: Silver Birch Growth Inc., Toronto · randy@scalehealth.ca · https://birchreserve.net
 `,
 } as const;
 
@@ -91,7 +91,7 @@ No guaranteed impression counts. No CTR floors. No “how many people will see t
 
 If your category belongs beside recovery checkout and booking moments, start at https://birchreserve.net. Hold $190 to look. Reserve $490 to lock in a slot before the minimum goes up. Multi-hub work is a call with Silver Birch Growth.
 
-Seller: Silver Birch Growth Inc., Toronto · randy@silverbirchgrowth.com · https://birchreserve.net
+Seller: Silver Birch Growth Inc., Toronto · randy@scalehealth.ca · https://birchreserve.net
 `,
 } as const;
 

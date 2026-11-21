@@ -16,7 +16,7 @@ export default function SampleIo() {
       </dl>
       <p className="mt-8 text-muted-foreground">
         Seller: Silver Birch Growth Inc. · Toronto, Ontario ·{" "}
-        <a className="underline" href="mailto:sales@silverbirchgrowth.com">Email sales</a>
+        <a className="underline" href="mailto:randy@scalehealth.ca">Email sales</a>
       </p>
       <p className="mt-4 text-xs uppercase tracking-widest text-muted-foreground">Draft until counsel stamps.</p>
     </article>

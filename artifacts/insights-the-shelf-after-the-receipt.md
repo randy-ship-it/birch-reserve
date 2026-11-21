@@ -42,4 +42,4 @@ No guaranteed impression counts. No CTR floors. No “how many people will see t
 
 If your category belongs beside recovery checkout and booking moments, start at https://birchreserve.net. Hold $190 to look. Reserve $490 to lock the aisle. Multi-hub work is a call with Silver Birch Growth.
 
-Seller: Silver Birch Growth Inc., Toronto · randy@silverbirchgrowth.com · https://birchreserve.net
+Seller: Silver Birch Growth Inc., Toronto · randy@scalehealth.ca · https://birchreserve.net

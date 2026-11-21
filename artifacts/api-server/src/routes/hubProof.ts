@@ -44,7 +44,7 @@ async function safe(res: Response, fn: () => Promise<void>): Promise<void> {
     await fn();
   } catch (err) {
     logger.warn({ err: err instanceof Error ? err.message : String(err) }, "hub proof route failed");
-    if (!res.headersSent) res.status(500).json({ ok: false, message: "Something went wrong. Try again, or email sales@silverbirchgrowth.com." });
+    if (!res.headersSent) res.status(500).json({ ok: false, message: "Something went wrong. Try again, or email randy@scalehealth.ca." });
   }
 }
 
@@ -112,7 +112,7 @@ router.get(["/hub-proof", "/intake/hub-proof"], (req, res) => {
 <script>(function(){var f=document.getElementById("f"),m=document.getElementById("m"),b=document.getElementById("go");
 f.addEventListener("submit",function(e){e.preventDefault();m.textContent="";if(!f.reportValidity())return;var fl=document.getElementById("fl").files[0];if(!fl){m.textContent="Add your proof screenshot.";return}if(fl.size>3*1024*1024){m.textContent="That file is over 3 MB.";return}if(!document.getElementById("tm").checked){m.textContent="Tick the box to accept the terms.";return}
 b.disabled=true;m.textContent="Sending…";var r=new FileReader();r.onload=function(){var d=String(r.result).split(",")[1]||"";var q=Object.fromEntries(new FormData(f));q.reach=Number(q.reach);q.terms=true;q.file={data:d};
-fetch("${base}/v1/hub-proof",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(q)}).then(function(x){return x.json().catch(function(){return{}}).then(function(j){if(j.ok){f.innerHTML='<h2 style="font-family:Fraunces,Georgia,serif;font-weight:400">Got it.</h2><p>'+j.message+'</p>'}else{m.textContent=j.message||"That didn't work. Try again.";b.disabled=false}})}).catch(function(){m.textContent="Could not send. Try again or email sales@silverbirchgrowth.com.";b.disabled=false})};r.readAsDataURL(fl)})})();</script></body></html>`);
+fetch("${base}/v1/hub-proof",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(q)}).then(function(x){return x.json().catch(function(){return{}}).then(function(j){if(j.ok){f.innerHTML='<h2 style="font-family:Fraunces,Georgia,serif;font-weight:400">Got it.</h2><p>'+j.message+'</p>'}else{m.textContent=j.message||"That didn't work. Try again.";b.disabled=false}})}).catch(function(){m.textContent="Could not send. Try again or email randy@scalehealth.ca.";b.disabled=false})};r.readAsDataURL(fl)})})();</script></body></html>`);
 });
 
 export default router;

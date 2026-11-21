@@ -176,7 +176,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
       res.json({ url: session.url, livemode: session.livemode, stored: friday.status });
     } catch (err) {
       log("area checkout failed", err);
-      res.status(502).json({ error: "Checkout could not open. Email sales@silverbirchgrowth.com and we'll hold your area." });
+      res.status(502).json({ error: "Checkout could not open. Email randy@scalehealth.ca and we'll hold your area." });
     }
   });
 
@@ -321,7 +321,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     });
     log("activation", { stored: Boolean(lead), alert: alert.status, openness: v.openness });
     if (!lead && alert.status !== "sent") {
-      res.status(502).json({ error: "Couldn't save that. Email sales@silverbirchgrowth.com and we'll add it for you." });
+      res.status(502).json({ error: "Couldn't save that. Email randy@scalehealth.ca and we'll add it for you." });
       return;
     }
     res.json({ ok: true, stored: lead ? "saved" : "alert_only", alert: alert.status, ...(leadTest && lead ? { leadId: lead.id } : {}) });
@@ -498,7 +498,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
       void recordPulse("placement_question", label, { region: coarseRegion((h) => req.get(h)) });
     }
     if (alert.status !== "sent" && friday.status !== "sent") {
-      res.status(502).json({ error: "We could not send that. Call (647) 931-6278 or email sales@silverbirchgrowth.com." });
+      res.status(502).json({ error: "We could not send that. Call (647) 931-6278 or email randy@scalehealth.ca." });
       return;
     }
     res.json({ ok: true, alert: alert.status, category: label });

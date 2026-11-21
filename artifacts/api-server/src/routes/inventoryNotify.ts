@@ -25,7 +25,7 @@ import { transcriptFrom } from "../lib/randyChatTranscripts";
 import { limiter } from "../lib/rateLimit";
 
 export const INVENTORY_NOTIFY_RECIPIENTS = new Set([
-  "sales@silverbirchgrowth.com",
+  "randy@scalehealth.ca",
   "randy@silverbirchgrowth.com",
   "jon@silverbirchgrowth.com",
 ]);
@@ -123,7 +123,7 @@ router.post("/inventory/confirm", async (req, res): Promise<void> => {
   }
   const mail = buildTamAccessConfirmation(m.name, m.ref, m.test);
   try {
-    const { id } = await resendSend({ from: transcriptFrom(), to: [m.to], subject: mail.subject, text: mail.text, html: mail.html, replyTo: "sales@silverbirchgrowth.com" });
+    const { id } = await resendSend({ from: transcriptFrom(), to: [m.to], subject: mail.subject, text: mail.text, html: mail.html, replyTo: "randy@scalehealth.ca" });
     confirmedRecently.set(m.to, now);
     req.log?.info({ kind: "inventory_confirm", id }, "TAM access confirmation sent");
     res.status(200).json({ ok: true, id });

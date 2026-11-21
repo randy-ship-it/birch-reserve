@@ -281,7 +281,7 @@ function AgencyTest({ brand, email: emailIn }: { brand: string; email: string })
         <input aria-label="Your email" placeholder="you@agency.com" type="email" inputMode="email" autoComplete="email" className={input} value={email} onChange={(e) => setEmail(e.target.value)} data-testid="lane-agency-email" />
       </div>
       <button type="button" onClick={send} disabled={state === "busy"} className="mt-2 inline-flex h-11 items-center gap-2 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white" data-testid="lane-agency-send">{state === "busy" ? <Loader2 className="size-4 animate-spin" /> : null}Request a client test</button>
-      {state === "error" ? <p className="mt-1 text-[12px] font-semibold text-red-700" role="alert">Add a work email, or email sales@silverbirchgrowth.com.</p> : null}
+      {state === "error" ? <p className="mt-1 text-[12px] font-semibold text-red-700" role="alert">Add a work email, or email randy@scalehealth.ca.</p> : null}
     </div>
   );
 }
@@ -314,7 +314,7 @@ function BlockLane() {
         if (!res.ok) throw new Error(String(res.status));
       } catch {
         setState("idle");
-        setError("We could not send that. Call (647) 931-6278 or email sales@silverbirchgrowth.com.");
+        setError("We could not send that. Call (647) 931-6278 or email randy@scalehealth.ca.");
         return;
       }
     }

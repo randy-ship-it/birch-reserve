@@ -46,7 +46,7 @@ test("operator line, founder contact, and one-page media kit are present", () =>
   assert.match(identity, /Birch Reserve is operated by Silver Birch Growth Inc\./);
   assert.match(identity, /Toronto, Ontario/);
   assert.match(identity, /Randy Gilling, founder/);
-  assert.match(identity, /sales@silverbirchgrowth\.com/);
+  assert.match(identity, /randy@scalehealth\.ca/);
   assert.match(identity, /We reply within 1 business day\./);
   assert.match(identity, /\/birch-reserve-one-pager\.pdf/);
   assert.match(layout, /Call our sales line\./);

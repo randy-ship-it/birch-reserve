@@ -464,7 +464,7 @@ test("buycalc dual sales motion (Randy, Nov 17 2026 8:56 PM ET): additive copy, 
   // Self-serve buttons unchanged; A2 inquire link is a secondary text link, not a third button.
   assert.match(html, /<div class="ctas"><a class="btn" href="\/buycalc\?sku=reserve-490#reserve" data-pick-sku="reserve-490">Reserve your space · \$490 USD<\/a><a class="btn line" href="\/buycalc\?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · \$190 USD<\/a><\/div>/);
   assert.match(html, /<p class="hero-inquire" data-testid="hero-inquire"><a href="#request">Ask about a premium slot or multi-hub program →<\/a><\/p>/);
-  assert.match(html, /Or call <a href="tel:\+16479316278">\(647\) 931-6278<\/a> to request a call back · <a href="mailto:sales@silverbirchgrowth\.com/);
+  assert.match(html, /Or call <a href="tel:\+16479316278">\(647\) 931-6278<\/a> to request a call back · <a href="mailto:randy@scalehealth\.ca/);
   // B1 sample IO next to the offer cards.
   assert.match(html, /data-testid="offers-sample-io">Before you pay: read the <a href="\/sample-io">sample insertion order<\/a> you'd approve before anything runs\./);
   // B2 three new questions in the one FAQ.

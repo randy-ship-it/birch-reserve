@@ -7,7 +7,7 @@ import { AGENCY, AREA_LOCK, BRAND_HUBS, INVENTORY, PLACEMENT_LABELS, PUBLISHER_I
 
 export const AGENT_CATALOG_VERSION = "2026-11-17";
 export const SITE = "https://birchreserve.net";
-export const HANDOFF_EMAIL = "sales@silverbirchgrowth.com";
+export const HANDOFF_EMAIL = "randy@scalehealth.ca";
 
 export type AgentOfferKey = "hold-190" | "reserve-490";
 

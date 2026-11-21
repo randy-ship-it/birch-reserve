@@ -10,7 +10,7 @@ import { PREPAY_REFUND_CUTOFF_DAYS } from "./reserveOffers";
 
 export const BIRCH_FACTS_VERSION = "2026-11-17-usd-only" as const;
 export const BIRCH_SALES_PHONE = "(647) 931-6278" as const;
-export const BIRCH_SALES_EMAIL = "sales@silverbirchgrowth.com" as const;
+export const BIRCH_SALES_EMAIL = "randy@scalehealth.ca" as const;
 export const SELF_SERVE_LIMIT_USD = 10_000 as const;
 export const CALLBACK_ENDPOINT = "https://birchreserve.net/v1/callback-request" as const;
 

@@ -4593,7 +4593,7 @@ test("availability is integer-valued and buycalc remains useful without JavaScri
   assert.match(html, /<a href="https:\/\/physio\.drhonow\.com" target="_blank" rel="noopener">physio\.drhonow\.com<\/a>/);
   assert.match(html, /Public benchmark<\/span>Not a Birch result/);
   assert.match(html, /href="tel:\+16479316278"/);
-  assert.match(html, /mailto:sales@silverbirchgrowth\.com/);
+  assert.match(html, /mailto:randy@scalehealth\.ca/);
   assert.match(html, /Fully refundable until 14 days before your launch date\./);
   assert.match(html, /The insertion order names the hub and placement before anything runs\./);
   assert.match(html, /No impression guarantee/);

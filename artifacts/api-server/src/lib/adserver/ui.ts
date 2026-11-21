@@ -100,7 +100,7 @@ export function shell(o: { title: string; nav?: string; right?: string; body: st
 <style>${CSS}</style></head><body>
 <header class="top"><div class="wrap"><a class="logo" href="${esc(o.home ?? "/")}">${esc(o.brand ?? "BIRCH RESERVE")}<span>${esc(o.nav ?? "")}</span></a>${o.right ?? ""}</div></header>
 <main class="wrap">${o.body}</main>
-<footer class="wrap fine">${o.footer ?? `Birch Reserve, a Silver Birch Growth company · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · Aggregate reporting only. No impression guarantees.`}</footer>
+<footer class="wrap fine">${o.footer ?? `Birch Reserve, a Silver Birch Growth company · <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · Aggregate reporting only. No impression guarantees.`}</footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div><script>${FORM_JS}</script></body></html>`;
 }
 

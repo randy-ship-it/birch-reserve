@@ -132,7 +132,7 @@ a{color:#071A39}nav{display:flex;flex-wrap:wrap;gap:12px;font-size:.9rem}.fine{c
 </style></head><body>
 <header><a href="/"><strong>BIRCH RESERVE</strong></a><nav><a href="/insights">Insights</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="/sample-io">Sample IO</a></nav></header>
 <main>${body}</main>
-<footer class="fine">${escapeHtml(SELLER)} · <a href="mailto:sales@silverbirchgrowth.com">Email sales</a></footer>
+<footer class="fine">${escapeHtml(SELLER)} · <a href="mailto:randy@scalehealth.ca">Email sales</a></footer>
 </body></html>`;
 }
 
@@ -156,7 +156,7 @@ const TERMS_HTML = documentPage(
 <p id="spend-down"><strong>Spend-down.</strong> ${escapeHtml(SPEND_DOWN_TERM)}</p>
 <h2 id="exclusive">Exclusive display reserve ($1,900 USD or CAD)</h2>
 <ul>${EXCLUSIVE_RESERVE_TERMS.map((t) => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
-<p>Checkout is Stripe-hosted. Silver Birch Growth Inc. does not store full card numbers. Questions: <a href="mailto:sales@silverbirchgrowth.com">Email sales</a>.</p>
+<p>Checkout is Stripe-hosted. Silver Birch Growth Inc. does not store full card numbers. Questions: <a href="mailto:randy@scalehealth.ca">Email sales</a>.</p>
 <p><a href="/privacy">Privacy</a></p>`,
   "/terms",
 );
@@ -173,7 +173,7 @@ const PRIVACY_HTML = documentPage(
 <p>When a Birch Reserve placement shows inside a hub, our ad script counts a viewable impression (half the ad on screen for one second) and a click through our link. To cap how often one browser sees the same ad, the script keeps a random id in that hub site's own browser storage (localStorage, not a cookie). We hash it on our side with a salt that changes every day and never store the raw id. We do not collect names, emails, IP addresses or health information through the ad script, and we do not use cross-site cookies.</p>
 <p>A brand can add our conversion pixel to its own order confirmation page. The pixel sends only the click id our ad link added to the landing URL, the order value and currency, and an order reference that we hash and use only to drop duplicates. Brands receive aggregate counts only (viewable impressions, clicks, conversions, spend), never visitor-level data. The pixel is never placed on clinical or patient pages.</p>
 <p>If your browser sends Do Not Track or Global Privacy Control, the ad script creates no id and keeps no view history, and the pixel sends nothing. You can also clear the hub site's storage at any time. The ad dashboard at /account and the admin console use a sign-in cookie that is strictly necessary for signing in.</p>
-<p>The Stripe descriptor should read SCALE HEALTH*BIRCH or BIRCH RESERVE. Contact <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> to ask for a copy of reservation details or to correct a brand name or email on an unpaid hold.</p>
+<p>The Stripe descriptor should read SCALE HEALTH*BIRCH or BIRCH RESERVE. Contact <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a> to ask for a copy of reservation details or to correct a brand name or email on an unpaid hold.</p>
 <p><a href="/terms">Terms of sale</a></p>`,
   "/privacy",
 );
@@ -366,7 +366,7 @@ const KIT_HTML = documentPage(
 <li>motion_15s</li>
 </ul>
 <h2>Contact</h2>
-<p><a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · human calculator: <a href="/buycalc">/buycalc</a></p>
+<p><a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a> · human calculator: <a href="/buycalc">/buycalc</a></p>
 <p><a href="/sample-io">Sample insertion order</a> · <a href="/terms">Terms</a></p>`,
   "/kit",
 );

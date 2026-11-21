@@ -8,7 +8,7 @@
  */
 /** Mailto kept as secondary / fallback only. */
 export const BOOK_CALL_MAILTO_HREF =
-  "mailto:sales@silverbirchgrowth.com?subject=Birch%20Reserve" as const;
+  "mailto:randy@scalehealth.ca?subject=Birch%20Reserve" as const;
 
 export const BOOK_CALL_LABEL = "Book a call" as const;
 
