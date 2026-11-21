@@ -109,7 +109,9 @@ export default function BrHome() {
       <style>{`@media (max-width: 767px){html.br-hero-in-view .birch-dock-squirrel,html.br-hero-in-view elevenlabs-convai{visibility:hidden!important;pointer-events:none!important}}`}</style>
       {/* 1. Hero: one line + the kit CTA. */}
       <section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]" data-testid="home-hero">
-        <div className="container mx-auto grid max-w-6xl gap-x-8 gap-y-5 px-4 pb-8 pt-10 md:grid-cols-[1fr_1.05fr] md:grid-rows-[auto_auto] md:content-center md:pb-12 md:pt-14">
+        {/* Mobile first screen (Randy, Nov 21 2:26 PM): one slim line of real recent activity above the headline. In flow, never over the preview card. */}
+        <div className="container mx-auto min-h-8 max-w-6xl px-4 pt-3 md:hidden" data-testid="home-pulse-slim"><ActivityPulse mode="inline" slim /></div>
+        <div className="container mx-auto grid max-w-6xl gap-x-8 gap-y-5 px-4 pb-8 pt-4 md:grid-cols-[1fr_1.05fr] md:grid-rows-[auto_auto] md:content-center md:pb-12 md:pt-14">
           <div className="md:col-start-1 md:row-start-1 md:self-end">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · Private wellness hubs</p>
           <h1 className="mt-2 font-display text-[2.6rem] leading-[1.02] text-[#0b1f3a] md:text-6xl">See your brand inside a live wellness hub.</h1>
@@ -129,8 +131,6 @@ export default function BrHome() {
       </section>
       {/* Light continuous category strip under the hero (Randy Nov 21 10:20 AM). */}
       <div className="container mx-auto max-w-6xl px-4 pb-5"><CategoryStrip testId="home-category-strip" /></div>
-      {/* Mobile: the live feed sits in the gap between the hero and the stats (Randy, Nov 20 4:54 PM). */}
-      <div className="container mx-auto max-w-5xl px-4 pb-6 md:hidden"><ActivityPulse mode="inline" /></div>
 
       {/* 2. Big numbers. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-stats">
