@@ -86,6 +86,7 @@ const API_PATHS = [
   // Self-serve buy (server-rendered).
   "/buy/?",
   "/hub-proof/?",
+  "/intake/hub-proof/?",
   // Blog (server-rendered).
   "/blog(?:/[a-z0-9-]+)?/?",
 ];

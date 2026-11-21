@@ -3,7 +3,7 @@ export const HUB_DEMAND_LINE = "Brands are already buying placements, so your hu
 export const HUB_DEMAND_SUB = "Monetize your audience two ways: your own products, and real ads from brands.";
 export const HUB_EARN_TITLE = "Activate your own hub, earn $100";
 export const HUB_EARN_LINE = "Send your hub to 1,000 or more people, show us it went out, and get a $100 ad credit.";
-export const HUB_PROOF_PATH = "/hub-proof";
+export const HUB_PROOF_PATH = "/intake/hub-proof";
 export const HUB_PROOF_TERMS = [
   "One $100 USD ad credit per hub, after your hub is activated and you show it went out to 1,000 or more people (for example a screenshot of an email or SMS send count, or a social post's reach).",
   "A person reviews every submission. Approval is at Birch Reserve's discretion, and we may ask for more detail.",
