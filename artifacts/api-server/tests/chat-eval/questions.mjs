@@ -12,7 +12,7 @@ export const QUESTIONS = [
   { id: "after-pay", q: "what happens after I pay?", any: [[/IO|insertion order/i], [/review|approve|approval/i], [/creative|ad\b|upload|specs/i]], link: [/ads\/specs|sample-io|\/buy|\/account|terms/] },
   { id: "promo", q: "do you have a promo code?", any: [[/no |don'?t|not |none|can'?t|unable/i], [/request form|call-?back|team|person|human|call/i]] },
   { id: "clinic-count", q: "how many clinics are in your network?", any: [[/signed partnership contracts/i]], mustNot: [/\b\d{2,4}\s+(clinics|hubs)\b/i] },
-  { id: "toronto-live", q: "is the Toronto hub live?", any: [[/not (live|open)|isn'?t (live|open)|in queue|queue|launching|coming|can'?t say|don'?t (have|know)|only (DR|two|the two)/i]], link: [/hub-alerts|\/hubs/] , mustNot: [/toronto[^.]{0,60}\b(is|are) (now )?(live|open)\b/i] },
+  { id: "toronto-live", q: "is the Toronto hub live?", any: [[/not (live|open)|isn'?t (live|open)|in queue|queue|launching|coming|can'?t say|don'?t (have|know)|only (DR|two|the two)/i]], link: [/hub-alerts|\/hubs/] , mustNot: [] },
   { id: "agency-resell", q: "can my agency resell your inventory to our clients?", link: [/\/partners|\/agencies/], any: [[/margin|resell|wholesale|10%/i]] },
   { id: "when-run", q: "how long until my ad runs?", any: [[/1 business day|one business day|IO|insertion order/i], [/launch date|approve|no fixed|nothing runs/i]], mustNot: [/within \d+ (hours|days)\b(?!.*(refund|before))/i, /\bguarantee(d)? (live|launch)/i] },
   { id: "cad-price", q: "I'm in Canada. How much is the 7-day look and the reserve?", any: [[/\$270/], [/\$690/]] },
@@ -35,6 +35,9 @@ export const QUESTIONS = [
   { id: "human", q: "can I talk to a real person?", any: [[/647|call-?back|request form|team|person|human/i]] },
   { id: "which-offer", q: "I have a $2,000 budget for a first test. what should I buy?", any: [[/\$190|7-day look|pack|\$1,500|reserve/i]], link: [/buycalc|sponsor|\/buy/] },
   { id: "order-of-ops", q: "walk me through the whole onboarding from free kit to my ad running", any: [[/kit/i], [/look|reserve|pack/i], [/IO|insertion order/i]], link: [/\/intake/] },
+  { id: "proof-19-day", q: "can you actually execute? do you have any proof you move fast with partners?", any: [[/19 days/i], [/virtual care/i]], mustNot: [/Birch Reserve (campaign )?results/i, /guarantee(?!s? (no|any))/i] },
+  { id: "activate-step", q: "I submitted the free kit form. what's the Step 2 of 2 about inventory and ads?", any: [[/inventory|estimate|range/i], [/ads|curated|premium|which ads/i]], link: [/\/intake\/activate/] },
+  { id: "ad-openness", q: "I run a hub. can I choose which kinds of ads run on it, and exclude alcohol?", any: [[/curated|premium|any approved/i], [/exclu/i], [/review|approv/i]], link: [/\/intake\/activate/] },
 ];
 
 /** Universal rules for every answer. `brand` is "birch" or "scale". */
@@ -46,7 +49,7 @@ export const RULES = (brand) => [
   { id: "no-guarantee-claims", bad: /\b(we|will) guarantee\b|\bguaranteed (impressions|results|roi|sales|reach|clicks)\b/i },
   { id: "no-zero-counts", bad: /\b(0|zero) (clinics|hubs|locations|partners|brands|seats)\b|\$0 booked/i },
   { id: "no-booked-counts", bad: /\b\d+ (of \d+ )?(seats?|spots?|slots?) (are )?(left|open|remaining|available|taken|booked)\b/i },
-  { id: "no-hub-open-claim", bad: /\b(toronto|vancouver|calgary|montreal|new york|chicago)\b[^.\n]{0,60}\b(is|are) (now )?(open|live)\b/i },
+  { id: "no-hub-open-claim", bad: /\b(toronto|vancouver|calgary|montreal|new york|chicago)\b(?:(?!\bnot\b|n't|\bonly\b|\bnor\b|[;,])[^.\n]){0,60}\b(is|are) (now )?(open|live)\b/i },
   { id: "no-revenue-split", bad: /\b(revenue|rev)[- ]?share\b|\bcommission (split|share)\b|\b(20|5|65)\s?%\s+(to\s+)?(birch|scale)\b/i },
   { id: "no-legacy-price", bad: /\$\s?899\b/ },
   { id: "no-em-dash", bad: /[\u2014\u2013]/ },

@@ -17,6 +17,7 @@ import { EXCLUSIVE_RESERVE } from "./exclusiveReserveTerms";
 import { PUBLIC_CAD_AMOUNT_CENTS, PREPAY_REFUND_CUTOFF_DAYS } from "./reserveOffers";
 import { MEDIA_KIT_OFFERS, AGENCY_CASH_PCT } from "./overhaul/mediaKit";
 import { GTM_SETUP_PRICE_USD } from "./overhaul/gtmSetup";
+import { ACT_OPENNESS, ACT_EXCLUSIONS, ACT_REVIEW_NOTE } from "./overhaul/adActivation";
 import { RETAIL_COPY, RETAIL_TAG, STREET_REACH_FIG } from "./overhaul/brandIntake";
 
 export type ChatBrand = "birch" | "scale";
@@ -100,20 +101,23 @@ export function buildOnboardingModule(opts: { payLive?: boolean } = {}): string 
   return [
     "ONBOARDING MODULE (source of truth for 'how do I get started', 'what happens after I pay', 'where do I sign up', 'what does it cost'. Facts below match the live pages. The same module runs on birchreserve.net and the Scale mirror; only the name and links differ.)",
     "",
-    "STEP ONE, ALWAYS: work out who the visitor is, in one short question if they have not said (brand or supplier, agency, provider or retailer wanting a hub, or a partner). Then give the 3 to 5 step path for THAT type, one recommended starting offer, ONE correct link, and offer the request form or a human. Do not dump the whole module.",
+    "TRACK RECORD (use when asked 'can you execute', 'proof', 'how fast'; always labelled as internal, anonymous and not Birch Reserve campaign results): a virtual care partner went from first email to ready to sign in 19 days, run by our field sales bot (12 scored emails). Never name the partner, never tie it to ad performance, never promise a timeline.",
+    "",
+    "STEP ONE, ALWAYS: work out who the visitor is, in one short question if they have not said (brand or supplier, agency, provider or retailer wanting a hub, or a partner). Then give the 3 to 5 step path for THAT type, one recommended starting offer, ONE correct link, and offer the request form or a human. Do not dump the whole module. If the visitor asks for the whole flow or a generic 'how does it work', do NOT ask first: assume a brand, answer with the Path A steps and the link, and ask who they are afterwards.",
     "",
     "PATH A: BRAND OR SUPPLIER (default; includes 'I'm a supplement brand in the US')",
     `1. Free Monetization Kit: ${U("/intake")}. One short form (website and work email, no card). It builds a free, modelled kit for the brand. Same form for the brand's SKUs and for onboarding a hub; ${U("/intake/supplier")} opens it supplier-first.`,
     `2. Pick channels. A brand can reach three channels: (a) branded ScaleHealth.ca hubs; (b) the ${RETAIL_TAG} across Canada and the USA (${RETAIL_COPY}); (c) our owned digital clinic Calm Joints plus the Street Team Ambassadors, with on-site product sampling and door-to-door (${STREET_REACH_FIG.v} ${STREET_REACH_FIG.l}). Say these are based on signed partnership contracts, as reach and audience, never as delivered impressions or a guarantee.`,
     `3. Start small: the $${look.spendUsd} USD 7-day look (${cur(cadLook, "CAD")} in Canada) or the $${seat.spendUsd} USD reserve (${cur(cadSeat, "CAD")} in Canada). ${payLive ? `Look: ${U("/buycalc?sku=hold-190")}. Reserve: ${U("/buycalc?sku=reserve-490")}.` : `Card checkout is OFF right now: send them to the request form ${U("/buycalc#request")} instead of a pay link.`} DEFAULT recommendation: the $${look.spendUsd} look for a first-timer, a mid-tier pack for a brand that already knows it wants to run.`,
     `4. Scale up: sponsorship packs at ${U("/sponsor")}, or the exclusive reserve at ${U("/exclusive")}.`,
-    `5. Pay by card on Stripe, then the after-payment path below. Not ready: the request form ${U("/buycalc#request")} (no card, reply within 1 business day) or a call-back from the team.`,
+    `5. Step 2 of 2 after the kit form (also ${U("/intake/activate")}): "Getting your ads turned on", two quick questions with ranges only: (a) a rough inventory estimate (pages, monthly views, email or SMS list size; ranges, never exact numbers; used for internal planning only and never changes the public figures); (b) which ads can run on their hubs: ${ACT_OPENNESS.map((o) => o.label.toLowerCase()).join(" / ")}, with category exclusions (${ACT_EXCLUSIONS.map((x) => x.label.toLowerCase()).join(", ")}). ${ACT_REVIEW_NOTE} Tell hubs and providers about this step; brands can skip (b).`,
+    `6. Pay by card on Stripe, then the after-payment path below. Not ready: the request form ${U("/buycalc#request")} (no card, reply within 1 business day) or a call-back from the team.`,
     "",
     "PATH B: AGENCY (buying for a client)",
     `1. Reserve for a client on the checkout page, ${U("/buycalc")}, or self-serve at ${U("/buy")}. 2. Agency of record earns ${AGENCY_CASH_PCT}% of media spend, in cash, per the IO. 3. Page: ${U("/agencies")}. 4. 'Can my agency resell?': agencies, media houses and newspapers with inventory and customers can offer our display inventory to their own customers and keep their margin through a wholesale inventory deal; terms are discussed directly (never state a wholesale price or margin). Apply at ${U("/partners")}.`,
     "",
     "PATH C: PROVIDER, CLINIC, STUDIO OR RETAILER (wants a hub or to join the provider network)",
-    `1. Start the same one-form intake at ${U("/intake")} and choose the hub side (${U("/intake/publisher")} shows what a hub could earn, as a labelled estimate). 2. The team reviews the hub for approval and onboards it. 3. Never say a hub is open or live before it is; only DR-HO'S and SOLE are live. Hub launch alerts by category: ${U("/media-kit#hub-alerts")}. Local gyms, studios and clinics can also check the area lock at ${U("/advertise/local")}.`,
+    `1. Start the same one-form intake at ${U("/intake")} and choose the hub side (${U("/intake/publisher")} shows what a hub could earn, as a labelled estimate). 2. The team reviews the hub for approval and onboards it. 3. Never say a hub is open or live before it is; only DR-HO'S and SOLE are live. Then the Step 2 of 2 page ${U("/intake/activate")} (inventory estimate and which ads can run). Hub launch alerts by category: ${U("/media-kit#hub-alerts")}. Local gyms, studios and clinics can also check the area lock at ${U("/advertise/local")}.`,
     "",
     "PATH D: PARTNER (service vendor, reseller or media house)",
     `${U("/partners")} has two groups: service vendors (ad buying, creative, flyer and distribution, other services; we only sell our own ads, so we do not compete with agencies) and inventory and reach partners (agencies, media houses, newspapers who offer our display inventory and keep their margin; wholesale terms discussed directly; nothing is charged or promised from the form). The form is two quick steps and the team replies by email within 1 business day.`,

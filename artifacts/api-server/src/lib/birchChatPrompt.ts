@@ -261,7 +261,7 @@ export const BANNED_REPLY_PATTERNS: ReadonlyArray<{ id: string; re: RegExp }> = 
   { id: "align_name", re: /\bAlign\b(?!\s+(?:with|to|your|our|their|the|it|them|you|on|around|each|all)\b)/ },
   { id: "guarantee_claim", re: /\b(we|will|to)\s+guarantee\b|\bguaranteed\s+(impressions|results|roi|sales|reach|clicks|placement|delivery)\b/i },
   { id: "zero_counts", re: /\b0\s+(clinics|hubs|locations|partners|brands|seats)\b|\bzero\s+(clinics|hubs|locations|partners|brands|seats)\b/i },
-  { id: "hub_open_claim", re: /\b(toronto|vancouver|calgary|montreal|new york|la|chicago)\b[^.\n]{0,40}\b(hub|clinic)\b[^.\n]{0,30}\b(is|are) (now )?(open|live)\b/i },
+  { id: "hub_open_claim", re: /\b(toronto|vancouver|calgary|montreal|new york|chicago)\b(?:(?!\bnot\b|n't|\bonly\b|\bnor\b|[;,])[^.\n]){0,60}\b(is|are) (now )?(open|live)\b/i },
   { id: "revenue_split", re: /\b(revenue|rev)[- ]?share\b|\bcommission (split|share)\b|\b(birch|scale)(\s+health)?\s+share\b|\b(20|5|65|25)\s?%\s+(to\s+)?(birch|scale)\b/i },
 ];
 
