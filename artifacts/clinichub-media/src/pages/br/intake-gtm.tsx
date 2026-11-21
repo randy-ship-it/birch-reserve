@@ -13,8 +13,8 @@ export default function BrIntakeGtm() {
   return (
     <div className="bg-[radial-gradient(ellipse_at_top,_#ecfccb_0%,_transparent_55%)]" data-testid="gtm-intake">
       <header className="container mx-auto max-w-2xl px-4 pb-4 pt-8 md:pt-12">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">{GTM_SETUP.eyebrow}</p>
-        <h1 className="font-display text-4xl leading-[1.02] md:text-5xl">Start with a $3,500 USD setup.</h1>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55" data-currency-fixed>{GTM_SETUP.eyebrow}</p>
+        <h1 className="font-display text-4xl leading-[1.02] md:text-5xl" data-currency-fixed>Start with a $3,500 USD setup.</h1>
         <p className="mt-3 text-base text-muted-foreground">Two quick steps. We reply by email. Nothing is charged here.</p>
         <p className="mt-2 text-sm text-foreground/70">{GTM_SETUP.separate}</p>
       </header>

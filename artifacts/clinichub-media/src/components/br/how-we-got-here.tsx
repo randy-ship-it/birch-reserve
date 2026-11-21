@@ -15,7 +15,7 @@ export const HOW_WE_GOT_HERE = {
     "Then we added more ways to activate, like our Street Team, on-site and door to door.",
     "We started in recovery, built on our team's experience opening and scaling digital-first clinics, with vertical integration to curate providers quickly.",
     "That clinic layer became the foundation. Hubs are now turning into inventory that can be monetized immediately, at low or zero incremental cost to the brand.",
-    "The same systems and GTM expertise we use to sign and onboard partners now power our ad product and the $3,500+ partnership bot setup.",
+    "The same systems and GTM expertise we use to sign and onboard partners now power our ad product and the $3,500+ USD partnership bot setup.",
   ],
   note: "Internal testing that informed the product, not campaign results or current sold performance.",
   cta: "Start with the $190 USD 7-day look",
@@ -34,7 +34,7 @@ export function HowWeGotHere({ where }: { where: "home" | "media_kit" }) {
         {HOW_WE_GOT_HERE.steps.map((s, i) => (
           <li key={i} className={`relative items-start gap-3 ${i >= VISIBLE_MOBILE && !open ? "hidden md:flex" : "flex"}`}>
             <span className="z-10 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-[#0b1f3a] text-sm font-bold text-white">{i + 1}</span>
-            <p className="min-w-0 flex-1 rounded-xl bg-white px-3 py-1.5 text-[13px] leading-snug text-foreground/80 shadow-sm">{s}</p>
+            <p className="min-w-0 flex-1 rounded-xl bg-white px-3 py-1.5 text-[13px] leading-snug text-foreground/80 shadow-sm" {...(s.includes("$3,500") ? { "data-currency-fixed": "" } : {})}>{s}</p>
           </li>
         ))}
       </ol>
