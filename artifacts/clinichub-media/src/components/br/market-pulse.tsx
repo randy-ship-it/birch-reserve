@@ -82,6 +82,61 @@ export function QuestionsBrandsAsk() {
   );
 }
 
+/**
+ * Light continuous category strip (Randy Nov 21 10:20 AM). Titled "Categories we place for": real inquiries do not back
+ * every one of the 8 categories, so it never says companies in them are "currently reviewing". Motion stops under
+ * prefers-reduced-motion (index.css), where it simply wraps.
+ */
+export function CategoryStrip({ className = "", testId = "category-strip" }: { className?: string; testId?: string }) {
+  const items = SERVED_CATEGORIES.map((c) => c.name);
+  return (
+    <section className={`overflow-hidden ${className}`} aria-label="Categories we place for" data-testid={testId}>
+      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Categories we place for</p>
+      <div className="relative mt-2 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)] motion-reduce:[mask-image:none]">
+        <ul className="flex w-max animate-marquee gap-2 [animation-duration:45s] hover:[animation-play-state:paused] motion-reduce:w-auto motion-reduce:flex-wrap" aria-hidden={false}>
+          {[...items, ...items].map((n, i) => (
+            <li key={`${n}-${i}`} className={`whitespace-nowrap rounded-full bg-white px-3 py-1 text-[13px] font-semibold text-[#0b1f3a] ring-1 ring-foreground/10 ${i >= items.length ? "motion-reduce:hidden" : ""}`} aria-hidden={i >= items.length ? true : undefined} data-testid={i < items.length ? "category-strip-item" : undefined}>
+              {n}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+const packRange = `${fmtUsd(DEPOSIT_TIERS[0]!.usd).replace(",500", ".5K").replace(/,000$/, "K")}–${fmtUsd(DEPOSIT_TIERS[DEPOSIT_TIERS.length - 1]!.usd).replace(/,000$/, "K")}`;
+
+/**
+ * Compact 6-question version (Randy Nov 21 10:20 AM): one-line answers, checked against /terms and the live offer.
+ * Common questions, not dated or attributed inquiries.
+ */
+export const BRAND_QUESTIONS_COMPACT = [
+  { q: "Can we get a mock on the live DR-HO’S hub before paying the $190?", a: "Yes. The illustrative mock is free, and after your free kit it shows your own card on the hub before you pay anything." },
+  { q: `Does the $490 credit carry into a ${packRange} pack?`, a: "Yes. A paid $190 look or $490 reserve counts in full toward any sponsorship pack bought within 30 days." },
+  { q: "How does UTM reporting work if it’s aggregate only?", a: "Views, clicks, UTM visits and promo-code redemptions are counted per hub and surface, never who saw your card." },
+  { q: "Shared seat or premium lock?", a: "The $490 reserve is a shared category seat. Only exclusive display (a $25K–$50K USD premium slot or the $1,900 CAD exclusive reserve) locks one brand per category." },
+  { q: `Can an agency prepay a client test and get the ${AGENCY_TEST.cashPct}% cash?`, a: `Yes. ${fmtUsd(AGENCY_TEST.lowUsd).replace(/,000$/, "K")}–${fmtUsd(AGENCY_TEST.highUsd).replace(/,000$/, "K")} USD per client on a pre-filled IO, no card; ${AGENCY_TEST.cashPct}% of media spend is paid in cash to the agency of record.` },
+  { q: "What if we change our mind?", a: "The $490 reserve and packs are fully refundable until 14 days before the IO launch date; an unconverted $190 look is refunded." },
+] as const;
+
+export function QuestionsBrandsAskCompact({ className = "", testId = "questions-brands-ask-compact" }: { className?: string; testId?: string }) {
+  return (
+    <section className={className} data-testid={testId} aria-labelledby={`${testId}-h`}>
+      <h2 id={`${testId}-h`} className="font-display text-2xl leading-tight text-[#0b1f3a] md:text-3xl">Questions brands ask</h2>
+      <dl className="mt-3 grid gap-x-6 gap-y-3 md:grid-cols-2">
+        {BRAND_QUESTIONS_COMPACT.map((x) => (
+          <div key={x.q} className="rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-foreground/10" data-testid="brand-question-compact">
+            <dt className="text-[14px] font-bold leading-snug text-[#0b1f3a]">{x.q}</dt>
+            <dd className="mt-1 text-[13px] leading-snug text-foreground/75">{x.a}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="mt-2 text-[12px] text-foreground/60">Figures are modelled estimates. Nothing runs until you sign an insertion order. Reporting is aggregate only. <a href="/terms" className="underline underline-offset-2">Terms</a></p>
+    </section>
+  );
+}
+
 const FEED_URL = "/v1/activity-pulse";
 type PulseEvent = { who: string; region: string | null; action: string; ago: string; age_h?: number; kind?: "launch" };
 type Feed = { show: boolean; events: PulseEvent[] };

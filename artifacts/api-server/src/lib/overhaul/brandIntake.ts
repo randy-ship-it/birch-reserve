@@ -191,10 +191,10 @@ export const CHANNEL_TILES_LABEL = "Network figures / targets";
 /** Retail network line (Randy, Nov 19 2026 2:27 PM ET via Emma): a retail-network estimate, site-wide. */
 export const RETAIL_COPY = "120+ retail hubs · 1MM+ recovery customers (est., growing to 300–500+ hubs) · Canada + USA";
 export const RETAIL_TAG = "retail-network estimate";
-/** Street Team reach (same note): no homes figure; "a few million doors" targeted around the retail network. */
-export const STREET_REACH_FIG = { v: "A few million", l: "doors targeted around the retail network" } as const;
-export const STREET_REACH_LINE = "reaches a few million doors targeted around the retail network";
-export const STREET_REACH_SENTENCE = "Street Team reaches a few million doors targeted around the retail network.";
+/** Street Team reach (same note): no homes figure. Randy Nov 21 10:22 AM: "2MM+ doors" (estimated) targeted around the retail network. */
+export const STREET_REACH_FIG = { v: "2MM+", l: "doors targeted around the retail network (est.)" } as const;
+export const STREET_REACH_LINE = "reaches an estimated 2MM+ doors targeted around the retail network";
+export const STREET_REACH_SENTENCE = "Street Team reaches an estimated 2MM+ doors targeted around the retail network.";
 
 export const CHANNEL_TILES = [
   { key: "scale-hubs", name: "Scale Hubs", stats: [{ v: ">20MM", l: "unique customers" }, { v: ">700MM", l: "page views rolling out" }, { v: ">5B", l: "page views in 2027 (target)" }], line: "Private health and wellness hubs: physio, recovery, longevity and food brands." },
@@ -290,7 +290,7 @@ export function hubFit(categoryKey: string) {
 export const EXPOSURE_CHANNELS = [
   { key: "hubs", name: "Scale Hubs", reach: ">20MM unique customers · >700MM page views rolling out", cpm: HUB_RATE_RANGE.cpm, cpc: HUB_RATE_RANGE.cpc, rateNote: "Rate card starter range" },
   { key: "calm-joints", name: "Calm Joints", reach: "Figures to come", cpm: null, cpc: null, rateNote: "Priced by IO" },
-  { key: "street-team", name: "Street Team", reach: "Reaches a few million doors targeted around the retail network", cpm: null, cpc: null, rateNote: "Inquire: priced by route" },
+  { key: "street-team", name: "Street Team", reach: "Reaches an estimated 2MM+ doors targeted around the retail network", cpm: null, cpc: null, rateNote: "Inquire: priced by route" },
   { key: "retail-network", name: "Retail Network", reach: RETAIL_COPY, cpm: null, cpc: null, rateNote: "Priced by IO" },
 ] as const;
 

@@ -25,6 +25,7 @@ import { MODELLED_PLAN_LABEL } from "@/components/br/modelled";
 export { MODELLED_PLAN_LABEL, PlanChip } from "@/components/br/modelled";
 import { RATE_SURFACES, fmtUsd } from "../../../../api-server/src/lib/overhaul/pricing";
 import { DEPOSIT_TIERS } from "../../../../api-server/src/lib/sponsorKit";
+import { CARRY_OVER_CLAUSE } from "../../../../api-server/src/lib/sponsorTerms";
 import { AGENCY_TEST, agencyPrepayLeadPayload, clampAgencyBudget, draftRef } from "../../../../api-server/src/lib/twoLane";
 
 export const MID_TIER_LINE = `Prepay a client test or sponsorship credit. 100% media credit. ${AGENCY_TEST.cashPct}% cash to the agency of record.`;
@@ -213,9 +214,10 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
     <section className="rounded-3xl p-5 text-white md:p-6" style={{ background: NAVY }} data-testid="mid-tier" data-where={where}>
       <div className={showMock ? "flex flex-col gap-4 md:flex-row md:items-start md:justify-between" : ""}>
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Next step after the look</p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Next step after your kit or $190 look</p>
           <h3 className="mt-1 font-display text-2xl leading-tight md:text-3xl" data-testid="mid-tier-line">Bigger test? Prepay a sponsorship pack.</h3>
           <p className="mt-1 text-[13px] text-white/75">Card now. Your insertion order names the hub and dates before anything runs.</p>
+          <p className="mt-2 inline-flex rounded-full bg-lime-300/15 px-3 py-1 text-[12px] font-semibold text-lime-200 ring-1 ring-lime-300/40" data-testid="mid-tier-carry-over">Credit carries over: {CARRY_OVER_CLAUSE.replace(/^A paid/, "a paid")}</p>
           <p className="mt-2 text-[13px] font-semibold text-lime-300" data-testid="early-rate-line">{URGENCY_LINE}</p>
         </div>
         {showMock ? <DepositMock /> : null}

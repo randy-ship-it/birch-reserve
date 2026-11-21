@@ -172,7 +172,7 @@ paths:
       tags: [launch]
       servers: [{ url: / }]
       responses:
-        "200": { description: Count-free availability (limited early placements) and prices, content: { application/json: { schema: { $ref: "#/components/schemas/BirchReserveAvailability" } } } }
+        "200": { description: Count-free availability (placements curated as hubs launch) and prices, content: { application/json: { schema: { $ref: "#/components/schemas/BirchReserveAvailability" } } } }
   /v1/quote:
     get:
       operationId: getBirchReserveQuote
