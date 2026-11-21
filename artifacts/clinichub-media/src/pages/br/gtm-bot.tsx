@@ -34,7 +34,7 @@ export default function BrGtmBot() {
           </div>
           <div className="rounded-2xl bg-[#ecfccb]/70 p-4" data-testid="gtm-bot-pricing">
             <p className="font-display text-xl text-[#0b1f3a]">{GTM_BOT.pricing.t}</p>
-            <p className="mt-1 text-sm text-foreground/75">{GTM_BOT.pricing.d}</p>
+            <p className="mt-1 text-sm text-foreground/75" data-currency-fixed>{GTM_BOT.pricing.d}</p>
           </div>
         </div>
       </section>

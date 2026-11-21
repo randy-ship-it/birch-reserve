@@ -2,6 +2,8 @@
  * GTM setup packages (Randy t332u, Nov 21 2026). One source of truth for the homepage block, the media-kit block,
  * the /intake/gtm form, the site chat and llms.txt. Anonymous by design: no client names, logos, cities, categories
  * that identify, or numbers. Separate from the ad inventory product; same systems. No outcome guarantees.
+ * Currency: the setup is quoted in USD for every visitor (no CAD table, nothing charged online). Every element that
+ * shows the $3,500 USD figure carries data-currency-fixed so the CA page-wide relabel (currency-text.tsx) skips it.
  */
 export const GTM_SETUP_PRICE_USD = 3500;
 export const GTM_SETUP_HREF = "/intake/gtm";
@@ -23,7 +25,7 @@ export const GTM_SETUP = {
     "Same thread: prospect tone rose from 55 on the first reply to 94 at ready to sign, across 12 scored emails (our read of the wording).",
   ],
   casesNote: "Examples are anonymous. No outcomes are guaranteed.",
-  cta: "Start with a $3,500 setup",
+  cta: "Start with a $3,500 USD setup",
   detailsLabel: "What's included and how it works",
   details: [
     "Setup of the same partnership / B2B go-to-market bot and console we use in-house.",
