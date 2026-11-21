@@ -20,6 +20,7 @@ ${error ? `<p class="warn" role="alert">${esc(error)}</p>` : ""}
 }
 
 export type AdminView = {
+  hubServing?: Map<string, { enabled: boolean; approvedBy: string; actor: string; note: string | null; at: Date }>;
   who: string;
   campaigns: Array<{ c: Campaign; t: Totals }>;
   pending: Array<Creative & { brand: string; variants?: CreativeVariant[] }>;
@@ -140,6 +141,22 @@ ${c ? `<label>Status${sel("status", [["draft", "Draft"], ["active", "Active (ser
 <label>Notes<input name="notes" value="${esc(v?.notes ?? "")}" maxlength="500"></label>`;
 }
 
+/** Where ads may run (Randy Nov 21 2026 3:42/3:43 PM). Hubs default OFF; only Randy or Jon turn one on. */
+function hubServingHtml(v: AdminView): string {
+  const hubs = new Map<string, string>();
+  for (const s of AD_SLOTS) if (s.kind !== "marketing" && !s.test) hubs.set(s.hub, s.hubName);
+  const rows = [...hubs].map(([k, name]) => {
+    const st = v.hubServing?.get(k);
+    return `<tr><td>${esc(name)} <span class="fine"><code>${esc(k)}</code></span></td><td><span class="chip ${st?.enabled ? "c-active" : "c-pending"}">${st?.enabled ? "ADS ON" : "OFF"}</span>${st ? `<div class="fine">${st.enabled ? "approved by" : "turned off by"} ${esc(st.approvedBy)} (${esc(st.actor)}) · ${fmtDateTime(st.at)}${st.note ? ` · ${esc(st.note)}` : ""}</div>` : ""}</td>
+<td><form class="f" data-post="/ads/admin/hubs/${esc(k)}/serving" data-reload style="display:flex;gap:6px">${st?.enabled ? `<input type="hidden" name="enabled" value="">` : `<input type="hidden" name="enabled" value="on"><input name="note" maxlength="300" required placeholder="Randy/Jon approval note">`}<button class="ghost sm" type="submit">${st?.enabled ? "Turn off" : "Turn on"}</button></form></td></tr>`;
+  });
+  const mk = AD_SLOTS.filter((s) => s.kind === "marketing").map((s) => `<tr><td><code>${esc(s.key)}</code></td><td>${esc(s.label)}</td><td class="fine">${esc(s.hubUrl)}</td></tr>`).join("");
+  return `<section id="where"><h2>Where ads run</h2>
+<p class="fine">Ads run only on Birch / Scale marketing and intake pages that sell ads. A marketing slot serves only campaigns that name it (never by auto-move); none is embedded on a page yet. <b>Hubs are OFF</b> until Randy or Jon turns one on here (audited, with who approved it). The server refuses every hub slot that is off, including auto-moved campaigns.</p>
+<h3>Marketing and intake placements</h3><div class="tw"><table><thead><tr><th>Slot</th><th>Page</th><th>URL</th></tr></thead><tbody>${mk}</tbody></table></div>
+<h3>Hubs</h3><div class="tw"><table><thead><tr><th>Hub</th><th>Ads</th><th></th></tr></thead><tbody>${rows.join("")}</tbody></table></div></section>`;
+}
+
 export function adminPage(v: AdminView, now = Date.now()): string {
   const live = v.campaigns.filter((x) => x.c.status === "active");
   const drafts = v.campaigns.filter((x) => x.c.status === "draft");
@@ -206,6 +223,7 @@ ${x.kind === "video" && !poster ? `<form class="f" data-post="/ads/admin/creativ
 <details class="ed"><summary>Customer dashboard link</summary><form data-post="/ads/admin/account-link" class="f"><div class="row"><label>Customer dashboard link by email (promo-only buyers)<input name="email" type="email" required></label></div><button class="ghost sm" type="submit">Copy dashboard link</button><pre data-out style="display:none;white-space:pre-wrap;word-break:break-all"></pre></form></details>
 <details class="ed"><summary>New campaign (manual or from an IO)</summary><form class="f" data-post="/ads/admin/campaigns" data-reload>${campaignForm(null)}<button type="submit">Create draft</button></form></details></section>
 <section id="creatives"><h2>Creative approval</h2>${pending.length ? `<div class="grid two">${pending.join("")}</div>` : `<p class="empty">Nothing waiting for review.</p>`}</section>
+${hubServingHtml(v)}
 <section id="onboard"><h2>Hubs on contract</h2><p class="fine">When a hub signs, add it here with the contract reference. Its ${PLACEMENTS.length} placements become sellable at card rates right away (serving still needs a paid, approved, active campaign). Same key as a queued kit hub (e.g. <code>jack-health</code>) switches that hub live. The royalty rate stays <b>pending rate</b> until set below from the contract.</p>
 <div class="tw"><table><thead><tr><th>Hub</th><th>URL</th><th>Royalty partner</th><th>Contract</th><th>Status</th><th></th></tr></thead><tbody>${hubRows.join("") || `<tr><td colspan="6" class="muted">No hubs onboarded on contract yet. Kit hubs below are built in.</td></tr>`}</tbody></table></div>
 <details class="ed"><summary>Onboard a hub on contract</summary><form class="f" data-post="/ads/admin/hubs" data-reload><div class="row"><label>Key (lowercase, e.g. calm-joints)<input name="key" required pattern="[a-z0-9][a-z0-9-]{1,40}"></label><label>Hub name<input name="name" required maxlength="80"></label><label>Audience category<input name="category" required maxlength="80"></label><label>Hub URL<input name="url" type="url" required></label><label>Royalty partner (defaults to hub name)<input name="partner" maxlength="120"></label><label>Contract reference (signed agreement, date)<input name="contractRef" required maxlength="160"></label></div>

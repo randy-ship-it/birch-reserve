@@ -26,7 +26,23 @@ export type AdSlot = {
   live: boolean; // live hubs serve; queued hubs are listed but never fill
   test?: boolean; // QA hub: serves test campaigns on test requests only, never real buyers
   contractRef?: string | null; // set when the hub was onboarded on contract in /ads/admin
+  /** "marketing" = a Birch/Scale page that sells ads (no hub, no royalty). Default "hub". */
+  kind?: "hub" | "marketing";
 };
+
+/*
+ * Allowed placements (Randy, Nov 21 2026 3:42 PM t396u + 3:43 PM t397u): ads run only on Birch / Scale marketing and intake
+ * pages that sell ads. Hub slots stay in the system but never serve unless that hub is explicitly enabled by Randy or Jon
+ * (ad_hub_serving, audited). A marketing slot only serves a campaign that names it in its hubs (never by auto-move).
+ * None of these is embedded on a page yet; embedding one is a separate, approved change.
+ */
+export const MARKETING_SLOTS: readonly AdSlot[] = [
+  { key: "mkt-birch.media_kit", hub: "mkt-birch", hubName: "Birch Reserve (marketing)", hubCategory: "Marketing", hubUrl: "https://birchreserve.net/media-kit", partner: "", placement: "landing", label: "Birch Reserve · Media kit page", cpmUsd: 4, cpcUsd: 0.4, live: true, kind: "marketing" },
+  { key: "mkt-birch.buy_ads", hub: "mkt-birch", hubName: "Birch Reserve (marketing)", hubCategory: "Marketing", hubUrl: "https://birchreserve.net/buy-ads", partner: "", placement: "landing", label: "Birch Reserve · Buy ads guide", cpmUsd: 4, cpcUsd: 0.4, live: true, kind: "marketing" },
+  { key: "mkt-birch.specs", hub: "mkt-birch", hubName: "Birch Reserve (marketing)", hubCategory: "Marketing", hubUrl: "https://birchreserve.net/ads/specs", partner: "", placement: "landing", label: "Birch Reserve · Ad specs page", cpmUsd: 4, cpcUsd: 0.4, live: true, kind: "marketing" },
+  { key: "mkt-scale.intake", hub: "mkt-scale", hubName: "Scale Health (intake)", hubCategory: "Marketing", hubUrl: "https://www.scalehealth.ca/intake", partner: "", placement: "landing", label: "Scale Health · Advertiser intake", cpmUsd: 4, cpcUsd: 0.4, live: true, kind: "marketing" },
+];
+export const isMarketingSlot = (s: Pick<AdSlot, "kind">): boolean => s.kind === "marketing";
 
 const SURFACE = new Map(RATE_SURFACES.map((s) => [s.key, s] as const));
 
@@ -48,7 +64,7 @@ const STATIC_SLOTS: readonly AdSlot[] = HUBS.flatMap((h) =>
 );
 
 /** Live slot list: static kit hubs plus hubs onboarded on contract (ad_hubs, store.ts). Mutated in place so every importer sees updates. */
-export const AD_SLOTS: AdSlot[] = [...STATIC_SLOTS];
+export const AD_SLOTS: AdSlot[] = [...STATIC_SLOTS, ...MARKETING_SLOTS];
 
 export type ContractHub = { key: string; name: string; category: string; url: string; partner: string; contractRef: string; status: "live" | "paused"; isTest: boolean };
 
@@ -64,7 +80,7 @@ export function setContractHubs(hubs: readonly ContractHub[]): void {
       });
     }
   }
-  AD_SLOTS.splice(0, AD_SLOTS.length, ...next);
+  AD_SLOTS.splice(0, AD_SLOTS.length, ...next, ...MARKETING_SLOTS);
 }
 
 export const findSlot = (key: unknown): AdSlot | null => (typeof key === "string" ? AD_SLOTS.find((s) => s.key === key) ?? null : null);

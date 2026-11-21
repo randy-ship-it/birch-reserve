@@ -163,7 +163,8 @@ media-src   https://birchreserve.net`;
 <section class="hero"><span class="eyebrow">${esc(b.name)} · For hub builders</span>
 <h1>Hub drop-in kit</h1>
 <p class="lede">One script and one tag per slot. Our ads show only in the slots we agreed with you. When there's no ad, the tag stays empty and takes no space. No cookies, no extra tracking.</p>
-<p><span class="pill">Copy · paste · check with ?br_ads=test</span></p></section>
+<p><span class="pill">Copy · paste · check with ?br_ads=test</span></p>
+<p class="fine" style="border-left:3px solid #C8F55A;padding-left:10px"><b>Not live yet.</b> A hub only shows ads after Randy or Jon approves that hub in the Birch ad system. Until then every slot on the hub stays empty, even if the tag is pasted.</p></section>
 
 <section id="snippet"><h2>1. Paste this</h2><pre id="snip">${esc(snippet)}</pre><button class="ghost sm" data-copy="#snip" type="button">Copy snippet</button>
 <p class="fine">Replace <code>HUB</code> with your hub id (we send it to you) and keep the placement name after the dot.</p>

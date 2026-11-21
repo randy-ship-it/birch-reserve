@@ -60,6 +60,8 @@ export function eventCostMicros(c: Pick<Campaign, "pricing" | "rateMultiplierBps
 export function eligibility(c: Campaign, slot: AdSlot): Eligibility {
   if (!slot.live) return null;
   if (slot.test && !c.isTest) return null; // QA hubs never carry real buyers
+  // Marketing/intake pages: only campaigns that name the page explicitly, never by auto-move.
+  if (slot.kind === "marketing") return c.hubs.includes(slot.hub) ? "primary" : null;
   if (c.hubs.length > 0 && !c.hubs.includes(slot.hub)) return null;
   if (slot.placement === c.primaryPlacement) return "primary";
   if (!c.allowSubstitute) return null;
