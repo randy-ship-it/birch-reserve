@@ -16,6 +16,12 @@ import { cronAuthorized } from "../lib/cronAuth";
 import { FixedWindowLimiter } from "../lib/rateLimit";
 import { ADS_FROM, hubAlertEmail, loginLinkEmail, siteMail } from "../lib/adserver/mail";
 import { sendBuyerEmail } from "../lib/siteMail";
+import { renderSalesAlert } from "../lib/salesAlert";
+import { renderLocalBizLeadEmail } from "../lib/localBizLeadNotify";
+import { renderEmailCaptureEmail } from "../lib/emailCapture";
+import { renderTranscriptEmail } from "../lib/randyChatTranscripts";
+import { renderKitEmail, renderNudgeEmail } from "../lib/kitEmails";
+import { buildPrepayConfirmationEmail } from "../lib/prepayConfirmationEmail";
 import { AD_SLOTS, ALERT_CATEGORIES, AD_DEFAULTS, PROMO_RATE_BPS, isPromoCampaign, MICROS, PLACEMENTS, adminEmails, adsLoginEmailEnabled, findSlot, placementLabel, type Placement } from "../lib/adserver/config";
 import { pixelId, postbackKey, safeEqual, sign, verify } from "../lib/adserver/auth";
 import * as store from "../lib/adserver/store";
@@ -506,7 +512,7 @@ router.post("/ads/admin/campaigns", json, (req, res) =>
     const { campaign } = await store.createCampaign({
       accountEmail: email, brand: str(b.brand, 160), category: patch.category ?? null, currency: b.currency === "cad" ? "cad" : "usd", budgetMicros: Math.round(budget * MICROS),
       pricing: patch.pricing, primaryPlacement: patch.primaryPlacement, hubs: patch.hubs, allowSubstitute: patch.allowSubstitute ?? true, rateMultiplierBps: patch.rateMultiplierBps,
-      clickUrl: patch.clickUrl ?? null, exclusive: patch.exclusive, isTest: b.isTest === true, notes: patch.notes ?? null, orderKind: "manual (admin)", actor: who,
+      clickUrl: patch.clickUrl ?? null, exclusive: patch.exclusive, isTest: b.isTest === true, notes: patch.notes ?? null, orderKind: "manual (admin)", seller: b.seller === "scale" ? "scale" : "birch", actor: who,
     });
     const { status: _s, ...rest } = patch;
     await store.updateCampaign(campaign.id, rest, who);
@@ -900,7 +906,7 @@ router.get("/ads/admin/export/:what", (req, res) =>
     if (what === "campaigns") {
       const cs = await store.listCampaigns();
       const t = await store.totalsByCampaign("all");
-      rows = cs.map((c) => ({ id: c.id, brand: c.brand, email: c.accountEmail, status: c.status, test: c.isTest, order: c.orderRef, kind: c.orderKind, currency: c.currency, budget: (c.budgetMicros / MICROS).toFixed(2), spent: (c.spentMicros / MICROS).toFixed(2), pricing: c.pricing, placement: c.primaryPlacement, auto_move: c.allowSubstitute, flight_start: c.flightStart, flight_end: c.flightEnd, viewable: t.get(c.id)?.views ?? 0, clicks: t.get(c.id)?.clicks ?? 0, conversions: t.get(c.id)?.convs ?? 0 }));
+      rows = cs.map((c) => ({ id: c.id, seller: c.seller ?? "birch", brand: c.brand, email: c.accountEmail, status: c.status, test: c.isTest, order: c.orderRef, kind: c.orderKind, currency: c.currency, budget: (c.budgetMicros / MICROS).toFixed(2), spent: (c.spentMicros / MICROS).toFixed(2), pricing: c.pricing, placement: c.primaryPlacement, auto_move: c.allowSubstitute, flight_start: c.flightStart, flight_end: c.flightEnd, viewable: t.get(c.id)?.views ?? 0, clicks: t.get(c.id)?.clicks ?? 0, conversions: t.get(c.id)?.convs ?? 0 }));
     } else if (what === "ledger") {
       rows = (await store.ledger({ limit: 50_000 })).map((l) => ({ at: l.at, campaign_id: l.campaignId, kind: l.kind, slot: l.slotKey, partner: l.partner, units: l.units, amount: (l.amountMicros / MICROS).toFixed(6), currency: l.currency, note: l.note, actor: l.actor, test: l.isTest }));
     } else if (what === "royalties") {
@@ -958,10 +964,26 @@ router.post("/ads/admin/email-test", json, (req, res) =>
     const login = loginLinkEmail(`${base}/account/auth?t=${encodeURIComponent(sign("l", { e: EMAIL_TEST_TO }, 864e5))}`);
     const off = `${base}/account/alerts/off?t=${encodeURIComponent(sign("u", { e: EMAIL_TEST_TO }, 365 * 864e5))}`;
     const alert = hubAlertEmail({ hubName: "Example Physio Hub", category: "Recovery hardware", hubUrl: "https://scalehealth.ca", unsubscribeUrl: off });
+    const all = (req.body as Record<string, unknown> | undefined)?.all === true;
+    const now = new Date();
+    const lead = { id: "lead_test", name: "Test Person", company: "Northline Recovery (test)", role: "Founder", email: EMAIL_TEST_TO, phone: null, need: "Reach recovery shoppers", size: "$5K", timing: "Next month", pagePath: "/intake", meta: { category: "Recovery hardware", hubs: "SOLE" }, sourceRef: "test", utmSource: null, utmMedium: null, utmCampaign: null, utmTerm: null, utmContent: null, referrer: null, landingPage: "/intake" } as never;
+    const extra = all
+      ? [
+          renderSalesAlert({ event: "inquiry", title: "gtm setup inquiry: Northline Recovery (test)", rows: [["Form", "gtm_setup_inquiry"], ["Company", "Northline Recovery (test)"], ["Email", EMAIL_TEST_TO]], isTest: true }),
+          renderSalesAlert({ event: "paid_checkout", title: "Paid: 7-day look $190 · Northline Recovery (test)", rows: [["Amount", "$190.00 USD"], ["Plan", "7-day look"]], isTest: true }),
+          renderSalesAlert({ event: "seat_hold", title: "/buy 7-day look: Northline Recovery (test)", rows: [["Plan", "7-day look · $190"]], isTest: true }),
+          renderLocalBizLeadEmail(lead),
+          renderEmailCaptureEmail(lead),
+          renderTranscriptEmail({ id: "sess_test", messages: [{ role: "user", content: "How does pricing work?" }, { role: "assistant", content: "See https://birchreserve.net/rates" }], qualify: { company: "Northline Recovery (test)" }, contact: { name: "Test Person", email: EMAIL_TEST_TO }, events: [], lastHandoff: null, handoffPending: false, pagePath: "/rates", createdAt: now, lastActivityAt: now, sentAt: null, sentMessageCount: 0, sendingAt: null, sendAttempts: 0 } as never),
+          renderKitEmail({ brand: "Northline Recovery (test)", reportUrl: `${base}/intake`, headline: { exposureMonth: "120K", earningsMonth: "$2.4K" }, hasPdf: false }),
+          renderNudgeEmail({ resumeUrl: `${base}/intake`, unsubscribeUrl: `${base}/intake`, website: "northline.test" }),
+          buildPrepayConfirmationEmail({ brandName: "Northline Recovery (test)", amountCents: 49000, currency: "usd" } as never),
+        ]
+      : [];
     const ids: Array<string | null> = [];
-    for (const m of [login, alert]) ids.push((await sendBuyerEmail({ from: ADS_FROM(), to: [EMAIL_TEST_TO], ...m, subject: `[Test] ${m.subject}` })).id);
+    for (const m of [login, alert, ...extra]) ids.push((await sendBuyerEmail({ from: ADS_FROM(), to: [EMAIL_TEST_TO], subject: `[Test] ${m.subject}`, text: m.text, html: m.html })).id);
     await store.audit(who, "email.test", EMAIL_TEST_TO, ids.join(","));
-    res.json({ message: `Sent 2 test emails to ${EMAIL_TEST_TO}.`, ids });
+    res.json({ message: `Sent ${ids.length} test emails to ${EMAIL_TEST_TO}.`, ids });
   }),
 );
 

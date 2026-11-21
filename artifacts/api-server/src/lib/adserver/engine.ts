@@ -20,6 +20,8 @@ export type Campaign = {
   category: string | null;
   orderRef: string | null;
   orderKind: string | null;
+  /** Who sold it: Birch Reserve (reseller channel) or Scale Health direct (its own proprietary ads). Same rig, one ledger. */
+  seller?: "birch" | "scale";
   currency: "usd" | "cad";
   budgetMicros: number;
   spentMicros: number;

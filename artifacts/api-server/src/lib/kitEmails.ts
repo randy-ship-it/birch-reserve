@@ -7,6 +7,7 @@
  * Sender: KIT_EMAIL_FROM (default "Birch Reserve <kit@birchreserve.net>", must be a verified Resend sender).
  * Reply-To: BIRCH_REPLY_TO (siteMail). Tokens: KIT_EMAIL_SECRET (HMAC). Never mentions Friday.
  */
+import { EMAIL_TOKENS, emailButton, emailLayout } from "./emailLayout";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 type Env = NodeJS.ProcessEnv;
@@ -52,31 +53,22 @@ export function readToken(t: string, secret: string, now = Date.now()): { k: "re
 
 /* ------------------------------------------------------------------ templates */
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
-const FOREST = "#0E3B2A", MINT = "#BFF3D6", INK = "#0B1F17", MUTE = "#5B6B63", PAPER = "#F6F4EE";
+const FOREST = EMAIL_TOKENS.ink, MINT = EMAIL_TOKENS.limeSoft, MUTE = EMAIL_TOKENS.muted; // /intake tokens via the shared layout
 function shell(title: string, pre: string, inner: string, foot: string): string {
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title></head>
-<body style="margin:0;background:${PAPER};font-family:Helvetica,Arial,sans-serif;color:${INK}">
-<span style="display:none;max-height:0;overflow:hidden">${esc(pre)}</span>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${PAPER}"><tr><td align="center" style="padding:28px 12px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fff;border-radius:18px;overflow:hidden;border:1px solid #E4E1D8">
-<tr><td style="background:${FOREST};padding:22px 28px;color:#fff"><div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:${MINT};font-weight:bold">Birch Reserve · Monetization Kit</div></td></tr>
-<tr><td style="padding:28px">${inner}</td></tr>
-<tr><td style="padding:18px 28px;border-top:1px solid #EEE;font-size:12px;line-height:1.5;color:${MUTE}">${foot}</td></tr>
-</table></td></tr></table></body></html>`;
+  return emailLayout({ title, preheader: pre, eyebrow: "Birch Reserve · Monetization Kit", body: inner, footer: foot });
 }
-const button = (href: string, label: string) =>
-  `<a href="${esc(href)}" style="display:inline-block;background:${FOREST};color:#fff;text-decoration:none;font-weight:bold;padding:14px 22px;border-radius:999px;font-size:15px">${esc(label)}</a>`;
+const button = (href: string, label: string) => emailButton(href, label);
 
 export type KitEmailInput = { brand?: string | null; reportUrl: string; headline?: { exposureMonth?: string; earningsMonth?: string } | null; hasPdf: boolean };
 export function renderKitEmail(i: KitEmailInput): { subject: string; html: string; text: string } {
   const who = i.brand?.trim() ? esc(i.brand.trim()) : "your brand";
   const stats = [i.headline?.exposureMonth ? [i.headline.exposureMonth, "page-view exposures a month, likely"] : null, i.headline?.earningsMonth ? [i.headline.earningsMonth, "hub earnings a month, likely"] : null].filter(Boolean) as string[][];
   const statHtml = stats.length
-    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px -8px;border-collapse:separate;border-spacing:8px 0;width:calc(100% + 16px)"><tr>${stats.map(([v, l]) => `<td style="background:${MINT};border-radius:14px;padding:14px 16px;width:50%"><div style="font-family:Georgia,serif;font-size:28px;color:${FOREST}">${esc(v)}</div><div style="font-size:12px;color:${FOREST}">${esc(l)}</div></td>`).join('')}</tr></table>`
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px -8px;border-collapse:separate;border-spacing:8px 0;width:calc(100% + 16px)"><tr>${stats.map(([v, l]) => `<td style="background:${MINT};border-radius:14px;padding:14px 16px;width:50%"><div style="font-family:${EMAIL_TOKENS.serif};font-size:28px;color:${FOREST}">${esc(v)}</div><div style="font-size:12px;color:${FOREST}">${esc(l)}</div></td>`).join('')}</tr></table>`
     : "";
-  const inner = `<h1 style="font-family:Georgia,serif;font-weight:normal;font-size:30px;line-height:1.15;margin:0 0 10px">Your Monetization Kit is ready.</h1>
+  const inner = `<h1 style="font-family:${EMAIL_TOKENS.serif};font-weight:400;font-size:28px;line-height:1.18;margin:0 0 10px;color:${EMAIL_TOKENS.ink}">Your Monetization Kit is ready.</h1>
 <p style="font-size:15px;line-height:1.55;margin:0;color:${MUTE}">Here is what ${who} could reach and earn across health and wellness hubs. Estimates, reviewed by a person.</p>
-${statHtml}<p style="margin:22px 0">${button(i.reportUrl, "Open my Monetization Kit")}</p>
+${statHtml}<div>${button(i.reportUrl, "Open my Monetization Kit")}</div>
 ${i.hasPdf ? `<p style="font-size:13px;color:${MUTE};margin:0">Your kit is attached as a PDF.</p>` : ""}`;
   const foot = `Estimates in USD, not guarantees. A person at Birch Reserve reviews every request; nothing is booked or charged automatically.<br>Birch Reserve · birchreserve.net · Reply to this email to reach the team.`;
   const text = `Your Monetization Kit is ready.\n\nHere is what ${i.brand?.trim() || "your brand"} could reach and earn across health and wellness hubs. Estimates, reviewed by a person.\n${stats.map(([v, l]) => `- ${v} ${l}`).join("\n")}\n\nOpen your Monetization Kit: ${i.reportUrl}\n${i.hasPdf ? "Your kit is attached as a PDF.\n" : ""}\nEstimates in USD, not guarantees. Birch Reserve · birchreserve.net`;
@@ -86,9 +78,9 @@ ${i.hasPdf ? `<p style="font-size:13px;color:${MUTE};margin:0">Your kit is attac
 export type NudgeInput = { resumeUrl: string; unsubscribeUrl: string; website?: string | null };
 export function renderNudgeEmail(i: NudgeInput): { subject: string; html: string; text: string } {
   const site = i.website?.trim() ? ` for ${esc(i.website.trim())}` : "";
-  const inner = `<h1 style="font-family:Georgia,serif;font-weight:normal;font-size:28px;line-height:1.15;margin:0 0 10px">Your Monetization Kit is one click away.</h1>
+  const inner = `<h1 style="font-family:${EMAIL_TOKENS.serif};font-weight:400;font-size:28px;line-height:1.18;margin:0 0 10px;color:${EMAIL_TOKENS.ink}">Your Monetization Kit is one click away.</h1>
 <p style="font-size:15px;line-height:1.55;margin:0;color:${MUTE}">You started your kit${site}. We saved what you typed, so you can pick up right where you left off.</p>
-<p style="margin:22px 0">${button(i.resumeUrl, "Finish my Monetization Kit")}</p>
+<div>${button(i.resumeUrl, "Finish my Monetization Kit")}</div>
 <p style="font-size:13px;color:${MUTE};margin:0">Takes under a minute. Free.</p>`;
   const foot = `This is the only reminder we will send about this kit. <a href="${esc(i.unsubscribeUrl)}" style="color:${MUTE}">Unsubscribe</a>.<br>Birch Reserve · birchreserve.net`;
   const text = `Your Monetization Kit is one click away.\n\nYou started your kit${i.website ? ` for ${i.website}` : ""}. We saved what you typed, so you can pick up where you left off.\n\nFinish my Monetization Kit: ${i.resumeUrl}\n\nThis is the only reminder we will send about this kit. Unsubscribe: ${i.unsubscribeUrl}\nBirch Reserve · birchreserve.net`;

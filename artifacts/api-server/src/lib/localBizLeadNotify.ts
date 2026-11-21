@@ -2,6 +2,7 @@
  * Local Biz lead → Randy + Jon email (same Resend sender / recipients as chat
  * transcripts and email capture). Skipped for is_test leads by the caller.
  */
+import { emailH1, emailLayout, emailRows } from "./emailLayout";
 import { logger } from "./logger";
 import type { Lead } from "./leads";
 import {
@@ -43,14 +44,7 @@ export function renderLocalBizLeadEmail(lead: Lead): RenderedEmail {
   ];
   const subject = `Local Biz lead: ${lead.company || lead.email || lead.name || "anon"}`;
   const text = ["Local Biz lead (birchreserve.net)", "", ...rows.map(([k, v]) => `${k}: ${v}`)].join("\n");
-  const html = [
-    `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#111;line-height:1.45">`,
-    `<h2 style="margin:0 0 8px">Local Biz lead</h2>`,
-    `<table style="border-collapse:collapse">${rows
-      .map(([k, v]) => `<tr><td style="padding:2px 12px 2px 0;color:#555">${esc(k)}</td><td style="padding:2px 0">${esc(v)}</td></tr>`)
-      .join("")}</table>`,
-    `</body></html>`,
-  ].join("\n");
+  const html = emailLayout({ title: "Local Biz lead", eyebrow: "Local Biz lead (birchreserve.net)", body: emailH1("Local Biz lead") + emailRows(rows.map(([k, v]) => [k, esc(v)])) });
   return { subject, text, html, ...(lead.email ? { replyTo: lead.email } : {}) };
 }
 

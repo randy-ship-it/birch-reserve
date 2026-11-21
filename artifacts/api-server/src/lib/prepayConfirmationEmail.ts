@@ -11,6 +11,7 @@
  *   - Never for is_test reservations. Never throws (webhook still returns 2xx to Stripe).
  *   - Hold-190 is not a prepay and gets no email from this module.
  */
+import { EMAIL_TOKENS, emailLayout, emailP, escEmail } from "./emailLayout";
 import type Stripe from "stripe";
 import { logger } from "./logger";
 import { PREPAY_REFUND_CUTOFF_DAYS } from "./reserveOffers";
@@ -24,12 +25,25 @@ export type PrepayEmailInput = {
   currency: string;
 };
 
-export type PrepayEmail = { subject: string; text: string };
+export type PrepayEmail = { subject: string; text: string; html: string };
 
 export function formatPrepayAmount(amountCents: number, currency: string): string {
   const cur = currency.toUpperCase();
   const whole = amountCents % 100 === 0 ? String(amountCents / 100) : (amountCents / 100).toFixed(2);
   return `$${whole} ${cur}`;
+}
+
+/** Same words as the text version, in the shared /intake-styled layout. */
+function prepayHtml(text: string): string {
+  const blocks = text.split("\n\n");
+  const body = blocks
+    .map((b, i) => {
+      const lines = b.split("\n");
+      if (lines.every((l) => /^(\d+\.|-) /.test(l))) return `<ul style="margin:0 0 12px;padding-left:20px;font-family:${EMAIL_TOKENS.sans};font-size:15px;line-height:1.6;color:${EMAIL_TOKENS.ink}">${lines.map((l) => `<li style="margin:0 0 6px">${escEmail(l.replace(/^(\d+\.|-) /, ""))}</li>`).join("")}</ul>`;
+      return emailP(lines.map(escEmail).join("<br>"), { muted: /^Your payment is display credit|^Refund:/.test(b) });
+    })
+    .join("");
+  return emailLayout({ title: "Your category is reserved", preheader: "Reply with your artwork, copy and links", eyebrow: "Birch Reserve · Prepayment received", body });
 }
 
 export function buildPrepayConfirmationEmail(input: PrepayEmailInput): PrepayEmail {
@@ -62,7 +76,7 @@ export function buildPrepayConfirmationEmail(input: PrepayEmailInput): PrepayEma
     "",
     "Birch Reserve",
   ].join("\n");
-  return { subject, text };
+  return { subject, text, html: prepayHtml(text) };
 }
 
 export type PrepayReservation = {
@@ -77,7 +91,7 @@ export type PrepayReservation = {
 
 export type PrepayEmailDeps = {
   loadReservation: (id: string) => Promise<PrepayReservation | undefined>;
-  send: (mail: { from: string; to: string[]; subject: string; text: string }) => Promise<{ id: string | null }>;
+  send: (mail: { from: string; to: string[]; subject: string; text: string; html?: string }) => Promise<{ id: string | null }>;
   enabled: () => boolean;
 };
 

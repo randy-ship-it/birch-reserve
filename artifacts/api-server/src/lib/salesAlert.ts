@@ -7,6 +7,7 @@
  * Never throws: callers await it so the serverless function does not freeze
  * before the email leaves, but a mail failure never breaks the buyer's flow.
  */
+import { emailH1, emailLayout, emailP, emailRows, emailTestBanner } from "./emailLayout";
 import { logger } from "./logger";
 import { resendKeyConfigured, resendSend, type SiteMail } from "./siteMail";
 import { transcriptFrom } from "./randyChatTranscripts";
@@ -65,17 +66,18 @@ export function renderSalesAlert(alert: SalesAlert): Pick<SiteMail, "subject" | 
     "",
     "Reply to this email to answer the buyer directly.",
   ].filter((l, i) => l !== "" || i > 0).join("\n");
-  const html = [
-    `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#111;line-height:1.45">`,
-    alert.isTest ? `<p style="background:#fff3cd;padding:6px 10px;margin:0 0 10px"><strong>TEST submission.</strong> Safe to ignore.</p>` : "",
-    `<h2 style="margin:0 0 4px">${esc(alert.title)}</h2>`,
-    `<p style="margin:0 0 12px;color:#555">Received ${esc(when)} ET on birchreserve.net</p>`,
-    `<table style="border-collapse:collapse">${rows
-      .map(([k, v]) => `<tr><td style="padding:3px 14px 3px 0;color:#555;vertical-align:top">${esc(k)}</td><td style="padding:3px 0">${esc(v)}</td></tr>`)
-      .join("")}</table>`,
-    `<p style="margin:14px 0 0;color:#555">Reply to this email to answer the buyer directly.</p>`,
-    `</body></html>`,
-  ].join("");
+  const html = emailLayout({
+    title: alert.title,
+    preheader: `Received ${when} ET on birchreserve.net`,
+    eyebrow: `Birch ${EVENT_LABEL[alert.event].toLowerCase()}`,
+    body: [
+      alert.isTest ? emailTestBanner(`<strong>TEST submission.</strong> Safe to ignore.`) : "",
+      emailH1(esc(alert.title)),
+      emailP(`Received ${esc(when)} ET on birchreserve.net`, { muted: true, small: true }),
+      emailRows(rows.map(([k, v]) => [k, esc(v)])),
+      emailP("Reply to this email to answer the buyer directly.", { muted: true, small: true }),
+    ].join(""),
+  });
   return { subject, text, html };
 }
 

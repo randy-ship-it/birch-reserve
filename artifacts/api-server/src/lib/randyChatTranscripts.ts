@@ -16,6 +16,7 @@
  *   a 60s unref'd interval. Claims are atomic (sending_at + SKIP LOCKED), and
  *   sent_message_count makes sends idempotent across instances and restarts.
  */
+import { EMAIL_TOKENS, emailH1, emailH2, emailLayout, emailP, emailRows } from "./emailLayout";
 import { resendSend } from "./siteMail";
 import { logger } from "./logger";
 import { isTestIdentity } from "./testTraffic";
@@ -342,23 +343,20 @@ export function renderTranscriptEmail(s: TranscriptSession): RenderedEmail {
     ...lines.flatMap((l) => [l, ""]),
   ].join("\n");
 
-  const row = (k: string, v: string) =>
-    `<tr><td style="padding:2px 12px 2px 0;color:#555;vertical-align:top">${escapeHtml(k)}</td><td style="padding:2px 0">${htmlWithNakedLinks(v)}</td></tr>`;
-  const html = [
-    `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#111;line-height:1.45">`,
-    `<h2 style="margin:0 0 8px">Birch chat transcript</h2>`,
-    `<h3 style="margin:12px 0 4px">Callback intake</h3>`,
-    `<table style="border-collapse:collapse;margin-bottom:12px">${fields.map(([k, v]) => row(k, v?.trim() || "(not given)")).join("")}</table>`,
-    `<table style="border-collapse:collapse;margin-bottom:12px">${meta.map(([k, v]) => row(k, v)).join("")}</table>`,
-    `<h3 style="margin:12px 0 4px">Events</h3>`,
-    `<ul style="margin:0 0 12px;padding-left:18px">${(events.length ? events : ["(none)"]).map((e) => `<li>${escapeHtml(e)}</li>`).join("")}</ul>`,
-    `<h3 style="margin:12px 0 4px">Transcript</h3>`,
-    ...s.messages.map(
-      (m) =>
-        `<p style="margin:0 0 10px"><strong>${m.role === "user" ? "Visitor" : "Squirrel"}:</strong> ${htmlWithNakedLinks(m.content)}</p>`,
-    ),
-    `</body></html>`,
-  ].join("\n");
+  const html = emailLayout({
+    title: "Birch chat transcript",
+    eyebrow: "Birch chat transcript",
+    body: [
+      emailH1("Birch chat transcript"),
+      emailH2("Callback intake"),
+      emailRows(fields.map(([k, v]) => [k, htmlWithNakedLinks(v?.trim() || "(not given)")])),
+      emailRows(meta.map(([k, v]) => [k, htmlWithNakedLinks(v)])),
+      emailH2("Events"),
+      `<ul style="margin:0 0 12px;padding-left:18px;font-family:${EMAIL_TOKENS.sans};font-size:14px;color:${EMAIL_TOKENS.ink}">${(events.length ? events : ["(none)"]).map((e) => `<li>${escapeHtml(e)}</li>`).join("")}</ul>`,
+      emailH2("Transcript"),
+      ...s.messages.map((m) => emailP(`<strong>${m.role === "user" ? "Visitor" : "Squirrel"}:</strong> ${htmlWithNakedLinks(m.content)}`)),
+    ].join("\n"),
+  });
 
   return { subject, text, html, ...(s.contact.email ? { replyTo: s.contact.email } : {}) };
 }

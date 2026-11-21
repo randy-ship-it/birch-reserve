@@ -10,6 +10,7 @@
  * the linger capture delivers the media kit in-page, and intake confirmations are
  * on-screen. Any future buyer email must go through sendBuyerEmail so Reply-To is enforced.
  */
+import { BR_MARK_CID, BR_MARK_PNG_BASE64 } from "./emailBrandMark";
 export const DEFAULT_BIRCH_REPLY_TO = "sales@silverbirchgrowth.com";
 export const RESEND_ENDPOINT = "https://api.resend.com/emails";
 
@@ -29,7 +30,7 @@ export type SiteMail = {
   html?: string;
   replyTo?: string;
   /** Resend attachments: base64 content (e.g. the Monetization Kit PDF). */
-  attachments?: Array<{ filename: string; content: string }>;
+  attachments?: Array<{ filename: string; content: string; content_id?: string; content_type?: string }>;
   /** Extra headers (List-Unsubscribe on the nudge). */
   headers?: Record<string, string>;
 };
@@ -47,6 +48,15 @@ export function setSiteMailFetchForTests(f: ResendFetch | null): void {
 
 export function resendKeyConfigured(): boolean {
   return Boolean(process.env["RESEND_API_KEY"]?.trim());
+}
+
+/** Shared email layout logo: attach the inline mark whenever the HTML references cid:br-mark. */
+function withBrandMark(mail: SiteMail): NonNullable<SiteMail["attachments"]> {
+  const list = [...(mail.attachments ?? [])];
+  if (mail.html?.includes(`cid:${BR_MARK_CID}`) && !list.some((a) => a.content_id === BR_MARK_CID)) {
+    list.push({ filename: "birch-reserve.png", content: BR_MARK_PNG_BASE64, content_id: BR_MARK_CID, content_type: "image/png" });
+  }
+  return list;
 }
 
 /** POST to Resend; returns the provider message id. Throws on failure (key never in errors). */
@@ -67,7 +77,7 @@ export async function resendSend(mail: SiteMail): Promise<{ id: string | null }>
         text: mail.text,
         ...(mail.html ? { html: mail.html } : {}),
         ...(mail.replyTo ? { reply_to: mail.replyTo } : {}),
-        ...(mail.attachments?.length ? { attachments: mail.attachments } : {}),
+        ...(withBrandMark(mail).length ? { attachments: withBrandMark(mail) } : {}),
         ...(mail.headers ? { headers: mail.headers } : {}),
       }),
       signal: controller.signal,
