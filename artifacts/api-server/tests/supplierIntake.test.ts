@@ -105,7 +105,7 @@ test("network figures (2:27 PM): shared constants site-wide, no homes figure, no
   const bi = await import("../src/lib/overhaul/brandIntake");
   const act = await import("../src/lib/kitCalc/activation");
   assert.equal(bi.RETAIL_COPY, "200+ locations, 500+ soon · 1MM+ captive recovery consumers · Canada + USA");
-  assert.equal(bi.RETAIL_TAG, "private retail network of fitness & recovery retailers");
+  assert.equal(bi.RETAIL_TAG, "private network of digital and brick-and-mortar fitness & recovery retailers");
   assert.equal(bi.AUDIENCE_LINE, "700MM+ captive page views activating · 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers · 2MM+ homes reached by 2027");
   assert.equal(bi.STREET_REACH_LINE, "planned to reach 2MM+ homes by 2027 with Calm Joints");
   const s = JSON.stringify([bi.CHANNEL_TILES, bi.EXPOSURE_CHANNELS, act]);

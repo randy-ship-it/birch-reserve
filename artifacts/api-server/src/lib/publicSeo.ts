@@ -103,6 +103,7 @@ export const SPA_SHELL_PATHS = [
   "/gtm-bot",
   "/intake/street-team",
   "/partners",
+  "/intake/reel",
   "/street-team",
   "/intake/report",
   "/brand-kit",

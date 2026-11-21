@@ -47,7 +47,7 @@ const FAQ = [
 /** One audience framing, three channels (Randy Nov 21 1:00 PM). Reach and audience, not delivered impressions. */
 const STATS = [
   { v: "700MM+", l: "captive page views activating", name: "Branded ScaleHealth.ca hubs", tid: "stat-hub-views", more: "Private, members-only hubs on ScaleHealth.ca where recovery and wellness customers already shop and book care. Page views are activating as brand hubs go live." },
-  { v: "200+", l: "locations, 500+ soon", name: "Private retail network", tid: "stat-retail-locations", more: "Our private network of fitness & recovery retailers in Canada and the USA: 200+ locations today, 500+ soon, with 1MM+ captive recovery consumers." },
+  { v: "200+", l: "locations, 500+ soon", name: "Private retail network", tid: "stat-retail-locations", more: "Our private network of digital and brick-and-mortar fitness & recovery retailers in Canada and the USA: 200+ locations today, 500+ soon, with 1MM+ captive recovery consumers." },
 ];
 
 
@@ -154,7 +154,7 @@ export default function BrHome() {
               <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#BFF3D6]">Calm Joints + Street Team Ambassadors</span>
               <p className="mt-2 font-display text-[2.6rem] leading-none md:text-5xl" data-testid="home-street-figure">2MM+</p>
               <p className="mt-1.5 text-sm text-white/80">homes reached by 2027 <ArrowRight className="ml-1 inline size-3.5 transition group-hover:translate-x-0.5" aria-hidden /></p>
-              <p className="mt-1 text-[11px] text-white/60">Our owned digital clinic plus ambassadors on the ground. Based on signed partnership contracts.</p>
+              <p className="mt-1 text-[11px] text-white/60">Our owned digital clinic plus ambassadors doing on-site sampling and door-to-door. Based on signed partnership contracts.</p>
             </div>
           </a>
         </div>
