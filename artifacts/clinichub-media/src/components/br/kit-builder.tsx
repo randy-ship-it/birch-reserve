@@ -11,6 +11,8 @@ import { IntakeWarnings } from "@/components/br/intake-warnings";
 import { useBrandCategories } from "@/lib/brandCategories";
 import { toBirchCategory } from "../../../../api-server/src/lib/kitCalc/fridayV12";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { priceLabel, useCurrency } from "@/lib/currency";
+import { DEPOSIT_TIERS } from "../../../../api-server/src/lib/sponsorKit";
 import { Link } from "wouter";
 import { Download, Loader2, Check, Minus, Plus, Link2, ShieldAlert } from "lucide-react";
 import { KIT_CALC_ASSUMPTIONS, KIT_CALC_CONFIG, KIT_CALC_FORMULA, kitCalc, repeatRange } from "../../../../api-server/src/lib/kitCalc";
@@ -44,6 +46,14 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
   const [repeat, setRepeat] = useState(KIT_CALC_CONFIG.repeatBands[1]!.key);
   const [band, setBand] = useState(KIT_CALC_CONFIG.marginBands[1]!.key);
   const [spend, setSpend] = useState(KIT_CALC_CONFIG.spendLevels[0]!.usd);
+  // The calculator models in USD. A Canadian visitor sees each spend step at its CAD table price ($690 CAD reserve,
+  // $2,100 / $4,200 / $8,400 CAD packs) with the USD amount the model uses; model outputs stay labelled USD.
+  const { currency, prices } = useCurrency();
+  const spendLabel = (usd: number, fallback: string): string => {
+    if (currency !== "cad") return fallback;
+    const cad = usd === 490 ? priceLabel("reserve-490", "cad", prices) : (() => { const t = DEPOSIT_TIERS.find((x) => x.usd === usd); return t ? `$${t.cad.toLocaleString("en-US")} CAD` : null; })();
+    return cad ? `${cad} ${usd === 490 ? "reserve" : "pack"} (modelled as $${usd.toLocaleString("en-US")} USD)` : fallback;
+  };
   const [conv, setConv] = useState(KIT_CALC_CONFIG.defaultConversionPct);
   const [market, setMarket] = useState<Market>(pre?.market ?? DEFAULT_MARKET);
   const [gates, setGates] = useState<LeadGates | null>(null);
@@ -152,7 +162,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
 
   const ltv = view.ltvGp;
   return (
-    <section id={id} data-testid="kit-builder" className="scroll-mt-20 border-b border-border/70 bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_50%)]">
+    <section id={id} data-testid="kit-builder" data-currency-fixed className="scroll-mt-20 border-b border-border/70 bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_50%)]">
       {showMockBanner ? <MockBanner /> : null}
       <div className="container mx-auto px-4 py-8 md:py-10">
         {/* Tight layout (Randy, Nov 21 2026 4:15 PM ET: "horrendous use of space. Tighten."): inputs | results | kit preview on wide screens. */}
@@ -218,7 +228,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
             <label>
               <span className={lab}>Scale test spend</span>
               <select data-testid="kit-spend" value={spend} onChange={(e) => tap(setSpend)(Number(e.target.value))} className={numIn}>
-                {KIT_CALC_CONFIG.spendLevels.map((s) => <option key={s.usd} value={s.usd}>{s.label}</option>)}
+                {KIT_CALC_CONFIG.spendLevels.map((s) => <option key={s.usd} value={s.usd}>{spendLabel(s.usd, s.label)}</option>)}
               </select>
             </label>
             <label>
@@ -236,7 +246,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
               <span className="ml-auto"><InfoPop dark title="Formula and assumptions" label="Formula" testId="kit-formula">{(view.source === "friday" ? view.formula : KIT_CALC_FORMULA).map((f) => <p key={f}>• {f}</p>)}<hr className="my-2" />{KIT_CALC_ASSUMPTIONS.map((a) => <p key={a} className="text-xs">{a}</p>)}<p className="mt-2 text-xs">While you type, numbers are a live preview. After you send, the LTV and channel fit come from your report.</p></InfoPop></span>
             </div>
             <p className="mt-1 font-display text-3xl tabular-nums text-lime-200" data-testid="kit-ltv">{ltv ? `${$(ltv[0])}–${$(ltv[1])}` : "Needs inputs"}</p>
-            <p className="text-xs text-white/70">Revenue opportunity {$(view.revenueOpp[0])}–{$(view.revenueOpp[1])} from a {$(spend)} USD test</p>
+            <p className="text-xs text-white/70">Revenue opportunity {$(view.revenueOpp[0])}–{$(view.revenueOpp[1])} from a {currency === "cad" ? spendLabel(spend, `${$(spend)} USD`).replace(/ (reserve|pack) \(/, " test (") : `${$(spend)} USD test`}. Estimates in USD.</p>
             {view.source === "friday" ? <p className="mt-1 text-[11px] text-lime-200/90">Channel fit: {view.fitHeader}</p> : null}
           </div>
           <div className="mt-3"><ExposureCard exposure={expo.ex} source={expo.source} testId="kit-exposure" /></div>
