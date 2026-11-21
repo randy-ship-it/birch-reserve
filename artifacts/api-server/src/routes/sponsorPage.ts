@@ -133,7 +133,7 @@ export function sponsorDepositsOpen(env: NodeJS.ProcessEnv = process.env): boole
 
 export type SponsorPageOpts = {
   /** Payout display region from x-vercel-ip-country. Default CA (CAD). */
-  payout?: PayoutRegion; open?: boolean; pack?: string | null; prefill?: { email?: string; company?: string } | null; status?: string | null };
+  payout?: PayoutRegion; open?: boolean; pack?: string | null; prefill?: { email?: string; company?: string } | null; status?: string | null; sessionId?: string | null };
 
 /** /sponsor (Randy, Nov 20 2026 audit #6): three packs, each "Prepay $X". USD only. */
 export function sponsorHtml(_currency: Currency, opts: SponsorPageOpts = {}): string {
@@ -150,7 +150,7 @@ export function sponsorHtml(_currency: Currency, opts: SponsorPageOpts = {}): st
   const ladder = SMB_LADDER.map((r) => `<tr><td>${r.customers} activated customers</td><td class="n">${payoutAmount(r.cashCad, payout)} cash</td><td class="n">${payoutAmount(r.creditCad, payout)} ad credit</td></tr>`).join("");
   const status =
     opts.status === "success"
-      ? `<p class="ok" data-testid="sponsor-paid">Payment received. We'll email your insertion order to sign within 1 business day. Nothing runs before it.</p>`
+      ? `<p class="ok" data-testid="sponsor-paid">Payment received. We'll email your insertion order to sign within 1 business day. Nothing runs before it.${opts.sessionId ? ` <a href="/account/login?session_id=${esc(opts.sessionId)}" style="font-weight:700">Open your ad dashboard →</a>` : ""}</p>`
       : opts.status === "cancelled"
         ? `<p class="draft" data-testid="sponsor-cancelled">Checkout cancelled. No charge was made.</p>`
         : "";
@@ -262,7 +262,7 @@ router.get(["/sponsor", "/sponsor/"], (req: Request, res: Response) => {
   }
   const status = req.query.deposit === "success" ? "success" : req.query.deposit === "cancelled" ? "cancelled" : null;
   const pack = typeof req.query.pack === "string" ? req.query.pack : null;
-  res.type("html").send(shell("Sponsorship packs — Birch Reserve", "Prepay a $1,500, $3,000 or $6,000 USD sponsorship pack with up to 15% bonus media credit. Card now, insertion order before anything runs.", "/sponsor", currency, sponsorHtml(currency, { open: sponsorDepositsOpen(), pack, prefill, status, payout })));
+  res.type("html").send(shell("Sponsorship packs — Birch Reserve", "Prepay a $1,500, $3,000 or $6,000 USD sponsorship pack with up to 15% bonus media credit. Card now, insertion order before anything runs.", "/sponsor", currency, sponsorHtml(currency, { open: sponsorDepositsOpen(), pack, prefill, status, payout, sessionId: typeof req.query.session_id === "string" && /^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(req.query.session_id) ? req.query.session_id : null })));
 });
 
 router.get(["/kit", "/kit/"], (req: Request, res: Response) => {

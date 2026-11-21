@@ -18,14 +18,14 @@ const router: IRouter = Router();
 
 const esc = (v: string) => v.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 
-type Status = { kind: "success"; ref: string; paid: boolean; livemode: boolean } | { kind: "cancelled" } | null;
+type Status = { kind: "success"; ref: string; paid: boolean; livemode: boolean; sid?: string } | { kind: "cancelled" } | null;
 
 function page(open: boolean, status: Status): string {
   const pace = PACING_ROWS.find((r) => r.key === "exclusive-1900")!;
   const cats = TWO_LANE_CATEGORIES.map((c) => `<option value="${esc(c.label)}">${esc(c.label)}</option>`).join("");
   const banner =
     status?.kind === "success"
-      ? `<div class="ok" role="status"><b>${status.paid ? "Payment received." : "Payment is processing."}</b> Your exclusive display reserve is recorded${status.livemode ? "" : " (test mode, no real charge)"}. Ref ${esc(status.ref)}. We email your insertion order within 1 business day. Nothing runs until you sign it.</div>`
+      ? `<div class="ok" role="status"><b>${status.paid ? "Payment received." : "Payment is processing."}</b> Your exclusive display reserve is recorded${status.livemode ? "" : " (test mode, no real charge)"}. Ref ${esc(status.ref)}. We email your insertion order within 1 business day. Nothing runs until you sign it.${status.paid && status.sid ? ` <a href="/account/login?session_id=${esc(status.sid)}" style="font-weight:700">Open your ad dashboard →</a>` : ""}</div>`
       : status?.kind === "cancelled"
         ? `<div class="note" role="status">Checkout cancelled. No charge was made.</div>`
         : "";
@@ -76,7 +76,7 @@ router.get(["/exclusive", "/exclusive/"], async (req: Request, res: Response) =>
   if (req.query.reserve === "success" && /^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(sid)) {
     try {
       const s = await getStripeClient().checkout.sessions.retrieve(sid);
-      if (s.metadata?.kind === EXCLUSIVE_RESERVE.kind) status = { kind: "success", ref: s.id.slice(-8).toUpperCase(), paid: s.payment_status === "paid", livemode: s.livemode };
+      if (s.metadata?.kind === EXCLUSIVE_RESERVE.kind) status = { kind: "success", ref: s.id.slice(-8).toUpperCase(), paid: s.payment_status === "paid", livemode: s.livemode, sid: s.id };
     } catch (err) {
       logger.warn({ err: err instanceof Error ? err.message : String(err) }, "exclusive reserve success lookup failed");
     }

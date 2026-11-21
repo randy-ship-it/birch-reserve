@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/pulse-ingest",
       "schedule": "17 * * * *"
+    },
+    {
+      "path": "/api/cron/ads-friday",
+      "schedule": "40 11 * * *"
     }
   ]
 }

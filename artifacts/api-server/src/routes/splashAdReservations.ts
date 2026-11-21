@@ -62,6 +62,7 @@ import { hasValidQaHeader } from "../lib/testTraffic";
 import { attributionFrom } from "../lib/publicGuards";
 import { recordPaidCheckoutSafe } from "../lib/checkoutLead";
 import { EXCLUSIVE_RESERVE, recordPaidExclusiveReserveSafe } from "../lib/exclusiveReserve";
+import { draftCampaignFromCheckoutSafe } from "../lib/adserver/service";
 import { sendPrepayConfirmationSafe } from "../lib/prepayConfirmationEmail";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { logger } from "../lib/logger";
@@ -570,6 +571,8 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
     event.type === "checkout.session.async_payment_succeeded"
   ) {
     const session = event.data.object as Stripe.Checkout.Session;
+    // Ad system (Nov 21 2026): every paid checkout opens a DRAFT campaign holding its credit. Never throws; nothing serves until an admin activates it.
+    if (session.payment_status === "paid") await draftCampaignFromCheckoutSafe(session);
     if (session.payment_status === "paid" && session.metadata?.kind === EXCLUSIVE_RESERVE.kind) {
       // $1,900 CAD exclusive display reserve (Nov 21 2026): leads row + Friday, then the sales alert so the IO goes out.
       await recordPaidExclusiveReserveSafe(session);
