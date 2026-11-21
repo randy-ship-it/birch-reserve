@@ -227,7 +227,7 @@ const readOff = () => {
  * mode "inline" (mobile, Randy Nov 20 4:54 PM): sits in a divider gap between sections, in the page flow, so it never
  * covers a card, CTA, form, squirrel or call button. Shown below md only.
  */
-export function ActivityPulse({ mode = "fixed", desktopOnly = false, className = "" }: { mode?: "fixed" | "inline"; desktopOnly?: boolean; className?: string } = {}) {
+export function ActivityPulse({ mode = "fixed", desktopOnly = false, className = "", slim = false }: { mode?: "fixed" | "inline"; desktopOnly?: boolean; className?: string; slim?: boolean } = {}) {
   const inline = mode === "inline";
   const [feed, setFeed] = useState<Feed | null>(null);
   const [i, setI] = useState(-1);
@@ -282,12 +282,12 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, className =
     t = window.setTimeout(() => {
       setI(next());
       t = window.setTimeout(tick, swapMs(reduced));
-    }, FIRST_MS);
+    }, slim ? 0 : FIRST_MS);
     return () => {
       window.clearTimeout(t);
       window.clearTimeout(f);
     };
-  }, [feed, off, reduced]);
+  }, [feed, off, reduced, slim]);
   useEffect(() => {
     if (!feed || inline) return;
     let raf = 0;
@@ -394,7 +394,7 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, className =
       <div className={`flex ${inline ? "w-full max-w-md" : "w-[15.5rem] max-w-[calc(100vw-1rem)]"} items-center gap-2 rounded-xl bg-white/80 px-3 py-1.5 shadow-sm ring-1 ring-foreground/5 backdrop-blur md:w-[22rem]`} role="status" aria-live="off">
         <span className="inline-flex size-1.5 shrink-0 rounded-full bg-lime-500/70" aria-hidden />
         {/* One text flow (no flex gaps between fragments), left-aligned, normal spacing, so it wraps naturally on phones. */}
-        <span className={`block min-w-0 flex-1 whitespace-normal text-left text-[11px] font-normal normal-case tracking-normal opacity-80 transition-opacity ease-out [hyphens:none] [text-align-last:auto] [word-spacing:normal] motion-reduce:transition-none md:text-[12px] ${fading ? "opacity-0" : ""}`} style={{ color: NAVY, lineHeight: 1.35, transitionDuration: `${FADE_MS}ms` }} data-testid="activity-pulse-text">
+        <span className={`block min-w-0 flex-1 ${slim ? "truncate whitespace-nowrap" : "whitespace-normal"} text-left text-[11px] font-normal normal-case tracking-normal opacity-80 transition-opacity ease-out [hyphens:none] [text-align-last:auto] [word-spacing:normal] motion-reduce:transition-none md:text-[12px] ${fading ? "opacity-0" : ""}`} style={{ color: NAVY, lineHeight: 1.35, transitionDuration: `${FADE_MS}ms` }} data-testid="activity-pulse-text">
           {e.kind === "launch" ? (
             <>
               {/* Launch highlight (Randy Nov 20 5:24 PM): small accent badge, place type only, never a business name. */}
@@ -414,7 +414,7 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, className =
           )}
           {" · "}
           <span className="text-foreground/45">{e.ago}</span>
-          <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className="mt-0.5 block text-left text-[10px] leading-tight text-foreground/40 underline underline-offset-2 hover:text-foreground/70" data-testid="activity-pulse-hide">
+          <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className={`mt-0.5 ${slim ? "hidden" : "block"} text-left text-[10px] leading-tight text-foreground/40 underline underline-offset-2 hover:text-foreground/70`} data-testid="activity-pulse-hide">
             Hide activity
           </button>
         </span>
