@@ -155,14 +155,14 @@ test("full flow on Postgres: serve → viewable → click → conversion, ledger
   const led = await store.ledger({ campaignId: campaign.id });
   assert.equal(led.filter((l) => l.kind === "credit").length, 1);
   assert.equal(-led.filter((l) => l.kind === "charge").reduce((a, l) => a + l.amountMicros, 0), after.spentMicros);
-  // Royalties: computed from delivered spend; approve needs a share and records only.
+  // Royalties: seeded default (20% override, hub 35% of net); held until the hub's payout gate passes; approve records only.
   let roy = (await store.royalties()).find((r) => r.partner === "SOLE")!;
   assert.equal(roy.grossMicros, 36_000);
-  assert.equal(roy.payableMicros, null);
+  assert.equal(roy.payableMicros, 10_080);
+  assert.equal(roy.status, "held");
   assert.equal(await store.approvePayout("SOLE", roy.month, "usd", "randy"), null);
-  await store.setPartnerShare("SOLE", 2500, "randy");
+  await store.setGate("SOLE", { live: true, hasTransactions: false, audienceActivated: false, override: true, note: "test release" }, "randy");
   roy = (await store.royalties()).find((r) => r.partner === "SOLE")!;
-  assert.equal(roy.payableMicros, 9_000);
   assert.equal((await store.approvePayout("SOLE", roy.month, "usd", "randy"))!.status, "approved");
   // Friday payload is aggregate only.
   const payload = campaignPayload(after, t, { workspace: "w", stage: "s" });
@@ -212,7 +212,7 @@ test("hub on contract: becomes sellable at card rates, QA hub carries test campa
   // Real campaigns never fill a QA hub; test campaigns do on test requests.
   assert.equal(eligibility(camp(), slot), null);
   assert.equal(eligibility(camp({ isTest: true }), slot), "primary");
-  const { campaign } = await store.createCampaign({ accountEmail: "qa@birchreserve.test", brand: "QA Brand", orderRef: "promo:qa", orderKind: "promo STREET100", budgetMicros: 100_000_000, currency: "usd", primaryPlacement: "post_purchase", hubs: ["calm-qa"], isTest: true, actor: "test" });
+  const { campaign } = await store.createCampaign({ accountEmail: "qa@birchreserve.test", brand: "QA Brand", orderRef: "cs_test_qa", orderKind: "sponsor pack", budgetMicros: 100_000_000, currency: "usd", primaryPlacement: "post_purchase", hubs: ["calm-qa"], isTest: true, actor: "test" });
   const png = Buffer.from("89504e470d0a1a0a0000000d49484452000001f4000001f40806000000", "hex");
   const bad = await store.addCreative({ campaignId: campaign.id, mime: "image/png", width: 500, height: 500, data: png, alt: "x", uploadedBy: "test" });
   await store.setCreativeStatus(bad.id, "rejected", "test", "Logo too small");
@@ -230,7 +230,8 @@ test("hub on contract: becomes sellable at card rates, QA hub carries test campa
   assert.equal((await store.getCampaign(campaign.id))!.spentMicros, 18_000);
   const tr = await store.royalties(1, { testOnly: true });
   assert.equal(tr[0]!.partner, "QA Partner");
-  assert.equal(tr[0]!.shareBps, null); // pending rate until set from the contract
+  assert.equal(tr[0]!.shareBps, 3500); // default hub share of net
+  assert.equal(tr[0]!.status, "held"); // gate not passed
   assert.equal((await store.royalties(1)).length, 0); // never in real statements
   // Paused hub stops serving.
   await store.setHubStatus("calm-qa", "paused", "test");
@@ -238,5 +239,61 @@ test("hub on contract: becomes sellable at card rates, QA hub carries test campa
   assert.equal(await store.purgeTestCampaign(campaign.id, "test"), true);
   assert.equal(await store.purgeTestHub("calm-qa", "test"), true);
   assert.equal(findSlot(slot.key), null);
+  store.setAdPoolForTests(null);
+});
+
+test("payout split: 20% override off the top, hub 35% of net, recipients share the pool, tiers progressive, dated rates", async () => {
+  const { splitCharges, workedExample, maxPoolAllocationBps, dueDate } = await import("../src/lib/adserver/payoutSplit");
+  const ex = workedExample(2000, 3500, []);
+  assert.deepEqual([ex.override, ex.net, ex.hub, ex.retained], [200, 800, 280, 520]);
+  const t0 = new Date(Date.UTC(2026, 10, 1));
+  const rates = [{ partner: null, overrideBps: 2000, hubBps: 3500, effectiveAt: t0 }];
+  const recips = [{ rkey: "b", name: "Broker", kind: "brokerage" as const, pctBps: 5000, scopePartner: null, scopeCampaign: null, active: true, payoutRef: null, effectiveAt: t0 }];
+  const line = (at: number, gross: number) => ({ partner: "SOLE", campaignId: "c1", at: new Date(at), currency: "usd", grossMicros: gross });
+  const r = splitCharges([line(t0.getTime() + 1000, 1_000_000_000)], rates, recips);
+  const hub = r.payees.find((p) => p.kind === "hub")!;
+  const br = r.payees.find((p) => p.kind === "brokerage")!;
+  assert.equal(hub.payable, 280_000_000);
+  assert.equal(br.payable, 100_000_000); // 50% of the $200 pool
+  assert.equal(Math.round(r.months[0]!.gross - r.months[0]!.override - r.months[0]!.hub), 520_000_000);
+  // Not retroactive: a later rate change leaves earlier delivery alone.
+  const later = [...rates, { partner: "SOLE", overrideBps: null, hubBps: 5000, effectiveAt: new Date(t0.getTime() + 864e5) }];
+  assert.equal(splitCharges([line(t0.getTime() + 1000, 1_000_000_000)], later, []).payees[0]!.payable, 280_000_000);
+  assert.equal(splitCharges([line(t0.getTime() + 2 * 864e5, 1_000_000_000)], later, []).payees[0]!.payable, 400_000_000);
+  // Tiers: first $500 at 35%, rest at 50% (of net).
+  const tiered = [...rates, { partner: "SOLE", overrideBps: null, hubBps: null, tiers: [{ fromMicros: 500_000_000, hubBps: 5000 }], effectiveAt: t0 }];
+  assert.equal(splitCharges([line(t0.getTime() + 1000, 1_000_000_000)], tiered, []).payees[0]!.payable, 140_000_000 + 200_000_000);
+  // No rate in effect = pending.
+  assert.equal(splitCharges([line(t0.getTime() - 1000, 1_000_000)], rates, []).payees[0]!.pending, true);
+  assert.equal(maxPoolAllocationBps([...recips, { ...recips[0]!, rkey: "c", pctBps: 6000, scopePartner: "SOLE" }], ["SOLE", "DR-HO’S"], []), 11_000);
+  assert.equal(dueDate("2026-11", "monthly", 30).toISOString().slice(0, 10), "2026-12-31");
+  assert.equal(dueDate("2026-11", "quarterly", 0).toISOString().slice(0, 10), "2027-01-01");
+});
+
+test("statements: promo delivery earns nothing, gate holds until live+transactions+audience or override, approve freezes", async () => {
+  const db = new PGlite();
+  store.setAdPoolForTests(db as unknown as store.Queryable, "ads_split_test");
+  resetServeCacheForTests();
+  const now = Date.now();
+  await store.addRate({ partner: null, overrideBps: 2000, hubBps: 3500, tiers: null, effectiveAt: new Date(now - 864e5) }, "test");
+  const { campaign } = await store.createCampaign({ accountEmail: "b@brand.com", brand: "Paid", orderRef: "cs_x", orderKind: "sponsor pack", budgetMicros: 100_000_000, currency: "usd", primaryPlacement: "post_purchase", actor: "test" });
+  const promo = (await store.createCampaign({ accountEmail: "p@brand.com", brand: "Promo", orderRef: "promo:1", orderKind: "promo STREET100", budgetMicros: 100_000_000, currency: "usd", primaryPlacement: "post_purchase", actor: "test" })).campaign;
+  for (const c of [campaign, promo]) {
+    const id = await store.insertEvent({ kind: "view", campaignId: c.id, slotKey: "sole.post_purchase", dedupeKey: `v:${c.id}`, isTest: false, at: new Date(now) });
+    assert.ok(await store.chargeEvent(id!, c, "sole.post_purchase", 18_000, new Date(now)));
+  }
+  let rows = await store.royalties(1);
+  assert.equal(rows.length, 1); // promo delivery excluded
+  assert.equal(rows[0]!.status, "held");
+  assert.equal(await store.approvePayout(rows[0]!.partner, rows[0]!.month, "usd", "test"), null);
+  await store.setGate("SOLE", { live: true, hasTransactions: true, audienceActivated: true, override: false, note: null }, "test");
+  rows = await store.royalties(1);
+  assert.equal(rows[0]!.status, "calculated");
+  assert.equal(rows[0]!.payableMicros, Math.floor(18_000 * 0.8 * 0.35));
+  assert.ok(await store.approvePayout(rows[0]!.partner, rows[0]!.month, "usd", "test"));
+  const b = await store.createPayoutBatch("test");
+  assert.equal(b.rows.length, 1);
+  assert.ok(await store.markPayoutPaid(rows[0]!.partner, rows[0]!.month, "usd", "ref-1", "test"));
+  assert.equal((await store.royalties(1))[0]!.status, "paid");
   store.setAdPoolForTests(null);
 });

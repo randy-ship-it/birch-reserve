@@ -15,9 +15,10 @@ import { checkCreative, buyStore } from "../lib/buyFlow";
 import { cronAuthorized } from "../lib/cronAuth";
 import { FixedWindowLimiter } from "../lib/rateLimit";
 import { ADS_FROM, hubAlertEmail, loginLinkEmail, siteMail } from "../lib/adserver/mail";
-import { ALERT_CATEGORIES, AD_DEFAULTS, PROMO_RATE_BPS, isPromoCampaign, MICROS, PLACEMENTS, adminEmails, adsLoginEmailEnabled, findSlot, placementLabel, type Placement } from "../lib/adserver/config";
+import { AD_SLOTS, ALERT_CATEGORIES, AD_DEFAULTS, PROMO_RATE_BPS, isPromoCampaign, MICROS, PLACEMENTS, adminEmails, adsLoginEmailEnabled, findSlot, placementLabel, type Placement } from "../lib/adserver/config";
 import { pixelId, postbackKey, safeEqual, sign, verify } from "../lib/adserver/auth";
 import * as store from "../lib/adserver/store";
+import { maxPoolAllocationBps, recipientsAt } from "../lib/adserver/payoutSplit";
 import { draftCampaignFromCheckoutSafe, recordClick, recordConversion, recordView, serve } from "../lib/adserver/service";
 import { EMBED_JS, PIXEL_JS } from "../lib/adserver/embed";
 import { dashboardPage, loginPage } from "../lib/adserver/accountPage";
@@ -367,7 +368,8 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
       store.totalsByCampaign("all"), store.listCreatives({}), store.bySlotFor("all", 30), store.ledger({ limit: 300 }), store.royalties(6), store.partnerShares(),
       store.alertSubscribers(), store.auditLog(80), store.totalsByCampaign("all", 1), buyStore().listOrders(50).catch(() => []),
     ]);
-    const [hubs, testRoyalties] = await Promise.all([store.listContractHubs(), store.royalties(6, { testOnly: true })]);
+    const [hubs, testSt, realSt, rates, recips, gateMap, timing] = await Promise.all([store.listContractHubs(), store.statements(6, { testOnly: true }), store.statements(6), store.rateHistory(), store.recipientHistory(), store.gates(), store.payoutSettings()]);
+    const testRoyalties = testSt.lines;
     const byC = new Map<string, typeof creatives>();
     for (const cr of creatives) byC.set(cr.campaignId, [...(byC.get(cr.campaignId) ?? []), cr]);
     const brand = new Map(campaigns.map((c) => [c.id, c.brand]));
@@ -378,7 +380,7 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
         who, campaigns: campaigns.map((c) => ({ c, t: totals.get(c.id) ?? { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 } })),
         pending: creatives.filter((x) => x.status === "pending" && ids.includes(x.campaignId)).map((x) => ({ ...x, brand: brand.get(x.campaignId) ?? "" })),
         creativesByCampaign: byC, slotTotals, ledger: led, royalties: roy, shares, alerts, audit, day: dayT, friday: fridayReady(), schema: store.adSchema(),
-        promoHtml: await promoPanels(), hubs, testRoyalties,
+        promoHtml: await promoPanels(), hubs, testRoyalties, summary: realSt.summary, testSummary: testSt.summary, rates, recipients: recips, gates: gateMap, timing,
         orders: orders.map((o) => ({ id: o.id, at: o.createdAt, email: o.email, company: o.company, plan: o.plan, format: o.format, creativeId: o.creativeId })),
       }),
     );
@@ -746,6 +748,132 @@ router.post("/ads/admin/payouts/paid", json, (req, res) =>
   }),
 );
 
+/* ---------------------------------------------------------------- payout split settings (Randy voice Nov 21 1:09 / 1:10 PM) */
+const pctBps = (v: unknown): number | null | undefined => {
+  if (v === undefined || v === null || String(v).trim() === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 && n <= 100 ? Math.round(n * 100) : undefined;
+};
+/**
+ * Effective time: blank or today = the next full hour (delivery is ledgered in hourly lines, so this is never retroactive);
+ * a future date = that day 00:00 Toronto. Past dates are refused.
+ */
+function effectiveFrom(v: unknown): Date | null {
+  const d = str(v, 10);
+  const now = new Date(Math.ceil(Date.now() / 3_600_000) * 3_600_000);
+  if (!d) return now;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return null;
+  const t = new Date(`${d}T00:00:00-05:00`);
+  if (Number.isNaN(t.getTime())) return null;
+  if (t.getTime() < Date.now() - 864e5) return null;
+  return t.getTime() < now.getTime() ? now : t;
+}
+function parseTiers(v: unknown): Array<{ fromMicros: number; hubBps: number }> | null | undefined {
+  const raw = str(v, 400);
+  if (!raw) return null;
+  const out: Array<{ fromMicros: number; hubBps: number }> = [];
+  for (const part of raw.split(/[,;\n]+/).map((x) => x.trim()).filter(Boolean)) {
+    const m = /^\$?([\d_.,]+)\s*[:=@]\s*([\d.]+)%?$/.exec(part.replace(/\s+/g, " "));
+    if (!m) return undefined;
+    const usd = Number(m[1]!.replace(/[_,]/g, ""));
+    const pct = Number(m[2]);
+    if (!Number.isFinite(usd) || usd <= 0 || !Number.isFinite(pct) || pct < 0 || pct > 100) return undefined;
+    out.push({ fromMicros: Math.round(usd * MICROS), hubBps: Math.round(pct * 100) });
+  }
+  return out.sort((a, b) => a.fromMicros - b.fromMicros);
+}
+
+router.post("/ads/admin/payout/rates", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const partner = str(b.partner, 120) || null;
+    const ov = pctBps(b.overridePct);
+    const hub = pctBps(b.hubPct);
+    const tiers = parseTiers(b.tiers);
+    const eff = effectiveFrom(b.effective);
+    if (ov === undefined || hub === undefined) return void res.status(400).json({ message: "Percentages run 0–100 (blank on a hub = use the default)." });
+    if (tiers === undefined) return void res.status(400).json({ message: "Tiers look like: 10000:40, 25000:50 (monthly USD gross : hub % of net)." });
+    if (!eff) return void res.status(400).json({ message: "Pick today or a future date. Rate changes are never retroactive." });
+    if (!partner && (ov === null || hub === null)) return void res.status(400).json({ message: "The default needs both the override % and the hub %." });
+    if (!partner && tiers?.length) return void res.status(400).json({ message: "Volume tiers are set per hub." });
+    await store.addRate({ partner, overrideBps: ov, hubBps: hub, tiers, effectiveAt: eff, note: str(b.note, 300) || null }, who);
+    res.json({ message: `${partner ?? "Default"} rates saved, effective ${eff.toISOString().slice(0, 16).replace("T", " ")} UTC. Earlier delivery keeps its old rate.` });
+  }),
+);
+
+router.post("/ads/admin/payout/recipients", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const name = str(b.name, 120);
+    const pct = pctBps(b.pct);
+    const eff = effectiveFrom(b.effective);
+    const kind = b.kind === "commission" ? "commission" : "brokerage";
+    const rkey = (str(b.rkey, 60) || name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40)) || "";
+    if (!name || !rkey || pct === undefined || pct === null) return void res.status(400).json({ message: "Add a name and a % of the override pool (0–100)." });
+    if (!eff) return void res.status(400).json({ message: "Pick today or a future date. Changes are never retroactive." });
+    const active = b.active === "on" || b.active === true;
+    const next = { rkey, name, kind, pctBps: pct, scopePartner: str(b.scopePartner, 120) || null, scopeCampaign: str(b.scopeCampaign, 40) || null, active, payoutRef: str(b.payoutRef, 200) || null, effectiveAt: eff } as const;
+    const hist = await store.recipientHistory();
+    const at = recipientsAt([...hist, next], eff.getTime() + 1).filter((r) => r.active);
+    const campaigns = (await store.listCampaigns()).map((c) => c.id);
+    const max = maxPoolAllocationBps(at, [...new Set(AD_SLOTS.map((x) => x.partner))], campaigns);
+    if (max > 10_000) return void res.status(400).json({ message: `That would hand out ${(max / 100).toFixed(2)}% of the override pool on some hub or campaign. Keep the total at or under 100%.` });
+    await store.addRecipientVersion({ ...next }, who);
+    res.json({ message: `${name} saved (${pct / 100}% of the pool). Up to ${(max / 100).toFixed(2)}% of the pool is now allocated on any one hub; the rest stays with Birch.` });
+  }),
+);
+
+router.post("/ads/admin/payout/recipients/:rkey/purge", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const ok = await store.purgeTestRecipient(String(req.params.rkey), who);
+    res.status(ok ? 200 : 400).json({ message: ok ? "Test recipient deleted." : "Only test recipients (key starting qa-) can be deleted; switch real ones off instead." });
+  }),
+);
+
+router.post("/ads/admin/payout/gates", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const partner = str(b.partner, 120);
+    const on = (k: string) => b[k] === "on" || b[k] === true;
+    const note = str(b.note, 300) || null;
+    if (!partner) return void res.status(400).json({ message: "Pick a hub." });
+    if (on("override") && !note) return void res.status(400).json({ message: "An override needs a note (why it's released early)." });
+    await store.setGate(partner, { live: on("live"), hasTransactions: on("hasTransactions"), audienceActivated: on("audienceActivated"), override: on("override"), note }, who);
+    res.json({ message: `${partner} payout gate saved.` });
+  }),
+);
+
+router.post("/ads/admin/payout/timing", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const netDays = Number(b.netDays);
+    if (!Number.isInteger(netDays) || netDays < 0 || netDays > 120) return void res.status(400).json({ message: "Net days run 0–120." });
+    await store.setPayoutSettings({ cadence: b.cadence === "quarterly" ? "quarterly" : "monthly", netDays }, who);
+    res.json({ message: "Payout timing saved." });
+  }),
+);
+
+/* "Pay": no Stripe connected accounts exist, so this builds a batch of approved lines and a Stripe-ready CSV. No money moves. */
+router.post("/ads/admin/payouts/batch", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const r = await store.createPayoutBatch(who);
+    if (!r.rows.length) return void res.json({ message: "No approved, unbatched lines to pay." });
+    res.json({ message: `Batch ${r.batchId}: ${r.rows.length} lines. Download the CSV, pay each line, then Mark paid with the reference. Nothing was sent.`, copy: `${origin(req)}/ads/admin/export/batch-${r.batchId}.csv` });
+  }),
+);
+
 router.post("/ads/admin/friday-sync", json, (req, res) =>
   safe(res, async () => {
     const who = guard(req, res);
@@ -771,9 +899,11 @@ router.get("/ads/admin/export/:what", (req, res) =>
     } else if (what === "ledger") {
       rows = (await store.ledger({ limit: 50_000 })).map((l) => ({ at: l.at, campaign_id: l.campaignId, kind: l.kind, slot: l.slotKey, partner: l.partner, units: l.units, amount: (l.amountMicros / MICROS).toFixed(6), currency: l.currency, note: l.note, actor: l.actor, test: l.isTest }));
     } else if (what === "royalties") {
-      rows = (await store.royalties(13)).map((r) => ({ partner: r.partner, month: r.month, currency: r.currency, delivered: (r.grossMicros / MICROS).toFixed(2), share_pct: r.shareBps === null ? "" : (r.shareBps / 100).toFixed(2), payable: r.payableMicros === null ? "" : (r.payableMicros / MICROS).toFixed(2), status: r.status, approved_by: r.approvedBy, approved_at: r.approvedAt }));
+      rows = (await store.royalties(13)).map((r) => ({ type: r.kind, payee: r.label, hub: r.hub, source: r.source, due: r.dueAt ? r.dueAt.toISOString().slice(0, 10) : "", held: r.heldReason ?? "", partner: r.partner, month: r.month, currency: r.currency, delivered: (r.grossMicros / MICROS).toFixed(2), share_pct: r.shareBps === null ? "" : (r.shareBps / 100).toFixed(2), payable: r.payableMicros === null ? "" : (r.payableMicros / MICROS).toFixed(2), status: r.status, approved_by: r.approvedBy, approved_at: r.approvedAt }));
+    } else if (what.startsWith("batch-batch_")) {
+      rows = (await store.batchRows(what.slice(6))).map((r) => ({ batch_id: r.batch_id, payee: r.label ?? r.partner, payee_key: r.partner, type: r.kind ?? "hub", destination_stripe_account: "", amount_cents: Math.round(Number(r.payable_micros) / 10_000), currency: r.currency, description: `Birch Reserve ${r.kind ?? "hub"} payout ${r.month}`, "metadata[month]": r.month, "metadata[payee_key]": r.partner, payout_reference: r.payee_ref ?? "", status: r.status }));
     } else if (what === "payouts") {
-      rows = (await store.payoutRows()).map((r) => ({ partner: r.partner, month: r.month, currency: r.currency, delivered: (Number(r.gross_micros) / MICROS).toFixed(2), share_pct: (Number(r.share_bps) / 100).toFixed(2), amount_to_pay: (Number(r.payable_micros) / MICROS).toFixed(2), status: r.status, approved_by: r.approved_by, approved_at: r.approved_at, paid_ref: r.paid_ref ?? "", paid_by: r.paid_by ?? "", paid_at: r.paid_at ?? "" }));
+      rows = (await store.payoutRows()).map((r) => ({ type: r.kind ?? "hub", payee: r.label ?? r.partner, payout_reference: r.payee_ref ?? "", batch_id: r.batch_id ?? "", partner: r.partner, month: r.month, currency: r.currency, delivered: (Number(r.gross_micros) / MICROS).toFixed(2), share_pct: (Number(r.share_bps) / 100).toFixed(2), amount_to_pay: (Number(r.payable_micros) / MICROS).toFixed(2), status: r.status, approved_by: r.approved_by, approved_at: r.approved_at, paid_ref: r.paid_ref ?? "", paid_by: r.paid_by ?? "", paid_at: r.paid_at ?? "" }));
     } else if (what === "delivery") {
       const cs = await store.listCampaigns();
       for (const c of cs) for (const d of await store.dailyFor([c.id], 400)) rows.push({ day: d.day, campaign_id: c.id, brand: c.brand, test: c.isTest, served: d.serves, viewable: d.views, clicks: d.clicks, conversions: d.convs, spend: (d.spendMicros / MICROS).toFixed(2), currency: c.currency });
