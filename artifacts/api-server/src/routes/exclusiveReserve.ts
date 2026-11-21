@@ -5,6 +5,8 @@
  * Same gate as sponsorship packs (sponsorDepositsOpen): live sessions only when
  * SPONSOR_DEPOSITS_LIVE=true, so a preview with a test key only ever makes test sessions.
  */
+import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
+import { promoMetadata } from "../lib/adserver/promoContext";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { getStripeClient } from "../lib/stripeClient";
 import { logger } from "../lib/logger";
@@ -44,7 +46,7 @@ form{display:grid;gap:10px;border:1px solid #ccd2d8;border-radius:14px;padding:1
 button{background:#071A39;color:#fff;border:0;border-radius:999px;padding:13px 16px;font:600 1rem "IBM Plex Sans";cursor:pointer}button:disabled{opacity:.6}
 details{border-top:1px solid #ccd2d8;padding:12px 0}summary{cursor:pointer;font-weight:600}ul{padding-left:1.1em}</style></head><body>
 <header><a href="/"><strong>BIRCH RESERVE</strong></a><nav class="fine"><a href="/media-kit">Media kit</a> · <a href="/rates">Rates</a> · <a href="/terms#exclusive">Terms</a></nav></header>
-<main>${banner}
+<main>${banner}<div data-promo-box="success"></div>
 <p class="fine">EXCLUSIVE DISPLAY · ONE BRAND PER CATEGORY</p>
 <h1>Reserve ${EXCLUSIVE_RESERVE.label}. Lock your category's exclusive display.</h1>
 <p>Your $1,900 locks a ${EXCLUSIVE_RESERVE.packageRange} CAD exclusive display package in your category at ${EXCLUSIVE_RESERVE.discountPct}% below the regular rate. All $1,900 counts toward the package. Your insertion order names the hub, placement and dates before anything runs.</p>
@@ -58,12 +60,13 @@ ${open ? `<form id="f"><label>Brand<input name="brand" required maxlength="160" 
 <label>Work email<input name="email" type="email" required maxlength="200" autocomplete="email"></label>
 <label>Category<select name="category" required><option value="">Choose a category</option>${cats}</select></label>
 <label class="fine"><input type="checkbox" name="agree" style="width:auto"> I agree to the <a href="/terms#exclusive">reserve terms</a>. Nothing runs until I sign an insertion order.</label>
-<button id="b" type="submit">Reserve for ${EXCLUSIVE_RESERVE.label}</button><p id="m" class="fine" role="status"></p></form>`
+<div data-promo-box></div><button id="b" type="submit">Reserve for ${EXCLUSIVE_RESERVE.label}</button><p id="m" class="fine" role="status"></p></form>`
     : `<form id="f"><p><b>Card checkout is paused right now.</b> Leave your details and we'll send the insertion order and a payment link within 1 business day.</p><label>Brand<input name="brand" required></label><label>Work email<input name="email" type="email" required></label><label>Category<select name="category"><option value="">Choose a category</option>${cats}</select></label><input type="hidden" name="agree" value="on"><button id="b" type="submit">Request the reserve</button><p id="m" class="fine" role="status"></p></form>`}
 <p class="fine">Card checkout by Stripe, charged in CAD. Statement shows BIRCHRSV* RESERVE.</p>
 <details><summary>Reserve terms</summary><ul>${EXCLUSIVE_RESERVE_TERMS.map((t) => `<li>${esc(t)}</li>`).join("")}</ul></details>
 <details><summary>How the 6-month spend-down works</summary><p><span class="mc">Modelled</span>A ${esc(pace.credit)} package paced over 6 months is ${esc(pace.perMonth)}, about ${esc(pace.viewsPerMonth)} at today's blended starter CPM. Spend faster if you like. No impression guarantee; reporting is aggregate only.</p></details>
 </main><footer class="fine">Silver Birch Growth Inc. · Toronto, Ontario · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · (647) 931-6278</footer>
+${PROMO_SCRIPT_TAG}
 <script>(function(){var f=document.getElementById("f"),b=document.getElementById("b"),m=document.getElementById("m");f.addEventListener("submit",async function(e){e.preventDefault();var d=Object.fromEntries(new FormData(f));var body={brand:d.brand,email:d.email,category:d.category||"",agree:d.agree==="on"};if(!body.agree){m.textContent="Please agree to the reserve terms.";return}b.disabled=true;m.textContent="Opening secure checkout…";try{var r=await fetch("/v1/exclusive/reserve",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});var o=await r.json().catch(function(){return{}});if(o.url){location.assign(o.url);return}if(o.held){m.textContent=o.message;f.querySelectorAll("input,select,button").forEach(function(x){x.disabled=true});return}m.textContent=o.error||"Checkout could not open. Email sales@silverbirchgrowth.com.";b.disabled=false}catch(err){m.textContent="Checkout could not open. No charge was made.";b.disabled=false}})})();</script>
 </body></html>`;
 }
@@ -102,7 +105,7 @@ router.post("/v1/exclusive/reserve", express.json({ limit: "8kb" }), async (req:
     return;
   }
   try {
-    const session = await getStripeClient().checkout.sessions.create(built.params as never);
+    const session = await getStripeClient().checkout.sessions.create({ ...built.params, metadata: { ...(built.params.metadata ?? {}), ...promoMetadata() } } as never);
     res.json({ url: session.url, livemode: session.livemode });
   } catch (err) {
     logger.warn({ err: err instanceof Error ? err.message : String(err) }, "exclusive reserve session failed");

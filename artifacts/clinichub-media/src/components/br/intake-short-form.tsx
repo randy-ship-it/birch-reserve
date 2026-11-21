@@ -8,6 +8,7 @@
  *   optional here and asked ONCE for both sides. Role-specific detail comes after the submit (IntakeDetails), prefilled,
  *   updating the same record. Friday is contacted only on the final click (server routes add the secret).
  */
+import { PromoBox } from "@/components/br/promo-box";
 import { skinText } from "@/lib/siteSkin";
 import { IntakeWarnings } from "@/components/br/intake-warnings";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -334,6 +335,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
           {busy ? <Loader2 className="size-5 animate-spin" /> : null} {sup && r.hub ? "Create my hub" : "Get my Monetization Kit"} <ArrowRight className="size-5" />
         </button>
       </div>
+      <PromoBox />
       <input tabIndex={-1} aria-hidden autoComplete="off" name="company_url" value={hp} onChange={(e) => setHp(e.target.value)} className="absolute -left-[9999px] h-0 w-0 opacity-0" />
       {err ? <p className="mt-2 text-sm font-semibold text-red-700" data-testid="intake-error">{err}</p> : null}
 

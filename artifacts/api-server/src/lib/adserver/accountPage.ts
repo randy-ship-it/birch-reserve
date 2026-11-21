@@ -1,4 +1,6 @@
 /** Customer dashboard (/account). Real logged data only: every number is a count or sum of ad_events / ledger rows. */
+import { isPromoCampaign, regularRateSummary } from "./config";
+import { PROMO_SCRIPT_TAG } from "./promoBoxJs";
 import { HUBS } from "../sponsorKit";
 import { ALERT_CATEGORIES, adsAlertEmailEnabled, adsLoginEmailEnabled, placementLabel } from "./config";
 import { flightProgress, pacingState, type Campaign } from "./engine";
@@ -37,13 +39,14 @@ const STATE_LABEL: Record<string, string> = { draft: "Getting ready", not_starte
 function campaignCard(v: AccountView["campaigns"][number], now: number): string {
   const { c, t } = v;
   const st = pacingState(c, now);
+  const promoCamp = isPromoCampaign(c);
   const spentPct = c.budgetMicros > 0 ? Math.min(100, (c.spentMicros / c.budgetMicros) * 100) : 0;
   const flightPct = flightProgress(c, now) * 100;
   const remaining = Math.max(0, c.budgetMicros - c.spentMicros);
   const approved = v.creatives.some((x) => x.status === "approved");
   const pending = v.creatives.some((x) => x.status === "pending");
   const steps = [
-    { done: true, text: `Paid · ${esc(c.orderKind ?? "media credit")}` },
+    { done: true, text: promoCamp ? `Free ad credit · ${esc(c.orderKind ?? "promo")}` : `Paid · ${esc(c.orderKind ?? "media credit")}` },
     { done: approved, text: approved ? "Creative approved" : pending ? "Creative uploaded, in review (usually 1 business day)" : "Send your creative (upload below)" },
     { done: Boolean(c.flightStart), text: c.flightStart ? `Flight set: ${fmtDate(c.flightStart)} – ${fmtDate(c.flightEnd)}` : "Insertion order signed and flight dates set (we email the IO)" },
     { done: c.status === "active" || c.status === "completed", text: "Live on the hubs" },
@@ -61,7 +64,8 @@ ${v.bySlot.map((r) => `<tr><td>${esc(r.slot)}</td><td class="n">${fmtInt(r.t.vie
 </tbody></table></div>`;
   return `<article class="card" style="margin-top:14px" id="c-${esc(c.id)}">
 <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><h3 style="margin:0">${esc(c.brand)}${c.category ? ` <span class="muted" style="font-size:.9rem">· ${esc(c.category)}</span>` : ""}</h3>
-<span><span class="chip c-${esc(st)}">${esc(STATE_LABEL[st] ?? st)}</span>${c.isTest ? ` <span class="chip c-test">Test</span>` : ""}${c.exclusive ? ` <span class="chip c-ahead">Exclusive</span>` : ""}</span></div>
+<span><span class="chip c-${esc(st)}">${esc(STATE_LABEL[st] ?? st)}</span>${c.isTest ? ` <span class="chip c-test">Test</span>` : ""}${c.exclusive ? ` <span class="chip c-ahead">Exclusive</span>` : ""}${promoCamp ? ` <span class="chip c-approved">Promo credit · regular rates</span>` : ""}</span></div>
+${promoCamp ? `<p class="fine" style="margin:6px 0 0">${esc(regularRateSummary().line)} ${esc(regularRateSummary().compare)} Ad spend only, no cash value.</p>` : ""}
 <div class="grid two" style="margin-top:8px"><div><div class="fine">Credit used ${fmtMoney(c.spentMicros, c.currency)} of ${fmtMoney(c.budgetMicros, c.currency)} · <b>${fmtMoney(remaining, c.currency)} left</b></div>
 <div class="bar" title="Spent ${spentPct.toFixed(0)}% · flight ${flightPct.toFixed(0)}% through"><i style="width:${spentPct.toFixed(1)}%"></i>${c.flightStart ? `<em style="left:${flightPct.toFixed(1)}%"></em>` : ""}</div>
 <div class="fine">${c.flightStart ? `Even pacing over ${fmtDate(c.flightStart)} – ${fmtDate(c.flightEnd)}. Green mark = where an even plan would be today.` : "Pacing starts when your flight is set (up to 6 months, or faster)."}</div></div>
@@ -103,6 +107,8 @@ ${all.length === 0 ? `<div class="empty" style="margin-top:14px"><b>No campaigns
 <div class="card kpi"><span>Clicks</span><b>${fmtInt(clicks)}</b><small>CTR ${fmtPct(clicks, views)}</small></div>
 <div class="card kpi"><span>Conversions</span><b>${fmtInt(convs)}</b><small>from your pixel or postback</small></div></div>`}
 ${all.map((x) => campaignCard(x, now)).join("")}
+<section id="code"><h2>Promo code</h2><div data-promo-box="account"></div></section>
+${PROMO_SCRIPT_TAG}
 <section id="more"><h2>Grow your reach</h2>
 <div class="grid two"><div class="card"><h3>Top up with a sponsor pack</h3><p>$1,500, $3,000 or $6,000 of credit with 5–15% bonus credit. A paid $190 look or $490 reserve counts in full toward a pack bought within 30 days.</p><a class="btn" href="/sponsor">See sponsor packs</a></div>
 <div class="card"><h3>Lock your category</h3><p>$1,900 CAD reserves a $5K–$50K exclusive display package in your category, 25% below the regular rate. Insertion order before anything runs.</p><a class="btn ghost" href="/exclusive">Exclusive reserve</a></div>

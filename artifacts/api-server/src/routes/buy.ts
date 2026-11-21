@@ -7,6 +7,7 @@
  *   GET  /api/sales/buy-orders     staff only (mounted after Clerk)
  *   GET  /api/sales/buy-creatives/:id
  */
+import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
 import { randomUUID } from "node:crypto";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import {
@@ -347,6 +348,7 @@ ${publicSeoTags(BUY_PATH, TITLE, DESCRIPTION)}
 <div class="sum" id="sum" data-testid="buy-summary"></div>
 <label class="check"><input type="checkbox" id="b-terms" required><span>I agree to the <a href="/terms" target="_blank" rel="noopener">terms</a>. My ad is reviewed before it runs.</span></label>
 <span class="fe" id="e-terms"></span>
+<div data-promo-box></div>
 <div class="actions"><button class="back" type="button" data-back="2">← Back</button><button class="btn alt" id="s3-go" type="submit">${opts.checkoutLive ? "Continue to secure checkout" : "Send my order"}</button></div>
 <p class="msg" id="s3-msg" role="status" aria-live="polite"></p>
 <ul class="trust"><li>Card checkout by Stripe</li><li>Bank check when your bank asks</li><li>Ad reviewed by a person</li><li>USD</li></ul>
@@ -355,6 +357,7 @@ ${publicSeoTags(BUY_PATH, TITLE, DESCRIPTION)}
 <div class="card done-box" id="done" role="status"><h2 id="done-h">Got it.</h2><p id="done-p"></p><p class="sub">What happens next</p><ol id="done-next"><li>We email your insertion order within 1 business day. It names the hub, placement and dates.</li><li>A person checks your ad. No ad yet? Reply to that email with it.</li><li>You approve the insertion order. Then it runs.</li></ol><div class="actions"><a class="btn" href="/media-kit">See the media kit</a><a class="back" href="/" style="display:inline-flex;align-items:center;text-decoration:none">Back to Birch Reserve</a></div></div>
 </main>
 <footer><div class="wrap">Silver Birch Growth Inc. · Toronto · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · <a href="tel:+16479316278">(647) 931-6278</a></div></footer>
+${PROMO_SCRIPT_TAG}
 <script>
 (function(){var acct=null,crv=null,live=${opts.checkoutLive ? "true" : "false"},cur=1,hasPf=${opts.prefill ? "true" : "false"};
 var PLANS=${JSON.stringify(planMeta).replaceAll("<", "\\u003c")},FORMATS=${JSON.stringify(formatMeta).replaceAll("<", "\\u003c")};

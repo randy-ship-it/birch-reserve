@@ -24,7 +24,7 @@ async function pool(): Promise<Queryable> {
   return (await import("@workspace/db")).pool as unknown as Queryable;
 }
 
-const S = () => adSchema();
+export const S = () => adSchema();
 const DDL = (s: string) => [
   `CREATE SCHEMA IF NOT EXISTS ${s}`,
   `CREATE TABLE IF NOT EXISTS ${s}.ad_campaigns (
@@ -63,11 +63,32 @@ const DDL = (s: string) => [
     payable_micros bigint NOT NULL, status text NOT NULL DEFAULT 'approved', approved_by text, approved_at timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (partner, month, currency))`,
   `CREATE TABLE IF NOT EXISTS ${s}.ad_alert_prefs (email text PRIMARY KEY, categories text[] NOT NULL DEFAULT '{}', opted_in boolean NOT NULL DEFAULT false, updated_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_promo_codes (
+    code_key text PRIMARY KEY, code text NOT NULL, aliases text[] NOT NULL DEFAULT '{}', credit_micros bigint NOT NULL, currency text NOT NULL DEFAULT 'usd',
+    max_redemptions integer, active boolean NOT NULL DEFAULT true, expires_at timestamptz, created_by text, notes text, created_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_promo_redemptions (
+    id bigserial PRIMARY KEY, code_key text NOT NULL, email text NOT NULL, domain_key text, company text, site text NOT NULL DEFAULT 'birch', st text, src text,
+    session_id text, campaign_id uuid, credit_micros bigint NOT NULL, status text NOT NULL DEFAULT 'pending', is_test boolean NOT NULL DEFAULT false,
+    created_at timestamptz NOT NULL DEFAULT now(), applied_at timestamptz)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS ad_promo_red_email ON ${s}.ad_promo_redemptions (code_key, email) WHERE status <> 'void'`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS ad_promo_red_domain ON ${s}.ad_promo_redemptions (code_key, domain_key) WHERE domain_key IS NOT NULL AND status <> 'void'`,
+  `CREATE INDEX IF NOT EXISTS ad_promo_red_session ON ${s}.ad_promo_redemptions (session_id) WHERE session_id IS NOT NULL`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_street_members (id text PRIMARY KEY, label text NOT NULL, active boolean NOT NULL DEFAULT true, created_by text, created_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_street_qrs (
+    id bigserial PRIMARY KEY, member text NOT NULL, label text NOT NULL, site text NOT NULL DEFAULT 'birch', url text NOT NULL, created_by text, created_at timestamptz NOT NULL DEFAULT now(), UNIQUE (member, label))`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_street_events (
+    id bigserial PRIMARY KEY, at timestamptz NOT NULL DEFAULT now(), member text NOT NULL, kind text NOT NULL, qr text, site text, ref text,
+    amount_cents bigint, currency text, is_test boolean NOT NULL DEFAULT false, dedupe_key text)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS ad_street_events_dedupe ON ${s}.ad_street_events (dedupe_key) WHERE dedupe_key IS NOT NULL`,
+  `CREATE INDEX IF NOT EXISTS ad_street_events_member ON ${s}.ad_street_events (member, kind)`,
+  `INSERT INTO ${s}.ad_promo_codes (code_key, code, aliases, credit_micros, notes, created_by) VALUES
+    ('street100','STREET100','{streetteam100,streetteamhundred,streethundred}',100000000,'Street team: $100 USD ad credit handed out by street team members. Ad spend only, no cash value, non-transferable.','seed') ON CONFLICT DO NOTHING`,
+  `INSERT INTO ${s}.ad_street_members (id, label, created_by) VALUES ('bridget','Bridget','seed'),('mona','Mona','seed') ON CONFLICT DO NOTHING`,
   `CREATE TABLE IF NOT EXISTS ${s}.ad_audit (id bigserial PRIMARY KEY, at timestamptz NOT NULL DEFAULT now(), actor text, action text NOT NULL, target text, detail text)`,
 ];
 
 let ready: Promise<void> | null = null;
-async function db(): Promise<Queryable> {
+export async function db(): Promise<Queryable> {
   const p = await pool();
   ready ??= (async () => {
     for (const stmt of DDL(S())) await p.query(stmt);
