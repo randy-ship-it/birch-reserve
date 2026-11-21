@@ -19,6 +19,7 @@ import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { Details } from "@/components/br/details";
 import { ExclusiveReserveCard, SpendDown } from "@/components/br/inventory-plan";
 import { HubMock, twoLaneMock } from "@/components/br/two-lane";
+import { HUB_MOCKS, HUB_KEYS, type HubKey } from "@/lib/hub-mocks";
 import { STARTER_BLOCK } from "@/components/br/start-small";
 import { trackCta } from "@/lib/track-cta";
 import { MODELLED_PLAN_LABEL } from "@/components/br/modelled";
@@ -62,24 +63,25 @@ export function twoSurfaceExample(creditUsd: number) {
 /** Live-hub mock with numbered pins (DR-HO'S physio or SOLE, the two live hubs). Legend lives in an expander. */
 /** Audit #3 (Randy, Nov 20 2026): always-visible badge + pin legend + DR-HO'S/SOLE toggle. */
 export const MOCK_PINS = ["Your ad card, approved by a person", "Live members-only hub", "Clicks to your site, UTM-tagged"] as const;
-export function mockBadge(hub: "drho" | "sole"): string {
-  return `Illustrative mock · your ad on the live ${hub === "drho" ? "DR-HO'S physio" : "SOLE"} hub`;
+export function mockBadge(hub: HubKey): string {
+  return `Illustrative mock · your ad on the live ${HUB_MOCKS[hub].name} hub`;
 }
-export function AnnotatedHubMock({ brand = "", testId = "annotated-hub-mock" }: { brand?: string; testId?: string }) {
-  const [hub, setHub] = useState<"drho" | "sole">("drho");
+export function AnnotatedHubMock({ brand = "", testId = "annotated-hub-mock", initial = "drho" }: { brand?: string; testId?: string; initial?: HubKey }) {
+  const [hub, setHub] = useState<HubKey>(initial);
   return (
     <div data-testid={testId}>
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <span className="rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2.5 py-1 text-[11px] font-bold text-[#8A5A00]" data-testid="mock-badge">{mockBadge(hub)}</span>
-        <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider" role="group" aria-label="Live hub">
-          {(["drho", "sole"] as const).map((h) => (
-            <button key={h} type="button" aria-pressed={hub === h} onClick={() => setHub(h)} className={`rounded-full px-3 py-1 ${hub === h ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/70 ring-1 ring-foreground/15"}`} data-testid={`mock-hub-${h}`}>
-              {h === "drho" ? "DR-HO'S" : "SOLE"}
+        <div className="flex max-w-full items-center gap-1.5 overflow-x-auto text-[11px] font-bold uppercase tracking-wider [scrollbar-width:none]" role="group" aria-label="Live hub">
+          {HUB_KEYS.map((h) => (
+            <button key={h} type="button" aria-pressed={hub === h} onClick={() => setHub(h)} className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1 ${hub === h ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/70 ring-1 ring-foreground/15"}`} data-testid={`mock-hub-${h}`}>
+              {HUB_MOCKS[h].tab}
             </button>
           ))}
         </div>
       </div>
       <HubMock brand={brand} logo={null} hub={hub} category="Your category" pins badge={mockBadge(hub)} />
+      <p className="mt-1.5 text-[11px] text-foreground/55" data-testid="mock-coming-soon">Coming soon: Food &amp; Nutrition hub</p>
       <ol className="mt-2 grid gap-1 text-[12px] text-foreground/75 sm:grid-cols-3" data-testid="annotated-hub-legend">
         {MOCK_PINS.map((p, i) => (
           <li key={p} className="flex items-start gap-1.5">
@@ -190,12 +192,12 @@ async function openSponsorPack(key: string, where: string, kit?: KitPrefill | nu
  * deposit checkout), plus the agency $1K–$5K client test (pre-filled IO, no card). USD only.
  */
 /** Static annotated sample card on the live SOLE hub, beside the deposit CTAs (Randy t291u). Labelled "Illustrative mock". */
-export function DepositMock() {
+export function DepositMock({ hub = "sole" }: { hub?: HubKey }) {
   return (
     <figure className="w-full max-w-[300px] shrink-0" data-testid="deposit-mock">
       <span className="mb-1.5 inline-block rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A5A00]">Illustrative mock</span>
-      <HubMock brand="" logo={null} hub="sole" category="Your category" pins badge="Illustrative mock" />
-      <figcaption className="mt-1.5 text-[11px] leading-snug text-white/70">Sample card on the live SOLE hub: <b className="text-lime-300">1</b> your card, approved by a person · <b className="text-lime-300">2</b> members-only hub · <b className="text-lime-300">3</b> UTM-tagged click to your site.</figcaption>
+      <HubMock brand="" logo={null} hub={hub} category="Your category" pins badge="Illustrative mock" />
+      <figcaption className="mt-1.5 text-[11px] leading-snug text-white/70">Sample card on the live {HUB_MOCKS[hub].name} hub: <b className="text-lime-300">1</b> your card, approved by a person · <b className="text-lime-300">2</b> members-only hub · <b className="text-lime-300">3</b> UTM-tagged click to your site.</figcaption>
     </figure>
   );
 }
@@ -220,7 +222,7 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
           <p className="mt-2 inline-flex rounded-full bg-lime-300/15 px-3 py-1 text-[12px] font-semibold text-lime-200 ring-1 ring-lime-300/40" data-testid="mid-tier-carry-over">Credit carries over: {CARRY_OVER_CLAUSE.replace(/^A paid/, "a paid")}</p>
           <p className="mt-2 text-[13px] font-semibold text-lime-300" data-testid="early-rate-line">{URGENCY_LINE}</p>
         </div>
-        {showMock ? <DepositMock /> : null}
+        {showMock ? <DepositMock hub="calmjoints" /> : null}
       </div>
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         {DEPOSIT_TIERS.map((t) => {
@@ -287,7 +289,7 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
     <section id={anchor ? "next-step" : undefined} className="scroll-mt-20" data-testid="next-step" data-where={where}>
       <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">{showMock ? "See it on a live hub first." : "Start with a $190 look."}</h2>
       <div className={`mt-4 grid items-center gap-5 ${showMock ? "md:grid-cols-[1.2fr_1fr]" : ""}`}>
-        {showMock ? <AnnotatedHubMock brand={brand} /> : null}
+        {showMock ? <AnnotatedHubMock brand={brand} initial="effortless" /> : null}
         <div>
           <p className="font-display text-5xl leading-none text-[#0b1f3a]">$190 <span className="text-lg">USD</span></p>
           <p className="mt-2 text-[15px] text-foreground/75">Your ad, live for 7 days.</p>
@@ -356,7 +358,7 @@ export function PostKitNext({ kit, where = "post_kit" }: { kit: KitPrefill; wher
     <section className="rounded-3xl bg-white p-4 md:p-6" data-testid="post-kit-next" data-where={where}>
       <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">Your kit is ready. See your ad live.</h2>
       <div className="mt-4 grid items-center gap-5 md:grid-cols-[1.2fr_1fr]">
-        <AnnotatedHubMock brand={brand} />
+        <AnnotatedHubMock brand={brand} initial="sole" />
         <div>
           <p className="mb-3 text-[13px] font-semibold text-[#0b1f3a]" data-testid="post-kit-urgency">{URGENCY_LINE}</p>
           <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={go("hold-190")} className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-7 text-lg font-bold text-white hover:bg-[#13305a] md:w-auto" data-testid="post-kit-look">

@@ -149,7 +149,7 @@ export default function BrMediaKit() {
           <h1 className="mt-3 font-display text-[2.15rem] leading-[1.05] tracking-tight md:text-6xl">Put your brand inside private health and wellness hubs.</h1>
           <p className="mt-2 font-display text-xl text-foreground/70 md:text-2xl">A growing network. Curated placements.</p>
           </div>
-          <AnnotatedHubMock testId="mk-hero-mock" />
+          <AnnotatedHubMock testId="mk-hero-mock" initial="effortless" />
           </div>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-foreground/80" data-testid="mk-what">
             Birch Reserve sells a share of display space across our growing network of private, members-only hubs (live today: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, with more launching): the pages members use right after they buy or book, and when they log back in. Placements are curated as each hub launches. Your payment is media credit until the insertion order. Start self-serve by reserving for {price.seat} or with a {price.look} 7-day look; premium slots are inquire-only.

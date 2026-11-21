@@ -15,7 +15,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowRight, Check, CreditCard, Download, FileText, ImagePlus, Landmark, Loader2, Lock } from "lucide-react";
 import { Details } from "@/components/br/details";
-import { LIVE_HUB_IMAGE, SOLE_HUB_IMAGE } from "@/components/br/prime-hero";
+import { HUB_MOCKS, HUB_KEYS, type HubKey } from "@/lib/hub-mocks";
 import { trackCta as trackCtaRaw } from "@/lib/track-cta";
 import { trackIntake as trackIntakeRaw } from "@/lib/intakeTrack";
 import { openRandyChat } from "@/lib/book-call";
@@ -100,23 +100,25 @@ function Chips({ items, dark }: { items: readonly string[]; dark?: boolean }) {
 }
 
 /** Live-looking mock of the buyer's square card on a live hub surface. Logo stays in this browser (object URL). */
-export function HubMock({ brand, logo, hub, category, pins = false, badge }: { brand: string; logo: string | null; hub: "drho" | "sole"; category: string; pins?: boolean; badge?: string }) {
+export function HubMock({ brand, logo, hub, category, pins = false, badge }: { brand: string; logo: string | null; hub: HubKey; category: string; pins?: boolean; badge?: string }) {
   const name = brand.trim() || "Your brand";
-  const hubName = hub === "drho" ? "DR-HO'S physio" : "SOLE";
-  const surface = hub === "drho" ? "Booking confirmation" : "Hub home";
+  const H = HUB_MOCKS[hub];
+  const hubName = H.name;
+  const surface = H.surface;
+  const left = H.cardSide === "left";
   const initials = name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
   return (
     <figure className="relative overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-foreground/10" data-testid="hub-mock" data-hub={hub}>
       <div className="flex items-center gap-1.5 border-b border-foreground/10 bg-foreground/[0.03] px-3 py-2">
         <span className="size-2 rounded-full bg-red-300" /><span className="size-2 rounded-full bg-amber-300" /><span className="size-2 rounded-full bg-lime-400" />
-        <span className="ml-2 truncate text-[11px] text-foreground/55">{hub === "drho" ? "physio.drhonow.com" : "scalehealth.ca/sole"}</span>
+        <span className="ml-2 truncate text-[11px] text-foreground/55">{H.host}</span>
       </div>
       {/* Randy Nov 21 11:03 AM: the frame matches the 1440x900 captures (16:10), so the whole page shows (logo, headline,
           hub card) with no side crop; the 1440px source stays sharp at 2x for this width. */}
       <div className="relative aspect-[16/10] w-full">
-        <img src={hub === "drho" ? LIVE_HUB_IMAGE : SOLE_HUB_IMAGE} alt={`${hubName} live hub`} width={1440} height={900} decoding="async" className="absolute inset-0 size-full object-cover object-center" />
+        <img src={H.img} alt={`${hubName} live hub`} width={1440} height={900} decoding="async" className="absolute inset-0 size-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-        <div className="absolute bottom-3 right-3 w-[46%] max-w-[220px] rounded-xl bg-white p-2.5 shadow-2xl ring-2 ring-lime-300 sm:p-3" data-testid="hub-mock-card">
+        <div className={`absolute bottom-3 ${left ? "left-3" : "right-3"} w-[46%] max-w-[220px] rounded-xl bg-white p-2.5 shadow-2xl ring-2 ring-lime-300 sm:p-3`} data-testid="hub-mock-card">
           {pins ? <><span className="absolute grid size-6 place-items-center rounded-full bg-lime-300 text-[11px] font-black text-[#0b1f3a] shadow-lg ring-2 ring-white -left-3 -top-3" aria-hidden>1</span><span className="absolute grid size-6 place-items-center rounded-full bg-lime-300 text-[11px] font-black text-[#0b1f3a] shadow-lg ring-2 ring-white -bottom-3 -right-2" aria-hidden>3</span></> : null}
           <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-foreground/45">Featured · {surface}</p>
           <div className="mt-2 flex items-center gap-2">
@@ -149,7 +151,7 @@ function CardLane({ initialSku }: { initialSku: CardSku }) {
   const [brand, setBrand] = useState("");
   const [email, setEmail] = useState("");
   const [category, setCategory] = useState<string>("");
-  const [hub, setHub] = useState<"drho" | "sole">("drho");
+  const [hub, setHub] = useState<HubKey>("drho");
   const [logo, setLogo] = useState<string | null>(null);
   const [agency, setAgency] = useState(false);
   const [built, setBuilt] = useState<string | null>(null);
@@ -220,9 +222,9 @@ function CardLane({ initialSku }: { initialSku: CardSku }) {
         <div className="min-w-0">
           <div className="mb-2 flex items-center justify-between gap-2">
             <span className="text-[11px] font-bold uppercase tracking-wide text-foreground/55">Your card, on a live hub</span>
-            <div className="flex rounded-full bg-foreground/[0.05] p-0.5" role="radiogroup" aria-label="Live hub">
-              {(["drho", "sole"] as const).map((h) => (
-                <button key={h} type="button" role="radio" aria-checked={hub === h} onClick={() => setHub(h)} data-testid={`lane-hub-${h}`} className={`rounded-full px-3 py-1 text-[11px] font-bold ${hub === h ? "bg-[#0b1f3a] text-white" : "text-foreground/60"}`}>{h === "drho" ? "DR-HO'S" : "SOLE"}</button>
+            <div className="flex max-w-full overflow-x-auto rounded-full bg-foreground/[0.05] p-0.5 [scrollbar-width:none]" role="radiogroup" aria-label="Live hub">
+              {HUB_KEYS.map((h) => (
+                <button key={h} type="button" role="radio" aria-checked={hub === h} onClick={() => setHub(h)} data-testid={`lane-hub-${h}`} className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-bold ${hub === h ? "bg-[#0b1f3a] text-white" : "text-foreground/60"}`}>{HUB_MOCKS[h].tab}</button>
               ))}
             </div>
           </div>
