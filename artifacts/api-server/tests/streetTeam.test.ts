@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { STREET_TEAM, STREET_TEAM_BUDGET, STREET_TEAM_FACT, STREET_TEAM_LLMS, STREET_TEAM_TIERS, STREET_TEAM_TODAY } from "../src/lib/overhaul/streetTeam";
 import { OVERHAUL_ROUTES } from "../src/lib/overhaul/seo";
+import { isTestLead } from "../src/lib/testTraffic";
+import { STREET_TEAM_CHAT_RULE, STREET_TEAM_ONE_LINE } from "../src/lib/overhaul/streetTeam";
 import { PUBLIC_SITEMAP_PATHS } from "../src/lib/publicSeo";
 
 const ALL = JSON.stringify([STREET_TEAM, STREET_TEAM_TIERS, STREET_TEAM_TODAY, STREET_TEAM_FACT, STREET_TEAM_LLMS, STREET_TEAM_BUDGET]);
@@ -22,4 +24,20 @@ test("street team routes: meta + sitemap", () => {
   assert.ok(OVERHAUL_ROUTES["/intake/street-team"]);
   assert.ok((PUBLIC_SITEMAP_PATHS as readonly string[]).includes("/street-team"));
   assert.ok(!(PUBLIC_SITEMAP_PATHS as readonly string[]).includes("/intake/street-team"));
+});
+
+test("one-line mention follows the copy rules", () => {
+  assert.match(STREET_TEAM_ONE_LINE, /Coming soon, 2027/);
+  assert.match(STREET_TEAM_ONE_LINE, /Calm Joints/);
+  assert.doesNotMatch(STREET_TEAM_ONE_LINE, /\$|\b(gig|uber|on-demand|align|friday)\b/i);
+  assert.match(STREET_TEAM_CHAT_RULE, /birchreserve\.net\/street-team/);
+});
+
+test("/v1/leads test submissions skip the CRM push", () => {
+  assert.equal(isTestLead({ email: "a@b.com", company: "TEST Street Team QA Brand" }), true);
+  assert.equal(isTestLead({ email: "qa+x@silverbirchgrowth.com", company: "Acme" }), true);
+  assert.equal(isTestLead({ email: "a@b.com", company: "Acme", test: true }), true);
+  assert.equal(isTestLead({ email: "a@b.com", name: "QA Test person", company: "Acme" }), true);
+  assert.equal(isTestLead({ email: "owner@acme.com", name: "Pat Smith", company: "Testa Recovery" }), false);
+  assert.equal(isTestLead({ email: "owner@acme.com", name: "Pat Smith", company: "Acme" }), false);
 });

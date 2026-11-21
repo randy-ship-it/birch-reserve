@@ -14,10 +14,10 @@ import { fetchSiteSignals } from "../lib/overhaul/fetchSite";
 import { emptySignals, normalizeUrl, scoreMatch } from "../lib/overhaul/audienceMatch";
 import { quoteAreaLock, type Currency } from "../lib/overhaul/model";
 import { buildAreaLockSession, checkoutGate } from "../lib/overhaul/checkout";
-import { sendIntake, type IntakeKind } from "../lib/overhaul/fridayIntake";
+import { intakeExternalId, sendIntake, type IntakeKind } from "../lib/overhaul/fridayIntake";
 import { PREMIUM_INQUIRY_MESSAGE, isPremiumOffer } from "../lib/premiumInquireOnly";
 import { sendSalesAlert } from "../lib/salesAlert";
-import { isTestIdentity } from "../lib/testTraffic";
+import { isTestIdentity, isTestLead } from "../lib/testTraffic";
 import { coarseRegion, recordPulse } from "../lib/activityPulse";
 import { MEDIA_KIT_CATEGORIES } from "../lib/overhaul/mediaKit";
 
@@ -193,7 +193,8 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     const fields = (body.fields ?? {}) as Record<string, unknown>;
     const meta: Record<string, string> = {};
     for (const [k, v] of Object.entries(fields).slice(0, 20)) if (/^[a-z_]{2,40}$/.test(k)) meta[k] = str(v, 500);
-    const friday = await sendIntake({
+    const leadTest = isTestLead({ email, name: str(body.name, 120), company: str(body.company, 160), test: body.test });
+    const intake = {
       kind,
       email,
       name: str(body.name, 120) || undefined,
@@ -204,7 +205,9 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
       path: str(body.path, 200) || undefined,
       meta,
       utm: utmOf(body),
-    });
+    };
+    // Test submissions keep the [TEST] alert but never reach the CRM.
+    const friday = leadTest ? { status: "skipped" as const, externalId: intakeExternalId(intake) } : await sendIntake(intake);
     log("lead", { kind, friday: friday.status });
     // Randy 9:41pm Nov 13: every request emails randy@scalehealth.ca + randy@silverbirchgrowth.com.
     const alert = await sendSalesAlert({
@@ -222,7 +225,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
         ...Object.entries(meta).map(([k, v]) => [k, v] as [string, string]),
       ],
       replyTo: email,
-      isTest: isTestIdentity({ email, name: str(body.name, 120) || str(body.company, 160) }),
+      isTest: leadTest,
     });
     res.json({ ok: true, stored: friday.status, alert: alert.status });
   });

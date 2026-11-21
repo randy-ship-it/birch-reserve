@@ -58,3 +58,13 @@ export function isTestIdentity(v: TestIdentity): boolean {
   if (v.label && QA_SESSION.test(v.label.trim())) return true;
   return false;
 }
+
+/**
+ * /v1/leads test submissions (Nov 21 2026): TEST in the brand / name, a qa+ email, the QA name markers, or an explicit
+ * test flag. They still email the [TEST] alert, but are never pushed to the CRM (Friday).
+ */
+export function isTestLead(v: { email?: string | null; name?: string | null; company?: string | null; test?: unknown }): boolean {
+  if (v.test === true) return true;
+  if (/\bTEST\b/.test(`${v.company ?? ""} ${v.name ?? ""}`)) return true;
+  return isTestIdentity({ email: v.email, name: `${v.name ?? ""} ${v.company ?? ""}` });
+}
