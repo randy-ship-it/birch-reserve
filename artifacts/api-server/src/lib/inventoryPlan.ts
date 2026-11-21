@@ -5,7 +5,7 @@
  * Every figure here comes from numbers already on the site:
  *   - TAM feed (scalehealth.ca/tam, read 2026-11-12): ~128MM modelled monthly views, 42 listed partners,
  *     of which ~4.18MM a month are on the four hub placements (post-purchase, hub home, product/services, dashboard).
- *   - Network framing: 120+ retail hubs today, growing to 300–500+ hubs.
+ *   - Pricing model only: 120 and 300 hubs are modelling assumptions, not the audience claim (see AUDIENCE_CHANNELS).
  *   - Starter (starting-at) CPMs from the rate card, blended by modelled views.
  * No impression guarantee, no CTR or ROAS. Modelled, not a commitment.
  */
@@ -70,9 +70,9 @@ function tamCase(key: "low" | "base", label: string, hubs: number): Tam2027Case 
 
 export const TAM_2027 = {
   label: "Modelled 2027 estimate, not a commitment",
-  cases: [tamCase("low", "Low: today's 120+ hubs", 120), tamCase("base", "Base: 300 hubs (low end of 300–500+)", 300)] as const,
+  cases: [tamCase("low", "Low case: 120 hubs (model assumption)", 120), tamCase("base", "Base case: 300 hubs (model assumption)", 300)] as const,
   basis: [
-    `~${(HUB_VIEWS_MONTHLY / 1_000_000).toFixed(2)}MM modelled hub-placement views a month across ${TAM.listedPartners} listed partners (TAM feed, part of ~128MM total modelled views).`,
+    `~${(HUB_VIEWS_MONTHLY / 1_000_000).toFixed(2)}MM modelled hub-placement views a month across ${TAM.listedPartners} listed partners (TAM feed, part of ~128MM total modelled views). This is a modelled pricing inventory, separate from the audience channels (700MM+ captive page views activating).`,
     `≈ ${VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} modelled views per hub a month.`,
     `× 12 months × hubs × $${BLENDED_STARTER_CPM.toFixed(2)} blended starter CPM (rate card).`,
     "Hubs live today: DR-HO'S physio (June) and SOLE (October). Queued categories: Longevity, Sleep, Food & Nutrition, Medi/Spa, Pets.",

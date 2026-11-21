@@ -376,7 +376,7 @@ test("street-team door section: est. 2026 headline from the census file, inquire
   assert.match(DOOR_ROUTE.title, /^Day 1: lead ambassador testing areas around our private network\.$/);
   assert.match(DOOR_ROUTE.body, /sought-after door-to-door display and performance-based placements, targeted by neighbourhood/);
   assert.match(DOOR_ROUTE.body, /limited by route/);
-  assert.match(DOOR_ROUTE.goal, /up to 1MM doors with multiple offers/);
+  assert.match(DOOR_ROUTE.goal, /2MM\+ homes by 2027/);
   assert.match(DOOR_ROUTE.goalNote, /target, modelled, not a guarantee/);
   assert.match(DOOR_ROUTE.inquireNote, /by inquiry only/);
   assert.doesNotMatch(copy, /exclusiv|USD|\bguaranteed\b|deposit/i);

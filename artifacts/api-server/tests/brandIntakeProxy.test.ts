@@ -218,7 +218,7 @@ test("excluded competing hubs never reach the browser: keys, flagged items and n
 
 test("retail copy reads exactly the retail-network estimate line everywhere", async () => {
   const { RETAIL_COPY, RETAIL_TAG, CHANNEL_TILES, EXPOSURE_CHANNELS } = await import("../src/lib/overhaul/brandIntake");
-  assert.equal(RETAIL_COPY, "120+ retail hubs · 1MM+ recovery customers (est., growing to 300–500+ hubs) · Canada + USA");
+  assert.equal(RETAIL_COPY, "200+ locations, 500+ soon · 1MM+ captive recovery consumers · Canada + USA");
   assert.equal(CHANNEL_TILES.find((t) => t.key === "retail-network")!.line, `${RETAIL_COPY} · ${RETAIL_TAG}`);
   assert.equal(EXPOSURE_CHANNELS.find((t) => t.key === "retail-network")!.reach, RETAIL_COPY);
   assert.doesNotMatch(JSON.stringify([CHANNEL_TILES, EXPOSURE_CHANNELS]), /across Canada|retail locations|>120 locations/);

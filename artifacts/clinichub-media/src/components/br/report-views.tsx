@@ -47,9 +47,9 @@ const scale = (r: LLH, f: number): LLH => ({ low: r.low * f, likely: r.likely * 
 
 /* ------------------------------------------------------------------ model */
 const NAMES: Record<string, { name: string; unit: string; monthly: boolean }> = {
-  hubs: { name: "Scale Hubs", unit: "page views", monthly: true },
-  retail: { name: "Retail hubs", unit: "recovery customers", monthly: false },
-  street_team: { name: "Street Team · Ontario", unit: "doors", monthly: false },
+  hubs: { name: "Branded ScaleHealth.ca hubs", unit: "page views", monthly: true },
+  retail: { name: "Private retail network", unit: "captive recovery consumers", monthly: false },
+  street_team: { name: "Calm Joints + Street Team", unit: "homes", monthly: false },
   calm_joints: { name: "Calm Joints", unit: "", monthly: false },
 };
 const ORDER = ["hubs", "retail", "street_team", "calm_joints"];
@@ -64,7 +64,7 @@ export function sharesOf(ex: FridayExposure) {
 }
 /** Channel rows for one tier: base figure (= channel now.min ÷ min share) × the tier's share band. */
 /** Street Team row note: text reach, never a homes figure (Randy, Nov 19 2026 2:27 PM ET). */
-export const STREET_ROW_NOTE = STREET_REACH_LINE.charAt(0).toUpperCase() + STREET_REACH_LINE.slice(1);
+export const STREET_ROW_NOTE = "2MM+ homes reached by 2027 (our plan, not a guarantee)";
 
 export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
   const s = sharesOf(ex);
@@ -73,7 +73,7 @@ export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
     const c = ex.channels.find((x) => x.key === key);
     const n = NAMES[key]!;
     if (key === "street_team") {
-      // Street Team: text reach only ("an estimated 2MM+ doors targeted around the retail network"), never a homes figure.
+      // Street Team: text reach only ("2MM+ homes reached by 2027"), never a homes figure.
       // Shown as text, never as a homes figure (Randy, Nov 19 2026 2:27 PM ET).
       const range = null;
       const later = null;
@@ -142,7 +142,7 @@ function ChannelTable({ rows, extra, testId }: { rows: ChannelRow[]; extra?: Rea
         <div key={r.key} className="grid grid-cols-[1fr_auto] items-baseline gap-2 px-3 py-2.5 text-[13px] md:grid-cols-[1.3fr_1fr_1fr]" style={{ borderTop: `1px solid ${RT.line}` }} data-testid={`${testId}-${r.key}`}>
           <span className="min-w-0">
             <span className="font-semibold" style={{ color: RT.ink }}>{r.name}</span>
-            <span className="block text-[11px]" style={{ color: RT.mute }}>{r.key === "street_team" ? "doors · " : r.unit ? `${r.unit}${r.monthly ? " / month" : " in reach"} · ` : ""}{r.geo}</span>
+            <span className="block text-[11px]" style={{ color: RT.mute }}>{r.key === "street_team" ? "homes · " : r.unit ? `${r.unit}${r.monthly ? " / month" : " in reach"} · ` : ""}{r.geo}</span>
           </span>
           {r.range ? (
             <>
@@ -208,7 +208,7 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
             <Headline value={hubs.likely * 12} unit="page-view exposures over 12 months, likely" range={scale(hubs, 12)} fmt={big} dark testId="supplier-headline-year" />
           </div>
         ) : null}
-        {reach.likely > 0 ? <p className="mt-4 text-[14px] text-white/85" data-testid="supplier-reach">Plus about <strong className="text-white">{big(reach.likely)}</strong> recovery customers across the retail network (est.), and a Street Team that {STREET_REACH_LINE}.</p> : null}
+        {reach.likely > 0 ? <p className="mt-4 text-[14px] text-white/85" data-testid="supplier-reach">Plus about <strong className="text-white">{big(reach.likely)}</strong> captive recovery consumers across our private retail network (200+ locations, 500+ soon), plus Calm Joints and the Street Team, {STREET_REACH_LINE}.</p> : null}
       </div>
       <div className="p-5 md:p-6">
         <div className="grid gap-3 sm:grid-cols-2" data-testid="supplier-compare">
@@ -290,7 +290,7 @@ export function HubView({ m, exposure, cta, physical }: { m: ReportModel; exposu
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3" data-testid="hub-stats">
           <Stat label="Your share" value={`${Math.round(m.share * 100)}%`} sub="of media revenue (base)" />
           <Stat label="Your own views" value={big(own.on)} sub={`a month on your surfaces; up to ${big(own.all)} with every surface on · modelled`} testId="hub-own-views" />
-          <Stat wide label="Network reach" value={rows[0]?.range ? big(rows[0].range.likely) : "—"} sub="Scale Hubs page views a month for your products, likely" />
+          <Stat wide label="Network reach" value={rows[0]?.range ? big(rows[0].range.likely) : "—"} sub="Branded ScaleHealth.ca hubs page views a month for your products, likely" />
         </div>
         {surfaces.length ? (
           <div className="mt-4 overflow-hidden" style={{ border: `1px solid ${RT.line}`, borderRadius: 14 }} data-testid="hub-surfaces">

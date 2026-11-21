@@ -36,10 +36,10 @@ const FAQ = [
   { q: "Do agencies get anything?", a: `Yes. ${AGENCY_SHARE.line} Agencies can also prepay a client test budget and get UTM and promo-code reporting per hub and surface.` },
 ];
 
+/** One audience framing, three channels (Randy Nov 21 1:00 PM). Reach and audience, not delivered impressions. */
 const STATS = [
-  { v: "120+", l: "retail hubs", tid: "stat-retail-hubs" },
-  { v: "1MM+", l: "recovery customers (est.)", tid: "stat-recovery-customers" },
-  { v: "CA + US", l: "Canada + USA", tid: "stat-geo" },
+  { v: "700MM+", l: "captive page views activating", name: "Branded ScaleHealth.ca hubs", tid: "stat-hub-views", more: "Private, members-only hubs on ScaleHealth.ca where recovery and wellness customers already shop and book care. Page views are activating as brand hubs go live." },
+  { v: "200+", l: "locations, 500+ soon", name: "Private retail network", tid: "stat-retail-locations", more: "Our private network of fitness & recovery retailers in Canada and the USA: 200+ locations today, 500+ soon, with 1MM+ captive recovery consumers." },
 ];
 
 const HUBS = [
@@ -79,7 +79,7 @@ function Expand({ title, sub, children, testId, open = false }: { title: string;
 }
 
 export default function BrHome() {
-  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand inside private, members-only health and wellness hubs: 120+ retail hubs, 1MM+ recovery customers (est., growing to 300–500+ hubs), Canada + USA. Get a free Monetization Kit. Prices in USD; estimates are modelled.");
+  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand inside private, members-only health and wellness hubs: 700MM+ captive page views activating, 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 2MM+ homes reached by 2027. Get a free Monetization Kit. Prices in USD; figures are reach and audience, not delivered impressions.");
   const price = priceLabels(useAvailability());
   return (
     <div className="w-full overflow-x-hidden bg-[#FAF8F3]" data-testid="br-home">
@@ -124,32 +124,23 @@ export default function BrHome() {
 
       {/* 2. Big numbers. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-stats">
-        <div className="grid gap-3 md:grid-cols-[1.45fr_1fr]">
-          <div className="rounded-2xl p-5 text-white shadow-lg md:p-7" style={{ background: NAVY }} data-testid="home-retail-tile">
-            <div className="flex flex-wrap items-center gap-2">
-              <Store className="size-4 text-lime-300" aria-hidden />
-              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Retail network</span>
-              <Chip>Modelled</Chip>
+        <div className="grid gap-3 md:grid-cols-3" data-testid="home-retail-tile">
+          {STATS.map((s) => (
+            <div key={s.tid} className="rounded-2xl p-5 text-white shadow-lg md:p-6" style={{ background: NAVY }} data-testid={s.tid}>
+              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">{s.name}</span>
+              <p className="mt-3 whitespace-nowrap font-display text-[2.6rem] leading-none tabular-nums md:text-5xl">{s.v}</p>
+              <p className="mt-1.5 text-sm leading-tight text-white/75">{s.l}</p>
+              <details className="mt-3 text-[12px] text-white/70"><summary className="cursor-pointer font-semibold text-lime-200">Details</summary><p className="mt-1.5 leading-snug">{s.more}</p></details>
             </div>
-            <ul className="mt-5 flex flex-wrap justify-between gap-x-6 gap-y-4 md:justify-start md:gap-x-8">
-              {STATS.map((s) => (
-                <li key={s.tid} data-testid={s.tid}>
-                  <p className="whitespace-nowrap font-display text-[1.9rem] leading-none tabular-nums md:text-[2.8rem]">{s.v}</p>
-                  <p className="mt-1.5 text-[12px] leading-tight text-white/70 md:text-sm">{s.l}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <a href="/media-kit#doors" className="group relative block min-h-[180px] overflow-hidden rounded-2xl text-white shadow-lg" style={{ background: "#0E3B2A" }} data-testid="home-street-tile">
+          ))}
+          <a href="/media-kit#doors" className="group relative block min-h-[200px] overflow-hidden rounded-2xl text-white shadow-lg" style={{ background: "#0E3B2A" }} data-testid="home-street-tile">
             <img src={DOOR_ROUTE.mapWebp} alt="" aria-hidden width={DOOR_ROUTE.mapWidth} height={DOOR_ROUTE.mapHeight} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover opacity-45 transition group-hover:opacity-60" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0E3B2A] via-[#0E3B2A]/60 to-transparent" />
-            <div className="relative flex h-full flex-col justify-end p-5 md:p-7">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#BFF3D6]">Street Team</span>
-                <Chip>Modelled</Chip>
-              </div>
-              <p className="mt-2 font-display text-[2.4rem] leading-none md:text-5xl" data-testid="home-street-figure">2MM+</p>
-              <p className="mt-1.5 text-sm text-white/75">doors targeted around the retail network (est.) <ArrowRight className="ml-1 inline size-3.5 transition group-hover:translate-x-0.5" aria-hidden /></p>
+            <div className="relative flex h-full flex-col justify-end p-5 md:p-6">
+              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#BFF3D6]">Calm Joints + Street Team Ambassadors</span>
+              <p className="mt-2 font-display text-[2.6rem] leading-none md:text-5xl" data-testid="home-street-figure">2MM+</p>
+              <p className="mt-1.5 text-sm text-white/80">homes reached by 2027 <ArrowRight className="ml-1 inline size-3.5 transition group-hover:translate-x-0.5" aria-hidden /></p>
+              <p className="mt-1 text-[11px] text-white/60">Our owned digital clinic plus ambassadors on the ground. A plan, not a guarantee.</p>
             </div>
           </a>
         </div>
