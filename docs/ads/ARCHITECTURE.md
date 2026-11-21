@@ -47,5 +47,5 @@ Positioning: Randy voice, Nov 21 2026 1:41 PM.
 - Reporting: `seller` is stored and shown on campaigns and in the campaigns CSV, but statements and summaries don't split by seller yet.
 - Scale-direct campaigns are created by an admin only (no Scale-branded checkout); they share the Birch admin UI and allowlist.
 - Code and project names still say "birch" (repo, Vercel project, `/ads/admin` on birchreserve.net). Moving the core under a Scale domain would be a hosting change, not a data change.
-- No Stripe test keys exist on previews, so a sandbox checkout needs `STRIPE_SECRET_KEY` (sk_test) + `STRIPE_WEBHOOK_SECRET` (test endpoint) on Preview.
+- No Stripe test keys on Preview yet. Once `STRIPE_SECRET_KEY` (sk_test) is there, `scripts/stripe-test-setup.mjs` creates the test prices + webhook and sets `STRIPE_WEBHOOK_SECRET` / `STRIPE_PRICE_*` on Preview (dry run unless `--apply`; refuses live keys).
 - Stripe Connect isn't set up, so payouts are a batch + CSV.
