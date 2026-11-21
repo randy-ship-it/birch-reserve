@@ -51,7 +51,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
   }, []);
   // Scroll depth, first touch and time to first interaction for the intake (same code serves scalehealth.ca/intake via the mirror).
   useAttention({ ladder: "[data-testid=intake-next-step]" });
-  usePageMeta(sup ? "Supplier intake · Max your exposure | Birch Reserve" : "Get your Monetization Kit | Birch Reserve", sup ? "Suppliers start performance-only: no setup fee, no monthly fee, you approve every placement. Max your exposure with your own hub or CPM/CPC display." : "One short form for suppliers and hubs. See your hub earnings and your supplier exposure on performance-only terms (pay on results), side by side. Estimates in USD, reviewed by a person.");
+  usePageMeta(sup ? "Supplier intake · Max your exposure | Birch Reserve" : "Get your free Monetization Kit | Birch Reserve", sup ? "Suppliers start performance-only: no setup fee, no monthly fee, you approve every placement. Max your exposure with your own hub or CPM/CPC display." : "One short form for suppliers and hubs. See your hub earnings and your supplier exposure on performance-only terms (pay on results), side by side. Estimates in USD, reviewed by a person.");
   return (
     <div data-testid="intake-landing">
       <MockBanner />
@@ -67,7 +67,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
           ) : (
             <>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">{skinText("Birch Reserve · Monetization Kit")}</p>
-              <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Get your Monetization Kit.</h1>
+              <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Get your free Monetization Kit.</h1>
               <p className="mt-2 max-w-2xl text-base text-muted-foreground">Reserve space now, book a big block, or get your free kit.</p>
               <div className="mt-5"><TwoLane /></div>
               <div className="mt-6 flex items-center gap-3" data-testid="kit-divider"><span className="h-px flex-1 bg-foreground/15" /><span className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Or get your free Monetization Kit</span><span className="h-px flex-1 bg-foreground/15" /></div>

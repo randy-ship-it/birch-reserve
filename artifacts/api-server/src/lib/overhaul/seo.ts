@@ -21,7 +21,7 @@ export const INTAKE_OG_IMAGE = "https://birchreserve.net/og-monetization-kit.png
 const INTAKE_DESC = "One short form for suppliers and hubs. See what your hub could earn and where your products get seen, side by side. Estimates in USD, reviewed by a person.";
 
 export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
-  "/intake": { title: "Get your Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
+  "/intake": { title: "Get your free Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
   "/intake/publisher": { title: "Hub · max exposure + earnings · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
   "/intake/supplier": { title: "Supplier intake · Your own hub | Birch Reserve", description: "Suppliers: get your own hub on Birch Reserve. No setup fee, no monthly fee, you approve every placement. Goes live once our team approves it.", image: INTAKE_OG_IMAGE },
   "/intake/gtm": { title: "GTM setup packages from $3,500 USD | Birch Reserve", description: "We set up the partnership / B2B go-to-market bot and console we use, get your motion running, then hand over the keys. For health and wellness businesses.", image: INTAKE_OG_IMAGE },

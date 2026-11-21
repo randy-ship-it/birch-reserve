@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { logCtaClick } from "@/lib/shareTrack";
 
-export const KIT_CTA_LABEL = "Get my Monetization Kit";
+export const KIT_CTA_LABEL = "Get my free Monetization Kit";
 export const intakeHref = (ref: string) => `/intake?ref=${encodeURIComponent(ref)}`;
 
 export function KitCta({ placement, size = "lg", tone = "lime", label = KIT_CTA_LABEL, sub, className = "", testId, onClick }: { placement: string; size?: "sm" | "md" | "lg"; tone?: "lime" | "ink"; label?: string; sub?: string | null; className?: string; testId?: string; onClick?: () => void }) {
@@ -17,7 +17,7 @@ export function KitCta({ placement, size = "lg", tone = "lime", label = KIT_CTA_
     <span className={`inline-flex flex-col gap-1 ${className}`}>
       <a href={intakeHref(placement)} onClick={() => { logCtaClick(placement); onClick?.(); }} data-testid={testId ?? `kit-cta-${placement}`} className={`group inline-flex items-center justify-center gap-2 rounded-full font-bold shadow-lg ring-2 ring-[#0b1f3a]/10 transition ${h} ${colors}`}>
         <Sparkles className={size === "sm" ? "size-4" : "size-5"} aria-hidden />
-        {label}
+        {size === "sm" && label === KIT_CTA_LABEL ? <><span className="sm:hidden">Get my free kit</span><span className="hidden sm:inline">{label}</span></> : label}
         <ArrowRight className={`${size === "sm" ? "size-4" : "size-5"} transition-transform group-hover:translate-x-0.5`} aria-hidden />
       </a>
       {sub === null ? null : sub ? <span className="text-xs opacity-75">{sub}</span> : null}

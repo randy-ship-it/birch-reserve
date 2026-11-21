@@ -159,7 +159,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Your personalized Monetization Kit</p>
-            <h2 className="font-display text-3xl leading-[1.05] md:text-4xl">Get my Monetization Kit</h2>
+            <h2 className="font-display text-3xl leading-[1.05] md:text-4xl">Get my free Monetization Kit</h2>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-sm text-muted-foreground">Four quick numbers. Side A: your revenue opportunity. Side B: your exposure.</p>
@@ -242,7 +242,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
           <div className="mt-3"><ExposureCard exposure={expo.ex} source={expo.source} testId="kit-exposure" /></div>
           {step === "contact" && !report && !held ? (
             <div className="mt-4 grid gap-2 rounded-2xl border border-foreground/15 bg-white p-4" data-testid="kit-contact">
-              <p className="text-sm font-semibold">Where should we send your Monetization Kit?</p>
+              <p className="text-sm font-semibold">Where should we send your free Monetization Kit?</p>
               <p className="text-xs text-muted-foreground">Brand-level only. A person checks the numbers and confirms fit by hand. Nothing is booked or charged.</p>
               <input data-testid="kit-website" onFocus={() => trackIntake("advertiser", "field_start", "website", { dedupe: true })} value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" autoComplete="url" className={numIn} />
               <input data-testid="kit-email" onFocus={() => trackIntake("advertiser", "field_start", "email", { dedupe: true })} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourbrand.com" autoComplete="email" className={numIn} />
@@ -255,7 +255,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
           <LeadGatesStatus gates={gates} testId="kit-lead-gates" />
           <IntakeWarnings testId="kit-warnings" />
           <button type="button" data-testid="kit-download" onClick={getKit} disabled={busy === "busy"} className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 text-base font-bold text-accent-foreground shadow-lg shadow-lime-500/20 transition hover:bg-foreground hover:text-background">
-            {busy === "busy" ? <Loader2 className="size-5 animate-spin" /> : busy === "done" ? <Check className="size-5" /> : <Download className="size-5" />} {busy === "done" ? "Monetization Kit downloaded (PDF + PNG)" : step === "contact" && !report ? "Get my Monetization Kit" : "Download my Monetization Kit"}
+            {busy === "busy" ? <Loader2 className="size-5 animate-spin" /> : busy === "done" ? <Check className="size-5" /> : <Download className="size-5" />} {busy === "done" ? "Monetization Kit downloaded (PDF + PNG)" : step === "contact" && !report ? "Get my free Monetization Kit" : "Download my free Monetization Kit"}
           </button>
           {busy === "done" || queued || held ? <div className="mt-4" data-testid="kit-next-cta"><PrimaryCta side="advertiser" where="kit" /></div> : null}
           {ref && (report || held) ? (
