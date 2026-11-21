@@ -35,7 +35,7 @@ function BasisTag({ basis, tone = "light" }: { basis: Basis; tone?: "light" | "d
   const dark = tone === "dark" ? "border-background/40 bg-transparent text-background/80" : cls;
   return (
     <span
-      className={`inline-flex max-w-full items-center border px-1.5 py-0.5 leading-tight sm:whitespace-nowrap align-middle text-[10px] font-semibold uppercase tracking-wider ${dark}`}
+      className={`inline-flex max-w-full items-center border px-1.5 py-0.5 leading-tight align-middle text-[10px] font-semibold uppercase tracking-wider ${dark}`}
       title={BASIS_NOTE[basis]}
       data-basis={basis}
     >
