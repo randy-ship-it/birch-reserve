@@ -241,7 +241,7 @@ export function BrochureSlideIn() {
   return (
     <aside
       aria-label="Get the brochure"
-      className="fixed bottom-3 left-3 right-3 z-[56] rounded-2xl border border-black/5 bg-white p-4 text-slate-900 shadow-[0_18px_50px_-16px_rgba(7,26,57,0.45)] md:bottom-6 md:left-auto md:right-6 md:w-[340px]"
+      className="fixed bottom-3 left-3 right-[84px] z-[56] rounded-2xl border border-black/5 bg-white p-4 text-slate-900 shadow-[0_18px_50px_-16px_rgba(7,26,57,0.45)] md:bottom-6 md:left-auto md:right-6 md:w-[340px]"
       style={{ marginBottom: "env(safe-area-inset-bottom)" }}
       data-testid="brochure-slidein"
     >
