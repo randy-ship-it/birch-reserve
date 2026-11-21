@@ -6,9 +6,14 @@ import scaleLogo from "@assets/brand/scalehealth-logo-srgb-v2.png";
 
 /** One-line swap point: the reel files live at fixed paths under /reel (v5 is live there). */
 const R = "/reel";
-const FMT = {
-  v: { src: `${R}/birch-scale-ad-system-9x16.mp4`, poster: `${R}/poster.jpg`, w: 1080, h: 1920 },
-  h: { src: `${R}/birch-scale-ad-system-16x9.mp4`, poster: `${R}/poster-16x9.jpg`, w: 1920, h: 1080 },
+/** The Scale skin gets the Scale render (its last slide is Scale's three exclusive private channels). */
+const fmt = (scale: boolean) => {
+  const p = scale ? "scale-ad-system" : "birch-scale-ad-system";
+  return {
+    v: { src: `${R}/${p}-9x16.mp4`, poster: `${R}/poster.jpg`, w: 1080, h: 1920 },
+    h: { src: `${R}/${p}-16x9.mp4`, poster: `${R}/poster-16x9.jpg`, w: 1920, h: 1080 },
+    vtt: `${R}/${scale ? "captions-scale-en.vtt" : "captions-en.vtt"}`,
+  };
 };
 
 function useNarrow() {
@@ -25,9 +30,10 @@ function useNarrow() {
 
 export default function ReelModal({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
   const narrow = useNarrow();
+  const scale = isScaleSkin();
+  const FMT = fmt(scale);
   const f = narrow ? FMT.v : FMT.h;
   const vid = useRef<HTMLVideoElement>(null);
-  const scale = isScaleSkin();
   useEffect(() => {
     const v = vid.current;
     if (!v) return;
@@ -74,7 +80,7 @@ export default function ReelModal({ open, onOpenChange }: { open: boolean; onOpe
           <div className="overflow-hidden rounded-xl bg-black shadow-2xl" style={{ aspectRatio: `${f.w} / ${f.h}` }}>
             <video key={f.src} ref={vid} className="block h-full w-full" controls playsInline preload="metadata" poster={f.poster} data-testid="reel-modal-video">
               <source src={f.src} type="video/mp4" />
-              <track kind="captions" src={`${R}/captions-en.vtt`} srcLang="en" label="English" default />
+              <track kind="captions" src={FMT.vtt} srcLang="en" label="English" default />
             </video>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[11px] leading-snug text-white/70">

@@ -14,6 +14,11 @@ import { useCurrency } from "@/lib/currency";
 import { isScaleSkin } from "@/lib/siteSkin";
 
 const R = "/reel";
+/** The Scale skin plays its own render: same reel, but the last slide is Scale's three exclusive private channels (Randy, Nov 21 2026 5:38 PM). */
+const SCALE_END = "Three exclusive private channels: branded hubs, our digital and brick-and-mortar provider network across Canada and the USA, and Calm Joints, our recovery store, with Street Team ambassadors going home by home and into retail.";
+const REEL_FILES = (scale: boolean) => scale
+  ? { v: `${R}/scale-ad-system-9x16.mp4`, h: `${R}/scale-ad-system-16x9.mp4`, vtt: `${R}/captions-scale-en.vtt`, len: "One-minute walkthrough" }
+  : { v: `${R}/birch-scale-ad-system-9x16.mp4`, h: `${R}/birch-scale-ad-system-16x9.mp4`, vtt: `${R}/captions-en.vtt`, len: "50-second walkthrough" };
 const TRANSCRIPT =
   "Hey guys, here's the Scale Health ad system. One distribution network, for brands and for hubs. Starting as a supplier only? Stay performance-only, and earn when your products sell across our distribution channels. Maximize that exposure by activating your own audience, with a co-branded hub. Your dashboard shows your audience. Then tap our targeted audiences with open inventory, and crush it with yours. Ready for ads? Go deep where you know you'll convert, in front of the right audiences for your brand. Upload your ad, check out through Birch Reserve, and watch views, clicks and claims in your own cockpit. Recovery is live now. Longevity, sleep, fitness, food and nutrition, medi-spa, mental health and pets are coming next. One distribution system. Birch Reserve, plus Scale Health.";
 
@@ -54,9 +59,11 @@ function Tile({ t }: { t: (typeof TILES)[number] }) {
 
 export default function BrIntakeReel() {
   const scale = isScaleSkin();
+  const F = REEL_FILES(scale);
+  const transcript = scale ? TRANSCRIPT.replace("One distribution system. Birch Reserve, plus Scale Health.", SCALE_END) : TRANSCRIPT;
   const { currency } = useCurrency();
   const C = currency.toUpperCase();
-  usePageMeta("Watch: how the Scale Health ad system works | Birch Reserve", "A 51-second walkthrough: start performance-only as a supplier, activate your own audience with a co-branded hub, then run targeted ads. Recovery is live, more categories are next.");
+  usePageMeta("Watch: how the Scale Health ad system works | Birch Reserve", `A ${scale ? "one-minute" : "50-second"} walkthrough: start performance-only as a supplier, activate your own audience with a co-branded hub, then run targeted ads. Recovery is live, more categories are next.`);
   // On the Scale skin every link stays under /intake, so the visit and any checkout stay on scalehealth.ca (Scale direct).
   const kit = `/intake?utm_source=reel&utm_medium=${scale ? "scale_reel" : "reel"}`;
   const exclusive = `${scale ? "/intake/_m" : ""}/exclusive?currency=${currency}&utm_source=reel&utm_medium=${scale ? "scale_reel" : "reel"}`;
@@ -83,17 +90,17 @@ export default function BrIntakeReel() {
     <div className={`bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_55%)] ${scale ? "reel-s" : ""}`} data-testid="intake-reel">
       <style>{`.reel-pl{max-width:min(420px,calc((100vh - 300px) * 9 / 16 + 18px));max-width:min(420px,calc((100dvh - 300px) * 9 / 16 + 18px))}@media (min-width:768px){.reel-pl{max-width:calc((100vh - 250px) * 16 / 9 + 18px);max-width:calc((100dvh - 250px) * 16 / 9 + 18px)}}.reel-s .reel-pl{max-width:min(420px,calc((100dvh - 380px) * 9 / 16 + 18px))}@media (min-width:768px){.reel-s .reel-pl{max-width:calc((100dvh - 300px) * 16 / 9 + 18px)}}`}</style>
       <section className="container mx-auto max-w-5xl px-4 pt-5 md:pt-8">
-        <p className="text-xs font-bold uppercase tracking-[0.18em] text-foreground/55">51-second walkthrough<span className="hidden sm:inline"> · {scale ? "Scale Health + Birch Reserve" : "Birch Reserve + Scale Health"}</span></p>
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-foreground/55">{F.len}<span className="hidden sm:inline"> · {scale ? "Scale Health + Birch Reserve" : "Birch Reserve + Scale Health"}</span></p>
         <h1 className="mt-1.5 font-display text-[2rem] leading-[1.05] md:text-5xl">One distribution system, for brands and hubs.</h1>
         {scale ? <ScaleAdUnitLockup className="mt-3" /> : null}
         <div className="reel-pl mx-auto mt-4 rounded-[18px] border border-[#D3D7DE] bg-white p-2 shadow-[0_14px_34px_-18px_rgba(7,26,57,.25)]" data-testid="reel-player">
-          <video ref={h} className="hidden aspect-video w-full rounded-xl bg-[#0B1B38] md:block" controls playsInline preload="metadata" poster={`${R}/poster-16x9.jpg`} aria-label="How the Scale Health ad system works, 16:9">
-            <source src={`${R}/birch-scale-ad-system-16x9.mp4`} type="video/mp4" />
-            <track kind="captions" src={`${R}/captions-en.vtt`} srcLang="en" label="English" default />
+          <video key={F.h} ref={h} className="hidden aspect-video w-full rounded-xl bg-[#0B1B38] md:block" controls playsInline preload="metadata" poster={`${R}/poster-16x9.jpg`} aria-label="How the Scale Health ad system works, 16:9">
+            <source src={F.h} type="video/mp4" />
+            <track kind="captions" src={F.vtt} srcLang="en" label="English" default />
           </video>
-          <video ref={v} className="block aspect-[9/16] w-full rounded-xl bg-[#0B1B38] md:hidden" controls playsInline preload="metadata" poster={`${R}/poster.jpg`} aria-label="How the Scale Health ad system works, 9:16">
-            <source src={`${R}/birch-scale-ad-system-9x16.mp4`} type="video/mp4" />
-            <track kind="captions" src={`${R}/captions-en.vtt`} srcLang="en" label="English" default />
+          <video key={F.v} ref={v} className="block aspect-[9/16] w-full rounded-xl bg-[#0B1B38] md:hidden" controls playsInline preload="metadata" poster={`${R}/poster.jpg`} aria-label="How the Scale Health ad system works, 9:16">
+            <source src={F.v} type="video/mp4" />
+            <track kind="captions" src={F.vtt} srcLang="en" label="English" default />
           </video>
         </div>
         <div className="mt-4"><Ctas where="hero" /></div>
@@ -113,7 +120,7 @@ export default function BrIntakeReel() {
         </div>
         <div className="mt-6 divide-y divide-foreground/10 rounded-2xl border border-[#D3D7DE] bg-white px-5 py-2 text-sm">
           <details className="py-2.5"><summary className="cursor-pointer font-semibold">What the $1,900 exclusive reserve is</summary><p className="mt-1.5 text-foreground/75">An exclusive display reserve: one brand per category. It locks an exclusive package at a discount, all of it counts toward that package, and an insertion order is signed before anything runs. Shown in your currency.</p></details>
-          <details className="py-2.5" data-testid="reel-transcript"><summary className="cursor-pointer font-semibold">Transcript</summary><p className="mt-1.5 text-foreground/75">{TRANSCRIPT}</p></details>
+          <details className="py-2.5" data-testid="reel-transcript"><summary className="cursor-pointer font-semibold">Transcript</summary><p className="mt-1.5 text-foreground/75">{transcript}</p></details>
         </div>
         <p className="mt-5 max-w-3xl text-[13px] text-foreground/60">Northline Recovery, its hub and all dashboard figures in the video are examples, labelled EXAMPLE, not results. The hub placement shown is an example of how an ad could look, and runs only with the hub owner's approval. Upcoming categories are queued, with no launch dates. Channel figures are based on signed partnership contracts, not a delivery promise. No guarantee of views, clicks, sales or results. Prices in the video are in USD.</p>
       </section>
