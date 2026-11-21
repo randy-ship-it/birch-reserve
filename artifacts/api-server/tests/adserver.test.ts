@@ -8,7 +8,8 @@ import { PGlite } from "@electric-sql/pglite";
 import { AD_SLOTS, findSlot } from "../src/lib/adserver/config";
 import { allowedSpendMicros, canSpend, eligibility, eventCostMicros, landingUrl, pacingState, pickAd, type Campaign } from "../src/lib/adserver/engine";
 import * as store from "../src/lib/adserver/store";
-import { recordClick, recordConversion, recordView, resetServeCacheForTests, serve } from "../src/lib/adserver/service";
+import { draftCampaignFromCheckoutSafe, recordClick, recordConversion, recordView, resetServeCacheForTests, serve } from "../src/lib/adserver/service";
+import { buyStore } from "../src/lib/buyFlow";
 import { pixelId, verify, visitorHash } from "../src/lib/adserver/auth";
 import { EMBED_JS, PIXEL_JS } from "../src/lib/adserver/embed";
 import { campaignPayload } from "../src/lib/adserver/friday";
@@ -328,4 +329,31 @@ test("new-hub alert: never says open/unclaimed, one per hub per email, unsubscri
   assert.equal(await store.claimHubAlert("sole", "A@b.co"), false);
   await store.alertsOff("a@b.co");
   assert.deepEqual(await store.alertSubscribers(), []);
+});
+
+test("paid /buy checkout: draft campaign takes the order's company + format, and the uploaded ad waits in the approval queue (never approved)", async () => {
+  const db = new PGlite();
+  store.setAdPoolForTests(db as unknown as store.Queryable, "ads_buy_link_test");
+  const bs = buyStore();
+  const t0 = Date.now();
+  const png = Buffer.from("89504e470d0a1a0a", "hex");
+  await bs.putCreative({ id: "cr-old", accountId: "a", email: "buyer@brand.co", mime: "image/png", width: 1200, height: 628, bytes: 8, sha256: "x", data: png, createdAt: new Date(t0 - 3_600_000) });
+  await bs.putCreative({ id: "cr-new", accountId: "a", email: "buyer@brand.co", mime: "image/png", width: 1200, height: 628, bytes: 8, sha256: "y", data: png, createdAt: new Date(t0 - 60_000) });
+  const base = { accountId: "a", name: "Card Name", email: "buyer@brand.co", website: "https://brand.co", domainCheck: "match" as const, plan: "hold-190", reviewStatus: "pending_review" as const, ip: "1" };
+  await bs.putOrder({ ...base, id: "ord-old", company: "Old Co", format: "scheduled_service", creativeId: "cr-old", createdAt: new Date(t0 - 3_600_000) });
+  await bs.putOrder({ ...base, id: "ord-new", company: "Brand Co Inc.", format: "member_hub", creativeId: "cr-new", createdAt: new Date(t0 - 60_000) });
+  const session = { id: "cs_live_buylink", livemode: true, payment_status: "paid", status: "complete", currency: "usd", amount_total: 19_000, created: Math.floor(t0 / 1000),
+    customer_details: { email: "buyer@brand.co", name: "Card Name" }, metadata: { reservationId: "res-1", sku: "hold-190", offerKey: "hold-190" } } as never;
+  assert.equal(await draftCampaignFromCheckoutSafe(session), "created");
+  const c = (await store.listCampaigns()).find((x) => x.orderRef === "cs_live_buylink")!;
+  assert.equal(c.brand, "Brand Co Inc.");
+  assert.equal(c.primaryPlacement, "dashboard");
+  assert.equal(c.status, "draft");
+  const crs = await store.listCreatives({ campaignId: c.id });
+  assert.equal(crs.length, 1);
+  assert.equal(crs[0]!.status, "pending");
+  assert.equal(crs[0]!.sourceRef, "buy:ord-new");
+  assert.equal(await draftCampaignFromCheckoutSafe(session), "exists"); // webhook retry: no second campaign or creative
+  assert.equal((await store.listCreatives({ campaignId: c.id })).length, 1);
+  store.setAdPoolForTests(null);
 });

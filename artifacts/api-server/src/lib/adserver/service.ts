@@ -9,6 +9,7 @@ import { hashRef, pixelId, randomId, sign, verify, visitorHash } from "./auth";
 import * as store from "./store";
 import { afterOrderCampaign } from "./promo";
 import { isTestIdentity } from "../testTraffic";
+import { buyStore } from "../buyFlow";
 
 export type ServeInput = { slot: string; vid?: string | null; test?: boolean; ua?: string; dnt?: boolean; origin: string; now?: number };
 export type ServeResult =
@@ -189,6 +190,13 @@ export async function draftCampaignFromCheckoutSafe(session: Stripe.Checkout.Ses
       accountEmail: email, brand: clean(md.brand || session.customer_details?.name || email.split("@")[1] || "Brand"), category: clean(md.category, 80) || null,
       orderRef: session.id, orderKind, currency, budgetMicros: budgetCents * 10_000, exclusive, rateMultiplierBps: mult, isTest, notes, actor: "stripe-webhook",
     });
+    if (r.created && md.reservationId && (md.sku === "hold-190" || md.sku === "reserve-490" || md.sku === "reserve-899")) {
+      try {
+        await linkBuyOrder(r.campaign, session, md.sku);
+      } catch (err) {
+        await store.audit("stripe-webhook", "buy.link_error", session.id, err instanceof Error ? err.message : String(err));
+      }
+    }
     try {
       await afterOrderCampaign(session, { id: r.campaign.id, currency: r.campaign.currency, brand: r.campaign.brand }, isTest);
     } catch (err) {
@@ -198,6 +206,33 @@ export async function draftCampaignFromCheckoutSafe(session: Stripe.Checkout.Ses
   } catch {
     return "error";
   }
+}
+
+/** /buy format → ad placement (the member's home screen is the logged-in dashboard). */
+export const BUY_FORMAT_PLACEMENT: Record<string, Campaign["primaryPlacement"]> = {
+  member_hub: "dashboard", recovery_plan: "dashboard", scheduled_service: "services", post_checkout: "post_purchase",
+};
+
+/**
+ * Paid /buy checkout → the buyer's /buy order (same email + plan, latest one created before the session):
+ * brand = the company they typed, placement = their chosen format, and the ad they uploaded goes to the
+ * approval queue as PENDING (same source key as the admin "Send to approval queue", so never doubled).
+ * Nothing is approved or activated here.
+ */
+export async function linkBuyOrder(c: Campaign, session: Stripe.Checkout.Session, sku: string): Promise<string | null> {
+  const before = (session.created ?? Math.floor(Date.now() / 1000)) * 1000 + 60_000;
+  const order = (await buyStore().listOrders(200))
+    .filter((o) => o.email.toLowerCase() === c.accountEmail && o.plan === sku && new Date(o.createdAt).getTime() <= before)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+  if (!order) return null;
+  const placement = BUY_FORMAT_PLACEMENT[order.format];
+  await store.updateCampaign(c.id, { ...(order.company ? { brand: order.company.slice(0, 160) } : {}), ...(placement ? { primaryPlacement: placement } : {}) }, "stripe-webhook");
+  if (order.creativeId && !(await store.listCreatives({ campaignId: c.id })).some((x) => x.sourceRef === `buy:${order.id}`)) {
+    const cr = await buyStore().getCreative(order.creativeId);
+    if (cr) await store.addCreative({ campaignId: c.id, mime: cr.mime, width: cr.width, height: cr.height, data: cr.data, alt: `${order.company || c.brand} (sponsored)`, uploadedBy: `${c.accountEmail} (from /buy)`, status: "pending", sourceRef: `buy:${order.id}` });
+  }
+  await store.audit("stripe-webhook", "buy.linked", c.id, `order ${order.id} · ${order.format} · creative ${order.creativeId ?? "none"}`);
+  return order.id;
 }
 
 export { pixelId };
