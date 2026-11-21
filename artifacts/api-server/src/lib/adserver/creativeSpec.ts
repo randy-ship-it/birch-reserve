@@ -12,7 +12,7 @@ import { sniffImage } from "../buyFlow";
 import type { Placement } from "./config";
 
 export type CreativeKind = "image" | "video";
-export type FormatKey = "hero_wide" | "hero_phone" | "leaderboard" | "splash" | "vertical" | "card" | "mrec" | "video_vertical" | "video_landscape";
+export type FormatKey = "hero_wide" | "hero_phone" | "landscape" | "leaderboard" | "splash" | "vertical" | "card" | "mrec" | "video_vertical" | "video_landscape";
 
 export type CreativeFormat = {
   key: FormatKey;
@@ -56,6 +56,8 @@ const KB = 1024;
 export const FORMATS: readonly CreativeFormat[] = [
   { key: "hero_wide", kind: "image", label: "Wide banner", size: [1200, 300], ratio: "4:1", upload: [2400, 600], min: [1200, 300], placements: ["landing"], where: "Top of the hub home page (desktop and tablet).", safe: 24, targetBytes: 150 * KB },
   { key: "hero_phone", kind: "image", label: "Phone banner", size: [640, 320], ratio: "2:1", upload: [1280, 640], min: [640, 320], placements: ["landing", "dashboard"], where: "Hub home on phones, and the member dashboard.", safe: 20, targetBytes: 150 * KB },
+  // 1200×628 (1.91:1): the common social / display landscape image, so buyers can reuse what they already have (Nov 21 2026).
+  { key: "landscape", kind: "image", label: "Landscape", size: [600, 314], ratio: "1.91:1", upload: [1200, 628], min: [600, 314], placements: ["landing", "dashboard"], where: "In-page unit on the hub home and the member dashboard (the common 1200×628 social and display size).", safe: 24, targetBytes: 200 * KB },
   { key: "leaderboard", kind: "image", label: "Leaderboard", size: [728, 90], ratio: "728:90", upload: [1456, 180], min: [728, 90], placements: ["landing"], where: "Partner pages with a classic banner row (IAB 728×90).", safe: 8, targetBytes: 150 * KB },
   { key: "splash", kind: "image", label: "Thank-you splash", size: [656, 280], ratio: "82:35", upload: [1312, 560], min: [656, 280], placements: ["post_purchase"], where: "Order and booking confirmation pages, right after a member pays.", safe: 20, targetBytes: 300 * KB },
   { key: "vertical", kind: "image", label: "Vertical", size: [360, 640], ratio: "9:16", upload: [1080, 1920], min: [360, 640], placements: ["post_purchase", "dashboard"], where: "Full-height card on phones after checkout and on hub screens.", safe: 24, targetBytes: 500 * KB },

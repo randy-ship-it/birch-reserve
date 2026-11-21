@@ -14,6 +14,7 @@ the embed renders today. No performance claims.
 |---|---|---|---|---|---|---|---|---|
 | `hero_wide` | still | 1200×300 | 4:1 | 2400×600 | 1200×300 | 48 | ≤150 KB | landing |
 | `hero_phone` | still | 640×320 | 2:1 | 1280×640 | 640×320 | 40 | ≤150 KB | landing, dashboard |
+| `landscape` | still | 600×314 | 1.91:1 | 1200×628 | 600×314 | 48 | ≤200 KB | landing, dashboard (the common 1200×628 social/display size) |
 | `leaderboard` | still | 728×90 | 728:90 | 1456×180 | 728×90 | 16 | ≤150 KB | landing (partner pages) |
 | `splash` | still | 656×280 | 82:35 | 1312×560 | 656×280 | 40 | ≤300 KB | post_purchase |
 | `vertical` | still | 360×640 | 9:16 | 1080×1920 | 360×640 | 72 | ≤500 KB | post_purchase, dashboard |
