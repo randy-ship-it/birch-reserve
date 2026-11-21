@@ -89,7 +89,7 @@ export async function syncToFriday(opts: { campaignId?: string; includeTest?: bo
     }
   }
   if (opts.royalties !== false && !opts.campaignId) {
-    for (const r of (await store.royalties(3)).filter((x) => x.status === "approved")) {
+    for (const r of (await store.royalties(3)).filter((x) => x.status !== "calculated")) {
       const res = await post({
         externalId: `birch-ads-royalty-${r.partner}-${r.month}-${r.currency}`.toLowerCase().replace(/[^a-z0-9-]+/g, "-").slice(0, 160),
         company: r.partner,

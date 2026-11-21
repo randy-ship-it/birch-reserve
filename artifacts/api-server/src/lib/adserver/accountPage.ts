@@ -45,9 +45,10 @@ function campaignCard(v: AccountView["campaigns"][number], now: number): string 
   const remaining = Math.max(0, c.budgetMicros - c.spentMicros);
   const approved = v.creatives.some((x) => x.status === "approved");
   const pending = v.creatives.some((x) => x.status === "pending");
+  const rejected = !approved && !pending ? v.creatives.find((x) => x.status === "rejected") : undefined;
   const steps = [
     { done: true, text: promoCamp ? `Free ad credit · ${esc(c.orderKind ?? "promo")}` : `Paid · ${esc(c.orderKind ?? "media credit")}` },
-    { done: approved, text: approved ? "Creative approved" : pending ? "Creative uploaded, in review (usually 1 business day)" : "Send your creative (upload below)" },
+    { done: approved, text: approved ? "Creative approved" : pending ? "Creative uploaded, in review (usually 1 business day)" : rejected ? `Creative not approved${rejected.reviewNote ? `: ${esc(rejected.reviewNote)}` : ""}. Upload a new one below.` : "Send your creative (upload below)" },
     { done: Boolean(c.flightStart), text: c.flightStart ? `Flight set: ${fmtDate(c.flightStart)} – ${fmtDate(c.flightEnd)}` : "Insertion order signed and flight dates set (we email the IO)" },
     { done: c.status === "active" || c.status === "completed", text: "Live on the hubs" },
   ];

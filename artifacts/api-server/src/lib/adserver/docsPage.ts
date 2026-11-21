@@ -3,7 +3,7 @@ import { AD_DEFAULTS, AD_SLOTS, VIEWABILITY, placementLabel } from "./config";
 import { esc, shell } from "./ui";
 
 export function docsPage(origin: string): string {
-  const live = AD_SLOTS.filter((s) => s.live);
+  const live = AD_SLOTS.filter((s) => s.live && !s.test);
   const embed = `<!-- Once per page, anywhere -->
 <script async src="${origin}/ads/embed.js"></script>
 

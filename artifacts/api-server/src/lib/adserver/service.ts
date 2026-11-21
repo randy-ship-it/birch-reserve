@@ -32,6 +32,7 @@ async function candidates(now: number) {
 export async function serve(input: ServeInput): Promise<ServeResult> {
   const now = input.now ?? Date.now();
   if (!adsServingEnabled()) return { fill: false, reason: "paused" };
+  await store.db(); // loads hubs onboarded on contract into the slot list
   const slot = findSlot(input.slot);
   if (!slot) return { fill: false, reason: "unknown_slot" };
   if (!slot.live) return { fill: false, reason: "slot_not_live" };
