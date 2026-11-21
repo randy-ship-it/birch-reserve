@@ -18,6 +18,7 @@ import { sampleReport } from "@/lib/fridayMockReport";
 import { RT, RT_SANS, RT_SERIF } from "@/lib/reportTokens";
 import { TwoLane } from "@/components/br/two-lane";
 import { NextStep } from "@/components/br/next-step";
+import { useAttention } from "@/lib/attention";
 import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAskCompact } from "@/components/br/market-pulse";
 import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 import { brandFromUrl, presetOf, type IntakePreset } from "@/components/br/supplier-mode";
@@ -47,6 +48,8 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
     r.roles = ["supplier", "publisher"];
     return r;
   }, []);
+  // Scroll depth, first touch and time to first interaction for the intake (same code serves scalehealth.ca/intake via the mirror).
+  useAttention({ ladder: "[data-testid=intake-next-step]" });
   usePageMeta(sup ? "Supplier intake · Max your exposure | Birch Reserve" : "Get your Monetization Kit | Birch Reserve", sup ? "Suppliers start performance-only: no setup fee, no monthly fee, you approve every placement. Max your exposure with your own hub or CPM/CPC display." : "One short form for suppliers and hubs. See your hub earnings and your supplier exposure on performance-only terms (pay on results), side by side. Estimates in USD, reviewed by a person.");
   return (
     <div data-testid="intake-landing">

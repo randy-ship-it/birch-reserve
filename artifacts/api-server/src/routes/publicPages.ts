@@ -125,7 +125,7 @@ ${publicSeoTags(path, title, description)}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f8f6ef;color:#071A39;font:16px/1.6 "IBM Plex Sans",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:#F9F8F6;color:#071A39;font:16px/1.6 "IBM Plex Sans",sans-serif}
 header,main,footer{max-width:760px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;gap:16px;align-items:baseline;border-bottom:1px solid #ccd2d8}
 h1,h2,h3{font-family:Fraunces,serif;font-weight:400;line-height:1.15}h1{font-size:clamp(2.2rem,6vw,3.4rem);margin:.4em 0}
 a{color:#071A39}nav{display:flex;flex-wrap:wrap;gap:12px;font-size:.9rem}.fine{color:#4d5b6a;font-size:.9rem}

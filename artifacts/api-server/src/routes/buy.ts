@@ -244,7 +244,7 @@ const MOCK: Record<string, string> = {
   post_checkout: `<div class="mk"><span class="ok">✓</span><i class="l w5"></i><b class="ad big">Your ad</b></div>`,
 };
 
-const CSS = `*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:#f8f6ef;color:#071A39;font:16px/1.5 "IBM Plex Sans",system-ui,sans-serif}
+const CSS = `*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:#F9F8F6;color:#071A39;font:16px/1.5 "IBM Plex Sans",system-ui,sans-serif}
 a{color:inherit}.wrap{max-width:860px;margin:0 auto;padding:0 18px}
 header.top{border-bottom:1px solid #d8dccf}header.top .wrap{display:flex;justify-content:space-between;align-items:center;min-height:56px;gap:12px}
 .logo{font-weight:600;letter-spacing:.14em;font-size:.84rem;text-decoration:none}header nav{display:flex;gap:14px;font-size:.9rem}header nav a{text-decoration:none;opacity:.8}
@@ -260,7 +260,7 @@ label.f{display:block;font-size:.86rem;font-weight:600;margin:12px 0 4px}input[t
 input[aria-invalid=true]{border-color:#a12b1f;background:#fff8f6}.fe{display:block;min-height:0;font-size:.85rem;font-weight:600;color:#a12b1f;margin-top:4px}.fe:empty{display:none}
 input:focus{outline:3px solid #C8F55A;border-color:#071A39}.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
 .actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:20px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:0 28px;border-radius:999px;border:0;background:#071A39;color:#f8f6ef;font:700 17px "IBM Plex Sans",system-ui;cursor:pointer;text-decoration:none;flex:1 1 auto;max-width:420px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:0 28px;border-radius:999px;border:0;background:#071A39;color:#F9F8F6;font:700 17px "IBM Plex Sans",system-ui;cursor:pointer;text-decoration:none;flex:1 1 auto;max-width:420px}
 .btn[disabled]{opacity:.55;cursor:wait}.btn.alt{background:#C8F55A;color:#071A39;box-shadow:0 8px 24px rgba(159,209,58,.35)}
 .back{min-height:56px;padding:0 20px;border-radius:999px;border:1.5px solid #c9cfc2;background:#fff;font:600 15px "IBM Plex Sans",system-ui;color:#071A39;cursor:pointer}
 .msg{min-height:1.4em;font-size:.92rem;margin:10px 0 0}.msg.err{color:#a12b1f;font-weight:600}.msg.ok{color:#24412a}
@@ -273,7 +273,7 @@ input:focus{outline:3px solid #C8F55A;border-color:#071A39}.g2{display:grid;grid
 .pick input{position:absolute;opacity:0;top:0;left:0;width:1px;height:1px}.pick:has(input:checked){border-color:#071A39;box-shadow:4px 4px 0 #C8F55A;background:#fff}.pick:has(input:disabled){opacity:.45;cursor:not-allowed}
 .pick:has(input:focus-visible){outline:3px solid #C8F55A}
 .pick strong{display:block;font-size:.98rem}.pick small{display:block;font-size:.8rem;color:#4d5b6a;line-height:1.3;margin-top:2px}
-.pick .price{font-family:Fraunces,Georgia,serif;font-size:1.9rem;line-height:1;display:block;margin-bottom:6px}.pick .tag{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:#071A39;color:#f8f6ef;border-radius:999px;padding:2px 8px;margin-top:6px}
+.pick .price{font-family:Fraunces,Georgia,serif;font-size:1.9rem;line-height:1;display:block;margin-bottom:6px}.pick .tag{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:#071A39;color:#F9F8F6;border-radius:999px;padding:2px 8px;margin-top:6px}
 .pick .lock{display:none;font-size:.72rem;font-weight:700;color:#8a5a00;margin-top:4px}.pick:has(input:disabled) .lock{display:block}
 .mk{height:76px;border-radius:10px;background:#eef0ea;padding:8px;display:flex;flex-direction:column;gap:5px;margin-bottom:8px;overflow:hidden}
 .mk .l{display:block;height:6px;border-radius:3px;background:#c9cfc2}.w5{width:50%}.w6{width:60%}.w7{width:70%}
