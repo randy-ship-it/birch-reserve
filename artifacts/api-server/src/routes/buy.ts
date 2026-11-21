@@ -7,6 +7,7 @@
  *   GET  /api/sales/buy-orders     staff only (mounted after Clerk)
  *   GET  /api/sales/buy-creatives/:id
  */
+import { BUYER_HEADER_CSS, TOKENS_CSS, buyerHeaderHtml } from "../lib/brandTokens";
 import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
 import { randomUUID } from "node:crypto";
 import express, { Router, type IRouter, type Request, type Response } from "express";
@@ -312,8 +313,8 @@ export function renderBuyPage(opts: { checkoutLive: boolean; plan?: unknown; pre
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(TITLE)} | Birch Reserve</title><meta name="description" content="${esc(DESCRIPTION)}">
 ${publicSeoTags(BUY_PATH, TITLE, DESCRIPTION)}
-<link rel="icon" href="/favicon.svg"><style>${CSS}</style></head><body>
-<header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav><a href="/rates">Rates</a><a href="/media-kit">Media kit</a><a href="tel:+16479316278">(647) 931-6278</a></nav></div></header>
+<link rel="icon" href="/favicon.svg"><style>${TOKENS_CSS}${CSS}${BUYER_HEADER_CSS}</style></head><body>
+${buyerHeaderHtml("buy")}
 <main class="wrap">
 <section class="hero"><h1>${esc(BUY_TAGLINE)}</h1><p class="lede">3 short steps · about 1 minute · USD · nothing runs until a person approves your ad</p>
 <div class="prog" id="prog" aria-live="polite"><div class="row"><span id="prog-n">Step 1 of 3</span><span id="prog-t">Your plan</span></div><div class="bar" role="progressbar" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1" id="prog-bar"><i style="width:33%"></i></div></div></section>

@@ -5,6 +5,7 @@
  * Same gate as sponsorship packs (sponsorDepositsOpen): live sessions only when
  * SPONSOR_DEPOSITS_LIVE=true, so a preview with a test key only ever makes test sessions.
  */
+import { BUYER_HEADER_CSS, TOKENS_CSS, buyerHeaderHtml } from "../lib/brandTokens";
 import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
 import { promoMetadata, withScaleReturn } from "../lib/adserver/promoContext";
 import express, { Router, type IRouter, type Request, type Response } from "express";
@@ -43,9 +44,9 @@ h1,h2{font-family:Fraunces,serif;font-weight:400;line-height:1.15}h1{font-size:c
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}.stat{border:1px solid #ccd2d8;border-radius:12px;padding:14px;background:#fff}.stat b{display:block;font:600 1.6rem Fraunces,serif}
 .mc{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;background:#FFF4DB;border:1px solid #F1D58F;color:#8A5A00;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;vertical-align:middle}
 form{display:grid;gap:10px;border:1px solid #ccd2d8;border-radius:14px;padding:18px;background:#fff}input,select{width:100%;padding:10px;border:1px solid #b9c1c9;border-radius:8px;font:inherit}
-button{background:#071A39;color:#fff;border:0;border-radius:999px;padding:13px 16px;font:600 1rem "IBM Plex Sans";cursor:pointer}button:disabled{opacity:.6}
-details{border-top:1px solid #ccd2d8;padding:12px 0}summary{cursor:pointer;font-weight:600}ul{padding-left:1.1em}</style></head><body>
-<header><a href="/"><strong>BIRCH RESERVE</strong></a><nav class="fine"><a href="/media-kit">Media kit</a> · <a href="/rates">Rates</a> · <a href="/terms#exclusive">Terms</a></nav></header>
+button{background:#071A39;color:#fff;border:0;border-radius:6px;min-height:44px;padding:12px 18px;justify-self:start;font:600 1rem "IBM Plex Sans";cursor:pointer}button:disabled{opacity:.6}
+details{border-top:1px solid #ccd2d8;padding:12px 0}summary{cursor:pointer;font-weight:600}ul{padding-left:1.1em}${TOKENS_CSS}${BUYER_HEADER_CSS}</style></head><body>
+${buyerHeaderHtml("exclusive")}
 <main>${banner}<div data-promo-box="success"></div>
 <p class="fine">EXCLUSIVE DISPLAY · ONE BRAND PER CATEGORY</p>
 <h1>Reserve ${EXCLUSIVE_RESERVE.label}. Lock your category's exclusive display.</h1>

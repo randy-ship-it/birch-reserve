@@ -1,3 +1,4 @@
+import { BUYER_HEADER_CSS, TOKENS_CSS, buyerHeaderHtml } from "../lib/brandTokens";
 import { hundredHtml } from "../lib/overhaul/hundred";
 import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
 import { withStreetNet } from "../lib/adserver/promoNet";
@@ -2370,8 +2371,8 @@ function renderBuycalcHtmlUsd(input: {
 })}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>${BUYCALC_CSS}${BUYER_COMFORT_CSS}${START_SMALL_CSS}${HERO_MOCK_CSS}</style></head><body>
-<header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav aria-label="Buy page"><a class="tl" href="/media-kit">Media kit</a><a class="tl" href="#request">Ask about a placement</a><a class="tl tel" href="tel:+16479316278">(647) 931-6278</a>${currencyToggleHtml(currency, { sku: input.sku, format: input.format, category })}</nav></div></header>
+<style>${TOKENS_CSS}${BUYCALC_CSS}${BUYER_COMFORT_CSS}${START_SMALL_CSS}${HERO_MOCK_CSS}${BUYER_HEADER_CSS}</style></head><body>
+${buyerHeaderHtml("buycalc", currencyToggleHtml(currency, { sku: input.sku, format: input.format, category }))}
 <main>
 <section class="hero"><div class="wrap hero-grid"><div><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
 ${heroSubHtml(price(look), price(seat))}
