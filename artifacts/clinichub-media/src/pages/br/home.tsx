@@ -10,13 +10,14 @@ import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPa
 import type { ReactNode } from "react";
 import { ArrowRight, BookOpen, Building2, ChevronDown, FileText, Handshake, LayoutGrid, Package, Sparkles, Store, Users } from "lucide-react";
 import { DoorRoute } from "@/components/br/door-route";
-import { FounderNote, LIVE_HUB_IMAGE, LIVE_HUB_URL, SOLE_HUB_IMAGE, SOLE_HUB_URL, priceLabels, useAvailability } from "@/components/br/prime-hero";
+import { FounderNote, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import { MediaKitPdfLink, ProofStrip, SalesContact, TRUST_FAQ, TrustBand, TrustFaq } from "@/components/br/trust";
 import { GtmSetup } from "@/components/br/gtm-setup";
 import { KitCta } from "@/components/br/kit-cta";
 import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BuyCta } from "@/components/br/buy-cta";
+import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
 import { AnnotatedHubMock, MidTier } from "@/components/br/next-step";
 import { ActivityPulse, CategoryStrip, QuestionsBrandsAskCompact } from "@/components/br/market-pulse";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
@@ -42,12 +43,6 @@ const STATS = [
   { v: "200+", l: "locations, 500+ soon", name: "Private retail network", tid: "stat-retail-locations", more: "Our private network of fitness & recovery retailers in Canada and the USA: 200+ locations today, 500+ soon, with 1MM+ captive recovery consumers." },
 ];
 
-const HUBS = [
-  { href: LIVE_HUB_URL, img: LIVE_HUB_IMAGE, name: "DR-HO'S physio", host: "physio.drhonow.com", tid: "live-hub-drho" },
-  { href: SOLE_HUB_URL, img: SOLE_HUB_IMAGE, name: "SOLE", host: "scalehealth.ca/sole", tid: "live-hub-sole" },
-  { href: "https://www.scalehealth.ca/effortlessadmin", img: "/hub-gallery/effortless.webp", name: "Effortless Admin", host: "scalehealth.ca/effortlessadmin", tid: "live-hub-effortless" },
-  { href: "https://www.scalehealth.ca/calmjoints", img: "/hub-gallery/calmjoints.webp", name: "Calm Joints", host: "scalehealth.ca/calmjoints", tid: "live-hub-calmjoints" },
-];
 
 const TILES = [
   { href: "/intake?ref=home_tile", icon: Sparkles, title: "Monetization Kit", line: "Exposure + hub earnings. Free.", tid: "tile-intake", hot: true },
@@ -186,21 +181,9 @@ export default function BrHome() {
 
       {/* 4. Live hubs as visual cards. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" id="proof-live" data-testid="live-hub-thumbs">
-        <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Live hubs</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {HUBS.map((h) => (
-            <a key={h.tid} href={h.href} target="_blank" rel="noopener" data-testid={h.tid} className="group block overflow-hidden rounded-2xl border border-[#0b1f3a]/10 bg-white shadow-sm transition hover:shadow-lg" aria-label={`Visit the live ${h.name} hub`}>
-              <img src={h.img} alt={`${h.name} members-only hub, live`} width={1440} height={900} loading="lazy" decoding="async" className="block aspect-[16/10] w-full object-cover object-top" />
-              <span className="flex items-center justify-between gap-3 px-4 py-3">
-                <span className="min-w-0">
-                  <span className="flex items-center gap-2 font-bold text-[#0b1f3a]">{h.name} <Chip tone="live">Live</Chip></span>
-                  <span className="block truncate text-xs text-foreground/55">{h.host}</span>
-                </span>
-                <span className="shrink-0 text-sm font-semibold text-[#0b1f3a] group-hover:underline">Visit ↗</span>
-              </span>
-            </a>
-          ))}
-        </div>
+        <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Live and activating hubs</h2>
+        <div className="mt-4"><LiveHubGrid /></div>
+        <HubFunnel />
       </section>
 
       {/* 5. Link tiles to the deeper pages. */}

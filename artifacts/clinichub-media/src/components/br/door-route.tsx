@@ -33,7 +33,7 @@ export function DoorRoute({ requestHref = "#request", testId = "door-route", lar
         <figure className="overflow-hidden border border-background/20">
           <picture>
             <source srcSet={d.mapWebp} type="image/webp" />
-            <img src={d.mapJpg} alt={d.mapAlt} width={d.mapWidth} height={d.mapHeight} loading="lazy" decoding="async" className="block h-auto w-full" data-testid="door-map" />
+            <img src={d.mapJpg} alt={d.mapAlt} width={d.mapWidth} height={d.mapHeight} loading="eager" decoding="async" className="block h-auto w-full" data-testid="door-map" />
           </picture>
           <figcaption className="border-t border-background/20 px-4 py-2.5 text-xs text-background/65">{d.mapCaption}</figcaption>
         </figure>
