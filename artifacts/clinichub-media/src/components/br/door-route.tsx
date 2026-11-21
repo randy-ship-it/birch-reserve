@@ -49,9 +49,9 @@ export function DoorRoute({ requestHref = "#request", testId = "door-route", lar
                 <span aria-hidden className="inline-block text-base leading-none transition-transform group-open:rotate-45">+</span>
               </span>
             </div>
-            <dl className="mt-3 grid grid-cols-[0.95fr_1.5fr_0.9fr_1fr] divide-x divide-background/15" data-testid="door-headline">
+            <dl className="mt-3 grid grid-cols-2 gap-y-3 sm:grid-cols-[0.95fr_1.5fr_0.9fr_1fr] sm:divide-x sm:divide-background/15" data-testid="door-headline">
               {DOOR_HEADLINE.map((s) => (
-                <div key={s.label} className="min-w-0 px-1.5 first:pl-0 last:pr-0 sm:px-3">
+                <div key={s.label} className="min-w-0 px-1.5 first:pl-0 last:pr-0 sm:px-3 max-sm:odd:pl-0">
                   <dd className="whitespace-nowrap font-display text-base leading-none tracking-tight sm:text-xl">{s.value}</dd>
                   <dt className="mt-1.5 text-[10px] leading-tight text-background/65 sm:text-xs">{s.label}</dt>
                 </div>

@@ -116,6 +116,8 @@
 }
 
 @layer base {
+  /* A grid with no column utility must not grow with its widest child (phones: long values overlapped their labels). */
+  .grid { grid-template-columns: minmax(0, 1fr); }
   * {
     @apply border-border;
   }

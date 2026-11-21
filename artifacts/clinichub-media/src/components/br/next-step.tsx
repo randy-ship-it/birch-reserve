@@ -288,7 +288,7 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
   return (
     <section id={anchor ? "next-step" : undefined} className="scroll-mt-20" data-testid="next-step" data-where={where}>
       <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">{showMock ? "See it on a live hub first." : "Start with a $190 look."}</h2>
-      <div className={`mt-4 grid items-center gap-5 ${showMock ? "md:grid-cols-[1.2fr_1fr]" : ""}`}>
+      <div className={`mt-4 grid grid-cols-[minmax(0,1fr)] items-center gap-5 ${showMock ? "md:grid-cols-[1.2fr_1fr]" : ""}`}>
         {showMock ? <AnnotatedHubMock brand={brand} initial="effortless" /> : null}
         <div>
           <p className="font-display text-5xl leading-none text-[#0b1f3a]">$190 <span className="text-lg">USD</span></p>
