@@ -161,3 +161,14 @@ test("timing question: prompt and FAQ fallback answer it without dates, counts o
   assert.match(faq.text, /USD/);
   assert.equal(birchFaqAnswer([{ role: "user", content: "How long until I get a refund?" }]).intent, "refund");
 });
+
+test("network explainer: what the private display network is, spend-down, packs, exclusive link (Nov 21 2026)", () => {
+  const p = buildBirchChatSystemPrompt({ checkout: live });
+  assert.match(p, /THE PRIVATE DISPLAY NETWORK/);
+  assert.match(p, /distribution platform that started in Recovery/);
+  assert.match(p, /Never call it gig, on-demand or Uber-like/);
+  assert.match(p, /up to 6 months once your IO starts/);
+  assert.match(p, /\$1,500, \$3,000 or \$6,000 USD/);
+  assert.ok(p.includes("https://birchreserve.net/exclusive"));
+  assert.doesNotMatch(p, /\b1,900\b|signed partners|unclaimed|\bAlign\b/i);
+});
