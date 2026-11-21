@@ -13,6 +13,8 @@ Public-safe proof is the live hub https://physio.drhonow.com, named launching br
 3. Owned digital clinic Calm Joints and Street Team Ambassadors: 2MM+ homes reached by 2027 (Randy's plan; no other backing source on file).
 Single source in code: AUDIENCE_CHANNELS / AUDIENCE_LINE in artifacts/api-server/src/lib/overhaul/brandIntake.ts. The old 120+ hubs, 300–500+ hubs, 2MM+ doors, >20MM and >5B lines are retired. TAM feed figures (20MM+ orders, ~128MM modelled views) are modelling inputs for pricing only, labelled modelled, never presented as reach. Still never: Align, Clairvoyant, Alset, MedVibe, Friday, "signed partners", "80 locations", or "1MM patients" as Birch uniques.
 
+**Qualifier (Randy, 2026-11-21 1:36 PM):** wherever a modelled demand figure (audience orders, views, queue, 2027 inventory) appears on birchreserve.net, /media-kit, /audiences, /inventory or scalehealth.ca/tam, say it is "based on signed partnership contracts". This overrides the "signed partners" ban for that qualifier only; never add counts (feed still holds signed_partners: 0, never publish it). Never use forecast, projection, projected, planning estimate, expected or model assumption beside these figures. Keep "not delivered impressions, not a guarantee". Keep the street team "2MM+ homes by 2027" target wording. CPM-derived impression estimates stay "modelled estimate" (they are price math, not contract demand).
+
 **Why:** The 2026-09-24 commercial lock forbids reach and financial claims that earlier planning notes treated as publishable.
 
 **How to apply:** If a page, guide answer, or llms.txt would state a visitor count, CTR, or CIM figure, delete it. Answer “how many people will see my ad?” with: we do not sell a guaranteed impression count.
