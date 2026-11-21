@@ -4,7 +4,8 @@
  * role detail after submit on the same record. The full advertiser form stays one click away (#expanded).
  * Below: a labelled sample showing both sides (supplier exposure + hub earnings).
  */
-import { skinText } from "@/lib/siteSkin";
+import { isScaleSkin, skinText } from "@/lib/siteSkin";
+import { BirchAdSlot } from "@/components/br/birch-ad-slot";
 import { useEffect, useMemo, useState } from "react";
 import { KitBuilder } from "@/components/br/kit-builder";
 import { trackIntake, type IntakeSide } from "@/lib/intakeTrack";
@@ -95,14 +96,16 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
         <Details testId="sample-details"><p>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range in USD, not a result or a guarantee.</p></Details>
         <div className="mt-4"><ReportV2 report={sample} sample compact exposure={SAMPLE_EXPOSURE} exposureSource="sample" /></div>
         {sup ? null : <div className="mt-10" data-testid="intake-next-step"><NextStep where="intake" yieldToPostKit /></div>}
+        {/* Sponsored, Scale mirror only (scalehealth.ca/intake = mkt-scale.intake; Randy Nov 21 2026 4:02 PM). Below the form and its CTA. */}
+        {sup || !isScaleSkin() ? null : <div className="mt-10" data-testid="intake-sponsored"><BirchAdSlot slot="mkt-scale.intake" testId="intake-ad-slot" /></div>}
         {sup ? null : (
           <div className="mt-10 space-y-8" style={{ fontFamily: "inherit" }} data-testid="intake-market-signals">
+            <ActivityPulse desktopInline className="-mb-3" />
             <CategoriesWeServe />
             <QuestionsBrandsAskCompact testId="intake-questions-compact" />
           </div>
         )}
       </div>
-      {sup ? null : <ActivityPulse desktopOnly />}
     </div>
   );
 }

@@ -23,6 +23,7 @@ import { Details } from "@/components/br/details";
 import { AnnotatedHubMock, NextStep } from "@/components/br/next-step";
 import { KitBuilder } from "@/components/br/kit-builder";
 import { PriceLadder } from "@/components/br/price-ladder";
+import { BirchAdSlot } from "@/components/br/birch-ad-slot";
 import { AvailabilityStrip, CategoryRequestForm, FaceBeforeFlight, FounderNote, NETWORK_HUBS, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import {
   AGENCY_CASH_PCT,
@@ -173,6 +174,10 @@ export default function BrMediaKit() {
             <Cta href="#request" variant="line" testId="mk-request-hero" className="w-full sm:w-auto">Ask about a placement</Cta>
             <MediaKitPdfLink variant="line" testId="mk-pdf-hero" className="w-full sm:w-auto" />
           </div>
+          <p className="mt-4 text-sm" data-testid="mk-reel-link">
+            <a href="/reel" className="font-semibold underline underline-offset-4 hover:no-underline">Watch how the ad system works</a>
+            <span className="text-foreground/60"> · 50-second walkthrough</span>
+          </p>
 
         </div>
       </section>
@@ -193,11 +198,11 @@ export default function BrMediaKit() {
       <section className="border-b border-border/70 bg-background" data-testid="mk-market-signals">
         <div className="container mx-auto max-w-5xl space-y-8 px-5 py-10 md:px-6 md:py-14">
           <Tam2027 testId="mk-tam-2027" />
+          <ActivityPulse desktopInline className="-mb-3" />
           <CategoriesWeServe />
           <QuestionsBrandsAsk />
         </div>
       </section>
-      <ActivityPulse desktopOnly />
 
       {/* GTM setup packages (Randy t332u, Nov 21 2026) */}
       <section className="border-b border-border/70 bg-background" data-testid="mk-gtm-setup">
@@ -357,6 +362,11 @@ export default function BrMediaKit() {
           <CategoryRequestForm path="/media-kit" />
         </div>
       </Block>
+
+      {/* Sponsored: one Birch-served ad on our own media kit (Randy, Nov 21 2026 4:02 PM). Reserved box, no layout shift. */}
+      <section className="border-b border-border/70 bg-background" data-testid="mk-sponsored">
+        <div className="container mx-auto max-w-5xl px-5 py-8 md:px-6"><BirchAdSlot slot="mkt-birch.media_kit" testId="mk-ad-slot" /></div>
+      </section>
 
       {/* Five questions buyers ask (buyer comfort, Nov 17 2026) */}
       <section id="doors" className="scroll-mt-20 border-b border-border/70 bg-foreground text-background">

@@ -56,11 +56,24 @@ Every rate is dated (`effective_at`, next full hour or a date you pick) and neve
 
 **Setting to revisit (Randy, Nov 21 2026 2:57 PM):** override recipients stay on the proportional default. They share whatever pool the channel produces, so on a $1,000 Scale direct or internal sale a 50% recipient gets $25, versus $100 on brokerage. If they should earn on brokerage only, scope them per campaign or add a channel filter to `ad_override_recipients`.
 
+## Where ads run (Randy, Nov 21 2026 3:42 PM t396u + 3:43 PM t397u)
+- **Allowed:** Birch / Scale marketing and intake pages that sell ads, listed explicitly in `config.ts` `MARKETING_SLOTS`:
+  `mkt-birch.media_kit` (birchreserve.net/media-kit), `mkt-birch.buy_ads` (/buy-ads), `mkt-birch.specs` (/ads/specs),
+  `mkt-scale.intake` (scalehealth.ca/intake). A marketing slot serves **only** a campaign that names it in `hubs`
+  (`mkt-birch` / `mkt-scale`), never by auto-move. No royalty (no hub partner). **None is embedded on a page yet.** Embedding
+  one is its own approved change.
+- **Hubs: OFF by default.** Hub slots (`<hub>.<placement>`) stay in the system, but `serve()` refuses them
+  (`hub_not_enabled`) unless that hub is enabled in `ad_hub_serving`. Only Randy or Jon (by signed-in admin email) can turn a
+  hub on, with a note. Every change is a new row plus an audit line (`hub.serving_on|off`, "approved by …"). This also stops
+  auto-move: a campaign can't substitute onto a hub that's off. QA test hubs (`is_test`) carry test campaigns only.
+- The SOLE embed on scalehealth.ca/sole was removed (scalehealthnew #1272). Calm Joints (899bcb46) is paused, with its creative still approved.
+- Explainer only: /buy step 3 shows a labelled screenshot of an example ad on a hub page ("Example, not a live placement").
+
 ## QA guard
 Box QA browsers send `x-br-qa: 1` on every request. The server refuses to approve a non-test creative (403, audited `creative.qa_approve_blocked`) when that header is present, and the box `post()` helper refuses approve calls locally too. Real ads are approved by hand in the admin.
 
 ## Tables (all additive)
-`ad_campaigns` (incl. `seller`, `internal`, `order_kind`, `is_test`), `ad_creatives` (incl. `kind`, `format`, `duration_ms`, `headline`, `cta`, `warnings`), `ad_creative_variants`, `ad_events`, `ad_ledger` (incl. `channel`), `ad_channel_rates`, `ad_hubs`, `ad_partners` (legacy shares), `ad_rate_history`, `ad_override_recipients`, `ad_hub_gates`, `ad_settings` (payout timing), `ad_payouts`, `ad_alert_prefs`, `ad_hub_alerts_sent`, `ad_audit`, `ad_promo_codes`, `ad_promo_redemptions`, `ad_street_members`, `ad_street_qrs`, `ad_street_events`.
+`ad_campaigns` (incl. `seller`, `internal`, `order_kind`, `is_test`), `ad_creatives` (incl. `kind`, `format`, `duration_ms`, `headline`, `cta`, `warnings`), `ad_creative_variants`, `ad_events`, `ad_ledger` (incl. `channel`), `ad_channel_rates`, `ad_hubs`, `ad_partners` (legacy shares), `ad_rate_history`, `ad_override_recipients`, `ad_hub_gates`, `ad_hub_serving`, `ad_settings` (payout timing), `ad_payouts`, `ad_alert_prefs`, `ad_hub_alerts_sent`, `ad_audit`, `ad_promo_codes`, `ad_promo_redemptions`, `ad_street_members`, `ad_street_qrs`, `ad_street_events`.
 
 ## Env vars (birch-reserve project; names only)
 | Var | Purpose |

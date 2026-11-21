@@ -46,6 +46,8 @@ export async function serve(input: ServeInput): Promise<ServeResult> {
   if (!slot) return { fill: false, reason: "unknown_slot" };
   if (!slot.live) return { fill: false, reason: "slot_not_live" };
   if (isBotUa(input.ua)) return { fill: false, reason: "filtered" };
+  // Hub guard (Randy Nov 21 2026 3:42/3:43 PM): no ads on a hub unless Randy or Jon enabled that hub (default OFF). QA test hubs carry test campaigns only.
+  if (slot.kind !== "marketing" && !slot.test && !(await store.hubServingEnabled(slot.hub))) return { fill: false, reason: "hub_not_enabled" };
   const vidHash = !input.dnt && input.vid ? visitorHash(input.vid, now) : null;
   const rows = await candidates(now);
   const ids = rows.map((r) => r.campaign.id);
