@@ -148,8 +148,8 @@ export function KitEntry({ from }: { from: string }) {
   return (
     <section data-testid={`kit-entry-${from}`} className="border-b border-border/70 bg-lime-200">
       <div className="container mx-auto flex flex-col gap-3 px-4 py-5 md:flex-row md:items-center md:justify-between">
-        <p className="font-display text-xl text-[#0b1f3a] md:text-2xl">Get your personalized Monetization Kit: revenue + exposure, in four numbers. <span className="text-sm font-sans text-[#0b1f3a]/70">Estimate</span></p>
-        <a href={intakeHref(`strip_${from}`)} onClick={() => logCtaClick(`strip_${from}`)} className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-6 text-sm font-bold text-lime-300"><Download className="size-4" />Get my Monetization Kit</a>
+        <p className="font-display text-xl text-[#0b1f3a] md:text-2xl">Get your free personalized Monetization Kit: revenue + exposure, in four numbers. <span className="text-sm font-sans text-[#0b1f3a]/70">Estimate</span></p>
+        <a href={intakeHref(`strip_${from}`)} onClick={() => logCtaClick(`strip_${from}`)} className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-6 text-sm font-bold text-lime-300"><Download className="size-4" />Get my free Monetization Kit</a>
       </div>
     </section>
   );

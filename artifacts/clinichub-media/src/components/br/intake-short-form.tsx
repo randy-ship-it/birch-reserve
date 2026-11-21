@@ -74,7 +74,7 @@ export function LocationsQuestion({ value: p, onChange, side }: { value: PhysFor
 const hostOf = (w: string) => w.trim().replace(/^https?:\/\//i, "").replace(/^www\./i, "").split(/[/?#]/)[0]!.toLowerCase().slice(0, 80) || "your site";
 const input = "h-12 w-full rounded-xl border border-foreground/20 bg-white px-3 text-base outline-none focus:border-foreground focus:ring-2 focus:ring-accent";
 const small = "h-11 w-full rounded-xl border border-foreground/20 bg-white px-3 text-sm outline-none focus:border-foreground";
-const ERR: Record<string, string> = { fast_needs_website_email: "Add your website and a work email to get your Monetization Kit.", too_fast: "One sec: give it a moment and try again.", email: "Use a valid work email.", website: "Add your website.", individual_data: "Please keep it to business-level details (no customer names or contacts).", rate_limited: "Too many tries. Please wait a minute." };
+const ERR: Record<string, string> = { fast_needs_website_email: "Add your website and a work email to get your free Monetization Kit.", too_fast: "One sec: give it a moment and try again.", email: "Use a valid work email.", website: "Add your website.", individual_data: "Please keep it to business-level details (no customer names or contacts).", rate_limited: "Too many tries. Please wait a minute." };
 
 export type OneFormRoles = { supplier: boolean; hub: boolean; accelerate: boolean };
 export const rolesOf = (r: OneFormRoles): IntakeRole[] => [...(r.supplier ? (["supplier"] as const) : []), ...(r.hub ? (["publisher"] as const) : []), ...(r.supplier && r.accelerate ? (["kit"] as const) : [])];
@@ -333,7 +333,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
           <FieldError msg={touched.email ? fieldErrs.email : ""} />
         </div>
         <button type="submit" disabled={busy} data-testid="intake-submit" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 transition hover:bg-[#0b1f3a] hover:text-white">
-          {busy ? <Loader2 className="size-5 animate-spin" /> : null} {sup && r.hub ? "Create my hub" : "Get my Monetization Kit"} <ArrowRight className="size-5" />
+          {busy ? <Loader2 className="size-5 animate-spin" /> : null} {sup && r.hub ? "Create my hub" : "Get my free Monetization Kit"} <ArrowRight className="size-5" />
         </button>
       </div>
       <PromoBox />

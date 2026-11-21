@@ -72,7 +72,7 @@ ${statHtml}<div>${button(i.reportUrl, "Open my Monetization Kit")}</div>
 ${i.hasPdf ? `<p style="font-size:13px;color:${MUTE};margin:0">Your kit is attached as a PDF.</p>` : ""}`;
   const foot = `Estimates in USD, not guarantees. A person at Birch Reserve reviews every request; nothing is booked or charged automatically.<br>Birch Reserve · birchreserve.net · Reply to this email to reach the team.`;
   const text = `Your Monetization Kit is ready.\n\nHere is what ${i.brand?.trim() || "your brand"} could reach and earn across health and wellness hubs. Estimates, reviewed by a person.\n${stats.map(([v, l]) => `- ${v} ${l}`).join("\n")}\n\nOpen your Monetization Kit: ${i.reportUrl}\n${i.hasPdf ? "Your kit is attached as a PDF.\n" : ""}\nEstimates in USD, not guarantees. Birch Reserve · birchreserve.net`;
-  return { subject: "Your Monetization Kit from Birch Reserve", html: shell("Your Monetization Kit", "Your exposure and earnings estimate, plus the PDF.", inner, foot), text };
+  return { subject: "Your free Monetization Kit from Birch Reserve", html: shell("Your Monetization Kit", "Your exposure and earnings estimate, plus the PDF.", inner, foot), text };
 }
 
 export type NudgeInput = { resumeUrl: string; unsubscribeUrl: string; website?: string | null };
@@ -80,11 +80,11 @@ export function renderNudgeEmail(i: NudgeInput): { subject: string; html: string
   const site = i.website?.trim() ? ` for ${esc(i.website.trim())}` : "";
   const inner = `<h1 style="font-family:${EMAIL_TOKENS.serif};font-weight:400;font-size:28px;line-height:1.18;margin:0 0 10px;color:${EMAIL_TOKENS.ink}">Your Monetization Kit is one click away.</h1>
 <p style="font-size:15px;line-height:1.55;margin:0;color:${MUTE}">You started your kit${site}. We saved what you typed, so you can pick up right where you left off.</p>
-<div>${button(i.resumeUrl, "Finish my Monetization Kit")}</div>
+<div>${button(i.resumeUrl, "Finish my free Monetization Kit")}</div>
 <p style="font-size:13px;color:${MUTE};margin:0">Takes under a minute. Free.</p>`;
   const foot = `This is the only reminder we will send about this kit. <a href="${esc(i.unsubscribeUrl)}" style="color:${MUTE}">Unsubscribe</a>.<br>Birch Reserve · birchreserve.net`;
   const text = `Your Monetization Kit is one click away.\n\nYou started your kit${i.website ? ` for ${i.website}` : ""}. We saved what you typed, so you can pick up where you left off.\n\nFinish my Monetization Kit: ${i.resumeUrl}\n\nThis is the only reminder we will send about this kit. Unsubscribe: ${i.unsubscribeUrl}\nBirch Reserve · birchreserve.net`;
-  return { subject: "Finish your Monetization Kit", html: shell("Finish your Monetization Kit", "We saved your answers. Pick up where you left off.", inner, foot), text };
+  return { subject: "Finish your free Monetization Kit", html: shell("Finish your Monetization Kit", "We saved your answers. Pick up where you left off.", inner, foot), text };
 }
 
 /* ------------------------------------------------------------------ nudge sweep */
