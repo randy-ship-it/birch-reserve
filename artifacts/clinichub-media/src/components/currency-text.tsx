@@ -1,28 +1,53 @@
 /**
  * Page-wide price text in the visitor's currency (BR-15 move 4 follow-up, Nov 21 2026).
- * Many pages still carry the $190 / $490 copy as plain text. When the visitor's currency is CAD, this rewrites
- * those text nodes to the CAD table ($270 / $690 CAD, from the same /api/currency source) and restores the
- * original text when they switch back to USD. Amounts that are USD-only (sponsor packs, CPMs, agency tests)
- * are never touched: only $190 and $490. Opt out a block with data-currency-fixed (e.g. USD-based math).
+ * Randy's rule: a Canadian visitor sees every price in CAD, everyone else USD; the same number in both currencies
+ * unless a CAD table exists. Many pages carry hard-coded USD copy, so when the visitor's currency is CAD this:
+ *   - rewrites $190 / $490 to the CAD table ($270 / $690 CAD, from the same /api/currency source);
+ *   - relabels every other USD label as CAD with the same number (no CAD table exists for those);
+ * and restores the original text when the visitor switches back to USD.
+ * Facts that are not our prices (third-party benchmarks, signed-contract values, data inputs) opt out with
+ * data-currency-fixed. Components with their own CAD table (sponsor packs) render CAD themselves.
  * Legal pages state both currencies themselves and are skipped.
  */
 import { useEffect } from "react";
 import { localizePrices, useCurrency } from "@/lib/currency";
 
 const SKIP_PATHS = /^\/(terms|privacy|sample-io)(\/|$)/;
-const HAS_PRICE = /\$(190|490)(?![0-9,]|\.[0-9])/;
+const SKIP_SEL = "script,style,textarea,input,[role=group],[data-testid^=currency],[data-currency-fixed],[contenteditable]";
+const HAS_PRICE = /\$(190|490)(?![0-9,]|\.[0-9])|\bUSD\b/;
+
+/** CAD copy: CAD table for $190 / $490, every other USD label becomes CAD with the same number. */
+export function toCadText(text: string, prices?: Parameters<typeof localizePrices>[2]): string {
+  return localizePrices(text, "cad", prices).replace(/\bUSD\b/g, "CAD").replace(/\bCAD(\s*[·,]?\s*)CAD\b/g, "CAD");
+}
+
+/** Text just before this node inside its block: all previous siblings ("$" + "190" + " USD"), or, for a
+ * "<span>USD</span>" right after "$690", the previous siblings of the wrapper. */
+function textBefore(node: Node): string {
+  let cur: Node | null = node;
+  while (cur && !cur.previousSibling && cur.parentNode && cur.parentNode.nodeType === Node.ELEMENT_NODE && cur.parentNode.childNodes.length === 1) cur = cur.parentNode;
+  let out = "";
+  for (let n = cur?.previousSibling ?? null; n && out.length < 40; n = n.previousSibling) out = (n.textContent ?? "") + out;
+  return out;
+}
 
 export function CurrencyText() {
   const { currency, prices } = useCurrency();
   useEffect(() => {
     if (typeof document === "undefined") return;
     const originals = new Map<Text, string>();
+    const localize = (node: Text, base: string): string => {
+      let next = toCadText(base, prices);
+      // "$490" became "$690 CAD" and a separate "USD" node follows it: drop the duplicate label.
+      if (/^\s*USD\b/.test(base) && /CAD\s*$/.test(textBefore(node))) next = next.replace(/^(\s*)CAD\b\s?/, "$1");
+      return next;
+    };
     const fix = (node: Text) => {
       const parent = node.parentElement;
-      if (!parent || parent.closest("script,style,textarea,input,[data-currency-fixed],[contenteditable]")) return;
+      if (!parent || parent.closest(SKIP_SEL)) return;
       const base = originals.get(node) ?? node.data;
       if (!HAS_PRICE.test(base)) return;
-      const next = localizePrices(base, "cad", prices);
+      const next = localize(node, base);
       if (next !== base) {
         originals.set(node, base);
         if (node.data !== next) node.data = next;
@@ -41,7 +66,7 @@ export function CurrencyText() {
           const t = m.target as Text;
           // React re-rendered this node with its own (USD) text: forget the old original and localize again.
           const orig = originals.get(t);
-          if (orig !== undefined && t.data !== localizePrices(orig, "cad", prices)) originals.delete(t);
+          if (orig !== undefined && t.data !== localize(t, orig)) originals.delete(t);
           fix(t);
         } else m.addedNodes.forEach(walk);
       }

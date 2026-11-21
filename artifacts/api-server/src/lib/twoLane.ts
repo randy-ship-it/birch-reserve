@@ -163,24 +163,27 @@ export function clampAgencyBudget(n: unknown): number {
 }
 
 export function agencyPrepayLeadPayload(
-  input: { email: string; agency: string; client: string; budgetUsd: number; where: string },
+  input: { email: string; agency: string; client: string; budgetUsd: number; where: string; currency?: "usd" | "cad" },
   ref: string,
   path = "/intake",
 ) {
   const budget = clampAgencyBudget(input.budgetUsd);
   const cash = Math.round((budget * AGENCY_CASH_PCT) / 100);
   const client = input.client.trim() || "a client";
+  // Same number in the visitor's currency (no CAD table for the agency test).
+  const C = input.currency === "cad" ? "CAD" : "USD";
   return {
     kind: "agency_inquiry" as const,
     email: input.email.trim(),
     company: input.agency.trim() ? `${input.agency.trim()} for ${client}` : client,
-    message: `Prepay a client test budget: ${fmt(budget)} USD for ${client} (from ${input.where}). Pre-filled IO request ${ref}. ${AGENCY_CASH_PCT}% of media spend (${fmt(cash)} USD) to the agency of record. No card charged.`,
+    message: `Prepay a client test budget: ${fmt(budget)} ${C} for ${client} (from ${input.where}). Pre-filled IO request ${ref}. ${AGENCY_CASH_PCT}% of media spend (${fmt(cash)} ${C}) to the agency of record. No card charged.`,
     path,
     fields: {
       lane: "agency_prepay",
-      budget: `${fmt(budget)} USD`,
+      budget: `${fmt(budget)} ${C}`,
+      currency: C.toLowerCase(),
       budget_usd: String(budget),
-      agency_cash: `${fmt(cash)} USD`,
+      agency_cash: `${fmt(cash)} ${C}`,
       client: input.client.trim(),
       agency: input.agency.trim(),
       draft_ref: ref,

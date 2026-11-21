@@ -99,9 +99,11 @@ test("checkout gate: live key needs the live flag", () => {
 
 test("deposit ladder sessions (non-exclusive slots buy down the rate)", () => {
   assert.deepEqual(SLOT_LADDER.map((s) => s.usd), [490, 1500, 3000, 6000]);
-  // USD only (Nov 20 2026): a CAD request still charges the USD pack.
+  // Geo pricing (Randy, Nov 21 2026 3:34 PM): a CAD page charges the CAD table; anything else charges USD.
   const t = buildDepositSession({ tier: "sponsor-3000", currency: "cad", brand: "Acme", email: "a@acme.com", agree: true }, "https://birchreserve.net");
-  assert.ok(t.ok && t.amountCents === 300000 && t.currency === "usd");
+  assert.ok(t.ok && t.amountCents === 420000 && t.currency === "cad");
+  const tu = buildDepositSession({ tier: "sponsor-3000", currency: "usd", brand: "Acme", email: "a@acme.com", agree: true }, "https://birchreserve.net");
+  assert.ok(tu.ok && tu.amountCents === 300000 && tu.currency === "usd");
   const starter = buildDepositSession({ amount: 490, currency: "usd", brand: "Acme", email: "a@acme.com", agree: true }, "https://birchreserve.net");
   assert.ok(starter.ok && starter.amountCents === 49000);
 });
@@ -403,8 +405,11 @@ test("sponsor deposits gate + /sponsor packs page (audit #6)", () => {
   assert.equal(sponsorDepositsOpen(E({ STRIPE_SECRET_KEY: "sk_test_x" })), false);
   const html = sponsorHtml("cad", { open: true, pack: "sponsor-6000", prefill: { email: "a@acme.com", company: "Acme <x>" } });
   // Guided form (Nov 21 2026): every pack is priced on its card; one primary button pays for the picked pack.
-  for (const n of ["1,500", "3,000", "6,000"]) assert.match(html, new RegExp(`data-testid="pack-sponsor-${n.replace(",", "")}"[^]*?\\$${n} USD`));
-  assert.match(html, /id="sp-go"[^>]*>Prepay \$6,000/);
+  // Geo pricing: a CAD visitor sees the CAD table and is charged in CAD.
+  for (const [k, n] of [["1500", "2,100"], ["3000", "4,200"], ["6000", "8,400"]]) assert.match(html, new RegExp(`data-testid="pack-sponsor-${k}"[^]*?\\$${n} CAD`));
+  assert.match(html, /id="sp-go"[^>]*>Prepay \$8,400/);
+  assert.match(html, /currency:'cad'/);
+  for (const n of ["1,500", "3,000", "6,000"]) assert.match(sponsorHtml("usd", { open: true }), new RegExp(`\\$${n} USD`));
   assert.match(html, /Step 1 of 2[^]*Step 2 of 2/);
   assert.match(html, /value="sponsor-6000" checked/);
   assert.match(html, /value="Acme &lt;x&gt;"/);

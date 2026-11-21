@@ -3,6 +3,7 @@
  * (same links, same logo, same Plus Jakarta Sans type) so the intake feels like a Scale page. The form below is the
  * unchanged Birch intake. All links stay on scalehealth.ca (data-mirror-keep) except the intake itself.
  */
+import { CurrencyToggle } from "@/components/currency-toggle";
 import scaleLogo from "@assets/brand/scalehealth-logo-srgb-v2.png";
 import { SCALE_HOME } from "@/lib/siteSkin";
 import { intakeHref } from "@/components/br/kit-cta";
@@ -41,6 +42,8 @@ export function ScaleHeader() {
             <a key={l.href} href={l.href} data-mirror-keep="" data-testid={l.testId} className="inline-flex min-h-11 items-center transition-colors hover:text-foreground">{l.label}</a>
           ))}
         </nav>
+        <div className="flex shrink-0 items-center gap-2">
+        <CurrencyToggle className="hidden sm:inline-flex" />
         <a
           href={intakeHref("nav_mobile")}
           onClick={() => logCtaClick("nav_mobile")}
@@ -49,6 +52,7 @@ export function ScaleHeader() {
         >
           Get my kit
         </a>
+        </div>
       </div>
     </header>
   );

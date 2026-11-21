@@ -134,17 +134,18 @@ export type SponsorPageOpts = {
   /** Payout display region from x-vercel-ip-country. Default CA (CAD). */
   payout?: PayoutRegion; open?: boolean; pack?: string | null; prefill?: { email?: string; company?: string } | null; status?: string | null; sessionId?: string | null };
 
-/** /sponsor (Randy, Nov 20 2026 audit #6): three packs, each "Prepay $X". USD only. */
+/** /sponsor (Randy, Nov 20 2026 audit #6): three packs, each "Prepay $X". Visitor currency since Nov 21 2026 (geo pricing): CAD table in Canada, USD elsewhere. */
 export function sponsorHtml(visitorCurrency: Currency, opts: SponsorPageOpts = {}): string {
-  // Packs are priced and charged in USD for everyone (Nov 20 2026). The look / reserve / exclusive ladder follows the visitor.
-  const currency: Currency = "usd";
+  // Geo pricing (Randy, Nov 21 2026 3:34 PM): packs show and charge in the visitor's currency, from the DEPOSIT_TIERS CAD table.
+  const currency: Currency = visitorCurrency;
+  const amt = (t: { usd: number; cad: number }) => (currency === "cad" ? t.cad : t.usd);
   const open = opts.open ?? false;
   const picked = DEPOSIT_TIERS.find((t) => t.key === opts.pack)?.key ?? DEPOSIT_TIERS[1]!.key;
   const pf = opts.prefill ?? {};
   const val = (v?: string) => (v ? ` value="${esc(v)}"` : "");
   const tiers = DEPOSIT_TIERS.map((t) => {
-    const credit = Math.round(t.usd * (1 + t.bonusPct / 100));
-    return `<label class="card pack${t.key === picked ? " on" : ""}" data-testid="pack-${t.key}"><input type="radio" name="tier" value="${t.key}"${t.key === picked ? " checked" : ""} class="sr"><strong>${esc(t.label)}</strong><span class="amt">${money(t.usd, currency)}</span><span>+${t.bonusPct}% bonus: ${money(credit, currency)} credit</span><span class="pick" aria-hidden="true">${t.key === picked ? "✓ Selected" : "Tap to choose"}</span></label>`;
+    const credit = Math.round(amt(t) * (1 + t.bonusPct / 100));
+    return `<label class="card pack${t.key === picked ? " on" : ""}" data-testid="pack-${t.key}"><input type="radio" name="tier" value="${t.key}"${t.key === picked ? " checked" : ""} class="sr"><strong>${esc(t.label)}</strong><span class="amt">${money(amt(t), currency)}</span><span>+${t.bonusPct}% bonus: ${money(credit, currency)} credit</span><span class="pick" aria-hidden="true">${t.key === picked ? "✓ Selected" : "Tap to choose"}</span></label>`;
   }).join("");
   const payout: PayoutRegion = opts.payout ?? "ca";
   const ladder = SMB_LADDER.map((r) => `<tr><td>${r.customers} activated customers</td><td class="n">${payoutAmount(r.cashCad, payout)} cash</td><td class="n">${payoutAmount(r.creditCad, payout)} ad credit</td></tr>`).join("");
@@ -164,14 +165,14 @@ export function sponsorHtml(visitorCurrency: Currency, opts: SponsorPageOpts = {
 <div class="row"><label>Brand<input name="brand" required maxlength="160" autocomplete="organization"${val(pf.company)}><span class="sp-err" id="e-brand"></span></label>
 <label>Work email<input name="email" type="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@yourbrand.com" required autocomplete="email"${val(pf.email)}><span class="sp-err" id="e-email"></span></label></div>
 <label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the <a href="#terms-pack" data-open="terms-pack">pack terms</a>.</label><span class="sp-err" id="e-terms"></span>
-${(() => { const amt = money(DEPOSIT_TIERS.find((t) => t.key === picked)!.usd, currency).replace(/ USD$/, ""); return `<button type="submit" class="btn sp-go" id="sp-go" data-testid="sponsor-go">${open ? `Prepay ${amt} →` : `Send ${amt} pack request →`}</button>`; })()}
+${(() => { const amt$ = money(amt(DEPOSIT_TIERS.find((t) => t.key === picked)!), currency).replace(/ (USD|CAD)$/, ""); return `<button type="submit" class="btn sp-go" id="sp-go" data-testid="sponsor-go">${open ? `Prepay ${amt$} →` : `Send ${amt$} pack request →`}</button>`; })()}
 <div data-promo-box></div>
 <p id="msg" role="status" class="fine"></p>
 </form>
 <div class="stats pay" data-testid="payout-key-figures">
 <div class="stat"><span class="fine">Clinics and studios earn</span><b>${payoutAmount(SMB_LADDER[0]!.cashCad, payout)}</b>cash, or ${payoutAmount(SMB_LADDER[0]!.creditCad, payout, true)} in ad credit<br><a class="btn" href="https://scalehealth.ca/clinichubs">Open a Clinic Hub</a></div>
 </div>
-<p class="fine" data-testid="packs-usd-note">Sponsor packs are priced and charged in USD.${visitorCurrency === "cad" ? " The steps below are in CAD." : ""}</p>
+<p class="fine" data-testid="packs-usd-note">Packs are charged in ${currency.toUpperCase()}, the currency shown. Bonus credit is added in the same currency.</p>
 ${priceLadderHtml(visitorCurrency, { title: "Or start smaller" })}
 <div class="boxes">
 <details><summary>How it works</summary><ol class="steps">
@@ -197,7 +198,7 @@ ${hubPackageTable(currency)}
 <script>
 (function(){
 var msg=document.getElementById('msg');var f=document.getElementById('prepay');var go=document.getElementById('sp-go');var OPEN=${open ? "true" : "false"};
-var AMT=${JSON.stringify(Object.fromEntries(DEPOSIT_TIERS.map((t) => [t.key, money(t.usd, currency).replace(/ USD$/, "")])))};
+var AMT=${JSON.stringify(Object.fromEntries(DEPOSIT_TIERS.map((t) => [t.key, money(amt(t), currency).replace(/ (USD|CAD)$/, "")])))};
 var KEY='br-form:sponsor';var EM=/^[^\\s@]{1,64}@[a-z0-9-]+(\\.[a-z0-9-]+)*\\.[a-z]{2,}$/i;
 function cur(){var r=f.querySelector('input[name=tier]:checked');return r?r.value:''}
 function label(){var k=cur();go.textContent=OPEN?('Prepay '+(AMT[k]||'')+' →'):('Send '+(AMT[k]||'')+' pack request →')}
@@ -210,7 +211,7 @@ label();
 ['brand','email'].forEach(function(n){f[n].addEventListener('input',function(){save();if(f[n].getAttribute('aria-invalid'))err(n,'')})});
 document.getElementById('terms').addEventListener('change',function(){if(this.checked)err('terms','')});
 function send(body){msg.textContent=OPEN?'Opening secure checkout…':'Sending…';go.disabled=true;fetch('/v1/sponsor/deposit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){if(x.ok&&x.j.url){try{localStorage.removeItem(KEY)}catch(_){}location.href=x.j.url}else if(x.ok){try{localStorage.removeItem(KEY)}catch(_){}msg.textContent=x.j.message||'Request sent. We confirm by email within 1 business day. No charge today.';f.querySelectorAll('input,button').forEach(function(el){el.disabled=true})}else{go.disabled=false;msg.textContent=x.j.message||x.j.error||'Email sales@silverbirchgrowth.com and we will confirm within 1 business day.'}}).catch(function(){go.disabled=false;msg.textContent='Network error. Press the button again, or email sales@silverbirchgrowth.com.'})}
-f.addEventListener('submit',function(e){e.preventDefault();var d={currency:'usd',tier:cur(),brand:f.brand.value.trim(),email:f.email.value.trim(),agree:document.getElementById('terms').checked};var bad=null;
+f.addEventListener('submit',function(e){e.preventDefault();var d={currency:'${currency}',tier:cur(),brand:f.brand.value.trim(),email:f.email.value.trim(),agree:document.getElementById('terms').checked};var bad=null;
 if(d.brand.length<2){err('brand','Add your brand name.');bad=bad||f.brand}else err('brand','');
 if(!EM.test(d.email)){err('email',d.email?'That email looks off. Check for a typo.':'Add your work email.');bad=bad||f.email}else err('email','');
 if(!d.agree){err('terms','Tick the box to agree to the pack terms.');bad=bad||document.getElementById('terms')}else err('terms','');
@@ -240,7 +241,7 @@ ${statsStrip()}
 <p class="fine mf">${MODELLED_FOOTER}</p>
 <h2>Ways to buy</h2>
 <ul>
-<li>Sponsorship credit (USD): ${DEPOSIT_TIERS.map((t) => `${money(t.usd, "usd")} (+${t.bonusPct}% credit)`).join(" · ")} or your own amount. <a href="/sponsor">Sponsor</a></li>
+<li>Sponsorship credit: ${DEPOSIT_TIERS.map((t) => `${money(currency === "cad" ? t.cad : t.usd, currency)} (+${t.bonusPct}% credit)`).join(" · ")} or your own amount. <a href="/sponsor">Sponsor</a></li>
 <li>${priceLadder(currency).map((s) => `${s.name}: ${s.price}`).join(" · ")} (the exclusive reserve locks a $5K–$50K ${currency.toUpperCase()} package; the shared reserve does not lock the category). <a href="/buycalc">Calculator</a> · <a href="/exclusive">Exclusive</a></li>
 <li>Multi-hub or annual programs: book a call at <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></li>
 </ul>
@@ -280,8 +281,8 @@ export type DepositRequest = { tier?: string; amount?: number; currency?: string
 export function buildDepositSession(body: DepositRequest, origin: string):
   | { ok: false; error: string }
   | { ok: true; amountCents: number; currency: Currency; params: Record<string, unknown> } {
-  // USD only (Randy HARD rule, Nov 20 2026), whatever the page sent.
-  const currency = "usd" as Currency;
+  // Charge the currency the page showed (geo pricing, Randy Nov 21 2026 3:34 PM; replaces the Nov 20 USD-only rule). Default USD.
+  const currency: Currency = String(body.currency ?? "").toLowerCase() === "cad" ? "cad" : "usd";
   const brand = String(body.brand ?? "").trim().slice(0, 160);
   const email = String(body.email ?? "").trim().slice(0, 200);
   if (!brand || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok: false, error: "Add your brand and a work email." };
@@ -305,6 +306,7 @@ export function buildDepositSession(body: DepositRequest, origin: string):
   const creditCents = Math.round(amountCents * (1 + bonusPct / 100));
   const metadata = {
     kind: "sponsorship_credit",
+    currency,
     tier: tierKey,
     bonus_pct: String(bonusPct),
     credit_cents: String(creditCents),
@@ -321,7 +323,7 @@ export function buildDepositSession(body: DepositRequest, origin: string):
       adaptive_pricing: { enabled: false },
       customer_email: email,
       customer_creation: "always",
-      line_items: [{ quantity: 1, price_data: { currency, unit_amount: amountCents, product_data: tierKey === "custom" ? customLineItem(amount) : packLineItem({ usd: amount, bonusPct }) } }],
+      line_items: [{ quantity: 1, price_data: { currency, unit_amount: amountCents, product_data: tierKey === "custom" ? customLineItem(amount, currency) : packLineItem({ usd: amount, bonusPct }, currency) } }],
       metadata,
       payment_intent_data: { ...birchPaymentIntentBrand(`Sponsorship pack · ${brand}`), metadata },
       custom_text: { submit: { message: "Card now. Nothing runs until you sign an insertion order. Refundable until 14 days before the IO launch date." } },

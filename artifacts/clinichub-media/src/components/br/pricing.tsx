@@ -345,7 +345,7 @@ export function ProveItLadder() {
 /** Channel benchmark ranges (planning estimates). */
 export function ChannelBenchmarks() {
   return (
-    <div className="overflow-x-auto" data-testid="channel-benchmarks">
+    <div className="overflow-x-auto" data-testid="channel-benchmarks" data-currency-fixed>
       <table className="w-full min-w-[520px] border-collapse text-left text-sm">
         <thead>
           <tr className="border-b-2 border-foreground">

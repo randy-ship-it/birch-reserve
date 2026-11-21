@@ -136,7 +136,7 @@ export function MetaComparison() {
             </tr>
             <tr>
               <td className="py-3 pr-4 font-medium">CPM, health &amp; wellness</td>
-              <td className="py-3 pr-4 text-muted-foreground">$20.70 USD (Meta, 2025)¹</td>
+              <td className="py-3 pr-4 text-muted-foreground" data-currency-fixed>$20.70 USD (Meta, 2025)¹</td>
               <td className="py-3">
                 Starting at ${RATE_SURFACES[0]!.cpmStarter[0]}–{RATE_SURFACES[4]!.cpmStarter[0]} USD by surface (~${BLENDED.starterCpm} blended) <Modelled>Estimate</Modelled>
               </td>
@@ -148,7 +148,7 @@ export function MetaComparison() {
             </tr>
             <tr>
               <td className="py-3 pr-4 font-medium">Cost per lead, health &amp; fitness</td>
-              <td className="py-3 pr-4 text-muted-foreground">$52.98 USD³</td>
+              <td className="py-3 pr-4 text-muted-foreground" data-currency-fixed>$52.98 USD³</td>
               <td className="py-3">Reported per campaign with UTM links and promo codes. No performance claims until campaigns report.</td>
             </tr>
             <tr>
@@ -159,7 +159,7 @@ export function MetaComparison() {
           </tbody>
         </table>
       </div>
-      <ol className="mt-4 space-y-1 text-[11px] leading-relaxed text-muted-foreground">
+      <ol className="mt-4 space-y-1 text-[11px] leading-relaxed text-muted-foreground" data-currency-fixed>
         {[BENCHMARKS[0], BENCHMARKS[4], BENCHMARKS[2]].map((b, i) => (
           <li key={b.metric}>
             {i + 1}. {b.metric}: {b.value}. Source:{" "}
