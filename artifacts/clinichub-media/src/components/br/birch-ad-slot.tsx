@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Birch ad slot for Birch / Scale marketing and intake pages (Randy, Nov 21 2026 4:02 PM: Calm Joints on the media kit and
- * Scale intake). Only MARKETING_SLOTS keys belong here; hubs are off unless Randy or Jon enable them in the ad system.
+ * Birch ad slot for Birch / Scale marketing and intake pages. Only MARKETING_SLOTS keys belong here; hubs are off unless
+ * Randy or Jon enable them in the ad system.
+ *
+ * NOT PLACED anywhere right now (Randy, Nov 21 2026 5:54 PM): no live ads on the Birch site. The Calm Joints creative
+ * appears only as an illustration inside the example-hub mockups (components/br/calm-example-ad.tsx). Placing this slot
+ * on a page again needs Randy's say-so.
  *
  * No layout shift: the box is reserved up front (creative ratio + the embed's "Sponsored" label row) and the embed renders
  * on top of it. If nothing fills, the reserved box collapses (an empty slot never sits on the page).

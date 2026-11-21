@@ -21,6 +21,7 @@ import { trackIntake as trackIntakeRaw } from "@/lib/intakeTrack";
 import { openRandyChat } from "@/lib/book-call";
 import { kitPdfBlob, saveBlob } from "@/lib/kitRender";
 import { ioDraftSvg } from "@/lib/ioDraft";
+import { CALM_EXAMPLE, CalmExampleCreative, showCalmExample } from "@/components/br/calm-example-ad";
 import {
   AGENCY_TEST,
   BLOCK_BANDS,
@@ -106,9 +107,11 @@ export function HubMock({ brand, logo, hub, category, pins = false, badge }: { b
   const hubName = H.name;
   const surface = H.surface;
   const initials = name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+  // No brand or logo yet: show the real Calm Joints creative as the example ad (illustration only, not a live ad).
+  const example = !brand.trim() && !logo && showCalmExample(hub);
   const pinCls = "absolute grid size-6 place-items-center rounded-full bg-lime-300 text-[11px] font-black text-[#0b1f3a] shadow-lg ring-2 ring-white";
   return (
-    <figure className="relative overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-foreground/10 [container-type:inline-size]" data-testid="hub-mock" data-hub={hub}>
+    <figure className="relative overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-foreground/10 [container-type:inline-size]" data-testid="hub-mock" data-hub={hub} data-example={example ? "calm" : undefined}>
       <div className="flex items-center gap-1.5 border-b border-foreground/10 bg-foreground/[0.03] px-3 py-2">
         <span className="size-2 rounded-full bg-red-300" /><span className="size-2 rounded-full bg-amber-300" /><span className="size-2 rounded-full bg-lime-400" />
         <span className="ml-2 truncate text-[11px] text-foreground/55">{H.host}</span>
@@ -118,21 +121,30 @@ export function HubMock({ brand, logo, hub, category, pins = false, badge }: { b
       <div className="relative aspect-[16/10] w-full">
         <img src={H.img} alt={`${hubName} live hub`} width={1440} height={900} decoding="async" className="absolute inset-0 size-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
-        <div className={`absolute ${H.card.pos} w-[42cqw] max-md:w-[60cqw] rounded-[1.6cqw] bg-white p-[2.2cqw] shadow-2xl ring-2 ring-lime-300`} style={H.card.scale ? { transform: `scale(${H.card.scale})`, transformOrigin: H.card.origin === "br" ? "bottom right" : "bottom left" } : undefined} data-testid="hub-mock-card">
+        <div className={`absolute ${H.card.pos} ${example ? "w-[36cqw] p-[1.4cqw] max-md:w-[40cqw]" : "w-[42cqw] p-[2.2cqw] max-md:w-[60cqw]"} rounded-[1.6cqw] bg-white shadow-2xl ring-2 ring-lime-300`} style={H.card.scale ? { transform: `scale(${H.card.scale})`, transformOrigin: H.card.origin === "br" ? "bottom right" : "bottom left" } : undefined} data-testid="hub-mock-card">
           {pins ? <><span className={`${pinCls} -left-3 -top-3`} aria-hidden>1</span><span className={`${pinCls} -bottom-3 ${H.card.pin3 === "bl" ? "-left-3" : "-right-3"}`} aria-hidden>3</span></> : null}
-          <p className="truncate text-[max(7px,1.7cqw)] font-bold uppercase tracking-[0.12em] text-foreground/45">Featured · {surface}</p>
-          <div className="mt-[1.4cqw] flex items-center gap-[1.6cqw]">
-            {logo ? (
-              <img src={logo} alt="" className="size-[max(24px,7.5cqw)] shrink-0 rounded-lg object-contain ring-1 ring-foreground/10" />
-            ) : (
-              <span className="grid size-[max(24px,7.5cqw)] shrink-0 place-items-center rounded-lg text-[max(9px,2.4cqw)] font-black text-white" style={{ background: NAVY }}>{initials || "YB"}</span>
-            )}
-            <div className="min-w-0">
-              <p className="truncate text-[max(10px,2.9cqw)] font-extrabold leading-tight text-[#0b1f3a]" data-testid="hub-mock-brand">{name}</p>
-              <p className="truncate text-[max(8px,2.1cqw)] leading-tight text-foreground/60">{category}</p>
-            </div>
-          </div>
-          <span className="mt-[1.6cqw] inline-flex h-[max(18px,5.2cqw)] w-full items-center justify-center rounded-full bg-lime-300 text-[max(8px,2.1cqw)] font-bold text-[#0b1f3a]">Shop the offer</span>
+          {example ? (
+            <>
+              <p className={`truncate text-[max(7px,1.6cqw)] font-bold uppercase tracking-[0.1em] text-foreground/50 ${pins ? "pl-[max(12px,2.4cqw)]" : ""}`} data-testid="hub-mock-example-label">{CALM_EXAMPLE.label}</p>
+              <div className="mt-[1.2cqw] overflow-hidden rounded-[1cqw] ring-1 ring-foreground/10"><CalmExampleCreative sizes="(max-width: 768px) 60vw, 480px" /></div>
+            </>
+          ) : (
+            <>
+              <p className="truncate text-[max(7px,1.7cqw)] font-bold uppercase tracking-[0.12em] text-foreground/45">Featured · {surface}</p>
+              <div className="mt-[1.4cqw] flex items-center gap-[1.6cqw]">
+                {logo ? (
+                  <img src={logo} alt="" className="size-[max(24px,7.5cqw)] shrink-0 rounded-lg object-contain ring-1 ring-foreground/10" />
+                ) : (
+                  <span className="grid size-[max(24px,7.5cqw)] shrink-0 place-items-center rounded-lg text-[max(9px,2.4cqw)] font-black text-white" style={{ background: NAVY }}>{initials || "YB"}</span>
+                )}
+                <div className="min-w-0">
+                  <p className="truncate text-[max(10px,2.9cqw)] font-extrabold leading-tight text-[#0b1f3a]" data-testid="hub-mock-brand">{name}</p>
+                  <p className="truncate text-[max(8px,2.1cqw)] leading-tight text-foreground/60">{category}</p>
+                </div>
+              </div>
+              <span className="mt-[1.6cqw] inline-flex h-[max(18px,5.2cqw)] w-full items-center justify-center rounded-full bg-lime-300 text-[max(8px,2.1cqw)] font-bold text-[#0b1f3a]">Shop the offer</span>
+            </>
+          )}
         </div>
         {badge ? null : <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]">Mock · live hub</span>}
         {pins ? <span className={pinCls} style={{ left: H.pin2.left, top: H.pin2.top }} aria-hidden>2</span> : null}
