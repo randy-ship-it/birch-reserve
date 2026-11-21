@@ -402,7 +402,10 @@ test("sponsor deposits gate + /sponsor packs page (audit #6)", () => {
   assert.equal(sponsorDepositsOpen(E({ SPONSOR_DEPOSITS_ENABLED: "true", SPONSOR_DEPOSITS_LIVE: "true", STRIPE_SECRET_KEY: "sk_live_x", STRIPE_CHECKOUT_DISABLED: "true" })), false);
   assert.equal(sponsorDepositsOpen(E({ STRIPE_SECRET_KEY: "sk_test_x" })), false);
   const html = sponsorHtml("cad", { open: true, pack: "sponsor-6000", prefill: { email: "a@acme.com", company: "Acme <x>" } });
-  for (const n of ["1,500", "3,000", "6,000"]) assert.match(html, new RegExp(`Prepay \\$${n}`));
+  // Guided form (Nov 21 2026): every pack is priced on its card; one primary button pays for the picked pack.
+  for (const n of ["1,500", "3,000", "6,000"]) assert.match(html, new RegExp(`data-testid="pack-sponsor-${n.replace(",", "")}"[^]*?\\$${n} USD`));
+  assert.match(html, /id="sp-go"[^>]*>Prepay \$6,000/);
+  assert.match(html, /Step 1 of 2[^]*Step 2 of 2/);
   assert.match(html, /value="sponsor-6000" checked/);
   assert.match(html, /value="Acme &lt;x&gt;"/);
   assert.match(html, /counts in full toward any sponsorship pack bought within 30 days/);
