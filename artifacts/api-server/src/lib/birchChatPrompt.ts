@@ -13,6 +13,7 @@
  */
 import { AGENCY_CASH_PCT, MEDIA_KIT_CPM, MEDIA_KIT_OFFERS, agencyCash, kitExample } from "./overhaul/mediaKit";
 import { GTM_SETUP_CHAT_RULE, GTM_SETUP_FACT } from "./overhaul/gtmSetup";
+import { TRACK_RECORD_FACT } from "./overhaul/trackRecord";
 import { GTM_BOT_FACT } from "./overhaul/gtmBot";
 import { STREET_TEAM_CHAT_RULE, STREET_TEAM_ONE_LINE } from "./overhaul/streetTeam";
 import { AREA_LOCK } from "./overhaul/model";
@@ -209,6 +210,7 @@ function buildBirchPromptText(opts: BirchChatPromptOptions, brand: ChatBrand): s
     `- "Not ready" or "want something custom": the request form at ${BIRCH_LINKS.request} (brand, email, what they sell, no card). The sales team replies by email within 1 business day.`,
     `- "What is the GTM bot / who built it?": ${GTM_BOT_FACT} Never name portfolio companies, never promise outcomes, never give monthly prices (say monthly ranges scoped to their needs).`,
     `- "Do you do setup / GTM / partnership bot help?": ${GTM_SETUP_FACT} ${GTM_SETUP_CHAT_RULE} Keep it separate from ad buying; it does not change the ad rules.`,
+    `- "What's your track record?" / "Why trust you?": ${TRACK_RECORD_FACT} Then point to the $190 USD 7-day look.`,
     `- "Street team / door-to-door?": ${STREET_TEAM_ONE_LINE} ${STREET_TEAM_CHAT_RULE}`,
     `- Discounts or custom pricing: none beyond what's on the site; for custom deals send the request form or offer a call-back.`,
     `- Questions about Scale Health clinics, providers, care or anything that isn't buying ads: answer in one line that the team can help, give ${BIRCH_LINKS.scale}, and offer a call-back. Don't pitch other companies.`,

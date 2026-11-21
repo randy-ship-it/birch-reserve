@@ -15,6 +15,7 @@ import { DoorRoute } from "@/components/br/door-route";
 import { FounderNote, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import { MediaKitPdfLink, ProofStrip, SalesContact, TRUST_FAQ, TrustBand, TrustFaq } from "@/components/br/trust";
 import { HowWeGotHere } from "@/components/br/how-we-got-here";
+import { TrackRecord } from "@/components/br/track-record";
 import { GtmSetup } from "@/components/br/gtm-setup";
 import { GtmBotTeaser } from "@/components/br/gtm-bot-teaser";
 import { StreetTeamProgram } from "@/components/br/street-team";
@@ -181,7 +182,7 @@ export default function BrHome() {
 
       {/* 2d. GTM setup packages (Randy t332u, Nov 21 2026): separate from the ad product, same systems. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-gtm-setup">
-        <div className="mb-4"><HowWeGotHere where="home" /></div>
+        <div className="mb-4"><HowWeGotHere where="home" /></div><div className="mb-4"><TrackRecord where="home" /></div>
         <GtmSetup where="home" />
         <div className="mt-4"><GtmBotTeaser /></div>
       </section>

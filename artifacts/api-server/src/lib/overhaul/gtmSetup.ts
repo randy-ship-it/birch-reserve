@@ -21,7 +21,7 @@ export const GTM_SETUP = {
   cases: [
     "Health brand signed and launched a partnership motion in under two weeks.",
     "Recovery company is now running its own console after setup.",
-    "Setup, then handover: the client runs the motion themselves.",
+    "Virtual care partner: first email to ready to sign in 19 days, run by our field sales bot.",
   ],
   casesNote: "Examples are anonymous. No outcomes are guaranteed.",
   cta: "Start with a $3,500 setup",
@@ -38,7 +38,7 @@ export const GTM_PARTNER_TYPES = ["Clinics & studios", "Retailers", "Brands", "D
 
 /** One short paragraph for the chat prompt and llms.txt. */
 export const GTM_SETUP_FACT =
-  "GTM setup packages start at $3,500 USD: we set up the same in-house partnership / B2B go-to-market bot and console we use, get the client's motion running, then hand over the keys so they run it themselves. For health and wellness businesses. Separate from the ad inventory product but runs on the same systems. Nothing is charged online; start at https://birchreserve.net/intake/gtm and the team replies by email. Examples are anonymous (a health brand signed and launched a partnership motion in under two weeks; a recovery company now runs its own console after setup). No outcomes are guaranteed.";
+  "GTM setup packages start at $3,500 USD: we set up the same in-house partnership / B2B go-to-market bot and console we use, get the client's motion running, then hand over the keys so they run it themselves. For health and wellness businesses. Separate from the ad inventory product but runs on the same systems. Nothing is charged online; start at https://birchreserve.net/intake/gtm and the team replies by email. Examples are anonymous (a health brand signed and launched a partnership motion in under two weeks; a recovery company now runs its own console after setup; a virtual care partner went from first email to ready to sign in 19 days). No outcomes are guaranteed.";
 
 /** Chat-only guardrail. */
 export const GTM_SETUP_CHAT_RULE = "If asked who the examples are, say they are anonymous and you can't share client details. Never name, describe or hint at any client, and never promise outcomes or give numbers for them.";
