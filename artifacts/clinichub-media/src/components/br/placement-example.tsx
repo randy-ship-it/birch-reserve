@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { HUB_MOCKS, HUB_KEYS, type HubKey } from "@/lib/hub-mocks";
+import { CALM_EXAMPLE, CalmExampleCreative, showCalmExample } from "@/components/br/calm-example-ad";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 /** The five rate-card surfaces (same keys as RATE_SURFACES in overhaul/pricing.ts). */
@@ -25,6 +26,10 @@ const COPY: Record<PlacementKey, { title: string; caption: string }> = {
 function Badge() {
   return <span className="rounded-sm bg-foreground px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-background">Example placement</span>;
 }
+
+/** Example creative inside a placement tile: the real Calm Joints ad, illustration only (Randy, Nov 21 2026 5:54 PM). */
+const Creative = ({ className = "" }: { className?: string }) => <div className={`overflow-hidden rounded-sm ${className}`}><CalmExampleCreative sizes="(max-width: 768px) 50vw, 320px" /></div>;
+const EX = CALM_EXAMPLE.brand;
 
 /** The highlighted "your ad here" box drawn inside each example. */
 function Unit({ className = "", label = "Your brand" }: { className?: string; label?: string }) {
@@ -63,6 +68,8 @@ function Shot({ src, alt, children }: { src: string; alt: string; children: Reac
 /** Landing example on any of the 4 live hubs (16:10 captures, nothing cropped). Banner sits in the header gap; tile in a blank corner. */
 const LANDING_BANNER: Record<HubKey, string> = { drho: "top-[18.6%]", sole: "top-[12.6%]", effortless: "top-[12.4%]", calmjoints: "top-[13.2%]" };
 const LANDING_TILE: Record<HubKey, string> = { drho: "right-[4%] top-[27%] w-[44%]", sole: "left-[4%] top-[24%] w-[44%]", effortless: "right-[2%] top-[29%] w-[44%]", calmjoints: "left-[4%] top-[22%] w-[40%]" };
+/** Same corners as LANDING_TILE, narrower so the creative tile stays in the blank area. */
+const LANDING_TILE_EX: Record<HubKey, string> = { drho: "right-[4%] top-[27%] w-[30%]", sole: "left-[4%] top-[24%] w-[30%]", effortless: "right-[2%] top-[29%] w-[30%]", calmjoints: "left-[4%] top-[22%] w-[30%]" };
 function LandingShot() {
   const [hub, setHub] = useState<HubKey>("drho");
   const H = HUB_MOCKS[hub];
@@ -74,8 +81,15 @@ function LandingShot() {
         ))}
       </div>
       <Shot src={H.img} alt={`${H.name} hub home page, with an example banner and tile drawn on top`}>
-        <Unit className={`absolute left-[4%] right-[4%] ${LANDING_BANNER[hub]} py-1`} label="Your brand · hub banner" />
-        <Unit className={`absolute ${LANDING_TILE[hub]}`} label="Your brand" />
+        <Unit className={`absolute left-[4%] right-[4%] ${LANDING_BANNER[hub]} py-1`} label={showCalmExample(hub) ? `${EX} · hub banner` : "Your brand · hub banner"} />
+        {showCalmExample(hub) ? (
+          <div className={`absolute ${LANDING_TILE_EX[hub]} rounded-md border-2 border-dashed border-emerald-600 bg-white/95 p-1 text-emerald-900 shadow`} data-testid="placement-example-tile">
+            <Creative />
+            <div className="mt-1 flex items-center justify-between gap-1"><span className="truncate text-[9px] font-semibold">{EX}</span><span className="shrink-0 rounded-sm bg-emerald-700 px-1 text-[7px] font-semibold uppercase tracking-wider text-white">Sponsored</span></div>
+          </div>
+        ) : (
+          <Unit className={`absolute ${LANDING_TILE[hub]}`} label="Your brand" />
+        )}
       </Shot>
     </div>
   );
@@ -89,8 +103,8 @@ export function PlacementVisual({ k }: { k: PlacementKey }) {
       return (
         <Shot src="/hub-proof/roll-marketplace-grid.webp" alt="ROLL Recovery member marketplace product grid, with an example sponsored card drawn on top">
           <div className="absolute bottom-[3%] right-[15%] w-[17%] rounded-md border-2 border-dashed border-emerald-600 bg-emerald-50/95 p-1.5 text-emerald-900 shadow">
-            <div className="aspect-[4/3] w-full rounded-sm bg-emerald-200/70" />
-            <p className="mt-1 truncate text-[9px] font-semibold">Your product</p>
+            <Creative />
+            <p className="mt-1 truncate text-[9px] font-semibold">{EX}</p>
             <span className="rounded-sm bg-emerald-700 px-1 text-[7px] font-semibold uppercase tracking-wider text-white">Sponsored</span>
           </div>
         </Shot>
@@ -107,8 +121,8 @@ export function PlacementVisual({ k }: { k: PlacementKey }) {
           <div className="mt-2 grid grid-cols-[1fr_1fr] gap-2">
             <div className="space-y-1.5 rounded-md border border-foreground/10 p-2"><p className="text-[9px] text-foreground/55">Recent activity</p><Bar /><Bar w="w-4/5" /><Bar w="w-3/5" /></div>
             <div className="flex flex-col rounded-md border-2 border-dashed border-emerald-600 bg-emerald-50 p-2 text-emerald-900">
-              <div className="aspect-[3/2] w-full rounded-sm bg-emerald-200/70" />
-              <p className="mt-1 text-[10px] font-semibold">Your brand · native tile</p>
+              <Creative />
+              <p className="mt-1 text-[10px] font-semibold">{EX} · native tile</p>
               <span className="mt-0.5 self-start rounded-sm bg-emerald-700 px-1 text-[8px] font-semibold uppercase tracking-wider text-white">Sponsored</span>
             </div>
           </div>
@@ -125,8 +139,8 @@ export function PlacementVisual({ k }: { k: PlacementKey }) {
               <div className="mt-2 h-5 rounded-sm bg-foreground/80" />
             </div>
             <div className="flex flex-col rounded-md border-2 border-dashed border-emerald-600 bg-emerald-50 p-2 text-emerald-900">
-              <div className="aspect-[3/2] w-full rounded-sm bg-emerald-200/70" />
-              <p className="mt-1 text-[10px] font-semibold">Your brand · booking unit</p>
+              <Creative />
+              <p className="mt-1 text-[10px] font-semibold">{EX} · booking unit</p>
               <span className="mt-0.5 self-start rounded-sm bg-emerald-700 px-1 text-[8px] font-semibold uppercase tracking-wider text-white">Sponsored</span>
             </div>
           </div>
@@ -142,8 +156,8 @@ export function PlacementVisual({ k }: { k: PlacementKey }) {
           </div>
           <div className="mt-3 rounded-md border-2 border-dashed border-emerald-600 bg-emerald-50 p-2 text-emerald-900">
             <div className="flex items-center gap-2">
-              <div className="h-12 w-20 shrink-0 rounded-sm bg-emerald-200/70" />
-              <div className="min-w-0"><p className="text-[10px] font-semibold">Your brand · thank-you splash</p><p className="text-[9px] opacity-80">Your offer and link</p></div>
+              <Creative className="w-24 shrink-0" />
+              <div className="min-w-0"><p className="text-[10px] font-semibold">{EX} · thank-you splash</p><p className="text-[9px] opacity-80">Their offer and link</p></div>
               <span className="ml-auto shrink-0 rounded-sm bg-emerald-700 px-1 text-[8px] font-semibold uppercase tracking-wider text-white">Sponsored</span>
             </div>
           </div>
@@ -159,7 +173,7 @@ function Body({ k }: { k: PlacementKey }) {
     <div>
       <PlacementVisual k={k} />
       <div className="mt-2 flex items-center gap-2"><Badge /><span className="text-[11px] text-muted-foreground">{shot ? "Drawn on a real hub screenshot" : "Mockup of a hub page"}</span></div>
-      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{c.caption} Illustration only: creative and exact position are set in your insertion order.</p>
+      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{c.caption} Illustration only: example creative from {EX}; your creative and exact position are set in your insertion order.</p>
     </div>
   );
 }
