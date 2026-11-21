@@ -417,7 +417,7 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, desktopInli
           )}
           {" · "}
           <span className="text-foreground/60">{e.ago}</span>
-          <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className={`mt-0.5 ${slim ? "hidden" : "inline-flex"} min-h-8 items-center text-left text-[12px] leading-tight text-foreground/55 underline underline-offset-2 hover:text-foreground/70`} data-testid="activity-pulse-hide">
+          <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className={`ml-2 mt-0.5 ${slim ? "hidden" : "inline-flex"} min-h-8 items-center text-left text-[12px] leading-tight text-foreground/55 underline underline-offset-2 hover:text-foreground/70`} data-testid="activity-pulse-hide">
             Hide activity
           </button>
         </span>
