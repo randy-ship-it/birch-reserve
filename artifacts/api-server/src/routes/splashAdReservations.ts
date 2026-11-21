@@ -66,6 +66,7 @@ import { recordPaidCheckoutSafe } from "../lib/checkoutLead";
 import { EXCLUSIVE_RESERVE, recordPaidExclusiveReserveSafe } from "../lib/exclusiveReserve";
 import { draftCampaignFromCheckoutSafe } from "../lib/adserver/service";
 import { sendPrepayConfirmationSafe } from "../lib/prepayConfirmationEmail";
+import { handleChargeRefundedSafe, handleDisputeCreatedSafe } from "../lib/stripeRefunds";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { logger } from "../lib/logger";
 import { markSplashReservationTestIfQa } from "../lib/splashTestTraffic";
@@ -556,6 +557,18 @@ async function markPaymentFailedFromSession(
  * idempotent, so Stripe retries and duplicate deliveries are safe.
  */
 export async function processStripeEvent(event: Stripe.Event): Promise<void> {
+  // Stripe audit (Nov 21 2026): refunds and chargebacks now take the credit back and tell sales (lib/stripeRefunds.ts).
+  if (event.type === "charge.refunded") {
+    await handleChargeRefundedSafe(
+      event.data.object as Stripe.Charge,
+      (event.data as { previous_attributes?: { amount_refunded?: number } }).previous_attributes ?? null,
+    );
+    return;
+  }
+  if (event.type === "charge.dispute.created") {
+    await handleDisputeCreatedSafe(event.data.object as Stripe.Dispute);
+    return;
+  }
   if (event.type === "payment_intent.succeeded") {
     await markSplashReservationPaidFromPaymentIntent(
       event.data.object as Stripe.PaymentIntent,
@@ -574,16 +587,19 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
   ) {
     const session = event.data.object as Stripe.Checkout.Session;
     // Ad system (Nov 21 2026): every paid checkout opens a DRAFT campaign holding its credit. Never throws; nothing serves until an admin activates it.
-    if (session.payment_status === "paid") await draftCampaignFromCheckoutSafe(session);
+    const drafted = session.payment_status === "paid" ? await draftCampaignFromCheckoutSafe(session) : "ignored";
+    // A repeat delivery of the same paid session (Stripe retry, or completed + async_payment_succeeded) finds the campaign
+    // already there ("exists"): the order is recorded once and sales is not emailed twice (Stripe audit, Nov 21 2026).
+    const firstDelivery = drafted !== "exists";
     if (session.payment_status === "paid" && session.metadata?.kind === EXCLUSIVE_RESERVE.kind) {
       // $1,900 CAD exclusive display reserve (Nov 21 2026): leads row + Friday, then the sales alert so the IO goes out.
       await recordPaidExclusiveReserveSafe(session);
-      await sendPaidSalesAlertSafe(session);
+      if (firstDelivery) await sendPaidSalesAlertSafe(session);
       return;
     }
     if (session.payment_status === "paid" && session.metadata?.kind === "sponsorship_credit") {
       // Sponsorship pack (Nov 20 2026): no splash reservation row. Alert sales so the IO goes out (internal email only).
-      await sendPaidSalesAlertSafe(session);
+      if (firstDelivery) await sendPaidSalesAlertSafe(session);
       return;
     }
     if (session.payment_status === "paid") {

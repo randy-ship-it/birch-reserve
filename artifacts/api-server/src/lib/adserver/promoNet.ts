@@ -16,6 +16,9 @@ export function setCouponEnsurerForTests(f?: typeof ensureUsdAmountOffCoupon): v
   ensureCoupon = f ?? ensureUsdAmountOffCoupon;
 }
 
+/** The discount label buyers see on the Stripe checkout page and receipt. Never the code itself (Randy, Nov 21 2026: "don't disclose it"). */
+export const STREET_COUPON_NAME = "$100 media credit";
+
 export type NetDiscount = { couponId: string; cents: number; code: string };
 
 /** The discount to apply to a checkout of `amountCents` USD for `email`, or null (no code, bad code, used, or order too small). */
@@ -30,7 +33,7 @@ export async function streetNetDiscount(o: { email?: string | null; currency: st
   if (!email || !validEmail(email)) return null;
   const v = await validateCode(code, email);
   if (!v.ok) return null;
-  const couponId = await ensureCoupon(`street100-usd-${cents}`, cents, "Street 100: $100 media credit");
+  const couponId = await ensureCoupon(`street100-usd-${cents}`, cents, STREET_COUPON_NAME);
   return { couponId, cents, code: c.code };
 }
 

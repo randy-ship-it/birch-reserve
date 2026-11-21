@@ -39,7 +39,7 @@ test("Checkout Session metadata carries st / st_qr / promo / site through every 
   const plainScale = await new Promise<Record<string, string>>((resolve) => mw(req({ origin: "https://www.scalehealth.ca" }) as never, {} as never, () => resolve(promoMetadata())));
   assert.deepEqual(plainScale, { site: "scale", sold_by: "scale" }, "every Scale-mirror checkout is Scale direct, referred or not");
   const merged = await new Promise<Record<string, unknown>>((resolve) => mw(req({ cookie: "br_st=bridget; br_qr=birch-intake" }) as never, {} as never, () => resolve(withPromoMetadata({ mode: "payment", metadata: { kind: "area_lock" } }) as never)));
-  assert.deepEqual(merged.metadata, { kind: "area_lock", st: "bridget", st_qr: "birch-intake", site: "birch" });
+  assert.deepEqual(merged.metadata, { kind: "area_lock", st: "bridget", st_qr: "birch-intake", site: "birch", sold_by: "birch" });
   assert.deepEqual(withPromoMetadata({ metadata: { a: "1" } }), { metadata: { a: "1" } }, "outside a request nothing is added");
 });
 
