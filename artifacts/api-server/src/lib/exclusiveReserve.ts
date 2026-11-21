@@ -2,7 +2,8 @@
  * $1,900 CAD exclusive display reserve (Randy, voice, Nov 21 2026 9:59 AM ET).
  * Locks a $5K–$50K exclusive display package in one category at 25% below the regular rate.
  * One source for /exclusive, /terms, llms.txt and the Stripe line item, so they never drift.
- * CAD only for this one offer; every other public checkout stays USD.
+ * Geo currency since Nov 21 2026 3:34 PM ET: the same $1,900 in CAD (Canada) or USD (everyone else),
+ * charged in the currency the page showed (body.currency).
  */
 import type Stripe from "stripe";
 import { CHECKOUT_TAGLINE } from "./checkoutCopy";
@@ -11,12 +12,12 @@ import { upsertLeadSafeDetailed } from "./leads";
 import { queueFridayPush } from "./fridayPush";
 import { isTestIdentity } from "./testTraffic";
 
-export { EXCLUSIVE_RESERVE, EXCLUSIVE_RESERVE_NAME, EXCLUSIVE_RESERVE_DESCRIPTION, EXCLUSIVE_RESERVE_TERMS } from "./exclusiveReserveTerms";
-import { EXCLUSIVE_RESERVE, EXCLUSIVE_RESERVE_NAME, EXCLUSIVE_RESERVE_DESCRIPTION } from "./exclusiveReserveTerms";
+export { EXCLUSIVE_RESERVE, EXCLUSIVE_RESERVE_NAME, EXCLUSIVE_RESERVE_DESCRIPTION, EXCLUSIVE_RESERVE_TERMS, exclusiveReserveFor } from "./exclusiveReserveTerms";
+import { EXCLUSIVE_RESERVE, EXCLUSIVE_RESERVE_DESCRIPTION, exclusiveReserveFor } from "./exclusiveReserveTerms";
 
-export type ReserveRequest = { brand?: unknown; email?: unknown; category?: unknown; agree?: unknown };
+export type ReserveRequest = { brand?: unknown; email?: unknown; category?: unknown; agree?: unknown; currency?: unknown };
 
-/** Pure: validate and build Stripe Checkout params (inline price_data in CAD). */
+/** Pure: validate and build Stripe Checkout params. body.currency "usd" charges USD; anything else CAD (the original offer). */
 export function buildExclusiveReserveSession(body: ReserveRequest, origin: string):
   | { ok: false; error: string }
   | { ok: true; params: Record<string, unknown> } {
@@ -25,9 +26,12 @@ export function buildExclusiveReserveSession(body: ReserveRequest, origin: strin
   const category = String(body.category ?? "").replace(/[\u0000-\u001f<>]/g, " ").trim().slice(0, 80);
   if (!brand || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok: false, error: "Add your brand and a work email." };
   if (body.agree !== true) return { ok: false, error: "Please agree to the reserve terms." };
+  const offer = exclusiveReserveFor(String(body.currency ?? "").toLowerCase() === "usd" ? "usd" : "cad");
+  const envPrice = offer.currency === "cad" ? process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD?.trim() : process.env.STRIPE_PRICE_EXCLUSIVE_1900_USD?.trim();
   const metadata = {
     kind: EXCLUSIVE_RESERVE.kind,
-    sku: EXCLUSIVE_RESERVE.sku,
+    sku: offer.sku,
+    currency: offer.currency,
     brand,
     category,
     terms_version: EXCLUSIVE_RESERVE.termsVersion,
@@ -38,13 +42,13 @@ export function buildExclusiveReserveSession(body: ReserveRequest, origin: strin
       mode: "payment",
       customer_email: email,
       customer_creation: "always",
-      // Live Price (Stripe product "Exclusive display reserve ($1,900 CAD)") when STRIPE_PRICE_EXCLUSIVE_1900_CAD is set; inline CAD price_data otherwise.
-      line_items: [process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD?.trim() ? { price: process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD.trim(), quantity: 1 } : {
+      // Live Price when STRIPE_PRICE_EXCLUSIVE_1900_<CUR> is set (CAD has one); inline price_data in the shown currency otherwise.
+      line_items: [envPrice ? { price: envPrice, quantity: 1 } : {
         quantity: 1,
         price_data: {
-          currency: EXCLUSIVE_RESERVE.currency,
-          unit_amount: EXCLUSIVE_RESERVE.amountCents,
-          product_data: { name: EXCLUSIVE_RESERVE_NAME, description: EXCLUSIVE_RESERVE_DESCRIPTION, metadata: { sku: EXCLUSIVE_RESERVE.sku } },
+          currency: offer.currency,
+          unit_amount: offer.amountCents,
+          product_data: { name: offer.name, description: EXCLUSIVE_RESERVE_DESCRIPTION, metadata: { sku: offer.sku } },
         },
       }],
       metadata,
@@ -73,12 +77,12 @@ export async function recordPaidExclusiveReserveSafe(session: Stripe.Checkout.Se
       sourceRef: session.id,
       email: email || undefined,
       company: brand,
-      need: `Paid Birch Reserve exclusive display reserve ($1,900 CAD)${session.metadata?.category ? ` · ${session.metadata.category}` : ""}`,
+      need: `Paid Birch Reserve exclusive display reserve ($1,900 ${String(session.currency ?? "cad").toUpperCase()})${session.metadata?.category ? ` · ${session.metadata.category}` : ""}`,
       isTest,
       meta: {
         paid: true,
         stripe_session_id: session.id,
-        sku: EXCLUSIVE_RESERVE.sku,
+        sku: session.metadata?.sku || EXCLUSIVE_RESERVE.sku,
         value: (session.amount_total ?? EXCLUSIVE_RESERVE.amountCents) / 100,
         currency: String(session.currency ?? "cad").toLowerCase(),
         ...(session.metadata?.category ? { category: session.metadata.category } : {}),

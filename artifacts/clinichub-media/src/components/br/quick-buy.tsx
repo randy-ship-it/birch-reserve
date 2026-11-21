@@ -9,6 +9,7 @@ import { WhatHundredGets } from "./hundred";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { priceLabel, useCurrency } from "@/lib/currency";
+import { CurrencyToggle } from "@/components/currency-toggle";
 import { trackCta } from "@/lib/track-cta";
 import { SURFACES } from "../../../../api-server/src/lib/overhaul/model";
 import { RATE_SURFACES, fmtViews } from "../../../../api-server/src/lib/overhaul/pricing";
@@ -112,7 +113,7 @@ export function QuickBuy() {
             </Chip>
           ))}
         </div>
-        <p className="mt-6 text-xs font-semibold uppercase tracking-wider text-foreground/60">2. Pick your start</p>
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-2"><p className="text-xs font-semibold uppercase tracking-wider text-foreground/60">2. Pick your start</p><CurrencyToggle /></div>
         <div className="mt-3 grid gap-2 sm:grid-cols-2" role="group" aria-label="Budget">
           <Chip on={sku === "reserve-490"} onClick={() => setSku("reserve-490")} testId="qb-sku-reserve-490">
             {priceLabel("reserve-490", currency)} · Reserve

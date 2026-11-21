@@ -1,3 +1,4 @@
+import { currentCurrency, priceLabel, useCurrency } from "@/lib/currency";
 import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
 import { KitCta } from "@/components/br/kit-cta";
 import { useEffect, useState, type FormEvent } from "react";
@@ -38,6 +39,7 @@ export type Availability = {
 export const NETWORK_HUBS = ["DR-HO'S physio", "SOLE"] as const;
 
 export function useAvailability(): Availability | null {
+  useCurrency(); // re-render price labels when the visitor flips USD / CAD
   const [a, setA] = useState<Availability | null>(null);
   useEffect(() => {
     const ctrl = new AbortController();
@@ -59,9 +61,10 @@ export function useAvailability(): Availability | null {
   return a;
 }
 
-/** Price labels in the buyer's checkout currency; bare USD figures until /availability.json answers. */
-export function priceLabels(a: Availability | null): { seat: string; look: string } {
-  return { seat: a?.seatLabel ?? "$490 USD", look: a?.lookLabel ?? "$190 USD" };
+/** Price labels in the visitor's currency (geo default, toggle wins). One source: lib/currency (server /api/currency). */
+export function priceLabels(_a?: Availability | null): { seat: string; look: string } {
+  const c = currentCurrency();
+  return { seat: priceLabel("reserve-490", c), look: priceLabel("hold-190", c) };
 }
 
 /** The network strip: hub names and curated placements. No category grid, no seat counts. */

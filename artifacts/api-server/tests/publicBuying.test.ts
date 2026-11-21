@@ -3978,7 +3978,7 @@ test("CAD checkout is stored and charged in CAD, USD stays the default", async (
   }
 });
 
-test("/v1/checkout with no currency is USD everywhere while CAD is paused (Canada too); explicit currency still wins", async () => {
+test("/v1/checkout with no currency follows location (Canada CAD, else USD); explicit currency still wins", async () => {
   const previousDisabled = process.env.STRIPE_CHECKOUT_DISABLED;
   const previousSecret = process.env.STRIPE_SECRET_KEY;
   const previousPublicUrl = process.env.PUBLIC_BASE_URL;
@@ -4004,8 +4004,8 @@ test("/v1/checkout with no currency is USD everywhere while CAD is paused (Canad
   });
   try {
     const cases: Array<[string, Record<string, string>, string | undefined, string, number]> = [
-      ["reserve-490", { "x-vercel-ip-country": "CA" }, undefined, "usd", 49000],
-      ["hold-190", { "x-vercel-ip-country": "CA" }, undefined, "usd", 19000],
+      ["reserve-490", { "x-vercel-ip-country": "CA" }, undefined, "cad", 69000],
+      ["hold-190", { "x-vercel-ip-country": "CA" }, undefined, "cad", 27000],
       ["reserve-490", { "x-vercel-ip-country": "US" }, undefined, "usd", 49000],
       ["reserve-490", { "x-vercel-ip-country": "GB" }, undefined, "usd", 49000],
       ["hold-190", {}, undefined, "usd", 19000],
@@ -4036,7 +4036,7 @@ test("/v1/checkout with no currency is USD everywhere while CAD is paused (Canad
         headers: { "x-vercel-ip-country": "CA" },
       })
     ).json()) as { currency?: string };
-    assert.equal(caQuote.currency, "USD");
+    assert.equal(caQuote.currency, "CAD");
   } finally {
     setStripeCheckoutFunctionsForTests();
     if (previousDisabled === undefined) delete process.env.STRIPE_CHECKOUT_DISABLED;
@@ -4050,48 +4050,26 @@ test("/v1/checkout with no currency is USD everywhere while CAD is paused (Canad
   }
 });
 
-test("visitor currency: USD for everyone while CAD is paused (Nov 16 2026), even for Canada, a CAD cookie or ?currency=cad", async () => {
+test("visitor currency follows location (Randy, Nov 21 2026 3:34 PM ET): Canada CAD, else USD; cookie and ?currency win", async () => {
   const currencyFor = async (headers: Record<string, string>, query = "") =>
     (await (await fetch(`${origin}/api/currency${query}`, { headers })).json()) as {
       currency: string;
       source: string;
       prices: Record<string, Record<string, { dueToday: number }>>;
     };
-  assert.equal((await currencyFor({ "x-vercel-ip-country": "CA" })).currency, "usd");
-  assert.equal((await currencyFor({ "cf-ipcountry": "CA" })).currency, "usd");
+  assert.equal((await currencyFor({ "x-vercel-ip-country": "CA" })).currency, "cad");
+  assert.equal((await currencyFor({ "cf-ipcountry": "CA" })).currency, "cad");
   assert.equal((await currencyFor({ "x-vercel-ip-country": "US" })).currency, "usd");
   assert.equal((await currencyFor({ "x-vercel-ip-country": "GB" })).currency, "usd");
   assert.equal((await currencyFor({})).currency, "usd");
   assert.equal((await currencyFor({ "x-vercel-ip-country": "CA", cookie: "br_currency=usd" })).currency, "usd");
-  assert.equal((await currencyFor({ "x-vercel-ip-country": "US", cookie: "br_currency=cad" })).currency, "usd");
-  assert.equal((await currencyFor({ "x-vercel-ip-country": "CA", cookie: "br_currency=usd" }, "?currency=cad")).currency, "usd");
+  assert.equal((await currencyFor({ "x-vercel-ip-country": "US", cookie: "br_currency=cad" })).currency, "cad");
+  assert.equal((await currencyFor({ "x-vercel-ip-country": "CA", cookie: "br_currency=usd" }, "?currency=cad")).currency, "cad");
   const data = await currencyFor({});
   assert.equal(data.prices["hold-190"]?.["usd"]?.dueToday, 190);
   assert.equal(data.prices["reserve-490"]?.["usd"]?.dueToday, 490);
-  assert.equal(data.prices["hold-190"]?.["cad"], undefined);
-  assert.equal(data.prices["reserve-490"]?.["cad"], undefined);
-
-  const avail = (await (await fetch(`${origin}/availability.json`, { headers: { "x-vercel-ip-country": "CA" } })).json()) as {
-    currency: string;
-    currencies?: string[];
-    prices: Record<string, Record<string, { amount_cents: number }>>;
-  };
-  assert.equal(avail.currency, "USD");
-  assert.deepEqual(avail.currencies, ["USD"]);
-  assert.equal(avail.prices["hold-190"]?.["USD"]?.amount_cents, 19000);
-  assert.equal(avail.prices["reserve-490"]?.["USD"]?.amount_cents, 49000);
-  assert.equal(avail.prices["hold-190"]?.["CAD"], undefined);
-  assert.equal(avail.prices["reserve-490"]?.["CAD"], undefined);
-
-  const catalog = (await (await fetch(`${origin}/v1/catalog.json`)).json()) as {
-    currencies?: string[];
-    currency_note?: string;
-    offers: Array<{ sku: string; prices?: Record<string, unknown> }>;
-  };
-  assert.deepEqual(catalog.currencies, ["USD"]);
-  assert.doesNotMatch(catalog.currency_note ?? "", /CAD/);
-  assert.equal(catalog.offers.find((o) => o.sku === "reserve-490")?.prices?.["CAD"], undefined);
-  assert.equal((catalog.offers.find((o) => o.sku === "reserve-490")?.prices?.["USD"] as { amount_cents?: number } | undefined)?.amount_cents, 49000);
+  assert.equal(data.prices["hold-190"]?.["cad"]?.dueToday, 270);
+  assert.equal(data.prices["reserve-490"]?.["cad"]?.dueToday, 690);
 
   const quote = (await (await fetch(`${origin}/v1/quote?sku=hold-190&format=post_checkout&days=30&currency=cad`)).json()) as Record<string, unknown>;
   assert.equal(quote.currency, "CAD");
@@ -4102,24 +4080,22 @@ test("visitor currency: USD for everyone while CAD is paused (Nov 16 2026), even
   assert.equal(usdQuote.amountCents, 19000);
 });
 
-test("buycalc shows USD to everyone (Canada included) while CAD is paused, labelled, with no CAD toggle", async () => {
+test("buycalc follows location with a toggle that sticks; the price ladder shows the same currency", async () => {
   const ca = await fetch(`${origin}/buycalc`, { headers: { "x-vercel-ip-country": "CA" } });
   const caHtml = await ca.text();
-  assert.match(caHtml, /\$490 USD/);
-  assert.match(caHtml, /\$190 USD/);
-  assert.doesNotMatch(caHtml, /\$690|\$270|CAD/);
-  assert.match(caHtml, /data-testid="currency-note"/);
-  assert.doesNotMatch(caHtml, /data-currency="cad"/);
-  const caCookie = await fetch(`${origin}/buycalc?currency=cad`, { headers: { "x-vercel-ip-country": "CA", cookie: "br_currency=cad" } });
-  assert.doesNotMatch(await caCookie.text(), /\$690|\$270/);
+  assert.match(caHtml, /\$690 CAD/);
+  assert.match(caHtml, /\$270 CAD/);
+  assert.match(caHtml, /\$1,900 CAD/);
+  assert.match(caHtml, /data-testid="currency-toggle"/);
+  assert.match(caHtml, /data-testid="price-ladder" data-currency="cad"/);
+  assert.match(ca.headers.get("vary") ?? "", /x-vercel-ip-country/i);
 
   const us = await fetch(`${origin}/buycalc`, { headers: { "x-vercel-ip-country": "US" } });
   const usHtml = await us.text();
   assert.match(usHtml, /\$490 USD/);
   assert.match(usHtml, /\$190 USD/);
-  assert.doesNotMatch(usHtml, /\$690/);
-  assert.doesNotMatch(usHtml, /\$270/);
-  assert.match(usHtml, /Prices in USD/);
+  assert.match(usHtml, /\$1,900 USD/);
+  assert.doesNotMatch(usHtml, /\$690|\$270/);
 
   // A Canadian visitor can switch to USD, and the choice sticks.
   const toggled = await fetch(`${origin}/buycalc?currency=usd`, { headers: { "x-vercel-ip-country": "CA" } });

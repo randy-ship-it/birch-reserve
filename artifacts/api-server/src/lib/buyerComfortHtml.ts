@@ -26,7 +26,7 @@ export function buycalcWording(s: string): string {
     .replaceAll("Is my category exclusive or shared?", "Is my category mine alone, or shared?")
     .replaceAll("Shared, not exclusive.", "Shared, open to more than one brand.")
     .replaceAll("shared, not exclusive", "shared, open to more than one brand")
-    .replaceAll("Category exclusivity is only available as a premium slot", "Locking a category to one brand is only available as a premium slot");
+    .replaceAll("Category exclusivity comes with exclusive display", "Locking a category to one brand comes with exclusive display");
 }
 
 const escRaw = (s: string) =>

@@ -1,3 +1,4 @@
+import { decideCurrency } from "../lib/currency";
 /**
  * Birch Reserve ad system routes (Randy t330u, Nov 21 2026).
  *   Public:   /ads/embed.js · /ads/px.js · /ads/docs · /v1/ads/serve · /v1/ads/v · /v1/ads/c · /v1/ads/px · /v1/ads/postback · /v1/ads/cr/:id
@@ -302,7 +303,8 @@ router.get(["/account", "/account/"], (req, res) =>
       return;
     }
     await promoAttach(email);
-    res.type("html").send(dashboardPage(await accountView(email, origin(req))));
+    res.setHeader("Vary", "Cookie, x-vercel-ip-country");
+    res.type("html").send(dashboardPage(await accountView(email, origin(req)), Date.now(), decideCurrency(req).currency));
   }),
 );
 

@@ -166,6 +166,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
         {mobileMenuOpen && (
           <div className="lg:hidden absolute top-16 left-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto bg-background border-b border-border p-6" data-testid="mobile-menu">
+            <div className="mb-5 flex items-center justify-between gap-3"><span className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/50">Currency</span><CurrencyToggle /></div>
             {NAV_GROUPS.map((g) => (
               <div key={g.label} className="mb-5">
                 <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/50">{g.label}</p>

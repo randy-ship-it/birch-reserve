@@ -26,6 +26,8 @@ import { MODELLED_PLAN_LABEL } from "@/components/br/modelled";
 export { MODELLED_PLAN_LABEL, PlanChip } from "@/components/br/modelled";
 import { RATE_SURFACES, fmtUsd } from "../../../../api-server/src/lib/overhaul/pricing";
 import { DEPOSIT_TIERS } from "../../../../api-server/src/lib/sponsorKit";
+import { exclusiveReserveFor } from "../../../../api-server/src/lib/exclusiveReserveTerms";
+import { useCurrency } from "@/lib/currency";
 import { CARRY_OVER_CLAUSE } from "../../../../api-server/src/lib/sponsorTerms";
 import { AGENCY_TEST, agencyPrepayLeadPayload, clampAgencyBudget, draftRef } from "../../../../api-server/src/lib/twoLane";
 
@@ -203,6 +205,7 @@ export function DepositMock({ hub = "sole" }: { hub?: HubKey }) {
 }
 
 export function MidTier({ where, kit, showMock = true }: { where: string; compact?: boolean; kit?: KitPrefill | null; showMock?: boolean }) {
+  const X = exclusiveReserveFor(useCurrency().currency);
   const [agencyOpen, setAgencyOpen] = useState(false);
   const [busy, setBusy] = useState("");
   const cardCls = "flex flex-col rounded-2xl bg-white/[0.06] p-4 ring-1 ring-white/15";
@@ -258,7 +261,7 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
         <p data-testid="mid-tier-agency-terms">{MID_TIER_LINE} One IO per client. {AGENCY_REPORTING_LINE}.</p>
         <p data-testid="mid-tier-refund">{MID_TIER_REFUND}</p>
         <p>View block: from {fmtUsd(STARTER_BLOCK.startingUsd)} USD for 100K modelled views. <a href={withUtm("/?inquire=pack&block=100000&surfaces=landing#quick-buy", where, "block")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-block-cta">Request a block</a></p>
-        <p>Premium, one brand per category: $25K–$50K by invoice, or lock a $5K–$50K CAD package with the <a href={withUtm("https://birchreserve.net/exclusive", where, "exclusive-1900")} className="font-semibold text-lime-300 underline underline-offset-2">$1,900 CAD reserve</a>. <a href={withUtm("/buy?plan=exclusive", where, "exclusive")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-exclusive">Request an invoice</a></p>
+        <p>Premium, one brand per category: lock a {X.packageLabel} package with the <a href={withUtm("https://birchreserve.net/exclusive", where, "exclusive-1900")} className="font-semibold text-lime-300 underline underline-offset-2">{X.label} reserve</a>, or ask about a $25K–$50K premium slot by invoice. <a href={withUtm("/buy?plan=exclusive", where, "exclusive")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-exclusive">Reserve on /buy</a></p>
         <TwoSurfaceExample dark />
       </Details>
     </section>

@@ -6,6 +6,7 @@
  * Shared by birchreserve.net and the Scale mirror (scalehealth.ca/intake): no site name in the copy.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useCurrency, usePriceText } from "@/lib/currency";
 import { LINGER_STATE_EVENT, isLingerOpen } from "@/lib/overlay-bus";
 import { Activity, Apple, Bed, Brain, ChevronDown, Dumbbell, HeartPulse, Microscope, Soup, X } from "lucide-react";
 import { STARTER_BLOCK } from "@/components/br/start-small";
@@ -58,13 +59,22 @@ export const BRAND_QUESTIONS = [
   { q: "Does the $190 look or $490 reserve count toward a bigger pack?", a: "Yes. A paid $190 look or $490 reserve counts in full toward any sponsorship pack bought within 30 days of that payment. The $190 look also converts in full to the $490 reserve within 7 days; otherwise it is refunded." },
   { q: "What are the sponsorship packs?", a: `${packs} USD. Bonus is media credit only, no cash value. Packs are refundable until 14 days before the IO launch date.` },
   { q: "How does reporting work with our UTM links?", a: "You send UTM-tagged links and an optional promo code. Reports show views, clicks, UTM-tagged visits and promo-code redemptions, per hub and surface. Aggregate only: never who saw your card. Reports go out on the schedule your IO sets." },
-  { q: "Shared category seat or premium lock?", a: "The $490 reserve is a shared category seat: more than one brand can sit in a category. Only a premium slot ($25K–$50K USD, inquire only) locks one brand per category." },
+  { q: "Shared category seat or premium lock?", a: "The $490 reserve is a shared category seat: more than one brand can sit in a category. Only exclusive display locks one brand per category: the $1,900 exclusive reserve, which locks a $5K–$50K package in your currency, or a $25K–$50K premium slot (inquire only)." },
   { q: "Can an agency prepay a client test?", a: `Yes. ${fmtUsd(AGENCY_TEST.lowUsd)}–${fmtUsd(AGENCY_TEST.highUsd)} USD per client on a pre-filled IO request, no card. ${AGENCY_TEST.cashPct}% cash to the agency of record. One IO per client.` },
   { q: "How is a view block priced?", a: `At each surface’s starter CPM (hub landing page from $${landing.cpmStarter[0]}), less a bundle discount when you add surfaces. 100K modelled views on the landing page start at ${fmtUsd(STARTER_BLOCK.startingUsd)} USD. Your IO sets the final rate.` },
   { q: "Do you guarantee impressions or results?", a: "No. Reach and view figures are modelled planning estimates, not delivery promises. Nothing runs until you sign the insertion order, which names the hub, surface and dates." },
 ] as const;
 
+/** FAQ answers in the visitor's currency ($190/$490 via the CAD table; the $1,900 reserve and its package keep the number). */
+function useFaqText(): (text: string) => string {
+  const { currency } = useCurrency();
+  const t = usePriceText();
+  const C = currency.toUpperCase();
+  return (text: string) => t(text).replace("$1,900 exclusive reserve", `$1,900 ${C} exclusive reserve`).replace(/\$5K–\$50K package( in your currency)?/, `$5K–$50K ${C} package`);
+}
+
 export function QuestionsBrandsAsk() {
+  const t = useFaqText();
   return (
     <section data-testid="questions-brands-ask" aria-labelledby="qba-h">
       <h2 id="qba-h" className="font-display text-2xl leading-tight text-[#0b1f3a] md:text-3xl">Questions brands ask</h2>
@@ -75,7 +85,7 @@ export function QuestionsBrandsAsk() {
               {x.q}
               <ChevronDown className="mt-0.5 size-4 shrink-0 text-[#0b1f3a]/60 transition group-open:rotate-180" aria-hidden />
             </summary>
-            <p className="mt-2 text-[13px] leading-relaxed text-foreground/75">{x.a}</p>
+            <p className="mt-2 text-[13px] leading-relaxed text-foreground/75">{t(x.a)}</p>
           </details>
         ))}
       </div>
@@ -116,12 +126,13 @@ export const BRAND_QUESTIONS_COMPACT = [
   { q: "Can we get a mock on the live DR-HO’S hub before paying the $190?", a: "Yes. The illustrative mock is free, and after your free kit it shows your own card on the hub before you pay anything." },
   { q: `Does the $490 credit carry into a ${packRange} pack?`, a: "Yes. A paid $190 look or $490 reserve counts in full toward any sponsorship pack bought within 30 days." },
   { q: "How does UTM reporting work if it’s aggregate only?", a: "Views, clicks, UTM visits and promo-code redemptions are counted per hub and surface, never who saw your card." },
-  { q: "Shared seat or premium lock?", a: "The $490 reserve is a shared category seat. Only exclusive display (a $25K–$50K USD premium slot or the $1,900 CAD exclusive reserve) locks one brand per category." },
+  { q: "Shared seat or premium lock?", a: "The $490 reserve is a shared category seat. Only exclusive display (the $1,900 exclusive reserve for a $5K–$50K package, or a $25K–$50K premium slot) locks one brand per category." },
   { q: `Can an agency prepay a client test and get the ${AGENCY_TEST.cashPct}% cash?`, a: `Yes. ${fmtUsd(AGENCY_TEST.lowUsd).replace(/,000$/, "K")}–${fmtUsd(AGENCY_TEST.highUsd).replace(/,000$/, "K")} USD per client on a pre-filled IO, no card; ${AGENCY_TEST.cashPct}% of media spend is paid in cash to the agency of record.` },
   { q: "What if we change our mind?", a: "The $490 reserve and packs are fully refundable until 14 days before the IO launch date; an unconverted $190 look is refunded." },
 ] as const;
 
 export function QuestionsBrandsAskCompact({ className = "", testId = "questions-brands-ask-compact" }: { className?: string; testId?: string }) {
+  const t = useFaqText();
   return (
     <section className={className} data-testid={testId} aria-labelledby={`${testId}-h`}>
       <h2 id={`${testId}-h`} className="font-display text-2xl leading-tight text-[#0b1f3a] md:text-3xl">Questions brands ask</h2>
@@ -129,7 +140,7 @@ export function QuestionsBrandsAskCompact({ className = "", testId = "questions-
         {BRAND_QUESTIONS_COMPACT.map((x) => (
           <div key={x.q} className="rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-foreground/10" data-testid="brand-question-compact">
             <dt className="text-[14px] font-bold leading-snug text-[#0b1f3a]">{x.q}</dt>
-            <dd className="mt-1 text-[13px] leading-snug text-foreground/75">{x.a}</dd>
+            <dd className="mt-1 text-[13px] leading-snug text-foreground/75">{t(x.a)}</dd>
           </div>
         ))}
       </dl>

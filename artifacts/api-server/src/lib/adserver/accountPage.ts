@@ -1,3 +1,4 @@
+import { priceLadder } from "../priceLadder";
 /** Customer dashboard (/account). Real logged data only: every number is a count or sum of ad_events / ledger rows. */
 import { isPromoCampaign, regularRateSummary } from "./config";
 import { PROMO_SCRIPT_TAG } from "./promoBoxJs";
@@ -82,7 +83,8 @@ ${creativeFields()}<button type="submit">Send for review</button></form>
 </article>`;
 }
 
-export function dashboardPage(v: AccountView, now = Date.now()): string {
+export function dashboardPage(v: AccountView, now = Date.now(), currency: "usd" | "cad" = "usd"): string {
+  const L = Object.fromEntries(priceLadder(currency).map((x) => [x.key, x.price]));
   const all = v.campaigns;
   const cur = all[0]?.c.currency ?? "usd";
   const sameCur = all.filter((x) => x.c.currency === cur);
@@ -113,9 +115,9 @@ ${all.map((x) => campaignCard(x, now)).join("")}
 <section id="code"><h2>Promo code</h2><div data-promo-box="account"></div></section>
 ${PROMO_SCRIPT_TAG}
 <section id="more"><h2>Grow your reach</h2>
-<div class="grid two"><div class="card"><h3>Top up with a sponsor pack</h3><p>$1,500, $3,000 or $6,000 of credit with 5–15% bonus credit. A paid $190 look or $490 reserve counts in full toward a pack bought within 30 days.</p><a class="btn" href="/sponsor">See sponsor packs</a></div>
-<div class="card"><h3>Lock your category</h3><p>$1,900 CAD reserves a $5K–$50K exclusive display package in your category, 25% below the regular rate. Insertion order before anything runs.</p><a class="btn ghost" href="/exclusive">Exclusive reserve</a></div>
-<div class="card"><h3>Add another placement</h3><p>Start a new placement on another hub or surface with a $190 look or $490 reserve.</p><a class="btn ghost" href="/buy">Order a placement</a></div></div></section>
+<div class="grid two"><div class="card"><h3>Top up with a sponsor pack</h3><p>$1,500, $3,000 or $6,000 USD of credit with 5–15% bonus credit. A paid ${L["hold-190"]} look or ${L["reserve-490"]} reserve counts in full toward a pack bought within 30 days.</p><a class="btn" href="/sponsor">See sponsor packs</a></div>
+<div class="card"><h3>Lock your category</h3><p>${L["exclusive"]} reserves a $5K–$50K ${currency.toUpperCase()} exclusive display package in your category, 25% below the regular rate. Insertion order before anything runs.</p><a class="btn ghost" href="/exclusive">Exclusive reserve</a></div>
+<div class="card"><h3>Add another placement</h3><p>Start a new placement on another hub or surface with a ${L["hold-190"]} look or ${L["reserve-490"]} reserve.</p><a class="btn ghost" href="/buy">Order a placement</a></div></div></section>
 <section id="hubs"><h2>Private hubs</h2><p class="fine">Members-only health and wellness hubs. Live hubs take placements now; the rest are being onboarded.</p>
 <div class="tw"><table><thead><tr><th>Hub</th><th>Audience</th><th>Status</th></tr></thead><tbody>${hubs.map(({ h, live, match }) => `<tr><td><a href="${esc(h.url)}" target="_blank" rel="noopener">${esc(h.name)}</a>${match ? ` <span class="chip c-approved">Fits your category</span>` : ""}</td><td>${esc(h.category)}</td><td><span class="chip ${live ? "c-active" : "c-pending"}">${live ? "Live" : esc(h.status)}</span></td></tr>`).join("")}</tbody></table></div></section>
 <section id="alerts"><h2>New-hub alerts</h2><div class="card"><form class="f" data-post="/account/alerts" data-reload>

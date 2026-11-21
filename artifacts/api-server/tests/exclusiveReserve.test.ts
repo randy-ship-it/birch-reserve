@@ -16,6 +16,19 @@ test("exclusive reserve session is CAD 1,900 with a plain description and the RE
   assert.match(p.success_url, /\/exclusive\?reserve=success&session_id=\{CHECKOUT_SESSION_ID\}/);
 });
 
+test("exclusive reserve charges USD when the page showed USD (same $1,900, inline price, USD sku)", () => {
+  process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD = "price_cad_only";
+  const r = buildExclusiveReserveSession({ brand: "Acme", email: "a@acme.com", agree: true, currency: "usd" }, "https://birchreserve.net");
+  delete process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD;
+  assert.ok(r.ok);
+  const p = r.params as any;
+  assert.equal(p.line_items[0].price_data.currency, "usd");
+  assert.equal(p.line_items[0].price_data.unit_amount, 190000);
+  assert.match(p.line_items[0].price_data.product_data.name, /\$1,900 USD/);
+  assert.equal(p.metadata.sku, "exclusive-reserve-1900-usd");
+  assert.equal(p.metadata.currency, "usd");
+});
+
 test("exclusive reserve uses the live Price ID when configured", () => {
   process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD = "price_test_x";
   const r = buildExclusiveReserveSession({ brand: "Acme", email: "a@acme.com", agree: true }, "https://birchreserve.net");
@@ -61,10 +74,20 @@ test("e2e (local): /exclusive renders, checkout is held when deposits are off, s
   const server = app.listen(0);
   const port = (server.address() as { port: number }).port;
   try {
-    const page = await (await fetch(`http://127.0.0.1:${port}/exclusive`)).text();
+    // Geo currency (Nov 21 2026 3:34 PM ET): Canada sees CAD, everyone else USD, same $1,900.
+    const page = await (await fetch(`http://127.0.0.1:${port}/exclusive`, { headers: { "x-vercel-ip-country": "CA" } })).text();
     assert.match(page, /Reserve \$1,900 CAD\. Lock your category/);
     assert.match(page, /25% below the regular rate/);
     assert.match(page, /\$833–\$8,333 CAD\/mo/);
+    assert.match(page, /name="currency" value="cad"/);
+    const us = await (await fetch(`http://127.0.0.1:${port}/exclusive`, { headers: { "x-vercel-ip-country": "US" } })).text();
+    assert.match(us, /Reserve \$1,900 USD\. Lock your category/);
+    assert.match(us, /\$5K–\$50K USD exclusive display package/);
+    assert.match(us, /charged in USD/);
+    assert.match(us, /data-testid="price-ladder" data-currency="usd"/);
+    const forced = await fetch(`http://127.0.0.1:${port}/exclusive?currency=cad`, { headers: { "x-vercel-ip-country": "US" } });
+    assert.match(forced.headers.get("set-cookie") ?? "", /br_currency=cad/);
+    assert.match(await forced.text(), /Reserve \$1,900 CAD/);
     const held = await fetch(`http://127.0.0.1:${port}/v1/exclusive/reserve`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ brand: "QA Test", email: "qa+exclusive@example.com", agree: true }) });
     assert.equal(held.status, 200);
     assert.equal(((await held.json()) as { held: boolean }).held, true);

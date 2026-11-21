@@ -5,7 +5,7 @@ import type { AddressInfo } from "node:net";
 import { deflateSync } from "node:zlib";
 import buyRouter, { renderBuyPage } from "../src/routes/buy";
 import {
-  BUY_FORMATS, BUY_PATH, BUY_PLANS, BUY_TAGLINE, CREATIVE_MAX_BYTES, checkCreative, domainCheck, parseAccount,
+  BUY_FORMATS, BUY_PATH, BUY_PLANS, BUY_TAGLINE, buyPlans, CREATIVE_MAX_BYTES, checkCreative, domainCheck, parseAccount,
   resetBuyLimitsForTests, setBuyStoreForTests, memoryBuyStore, signToken, sniffImage, validPick, verifyToken, findPlan, findFormat, isProductionRuntime, buyStore,
 } from "../src/lib/buyFlow";
 import { CHECKOUT_TAGLINE, STATEMENT_DESCRIPTOR_SUFFIX, birchCheckoutCustomText, birchPaymentIntentBrand } from "../src/lib/checkoutCopy";
@@ -16,7 +16,8 @@ import { buildAreaLockSession } from "../src/lib/overhaul/checkout";
 // Copy rules (Randy, Nov 2026). Kalaya is allowed.
 const BANNED = [
   /\bFriday\b/, /\bAlign\b/, /Clairvoyant/i, /Alset/i, /80 locations/i, /MedVibe/i, /\bsigned partners\b/i, /Integrity Fitness/i,
-  /\bPublisher\b/, /\bCAD\b|C\$/, /guarantee(d)? (results|reach|impressions|roi|leads|views)/i, /\bROAS\b/, /\bCTR\b/,
+  // CAD is allowed since Nov 21 2026 3:34 PM ET (geo currency + toggle); C$ shorthand stays out.
+  /\bPublisher\b/, /C\$/, /guarantee(d)? (results|reach|impressions|roi|leads|views)/i, /\bROAS\b/, /\bCTR\b/,
   /\b(not taken|unclaimed|is open|are open|still open|open now|0 (hubs|brands|spots|seats))\b/i, /\bseats? left\b/i, /—/,
 ];
 const visible = (html: string) => html.replace(/<script[\s\S]*?<\/script>/g, "").replace(/<style[\s\S]*?<\/style>/g, "");
@@ -62,7 +63,12 @@ test("page: Randy's line is the headline, copy rules hold, three steps, honeypot
 });
 
 test("slots: card plans only on self-serve spots, exclusive anywhere; prices come from the live offers", () => {
-  for (const o of PUBLIC_RESERVE_OFFERS) assert.ok(BUY_PLANS.some((p) => p.key === o.sku && p.price === `$${o.dueTodayUsd}`), o.sku);
+  for (const o of PUBLIC_RESERVE_OFFERS) assert.ok(BUY_PLANS.some((p) => p.key === o.sku && p.price === `$${o.dueTodayUsd} USD`), o.sku);
+  // One price source, visitor currency (Nov 21 2026): CAD table for look / reserve, same $1,900 for the exclusive reserve.
+  assert.deepEqual(buyPlans("cad").map((p) => p.price), ["$690 CAD", "$270 CAD", "$1,900 CAD"]);
+  assert.deepEqual(buyPlans("usd").map((p) => p.price), ["$490 USD", "$190 USD", "$1,900 USD"]);
+  assert.match(buyPlans("cad").find((p) => p.key === "exclusive")!.line, /\$5K–\$50K CAD/);
+  assert.equal(findPlan("exclusive")!.pay, "reserve");
   const prem = BUY_FORMATS.find((f) => f.premium)!;
   const self = BUY_FORMATS.find((f) => !f.premium)!;
   assert.equal(validPick(findPlan("reserve-490"), prem), false);
@@ -131,7 +137,7 @@ test("store: previews and tests never use the production database", () => {
   assert.equal(buyStore().name, "memory");
 });
 
-test("routes: account → upload → order (card hands back the /v1/checkout body; exclusive goes to invoice)", async () => {
+test("routes: account → upload → order (card hands back the /v1/checkout body; exclusive hands back the reserve checkout body)", async () => {
   const store = memoryBuyStore();
   setBuyStoreForTests(store);
   resetBuyLimitsForTests();
@@ -182,8 +188,10 @@ test("routes: account → upload → order (card hands back the /v1/checkout bod
     assert.equal(co.checkout.sku, "reserve-490");
     assert.equal(co.checkout.currency, "usd");
 
-    const inv = await json("/v1/buy/order", { account: acct.account, creative: crv.creative, plan: "exclusive", format: "post_checkout", terms: true });
-    assert.equal(((await inv.json()) as { next: string }).next, "invoice");
+    const inv = await json("/v1/buy/order", { account: acct.account, creative: crv.creative, plan: "exclusive", format: "post_checkout", terms: true, currency: "cad" });
+    const ex = (await inv.json()) as { next: string; reserve: Record<string, unknown> };
+    assert.equal(ex.next, "reserve");
+    assert.deepEqual(ex.reserve, { brand: "Acme", email: ex.reserve.email, category: "", agree: true, currency: "cad" });
     assert.equal((await store.listOrders(10)).length, 2);
 
     // "Send it later" (Nov 21 2026): no image needed to order; the order carries no creative and stays pending review.

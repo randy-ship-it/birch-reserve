@@ -55,6 +55,11 @@ export const PACING_ROWS: readonly PacingRow[] = [
   row("exclusive-1900", "Exclusive display locked by the $1,900 CAD reserve", 5000, 50000, "CAD", "25% below the regular rate, set on the IO"),
 ];
 
+/** The exclusive package locked by the $1,900 reserve, paced in the visitor's currency. */
+export function exclusivePacing(currency: "usd" | "cad"): PacingRow {
+  return row("exclusive-1900", `Exclusive display locked by the $1,900 ${currency.toUpperCase()} reserve`, 5000, 50000, currency === "usd" ? "USD" : "CAD", "25% below the regular rate, set on the IO");
+}
+
 /* ------------------------------------------------------------------ 2027 */
 /** Modelled hub-placement views a month across the 42 listed partners (feed snapshot). */
 export const HUB_VIEWS_MONTHLY = SURFACES.reduce((a, s) => a + s.monthly, 0);

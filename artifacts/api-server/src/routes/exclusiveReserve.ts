@@ -1,6 +1,6 @@
 /**
- * GET  /exclusive                $1,900 CAD exclusive display reserve (server-rendered)
- * POST /v1/exclusive/reserve     Stripe Checkout (inline CAD price_data)
+ * GET  /exclusive                $1,900 exclusive display reserve in the visitor's currency (server-rendered)
+ * POST /v1/exclusive/reserve     Stripe Checkout in the currency the page showed (body.currency)
  *
  * Same gate as sponsorship packs (sponsorDepositsOpen): live sessions only when
  * SPONSOR_DEPOSITS_LIVE=true, so a preview with a test key only ever makes test sessions.
@@ -14,8 +14,11 @@ import { logger } from "../lib/logger";
 import { sponsorDepositsOpen } from "./sponsorPage";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
 import { TWO_LANE_CATEGORIES } from "../lib/twoLane";
-import { EXCLUSIVE_RESERVE, EXCLUSIVE_RESERVE_TERMS, buildExclusiveReserveSession } from "../lib/exclusiveReserve";
-import { PACING_ROWS } from "../lib/inventoryPlan";
+import { EXCLUSIVE_RESERVE, EXCLUSIVE_RESERVE_TERMS, buildExclusiveReserveSession, exclusiveReserveFor } from "../lib/exclusiveReserve";
+import { exclusivePacing } from "../lib/inventoryPlan";
+import { pageCurrency } from "../lib/currency";
+import { PRICE_LADDER_CSS, currencyHref, currencyToggleHtml, priceLadderHtml } from "../lib/priceLadder";
+import type { ReserveCurrency } from "../lib/reserveOffers";
 
 const router: IRouter = Router();
 
@@ -23,8 +26,10 @@ const esc = (v: string) => v.replaceAll("&", "&amp;").replaceAll("<", "&lt;").re
 
 type Status = { kind: "success"; ref: string; paid: boolean; livemode: boolean; sid?: string } | { kind: "cancelled" } | null;
 
-function page(open: boolean, status: Status): string {
-  const pace = PACING_ROWS.find((r) => r.key === "exclusive-1900")!;
+function page(open: boolean, status: Status, currency: ReserveCurrency = "cad", query: Record<string, unknown> = {}): string {
+  const pace = exclusivePacing(currency);
+  const X = exclusiveReserveFor(currency);
+  const C = currency.toUpperCase();
   const cats = TWO_LANE_CATEGORIES.map((c) => `<option value="${esc(c.label)}">${esc(c.label)}</option>`).join("");
   const banner =
     status?.kind === "success"
@@ -33,8 +38,8 @@ function page(open: boolean, status: Status): string {
         ? `<div class="note" role="status">Checkout cancelled. No charge was made.</div>`
         : "";
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Exclusive display reserve · $1,900 CAD — Birch Reserve</title>
-<meta name="description" content="Reserve $1,900 CAD to lock a $5K–$50K exclusive display package in your category at 25% below the regular rate. Insertion order before anything runs.">
+<title>Exclusive display reserve · ${X.label} — Birch Reserve</title>
+<meta name="description" content="Reserve ${X.label} to lock a $5K–$50K exclusive display package in your category at 25% below the regular rate. Insertion order before anything runs.">
 <link rel="canonical" href="https://birchreserve.net/exclusive"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>*{box-sizing:border-box}body{margin:0;background:#F9F8F6;color:#071A39;font:16px/1.6 "IBM Plex Sans",sans-serif}
@@ -45,15 +50,15 @@ h1,h2{font-family:Fraunces,serif;font-weight:400;line-height:1.15}h1{font-size:c
 .mc{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;background:#FFF4DB;border:1px solid #F1D58F;color:#8A5A00;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;vertical-align:middle}
 form{display:grid;gap:10px;border:1px solid #ccd2d8;border-radius:14px;padding:18px;background:#fff}input,select{width:100%;padding:10px;border:1px solid #b9c1c9;border-radius:8px;font:inherit}
 button{background:#071A39;color:#fff;border:0;border-radius:6px;min-height:44px;padding:12px 18px;justify-self:start;font:600 1rem "IBM Plex Sans";cursor:pointer}button:disabled{opacity:.6}
-details{border-top:1px solid #ccd2d8;padding:12px 0}summary{cursor:pointer;font-weight:600}ul{padding-left:1.1em}${TOKENS_CSS}${BUYER_HEADER_CSS}</style></head><body>
-${buyerHeaderHtml("exclusive")}
+details{border-top:1px solid #ccd2d8;padding:12px 0}summary{cursor:pointer;font-weight:600}ul{padding-left:1.1em}${TOKENS_CSS}${BUYER_HEADER_CSS}${PRICE_LADDER_CSS}</style></head><body>
+${buyerHeaderHtml("exclusive", currencyToggleHtml(currency, (c) => currencyHref("/exclusive", query, c)))}
 <main>${banner}<div data-promo-box="success"></div>
 <p class="fine">EXCLUSIVE DISPLAY · ONE BRAND PER CATEGORY</p>
-<h1>Reserve ${EXCLUSIVE_RESERVE.label}. Lock your category's exclusive display.</h1>
-<p>Your $1,900 locks a ${EXCLUSIVE_RESERVE.packageRange} CAD exclusive display package in your category at ${EXCLUSIVE_RESERVE.discountPct}% below the regular rate. All $1,900 counts toward the package. Your insertion order names the hub, placement and dates before anything runs.</p>
+<h1>Reserve ${X.label}. Lock your category's exclusive display.</h1>
+<p>Your $1,900 locks a ${X.packageLabel} exclusive display package in your category at ${EXCLUSIVE_RESERVE.discountPct}% below the regular rate. All $1,900 counts toward the package. Your insertion order names the hub, placement and dates before anything runs.</p>
 <div class="grid">
-<div class="stat"><b>${EXCLUSIVE_RESERVE.label}</b>today, by card, counted in full</div>
-<div class="stat"><b>${EXCLUSIVE_RESERVE.packageRange}</b>exclusive display package, CAD</div>
+<div class="stat"><b>${X.label}</b>today, by card, counted in full</div>
+<div class="stat"><b>${EXCLUSIVE_RESERVE.packageRange}</b>exclusive display package, ${C}</div>
 <div class="stat"><b>${EXCLUSIVE_RESERVE.discountPct}% below</b>the regular rate, set on the IO</div>
 <div class="stat"><span class="mc">Modelled</span><b>${esc(pace.perMonth)}</b>over up to 6 months (${esc(pace.viewsPerMonth)})</div>
 </div>
@@ -61,14 +66,15 @@ ${open ? `<form id="f"><label>Brand<input name="brand" required maxlength="160" 
 <label>Work email<input name="email" type="email" required maxlength="200" autocomplete="email"></label>
 <label>Category<select name="category" required><option value="">Choose a category</option>${cats}</select></label>
 <label class="fine"><input type="checkbox" name="agree" style="width:auto"> I agree to the <a href="/terms#exclusive">reserve terms</a>. Nothing runs until I sign an insertion order.</label>
-<div data-promo-box></div><button id="b" type="submit">Reserve for ${EXCLUSIVE_RESERVE.label}</button><p id="m" class="fine" role="status"></p></form>`
-    : `<form id="f"><p><b>Card checkout is paused right now.</b> Leave your details and we'll send the insertion order and a payment link within 1 business day.</p><label>Brand<input name="brand" required></label><label>Work email<input name="email" type="email" required></label><label>Category<select name="category"><option value="">Choose a category</option>${cats}</select></label><input type="hidden" name="agree" value="on"><button id="b" type="submit">Request the reserve</button><p id="m" class="fine" role="status"></p></form>`}
-<p class="fine">Card checkout by Stripe, charged in CAD. Statement shows BIRCHRSV* RESERVE.</p>
+<div data-promo-box></div><input type="hidden" name="currency" value="${currency}"><button id="b" type="submit">Reserve for ${X.label}</button><p id="m" class="fine" role="status"></p></form>`
+    : `<form id="f"><p><b>Card checkout is paused right now.</b> Leave your details and we'll send the insertion order and a payment link within 1 business day.</p><label>Brand<input name="brand" required></label><label>Work email<input name="email" type="email" required></label><label>Category<select name="category"><option value="">Choose a category</option>${cats}</select></label><input type="hidden" name="agree" value="on"><input type="hidden" name="currency" value="${currency}"><button id="b" type="submit">Request the reserve</button><p id="m" class="fine" role="status"></p></form>`}
+<p class="fine">Card checkout by Stripe, charged in ${C}, the currency shown on this page. Statement shows BIRCHRSV* RESERVE.</p>
+${priceLadderHtml(currency, { title: "Where the reserve sits", current: "exclusive" })}
 <details><summary>Reserve terms</summary><ul>${EXCLUSIVE_RESERVE_TERMS.map((t) => `<li>${esc(t)}</li>`).join("")}</ul></details>
 <details><summary>How the 6-month spend-down works</summary><p><span class="mc">Modelled</span>A ${esc(pace.credit)} package paced over 6 months is ${esc(pace.perMonth)}, about ${esc(pace.viewsPerMonth)} at today's blended starter CPM. Spend faster if you like. No impression guarantee; reporting is aggregate only.</p></details>
 </main><footer class="fine">Silver Birch Growth Inc. · Toronto, Ontario · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · (647) 931-6278</footer>
 ${PROMO_SCRIPT_TAG}
-<script>(function(){var f=document.getElementById("f"),b=document.getElementById("b"),m=document.getElementById("m");f.addEventListener("submit",async function(e){e.preventDefault();var d=Object.fromEntries(new FormData(f));var body={brand:d.brand,email:d.email,category:d.category||"",agree:d.agree==="on"};if(!body.agree){m.textContent="Please agree to the reserve terms.";return}b.disabled=true;m.textContent="Opening secure checkout…";try{var r=await fetch("/v1/exclusive/reserve",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});var o=await r.json().catch(function(){return{}});if(o.url){location.assign(o.url);return}if(o.held){m.textContent=o.message;f.querySelectorAll("input,select,button").forEach(function(x){x.disabled=true});return}m.textContent=o.error||"Checkout could not open. Email sales@silverbirchgrowth.com.";b.disabled=false}catch(err){m.textContent="Checkout could not open. No charge was made.";b.disabled=false}})})();</script>
+<script>(function(){var f=document.getElementById("f"),b=document.getElementById("b"),m=document.getElementById("m");f.addEventListener("submit",async function(e){e.preventDefault();var d=Object.fromEntries(new FormData(f));var body={brand:d.brand,email:d.email,category:d.category||"",agree:d.agree==="on",currency:d.currency||"${currency}"};if(!body.agree){m.textContent="Please agree to the reserve terms.";return}b.disabled=true;m.textContent="Opening secure checkout…";try{var r=await fetch("/v1/exclusive/reserve",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});var o=await r.json().catch(function(){return{}});if(o.url){location.assign(o.url);return}if(o.held){m.textContent=o.message;f.querySelectorAll("input,select,button").forEach(function(x){x.disabled=true});return}m.textContent=o.error||"Checkout could not open. Email sales@silverbirchgrowth.com.";b.disabled=false}catch(err){m.textContent="Checkout could not open. No charge was made.";b.disabled=false}})})();</script>
 </body></html>`;
 }
 
@@ -85,7 +91,8 @@ router.get(["/exclusive", "/exclusive/"], async (req: Request, res: Response) =>
       logger.warn({ err: err instanceof Error ? err.message : String(err) }, "exclusive reserve success lookup failed");
     }
   }
-  res.type("html").send(page(sponsorDepositsOpen(), status));
+  const cur = pageCurrency(req, res).currency;
+  res.type("html").send(page(sponsorDepositsOpen(), status, cur, req.query as Record<string, unknown>));
 });
 
 router.post("/v1/exclusive/reserve", express.json({ limit: "8kb" }), async (req: Request, res: Response) => {
@@ -96,7 +103,7 @@ router.post("/v1/exclusive/reserve", express.json({ limit: "8kb" }), async (req:
       res.status(400).json({ error: "Add your brand and a work email." });
       return;
     }
-    const friday = await sendIntake({ kind: "deposit_interest", email, company: typeof b.brand === "string" ? b.brand.slice(0, 160) : undefined, path: "/exclusive", meta: { tier: EXCLUSIVE_RESERVE.sku, category: String(b.category ?? ""), checkout_open: false } }).catch(() => ({ status: "failed" }));
+    const friday = await sendIntake({ kind: "deposit_interest", email, company: typeof b.brand === "string" ? b.brand.slice(0, 160) : undefined, path: "/exclusive", meta: { tier: exclusiveReserveFor(String(b.currency ?? "").toLowerCase() === "usd" ? "usd" : "cad").sku, category: String(b.category ?? ""), checkout_open: false } }).catch(() => ({ status: "failed" }));
     res.json({ held: true, message: "Got it. We'll send your insertion order and payment link within 1 business day. No charge today.", stored: friday.status });
     return;
   }

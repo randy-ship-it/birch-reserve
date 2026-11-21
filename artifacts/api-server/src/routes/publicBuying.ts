@@ -1,4 +1,5 @@
 import { BUYER_HEADER_CSS, TOKENS_CSS, buyerHeaderHtml } from "../lib/brandTokens";
+import { PRICE_LADDER_CSS, priceLadderHtml } from "../lib/priceLadder";
 import { hundredHtml } from "../lib/overhaul/hundred";
 import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
 import { withStreetNet } from "../lib/adserver/promoNet";
@@ -2371,7 +2372,7 @@ function renderBuycalcHtmlUsd(input: {
 })}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>${TOKENS_CSS}${BUYCALC_CSS}${BUYER_COMFORT_CSS}${START_SMALL_CSS}${HERO_MOCK_CSS}${BUYER_HEADER_CSS}</style></head><body>
+<style>${TOKENS_CSS}${BUYCALC_CSS}${BUYER_COMFORT_CSS}${START_SMALL_CSS}${HERO_MOCK_CSS}${BUYER_HEADER_CSS}${PRICE_LADDER_CSS}</style></head><body>
 ${buyerHeaderHtml("buycalc", currencyToggleHtml(currency, { sku: input.sku, format: input.format, category }))}
 <main>
 <section class="hero"><div class="wrap hero-grid"><div><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
@@ -2383,6 +2384,7 @@ ${heroInquireHtml()}</div>${heroMockHtml("buycalc-hero-mock")}</div></section>
 
 <section class="band" id="offers"><div class="wrap"><p class="kicker">Two ways in</p><h2>Pick your start.</h2>
 <div class="offers">${offerCard(look, { eyebrow: "7-day look", name: "See it before you commit", lines: ["See your placement for 7 days while you decide.", "Converts in full to the reserve within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Reserve", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the hub network. Credit lasts 12 months.`, "Placements are curated as hubs launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Reserve your space · ${price(seat)}` })}</div>
+${priceLadderHtml(currency, { title: "Every step, in " + currency.toUpperCase() })}
 ${offersSampleIoHtml()}
 ${hundredHtml()}
 <!--BONUS_TIER_DRAFT-->

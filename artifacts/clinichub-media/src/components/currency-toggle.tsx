@@ -25,7 +25,7 @@ export function CurrencyToggle({ className = "" }: { className?: string }) {
           aria-pressed={currency === c}
           data-testid={`currency-${c}`}
           onClick={() => setCurrency(c)}
-          className={`px-2 py-1.5 transition-colors ${
+          className={`inline-flex min-h-10 min-w-11 items-center justify-center px-2.5 transition-colors ${
             currency === c ? "bg-accent text-accent-foreground" : "bg-background text-foreground hover:bg-secondary"
           }`}
         >

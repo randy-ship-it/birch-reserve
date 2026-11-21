@@ -11,13 +11,15 @@
  *                bytes, not the name. Held for human approval before anything runs.
  *   3. Slot      where it shows + plan. $190 / $490 go to the SAME Stripe Checkout path as /buycalc
  *                (POST /v1/checkout: Stripe verifies the card, Radar scores it, 3DS when the bank asks).
- *                Exclusive display goes to an insertion order and invoice (card, cheque or wire). No card.
+ *                Exclusive: the $1,900 exclusive reserve by card (POST /v1/exclusive/reserve), which locks a $5K–$50K
+ *                exclusive package on an insertion order. All prices in the visitor's currency (lib/priceLadder.ts).
  *
  * Store: production (VERCEL_ENV=production) writes buy_creatives / buy_orders in Postgres (created on first use,
  * additive). Every other environment keeps them in this instance's memory, so preview QA never writes prod data.
  */
 import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
-import { PUBLIC_RESERVE_OFFERS } from "./reserveOffers";
+import type { ReserveCurrency } from "./reserveOffers";
+import { priceLadder } from "./priceLadder";
 import { PREMIUM_INQUIRE_ONLY } from "./premiumInquireOnly";
 import { FixedWindowLimiter } from "./rateLimit";
 
@@ -30,17 +32,21 @@ export type BuyPlan = {
   price: string;
   name: string;
   line: string;
-  pay: "card" | "invoice";
+  /** card: $190 / $490 checkout. reserve: the $1,900 exclusive reserve checkout. */
+  pay: "card" | "reserve";
 };
 
-const look = PUBLIC_RESERVE_OFFERS.find((o) => o.sku === "hold-190")!;
-const seat = PUBLIC_RESERVE_OFFERS.find((o) => o.sku === "reserve-490")!;
+/** /buy plan cards from the one price source, in the visitor's currency. */
+export function buyPlans(currency: ReserveCurrency): readonly BuyPlan[] {
+  const L = Object.fromEntries(priceLadder(currency).map((s) => [s.key, s]));
+  return [
+    { key: "reserve-490", price: L["reserve-490"]!.price, name: "Reserve your space", line: "Shared category seat. 100% media credit. Refundable until 14 days before launch.", pay: "card" },
+    { key: "hold-190", price: L["hold-190"]!.price, name: "7-day look", line: "See your placement for 7 days. Converts in full, or refunded.", pay: "card" },
+    { key: "exclusive", price: L["exclusive"]!.price, name: "Exclusive reserve", line: `${L["exclusive"]!.line.replace(/ All \$1,900 counts toward it\.$/, "")} One brand per category; the IO sets hub and dates.`, pay: "reserve" },
+  ];
+}
 
-export const BUY_PLANS: readonly BuyPlan[] = [
-  { key: "reserve-490", price: `$${seat.dueTodayUsd}`, name: "Reserve your space", line: "100% media credit. Refundable until 14 days before launch.", pay: "card" },
-  { key: "hold-190", price: `$${look.dueTodayUsd}`, name: "7-day look", line: "See your placement for 7 days. Converts in full, or refunded.", pay: "card" },
-  { key: "exclusive", price: "$25K–$50K", name: "Exclusive display", line: "One brand per category. Insertion order and invoice.", pay: "invoice" },
-] as const;
+export const BUY_PLANS: readonly BuyPlan[] = buyPlans("usd");
 
 export type BuyFormat = { key: string; label: string; hint: string; premium: boolean };
 /** Display slots that take a still image. Motion 15s is by request (video), so it is not on this page. */
