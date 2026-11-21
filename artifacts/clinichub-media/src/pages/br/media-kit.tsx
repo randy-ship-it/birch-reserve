@@ -196,11 +196,11 @@ export default function BrMediaKit() {
       <section className="border-b border-border/70 bg-background" data-testid="mk-market-signals">
         <div className="container mx-auto max-w-5xl space-y-8 px-5 py-10 md:px-6 md:py-14">
           <Tam2027 testId="mk-tam-2027" />
+          <ActivityPulse desktopInline className="-mb-3" />
           <CategoriesWeServe />
           <QuestionsBrandsAsk />
         </div>
       </section>
-      <ActivityPulse desktopOnly />
 
       {/* GTM setup packages (Randy t332u, Nov 21 2026) */}
       <section className="border-b border-border/70 bg-background" data-testid="mk-gtm-setup">
