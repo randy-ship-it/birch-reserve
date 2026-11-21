@@ -19,6 +19,7 @@ import { sampleReport } from "@/lib/fridayMockReport";
 import { RT, RT_SANS, RT_SERIF } from "@/lib/reportTokens";
 import { TwoLane } from "@/components/br/two-lane";
 import { NextStep } from "@/components/br/next-step";
+import { GtmSetup } from "@/components/br/gtm-setup";
 import { useAttention } from "@/lib/attention";
 import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAskCompact } from "@/components/br/market-pulse";
 import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
@@ -105,6 +106,8 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
             <QuestionsBrandsAskCompact testId="intake-questions-compact" />
           </div>
         )}
+        {/* GTM setup packages (Randy Nov 21 2026): same shared block as home + media kit, below the main intake options. */}
+        {sup ? null : <div className="mx-auto mt-10 max-w-5xl" data-testid="intake-gtm-setup"><GtmSetup where="intake" /></div>}
       </div>
     </div>
   );
