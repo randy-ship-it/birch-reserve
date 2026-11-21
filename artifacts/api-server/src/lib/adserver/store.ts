@@ -85,6 +85,8 @@ const DDL = (s: string) => [
     ('street100','STREET100','{streetteam100,streetteamhundred,streethundred}',100000000,'Street team: $100 USD ad credit handed out by street team members. Ad spend only, no cash value, non-transferable.','seed') ON CONFLICT DO NOTHING`,
   `INSERT INTO ${s}.ad_street_members (id, label, created_by) VALUES ('bridget','Bridget','seed'),('mona','Mona','seed') ON CONFLICT DO NOTHING`,
   `CREATE TABLE IF NOT EXISTS ${s}.ad_audit (id bigserial PRIMARY KEY, at timestamptz NOT NULL DEFAULT now(), actor text, action text NOT NULL, target text, detail text)`,
+  `INSERT INTO ${s}.ad_street_qrs (member, label, site, url, created_by) VALUES ('bridget','birch-intake','birch','https://birchreserve.net/intake?code=STREET100&st=bridget&qr=birch-intake','seed'),('bridget','scale-intake','scale','https://scalehealth.ca/intake?code=STREET100&st=bridget&qr=scale-intake','seed'),('mona','birch-intake','birch','https://birchreserve.net/intake?code=STREET100&st=mona&qr=birch-intake','seed'),('mona','scale-intake','scale','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake','seed'),('mona','scale-intake-digital','scale','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake-digital','seed') ON CONFLICT DO NOTHING`,
+  `INSERT INTO ${s}.ad_audit (actor, action, target, detail) SELECT 'seed','street.qr','mona/scale-intake-digital','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake-digital (Mona digital Scale intake QR registered)' WHERE NOT EXISTS (SELECT 1 FROM ${s}.ad_audit WHERE action = 'street.qr' AND target = 'mona/scale-intake-digital')`,
 ];
 
 let ready: Promise<void> | null = null;

@@ -132,20 +132,20 @@ export async function streetEvent(e: { member: string; kind: StreetKind; qr?: st
   return rows.length > 0;
 }
 
-export type StreetRow = { id: string; label: string; active: boolean; visits: number; scans: number; intakes: number; redemptions: number; applied: number; orders: number; revenue: Array<{ currency: string; cents: number }>; creditMicros: number };
+export type StreetRow = { id: string; label: string; active: boolean; visits: number; scans: number; byQr: Record<string, number>; intakes: number; redemptions: number; applied: number; orders: number; revenue: Array<{ currency: string; cents: number }>; creditMicros: number };
 export async function streetStats(includeTest = false): Promise<StreetRow[]> {
   const p = await db();
   const ms = await members();
   const t = includeTest ? "" : "AND is_test = false";
-  const { rows: ev } = await p.query(`SELECT member, kind, count(*)::int AS n, coalesce(sum(amount_cents),0)::bigint AS cents, currency FROM ${S()}.ad_street_events WHERE true ${t} GROUP BY member, kind, currency`);
+  const { rows: ev } = await p.query(`SELECT member, kind, qr, count(*)::int AS n, coalesce(sum(amount_cents),0)::bigint AS cents, currency FROM ${S()}.ad_street_events WHERE true ${t} GROUP BY member, kind, qr, currency`);
   const { rows: rd } = await p.query(`SELECT st AS member, status, count(*)::int AS n, coalesce(sum(credit_micros),0)::bigint AS micros FROM ${S()}.ad_promo_redemptions WHERE st IS NOT NULL ${t} GROUP BY st, status`);
   return ms.map((m) => {
-    const row: StreetRow = { id: m.id, label: m.label, active: m.active, visits: 0, scans: 0, intakes: 0, redemptions: 0, applied: 0, orders: 0, revenue: [], creditMicros: 0 };
+    const row: StreetRow = { id: m.id, label: m.label, active: m.active, visits: 0, scans: 0, byQr: {}, intakes: 0, redemptions: 0, applied: 0, orders: 0, revenue: [], creditMicros: 0 };
     for (const r of ev) {
       if (r.member !== m.id) continue;
       const n = Number(r.n);
       if (r.kind === "visit") row.visits += n;
-      else if (r.kind === "scan") row.scans += n;
+      else if (r.kind === "scan") (row.scans += n), (row.byQr[String(r.qr ?? "qr")] = (row.byQr[String(r.qr ?? "qr")] ?? 0) + n);
       else if (r.kind === "intake") row.intakes += n;
       else if (r.kind === "order") {
         row.orders += n;
@@ -169,9 +169,9 @@ export async function listQrs(): Promise<QrRow[]> {
 }
 const SITE_BASE = { birch: "https://birchreserve.net/intake", scale: "https://scalehealth.ca/intake" } as const;
 /** Shareable link: prefilled code + member. qr=1 marks a QR scan (vs a pasted link). */
-export function shareUrl(member: string, site: "birch" | "scale", code = "STREET100", qr = true): string {
+export function shareUrl(member: string, site: "birch" | "scale", code = "STREET100", qrLabel: string | null = "qr"): string {
   const q = new URLSearchParams({ code, st: member });
-  if (qr) q.set("qr", "1");
+  if (qrLabel) q.set("qr", qrLabel);
   return `${SITE_BASE[site]}?${q.toString()}`;
 }
 export async function registerQr(member: string, label: string, site: "birch" | "scale", url: string, actor: string): Promise<boolean> {

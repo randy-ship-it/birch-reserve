@@ -43,8 +43,10 @@ export function siteOf(req: Pick<Request, "get" | "query">): "birch" | "scale" {
 }
 
 export function promoCtxOf(req: Pick<Request, "get" | "query">): PromoCtx {
-  const st = (cookieOf(req, ST_COOKIE) ?? "").trim().toLowerCase();
-  const code = (cookieOf(req, PC_COOKIE) ?? "").trim().slice(0, 40);
+  // The x-br-attr header (set by the site script on same-origin API calls) wins over cookies: cookies do not survive every proxy path (Scale mirror).
+  const hdr = new URLSearchParams(req.get("x-br-attr") ?? "");
+  const st = (hdr.get("st") ?? cookieOf(req, ST_COOKIE) ?? "").trim().toLowerCase();
+  const code = (hdr.get("code") ?? cookieOf(req, PC_COOKIE) ?? "").trim().slice(0, 40);
   return { st: MEMBER_RE.test(st) ? st : null, code: /^[A-Za-z0-9 _-]{2,40}$/.test(code) ? code : null, site: siteOf(req) };
 }
 
