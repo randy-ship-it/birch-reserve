@@ -506,7 +506,7 @@ router.post("/ads/admin/campaigns", json, (req, res) =>
     const { campaign } = await store.createCampaign({
       accountEmail: email, brand: str(b.brand, 160), category: patch.category ?? null, currency: b.currency === "cad" ? "cad" : "usd", budgetMicros: Math.round(budget * MICROS),
       pricing: patch.pricing, primaryPlacement: patch.primaryPlacement, hubs: patch.hubs, allowSubstitute: patch.allowSubstitute ?? true, rateMultiplierBps: patch.rateMultiplierBps,
-      clickUrl: patch.clickUrl ?? null, exclusive: patch.exclusive, isTest: b.isTest === true, notes: patch.notes ?? null, orderKind: "manual (admin)", actor: who,
+      clickUrl: patch.clickUrl ?? null, exclusive: patch.exclusive, isTest: b.isTest === true, notes: patch.notes ?? null, orderKind: "manual (admin)", seller: b.seller === "scale" ? "scale" : "birch", actor: who,
     });
     const { status: _s, ...rest } = patch;
     await store.updateCampaign(campaign.id, rest, who);
@@ -900,7 +900,7 @@ router.get("/ads/admin/export/:what", (req, res) =>
     if (what === "campaigns") {
       const cs = await store.listCampaigns();
       const t = await store.totalsByCampaign("all");
-      rows = cs.map((c) => ({ id: c.id, brand: c.brand, email: c.accountEmail, status: c.status, test: c.isTest, order: c.orderRef, kind: c.orderKind, currency: c.currency, budget: (c.budgetMicros / MICROS).toFixed(2), spent: (c.spentMicros / MICROS).toFixed(2), pricing: c.pricing, placement: c.primaryPlacement, auto_move: c.allowSubstitute, flight_start: c.flightStart, flight_end: c.flightEnd, viewable: t.get(c.id)?.views ?? 0, clicks: t.get(c.id)?.clicks ?? 0, conversions: t.get(c.id)?.convs ?? 0 }));
+      rows = cs.map((c) => ({ id: c.id, seller: c.seller ?? "birch", brand: c.brand, email: c.accountEmail, status: c.status, test: c.isTest, order: c.orderRef, kind: c.orderKind, currency: c.currency, budget: (c.budgetMicros / MICROS).toFixed(2), spent: (c.spentMicros / MICROS).toFixed(2), pricing: c.pricing, placement: c.primaryPlacement, auto_move: c.allowSubstitute, flight_start: c.flightStart, flight_end: c.flightEnd, viewable: t.get(c.id)?.views ?? 0, clicks: t.get(c.id)?.clicks ?? 0, conversions: t.get(c.id)?.convs ?? 0 }));
     } else if (what === "ledger") {
       rows = (await store.ledger({ limit: 50_000 })).map((l) => ({ at: l.at, campaign_id: l.campaignId, kind: l.kind, slot: l.slotKey, partner: l.partner, units: l.units, amount: (l.amountMicros / MICROS).toFixed(6), currency: l.currency, note: l.note, actor: l.actor, test: l.isTest }));
     } else if (what === "royalties") {

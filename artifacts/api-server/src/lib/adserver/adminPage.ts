@@ -94,7 +94,7 @@ const hubList = () => [...new Map(AD_SLOTS.map((s) => [s.hub, s] as const)).valu
 function campaignForm(c: Campaign | null): string {
   const v = c;
   return `<div class="row">
-${c ? "" : `<label>Customer email<input name="accountEmail" type="email" required></label><label>Brand<input name="brand" required maxlength="160"></label>`}
+${c ? "" : `<label>Customer email<input name="accountEmail" type="email" required></label><label>Brand<input name="brand" required maxlength="160"></label><label>Sold by<select name="seller"><option value="birch">Birch Reserve</option><option value="scale">Scale Health (direct)</option></select></label>`}
 ${c ? `<label>Brand<input name="brand" value="${esc(v!.brand)}" maxlength="160"></label>` : ""}
 <label>Category<input name="category" value="${esc(v?.category ?? "")}" maxlength="80"></label>
 ${c ? `<label>Status${sel("status", [["draft", "Draft"], ["active", "Active (serving)"], ["paused", "Paused"], ["completed", "Completed"]], v!.status)}</label>` : `<label>Budget (major units)<input name="budget" type="number" min="1" step="0.01" required></label><label>Currency${sel("currency", [["usd", "USD"], ["cad", "CAD"]], "usd")}</label>`}
@@ -121,7 +121,7 @@ export function adminPage(v: AdminView, now = Date.now()): string {
     const sp = c.budgetMicros > 0 ? (c.spentMicros / c.budgetMicros) * 100 : 0;
     const fp = flightProgress(c, now) * 100;
     const crs = v.creativesByCampaign.get(c.id) ?? [];
-    return `<tr><td><b>${esc(c.brand)}</b>${c.isTest ? ` <span class="chip c-test">Test</span>` : ""}${c.exclusive ? ` <span class="chip c-ahead">Excl.</span>` : ""}<div class="fine">${esc(c.accountEmail)}<br>${esc(c.orderKind ?? "manual")} · ${esc(c.id.slice(0, 8))}</div></td>
+    return `<tr><td><b>${esc(c.brand)}</b>${c.isTest ? ` <span class="chip c-test">Test</span>` : ""}${c.exclusive ? ` <span class="chip c-ahead">Excl.</span>` : ""}<div class="fine">${esc(c.accountEmail)}<br>${c.seller === "scale" ? "Scale direct" : "Birch"} · ${esc(c.orderKind ?? "manual")} · ${esc(c.id.slice(0, 8))}</div></td>
 <td><span class="chip c-${esc(c.status)}">${esc(c.status)}</span><br><span class="chip c-${esc(st)}" style="margin-top:4px">${esc(st.replace("_", " "))}</span></td>
 <td>${esc(placementLabel(c.primaryPlacement))}<div class="fine">${c.pricing.toUpperCase()}${c.allowSubstitute ? " · auto-move on" : ""}${c.rateMultiplierBps !== 10000 ? ` · ${c.rateMultiplierBps / 100}% of card` : ""}<br>${c.hubs.length ? esc(c.hubs.join(", ")) : "all live hubs"}</div></td>
 <td class="n">${fmtMoney(c.budgetMicros, c.currency)}<div class="fine">spent ${fmtMoney(c.spentMicros, c.currency)}</div><div class="bar" style="min-width:120px"><i style="width:${sp.toFixed(1)}%"></i>${c.flightStart ? `<em style="left:${fp.toFixed(1)}%"></em>` : ""}</div></td>

@@ -89,6 +89,7 @@ const DDL = (s: string) => [
   `CREATE TABLE IF NOT EXISTS ${s}.ad_hubs (
     key text PRIMARY KEY, name text NOT NULL, category text NOT NULL DEFAULT '', url text NOT NULL, partner text NOT NULL, contract_ref text NOT NULL,
     status text NOT NULL DEFAULT 'live', is_test boolean NOT NULL DEFAULT false, created_by text, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now())`,
+  `ALTER TABLE ${s}.ad_campaigns ADD COLUMN IF NOT EXISTS seller text NOT NULL DEFAULT 'birch'`,
   `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS review_note text`,
   `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS source_ref text`,
   `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS paid_ref text`,
@@ -136,7 +137,7 @@ const arr = (v: unknown): string[] => (Array.isArray(v) ? v.map(String) : typeof
 function toCampaign(r: Record<string, unknown>): Campaign {
   return {
     id: String(r.id), accountEmail: String(r.account_email), brand: String(r.brand), category: (r.category as string) ?? null,
-    orderRef: (r.order_ref as string) ?? null, orderKind: (r.order_kind as string) ?? null, currency: r.currency === "cad" ? "cad" : "usd",
+    orderRef: (r.order_ref as string) ?? null, orderKind: (r.order_kind as string) ?? null, seller: r.seller === "scale" ? "scale" : "birch", currency: r.currency === "cad" ? "cad" : "usd",
     budgetMicros: num(r.budget_micros), spentMicros: num(r.spent_micros), pricing: r.pricing === "cpc" ? "cpc" : "cpm",
     primaryPlacement: String(r.primary_placement) as Placement, hubs: arr(r.hubs), allowSubstitute: Boolean(r.allow_substitute),
     rateMultiplierBps: num(r.rate_multiplier_bps), flightStart: date(r.flight_start), flightEnd: date(r.flight_end),
@@ -158,7 +159,7 @@ export async function audit(actor: string | null, action: string, target: string
 export type NewCampaign = {
   accountEmail: string; brand: string; category?: string | null; orderRef?: string | null; orderKind?: string | null;
   currency?: "usd" | "cad"; budgetMicros: number; pricing?: Pricing; primaryPlacement?: Placement; hubs?: string[];
-  allowSubstitute?: boolean; rateMultiplierBps?: number; clickUrl?: string | null; exclusive?: boolean; isTest?: boolean; notes?: string | null; actor?: string | null;
+  allowSubstitute?: boolean; rateMultiplierBps?: number; clickUrl?: string | null; exclusive?: boolean; isTest?: boolean; notes?: string | null; actor?: string | null; seller?: "birch" | "scale";
 };
 
 /** Idempotent per order_ref: a repeat (webhook retry) returns the existing campaign and adds no second credit. */
@@ -170,11 +171,11 @@ export async function createCampaign(n: NewCampaign): Promise<{ campaign: Campai
   }
   const { rows } = await p.query(
     `INSERT INTO ${S()}.ad_campaigns (account_email, brand, category, order_ref, order_kind, currency, budget_micros, pricing, primary_placement, hubs,
-      allow_substitute, rate_multiplier_bps, click_url, exclusive, is_test, notes)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) ON CONFLICT DO NOTHING RETURNING *`,
+      allow_substitute, rate_multiplier_bps, click_url, exclusive, is_test, notes, seller)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) ON CONFLICT DO NOTHING RETURNING *`,
     [n.accountEmail.trim().toLowerCase(), n.brand.slice(0, 160), n.category ?? null, n.orderRef ?? null, n.orderKind ?? null, n.currency ?? "usd",
       Math.max(0, Math.round(n.budgetMicros)), n.pricing ?? "cpm", n.primaryPlacement ?? "post_purchase", n.hubs ?? [], n.allowSubstitute ?? true,
-      n.rateMultiplierBps ?? 10_000, n.clickUrl ?? null, n.exclusive ?? false, n.isTest ?? false, n.notes ?? null],
+      n.rateMultiplierBps ?? 10_000, n.clickUrl ?? null, n.exclusive ?? false, n.isTest ?? false, n.notes ?? null, n.seller === "scale" ? "scale" : "birch"],
   );
   if (!rows[0]) {
     const again = await p.query(`SELECT * FROM ${S()}.ad_campaigns WHERE order_ref = $1`, [n.orderRef]);
