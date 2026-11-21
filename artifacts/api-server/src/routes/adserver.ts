@@ -21,7 +21,7 @@ import { renderLocalBizLeadEmail } from "../lib/localBizLeadNotify";
 import { renderEmailCaptureEmail } from "../lib/emailCapture";
 import { renderTranscriptEmail } from "../lib/randyChatTranscripts";
 import { renderKitEmail, renderNudgeEmail } from "../lib/kitEmails";
-import { buildPrepayConfirmationEmail } from "../lib/prepayConfirmationEmail";
+import { buildHoldConfirmationEmail, buildPrepayConfirmationEmail } from "../lib/prepayConfirmationEmail";
 import { AD_SLOTS, ALERT_CATEGORIES, AD_DEFAULTS, PROMO_RATE_BPS, isPromoCampaign, MICROS, PLACEMENTS, adminEmails, adsLoginEmailEnabled, findSlot, placementLabel, type Placement } from "../lib/adserver/config";
 import { pixelId, postbackKey, safeEqual, sign, verify } from "../lib/adserver/auth";
 import * as store from "../lib/adserver/store";
@@ -1028,6 +1028,49 @@ router.post("/ads/admin/email-test", json, (req, res) =>
     }
     await store.audit(who, "email.test", EMAIL_TEST_TO, ids.join(","));
     res.json({ message: `Sent ${ids.length} test emails to ${EMAIL_TEST_TO}.`, ids });
+  }),
+);
+
+/*
+ * Replay a live Stripe event (Nov 21 2026, after the webhook signing-secret mismatch). The event is fetched from Stripe with the
+ * server's key (so it is authentic) and runs through the same idempotent handler as the webhook: mark paid, Friday record, the
+ * internal [BIRCH PAID] alert. Once per event id. Optional buyer confirmation for hold-190, only ever to Randy's own address.
+ */
+router.post("/ads/admin/stripe/replay", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const eventId = str(b.eventId, 80);
+    if (!/^evt_[A-Za-z0-9]+$/.test(eventId)) return void res.status(400).json({ message: "Pass a Stripe event id (evt_…)." });
+    const event = await getStripeClient().events.retrieve(eventId);
+    if (event.type !== "checkout.session.completed" && event.type !== "checkout.session.async_payment_succeeded") {
+      return void res.status(400).json({ message: `Only paid checkout events replay (got ${event.type}).` });
+    }
+    const session = event.data.object as import("stripe").Stripe.Checkout.Session;
+    if (session.payment_status !== "paid") return void res.status(400).json({ message: "That checkout is not paid." });
+    const out: Record<string, unknown> = { event: event.id, session: session.id, livemode: event.livemode };
+    if (await store.claimOnce(`stripe.replay:${event.id}`, who)) {
+      const { processStripeEvent } = await import("./splashAdReservations");
+      await processStripeEvent(event);
+      out.processed = true;
+    } else out.processed = "already replayed";
+    if (b.confirmation === true) {
+      const rid = session.metadata?.reservationId ?? "";
+      const r = await store.reservationForConfirmation(rid);
+      if (!r) out.confirmation = "no reservation";
+      else if (r.email !== EMAIL_TEST_TO) out.confirmation = "refused: buyer is not Randy (buyer emails stay off until Randy previews them)";
+      else if (r.offerKey !== "hold-190") out.confirmation = `refused: offer ${r.offerKey} (hold-190 only)`;
+      else if (!(await store.claimOnce(`buyer.confirmation:${rid}`, who))) out.confirmation = "already sent";
+      else {
+        const camp = (await store.listCampaigns()).find((c) => c.orderRef === session.id);
+        const fmt = camp ? placementLabel(camp.primaryPlacement) : null;
+        const m = buildHoldConfirmationEmail({ brandName: r.brandName, amountCents: r.amountCents, currency: r.currency, format: fmt });
+        out.confirmation = await sendBuyerEmail({ from: ADS_FROM(), to: [EMAIL_TEST_TO], subject: m.subject, text: m.text, html: m.html }).then((x) => `sent ${x.id ?? ""}`.trim(), (e: unknown) => `failed: ${String(e).slice(0, 80)}`);
+      }
+    }
+    await store.audit(who, "stripe.replay", eventId, JSON.stringify(out).slice(0, 300));
+    res.json({ message: "Replayed.", ...out });
   }),
 );
 

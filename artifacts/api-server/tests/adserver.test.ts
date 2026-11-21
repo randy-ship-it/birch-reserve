@@ -413,6 +413,21 @@ test("QA guard + alt text: creativeTestFlag tells real from TEST creatives; alt 
   store.setAdPoolForTests(null);
 });
 
+test("stripe replay helpers: claimOnce is one-shot; hold-190 confirmation has no URLs and quotes the terms", async () => {
+  const db = new PGlite();
+  store.setAdPoolForTests(db as unknown as store.Queryable, "ads_once_test");
+  assert.equal(await store.claimOnce("stripe.replay:evt_1", "t"), true);
+  assert.equal(await store.claimOnce("stripe.replay:evt_1", "t"), false);
+  store.setAdPoolForTests(null);
+  const { buildHoldConfirmationEmail } = await import("../src/lib/prepayConfirmationEmail");
+  const m = buildHoldConfirmationEmail({ brandName: "Calm Joints Inc.", amountCents: 19000, currency: "usd", format: "Member dashboard (post-login)" });
+  assert.match(m.subject, /Calm Joints Inc\./);
+  assert.match(m.text, /\$190 USD payment for the 7-day look/);
+  assert.match(m.text, /100% credit if you convert within 7 days\. Otherwise it is a cash refund\. It does not lock a category\./);
+  assert.match(m.text, /not an impression guarantee/);
+  assert.doesNotMatch(m.text + m.html.replace(/<[^>]+>/g, ""), /https?:\/\/|www\./);
+});
+
 test("new-hub alert: never says open/unclaimed, one per hub per email, unsubscribe turns alerts off", async () => {
   const { hubAlertEmail } = await import("../src/lib/adserver/mail");
   const m = hubAlertEmail({ hubName: "SOLE", category: "Recovery hardware", hubUrl: "https://scalehealth.ca/sole", unsubscribeUrl: "https://birchreserve.net/account/alerts/off?t=x" });

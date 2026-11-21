@@ -9,7 +9,7 @@
  *   - OFF by default. Only sends when PREPAY_CONFIRMATION_EMAIL=true AND RESEND_API_KEY is set.
  *     Preview / test deployments never send.
  *   - Never for is_test reservations. Never throws (webhook still returns 2xx to Stripe).
- *   - Hold-190 is not a prepay and gets no email from this module.
+ *   - Hold-190 is not a prepay and gets no automatic email from this module. buildHoldConfirmationEmail is only sent by the admin replay (Randy-only, Nov 21 2026).
  */
 import { EMAIL_TOKENS, emailLayout, emailP, escEmail } from "./emailLayout";
 import type Stripe from "stripe";
@@ -77,6 +77,40 @@ export function buildPrepayConfirmationEmail(input: PrepayEmailInput): PrepayEma
     "Birch Reserve",
   ].join("\n");
   return { subject, text, html: prepayHtml(text) };
+}
+
+/** hold-190 ($190 7-day look) order confirmation, same layout. Terms quoted from /terms; no URLs. */
+export function buildHoldConfirmationEmail(input: PrepayEmailInput & { format?: string | null }): PrepayEmail {
+  const brand = (input.brandName ?? "").trim();
+  const amount = formatPrepayAmount(input.amountCents, input.currency);
+  const subject = `Order received${brand ? `: ${brand}` : ""}. Your 7-day look is in review`;
+  const text = [
+    brand ? `Hi ${brand} team,` : "Hi,",
+    "",
+    `Thank you. Your ${amount} payment for the 7-day look is received${input.format ? ` (${input.format})` : ""}.`,
+    "",
+    "What happens next:",
+    "- Your ad is in our review queue. Nothing runs until we approve it.",
+    "- Once approved, your placement is live in a hub for 7 days.",
+    "- Sign in to your Birch Reserve account to see the status, or upload a different ad.",
+    "",
+    "Refund: the 7-day look is a 100% credit if you convert within 7 days. Otherwise it is a cash refund. It does not lock a category.",
+    "",
+    "Your payment is display credit, not an impression guarantee. Reporting is aggregate only.",
+    "",
+    "Reply to this email with any question.",
+    "",
+    "Birch Reserve",
+  ].join("\n");
+  const blocks = text.split("\n\n");
+  const body = blocks
+    .map((b) => {
+      const lines = b.split("\n");
+      if (lines.slice(1).length && lines.slice(1).every((l) => /^- /.test(l))) return emailP(escEmail(lines[0]!)) + `<ul style="margin:0 0 12px;padding-left:20px;font-family:${EMAIL_TOKENS.sans};font-size:15px;line-height:1.6;color:${EMAIL_TOKENS.ink}">${lines.slice(1).map((l) => `<li style="margin:0 0 6px">${escEmail(l.slice(2))}</li>`).join("")}</ul>`;
+      return emailP(lines.map(escEmail).join("<br>"), { muted: /^Your payment is display credit|^Refund:/.test(b) });
+    })
+    .join("");
+  return { subject, text, html: emailLayout({ title: "Order received", preheader: "Your 7-day look is in review", eyebrow: "Birch Reserve · Payment received", body }) };
 }
 
 export type PrepayReservation = {
