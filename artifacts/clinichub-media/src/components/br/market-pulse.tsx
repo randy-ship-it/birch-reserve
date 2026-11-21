@@ -6,6 +6,7 @@
  * Shared by birchreserve.net and the Scale mirror (scalehealth.ca/intake): no site name in the copy.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
+import { LINGER_STATE_EVENT, isLingerOpen } from "@/lib/overlay-bus";
 import { Activity, Apple, Bed, Brain, ChevronDown, Dumbbell, HeartPulse, Microscope, Soup, X } from "lucide-react";
 import { STARTER_BLOCK } from "@/components/br/start-small";
 import { AGENCY_TEST } from "../../../../api-server/src/lib/twoLane";
@@ -231,7 +232,14 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, className =
   const [feed, setFeed] = useState<Feed | null>(null);
   const [i, setI] = useState(-1);
   const [fading, setFading] = useState(false);
-  const [blocked, setBlocked] = useState(false);
+  const [blockedBase, setBlocked] = useState(false);
+  const [capOpen, setCapOpen] = useState(() => isLingerOpen());
+  useEffect(() => {
+    const on = (e: Event) => setCapOpen(Boolean((e as CustomEvent<{ open: boolean }>).detail?.open));
+    window.addEventListener(LINGER_STATE_EVENT, on);
+    return () => window.removeEventListener(LINGER_STATE_EVENT, on);
+  }, []);
+  const blocked = blockedBase || capOpen; // hide while an email-capture card is up
   const [off, setOff] = useState(readOff);
   const boxRef = useRef<HTMLDivElement | null>(null);
   const slotRef = useRef(-1); // chosen desktop spot, kept across item swaps
