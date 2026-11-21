@@ -1052,7 +1052,7 @@ test("GET /availability.json aliases /v1/availability.json (same handler, not SP
     const v1Body = JSON.parse(v1Text) as Record<string, unknown>;
     const aliasBody = JSON.parse(aliasText) as Record<string, unknown>;
     for (const k of ["seats_total", "seats_paid", "seats_held", "seats_open"]) assert.equal(k in v1Body, false, k);
-    assert.equal(v1Body.availability, "limited_early_placements");
+    assert.equal(v1Body.availability, "accepting_placements");
     assert.equal(aliasBody.availability, v1Body.availability);
     assert.equal(aliasBody.inventory_model, v1Body.inventory_model);
     assert.equal(aliasBody.default_sku, v1Body.default_sku);

@@ -17,6 +17,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { Details } from "@/components/br/details";
+import { ExclusiveReserveCard, SpendDown } from "@/components/br/inventory-plan";
 import { HubMock, twoLaneMock } from "@/components/br/two-lane";
 import { STARTER_BLOCK } from "@/components/br/start-small";
 import { trackCta } from "@/lib/track-cta";
@@ -246,12 +247,14 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
         </button>
       </article>
       {agencyOpen ? <div className="mt-3 rounded-2xl bg-white/[0.06] p-4 ring-1 ring-lime-300/50" data-testid="mid-tier-agency-panel"><AgencyPrepayForm where={where} dark /></div> : null}
+      <div className="mt-3"><ExclusiveReserveCard where={where} /></div>
       <p className="mt-3 text-[12px] text-white/70" data-testid="mid-tier-pack-terms">Packs: refundable until 14 days before the IO launch date. Bonus is media credit only, no cash value. No impression guarantees; reporting is aggregate. A paid $190 look or $490 reserve counts in full toward a pack within 30 days.</p>
+      <div className="mt-3"><SpendDown dark testId="mid-tier-spend-down" /></div>
       <Details dark label="Agency terms, view blocks and a $1.5K–$5K example" testId="mid-tier-details">
         <p data-testid="mid-tier-agency-terms">{MID_TIER_LINE} One IO per client. {AGENCY_REPORTING_LINE}.</p>
         <p data-testid="mid-tier-refund">{MID_TIER_REFUND}</p>
         <p>View block: from {fmtUsd(STARTER_BLOCK.startingUsd)} USD for 100K modelled views. <a href={withUtm("/?inquire=pack&block=100000&surfaces=landing#quick-buy", where, "block")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-block-cta">Request a block</a></p>
-        <p>Premium, one brand per category: $25K–$50K, inquire only. <a href={withUtm("/buy?plan=exclusive", where, "exclusive")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-exclusive">Request an invoice</a></p>
+        <p>Premium, one brand per category: $25K–$50K by invoice, or lock a $5K–$50K CAD package with the <a href={withUtm("/exclusive", where, "exclusive-1900")} className="font-semibold text-lime-300 underline underline-offset-2">$1,900 CAD reserve</a>. <a href={withUtm("/buy?plan=exclusive", where, "exclusive")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-exclusive">Request an invoice</a></p>
         <TwoSurfaceExample dark />
       </Details>
     </section>

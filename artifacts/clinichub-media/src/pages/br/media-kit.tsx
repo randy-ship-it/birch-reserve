@@ -1,3 +1,4 @@
+import { Tam2027 } from "@/components/br/inventory-plan";
 import { StartSmall } from "@/components/br/start-small";
 import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAsk } from "@/components/br/market-pulse";
 import { EstimateTag } from "@/components/br/intake-kit";
@@ -182,6 +183,7 @@ export default function BrMediaKit() {
       {/* Categories we serve + Questions brands ask (Randy t291u, Nov 20 2026) */}
       <section className="border-b border-border/70 bg-background" data-testid="mk-market-signals">
         <div className="container mx-auto max-w-5xl space-y-8 px-5 py-10 md:px-6 md:py-14">
+          <Tam2027 testId="mk-tam-2027" />
           <CategoriesWeServe />
           <QuestionsBrandsAsk />
         </div>

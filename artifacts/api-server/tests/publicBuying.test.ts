@@ -4538,7 +4538,7 @@ test("availability is integer-valued and buycalc remains useful without JavaScri
   ).json()) as Record<string, unknown>;
   assert.equal("seats_open" in availability, false);
   assert.equal("seats_held" in availability, false);
-  assert.equal(availability.availability, "limited_early_placements");
+  assert.equal(availability.availability, "accepting_placements");
 
   const response = await fetch(`${origin}/buycalc`);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html/);

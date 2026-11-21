@@ -9,6 +9,7 @@ import { createBrandIntakeProxy } from "../routes/brandIntakeProxy";
 import { mirrorHost } from "../middlewares/mirrorHost";
 import { createAgentRouter } from "../routes/agent";
 import sponsorPageRouter from "../routes/sponsorPage";
+import exclusiveReserveRouter from "../routes/exclusiveReserve";
 import { getStripeClient } from "../lib/stripeClient";
 import { decideCurrency, currencyCookieHeader } from "../lib/currency";
 import { PUBLIC_RESERVE_OFFERS, RESERVE_CURRENCIES, offerAmountCents, offerPriceLabel } from "../lib/reserveOffers";
@@ -43,6 +44,7 @@ export function createPreviewApp(indexHtml: string): Express {
   );
   app.use(createBrandIntakeProxy());
   app.use(sponsorPageRouter);
+  app.use(exclusiveReserveRouter);
   app.get("/api/currency", (req, res) => {
     const d = decideCurrency(req);
     res.setHeader("Cache-Control", "private, no-store");

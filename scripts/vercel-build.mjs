@@ -46,6 +46,7 @@ const API_PATHS = [
   "/kit/r/[^/]+/?",
   "/brand-kit/?",
   "/sponsor/?",
+  "/exclusive/?",
   // Overhaul routes: the function serves the SPA shell with per-route head + JSON-LD.
   "/advertise/(?:brands|local)/?",
   "/publish(?:/(?:brands|studios))?/?",

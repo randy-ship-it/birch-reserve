@@ -61,6 +61,7 @@ import {
 import { hasValidQaHeader } from "../lib/testTraffic";
 import { attributionFrom } from "../lib/publicGuards";
 import { recordPaidCheckoutSafe } from "../lib/checkoutLead";
+import { EXCLUSIVE_RESERVE, recordPaidExclusiveReserveSafe } from "../lib/exclusiveReserve";
 import { sendPrepayConfirmationSafe } from "../lib/prepayConfirmationEmail";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { logger } from "../lib/logger";
@@ -569,6 +570,12 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
     event.type === "checkout.session.async_payment_succeeded"
   ) {
     const session = event.data.object as Stripe.Checkout.Session;
+    if (session.payment_status === "paid" && session.metadata?.kind === EXCLUSIVE_RESERVE.kind) {
+      // $1,900 CAD exclusive display reserve (Nov 21 2026): leads row + Friday, then the sales alert so the IO goes out.
+      await recordPaidExclusiveReserveSafe(session);
+      await sendPaidSalesAlertSafe(session);
+      return;
+    }
     if (session.payment_status === "paid" && session.metadata?.kind === "sponsorship_credit") {
       // Sponsorship pack (Nov 20 2026): no splash reservation row. Alert sales so the IO goes out (internal email only).
       await sendPaidSalesAlertSafe(session);
@@ -608,7 +615,7 @@ async function sendPaidSalesAlertSafe(session: Stripe.Checkout.Session): Promise
     const amount = typeof session.amount_total === "number" ? `${(session.amount_total / 100).toFixed(2)} ${String(session.currency ?? "").toUpperCase()}` : undefined;
     await sendSalesAlert({
       event: "paid_checkout",
-      title: `PAID: ${reservation?.brandName ?? session.metadata?.brand ?? email ?? "buyer"} · ${reservation?.promotedOffer ?? session.metadata?.sku ?? (session.metadata?.kind === "sponsorship_credit" ? `sponsorship pack ${session.metadata?.tier ?? ""}`.trim() : "Birch seat")}`,
+      title: `PAID: ${reservation?.brandName ?? session.metadata?.brand ?? email ?? "buyer"} · ${reservation?.promotedOffer ?? session.metadata?.sku ?? (session.metadata?.kind === EXCLUSIVE_RESERVE.kind ? "exclusive display reserve $1,900 CAD" : session.metadata?.kind === "sponsorship_credit" ? `sponsorship pack ${session.metadata?.tier ?? ""}`.trim() : "Birch seat")}`,
       rows: [
         ["Brand", reservation?.brandName],
         ["Email", email],
