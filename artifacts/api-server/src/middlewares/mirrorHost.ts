@@ -113,8 +113,10 @@ export function mirrorHost() {
   return (req: Request, res: Response, next: NextFunction) => {
     const stripped = stripMirrorPrefix(req.url);
     if (stripped !== null) req.url = stripped;
+    const viaPrefix = stripped !== null;
     if (req.method !== "GET" && req.method !== "HEAD") return next();
-    const src = MIRROR_PAGE_RE.test(req.path) ? mirrorTagOf(req) : null;
+    // Any Birch HTML page opened through /intake/_m (buycalc, hub-proof, media kit...) gets the same mirror-aware fetch base.
+    const src = MIRROR_PAGE_RE.test(req.path) || viaPrefix ? mirrorTagOf(req) : null;
     if (!src) return next();
     const send = res.send.bind(res);
     res.send = ((body: unknown) => {
