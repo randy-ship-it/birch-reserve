@@ -228,6 +228,8 @@ const routes = [
   { src: "^/$", dest: "/api" },
   // Public reel page (static): Scale Health ad system walkthrough.
   { src: "^/reel/?$", dest: "/reel/index.html", check: true },
+  // Unlisted build spec for the brand onboarding form (static, noindex via meta + header, not linked anywhere).
+  { src: "^/dev/brand-onboarding/?$", dest: "/dev/brand-onboarding/index.html", headers: { "X-Robots-Tag": "noindex, nofollow, noarchive", "Cache-Control": "public, max-age=0, must-revalidate" }, check: true },
   { handle: "filesystem" },
   ...API_PATHS.map((src) => ({ src, dest: "/api" })),
   ...SPA_INDEX_PATHS.map((src) => ({ src, dest: "/index.html" })),
