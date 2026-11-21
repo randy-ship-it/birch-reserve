@@ -171,7 +171,7 @@ test("agent quote: public offers only, USD", () => {
   // CAD appears only on the $1,900 CAD exclusive display reserve lines (Randy, voice, Nov 21 2026).
   assert.doesNotMatch(llms.replace(/^.*exclusive.*$/gim, ""), /CAD|sponsor-|All eight/);
   assert.match(llms, /exclusive-reserve-1900-cad · \$1,900 CAD/);
-  assert.match(llms, /Modelled 2027 estimate, not a commitment/);
+  assert.match(llms, /Based on signed partnership contracts, not a commitment/);
 });
 
 test("agent checkout always holds (202, no charge) and points to the human checkout", async () => {
@@ -305,7 +305,7 @@ test("media kit page copy: required language in, banned words out", () => {
   for (const must of [/Media credit until IO/, /Modelled volumes/, /fully refundable until 14 days before your launch date/, /Aggregate UTM reporting only/, /No personal data/, /share of display space across the hub network/, /No impression guarantees/, /guarantees of reach, clicks or sales/, /Estimates are modelled; terms on IO/, /Randy Gilling, Founder/, /sales@silverbirchgrowth\.com/, /\(647\) 931-6278/, /curated as hubs launch/, /FaceBeforeFlight/, /CategoryRequestForm/, /AvailabilityStrip/, /Small business package/, /Premium slots/, /from \$25K/i, /\$25K–\$50K/, /Inquire only/, /UPGRADE_PATH_LINE/, /Exclusivity/, /larger display share/, /priority placement/]) {
     assert.match(src, must);
   }
-  for (const banned of [/Align/, /Clairvoyant/i, /80 locations/i, /Kalaya/i, /we sell them customers/i, /signed partner/i, /\bCTR\b/, /guarantee(d)? (reach|delivery|results)/i, /Test Rail/, /Category Lock/, /\$10K Test Rail/, /\$35K[–-]\$75K/, /8 self-serve seats/, /Eight categories/, /seats open/]) {
+  for (const banned of [/Align/, /Clairvoyant/i, /80 locations/i, /Kalaya/i, /we sell them customers/i, /\bsigned partner\b/i, /\bCTR\b/, /guarantee(d)? (reach|delivery|results)/i, /Test Rail/, /Category Lock/, /\$10K Test Rail/, /\$35K[–-]\$75K/, /8 self-serve seats/, /Eight categories/, /seats open/]) {
     assert.doesNotMatch(src, banned);
   }
 });

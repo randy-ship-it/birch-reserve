@@ -31,7 +31,7 @@ const FAQ = [
   { q: "Where exactly do the ads run?", a: "Only inside co-branded hubs from Recovery Brands (recovery, longevity and food today; pets in queue) and inside health and wellness business hubs such as physio, gym, studio and clinic hubs. Each hub has four placements: post-purchase, the hub home page, product and services pages, and the member dashboard behind login." },
   { q: "Which hubs are live?", a: `${INVENTORY.line} More hubs launch over time.` },
   { q: "Is this display or cost-per-click?", a: "Both. Every placement can be bought as display (priced per thousand views) or CPC (priced per click). Deposits and area locks draw down against either." },
-  { q: "Are the audience numbers measured?", a: "Not yet. Any audience or view figure on this site is a modelled estimate, not measured delivery. We don't publish a measured network views figure (the 2027 inventory estimate is modelled); your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
+  { q: "Are the audience numbers measured?", a: "Not yet. Audience and view figures on this site are based on signed partnership contracts, not measured delivery. We don't publish a measured network views figure (the 2027 inventory figure is based on signed partnership contracts); your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
   { q: "Can a local business or studio buy?", a: "Yes. Start with the same $190 USD 7-day look or $490 USD reserve. Locking your area (a share of hub display near your postal code) is a premium option, by inquiry." },
   { q: "How does my business become a hub?", a: `Studios and retailers activate a hub at scalehealth.ca/clinichubs and earn cash or ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded hub.` },
   { q: "Do agencies get anything?", a: `Yes. ${AGENCY_SHARE.line} Agencies can also prepay a client test budget and get UTM and promo-code reporting per hub and surface.` },
@@ -74,7 +74,7 @@ function Expand({ title, sub, children, testId, open = false }: { title: string;
 }
 
 export default function BrHome() {
-  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand inside private, members-only health and wellness hubs: 700MM+ captive page views activating, 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 2MM+ homes reached by 2027. Get a free Monetization Kit. Prices in USD; figures are reach and audience, not delivered impressions.");
+  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand inside private, members-only health and wellness hubs: 700MM+ captive page views activating, 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 2MM+ homes reached by 2027. Get a free Monetization Kit. Prices in USD; figures are based on signed partnership contracts: reach and audience, not delivered impressions.");
   const price = priceLabels(useAvailability());
   return (
     <div className="w-full overflow-x-hidden bg-[#FAF8F3]" data-testid="br-home">
@@ -263,7 +263,7 @@ export default function BrHome() {
             <KitCta placement="footer_home" size="md" testId="home-cta-kit-bottom" sub={null} />
             <a href="/terms" className="inline-flex items-center gap-1 text-sm text-foreground/60 underline underline-offset-4"><FileText className="size-4" aria-hidden />Terms</a>
           </div>
-          <p className="text-[12px] text-foreground/50">Prices in USD. Audience and reach figures are estimates (modelled), not measured delivery.</p>
+          <p className="text-[12px] text-foreground/50">Prices in USD. Audience and reach figures are based on signed partnership contracts, not measured delivery.</p>
         </div>
       </section>
 

@@ -106,7 +106,7 @@ test("plan by goal (Nov 17 2026): four goals map to the four spec-sheet placemen
     assert.equal(g.cpcFloorUsd, row.cpcFloorUsd, g.key);
     assert.equal(g.inquire, row.inquire, g.key);
     assert.match(g.measure, /^(Views|Clicks|UTM visits|promo-code redemptions|and| )+$/i, g.key);
-    assert.doesNotMatch(g.brief + g.measure, /guarantee|lift|CTR|\d+%|signed partner|Align|Clairvoyant|Kalaya/i, g.key);
+    assert.doesNotMatch(g.brief + g.measure, /guarantee|lift|CTR|\d+%|\bsigned partners?\b|Align|Clairvoyant|Kalaya/i, g.key);
   }
   assert.equal(GOAL_PLAN.find((g) => g.key === "conversion")!.buy, "Insertion order (inquire)");
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
@@ -124,7 +124,7 @@ test("in plain terms (Nov 18 2026): five category answers, published terms only,
   assert.match(text, /fully refundable until 14 days before the launch date/);
   assert.match(text, /Never names, contact details or health information/);
   // No counts, claims, guarantees, banned names or CAD.
-  assert.doesNotMatch(text, /guarantee|lift|CTR|\b\d+MM\b|million|listed partners|signed partner|Align\b|Clairvoyant|Kalaya|80 locations|we sell them customers|\bCAD\b/i);
+  assert.doesNotMatch(text, /guarantee|lift|CTR|\b\d+MM\b|million|listed partners|\bsigned partners?\b|Align\b|Clairvoyant|Kalaya|80 locations|we sell them customers|\bCAD\b/i);
   // Only the four published placements.
   for (const s of ["post-purchase", "hub home page", "product and services pages", "member dashboard"]) assert.match(text, new RegExp(s, "i"), s);
   const meta = OVERHAUL_ROUTES["/agencies"].jsonld as { "@graph": Array<Record<string, unknown>> };

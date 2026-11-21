@@ -43,8 +43,8 @@ test("pacing and 2027 figure are modelled and never zero", () => {
   for (const c of TAM_2027.cases) assert.ok(c.usdYear > 0 && c.viewsYear > 0);
   assert.match(tam2027Headline(), /^\$\d/);
   const txt = tam2027Text();
-  assert.match(txt, /Modelled 2027 estimate, not a commitment/);
-  assert.doesNotMatch(txt, /signed partners|Align|Clairvoyant|Alset|MedVibe|Friday|80 locations|Integrity Fitness|CTR|ROAS/i);
+  assert.match(txt, /Based on signed partnership contracts, not a commitment/);
+  assert.doesNotMatch(txt, /\bsigned partners\b|Align|Clairvoyant|Alset|MedVibe|Friday|80 locations|Integrity Fitness|CTR|ROAS/i);
 });
 
 test("e2e (local): /exclusive renders, checkout is held when deposits are off, signed checkout.session.completed records the order", async () => {

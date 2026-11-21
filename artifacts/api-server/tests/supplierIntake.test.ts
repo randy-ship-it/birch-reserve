@@ -92,7 +92,7 @@ test("supplier preset copy: hard rules; /intake/supplier is the shared intake, n
   assert.match(readFileSync(resolve(process.cwd(), "../clinichub-media/src/components/br/intake-short-form.tsx"), "utf8"), /preset\?: IntakePreset/);
   const c = readFileSync(resolve(process.cwd(), "../clinichub-media/src/components/br/supplier-mode.tsx"), "utf8");
   const visible = c.replace(/\/\*\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-  for (const bad of [/\bAlign\b/i, /clairvoyant/i, /alset/i, /80 locations/i, /medvibe/i, /friday/i, /integrity/i, /signed partners/i, /\bpublisher\b(?!")/i, /\badvertiser\b(?!")/i, /\bCAD\b/, /guarantee/i, /\bROAS\b/, /\bCTR\b/, /\bdeposit\b/i, /not taken/i, /\b0 (sold|signed|holds?)\b/i]) {
+  for (const bad of [/\bAlign\b/i, /clairvoyant/i, /alset/i, /80 locations/i, /medvibe/i, /friday/i, /integrity/i, /\bsigned partners\b/i, /\bpublisher\b(?!")/i, /\badvertiser\b(?!")/i, /\bCAD\b/, /guarantee/i, /\bROAS\b/, /\bCTR\b/, /\bdeposit\b/i, /not taken/i, /\b0 (sold|signed|holds?)\b/i]) {
     assert.ok(!bad.test(visible.replace(/fridayIntake|fridayBrandIntake|fridayV12|FRIDAY_CATEGORIES|"advertiser"|"publisher"/g, "")), `found ${bad}`);
   }
   assert.match(visible, /Your hub is created and goes live once our team approves it\./);

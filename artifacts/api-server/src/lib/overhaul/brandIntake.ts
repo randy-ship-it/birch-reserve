@@ -198,7 +198,7 @@ export const AUDIENCE_CHANNELS = [
   { key: "calm-street", name: "Calm Joints + Street Team Ambassadors", v: "2MM+", l: "homes reached by 2027", detail: "Our owned digital clinic Calm Joints, plus Street Team Ambassadors on the ground." },
 ] as const;
 export const AUDIENCE_LINE = "700MM+ captive page views activating · 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers · 2MM+ homes reached by 2027";
-export const AUDIENCE_FINE = "Audience and reach figures are our plan and network size, not delivered impressions, and not a guarantee of views, clicks or results.";
+export const AUDIENCE_FINE = "Audience and reach figures are based on signed partnership contracts. Reach and audience, not delivered impressions, and not a guarantee of views, clicks or results. 2MM+ homes by 2027 is the Calm Joints and Street Team target.";
 /** Street Team + Calm Joints reach. */
 export const STREET_REACH_FIG = { v: "2MM+", l: "homes reached by 2027" } as const;
 export const STREET_REACH_LINE = "planned to reach 2MM+ homes by 2027 with Calm Joints";
@@ -212,7 +212,7 @@ export const CHANNEL_TILES = [
 ] as const;
 
 export const CHANNEL_TILES_FINE =
-  "Audience figures are Scale Health's network size and plan as of Nov 21 2026. They are reach and audience, not delivered impressions, and not a guarantee. They are separate from the modelled /inventory pricing feed.";
+  "Audience figures are based on signed partnership contracts, as of Nov 21 2026. They are reach and audience, not delivered impressions, and not a guarantee. 2MM+ homes by 2027 is the Calm Joints and Street Team target. They are separate from the /inventory pricing feed.";
 
 /* ------------------------------------------------------------------ Friday payload (adapter) */
 
