@@ -182,7 +182,6 @@ export default function BrMediaKit() {
         </div>
       </section>
 
-      <BrochureInline />
       <BrochureSlideIn />
 
       {/* Categories we serve + Questions brands ask (Randy t291u, Nov 20 2026) */}
@@ -199,6 +198,8 @@ export default function BrMediaKit() {
       <section className="border-b border-border/70 bg-background" data-testid="mk-gtm-setup">
         <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14"><GtmSetup where="media_kit" /></div>
       </section>
+
+      <BrochureInline />
 
       {/* Download my kit: personalized two-sided kit (preview, Nov 18 2026) */}
       <KitBuilder />
