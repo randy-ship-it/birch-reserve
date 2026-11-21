@@ -256,15 +256,20 @@ export const BANNED_REPLY_PATTERNS: ReadonlyArray<{ id: string; re: RegExp }> = 
   { id: "signed_counts", re: /\b\d+\s+(of\s+\d+\s+)?(listed\s+)?(hubs?|partners?|brands?)\s+(have\s+)?signed\b|\bhubs signed\b/i },
   { id: "promo_code", re: /\bSTREET\s?100\b|\b(promo|discount|coupon) code (is|:)\s*[A-Z0-9]{4,}\b|\buse code\b/i },
   { id: "internal_names", re: /\b(alset|medvibe|pier\s?39(\.ai)?|clairvoyant)\b|\bAlign (Health|Wellness|Capital|Group|Clinics?|ops)\b|\bFriday (push|CRM|intake|agent)\b/i },
-  { id: "gig_positioning", re: /\b(uber|gig[- ]?(economy|work|platform)?|on[- ]demand (platform|service|marketplace))\b/i },
+  { id: "align_name", re: /\bAlign\b(?!\s+(?:with|to|your|our|their|the|it|them|you|on|around|each|all)\b)/ },
   { id: "guarantee_claim", re: /\b(we|will|to)\s+guarantee\b|\bguaranteed\s+(impressions|results|roi|sales|reach|clicks|placement|delivery)\b/i },
   { id: "zero_counts", re: /\b0\s+(clinics|hubs|locations|partners|brands|seats)\b|\bzero\s+(clinics|hubs|locations|partners|brands|seats)\b/i },
   { id: "hub_open_claim", re: /\b(toronto|vancouver|calgary|montreal|new york|la|chicago)\b[^.\n]{0,40}\b(hub|clinic)\b[^.\n]{0,30}\b(is|are) (now )?(open|live)\b/i },
   { id: "revenue_split", re: /\b(revenue|rev)[- ]?share\b|\bcommission (split|share)\b|\b(birch|scale)(\s+health)?\s+share\b|\b(20|5|65|25)\s?%\s+(to\s+)?(birch|scale)\b/i },
 ];
 
+/** Gig / Uber / on-demand positioning is banned unless the reply is plainly denying it ("never gig, Uber-type or on-demand"). */
+const GIG_RE = /\b(uber|gig[- ]?(economy|work|platform)?|on[- ]demand)\b/i;
+const GIG_DENIAL_RE = /\b(not|never|isn'?t|aren'?t|no|neither|nor|nothing like|unlike|without)\b[^.\n]{0,80}\b(uber|gig|on[- ]demand)\b[^.\n]*/gi;
+
 export function findBannedContent(text: string): string | null {
   for (const p of BANNED_REPLY_PATTERNS) if (p.re.test(text)) return p.id;
+  if (GIG_RE.test(text.replace(GIG_DENIAL_RE, ""))) return "gig_positioning";
   // CAD is allowed only at the real table amounts ($270, $690, the packs, the $1,900 reserve).
   if (offTableCadAmounts(text).length > 0) return "cad_price";
   return null;

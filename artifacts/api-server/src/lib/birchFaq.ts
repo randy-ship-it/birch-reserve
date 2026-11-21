@@ -55,6 +55,12 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
   if (/get(ting)? started|onboard|how do i (start|sign up|begin|join|apply)|where do i (start|sign up)|what do i do/.test(t)) {
     return { intent: "start", callback: null, text: `Here's the path for a brand:\n1. Get the free Monetization Kit (website and email, no card): [Start the kit](${INTAKE})\n2. Pick your channels: branded hubs, the private retail network across Canada and the USA, or Calm Joints with the Street Team\n3. Start small: the $190 USD 7-day look ($270 CAD in Canada): [See the look](${BUY}?sku=hold-190)\n4. Scale up with a sponsorship pack or the exclusive reserve\nNothing runs until you approve an insertion order. Want the request form, or a person to call you? [Request form](${REQ})` };
   }
+  if (/\buber\b|\bgig\b|on-?demand|taskrabbit|freelanc/.test(t)) {
+    return { intent: "positioning", callback: null, text: `No. Scale Health is a distribution platform that started in Recovery, where it is vertically integrated, and it is growing into more health and wellness categories. It is never gig, Uber-type or on-demand. Want the free kit or the request form? [Start the kit](${INTAKE})` };
+  }
+  if (/which clients|your clients|client list|who do you work with|case stud|testimonial|\balign\b|\balset\b|clairvoyant|medvibe|pier\s?39|investor/.test(t)) {
+    return { intent: "confidential", callback: null, text: `We keep client and partner details confidential, so I can't share or confirm names. What I can share: only DR-HO'S and SOLE are live hubs today. Want the request form, or a person to call you? [Request form](${REQ})` };
+  }
   if (/\bcad\b|canadian|canada|currency|us dollars|\busd\b|exchange rate/.test(t)) {
     return { intent: "currency", callback: null, text: `Visitors in Canada see and pay CAD ($270 CAD for the 7-day look, $690 CAD to reserve); everyone else pays USD ($190 and $490). The currency shown at checkout is the currency you're charged, and there's a toggle on the page. Start at ${BUY}, or ask us anything first at ${REQ}.` };
   }

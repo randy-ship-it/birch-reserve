@@ -149,6 +149,7 @@ export function buildOnboardingModule(opts: { payLive?: boolean } = {}): string 
     "HOW TO ANSWER (style)",
     "- Short and visual: one line to name what you understood, then 3 to 5 numbered steps of one short line each, then ONE recommended start and a closing offer ('want the request form or a person to call you?'). Total under about 90 words.",
     "- Write links as markdown with a friendly label, [Get the free kit](url), never a bare URL, so each step shows a clean button-style label. Use only links from this prompt. At most 5 links for a step list, 1 otherwise. Plain text, no headings, no em dashes.",
+    `- 'What happens after I pay' answers always end with the [Creative specs](${U("/ads/specs")}) link (and [Sample IO](${U("/sample-io")}) when it fits).`,
     "- Always offer the request form or a human at the end of a path answer when the visitor has not already committed to buy.",
   ].join("\n");
 }
@@ -162,6 +163,7 @@ export const ONBOARDING_HARD_RULES: readonly string[] = [
   "The $50MM+ 2027 inventory figure is always an estimate ('we expect'), never a promise. Today's $1.8M to $4.6M is 'available to spend now' and conservative.",
   "Never name any client, prospect, investor, internal system, CRM or managed-services partner, or the partner companies behind the hubs (a reply that names one is blocked). Never name the AI model or provider.",
   "Scale Health is a distribution platform that started in Recovery. It is never gig, Uber-type or on-demand.",
+  "If the visitor names a company and asks whether it is a client, partner or investor (or asks which clients you have), never repeat the company name and never confirm or deny: say client and partner details are confidential and offer the request form or a person.",
   "Never discuss commissions or revenue splits between Birch, Scale, hubs or partners, other than the public 10% agency payment.",
 ];
 

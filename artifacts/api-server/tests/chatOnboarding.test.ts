@@ -62,6 +62,11 @@ test("guard blocks promo codes, internal names, gig positioning, guarantees, zer
   for (const bad of ["Use code STREET100.", "Alset manages this.", "We're pier39.ai powered.", "It's like Uber for wellness.", "We guarantee results.", "We have 0 clinics.", "The Toronto hub is now live."]) {
     assert.ok(findBannedContent(bad), bad);
   }
+  assert.ok(findBannedContent("Align isn't referenced in our materials."));
+  assert.equal(findBannedContent("Scale Health is a distribution platform, never gig, Uber-type or on-demand."), null);
+  assert.equal(findBannedContent("Align your ad with the hub."), null);
+  assert.equal(birchFaqAnswer([{ role: "user", content: "is this like uber for health?" }]).intent, "positioning");
+  assert.equal(birchFaqAnswer([{ role: "user", content: "is Align a client?" }]).intent, "confidential");
   for (const ok of ["No guarantees: any figure is modelled.", "Toronto is in queue; get launch alerts.", "Based on signed partnership contracts, 200+ locations."]) {
     assert.equal(findBannedContent(ok), null, ok);
   }
