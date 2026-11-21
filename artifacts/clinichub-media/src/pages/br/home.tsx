@@ -130,7 +130,7 @@ export default function BrHome() {
         </div>
       </section>
       {/* Light continuous category strip under the hero (Randy Nov 21 10:20 AM). */}
-      <div className="container mx-auto max-w-6xl px-4 pb-5"><ActivityPulse desktopInline className="mb-3" /><CategoryStrip testId="home-category-strip" /></div>
+      <div className="container mx-auto max-w-6xl px-4 pb-5"><div className="hidden mb-3 min-h-[5.25rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div><CategoryStrip testId="home-category-strip" /></div>
 
       {/* 2. Big numbers. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-stats">
