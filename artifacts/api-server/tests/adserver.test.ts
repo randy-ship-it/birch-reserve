@@ -188,3 +188,13 @@ test("full flow on Postgres: serve → viewable → click → conversion, ledger
   assert.equal(verify("s", token.replace(/.$/, token.endsWith("A") ? "B" : "A")), null);
   store.setAdPoolForTests(null);
 });
+
+test("ad creatives accept banner shapes; the /buy upload rule is unchanged", async () => {
+  const { checkCreative } = await import("../src/lib/buyFlow");
+  const { AD_CREATIVE_MIN } = await import("../src/routes/adserver");
+  const png = (w: number, h: number) => { const b = Buffer.alloc(33); Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(b); b.writeUInt32BE(13, 8); b.write("IHDR", 12); b.writeUInt32BE(w, 16); b.writeUInt32BE(h, 20); return b; };
+  for (const [w, h] of [[728, 90], [320, 50], [656, 280], [300, 250]]) assert.equal(checkCreative(png(w, h), AD_CREATIVE_MIN).ok, true, `${w}x${h}`);
+  assert.equal(checkCreative(png(200, 200), AD_CREATIVE_MIN).ok, false);
+  assert.equal(checkCreative(png(728, 90)).ok, false);
+  assert.equal(checkCreative(png(656, 300)).ok, true);
+});

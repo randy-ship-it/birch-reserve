@@ -24,6 +24,8 @@ import { fridayReady, syncToFriday } from "../lib/adserver/friday";
 import { toCsv } from "../lib/adserver/ui";
 import type { CampaignPatch } from "../lib/adserver/store";
 
+export const AD_CREATIVE_MIN = { width: 300, height: 50 } as const;
+
 const router: IRouter = Router();
 const json = express.json({ limit: "32kb" });
 const raw = express.raw({ type: ["image/*", "application/octet-stream"], limit: "2200kb" });
@@ -304,7 +306,7 @@ router.post("/account/alerts", json, (req, res) =>
 
 async function uploadCreative(req: Request, campaignId: string, actor: string, approve: boolean): Promise<{ ok: boolean; message: string }> {
   const buf = Buffer.isBuffer(req.body) ? req.body : Buffer.alloc(0);
-  const chk = checkCreative(buf);
+  const chk = checkCreative(buf, AD_CREATIVE_MIN); // display banners (728×90, 320×50, 656×280) are wider than tall
   if (!chk.ok) return { ok: false, message: chk.error };
   await store.addCreative({ campaignId, mime: chk.value.mime, width: chk.value.width, height: chk.value.height, data: buf, alt: str(req.query.alt, 200), uploadedBy: actor, status: approve ? "approved" : "pending" });
   return { ok: true, message: approve ? "Creative uploaded and approved." : "Creative sent for review. We'll approve it within 1 business day." };
