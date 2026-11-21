@@ -1,3 +1,4 @@
+import { AudienceChannels } from "@/components/br/audience-channels";
 import { Tam2027 } from "@/components/br/inventory-plan";
 import { StartSmall } from "@/components/br/start-small";
 import { Lock, ShieldCheck, Sparkles } from "lucide-react";
@@ -162,6 +163,10 @@ export default function BrAudiences() {
       </Section>
 
       {/* Segments */}
+      <Section id="audience-channels">
+        <AudienceChannels testId="audiences-channels" />
+      </Section>
+
       <Section id="inventory-2027">
         <Tam2027 testId="audiences-tam-2027" />
       </Section>

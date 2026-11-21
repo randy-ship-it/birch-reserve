@@ -131,7 +131,7 @@ export function pickActivation(friday: unknown, modelled: ActivationBlock): { bl
 export { COUNTRY_LABEL };
 
 /* ------------------------- Exposure value (Friday v1.1 `exposure`) ------------------------- */
-const CH_NAME: Record<string, string> = { hubs: "Scale Hubs", calm_joints: "Calm Joints", street_team: "Street Team", retail: "Retail Network" };
+const CH_NAME: Record<string, string> = { hubs: "Branded ScaleHealth.ca hubs", calm_joints: "Calm Joints", street_team: "Calm Joints + Street Team", retail: "Private retail network" };
 const fmt = (n: number) => (n >= 1e9 ? `${+(n / 1e9).toFixed(1)}B` : n >= 1e6 ? `${+(n / 1e6).toFixed(1)}MM` : n >= 1e3 ? `${Math.round(n / 1e3)}K` : String(Math.round(n)));
 export type Horizon = "now" | "later";
 export type Expo = "min" | "max";

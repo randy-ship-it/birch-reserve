@@ -2,6 +2,7 @@ import { Tam2027 } from "@/components/br/inventory-plan";
 import { StartSmall } from "@/components/br/start-small";
 import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAsk } from "@/components/br/market-pulse";
 import { EstimateTag } from "@/components/br/intake-kit";
+import { AudienceChannels } from "@/components/br/audience-channels";
 import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPath";
 import { BrochureInline, BrochureSlideIn } from "@/components/br/brochure-capture";
 import { GtmSetup } from "@/components/br/gtm-setup";
@@ -172,6 +173,7 @@ export default function BrMediaKit() {
 
         </div>
       </section>
+      <section className="border-b border-border/70 bg-background" data-testid="mk-audience"><div className="container mx-auto max-w-5xl px-5 py-8 md:px-6"><AudienceChannels testId="mk-audience-channels" /></div></section>
       {/* Mobile: the live feed sits in the gap below the first section (Randy, Nov 20 4:54 PM). */}
       <div className="px-4 py-3 md:hidden"><ActivityPulse mode="inline" /></div>
 

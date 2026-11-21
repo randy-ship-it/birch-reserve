@@ -95,11 +95,10 @@ test("sponsor: existing SKUs and prices only, existing Stripe paths, area lock i
 test("channel tiles: Randy's figures labelled network figures / targets; Calm Joints shows none", () => {
   assert.equal(CHANNEL_TILES_LABEL, "Network figures / targets");
   const t = Object.fromEntries(CHANNEL_TILES.map((x) => [x.key, x]));
-  assert.deepEqual(t["scale-hubs"]!.stats.map((s) => s.v), [">20MM", ">700MM", ">5B"]);
-  assert.ok(/target/.test(t["scale-hubs"]!.stats[2]!.l));
+  assert.deepEqual(t["scale-hubs"]!.stats.map((s) => s.v), ["700MM+"]);
   assert.equal(t["calm-joints"]!.stats.length, 0);
   assert.deepEqual(t["street-team"]!.stats.map((s) => s.v), ["2MM+"]);
-  assert.deepEqual(t["retail-network"]!.stats.map((s) => s.v), ["120+", "1MM+", "CA + US"]);
+  assert.deepEqual(t["retail-network"]!.stats.map((s) => s.v), ["200+", "1MM+", "CA + US"]);
 });
 
 test("kit calculator config matches Birch modelled figures (no outside benchmarks)", () => {

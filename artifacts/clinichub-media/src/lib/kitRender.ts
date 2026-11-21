@@ -148,7 +148,7 @@ export function kitSideB(d: KitData): string {
   <rect x="72" y="${bannerY}" width="1056" height="110" rx="24" fill="${NAVY}"/>
   <text x="104" y="${bannerY + 46}" font-family="${SANS}" font-size="18" font-weight="700" letter-spacing="2" fill="${LIME}">HUB RATES · ESTIMATE</text>
   <text x="104" y="${bannerY + 82}" font-family="${SANS}" font-size="28" font-weight="700" fill="#fff">CPM $${d.hubRates.cpm[0]}–$${d.hubRates.cpm[1]} · CPC $${d.hubRates.cpc[0].toFixed(2)}–$${d.hubRates.cpc[1].toFixed(2)} USD</text>
-  <text x="1096" y="${bannerY + 82}" text-anchor="end" font-family="${SANS}" font-size="20" fill="${LIME}">${esc(d.hubRates.fitLabel ? `Hubs: ${d.hubRates.fitLabel}` : ">20MM unique customers (network figure)")}</text>
+  <text x="1096" y="${bannerY + 82}" text-anchor="end" font-family="${SANS}" font-size="20" fill="${LIME}">${esc(d.hubRates.fitLabel ? `Hubs: ${d.hubRates.fitLabel}` : "700MM+ captive page views activating")}</text>
   <text x="72" y="${h2Y}" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing="2" fill="${NAVY}">2 · CALM JOINTS + STREET TEAM</text>
   <text x="72" y="${h3Y}" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing="2" fill="${NAVY}">3 · RETAIL NETWORK</text>
   ${chCards}
