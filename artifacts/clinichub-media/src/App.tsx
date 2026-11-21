@@ -39,6 +39,8 @@ import BrIntakeSupplier from '@/pages/br/intake-supplier';
 import BrIntakeSponsor from '@/pages/br/intake-sponsor';
 import BrIntakeReport from '@/pages/br/intake-report';
 import BrIntakeGtm from '@/pages/br/intake-gtm';
+import BrIntakeStreetTeam from '@/pages/br/intake-street-team';
+import BrStreetTeam from '@/pages/br/street-team';
 import BrAiBuyers from '@/pages/br/ai-buyers';
 import BrAudiences from '@/pages/br/audiences';
 import BrSampleProfile from '@/pages/br/sample-profile';
@@ -307,6 +309,12 @@ function Router() {
         </Route>
         <Route path="/intake/gtm">
           <Layout><BrIntakeGtm /></Layout>
+        </Route>
+        <Route path="/intake/street-team">
+          <Layout><BrIntakeStreetTeam /></Layout>
+        </Route>
+        <Route path="/street-team">
+          <Layout><BrStreetTeam /></Layout>
         </Route>
         <Route path="/intake/report">
           <Layout><BrIntakeReport /></Layout>

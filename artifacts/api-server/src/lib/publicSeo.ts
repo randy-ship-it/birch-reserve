@@ -42,6 +42,7 @@ export const PUBLIC_SITEMAP_PATHS = [
   "/match",
   "/hubs",
   "/media-kit",
+  "/street-team",
   "/agencies",
   "/media-buyers",
   "/ai-buyers",
@@ -98,6 +99,8 @@ export const SPA_SHELL_PATHS = [
   "/intake/supplier",
   "/intake/sponsor",
   "/intake/gtm",
+  "/intake/street-team",
+  "/street-team",
   "/intake/report",
   "/brand-kit",
 ] as const;
