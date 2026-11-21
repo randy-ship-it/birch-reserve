@@ -268,7 +268,7 @@ export default function AdvertiserRequests() {
 
   if (!isLoaded) {
     return (
-      <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#101c25] text-[#8fd6a5]">
+      <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#F9F8F6] text-[#0b6b43]">
         <span className="text-xs uppercase tracking-[0.2em] animate-pulse">Loading access...</span>
       </div>
     );
@@ -290,18 +290,18 @@ export default function AdvertiserRequests() {
     const isExpired = accessError?.status === 401;
 
     return (
-      <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#101c25] px-6 py-16 text-[#f4f0e8]">
-        <div className="w-full max-w-md border border-white/10 bg-[#0b151c] p-7 shadow-2xl shadow-black/20 md:p-10">
-          <div className="mb-8 flex size-12 items-center justify-center border border-[#e87979]/35 bg-[#e87979]/10 text-[#e87979]">
+      <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#F9F8F6] px-6 py-16 text-[#071A39]">
+        <div className="w-full max-w-md border border-[#d9ddd2] bg-white p-7 shadow-2xl shadow-black/20 md:p-10">
+          <div className="mb-8 flex size-12 items-center justify-center border border-[#ecc4bf] bg-[#f6e3e1] text-[#8a2b1f]">
             <XCircle className="size-5" aria-hidden="true" />
           </div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#e87979]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8a2b1f]">
             {isExpired ? 'Session expired' : 'Sales access denied'}
           </p>
-          <h1 className="mt-3 font-display text-3xl text-white md:text-4xl">
+          <h1 className="mt-3 font-display text-3xl text-[#071A39] md:text-4xl">
             {isExpired ? 'Please sign in again' : 'Account unauthorized'}
           </h1>
-          <p className="mt-4 text-sm leading-relaxed text-[#9cabb4]">
+          <p className="mt-4 text-sm leading-relaxed text-[#566476]">
             {isExpired
               ? 'Your secure session has expired. Please sign in again to access the queue.'
               : `Your current account (${user?.primaryEmailAddress?.emailAddress}) is not assigned an active sales role. The queue remains locked.`}
@@ -309,7 +309,7 @@ export default function AdvertiserRequests() {
           <Button
             type="button"
             onClick={handleSignOut}
-            className="mt-8 h-11 w-full rounded-none bg-[#e87979] text-[#1c0909] hover:bg-[#ff8f8f]"
+            className="mt-8 h-11 w-full rounded-xl bg-[#8a2b1f] text-white hover:bg-[#6f2218]"
           >
             Sign out
           </Button>
@@ -320,7 +320,7 @@ export default function AdvertiserRequests() {
 
   if (queue.isPending) {
     return (
-      <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#101c25] text-[#8fd6a5]">
+      <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#F9F8F6] text-[#0b6b43]">
         <span className="text-xs uppercase tracking-[0.2em] animate-pulse">Fetching queue...</span>
       </div>
     );
@@ -328,20 +328,20 @@ export default function AdvertiserRequests() {
 
   if (queue.isError) {
     return (
-      <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#101c25] px-6 py-16 text-[#f4f0e8]">
-        <div className="w-full max-w-md border border-white/10 bg-[#0b151c] p-7 md:p-10">
-          <XCircle className="size-6 text-[#e87979]" aria-hidden="true" />
-          <h1 className="mt-5 font-display text-3xl text-white">
+      <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#F9F8F6] px-6 py-16 text-[#071A39]">
+        <div className="w-full max-w-md border border-[#d9ddd2] bg-white p-7 md:p-10">
+          <XCircle className="size-6 text-[#8a2b1f]" aria-hidden="true" />
+          <h1 className="mt-5 font-display text-3xl text-[#071A39]">
             Queue unavailable
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-[#9cabb4]">
+          <p className="mt-3 text-sm leading-relaxed text-[#566476]">
             The private queue could not be loaded. No contact details were
             retained by this page.
           </p>
           <Button
             type="button"
             onClick={() => void queue.refetch()}
-            className="mt-7 h-11 w-full rounded-none bg-[#8fd6a5] text-[#07130d] hover:bg-[#a8e8b9]"
+            className="mt-7 h-11 w-full rounded-xl bg-[#C8F55A] text-[#071A39] hover:bg-[#d8fa84]"
           >
             Try again
           </Button>
@@ -352,21 +352,21 @@ export default function AdvertiserRequests() {
 
   return (
     <div
-      className="min-h-[calc(100dvh-4rem)] bg-[#101c25] text-[#f4f0e8]"
+      className="min-h-[calc(100dvh-4rem)] bg-[#F9F8F6] text-[#071A39]"
       data-testid="sales-advertiser-request-queue"
     >
-      <section className="border-b border-white/10 bg-[#0b151c]">
+      <section className="border-b border-[#d9ddd2] bg-white">
         <div className="container mx-auto max-w-[1440px] px-6 pt-10 md:pt-14">
           <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end mb-8">
             <div className="max-w-2xl">
-              <div className="mb-5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8fd6a5]">
+              <div className="mb-5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0b6b43]">
                 <ShieldCheck className="size-4" aria-hidden="true" />
                 Private sales operations
               </div>
-              <h1 className="font-display text-4xl tracking-tight text-white md:text-6xl">
+              <h1 className="font-display text-4xl tracking-tight text-[#071A39] md:text-6xl">
                 Advertising requests
               </h1>
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-[#aab7bf] md:text-base">
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-[#566476] md:text-base">
                 Review contact details and bounded intake selections. Birch
                 Guide questions and transcripts are never stored and cannot
                 appear here.
@@ -377,14 +377,14 @@ export default function AdvertiserRequests() {
               <QueueMetric label="Reviewed" value={statusCounts.reviewed} />
               <QueueMetric label="Closed" value={statusCounts.closed} />
               <div className="flex flex-col gap-2">
-                <span className="text-right text-[10px] uppercase tracking-[0.16em] text-[#70818b]">
+                <span className="text-right text-[10px] uppercase tracking-[0.16em] text-[#566476]">
                   {user?.primaryEmailAddress?.emailAddress}
                 </span>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleSignOut}
-                  className="h-10 rounded-none border-white/15 bg-transparent text-[#f4f0e8] hover:border-[#e87979] hover:bg-white/5 hover:text-[#e87979]"
+                  className="h-10 rounded-xl border-[#071A39]/20 bg-transparent text-[#071A39] hover:border-[#8a2b1f] hover:bg-[#071A39]/5 hover:text-[#8a2b1f]"
                   data-testid="button-clear-sales-access"
                 >
                   <LogOut className="size-4" aria-hidden="true" />
@@ -402,7 +402,7 @@ export default function AdvertiserRequests() {
           <label className="relative flex-1">
             <span className="sr-only">Search advertiser requests</span>
             <Search
-              className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#788791]"
+              className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#566476]"
               aria-hidden="true"
             />
             <Input
@@ -410,14 +410,14 @@ export default function AdvertiserRequests() {
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               placeholder="Search email, intent, size, path, or source"
-              className="h-11 rounded-none border-white/15 bg-[#14232d] pl-10 text-[#f4f0e8] placeholder:text-[#788791] focus-visible:ring-[#8fd6a5]"
+              className="h-11 rounded-xl border-[#071A39]/20 bg-white pl-10 text-[#071A39] placeholder:text-[#566476] focus-visible:ring-[#C8F55A]"
               data-testid="input-search-advertiser-requests"
             />
           </label>
           <label className="relative min-w-56">
             <span className="sr-only">Filter by review status</span>
             <Filter
-              className="absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-[#788791]"
+              className="absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-[#566476]"
               aria-hidden="true"
             />
             <select
@@ -425,7 +425,7 @@ export default function AdvertiserRequests() {
               onChange={(event) =>
                 setStatusFilter(event.target.value as QueueStatusFilter)
               }
-              className="h-11 w-full appearance-none rounded-none border border-white/15 bg-[#14232d] pl-10 pr-9 text-sm text-[#f4f0e8] outline-none focus:border-[#8fd6a5] focus:ring-1 focus:ring-[#8fd6a5]"
+              className="h-11 w-full appearance-none rounded-xl border border-[#071A39]/20 bg-white pl-10 pr-9 text-sm text-[#071A39] outline-none focus:border-[#071A39] focus:ring-1 focus:ring-[#C8F55A]"
               data-testid="select-advertiser-request-filter"
             >
               <option value="all">All statuses</option>
@@ -434,29 +434,29 @@ export default function AdvertiserRequests() {
               <option value="closed">Closed</option>
             </select>
             <ChevronDown
-              className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#788791]"
+              className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#566476]"
               aria-hidden="true"
             />
           </label>
         </div>
 
-        <div className="border border-white/10 bg-[#0b151c]">
+        <div className="border border-[#d9ddd2] bg-white">
           <Table>
-            <TableHeader className="bg-white/[0.035]">
-              <TableRow className="border-white/10 hover:bg-transparent">
-                <TableHead className="h-12 px-5 text-[10px] uppercase tracking-[0.16em] text-[#82929c]">
+            <TableHeader className="bg-[#F9F8F6]">
+              <TableRow className="border-[#d9ddd2] hover:bg-transparent">
+                <TableHead className="h-12 px-5 text-[10px] uppercase tracking-[0.16em] text-[#566476]">
                   Contact and submitted
                 </TableHead>
-                <TableHead className="h-12 px-5 text-[10px] uppercase tracking-[0.16em] text-[#82929c]">
+                <TableHead className="h-12 px-5 text-[10px] uppercase tracking-[0.16em] text-[#566476]">
                   Visitor and source
                 </TableHead>
-                <TableHead className="h-12 px-5 text-[10px] uppercase tracking-[0.16em] text-[#82929c]">
+                <TableHead className="h-12 px-5 text-[10px] uppercase tracking-[0.16em] text-[#566476]">
                   Intent and path
                 </TableHead>
-                <TableHead className="h-12 px-5 text-[10px] uppercase tracking-[0.16em] text-[#82929c]">
+                <TableHead className="h-12 px-5 text-[10px] uppercase tracking-[0.16em] text-[#566476]">
                   Size and scope
                 </TableHead>
-                <TableHead className="h-12 px-5 text-right text-[10px] uppercase tracking-[0.16em] text-[#82929c]">
+                <TableHead className="h-12 px-5 text-right text-[10px] uppercase tracking-[0.16em] text-[#566476]">
                   Review status
                 </TableHead>
               </TableRow>
@@ -466,7 +466,7 @@ export default function AdvertiserRequests() {
                 <TableRow className="border-0 hover:bg-transparent">
                   <TableCell
                     colSpan={5}
-                    className="h-44 px-5 text-center text-sm text-[#82929c]"
+                    className="h-44 px-5 text-center text-sm text-[#566476]"
                   >
                     No requests match the current filters.
                   </TableCell>
@@ -475,42 +475,42 @@ export default function AdvertiserRequests() {
                 requests.map((request) => (
                   <TableRow
                     key={request.id}
-                    className="border-white/10 hover:bg-white/[0.025]"
+                    className="border-[#d9ddd2] hover:bg-[#071A39]/[0.03]"
                   >
                     <TableCell className="min-w-64 px-5 py-5 align-top">
                       <a
                         href={`mailto:${request.email}`}
-                        className="font-medium text-white underline decoration-white/20 underline-offset-4 transition-colors hover:text-[#8fd6a5]"
+                        className="font-medium text-[#071A39] underline decoration-[#071A39]/30 underline-offset-4 transition-colors hover:text-[#0b6b43]"
                       >
                         {request.email}
                       </a>
-                      <p className="mt-2 text-xs text-[#82929c]">
+                      <p className="mt-2 text-xs text-[#566476]">
                         {submittedAtFormatter.format(
                           new Date(request.createdAt),
                         )}
                       </p>
                     </TableCell>
                     <TableCell className="min-w-44 px-5 py-5 align-top">
-                      <p className="font-medium text-[#edf1ee]">
+                      <p className="font-medium text-[#071A39]">
                         {label(request.visitorType)}
                       </p>
-                      <p className="mt-2 text-xs text-[#82929c]">
+                      <p className="mt-2 text-xs text-[#566476]">
                         {label(request.source)}
                       </p>
                     </TableCell>
                     <TableCell className="min-w-48 px-5 py-5 align-top">
-                      <p className="font-medium text-[#edf1ee]">
+                      <p className="font-medium text-[#071A39]">
                         {label(request.advertisingIntent)}
                       </p>
-                      <p className="mt-2 text-xs text-[#82929c]">
+                      <p className="mt-2 text-xs text-[#566476]">
                         {label(request.adInterest)}
                       </p>
                     </TableCell>
                     <TableCell className="min-w-44 px-5 py-5 align-top">
-                      <p className="font-medium text-[#edf1ee]">
+                      <p className="font-medium text-[#071A39]">
                         {label(request.advertiserSize)}
                       </p>
-                      <p className="mt-2 text-xs text-[#82929c]">
+                      <p className="mt-2 text-xs text-[#566476]">
                         {label(request.operatingScope)}
                       </p>
                     </TableCell>
@@ -536,10 +536,10 @@ export default function AdvertiserRequests() {
                         />
                         {request.lastReviewedBy && request.lastReviewedAt ? (
                           <div className="text-right">
-                            <p className="text-[10px] text-[#70818b] truncate max-w-40">
+                            <p className="text-[10px] text-[#566476] truncate max-w-40">
                               By {request.lastReviewedBy}
                             </p>
-                            <p className="text-[10px] text-[#70818b]">
+                            <p className="text-[10px] text-[#566476]">
                               {submittedAtFormatter.format(new Date(request.lastReviewedAt))}
                             </p>
                           </div>
@@ -552,7 +552,7 @@ export default function AdvertiserRequests() {
             </TableBody>
           </Table>
         </div>
-        <p className="mt-4 text-xs leading-relaxed text-[#70818b]">
+        <p className="mt-4 text-xs leading-relaxed text-[#566476]">
           Private contact details are returned only after server-side access
           validation and are not cached by the API.
         </p>
@@ -563,22 +563,22 @@ export default function AdvertiserRequests() {
 
 function SignedOutGate() {
   return (
-    <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#101c25] px-6 py-16 text-[#f4f0e8]">
-      <div className="w-full max-w-md border border-white/10 bg-[#0b151c] p-7 shadow-2xl shadow-black/20 md:p-10">
-        <div className="mb-8 flex size-12 items-center justify-center border border-[#8fd6a5]/35 bg-[#8fd6a5]/10 text-[#8fd6a5]">
+    <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#F9F8F6] px-6 py-16 text-[#071A39]">
+      <div className="w-full max-w-md border border-[#d9ddd2] bg-white p-7 shadow-2xl shadow-black/20 md:p-10">
+        <div className="mb-8 flex size-12 items-center justify-center border border-[#b8e6c8] bg-[#dff5e6] text-[#0b6b43]">
           <LockKeyhole className="size-5" aria-hidden="true" />
         </div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8fd6a5]">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0b6b43]">
           Authorized staff only
         </p>
-        <h1 className="mt-3 font-display text-3xl text-white md:text-4xl">
+        <h1 className="mt-3 font-display text-3xl text-[#071A39] md:text-4xl">
           Sales request queue
         </h1>
-        <p className="mt-4 text-sm leading-relaxed text-[#9cabb4]">
+        <p className="mt-4 text-sm leading-relaxed text-[#566476]">
           Sign in with an authorized Birch Reserve sales account to review advertising requests and contact details.
         </p>
         <div className="mt-8">
-          <Link href="/sign-in" className="inline-flex h-11 w-full items-center justify-center rounded-none bg-[#8fd6a5] text-[#07130d] hover:bg-[#a8e8b9] font-medium transition-colors" data-testid="button-unlock-sales-queue">
+          <Link href="/sign-in" className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[#C8F55A] text-[#071A39] hover:bg-[#d8fa84] font-medium transition-colors" data-testid="button-unlock-sales-queue">
             Sign in to access
           </Link>
         </div>
@@ -601,12 +601,12 @@ function QueueMetric({
       <div
         className={cn(
           'font-display text-3xl',
-          accent ? 'text-[#8fd6a5]' : 'text-white',
+          accent ? 'text-[#0b6b43]' : 'text-[#071A39]',
         )}
       >
         {value}
       </div>
-      <div className="mt-1 text-[9px] uppercase tracking-[0.16em] text-[#82929c]">
+      <div className="mt-1 text-[9px] uppercase tracking-[0.16em] text-[#566476]">
         {metricLabel}
       </div>
     </div>
@@ -634,11 +634,11 @@ function StatusControl({
       className={cn(
         'relative inline-flex min-w-36 items-center gap-2 border px-3 py-2',
         request.reviewStatus === 'new' &&
-          'border-[#8fd6a5]/30 bg-[#8fd6a5]/10 text-[#a8e8b9]',
+          'border-[#b8e6c8] bg-[#dff5e6] text-[#0b6b43]',
         request.reviewStatus === 'reviewed' &&
-          'border-[#9bbbea]/30 bg-[#9bbbea]/10 text-[#bfd2f0]',
+          'border-[#cfd5df] bg-[#e7eaf0] text-[#33465e]',
         request.reviewStatus === 'closed' &&
-          'border-white/10 bg-white/5 text-[#9cabb4]',
+          'border-[#d9ddd2] bg-[#F9F8F6] text-[#566476]',
         isUpdating && 'opacity-60',
       )}
     >
