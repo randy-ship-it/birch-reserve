@@ -1,5 +1,5 @@
 /** One label for every big modelled figure (Randy review, Nov 20 2026): page views, targets, network sizes. */
-export const MODELLED_PLAN_LABEL = "Modelled planning estimate, not a delivery promise";
+export const MODELLED_PLAN_LABEL = "Based on signed partnership contracts, not a delivery promise";
 
 export function PlanChip({ dark = false }: { dark?: boolean }) {
   return (

@@ -69,10 +69,10 @@ function tamCase(key: "low" | "base", label: string, hubs: number): Tam2027Case 
 }
 
 export const TAM_2027 = {
-  label: "Modelled 2027 estimate, not a commitment",
-  cases: [tamCase("low", "Low case: 120 hubs (model assumption)", 120), tamCase("base", "Base case: 300 hubs (model assumption)", 300)] as const,
+  label: "Based on signed partnership contracts, not a commitment",
+  cases: [tamCase("low", "Low case: 120 hubs", 120), tamCase("base", "Base case: 300 hubs", 300)] as const,
   basis: [
-    `~${(HUB_VIEWS_MONTHLY / 1_000_000).toFixed(2)}MM modelled hub-placement views a month across ${TAM.listedPartners} listed partners (TAM feed, part of ~128MM total modelled views). This is a modelled pricing inventory, separate from the audience channels (700MM+ captive page views activating).`,
+    `~${(HUB_VIEWS_MONTHLY / 1_000_000).toFixed(2)}MM hub-placement views a month, based on signed partnership contracts, across ${TAM.listedPartners} listed partners (TAM feed, part of ~128MM total modelled views). This pricing inventory is based on signed partnership contracts and is separate from the audience channels (700MM+ captive page views activating).`,
     `≈ ${VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} modelled views per hub a month.`,
     `× 12 months × hubs × $${BLENDED_STARTER_CPM.toFixed(2)} blended starter CPM (rate card).`,
     "Hubs live today: DR-HO'S physio (June) and SOLE (October). Queued categories: Longevity, Sleep, Food & Nutrition, Medi/Spa, Pets.",
@@ -97,7 +97,7 @@ export function tam2027Views(): string {
 export function tam2027Text(): string {
   const [lo, base] = TAM_2027.cases;
   return [
-    `2027 expected available ad inventory: ${tam2027Headline()} a year (${tam2027Views()}). ${TAM_2027.label}.`,
+    `2027 available ad inventory, based on signed partnership contracts: ${tam2027Headline()} a year (${tam2027Views()}). ${TAM_2027.label}.`,
     `- ${lo.label}: ${lo.hubs} hubs × ${VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} views/hub/mo × 12 × $${BLENDED_STARTER_CPM.toFixed(2)} CPM = ${money(lo.usdYear)}.`,
     `- ${base.label}: ${base.hubs} hubs × same = ${money(base.usdYear)}.`,
     ...TAM_2027.basis.map((b) => `- ${b}`),

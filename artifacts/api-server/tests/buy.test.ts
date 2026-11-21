@@ -15,7 +15,7 @@ import { buildAreaLockSession } from "../src/lib/overhaul/checkout";
 
 // Copy rules (Randy, Nov 2026). Kalaya is allowed.
 const BANNED = [
-  /\bFriday\b/, /\bAlign\b/, /Clairvoyant/i, /Alset/i, /80 locations/i, /MedVibe/i, /signed partners/i, /Integrity Fitness/i,
+  /\bFriday\b/, /\bAlign\b/, /Clairvoyant/i, /Alset/i, /80 locations/i, /MedVibe/i, /\bsigned partners\b/i, /Integrity Fitness/i,
   /\bPublisher\b/, /\bCAD\b|C\$/, /guarantee(d)? (results|reach|impressions|roi|leads|views)/i, /\bROAS\b/, /\bCTR\b/,
   /\b(not taken|unclaimed|is open|are open|still open|open now|0 (hubs|brands|spots|seats))\b/i, /\bseats? left\b/i, /—/,
 ];

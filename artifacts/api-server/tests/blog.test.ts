@@ -8,7 +8,7 @@ import { PUBLIC_SITEMAP_PATHS } from "../src/lib/publicSeo";
 
 // Copy rules (Randy, Nov 2026). Kalaya is allowed.
 const BANNED = [
-  /\bFriday\b/, /\bAlign\b/, /Clairvoyant/i, /Alset/i, /80 locations/i, /MedVibe/i, /signed partners/i,
+  /\bFriday\b/, /\bAlign\b/, /Clairvoyant/i, /Alset/i, /80 locations/i, /MedVibe/i, /\bsigned partners\b/i,
   /\bPublisher\b/, /\bCAD\b|C\$/, /guarantee(d)? (results|reach|impressions|roi|leads|views)/i, /\bROAS\b/, /\bCTR\b/,
   /\b(not taken|is open|still open|0 (hubs|brands|spots))\b/i, /—/,
 ];

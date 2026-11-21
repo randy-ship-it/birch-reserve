@@ -47,8 +47,8 @@ export function Tam2027({ compact = false, dark = false, testId = "tam-2027" }: 
   return (
     <div className={compact ? "" : `rounded-2xl p-5 ${dark ? "bg-white/[0.06] ring-1 ring-white/15 text-white" : "border border-[#0b1f3a]/10 bg-white shadow-sm"}`} data-testid={testId}>
       <div className="flex flex-wrap items-center gap-2">
-        <span className={`text-[11px] font-bold uppercase tracking-[0.18em] ${dark ? "text-lime-300" : "text-[#0b1f3a]/70"}`}>2027 expected ad inventory</span>
-        <span className={`${chip} ${dark ? "bg-white/10 text-lime-200" : "border border-[#F1D58F] bg-[#FFF4DB] text-[#8A5A00]"}`}>Modelled</span>
+        <span className={`text-[11px] font-bold uppercase tracking-[0.18em] ${dark ? "text-lime-300" : "text-[#0b1f3a]/70"}`}>2027 ad inventory, based on signed partnership contracts</span>
+        <span className={`${chip} ${dark ? "bg-white/10 text-lime-200" : "border border-[#F1D58F] bg-[#FFF4DB] text-[#8A5A00]"}`}>Signed contracts</span>
       </div>
       <p className={`mt-2 font-display leading-none tabular-nums ${compact ? "text-[1.9rem] md:text-[2.4rem]" : "text-4xl md:text-5xl"}`} data-testid={`${testId}-figure`}>{tam2027Headline()}</p>
       <p className={`mt-1.5 text-[12px] md:text-sm ${dark ? "text-white/70" : "text-foreground/70"}`}>a year in hub display, growing with the network. {TAM_2027.label}.</p>

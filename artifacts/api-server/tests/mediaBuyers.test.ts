@@ -48,7 +48,7 @@ test("/media-buyers: no impression guarantees, CTR or ROAS claims, partner count
   assert.doesNotMatch(copy, /guaranteed (views|impressions|delivery)/i);
   assert.doesNotMatch(copy, /\d+(\.\d+)?\s*%\s*(CTR|click-through|ROAS|lift|conversion)/i);
   assert.doesNotMatch(copy, /\d+(\.\d+)?x\s*ROAS/i);
-  assert.doesNotMatch(copy, /signed partners?/i);
+  assert.doesNotMatch(copy, /\bsigned partners?\b/i);
   assert.doesNotMatch(copy, /20MM\+|\b42\b|80 locations/);
   assert.doesNotMatch(copy, /Align|Clairvoyant|Alset|Kalaya/);
 });

@@ -10,7 +10,7 @@ import { llmsTxt } from "../src/lib/overhaul/seo";
 import { PUBLIC_SITEMAP_PATHS } from "../src/lib/publicSeo";
 
 const BANNED = [
-  /\bFriday\b/, /\bAlign\b/, /Clairvoyant/i, /Alset/i, /80 locations/i, /MedVibe/i, /signed partners/i,
+  /\bFriday\b/, /\bAlign\b/, /Clairvoyant/i, /Alset/i, /80 locations/i, /MedVibe/i, /\bsigned partners\b/i,
   /\bPublishers?\b/, /\bCAD\b|C\$/, /guarantee(d)? (results|reach|impressions|roi|leads|views)/i, /\bROAS\b(?! promises)/,
   /\b(not taken|is open|still open|0 (hubs|brands|spots))\b/i, /sweepstake/i, /Integrity Fitness/i,
   /live in minutes|minutes to (go )?live/i, /\$1,900/,

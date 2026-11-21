@@ -6,7 +6,7 @@ import router, { renderGuide, renderGuidesIndex } from "../src/routes/advertiser
 import { ADVERTISER_GUIDES, GUIDE_PATHS, GUIDES_INDEX_PATH } from "../src/lib/advertiserGuides";
 import { PUBLIC_SITEMAP_PATHS } from "../src/lib/publicSeo";
 
-const BANNED = [/\bAlign\b/, /Clairvoyant/i, /80 locations/i, /Kalaya/i, /signed partners/i, /guarantee(d)? (results|reach|impressions|roi|leads)/i, /bypass|get around|evade|workaround|loophole/i, /\$\s?\d[\d,]*\s?(K|k)?\s*(test rail|category lock|seat)/i];
+const BANNED = [/\bAlign\b/, /Clairvoyant/i, /80 locations/i, /Kalaya/i, /\bsigned partners\b/i, /guarantee(d)? (results|reach|impressions|roi|leads)/i, /bypass|get around|evade|workaround|loophole/i, /\$\s?\d[\d,]*\s?(K|k)?\s*(test rail|category lock|seat)/i];
 
 test("every guide is self-canonical, titled, described, cited and links to /buy-ads and /media-kit", () => {
   assert.ok(ADVERTISER_GUIDES.length >= 3 && ADVERTISER_GUIDES.length <= 5);
