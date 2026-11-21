@@ -43,7 +43,7 @@ export function ScaleHeader() {
           ))}
         </nav>
         <div className="flex shrink-0 items-center gap-2">
-        <CurrencyToggle className="hidden sm:inline-flex" />
+        <span className="hidden sm:inline-flex"><CurrencyToggle /></span>
         <a
           href={intakeHref("nav_mobile")}
           onClick={() => logCtaClick("nav_mobile")}
