@@ -56,6 +56,27 @@ export const placementLabel = (p: string): string => SURFACE.get(p as Placement)
 export const CAD_PER_USD = 1.4;
 export const MICROS = 1_000_000;
 
+/**
+ * Credit source rate basis. Promo credit is valued and spent at the regular (card) rate. Paid credit keeps the multiplier it was sold at:
+ * card for $190 / $490 / sponsor packs, 25% below card for the exclusive display reserve (service.ts). No end date exists in config,
+ * so copy says "current pricing" and never a deadline.
+ */
+export const PROMO_RATE_BPS = 10_000;
+export const EXCLUSIVE_RATE_BPS = 7_500;
+export const isPromoCampaign = (c: { orderKind: string | null }): boolean => (c.orderKind ?? "").startsWith("promo ");
+export function regularRateSummary(): { cpmLow: number; cpmHigh: number; cpcLow: number; cpcHigh: number; line: string; compare: string } {
+  const cpm = RATE_SURFACES.map((s) => s.cpmStarter[0]);
+  const cpc = RATE_SURFACES.map((s) => s.cpcStarter[0]);
+  const f = (n: number) => (Number.isInteger(n) ? `$${n}` : `$${n.toFixed(2)}`);
+  const cpmLow = Math.min(...cpm), cpmHigh = Math.max(...cpm), cpcLow = Math.min(...cpc), cpcHigh = Math.max(...cpc);
+  const off = Math.round((1 - EXCLUSIVE_RATE_BPS / 10_000) * 100);
+  return {
+    cpmLow, cpmHigh, cpcLow, cpcHigh,
+    line: `Promo credit runs at regular rate-card rates (current pricing: ${f(cpmLow)}–${f(cpmHigh)} CPM or ${f(cpcLow)}–${f(cpcHigh)} CPC depending on the placement).`,
+    compare: `Exclusive display packages run ${off}% below regular; $190 looks, $490 reserves and sponsor packs run at the card rate.`,
+  };
+}
+
 export const AD_DEFAULTS = {
   flightDays: 182, // up to 6 months (SPEND_DOWN_MAX_MONTHS)
   maxFlightDays: 186,

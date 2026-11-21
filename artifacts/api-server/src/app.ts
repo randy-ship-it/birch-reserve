@@ -16,6 +16,8 @@ import aiDiscoveryRouter from "./routes/aiDiscovery";
 import buyRouter, { buyStaffRouter } from "./routes/buy";
 import exclusiveReserveRouter from "./routes/exclusiveReserve";
 import adserverRouter from "./routes/adserver";
+import promoRouter from "./routes/promo";
+import { promoContext } from "./lib/adserver/promoContext";
 import sponsorPageRouter from "./routes/sponsorPage";
 import { createOverhaulRouter } from "./routes/overhaul";
 import { createBrandIntakeProxy } from "./routes/brandIntakeProxy";
@@ -47,6 +49,7 @@ app.set("trust proxy", (_address: string, hop: number) => hop === 0);
 
 // Scale mirror (scalehealth.ca/intake): strip /intake/_m and shape the mirror shell. No-op on birchreserve.net.
 app.use(mirrorHost());
+app.use(promoContext());
 
 // ── Standard middleware ───────────────────────────────────────────────────────
 app.use(
@@ -114,6 +117,7 @@ app.use(createKitEmailRouter());
 app.use(sponsorPageRouter);
 app.use(exclusiveReserveRouter);
 // Ad system (Nov 21 2026): embed + pixel + serving, /account customer dashboard, /ads/admin. Own body parsers.
+app.use(promoRouter);
 app.use(adserverRouter);
 app.use(publicPagesRouter);
 app.use(advertiserGuidesRouter);

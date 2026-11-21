@@ -5,6 +5,9 @@
  *   Admin:    /ads/admin (+ campaigns, creatives, royalties, ledger, exports, Friday sync)
  *   Cron:     /api/cron/ads-friday (daily aggregate push to Friday)
  */
+import * as promoLib from "../lib/adserver/promo";
+import { promoAdminHtml } from "../lib/adserver/promoAdmin";
+import { attachPendingForAccount } from "../lib/adserver/promo";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { logger } from "../lib/logger";
 import { getStripeClient } from "../lib/stripeClient";
@@ -12,7 +15,7 @@ import { checkCreative, buyStore } from "../lib/buyFlow";
 import { cronAuthorized } from "../lib/cronAuth";
 import { FixedWindowLimiter } from "../lib/rateLimit";
 import { ADS_FROM, hubAlertEmail, loginLinkEmail, siteMail } from "../lib/adserver/mail";
-import { ALERT_CATEGORIES, AD_DEFAULTS, MICROS, PLACEMENTS, adminEmails, adsLoginEmailEnabled, findSlot, placementLabel, type Placement } from "../lib/adserver/config";
+import { ALERT_CATEGORIES, AD_DEFAULTS, PROMO_RATE_BPS, isPromoCampaign, MICROS, PLACEMENTS, adminEmails, adsLoginEmailEnabled, findSlot, placementLabel, type Placement } from "../lib/adserver/config";
 import { pixelId, postbackKey, safeEqual, sign, verify } from "../lib/adserver/auth";
 import * as store from "../lib/adserver/store";
 import { draftCampaignFromCheckoutSafe, recordClick, recordConversion, recordView, serve } from "../lib/adserver/service";
@@ -65,6 +68,11 @@ const admin = (req: Request) => {
 };
 const ua = (req: Request) => req.get("user-agent");
 const dntHeader = (req: Request) => req.get("dnt") === "1" || req.get("sec-gpc") === "1";
+const promoPanels = async () => {
+  const [codes, redemptions, street, qrs] = await Promise.all([promoLib.listCodes(), promoLib.listRedemptions(300), promoLib.streetStats(true), promoLib.listQrs()]);
+  return promoAdminHtml({ codes, redemptions, street, qrs });
+};
+const promoAttach = (email: string) => attachPendingForAccount(email).catch(() => 0);
 const noStore = (res: Response) => res.set("Cache-Control", "no-store");
 const cors = (res: Response) => res.set({ "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Timing-Allow-Origin": "*" });
 const str = (v: unknown, n = 300) => (typeof v === "string" ? v.trim().slice(0, n) : "");
@@ -216,6 +224,7 @@ router.get(["/account", "/account/"], (req, res) =>
       res.type("html").send(loginPage({ error: req.query.e === "expired" ? "That sign-in link has expired or was already used. Ask for a new one below." : undefined }));
       return;
     }
+    await promoAttach(email);
     res.type("html").send(dashboardPage(await accountView(email, origin(req))));
   }),
 );
@@ -243,6 +252,7 @@ router.get("/account/login", (req, res) =>
       return;
     }
     await draftCampaignFromCheckoutSafe(session);
+    await promoAttach(email);
     setCookie(res, ACCT, sign("a", { e: email }, 14 * 864e5), 14 * 86400);
     res.redirect(302, "/account");
   }),
@@ -366,6 +376,7 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
         who, campaigns: campaigns.map((c) => ({ c, t: totals.get(c.id) ?? { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 } })),
         pending: creatives.filter((x) => x.status === "pending" && ids.includes(x.campaignId)).map((x) => ({ ...x, brand: brand.get(x.campaignId) ?? "" })),
         creativesByCampaign: byC, slotTotals, ledger: led, royalties: roy, shares, alerts, audit, day: dayT, friday: fridayReady(), schema: store.adSchema(),
+        promoHtml: await promoPanels(),
         orders: orders.map((o) => ({ id: o.id, at: o.createdAt, email: o.email, company: o.company, plan: o.plan, format: o.format, creativeId: o.creativeId })),
       }),
     );
@@ -512,6 +523,7 @@ router.post("/ads/admin/campaigns/:id", json, (req, res) =>
       res.status(400).json({ message: error });
       return;
     }
+    if (isPromoCampaign(c)) patch.rateMultiplierBps = PROMO_RATE_BPS; // promo credit always runs at regular rates
     const next = { ...c, ...patch };
     if (patch.status === "active") {
       const approved = (await store.listCreatives({ campaignId: c.id, status: "approved" })).length;

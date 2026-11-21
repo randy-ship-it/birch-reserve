@@ -30,6 +30,7 @@ export type AdminView = {
   day: Totals;
   friday: boolean;
   schema: string;
+  promoHtml?: string;
 };
 
 const sel = (name: string, opts: Array<[string, string]>, cur: string) => `<select name="${name}">${opts.map(([v, l]) => `<option value="${esc(v)}"${v === cur ? " selected" : ""}>${esc(l)}</option>`).join("")}</select>`;
@@ -109,6 +110,7 @@ ${c.isTest ? `<form data-post="/ads/admin/campaigns/${esc(c.id)}/purge" data-rel
 <section id="royalties"><h2>Royalty statements</h2><p class="fine">Per hub partner and month, from delivered (charged) spend on that partner's slots, test campaigns excluded. Approving freezes the statement. <b>Nothing pays out from here.</b> Payment is sent by Randy outside this system.</p>
 <form class="f" data-post="/ads/admin/partners/share" data-reload style="margin-bottom:10px"><div class="row"><label>Partner${sel("partner", partners.map((p) => [p, `${p}${v.shares.get(p) != null ? ` (now ${(v.shares.get(p)! / 100).toFixed(2)}%)` : ""}`]), partners[0] ?? "")}</label><label>Royalty share %<input type="number" name="sharePct" min="0" max="100" step="0.01" required></label></div><button class="ghost sm" type="submit">Set share</button></form>
 <div class="tw"><table><thead><tr><th>Partner</th><th>Month</th><th class="n">Delivered</th><th class="n">Share</th><th class="n">Payable</th><th>Status</th><th></th></tr></thead><tbody>${roy.join("") || `<tr><td colspan="7" class="muted">No delivered spend yet.</td></tr>`}</tbody></table></div></section>
+${v.promoHtml ?? ""}
 <section id="ledger"><h2>Ledger</h2><p class="fine">Credits, hourly charge lines per slot, and manual adjustments. <a href="/ads/admin/export/ledger.csv">CSV</a></p>
 <div class="tw"><table><thead><tr><th>When</th><th>Kind</th><th>Campaign</th><th>Slot</th><th class="n">Units</th><th class="n">Amount</th><th>Note</th></tr></thead><tbody>${led.join("") || `<tr><td colspan="7" class="muted">Empty.</td></tr>`}</tbody></table></div></section>
 <section id="orders"><h2>Orders from /buy</h2><p class="fine">Card checkouts (packs, reserves) open draft campaigns automatically; /buy orders are listed here to turn into campaigns once paid.</p>

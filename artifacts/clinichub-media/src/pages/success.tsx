@@ -1,3 +1,4 @@
+import { PromoBox } from "@/components/br/promo-box";
 import { useSearch, Link } from "wouter";
 import {
   getGetSponsorReservationStatusQueryKey,
@@ -104,6 +105,7 @@ export default function Success() {
     return (
       <div className="min-h-[85vh] bg-background py-32 px-6 flex items-center justify-center">
         <div className="container mx-auto flex flex-col items-center">
+          <PromoBox mode="success" />
           <div className="bg-card border border-border p-12 text-center max-w-2xl w-full relative overflow-hidden shadow-2xl">
             <div className="absolute top-0 left-0 w-full h-1 bg-accent" />
             <div className="size-20 bg-secondary border border-border rounded-full flex items-center justify-center mx-auto mb-8">

@@ -3,10 +3,11 @@
  * Every count shown anywhere comes from rows these functions write. Nothing is modelled or padded here.
  */
 import type Stripe from "stripe";
-import { AD_DEFAULTS, MICROS, adsServingEnabled, findSlot, isBotUa, type AdSlot } from "./config";
+import { AD_DEFAULTS, EXCLUSIVE_RATE_BPS, MICROS, adsServingEnabled, findSlot, isBotUa, type AdSlot } from "./config";
 import { canSpend, eventCostMicros, landingUrl, pickAd, type Campaign } from "./engine";
 import { hashRef, pixelId, randomId, sign, verify, visitorHash } from "./auth";
 import * as store from "./store";
+import { afterOrderCampaign } from "./promo";
 import { isTestIdentity } from "../testTraffic";
 
 export type ServeInput = { slot: string; vid?: string | null; test?: boolean; ua?: string; dnt?: boolean; origin: string; now?: number };
@@ -175,7 +176,7 @@ export async function draftCampaignFromCheckoutSafe(session: Stripe.Checkout.Ses
     } else if (md.kind === "exclusive_reserve") {
       orderKind = "exclusive display reserve";
       exclusive = true;
-      mult = 7_500;
+      mult = EXCLUSIVE_RATE_BPS;
       notes = "Reserve deposit. The full package budget is set when the insertion order is signed.";
     } else if (md.sku === "hold-190" || md.offer === "hold-190") {
       orderKind = "7-day look ($190)";
@@ -187,6 +188,11 @@ export async function draftCampaignFromCheckoutSafe(session: Stripe.Checkout.Ses
       accountEmail: email, brand: clean(md.brand || session.customer_details?.name || email.split("@")[1] || "Brand"), category: clean(md.category, 80) || null,
       orderRef: session.id, orderKind, currency, budgetMicros: budgetCents * 10_000, exclusive, rateMultiplierBps: mult, isTest, notes, actor: "stripe-webhook",
     });
+    try {
+      await afterOrderCampaign(session, { id: r.campaign.id, currency: r.campaign.currency, brand: r.campaign.brand }, isTest);
+    } catch (err) {
+      await store.audit("stripe-webhook", "promo.error", session.id, err instanceof Error ? err.message : String(err));
+    }
     return r.created ? "created" : "exists";
   } catch {
     return "error";

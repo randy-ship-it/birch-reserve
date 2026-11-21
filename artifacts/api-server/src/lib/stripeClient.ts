@@ -1,3 +1,4 @@
+import { promoMetadata } from "./adserver/promoContext";
 import Stripe from "stripe";
 import { ReplitConnectors } from "@replit/connectors-sdk";
 
@@ -342,6 +343,8 @@ function defaultCreateStripeCheckoutSession(
   params: Stripe.Checkout.SessionCreateParams,
   idempotencyKey: string,
 ): Promise<Stripe.Checkout.Session> {
+  const carried = promoMetadata();
+  if (Object.keys(carried).length) params = { ...params, metadata: { ...(params.metadata ?? {}), ...carried } };
   if (preferStripeSdk()) {
     return getStripeClient().checkout.sessions.create(params, {
       idempotencyKey,

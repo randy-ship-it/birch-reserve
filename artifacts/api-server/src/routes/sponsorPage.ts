@@ -9,6 +9,8 @@
  * is refused unless SPONSOR_DEPOSITS_LIVE=true, so a preview can only ever
  * create test-mode sessions. All impression figures are modelled.
  */
+import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
+import { promoMetadata } from "../lib/adserver/promoContext";
 import { MODELLED_FOOTER, URGENCY_LINE } from "../lib/overhaul/pilotPath";
 import { CARRY_OVER_CLAUSE, SPONSOR_PACK_TERMS, SPONSOR_TERMS_VERSION, customLineItem, packLineItem } from "../lib/sponsorTerms";
 import { openPrefill } from "../lib/buyFlow";
@@ -99,7 +101,8 @@ form.dep.wide{max-width:none}.dep .row{display:grid;grid-template-columns:1fr 1f
 .lede{font-size:1.05rem;margin:.2em 0 1em}.boxes{margin-top:18px;border-top:1px solid #ccd2d8}.boxes details{border-bottom:1px solid #ccd2d8;padding:14px 0}.boxes summary{cursor:pointer;font:400 1.25rem Fraunces,serif;list-style:none;display:flex;justify-content:space-between}.boxes summary::-webkit-details-marker{display:none}.boxes summary::after{content:"+";font-size:1.5rem;line-height:1}.boxes details[open] summary::after{content:"\\2212"}.stats.pay .btn{display:inline-block;margin-top:10px}label.pack{cursor:pointer}label.pack.on{border:2px solid #071A39}.amt small{font-size:.9rem}.sr{position:absolute;top:0;left:0;opacity:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}label.pack{position:relative;cursor:pointer}label.pack.on{outline:3px solid #9fd13a;outline-offset:-1px}.pack .pick{margin-top:auto;font-weight:700;font-size:.85rem;opacity:.75}.pack.on .pick{opacity:1}.sp-step{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#4d5b6a;margin:4px 0 0}.sp-hint{font-weight:600;color:#24412a;margin:2px 0 6px}.sp-go{width:100%;min-height:54px;font-size:1.05rem!important;margin-top:4px}.sp-err{color:#a12b1f;font-weight:600;font-size:.88rem;display:block;margin-top:2px}.sp-err:empty{display:none}#prepay input[aria-invalid=true]{border-color:#a12b1f}
 </style></head><body>
 <header><a href="/"><strong>BIRCH RESERVE</strong></a><nav><a href="/sponsor?currency=${currency}">Sponsor</a><a href="/kit?currency=${currency}">Marketing kit</a><a href="/terms">Terms</a><span class="cur">Prices in ${currency.toUpperCase()}${PUBLIC_CAD_ENABLED ? ` · <a href="?currency=${other}">Show ${other.toUpperCase()}</a>` : ""}</span></nav></header>
-<main>${body}</main>
+<main><div data-promo-box="success"></div>${body}</main>
+${PROMO_SCRIPT_TAG}
 <footer class="fine">${esc(SELLER)} · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></footer>
 </body></html>`;
 }
@@ -165,6 +168,7 @@ export function sponsorHtml(_currency: Currency, opts: SponsorPageOpts = {}): st
 <label>Work email<input name="email" type="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@yourbrand.com" required autocomplete="email"${val(pf.email)}><span class="sp-err" id="e-email"></span></label></div>
 <label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the <a href="#terms-pack" data-open="terms-pack">pack terms</a>.</label><span class="sp-err" id="e-terms"></span>
 ${(() => { const amt = money(DEPOSIT_TIERS.find((t) => t.key === picked)!.usd, currency).replace(/ USD$/, ""); return `<button type="submit" class="btn sp-go" id="sp-go" data-testid="sponsor-go">${open ? `Prepay ${amt} →` : `Send ${amt} pack request →`}</button>`; })()}
+<div data-promo-box></div>
 <p id="msg" role="status" class="fine"></p>
 </form>
 <div class="stats pay" data-testid="payout-key-figures">
@@ -348,7 +352,7 @@ router.post("/v1/sponsor/deposit", express.json({ limit: "8kb" }), async (req: R
     return;
   }
   try {
-    const session = await getStripeClient().checkout.sessions.create(built.params as never);
+    const session = await getStripeClient().checkout.sessions.create({ ...built.params, metadata: { ...(built.params.metadata ?? {}), ...promoMetadata() } } as never);
     const em = String((req.body as Record<string, unknown> | undefined)?.email ?? "").trim().toLowerCase();
     if (session.livemode) void recordPulse("sponsor_checkout", null, { isTest: hasValidQaHeader(req) || isTestIdentity({ email: em }) || /@(silverbirchgrowth\.com|scalehealth\.ca|birchreserve\.net|example\.(com|org))$/.test(em), region: coarseRegion((h) => req.get(h)) });
     res.json({ url: session.url, livemode: session.livemode });

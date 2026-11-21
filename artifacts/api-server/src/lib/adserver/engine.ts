@@ -8,7 +8,7 @@
  * card rate is equal or lower. The pick prefers primary-slot campaigns, then the one furthest behind its even plan,
  * so an under-delivering campaign is moved onto other eligible space automatically.
  */
-import { AD_DEFAULTS, CAD_PER_USD, MICROS, placementRate, type AdSlot, type Placement } from "./config";
+import { AD_DEFAULTS, CAD_PER_USD, MICROS, isPromoCampaign, placementRate, type AdSlot, type Placement } from "./config";
 
 export type Pricing = "cpm" | "cpc";
 export type CampaignStatus = "draft" | "active" | "paused" | "completed";
@@ -148,7 +148,12 @@ export function pickAd(slot: AdSlot, cands: Candidate[], now: number, opts: { te
   // Light rotation among near-equals so two on-pace campaigns share the slot (within 10% pace of the leader).
   const lead = pool[0]!;
   const near = pool.filter((p) => p.el === lead.el && p.ratio - lead.ratio <= 0.1);
-  const chosen = near[Math.floor(rand() * near.length)] ?? lead;
+  let chosen = near[Math.floor(rand() * near.length)] ?? lead;
+  // One buyer with promo credit and paid credit: spend the promo credit first (it runs at regular rates). Never lets promo jump other brands.
+  if (!isPromoCampaign(chosen.x.campaign)) {
+    const promoFirst = pool.find((p) => p.el === chosen.el && isPromoCampaign(p.x.campaign) && p.x.campaign.accountEmail === chosen.x.campaign.accountEmail);
+    if (promoFirst) chosen = promoFirst;
+  }
   const ids = chosen.x.creativeIds;
   return { campaign: chosen.x.campaign, creativeId: ids[Math.floor(rand() * ids.length)] ?? ids[0]!, eligibility: chosen.el };
 }
