@@ -392,6 +392,27 @@ test("channel override on Postgres: seeded 5%, channel stamped at charge time (s
   store.setAdPoolForTests(null);
 });
 
+test("QA guard + alt text: creativeTestFlag tells real from TEST creatives; alt is editable", async () => {
+  const db = new PGlite();
+  store.setAdPoolForTests(db as unknown as store.Queryable, "ads_guard_test");
+  const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
+  const mk = async (isTest: boolean) => {
+    const { campaign } = await store.createCampaign({ accountEmail: "g@brand.com", brand: isTest ? "QA Co" : "Calm Joints Inc.", orderRef: `cs_${isTest}`, orderKind: "sponsor pack", budgetMicros: 1_000_000, currency: "usd", primaryPlacement: "post_purchase", isTest, actor: "test" });
+    await store.addCreative({ campaignId: campaign.id, mime: "image/png", width: 1, height: 1, data: png, alt: "Randall Gilling (sponsored)", uploadedBy: "t", status: "pending" });
+    return (await store.listCreatives({ campaignId: campaign.id }))[0]!;
+  };
+  const real = await mk(false);
+  const qa = await mk(true);
+  assert.deepEqual(await store.creativeTestFlag(real.id), { isTest: false });
+  assert.deepEqual(await store.creativeTestFlag(qa.id), { isTest: true });
+  assert.equal(await store.creativeTestFlag("00000000-0000-0000-0000-000000000000"), null);
+  assert.ok(await store.setCreativeAlt(real.id, "Calm Joints ad", "test"));
+  const after = (await store.listCreatives({ campaignId: real.campaignId }))[0]!;
+  assert.equal(after.alt, "Calm Joints ad");
+  assert.equal(after.status, "pending");
+  store.setAdPoolForTests(null);
+});
+
 test("new-hub alert: never says open/unclaimed, one per hub per email, unsubscribe turns alerts off", async () => {
   const { hubAlertEmail } = await import("../src/lib/adserver/mail");
   const m = hubAlertEmail({ hubName: "SOLE", category: "Recovery hardware", hubUrl: "https://scalehealth.ca/sole", unsubscribeUrl: "https://birchreserve.net/account/alerts/off?t=x" });

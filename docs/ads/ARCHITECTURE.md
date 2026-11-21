@@ -52,7 +52,10 @@ Every rate is dated (`effective_at`, next full hour or a date you pick) and neve
 
 **Dated change:** if Scale direct moves to 8% effective Dec 1, November delivery stays at 5% ($50 per $1,000) and December delivery pays 8% ($80 override, $920 net, $322 hub, $598 retained). Brokerage is unaffected.
 
-Open decision: recipients currently share the channel's pool, so they earn less on Scale direct and internal sales. If Randy wants recipients to earn only on brokerage, scope them per campaign or add a channel filter.
+**Setting to revisit (Randy, Nov 21 2026 2:57 PM):** override recipients stay on the proportional default. They share whatever pool the channel produces, so on a $1,000 Scale direct or internal sale a 50% recipient gets $25, versus $100 on brokerage. If they should earn on brokerage only, scope them per campaign or add a channel filter to `ad_override_recipients`.
+
+## QA guard
+Box QA browsers send `x-br-qa: 1` on every request. The server refuses to approve a non-test creative (403, audited `creative.qa_approve_blocked`) when that header is present, and the box `post()` helper refuses approve calls locally too. Real ads are approved by hand in the admin.
 
 ## Tables (all additive)
 `ad_campaigns` (incl. `seller`, `internal`, `order_kind`, `is_test`), `ad_creatives`, `ad_events`, `ad_ledger` (incl. `channel`), `ad_channel_rates`, `ad_hubs`, `ad_partners` (legacy shares), `ad_rate_history`, `ad_override_recipients`, `ad_hub_gates`, `ad_settings` (payout timing), `ad_payouts`, `ad_alert_prefs`, `ad_hub_alerts_sent`, `ad_audit`, `ad_promo_codes`, `ad_promo_redemptions`, `ad_street_members`, `ad_street_qrs`, `ad_street_events`.

@@ -620,6 +620,16 @@ router.post("/ads/admin/creatives", raw, (req, res) =>
   }),
 );
 
+router.post("/ads/admin/creatives/:id/alt", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const alt = str((req.body as Record<string, unknown> | undefined)?.alt, 200);
+    if (!alt) return void res.status(400).json({ message: "Add alt text." });
+    const ok = await store.setCreativeAlt(String(req.params.id), alt, who);
+    res.status(ok ? 200 : 404).json({ message: ok ? "Alt text saved." : "Not found." });
+  }),
+);
 router.post("/ads/admin/creatives/:id/status", json, (req, res) =>
   safe(res, async () => {
     const who = guard(req, res);
@@ -634,6 +644,15 @@ router.post("/ads/admin/creatives/:id/status", json, (req, res) =>
     if (to === "rejected" && !reason) {
       res.status(400).json({ message: "Add a reason. The buyer sees it on their dashboard." });
       return;
+    }
+    // QA guard (Nov 21 2026): automated QA (header x-br-qa, sent by every box QA browser) can never approve a real creative. Randy approves real ads by hand.
+    if (to === "approved" && req.get("x-br-qa")) {
+      const f = await store.creativeTestFlag(String(req.params.id));
+      if (!f?.isTest) {
+        await store.audit(who, "creative.qa_approve_blocked", String(req.params.id));
+        res.status(403).json({ message: "QA can only approve TEST creatives. Real ads are approved by hand." });
+        return;
+      }
     }
     const ok = await store.setCreativeStatus(String(req.params.id), to, who, to === "rejected" ? reason : null);
     res.status(ok ? 200 : 404).json({ message: ok ? (to === "approved" ? "Approved." : to === "pending" ? "Back in the approval queue." : "Rejected.") : "Not found." });
@@ -739,7 +758,7 @@ router.post("/ads/admin/orders/:id/attach", json, (req, res) =>
       res.status(404).json({ message: "The uploaded file is no longer stored. Ask the buyer to upload it on their dashboard." });
       return;
     }
-    await store.addCreative({ campaignId: c.id, mime: cr.mime, width: cr.width, height: cr.height, data: cr.data, alt: `${c.brand} (sponsored)`, uploadedBy: `${who} (from /buy)`, status: "pending", sourceRef: `buy:${order.id}` });
+    await store.addCreative({ campaignId: c.id, mime: cr.mime, width: cr.width, height: cr.height, data: cr.data, alt: `${c.brand} ad`, uploadedBy: `${who} (from /buy)`, status: "pending", sourceRef: `buy:${order.id}` });
     res.json({ message: "Sent to the approval queue." });
   }),
 );

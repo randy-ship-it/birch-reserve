@@ -161,6 +161,7 @@ ${c.isTest ? `<form data-post="/ads/admin/campaigns/${esc(c.id)}/purge" data-rel
   });
   const pending = v.pending.map((x) => `<div class="card" style="display:grid;gap:8px"><img src="/v1/ads/cr/${esc(x.id)}?preview=1" alt="${esc(x.alt)}" style="max-width:100%;border-radius:10px;border:1px solid #eee">
 <div><b>${esc(x.brand)}</b> <span class="fine">${x.width}×${x.height} · ${fmtInt(x.bytes / 1024)} KB · ${esc(x.uploadedBy ?? "")}</span><div class="fine">Alt: ${esc(x.alt || "–")}</div></div>
+<form class="f" data-post="/ads/admin/creatives/${esc(x.id)}/alt" data-reload style="display:flex;gap:6px;margin:6px 0"><input name="alt" maxlength="200" value="${esc(x.alt ?? "")}" aria-label="Alt text"><button class="ghost sm" type="submit">Save alt</button></form>
 <div style="display:flex;gap:8px"><form data-post="/ads/admin/creatives/${esc(x.id)}/status?to=approved" data-reload><button class="sm" type="submit">Approve</button></form><form data-post="/ads/admin/creatives/${esc(x.id)}/status?to=rejected" data-reload style="display:flex;gap:6px"><input name="reason" required maxlength="300" placeholder="Reason (the buyer sees this)"><button class="ghost sm" type="submit">Reject</button></form></div></div>`);
   const slotRows = [...AD_SLOTS].sort((a, b) => Number(b.live) - Number(a.live)).map((s) => {
     const t = v.slotTotals.get(s.key);
