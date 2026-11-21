@@ -81,3 +81,19 @@ test("public sample report: real events only, no test traffic, no zero counts", 
   fresh("s100_d");
   assert.equal((await publicSampleReport()).available, false);
 });
+
+test("new link token: opaque, maps to the street credit, never echoed; validate result has no canonical code", async () => {
+  fresh("s100_tok");
+  const tok = promo.memberToken("mona");
+  assert.match(tok, /^sc[0-9a-f]{12}$/);
+  assert.ok(!/street/i.test(tok));
+  const f = await promo.findCode(tok);
+  assert.equal(f?.codeKey, "street100");
+  assert.equal(await promo.findCode("sc000000000000"), null);
+  const url = promo.shareUrl("mona", "birch", null, "birch-intake");
+  assert.ok(!/street100/i.test(url) && url.includes(`c=${tok}`) && url.includes("st=mona"));
+  const v = await promo.validateCode(tok);
+  assert.ok(v.ok && !/street100/i.test(v.message));
+  const a = await promo.validateCode("streetteam100");
+  assert.ok(a.ok && !/street100/i.test(a.message));
+});

@@ -85,7 +85,8 @@ router.post("/v1/promo/validate", json, (req, res) =>
     if (vLim.hit(`v:${ip(req)}`).limited) return void res.status(429).json({ ok: false, reason: "rate", message: "Too many tries. Wait a minute and try again, or keep going without the code." });
     const b = (req.body ?? {}) as Record<string, unknown>;
     const r = await promo.validateCode(str(b.code, 60), promo.cleanEmail(b.email) || undefined);
-    res.json(r);
+    // Never echo the code (canonical or alias) back to the browser.
+    res.json(r.ok ? { ok: true, creditUsd: r.creditUsd, label: r.label, message: r.message } : r);
   }),
 );
 
@@ -131,7 +132,7 @@ router.post("/v1/promo/order", json, (req, res) =>
     const sid = str((req.body as Record<string, unknown>)?.session_id, 220);
     if (!/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(sid)) return void res.status(400).json({ applied: false });
     const show = async (r: Awaited<ReturnType<typeof promo.redemptionForSession>>) =>
-      r ? { applied: true, code: r.code, label: promo.creditLabel(r.creditMicros), member: await promo.memberLabel(r.st), rate: regularRateSummary().line, compare: regularRateSummary().compare } : null;
+      r ? { applied: true, label: promo.creditLabel(r.creditMicros), member: await promo.memberLabel(r.st), rate: regularRateSummary().line, compare: regularRateSummary().compare } : null;
     const hit = await show(await promo.redemptionForSession(sid));
     if (hit) return void res.json(hit);
     let session;
@@ -146,7 +147,7 @@ router.post("/v1/promo/order", json, (req, res) =>
     if (again) return void res.json(again);
     const code = session.metadata?.promo;
     const found = code ? await promo.findCode(code) : null;
-    res.json(found && !promo.codeProblem(found) ? { applied: false, pending: true, code: found.code, label: promo.creditLabel(found.creditMicros) } : { applied: false });
+    res.json(found && !promo.codeProblem(found) ? { applied: false, pending: true, label: promo.creditLabel(found.creditMicros) } : { applied: false });
   }),
 );
 
@@ -187,7 +188,7 @@ router.post("/account/promo", json, (req, res) =>
     const r = await promo.claimCode({ code, email, site: ctx.site, st: ctx.st, src: "account" });
     if (!r.ok) return void res.json({ ok: false, reason: r.reason, message: r.message });
     await promo.attachPendingForAccount(email, "account");
-    res.json({ ok: true, code: r.redemption.codeKey.toUpperCase(), message: `Code applied: ${r.label} added to your account. Ad spend only, no cash value.` });
+    res.json({ ok: true, message: `Code applied: ${r.label} added to your account. Ad spend only, no cash value.` });
   }),
 );
 
@@ -230,7 +231,7 @@ router.post("/ads/admin/street/member", json, (req, res) =>
     if (!r.ok) return void res.status(400).json({ message: r.message });
     const site = b.site === "scale" ? "scale" : "birch";
     const label = str(b.qrLabel, 60) || (site === "scale" ? "scale-intake-digital" : "birch-intake");
-    const url = promo.shareUrl(id, site, str(b.code, 60) || "STREET100", label.toLowerCase().replace(/[^a-z0-9_-]/g, "-").slice(0, 40));
+    const url = promo.shareUrl(id, site, str(b.code, 60) || null, label.toLowerCase().replace(/[^a-z0-9_-]/g, "-").slice(0, 40));
     await promo.registerQr(id, label, site, url, who);
     res.json({ message: `${r.message} Link copied; reload to see it in the table.`, copy: `${url}\nQR PNG: ${`${origin(req)}/ads/admin/street/qr.png?member=${encodeURIComponent(id)}&label=${encodeURIComponent(label)}`}`, url, png: `/ads/admin/street/qr.png?member=${encodeURIComponent(id)}&label=${encodeURIComponent(label)}` });
   }),

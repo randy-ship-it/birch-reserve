@@ -25,12 +25,13 @@ function qlab(v){v=(v||"").trim().toLowerCase();return v==="1"||v==="true"?"qr":
 function setMember(st,qr){var s=state();s.st=st;s.qr=qr||undefined;s.at=Date.now();sync(s)}
 function capture(){
  var q;try{q=new URLSearchParams(location.search)}catch(e){return}
- var s=state(),st=(q.get("st")||"").trim().toLowerCase(),alt=(q.get("ref")||q.get("via")||"").trim().toLowerCase(),code=(q.get("code")||"").trim().slice(0,40),qr=qlab(q.get("qr")),changed=false;
+ var s=state(),st=(q.get("st")||"").trim().toLowerCase(),alt=(q.get("ref")||q.get("via")||"").trim().toLowerCase(),code=(q.get("code")||q.get("c")||"").trim().slice(0,40),qr=qlab(q.get("qr")),changed=false;
  // ?st= is the street-team member param: last click wins. ?ref= / ?via= are also used by our own internal links (home_tile, share_*),
  // so they only take over once the server confirms an active member; an unknown value never wipes a real referrer.
  if(st&&MEMBER.test(st)){s.st=st;s.qr=qr||undefined;s.at=Date.now();changed=true}else st="";
  if(code&&CODE.test(code)){s.code=code;if(!s.at)s.at=Date.now();changed=true}
  if(changed||s.st||s.code)sync(s);
+ try{var u=new URL(location.href);if(u.searchParams.has("code")||u.searchParams.has("c")){u.searchParams.delete("code");u.searchParams.delete("c");history.replaceState(history.state,"",u.pathname+(u.search||"")+u.hash)}}catch(e){}
  var who=st||(alt&&MEMBER.test(alt)?alt:"");if(!who)return;
  var k="br_st_b_"+who+"_"+(qr||"");try{if(!st&&sessionStorage.getItem(k)==="0")return;if(st&&sessionStorage.getItem(k))return}catch(e){}
  post("/v1/promo/scan",{st:who,qr:qr||undefined,code:code||undefined}).then(function(j){var ok=j&&j.member===who;try{sessionStorage.setItem(k,ok?"1":"0")}catch(e){}if(ok&&!st)setMember(who,qr)}).catch(function(){})
@@ -51,32 +52,32 @@ function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null
 function mountForm(host,o){
  css();host.innerHTML="";var s=state(),d=el("details","brpromo");d.setAttribute("data-testid","promo-box");
  d.appendChild(el("summary",null,"Have a code?"));var b=el("div","bp-b"),row=el("div","bp-r"),inp=el("input");
- inp.type="text";inp.name="promo_code";inp.placeholder="Promo or street-team code";inp.autocomplete="off";inp.setAttribute("aria-label","Promo code");inp.setAttribute("data-testid","promo-input");inp.value=(s.code||"").toUpperCase();
+ inp.type="text";inp.name="promo_code";inp.placeholder="Promo or street-team code";inp.autocomplete="off";inp.setAttribute("aria-label","Promo code");inp.setAttribute("data-testid","promo-input");var held=s.code||"";inp.value="";if(held)inp.placeholder="Code saved on this page";
  var btn=el("button",null,"Apply");btn.type="button";btn.setAttribute("data-testid","promo-apply");
  var msg=el("p","bp-m");msg.setAttribute("role","status");msg.setAttribute("aria-live","polite");msg.setAttribute("data-testid","promo-msg");
  var fine=el("p","bp-f","Free ad credit: ad spend only, no cash value, not transferable. One per business.");
  row.appendChild(inp);row.appendChild(btn);b.appendChild(row);b.appendChild(msg);b.appendChild(fine);d.appendChild(b);host.appendChild(d);
  function show(ok,t){msg.className="bp-m "+(ok?"ok":"no");msg.textContent=t}
  function email(){if(o&&o.getEmail){var v=o.getEmail();if(v)return v}var f=host.closest("form")||document;var i=f.querySelector&&f.querySelector('input[type=email],input[name=email]');return i&&i.value?i.value.trim():""}
- function go(auto){var v=inp.value.trim();if(!v){show(false,"Type your code, or keep going without one.");return}
+ function go(auto){var v=inp.value.trim()||(auto?held:"");if(!v){show(false,"Type your code, or keep going without one.");return}
   btn.disabled=true;btn.textContent="Checking...";
   var req=o&&o.mode==="account"?post("/account/promo",{code:v}):post("/v1/promo/validate",{code:v,email:email()||undefined});
   req.then(function(j){btn.disabled=false;btn.textContent="Apply";
-   if(j.ok){var t=s2(j.code);if(o&&o.mode==="account"){show(true,j.message);setTimeout(function(){location.reload()},1400)}else{var cur=state();cur.code=j.code;if(!cur.at)cur.at=Date.now();sync(cur);show(true,j.message+" It will be added with your order or request.")}}
+   if(j.ok){if(o&&o.mode==="account"){show(true,j.message);setTimeout(function(){location.reload()},1400)}else{var cur=state();cur.code=v;if(!cur.at)cur.at=Date.now();sync(cur);show(true,j.message+" It will be added with your order or request.")}}
    else if(auto&&j.reason==="unknown"){show(false,j.message)}else show(false,j.message||"That didn't work. You can keep going without a code.")})
   .catch(function(){btn.disabled=false;btn.textContent="Apply";show(false,"We couldn't check that right now. Keep going, and your code stays saved on this page.")})}
  function s2(x){return x}
  btn.onclick=function(){go(false)};inp.onkeydown=function(e){if(e.key==="Enter"){e.preventDefault();go(false)}};
- d.open=true;if(inp.value){go(true)}
+ d.open=true;if(held){go(true)}
 }
 function mountSuccess(host){
  css();var q=new URLSearchParams(location.search),sid=q.get("session_id")||"";if(!/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(sid))return;
  host.innerHTML="";var tries=0;
  function tick(){post("/v1/promo/order",{session_id:sid}).then(function(j){
-  if(j.applied){host.innerHTML="";var b=el("div","brbanner","Code "+j.code+" applied: "+j.label+" added");b.setAttribute("role","status");b.setAttribute("data-testid","promo-applied");
+  if(j.applied){host.innerHTML="";var b=el("div","brbanner","Code applied: "+j.label+" added");b.setAttribute("role","status");b.setAttribute("data-testid","promo-applied");
    b.appendChild(el("small",null,"Ad spend only, no cash value. It is its own ad credit on your account"+(j.member?" · Street team: "+j.member:"")+". "+(j.rate||"")+" "+(j.compare||"")));host.appendChild(b)}
   else if(j.pending&&tries<4){tries+=1;setTimeout(tick,2500)}
-  else if(j.pending){host.innerHTML="";var c=el("div","brbanner","Code "+j.code+" is saved to your order");c.appendChild(el("small",null,"Your "+j.label+" appears in your account as soon as payment confirms."));host.appendChild(c)}
+  else if(j.pending){host.innerHTML="";var c=el("div","brbanner","Your code is saved to your order");c.appendChild(el("small",null,"Your "+j.label+" appears in your account as soon as payment confirms."));host.appendChild(c)}
  }).catch(function(){})}
  tick();
 }
