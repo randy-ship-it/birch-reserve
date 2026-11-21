@@ -13,6 +13,7 @@ import { DoorRoute } from "@/components/br/door-route";
 import { FounderNote, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import { MediaKitPdfLink, ProofStrip, SalesContact, TRUST_FAQ, TrustBand, TrustFaq } from "@/components/br/trust";
 import { GtmSetup } from "@/components/br/gtm-setup";
+import { StreetTeamProgram } from "@/components/br/street-team";
 import { KitCta } from "@/components/br/kit-cta";
 import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
@@ -154,6 +155,11 @@ export default function BrHome() {
       {/* 2d. GTM setup packages (Randy t332u, Nov 21 2026): separate from the ad product, same systems. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-gtm-setup">
         <GtmSetup where="home" />
+      </section>
+
+      {/* 2e. Street team program, coming 2027 (Randy, voice, Nov 21 2026 2:03 PM ET). */}
+      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-street-team">
+        <StreetTeamProgram where="home" />
       </section>
 
       {/* 3. Two ways in (same cards as the intake). */}
