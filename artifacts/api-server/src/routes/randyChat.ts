@@ -29,6 +29,7 @@ import { FRIENDLY_429, LIMITS, limiter } from "../lib/rateLimit";
 import { attributionFrom } from "../lib/publicGuards";
 import { MIRROR_ORIGIN_HOSTS } from "../middlewares/mirrorHost";
 import { birchFaqAnswer } from "../lib/birchFaq";
+import { BRAND_NAMES, chatBrandFor, swapForBrand, type ChatBrand } from "../lib/chatOnboarding";
 import { BIRCH_SALES_PHONE } from "../lib/birchFacts";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { isTestIdentity } from "../lib/testTraffic";
@@ -55,6 +56,8 @@ type RandyChatBody = {
   chipId?: string;
   sessionId?: string;
   pagePath?: string;
+  /** Widget skin: "scale" on the scalehealth.ca/intake mirror (chat name Scale Squirrel). Same module, swapped name and links. */
+  skin?: ChatBrand;
 };
 
 type RandyChatSuccess = {
@@ -235,12 +238,13 @@ type ParseErr = { ok: false; error: string };
 const WHO_ASK =
   /\b(who (are|r) (you|u)|who('s| is) this|who am i (talking|speaking|chatting)( to| with)?|what('s| is) your name|your name|introduce yourself|are (you|u) (a |an )?(ai|bot|robot|human|real|person)|is this (a |an )?(bot|ai|robot|real person|human))\b/i;
 const LINK_ASK = /\b(link|url|website|site|page|send( me)?|where can i|show me|see (it|a|the|an)|kit|portal|calendar|book)\b/i;
-const REINTRO = /^\s*(hi|hey|hello)?[,!.\s]*(?:i'?\s*a?m (?:randy(?: gilling)?(?: from birch reserve)?|the birch q&a squirrel(?: from birch reserve)?)|(?:the )?birch q&a squirrel here)[.!,:;]?\s*/i;
+const REINTRO = /^\s*(hi|hey|hello)?[,!.\s]*(?:i'?\s*a?m (?:randy(?: gilling)?(?: from (?:birch reserve|scale health))?|the (?:birch q&a|scale) squirrel(?: from (?:birch reserve|scale health))?)|(?:the )?(?:birch q&a|scale) squirrel here)[.!,:;]?\s*/i;
 /** If the model slips back into the old phone persona, rename it to the squirrel. */
-function squirrelIdentity(text: string): string {
+function squirrelIdentity(text: string, brand: ChatBrand = "birch"): string {
+  const n = BRAND_NAMES[brand];
   return text
-    .replace(/\b(?:I'm|I am|I’m) Randy(?: Gilling)?(?: from Birch Reserve)?\b/g, "I'm the Birch Q&A Squirrel")
-    .replace(/\ban AI version of Randy(?: from (?:Birch Reserve|the brand|that brand))?\b/gi, "an AI guide for Birch Reserve");
+    .replace(/\b(?:I'm|I am|I’m) Randy(?: Gilling)?(?: from (?:Birch Reserve|Scale Health))?\b/g, `I'm the ${n.squirrel}`)
+    .replace(/\ban AI version of Randy(?: from (?:Birch Reserve|Scale Health|the brand|that brand))?\b/gi, `an AI guide for ${n.site}`);
 }
 
 /**
@@ -248,12 +252,12 @@ function squirrelIdentity(text: string): string {
  * "I'm the Birch Q&A Squirrel." intro unless the visitor's last message asks
  * who he is or whether he's a bot (5:18pm rule; the widget opener already says hi).
  */
-export function polishReply(text: string, history: ReadonlyArray<{ role: string; content: string }>): string {
+export function polishReply(text: string, history: ReadonlyArray<{ role: string; content: string }>, brand: ChatBrand = "birch"): string {
   let out = text
     .replace(/\s+[\u2014\u2013]\s+/g, ", ")
     .replace(/[\u2014\u2013](?=\s*$)/gm, ".")
     .replace(/[\u2014\u2013]/g, ", ");
-  out = squirrelIdentity(out);
+  out = squirrelIdentity(out, brand);
   const lastUser = [...history].reverse().find((m) => m.role === "user")?.content ?? "";
   if (!WHO_ASK.test(lastUser)) {
     const stripped = out.replace(REINTRO, "");
@@ -343,7 +347,7 @@ export function parseBody(raw: unknown): ParseOk<RandyChatBody> | ParseErr {
   }
 
   const obj = raw as Record<string, unknown>;
-  const allowedKeys = new Set(["messages", "mode", "chipId", "sessionId", "pagePath"]);
+  const allowedKeys = new Set(["messages", "mode", "chipId", "sessionId", "pagePath", "skin"]);
   for (const key of Object.keys(obj)) {
     if (!allowedKeys.has(key)) {
       return { ok: false, error: "Unknown field." };
@@ -374,10 +378,13 @@ export function parseBody(raw: unknown): ParseOk<RandyChatBody> | ParseErr {
   if (!sessionId.ok) return sessionId;
   const pagePath = parseOptionalPagePath(obj.pagePath);
   if (!pagePath.ok) return pagePath;
+  if (obj.skin !== undefined && obj.skin !== "birch" && obj.skin !== "scale") return { ok: false, error: "Invalid skin." };
+  const skin = obj.skin as ChatBrand | undefined;
 
   return {
     ok: true,
     body: {
+      ...(skin ? { skin } : {}),
       messages: parsedMessages.body,
       ...(mode ? { mode } : {}),
       ...(chipId ? { chipId } : {}),
@@ -493,8 +500,9 @@ export const GROK_TEMPERATURE = 0.4;
 export const GROK_MAX_TOKENS = 1_500;
 
 /** Exactly what goes to xAI for one turn (exported for tests; no network). */
-export function buildGrokRequest(body: RandyChatBody, model = getGrokModel(), pulseThemes?: string[]) {
+export function buildGrokRequest(body: RandyChatBody, model = getGrokModel(), pulseThemes?: string[], brand: ChatBrand = chatBrandFor(body.skin, null)) {
   const systemPrompt = buildBirchChatSystemPrompt({
+    brand,
     mode: body.mode,
     chipId: body.chipId,
     pagePath: body.pagePath,
@@ -517,7 +525,7 @@ export function buildGrokRequest(body: RandyChatBody, model = getGrokModel(), pu
   };
 }
 
-async function callGrok(body: RandyChatBody, apiKey: string): Promise<string> {
+async function callGrok(body: RandyChatBody, apiKey: string, brand: ChatBrand): Promise<string> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), PROVIDER_TIMEOUT_MS);
   const themes = await currentPulseThemes().catch(() => [] as string[]);
@@ -529,7 +537,7 @@ async function callGrok(body: RandyChatBody, apiKey: string): Promise<string> {
         "content-type": "application/json",
         authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify(buildGrokRequest(body, undefined, themes)),
+      body: JSON.stringify(buildGrokRequest(body, undefined, themes, brand)),
       signal: controller.signal,
     });
 
@@ -648,15 +656,16 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
   }
 
   const startedAt = Date.now();
+  const brand = chatBrandFor(body.skin, req.get("origin"));
   try {
-    const raw = await callGrok(body, apiKey);
+    const raw = await callGrok(body, apiKey, brand);
     const { text: withoutMarker, callback } = extractCallbackMarker(raw);
-    let text = softenReply(polishReply(withoutMarker, body.messages));
+    let text = softenReply(polishReply(withoutMarker, body.messages, brand));
     const banned = findBannedContent(text);
     if (banned) {
       // Hard content rule tripped: send the deterministic answer instead (never the slip).
       req.log?.warn({ kind: "chat_guard", rule: banned }, "Randy chat reply replaced by FAQ (guard)");
-      text = birchFaqAnswer(body.messages).text;
+      text = swapForBrand(birchFaqAnswer(body.messages).text, brand);
     }
     if (callback) {
       const alert = await sendChatCallbackAlert(callback, body, qa);
@@ -710,7 +719,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
     );
     // Randy Nov 13 2026: chat must always answer. Fall back to the canonical FAQ.
     const faq = birchFaqAnswer(body.messages);
-    let text = faq.text;
+    let text = swapForBrand(faq.text, brand);
     if (faq.callback) {
       const alert = await sendChatCallbackAlert(faq.callback, body, qa);
       req.log?.info({ kind: "chat_callback", alert: alert.status, source: "faq" }, "Randy chat call-back submitted");

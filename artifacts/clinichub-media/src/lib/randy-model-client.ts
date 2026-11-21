@@ -26,6 +26,7 @@ import {
 import { fitWireBudget, withQuietRetry } from "@/lib/randy-wire";
 import { clearHumanToken, ensureHuman, humanHeaders } from "@/lib/human-gate";
 import { getAttribution } from "@/lib/attribution";
+import { siteSkin } from "@/lib/siteSkin";
 
 export type RandyModelMessage = {
   role: "user" | "assistant";
@@ -266,6 +267,7 @@ export async function requestRandyReply(
     ...(req.chipId ? { chipId: req.chipId } : {}),
     ...(req.sessionId ? { sessionId: req.sessionId } : {}),
     ...(pagePath ? { pagePath } : {}),
+    ...(siteSkin() === "scale" ? { skin: "scale" } : {}),
   });
   // Humans only: no-op when the gate is off or this tab already verified.
   await ensureHuman();

@@ -11,6 +11,7 @@ export type FaqResult = { text: string; callback: Record<string, string> | null;
 const BUY = "https://birchreserve.net/buycalc";
 const REQ = "https://birchreserve.net/buycalc#request";
 const KIT = "https://birchreserve.net/media-kit";
+const INTAKE = "https://birchreserve.net/intake";
 
 const PHONE_RE = /(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}/;
 const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
@@ -51,8 +52,11 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
       text: `Thanks${c.name ? `, ${c.name.split(" ")[0]}` : ""}. I've sent your call-back request to the Birch team${c.best_time ? ` for ${c.best_time}` : ""}. They'll reach you at ${c.phone || c.email}. If you'd rather not wait, call ${BIRCH_SALES_PHONE}.`,
     };
   }
+  if (/get(ting)? started|onboard|how do i (start|sign up|begin|join|apply)|where do i (start|sign up)|what do i do/.test(t)) {
+    return { intent: "start", callback: null, text: `Here's the path for a brand:\n1. Get the free Monetization Kit (website and email, no card): [Start the kit](${INTAKE})\n2. Pick your channels: branded hubs, the private retail network across Canada and the USA, or Calm Joints with the Street Team\n3. Start small: the $190 USD 7-day look ($270 CAD in Canada): [See the look](${BUY}?sku=hold-190)\n4. Scale up with a sponsorship pack or the exclusive reserve\nNothing runs until you approve an insertion order. Want the request form, or a person to call you? [Request form](${REQ})` };
+  }
   if (/\bcad\b|canadian|canada|currency|us dollars|\busd\b|exchange rate/.test(t)) {
-    return { intent: "currency", callback: null, text: `Prices are in USD for every buyer, including Canadian brands: $190 USD for the 7-day look and $490 USD to reserve. The currency you see on the Stripe checkout is the currency you're charged. Start at ${BUY}, or ask us anything first at ${REQ}.` };
+    return { intent: "currency", callback: null, text: `Visitors in Canada see and pay CAD ($270 CAD for the 7-day look, $690 CAD to reserve); everyone else pays USD ($190 and $490). The currency shown at checkout is the currency you're charged, and there's a toggle on the page. Start at ${BUY}, or ask us anything first at ${REQ}.` };
   }
   if (/anyone else|who else|other brands?|competitor|already (in|taken|booked)|someone else/.test(t)) {
     return { intent: "competition", callback: null, text: `We don't share who has reserved or how much space is taken. The $490 USD reserve is a shared category reserve, so it isn't exclusive; owning your category is a premium slot ($25,000 to $50,000 USD, inquire only). Placements are curated hub by hub, so reserving now gets you in as hubs launch: ${BUY}` };
@@ -61,7 +65,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return { intent: "timing", callback: null, text: `There's no fixed go-live time. After checkout a person reviews your ad, and we reply within 1 business day with the insertion order naming the hub, placement and launch date. Your ad runs from that launch date once you approve the IO; nothing runs before that. The quickest first step is the $190 USD 7-day look: ${BUY}` };
   }
   if (/how (does|do|would) (it|this|birch|the reserve)( \w+)? work|how it works|what happens (after|next|when)|the process/.test(t)) {
-    return { intent: "how", callback: null, text: `Three steps: reserve your space for $490 USD (or take a $190 USD 7-day look first), pay by card on the Stripe checkout with no login, then approve the insertion order that names the hub and placement. Nothing runs before you approve it, and the full amount is media credit. Start at ${BUY}` };
+    return { intent: "how", callback: null, text: `Three steps: reserve your space for $490 USD (or take a $190 USD 7-day look first), pay by card on the Stripe checkout with no login, then approve the insertion order that names the hub and placement. After you pay you get a receipt, send your ad (specs at https://birchreserve.net/ads/specs), and a person reviews it. Nothing runs before you approve the IO, and the full amount is media credit. Start at ${BUY}` };
   }
   if (/audience|who (will |would )?(see|sees)|who are (the )?members|demographic|who do (you|i) reach|who('s| is) the (audience|customer)/.test(t)) {
     return { intent: "audience", callback: null, text: `Members of private, members-only health and wellness hubs, reached right after they book or buy and when they log back in. Live today: DR-HO'S physio and SOLE, with more hubs launching. You can open a live hub now at https://physio.drhonow.com (DR-HO'S) or https://www.scalehealth.ca/sole (SOLE), or reserve at ${BUY}.` };
@@ -89,7 +93,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return { intent: "refund", callback: null, text: `The $490 reserve is 100% media credit until the insertion order. It's fully refundable until 14 days before the launch date on the IO, then usable for 12 months. If no approved surface is named within 60 days, it's a cash refund. The $190 look converts in full to the reserve within 7 days, otherwise it's refunded.` };
   }
   if (/buy|checkout|purchase|sign up|get started|how do i|pay|490|190|seat|look|book/.test(t)) {
-    return { intent: "buy", callback: null, text: `Here's how: open ${BUY}, pick the $490 reserve (or the $190 7-day look), add your brand name and work email, tick the terms box, then pay on the secure Stripe checkout. Prices are in USD. Not ready, or want something custom? Use the request form at ${REQ}. No card needed.` };
+    return { intent: "buy", callback: null, text: `Here's how: open ${BUY}, pick the $490 reserve (or the $190 7-day look), add your brand name and work email, tick the terms box, then pay on the secure Stripe checkout. Prices are in USD (CAD for visitors in Canada). Not ready, or want something custom? Use the request form at ${REQ}. No card needed.` };
   }
   if (/categor|open|available|left|inventory|spots|slots/.test(t)) {
     return { intent: "categories", callback: null, text: `You get a share of display space across our growing network of private, members-only health and wellness hubs, with more launching. Placements are curated by hand as each hub launches. Reserve at ${BUY}.` };

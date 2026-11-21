@@ -12,12 +12,14 @@ import { birchFaqAnswer } from "../src/lib/birchFaq";
 
 const live = { reserve: true, areaLock: false, deposits: false };
 
-test("prompt carries the site offer in USD only", () => {
+test("prompt carries the site offer in USD with CAD for Canadian visitors", () => {
   const p = buildBirchChatSystemPrompt({ checkout: live });
   assert.match(p, /\$190 USD/);
   assert.match(p, /\$490 USD/);
   assert.match(p, /\$25,000 to \$50,000 USD/);
-  assert.match(p, /USD only, for every buyer including Canadian brands/);
+  assert.match(p, /USD base prices; Canadian visitors pay CAD/);
+  assert.match(p, /\$270 CAD/);
+  assert.match(p, /\$690 CAD/);
   assert.doesNotMatch(p, /Integrity/i);
   assert.match(p, /DR-HO'S physio/);
   assert.match(p, /In queue/);
@@ -30,8 +32,8 @@ test("prompt never carries banned content or internal numbers", () => {
   // Randy Nov 19 2026: the prompt names neither the partner nor its legal company, not even in a rule line.
   assert.doesNotMatch(p, /Clairvoyant|\bAlign\b|alignwellness/i);
   // CAD and $899 appear only inside the rule lines that forbid them.
-  const withoutRules = p.replace(/^.*(Can I pay in CAD|Never mention \$899).*$/gm, "");
-  assert.doesNotMatch(withoutRules, /\bCAD\b|C\$|\$270|\$690|\$899/);
+  const withoutRules = p.replace(/^.*Never mention \$899.*$/gm, "");
+  assert.doesNotMatch(withoutRules, /\$899/);
   assert.doesNotMatch(p, /\b(grok|xai|openai|gpt)\b/i);
   assert.doesNotMatch(p, /Hi there(?!")/);
   assert.doesNotMatch(p, /seats_open|seats_paid|8 of 8|\b8 seats\b|184,176|46,044|42 listed|20MM|128MM|8\.7/);
@@ -70,8 +72,11 @@ test("grok request: one system prompt, full recent history, tuned sampling, GROK
 test("reply guard catches the hard bans and lets good replies through", () => {
   for (const bad of [
     "We're powered by Grok from xAI.",
-    "That's C$690 for Canadian buyers.",
-    "It's $270 for the look.",
+    "That's C$700 for Canadian buyers.",
+    "It's $300 CAD for the look.",
+    "Use code STREET100 at checkout.",
+    "We guarantee 1MM impressions.",
+    "Uber for wellness, basically.",
     "Right now $0 booked so far, 8 of 8 seats open.",
     "There are 3 seats left in your category.",
     "0 of 42 partners signed so far.",
@@ -100,7 +105,7 @@ test("fallback FAQ answers the five buyer questions usefully, in USD, with no ba
     const a = birchFaqAnswer([{ role: "user", content: q }]);
     assert.equal(a.intent, intent, q);
     assert.equal(findBannedContent(a.text), null, q);
-    assert.doesNotMatch(a.text, /\bCAD\b/);
+    if (intent !== "currency") assert.doesNotMatch(a.text, /\bCAD\b/);
     assert.match(a.text, /https:\/\/birchreserve\.net\/buycalc|physio\.drhonow\.com/);
   }
   const general = birchFaqAnswer([{ role: "user", content: "hello" }]);
@@ -170,5 +175,6 @@ test("network explainer: what the private display network is, spend-down, packs,
   assert.match(p, /up to 6 months once your IO starts/);
   assert.match(p, /\$1,500, \$3,000 or \$6,000 USD/);
   assert.ok(p.includes("https://birchreserve.net/exclusive"));
-  assert.doesNotMatch(p, /\b1,900\b|\bsigned partners\b|unclaimed|\bAlign\b/i);
+  assert.doesNotMatch(p, /\bsigned partners\b|unclaimed|\bAlign\b/i);
+  assert.match(p, /\$1,900/);
 });

@@ -817,7 +817,7 @@ test("faq fallback: answers core Birch questions and submits a premium call-back
   const buy = birchFaqAnswer([{ role: "user", content: "How do I buy the $490 seat?" }]);
   assert.equal(buy.intent, "buy");
   assert.match(buy.text, /Prices are in USD/);
-  assert.doesNotMatch(buy.text, /CAD|USD or CAD/);
+  assert.doesNotMatch(buy.text, /USD or CAD/);
   assert.match(birchFaqAnswer([{ role: "user", content: "Do you guarantee a CTR?" }]).text, /^No\./);
   const first = birchFaqAnswer([{ role: "user", content: "We want a premium slot, budget $30K" }]);
   assert.equal(first.intent, "premium");

@@ -42,6 +42,10 @@ const KNOWN_LABELS: ReadonlyArray<{ match: (u: URL) => boolean; label: string }>
     label: "Scale Health for providers",
   },
   {
+    match: (u) => /(^|\.)scalehealth\.ca$/.test(u.hostname) && /^\/intake(\/|$)/.test(u.pathname),
+    label: "Scale Health",
+  },
+  {
     match: (u) => /(^|\.)birchreserve\.net$/.test(u.hostname),
     label: "Birch Reserve",
   },
