@@ -327,7 +327,7 @@ router.get("/account/login", (req, res) =>
     noStore(res);
     const sid = str(req.query.session_id, 220);
     if (!/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(sid)) {
-      res.redirect(302, "/account");
+      res.redirect(302, mirrorPathOf(req, "/account"));
       return;
     }
     let session;
@@ -381,11 +381,11 @@ router.get("/account/auth", (req, res) => {
   noStore(res);
   const t = verify<{ e: string }>("l", req.query.t);
   if (!t) {
-    res.redirect(302, "/account?e=expired");
+    res.redirect(302, mirrorPathOf(req, "/account?e=expired"));
     return;
   }
   setCookie(res, ACCT, sign("a", { e: t.e }, 14 * 864e5), 14 * 86400);
-  res.redirect(302, "/account");
+  res.redirect(302, mirrorPathOf(req, "/account"));
 });
 
 router.post("/account/logout", json, (req, res) => {
@@ -486,7 +486,7 @@ router.get("/account/report.csv", (req, res) =>
   safe(res, async () => {
     const email = customer(req);
     if (!email) {
-      res.redirect(302, "/account");
+      res.redirect(302, mirrorPathOf(req, "/account"));
       return;
     }
     const cs = await store.listCampaigns({ email });
