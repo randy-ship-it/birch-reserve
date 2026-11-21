@@ -98,6 +98,7 @@ export const SPA_SHELL_PATHS = [
   "/intake",
   "/intake/publisher",
   "/intake/supplier",
+  "/intake/activate",
   "/intake/sponsor",
   "/intake/gtm",
   "/gtm-bot",

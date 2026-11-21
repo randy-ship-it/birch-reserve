@@ -275,7 +275,7 @@ const COCKPIT_CSS = `main.wrap{max-width:1360px}.cockpit{display:grid;grid-templ
 @media(max-width:900px){.cockpit{grid-template-columns:1fr;gap:8px}.ck-rail{position:static}.ck-rail nav{display:flex;flex-wrap:wrap;gap:4px}.ck-rail a{flex:1 1 auto;justify-content:center;gap:6px;border:1px solid var(--br-line);background:var(--br-surface)}.ck-kpis{position:static}}
 @media(max-width:640px){.ck-kpis .k{grid-template-columns:repeat(2,minmax(0,1fr))}}`;
 
-const COCKPIT_JS = `(function(){var G={overview:"*",campaigns:"campaigns",creatives:"creatives",inventory:"inventory",onboard:"hubs",hubproof:"hubs","payout-settings":"money",royalties:"money",referrals:"money",ledger:"money",orders:"money",exports:"money",promo:"promo",street:"promo",alerts:"promo",audit:"audit"};
+const COCKPIT_JS = `(function(){var G={overview:"*",campaigns:"campaigns",creatives:"creatives",inventory:"inventory",onboard:"hubs",hubproof:"hubs",activation:"hubs","payout-settings":"money",royalties:"money",referrals:"money",ledger:"money",orders:"money",exports:"money",promo:"promo",street:"promo",alerts:"promo",audit:"audit"};
 var secs=[].slice.call(document.querySelectorAll(".ck-pane>section[id]"));var tabs={};secs.forEach(function(s){var g=G[s.id]||"campaigns";s.setAttribute("data-g",g);tabs[g]=1});
 var links=[].slice.call(document.querySelectorAll(".ck-rail a[data-tab]"));
 function show(h){var id=(h||"").replace(/^#/,"");var g=tabs[id]?id:(G[id]&&G[id]!=="*"?G[id]:"campaigns");

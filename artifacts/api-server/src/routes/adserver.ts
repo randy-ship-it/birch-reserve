@@ -31,6 +31,7 @@ import { maxPoolAllocationBps, maxReferrerAllocationBps, recipientsAt, splitRefe
 import { listReferralOrders, toLine as toReferralLine } from "../lib/adserver/referrals";
 import { referralAdminHtml } from "../lib/adserver/referralAdmin";
 import { partnersAdminHtml } from "../lib/adserver/partnersAdmin";
+import { activationAdminHtml } from "../lib/adserver/activationAdmin";
 import { getLeadStore } from "../lib/leads";
 import { draftCampaignFromCheckoutSafe, recordClick, recordConversion, recordView, serve } from "../lib/adserver/service";
 import { EMBED_JS, PIXEL_JS } from "../lib/adserver/embed";
@@ -526,7 +527,7 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
           return pend.map((x) => ({ ...x, brand: brand.get(x.campaignId) ?? "", variants: vs.filter((y) => y.creativeId === x.id) }));
         })(),
         creativesByCampaign: byC, slotTotals, ledger: led, royalties: roy, shares, alerts, audit, day: dayT, friday: fridayReady(), schema: store.adSchema(),
-        promoHtml: await promoPanels(), partnersHtml: partnersAdminHtml(await getLeadStore().listBySource("partners", 300).catch(() => []), str(req.query["ptrack"], 20)), ...(await referralPanel(recips)), hubServing: await store.hubServing(), hubs, testRoyalties, summary: realSt.summary, testSummary: testSt.summary, rates, recipients: recips, gates: gateMap, timing, channelRates,
+        promoHtml: await promoPanels(), partnersHtml: partnersAdminHtml(await getLeadStore().listBySource("partners", 300).catch(() => []), str(req.query["ptrack"], 20)) + activationAdminHtml(await getLeadStore().listBySource("activation", 500).catch(() => []), str(req.query["act"], 20)), ...(await referralPanel(recips)), hubServing: await store.hubServing(), hubs, testRoyalties, summary: realSt.summary, testSummary: testSt.summary, rates, recipients: recips, gates: gateMap, timing, channelRates,
         orders: orders.map((o) => ({ id: o.id, at: o.createdAt, email: o.email, company: o.company, website: o.website, plan: o.plan, format: o.format, creativeId: o.creativeId })),
       }),
     );

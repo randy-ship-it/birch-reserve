@@ -36,6 +36,7 @@ import BrIntake from '@/pages/br/intake';
 import ShareEventsPage from '@/pages/sales/share-events';
 import BrIntakePublisher from '@/pages/br/intake-publisher';
 import BrIntakeSupplier from '@/pages/br/intake-supplier';
+import BrIntakeActivate from '@/pages/br/intake-activate';
 import BrIntakeSponsor from '@/pages/br/intake-sponsor';
 import BrIntakeReport from '@/pages/br/intake-report';
 import BrIntakeGtm from '@/pages/br/intake-gtm';
@@ -302,6 +303,9 @@ function Router() {
         </Route>
         <Route path="/intake/publisher">
           <Layout><BrIntakePublisher /></Layout>
+        </Route>
+        <Route path="/intake/activate">
+          <Layout><BrIntakeActivate /></Layout>
         </Route>
         <Route path="/intake/supplier">
           <Layout><BrIntakeSupplier /></Layout>
