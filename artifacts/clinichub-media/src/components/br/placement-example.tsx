@@ -62,7 +62,7 @@ function Shot({ src, alt, children }: { src: string; alt: string; children: Reac
 
 /** Landing example on any of the 4 live hubs (16:10 captures, nothing cropped). Banner sits in the header gap; tile in a blank corner. */
 const LANDING_BANNER: Record<HubKey, string> = { drho: "top-[18.6%]", sole: "top-[12.6%]", effortless: "top-[12.4%]", calmjoints: "top-[13.2%]" };
-const LANDING_TILE: Record<HubKey, string> = { drho: "right-[4%] top-[27%] w-[30%]", sole: "left-[4%] top-[24%] w-[30%]", effortless: "right-[2%] top-[29%] w-[34%]", calmjoints: "left-[4%] top-[22%] w-[30%]" };
+const LANDING_TILE: Record<HubKey, string> = { drho: "right-[4%] top-[27%] w-[44%]", sole: "left-[4%] top-[24%] w-[44%]", effortless: "right-[2%] top-[29%] w-[44%]", calmjoints: "left-[4%] top-[22%] w-[40%]" };
 function LandingShot() {
   const [hub, setHub] = useState<HubKey>("drho");
   const H = HUB_MOCKS[hub];
@@ -75,7 +75,7 @@ function LandingShot() {
       </div>
       <Shot src={H.img} alt={`${H.name} hub home page, with an example banner and tile drawn on top`}>
         <Unit className={`absolute left-[4%] right-[4%] ${LANDING_BANNER[hub]} py-1`} label="Your brand · hub banner" />
-        <Unit className={`absolute ${LANDING_TILE[hub]}`} label="Your brand · native tile" />
+        <Unit className={`absolute ${LANDING_TILE[hub]}`} label="Your brand" />
       </Shot>
     </div>
   );
