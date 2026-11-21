@@ -73,6 +73,18 @@ export async function auditPage(page: Page): Promise<Hit[]> {
         }
       }
     }
+    // The activity pulse card is skipped as text above (it rotates), so check its BOX against all other text/headings:
+    // a card sitting on a heading or paragraph is a bug even when the card text is faded out.
+    document.querySelectorAll("[data-testid=activity-pulse-inline],[data-testid=activity-pulse],[data-testid=activity-pulse-on-inline]").forEach((card) => {
+      const cr = card.getBoundingClientRect();
+      if (cr.width < 2 || cr.height < 2 || getComputedStyle(card).display === "none") return;
+      for (const b of boxes) {
+        if (card.contains(b.el)) continue;
+        const w = Math.min(cr.right, b.r.right) - Math.max(cr.left, b.r.left);
+        const h = Math.min(cr.bottom, b.r.bottom) - Math.max(cr.top, b.r.top);
+        if (w > 2 && h > 2) hits.push({ kind: "overlap", a: "pulse-card", b: name(b.el), detail: `${Math.round(w)}x${Math.round(h)}px at y=${Math.round(cr.top + scrollY)}` });
+      }
+    });
     // pairwise overlap between text boxes of different, unrelated elements
     boxes.sort((x, y) => x.r.top - y.r.top);
     for (let i = 0; i < boxes.length; i++) {
