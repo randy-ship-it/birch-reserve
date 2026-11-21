@@ -134,6 +134,9 @@ async function dockAudit(page: Page): Promise<Hit[]> {
         for (const d of dock()) {
           document.querySelectorAll(coverable).forEach((e) => {
             if (e.closest(".birch-dock-squirrel,elevenlabs-convai,[data-testid^=activity-pulse],[aria-hidden=true],.sr-only")) return;
+            // Content of a closed <details> keeps a layout box in Chrome but is not painted: only its summary can be covered.
+            const shut = e.closest("details:not([open])");
+            if (shut && !e.closest("summary")) return;
             const cs = getComputedStyle(e);
             if (cs.visibility === "hidden" || cs.display === "none" || cs.position === "fixed" || cs.position === "sticky" || Number(cs.opacity) === 0) return;
             const r = e.getBoundingClientRect();
