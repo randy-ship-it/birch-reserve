@@ -13,12 +13,12 @@ export default function Terms() {
       <p className="mt-6 text-sm text-muted-foreground">{SELLER_IDENTITY}</p>
       <div className="mt-10 space-y-6 text-base leading-relaxed text-muted-foreground">
         <p>
-          Birch Reserve is operated by Silver Birch Growth Inc. Public prices are $190 USD (
+          Birch Reserve is operated by Silver Birch Growth Inc. Public prices are $190 USD / $270 CAD (
           <span className="text-foreground">hold-190</span>, a 7-day category
-          look that does not lock a category) and $490 USD (
+          look that does not lock a category), $490 USD / $690 CAD (
           <span className="text-foreground">reserve-490</span>, a shared
-          self-serve category reserve; it does not lock the category). Every public checkout is
-          in USD, including for buyers in Canada, except the exclusive display reserve ($1,900 CAD), which is charged in CAD. The currency you see at checkout is the currency you are charged.
+          self-serve category reserve; it does not lock the category) and $1,900 USD or CAD (the exclusive display reserve, below). Prices show in CAD for
+          visitors in Canada and USD everywhere else, and you can switch on the page. Sponsorship packs are priced and charged in USD. The currency you see at checkout is the currency you are charged.
         </p>
         <p>
           hold-190 is a 100% credit if the buyer converts within 7 days.
@@ -52,7 +52,7 @@ export default function Terms() {
         <p id="promo-credit" data-testid="terms-promo-credit">
           <strong className="text-foreground">Promo credit.</strong> Promo codes (for example STREET100, $100 USD) give free ad credit: ad spend only, no cash value, not transferable, one per business. Promo credit is valued and spent at regular rate-card rates, not the lower exclusive-reserve rate, and runs under the same review and insertion-order rules as paid credit.
         </p>
-        <h2 id="exclusive" className="pt-4 font-display text-2xl text-foreground">Exclusive display reserve ($1,900 CAD)</h2>
+        <h2 id="exclusive" className="pt-4 font-display text-2xl text-foreground">Exclusive display reserve ($1,900 USD or CAD)</h2>
         <ul className="list-disc space-y-2 pl-5" data-testid="terms-exclusive">
           {EXCLUSIVE_RESERVE_TERMS.map((t) => <li key={t}>{t}</li>)}
         </ul>

@@ -6,7 +6,8 @@
 import { ArrowRight } from "lucide-react";
 import { Details } from "@/components/br/details";
 import { PACING_ROWS, SPEND_DOWN_LINE, TAM_2027, VIEWS_PER_HUB_MONTHLY, BLENDED_STARTER_CPM, tam2027Headline, tam2027Views } from "../../../../api-server/src/lib/inventoryPlan";
-import { EXCLUSIVE_RESERVE } from "../../../../api-server/src/lib/exclusiveReserveTerms";
+import { EXCLUSIVE_RESERVE, exclusiveReserveFor } from "../../../../api-server/src/lib/exclusiveReserveTerms";
+import { useCurrency } from "@/lib/currency";
 
 const chip = "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider";
 
@@ -63,16 +64,18 @@ export function Tam2027({ compact = false, dark = false, testId = "tam-2027" }: 
 }
 
 export function ExclusiveReserveCard({ where, dark = true }: { where: string; dark?: boolean }) {
-  const href = `https://birchreserve.net/exclusive?utm_source=birchreserve&utm_medium=next-step&utm_campaign=${encodeURIComponent(`${where}-exclusive-1900`)}`;
+  const { currency } = useCurrency();
+  const X = exclusiveReserveFor(currency);
+  const href = `https://birchreserve.net/exclusive?currency=${currency}&utm_source=birchreserve&utm_medium=next-step&utm_campaign=${encodeURIComponent(`${where}-exclusive-1900`)}`;
   return (
     <article className={`flex flex-col gap-3 rounded-2xl p-4 md:flex-row md:items-center md:justify-between md:gap-4 ${dark ? "bg-white/[0.06] ring-1 ring-lime-300/60" : "border border-[#0b1f3a]/15 bg-white shadow-sm"}`} data-testid="exclusive-reserve-card">
       <div>
         <p className={`text-[11px] font-bold uppercase tracking-wider ${dark ? "text-white/60" : "text-[#0b1f3a]/60"}`}>Exclusive display reserve · one brand per category</p>
-        <p className="mt-1 font-display text-2xl leading-none">{EXCLUSIVE_RESERVE.label}</p>
-        <p className={`mt-1 text-[13px] ${dark ? "text-white/75" : "text-foreground/75"}`}>Locks a {EXCLUSIVE_RESERVE.packageRange} CAD exclusive package at {EXCLUSIVE_RESERVE.discountPct}% below the regular rate. All $1,900 counts toward it. IO before anything runs.</p>
+        <p className="mt-1 font-display text-2xl leading-none">{X.label}</p>
+        <p className={`mt-1 text-[13px] ${dark ? "text-white/75" : "text-foreground/75"}`}>Locks a {X.packageLabel} exclusive package at {EXCLUSIVE_RESERVE.discountPct}% below the regular rate. All $1,900 counts toward it. IO before anything runs.</p>
       </div>
       <a href={href} className={`inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-sm font-bold ${dark ? "bg-lime-300 text-[#0b1f3a] hover:bg-white" : "bg-[#0b1f3a] text-white"}`} data-testid="exclusive-reserve-cta">
-        Reserve $1,900 CAD <ArrowRight className="size-4" />
+        Reserve {X.label} <ArrowRight className="size-4" />
       </a>
     </article>
   );

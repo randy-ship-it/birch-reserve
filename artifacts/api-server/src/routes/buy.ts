@@ -12,7 +12,7 @@ import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
 import { randomUUID } from "node:crypto";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import {
-  BUY_FORMATS, BUY_PATH, BUY_PLANS, BUY_TAGLINE, CREATIVE_MAX_BYTES, CREATIVE_MIN_PX, CREATIVE_TYPES,
+  BUY_FORMATS, BUY_PATH, BUY_PLANS, BUY_TAGLINE, buyPlans, CREATIVE_MAX_BYTES, CREATIVE_MIN_PX, CREATIVE_TYPES,
   accountToken, buyLimiters, buyStore, openPrefill, parsePrefill, sealPrefill, checkCreative, findFormat, findPlan, parseAccount, signToken, validPick, verifyToken,
   type AccountClaims, type CreativeClaims,
 } from "../lib/buyFlow";
@@ -26,6 +26,9 @@ import { FRIENDLY_429 } from "../lib/rateLimit";
 import { logger } from "../lib/logger";
 import { coarseRegion, recordPulse } from "../lib/activityPulse";
 import { isReserveCheckoutConfigured } from "../lib/checkoutState";
+import { decideCurrency, pageCurrency } from "../lib/currency";
+import { parseReserveCurrency, type ReserveCurrency } from "../lib/reserveOffers";
+import { currencyHref, currencyToggleHtml, PRICE_LADDER_CSS } from "../lib/priceLadder";
 
 const router: IRouter = Router();
 export const buyStaffRouter: IRouter = Router();
@@ -152,7 +155,7 @@ router.post("/v1/buy/order", express.json({ limit: "16kb" }), async (req, res): 
   const plan = findPlan(body.plan);
   const format = findFormat(body.format);
   if (!validPick(plan, format)) {
-    res.status(400).json({ error: format?.premium ? "After checkout is exclusive only. Pick Exclusive display, or another spot." : "Pick a spot and a plan." });
+    res.status(400).json({ error: format?.premium ? "After checkout is exclusive only. Pick Exclusive reserve, or another spot." : "Pick a spot and a plan." });
     return;
   }
   if (body.terms !== true) {
@@ -170,7 +173,7 @@ router.post("/v1/buy/order", express.json({ limit: "16kb" }), async (req, res): 
   }
   const origin = `https://${req.get("host") ?? "birchreserve.net"}`;
   const rows: Array<[string, string]> = [
-    ["Plan", `${plan!.name} (${plan!.price})`],
+    ["Plan", `${plan!.name} (${buyPlans(parseReserveCurrency(body.currency) ?? decideCurrency(req).currency).find((p) => p.key === plan!.key)!.price})`],
     ["Where it shows", format!.label],
     ["Company", acct.c],
     ["Name", acct.n],
@@ -185,20 +188,22 @@ router.post("/v1/buy/order", express.json({ limit: "16kb" }), async (req, res): 
   void sendSalesAlert({ event: plan!.pay === "card" ? "seat_hold" : "inquiry", title: `/buy ${plan!.name}: ${acct.c}`, rows, replyTo: acct.e, isTest }).catch((err) =>
     logger.warn({ err }, "buy sales alert failed"),
   );
-  if (plan!.pay === "invoice") {
+  // Charge the currency the page showed (sent by the page), else the visitor's geo currency.
+  const currency: ReserveCurrency = parseReserveCurrency(body.currency) ?? decideCurrency(req).currency;
+  if (plan!.pay === "reserve") {
     void sendIntake({
       kind: "premium_inquiry", email: acct.e, name: acct.n, company: acct.c, website: acct.w, path: BUY_PATH,
-      message: `Exclusive display via /buy. Slot: ${format!.label}. ${crv ? `Creative ${crv.id} held for review.` : "Creative: sending later."} Email vs website: ${acct.d}.`,
+      message: `Exclusive reserve via /buy (${currency.toUpperCase()}; card checkout opens next). Slot: ${format!.label}. ${crv ? `Creative ${crv.id} held for review.` : "Creative: sending later."} Email vs website: ${acct.d}.`,
       meta: { buy_order_id: orderId, format_pref: format!.key, creative_id: crv?.id ?? "later", domain_check: acct.d, is_test: isTest },
     }).catch((err) => logger.warn({ err }, "buy intake failed"));
-    res.json({ ok: true, order_id: orderId, next: "invoice" });
+    res.json({ ok: true, order_id: orderId, next: "reserve", reserve: { brand: acct.c, email: acct.e, category: "", agree: true, currency } });
     return;
   }
   res.json({
     ok: true,
     order_id: orderId,
     next: "checkout",
-    checkout: { sku: plan!.key, brand: acct.c, email: acct.e, website_url: acct.w, format_pref: format!.key, currency: "usd", idempotency_key: `buy-${orderId}` },
+    checkout: { sku: plan!.key, brand: acct.c, email: acct.e, website_url: acct.w, format_pref: format!.key, currency, idempotency_key: `buy-${orderId}` },
   });
 });
 
@@ -236,7 +241,7 @@ buyStaffRouter.get("/api/sales/buy-creatives/:id", requireSalesStaff, async (req
 
 /* ------------------------------------------------------------------ page */
 const TITLE = "Buy Scale Health ads through Birch Reserve";
-const DESCRIPTION = "Set up your account, upload your ad and pick where it shows. Pay by card with Stripe, or get an invoice for exclusive display. USD.";
+const DESCRIPTION = "Set up your account, upload your ad and pick where it shows. Pay by card with Stripe: a 7-day look, a shared reserve, or the exclusive reserve that locks your category. USD or CAD.";
 
 const MOCK: Record<string, string> = {
   recovery_plan: `<div class="mk"><i class="l w7"></i><i class="l w5"></i><b class="ad">Your ad</b><i class="l w6"></i></div>`,
@@ -297,26 +302,29 @@ footer{border-top:1px solid #d8dccf;margin-top:30px;padding:20px 0 36px;font-siz
  * now be sent later (nothing runs until a person approves it). Answers are kept in this browser until the order
  * is sent; Back on every step; inline checks; a clear success screen with what happens next.
  */
-export function renderBuyPage(opts: { checkoutLive: boolean; plan?: unknown; prefill?: import("../lib/buyFlow").BuyPrefill | null }): string {
+export function renderBuyPage(opts: { checkoutLive: boolean; plan?: unknown; prefill?: import("../lib/buyFlow").BuyPrefill | null; currency?: ReserveCurrency; query?: Record<string, unknown> }): string {
+  const currency: ReserveCurrency = opts.currency ?? "usd";
+  const C = currency.toUpperCase();
+  const PLANS_NOW = buyPlans(currency);
   const pf = opts.prefill ?? {};
   const val = (v?: string) => (v ? ` value="${esc(v)}"` : "");
   // ?plan= preselects a plan (deep links from the kit / media kit). Unknown values keep the default.
   const pre = findPlan(opts.plan)?.key ?? BUY_PLANS[0]!.key;
   const formats = BUY_FORMATS.map(
-    (f, i) => `<label class="pick" data-premium="${f.premium ? 1 : 0}"><input type="radio" name="format" value="${f.key}"${i === 0 ? " checked" : ""}>${MOCK[f.key] ?? ""}<strong>${esc(f.label)}</strong><small>${esc(f.hint)}</small>${f.premium ? `<span class="lock">Pick Exclusive display above to use this spot</span>` : ""}</label>`,
+    (f, i) => `<label class="pick" data-premium="${f.premium ? 1 : 0}"><input type="radio" name="format" value="${f.key}"${i === 0 ? " checked" : ""}>${MOCK[f.key] ?? ""}<strong>${esc(f.label)}</strong><small>${esc(f.hint)}</small>${f.premium ? `<span class="lock">Pick Exclusive reserve above to use this spot</span>` : ""}</label>`,
   ).join("");
-  const plans = BUY_PLANS.map(
-    (p) => `<label class="pick" data-pay="${p.pay}"><input type="radio" name="plan" value="${p.key}"${p.key === pre ? " checked" : ""}><span class="price">${esc(p.price)}</span><strong>${esc(p.name)}</strong><small>${esc(p.line)}</small><span class="tag">${p.pay === "card" ? "Card" : "Invoice"}</span></label>`,
+  const plans = PLANS_NOW.map(
+    (p) => `<label class="pick" data-pay="${p.pay}"><input type="radio" name="plan" value="${p.key}"${p.key === pre ? " checked" : ""}><span class="price">${esc(p.price)}</span><strong>${esc(p.name)}</strong><small>${esc(p.line)}</small><span class="tag">${p.pay === "card" ? "Card" : "Card · locks category"}</span></label>`,
   ).join("");
-  const planMeta = Object.fromEntries(BUY_PLANS.map((p) => [p.key, { name: p.name, price: p.price, pay: p.pay }]));
+  const planMeta = Object.fromEntries(PLANS_NOW.map((p) => [p.key, { name: p.name, price: p.price, pay: p.pay }]));
   const formatMeta = Object.fromEntries(BUY_FORMATS.map((f) => [f.key, f.label]));
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(TITLE)} | Birch Reserve</title><meta name="description" content="${esc(DESCRIPTION)}">
 ${publicSeoTags(BUY_PATH, TITLE, DESCRIPTION)}
-<link rel="icon" href="/favicon.svg"><style>${TOKENS_CSS}${CSS}${BUYER_HEADER_CSS}</style></head><body>
-${buyerHeaderHtml("buy")}
+<link rel="icon" href="/favicon.svg"><style>${TOKENS_CSS}${CSS}${BUYER_HEADER_CSS}${PRICE_LADDER_CSS}</style></head><body>
+${buyerHeaderHtml("buy", currencyToggleHtml(currency, (c) => currencyHref("/buy", opts.query ?? {}, c)))}
 <main class="wrap">
-<section class="hero"><h1>${esc(BUY_TAGLINE)}</h1><p class="lede">3 short steps · about 1 minute · USD · nothing runs until a person approves your ad</p>
+<section class="hero"><h1>${esc(BUY_TAGLINE)}</h1><p class="lede">3 short steps · about 1 minute · ${C} · nothing runs until a person approves your ad</p>
 <div class="prog" id="prog" aria-live="polite"><div class="row"><span id="prog-n">Step 1 of 3</span><span id="prog-t">Your plan</span></div><div class="bar" role="progressbar" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1" id="prog-bar"><i style="width:33%"></i></div></div></section>
 
 <form class="card step on" id="s1" data-step="1" novalidate><h2>Pick your plan</h2>
@@ -348,13 +356,13 @@ ${buyerHeaderHtml("buy")}
 <details class="ex"><summary>Example: what your ad looks like on a hub</summary><figure style="margin:8px 0 0"><img src="/ads-examples/hub-example-sole.webp" width="1280" height="720" loading="lazy" alt="Example: a sample ad shown inside a partner hub page, marked Sponsored" style="width:100%;height:auto;border-radius:10px;border:1px solid #e5e7eb"><figcaption class="hint">Illustration only, not a live placement. Ads run on a partner hub only once that hub is approved for ads.</figcaption></figure></details>
 <p class="msg" id="s2b-msg" role="status" aria-live="polite"></p>
 <div class="sum" id="sum" data-testid="buy-summary"></div>
-<label class="check"><input type="checkbox" id="b-terms" required><span>I agree to the <a href="/terms" target="_blank" rel="noopener">terms</a>. My ad is reviewed before it runs.</span></label>
+<label class="check"><input type="checkbox" id="b-terms" required><span>I agree to the <a href="/terms" target="_blank" rel="noopener">terms</a> (for Exclusive, the <a href="/terms#exclusive" target="_blank" rel="noopener">reserve terms</a>). My ad is reviewed before it runs.</span></label>
 <span class="fe" id="e-terms"></span>
 <div data-promo-box></div>
 <div class="actions"><button class="back" type="button" data-back="2">← Back</button><button class="btn alt" id="s3-go" type="submit">${opts.checkoutLive ? "Continue to secure checkout" : "Send my order"}</button></div>
 <p class="msg" id="s3-msg" role="status" aria-live="polite"></p>
-<ul class="trust"><li>Card checkout by Stripe</li><li>Bank check when your bank asks</li><li>Ad reviewed by a person</li><li>USD</li></ul>
-<details><summary>Small print</summary><ul><li>Card plans open Stripe Checkout. Stripe verifies the card and screens for fraud; your bank may ask you to confirm.</li><li>The $490 reserve is 100% media credit, refundable until 14 days before launch. The $190 look converts in full to the reserve within 7 days, or is refunded.</li><li>Exclusive display is one brand per category for its term. We send an insertion order and an invoice (card, cheque or wire). No card today.</li><li>Your ad shows inside private retail hubs. Placement is named in your insertion order before anything runs.</li><li>No impression guarantee. Aggregate reporting only. No patient data.</li></ul></details></form>
+<ul class="trust"><li>Card checkout by Stripe</li><li>Bank check when your bank asks</li><li>Ad reviewed by a person</li><li>Prices and checkout in ${C}</li></ul>
+<details><summary>Small print</summary><ul><li>Card plans open Stripe Checkout. Stripe verifies the card and screens for fraud; your bank may ask you to confirm.</li><li>The $490 reserve is 100% media credit, refundable until 14 days before launch. The $190 look converts in full to the reserve within 7 days, or is refunded.</li><li>The exclusive reserve is ${PLANS_NOW.find((p) => p.key === "exclusive")!.price} by card. It locks one exclusive display package in your category ($5K–$50K ${C}) at 25% below the regular rate, counted in full; the insertion order names the hub and dates. <a href="/terms#exclusive" target="_blank" rel="noopener">Reserve terms</a>. Premium slots ($25K–$50K) are by inquiry.</li><li>Your ad shows inside private retail hubs. Placement is named in your insertion order before anything runs.</li><li>No impression guarantee. Aggregate reporting only. No patient data.</li></ul></details></form>
 
 <div class="card done-box" id="done" role="status"><h2 id="done-h">Got it.</h2><p id="done-p"></p><p class="sub">What happens next</p><ol id="done-next"><li>We email your insertion order within 1 business day. It names the hub, placement and dates.</li><li>A person checks your ad. No ad yet? Reply to that email with it.</li><li>You approve the insertion order. Then it runs.</li></ol><div class="actions"><a class="btn" href="/media-kit">See the media kit</a><a class="back" href="/" style="display:inline-flex;align-items:center;text-decoration:none">Back to Birch Reserve</a></div></div>
 </main>
@@ -362,7 +370,7 @@ ${buyerHeaderHtml("buy")}
 ${PROMO_SCRIPT_TAG}
 <script>
 (function(){var acct=null,crv=null,live=${opts.checkoutLive ? "true" : "false"},cur=1,hasPf=${opts.prefill ? "true" : "false"};
-var PLANS=${JSON.stringify(planMeta).replaceAll("<", "\\u003c")},FORMATS=${JSON.stringify(formatMeta).replaceAll("<", "\\u003c")};
+var CUR=${JSON.stringify(currency)},PLANS=${JSON.stringify(planMeta).replaceAll("<", "\\u003c")},FORMATS=${JSON.stringify(formatMeta).replaceAll("<", "\\u003c")};
 var TITLES=["Your plan","Your details","Your ad + confirm"],KEY="br-form:buy",SKEY="br-buy-session";
 function $(id){return document.getElementById(id)}
 function msg(el,t,err){el.textContent=t||"";el.className="msg"+(t?(err?" err":" ok"):"")}
@@ -375,7 +383,7 @@ function pick(name){var x=document.querySelector("input[name="+name+"]:checked")
 function fields(){var f=$("s2");return{name:f.name.value,email:f.email.value,company:f.company.value,website:f.website.value}}
 function save(){try{var d=fields();d.plan=pick("plan");d.format=pick("format");localStorage.setItem(KEY,JSON.stringify({at:Date.now(),v:d}));sessionStorage.setItem(SKEY,JSON.stringify({acct:acct,crv:crv,step:cur}))}catch(_){}}
 function clearSave(){try{localStorage.removeItem(KEY);sessionStorage.removeItem(SKEY)}catch(_){}}
-function summary(){var p=PLANS[pick("plan")]||{},d=fields(),later=pick("admode")==="later";$("sum").innerHTML="";var add=function(k,v){var r=document.createElement("div");var b=document.createElement("b");b.textContent=k+": ";r.appendChild(b);r.appendChild(document.createTextNode(v));$("sum").appendChild(r)};add("Plan",(p.name||"")+" · "+(p.price||""));add("Where it shows",FORMATS[pick("format")]||"");add("For",(d.company||"")+" · "+(d.email||""));add("Your ad",later?"Sending later":(crv?"Uploaded, held for review":"Not uploaded yet"));var e=document.createElement("a");e.href="#";e.textContent="Change plan";e.onclick=function(ev){ev.preventDefault();step(1)};$("sum").appendChild(e);$("s3-go").textContent=p.pay==="invoice"?"Request invoice →":(live?"Continue to secure checkout · "+(p.price||""):"Send my order →")}
+function summary(){var p=PLANS[pick("plan")]||{},d=fields(),later=pick("admode")==="later";$("sum").innerHTML="";var add=function(k,v){var r=document.createElement("div");var b=document.createElement("b");b.textContent=k+": ";r.appendChild(b);r.appendChild(document.createTextNode(v));$("sum").appendChild(r)};add("Plan",(p.name||"")+" · "+(p.price||""));add("Where it shows",FORMATS[pick("format")]||"");add("For",(d.company||"")+" · "+(d.email||""));add("Your ad",later?"Sending later":(crv?"Uploaded, held for review":"Not uploaded yet"));var e=document.createElement("a");e.href="#";e.textContent="Change plan";e.onclick=function(ev){ev.preventDefault();step(1)};$("sum").appendChild(e);$("s3-go").textContent=p.pay==="reserve"?"Continue to secure checkout · "+(p.price||""):(live?"Continue to secure checkout · "+(p.price||""):"Send my order →")}
 // restore: kit prefill wins for contact fields; plan from the URL wins for the plan.
 (function(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o&&o.v&&Date.now()-o.at<6048e5){var f=$("s2"),v=o.v,any=false;["name","email","company","website"].forEach(function(k){if(v[k]&&!f[k].value){f[k].value=String(v[k]).slice(0,300);any=true}});if(v.format){var fm=document.querySelector("input[name=format][value='"+String(v.format).replace(/[^a-z_]/g,"")+"']");if(fm)fm.checked=true}if(v.plan&&!/[?&]plan=/.test(location.search)){var pl=document.querySelector("input[name=plan][value='"+String(v.plan).replace(/[^a-z0-9-]/g,"")+"']");if(pl)pl.checked=true}if(any&&!hasPf)$("saved").classList.add("on")}}catch(_){}
 try{var q=JSON.parse(sessionStorage.getItem("br_quick_reserve")||"null");if(q){var f2=$("s2");if(q.brand&&!f2.company.value)f2.company.value=String(q.brand).slice(0,160);if(q.email&&!f2.email.value)f2.email.value=String(q.email).slice(0,200)}}catch(_){}
@@ -401,9 +409,10 @@ try{var r=await fetch("/v1/buy/creative",{method:"POST",headers:{"content-type":
 $("b-terms").addEventListener("change",function(){if(this.checked)$("e-terms").textContent=""});
 s3.addEventListener("submit",async function(e){e.preventDefault();var m=$("s3-msg"),b=$("s3-go"),later=pick("admode")==="later";if(!acct){msg(m,"");step(2);msg($("s2-msg"),"Press Next to confirm your details.",true);return}if(!later&&!crv){msg(m,"Upload your ad, or pick Send it later.",true);drop.scrollIntoView({behavior:"smooth",block:"center"});return}if(!$("b-terms").checked){$("e-terms").textContent="Tick the box to agree to the terms.";$("b-terms").focus();return}
 b.disabled=true;msg(m,"Saving your order…");var plan=pick("plan"),fmt=pick("format");
-try{var r=await post("/v1/buy/order",JSON.stringify({account:acct,creative:later?null:crv,creative_later:later,plan:plan,format:fmt,terms:true}));if(!r.ok){if(r.status===401){acct=null;msg(m,"");step(2);msg($("s2-msg"),"Your session timed out. Press Next to refresh it. Your answers are still here.",true);b.disabled=false;return}msg(m,r.body.error||"That didn't work. Try again.",true);b.disabled=false;return}
+try{var r=await post("/v1/buy/order",JSON.stringify({account:acct,creative:later?null:crv,creative_later:later,plan:plan,format:fmt,terms:true,currency:CUR}));if(!r.ok){if(r.status===401){acct=null;msg(m,"");step(2);msg($("s2-msg"),"Your session timed out. Press Next to refresh it. Your answers are still here.",true);b.disabled=false;return}msg(m,r.body.error||"That didn't work. Try again.",true);b.disabled=false;return}
 if(r.body.next==="checkout"&&r.body.checkout){msg(m,"Opening secure checkout…");var c=await post("/v1/checkout",JSON.stringify(r.body.checkout));if(c.body.checkout_url){save();location.assign(c.body.checkout_url);return}if(c.body.order_id){finish("Order saved.","No card was charged. We'll confirm by email or call (647) 931-6278. Ref "+r.body.order_id.slice(0,8)+".");return}msg(m,c.body.error||"Checkout could not open. Call (647) 931-6278.",true);b.disabled=false;return}
-finish("Invoice on the way.","We'll send your insertion order and invoice within 1 business day. Your ad is held for review. No card was charged. Ref "+r.body.order_id.slice(0,8)+".")}catch(_){msg(m,"Network problem. No payment was taken. Try again.",true);b.disabled=false}});
+if(r.body.next==="reserve"&&r.body.reserve){msg(m,"Opening secure checkout…");var x=await post("/v1/exclusive/reserve",JSON.stringify(r.body.reserve));if(x.body.url){save();location.assign(x.body.url);return}if(x.body.held){finish("Request received.",x.body.message+" Ref "+r.body.order_id.slice(0,8)+".");return}msg(m,x.body.error||"Checkout could not open. Call (647) 931-6278.",true);b.disabled=false;return}
+finish("Order received.","We'll be in touch within 1 business day. Your ad is held for review. No card was charged. Ref "+r.body.order_id.slice(0,8)+".")}catch(_){msg(m,"Network problem. No payment was taken. Try again.",true);b.disabled=false}});
 function finish(h,p){clearSave();["s1","s2","s3"].forEach(function(id){$(id).classList.remove("on")});$("prog-n").textContent="Done";$("prog-t").textContent="Order received";$("prog-bar").firstChild.style.width="100%";$("done-h").textContent=h;$("done-p").textContent=p;$("done").classList.add("on");$("done").scrollIntoView({behavior:"smooth"})}
 if(/[?&]checkout=cancelled/.test(location.search)){step(acct?3:1,true);msg($("s"+(acct?3:1)+"-msg"),"Checkout was cancelled. No payment was taken. Your answers are still here.",false)}
 else if(acct){step(3,true)}
@@ -419,8 +428,9 @@ router.get(["/buy", "/buy/"], (req, res): void => {
     res.setHeader("Cache-Control", "private, no-store");
     res.setHeader("X-Robots-Tag", "noindex");
     res.setHeader("Referrer-Policy", "no-referrer");
-  } else res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
-  res.type("html").send(renderBuyPage({ checkoutLive: isReserveCheckoutConfigured(), plan: req.query.plan, prefill }));
+  } else res.setHeader("Cache-Control", "private, no-cache");
+  const currency = pageCurrency(req, res).currency;
+  res.type("html").send(renderBuyPage({ checkoutLive: isReserveCheckoutConfigured(), plan: req.query.plan, prefill, currency, query: req.query as Record<string, unknown> }));
 });
 
 export default router;

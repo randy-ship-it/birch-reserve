@@ -21,7 +21,8 @@ import { getStripeClient } from "../lib/stripeClient";
 import { logger } from "../lib/logger";
 import { coarseRegion, recordPulse } from "../lib/activityPulse";
 import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
-import { PUBLIC_CAD_ENABLED } from "../lib/currency";
+import { decideCurrency, pageCurrency } from "../lib/currency";
+import { PRICE_LADDER_CSS, currencyHref, currencyToggleHtml, priceLadder, priceLadderHtml } from "../lib/priceLadder";
 import { payoutAmount, payoutRegionForCountry, payoutUsNote, type PayoutRegion } from "../lib/payoutCurrency";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
 import {
@@ -46,14 +47,9 @@ function esc(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
 
+/** Visitor currency (same decision as /buycalc, /buy, /exclusive: ?currency, cookie, Canada → CAD, else USD). */
 export function pickCurrency(req: Request): Currency {
-  // USD only until the CAD checkout is tested (Randy, Nov 16 2026), same switch as /buycalc.
-  if (!PUBLIC_CAD_ENABLED) return "usd";
-  const q = String(req.query.currency ?? "").toLowerCase();
-  if (q === "cad" || q === "usd") return q;
-  const cookie = /(?:^|;\s*)br_currency=(cad|usd)/i.exec(req.headers.cookie ?? "");
-  if (cookie?.[1]) return cookie[1].toLowerCase() as Currency;
-  return String(req.headers["x-vercel-ip-country"] ?? "").toUpperCase() === "CA" ? "cad" : "usd";
+  return decideCurrency(req).currency;
 }
 
 function price(usd: number, currency: Currency): string {
@@ -64,8 +60,7 @@ function fmt(n: number): string {
   return Math.round(n).toLocaleString("en-US");
 }
 
-function shell(title: string, description: string, path: string, currency: Currency, body: string): string {
-  const other: Currency = currency === "cad" ? "usd" : "cad";
+function shell(title: string, description: string, path: string, currency: Currency, body: string, query: Record<string, unknown> = {}): string {
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(description)}"><meta name="robots" content="noindex,nofollow">
@@ -100,8 +95,8 @@ form.dep input,form.dep select{width:100%;padding:10px;border:1px solid #b9c1c9;
 .ok{background:#BFF3D6;color:#0B6B43;font-weight:600;padding:8px 14px;border-radius:8px;margin:12px 0}.urg{font-weight:600;color:#3b4a12}
 form.dep.wide{max-width:none}.dep .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.dep .row{grid-template-columns:1fr}}
 .lede{font-size:1.05rem;margin:.2em 0 1em}.boxes{margin-top:18px;border-top:1px solid #ccd2d8}.boxes details{border-bottom:1px solid #ccd2d8;padding:14px 0}.boxes summary{cursor:pointer;font:400 1.25rem Fraunces,serif;list-style:none;display:flex;justify-content:space-between}.boxes summary::-webkit-details-marker{display:none}.boxes summary::after{content:"+";font-size:1.5rem;line-height:1}.boxes details[open] summary::after{content:"\\2212"}.stats.pay .btn{display:inline-block;margin-top:10px}label.pack{cursor:pointer}label.pack.on{border:2px solid #071A39}.amt small{font-size:.9rem}.sr{position:absolute;top:0;left:0;opacity:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}label.pack{position:relative;cursor:pointer}label.pack.on{outline:3px solid #9fd13a;outline-offset:-1px}.pack .pick{margin-top:auto;font-weight:700;font-size:.85rem;opacity:.75}.pack.on .pick{opacity:1}.sp-step{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#4d5b6a;margin:4px 0 0}.sp-hint{font-weight:600;color:#24412a;margin:2px 0 6px}.sp-go{width:100%;min-height:54px;font-size:1.05rem!important;margin-top:4px}.sp-err{color:#a12b1f;font-weight:600;font-size:.88rem;display:block;margin-top:2px}.sp-err:empty{display:none}#prepay input[aria-invalid=true]{border-color:#a12b1f}
-form.dep>button[type=submit]{justify-self:start;width:auto;max-width:100%}@media(max-width:640px){form.dep>button[type=submit]{justify-self:stretch}}${TOKENS_CSS}${BUYER_HEADER_CSS}</style></head><body>
-${buyerHeaderHtml(path === "/sponsor" ? "sponsor" : null, `<span class="cur">Prices in ${currency.toUpperCase()}${PUBLIC_CAD_ENABLED ? ` · <a href="?currency=${other}">Show ${other.toUpperCase()}</a>` : ""}</span>`)}
+form.dep>button[type=submit]{justify-self:start;width:auto;max-width:100%}@media(max-width:640px){form.dep>button[type=submit]{justify-self:stretch}}${TOKENS_CSS}${BUYER_HEADER_CSS}${PRICE_LADDER_CSS}</style></head><body>
+${buyerHeaderHtml(path === "/sponsor" ? "sponsor" : null, currencyToggleHtml(currency, (c) => currencyHref(path, query, c)))}
 <main><div data-promo-box="success"></div>${body}</main>
 ${PROMO_SCRIPT_TAG}
 <footer class="fine">${esc(SELLER)} · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></footer>
@@ -140,7 +135,8 @@ export type SponsorPageOpts = {
   payout?: PayoutRegion; open?: boolean; pack?: string | null; prefill?: { email?: string; company?: string } | null; status?: string | null; sessionId?: string | null };
 
 /** /sponsor (Randy, Nov 20 2026 audit #6): three packs, each "Prepay $X". USD only. */
-export function sponsorHtml(_currency: Currency, opts: SponsorPageOpts = {}): string {
+export function sponsorHtml(visitorCurrency: Currency, opts: SponsorPageOpts = {}): string {
+  // Packs are priced and charged in USD for everyone (Nov 20 2026). The look / reserve / exclusive ladder follows the visitor.
   const currency: Currency = "usd";
   const open = opts.open ?? false;
   const picked = DEPOSIT_TIERS.find((t) => t.key === opts.pack)?.key ?? DEPOSIT_TIERS[1]!.key;
@@ -175,6 +171,8 @@ ${(() => { const amt = money(DEPOSIT_TIERS.find((t) => t.key === picked)!.usd, c
 <div class="stats pay" data-testid="payout-key-figures">
 <div class="stat"><span class="fine">Clinics and studios earn</span><b>${payoutAmount(SMB_LADDER[0]!.cashCad, payout)}</b>cash, or ${payoutAmount(SMB_LADDER[0]!.creditCad, payout, true)} in ad credit<br><a class="btn" href="https://scalehealth.ca/clinichubs">Open a Clinic Hub</a></div>
 </div>
+<p class="fine" data-testid="packs-usd-note">Sponsor packs are priced and charged in USD.${visitorCurrency === "cad" ? " The steps below are in CAD." : ""}</p>
+${priceLadderHtml(visitorCurrency, { title: "Or start smaller" })}
 <div class="boxes">
 <details><summary>How it works</summary><ol class="steps">
 <li><strong>Prepay</strong><br>Pick a pack. Stripe hosts the card payment.</li>
@@ -242,8 +240,8 @@ ${statsStrip()}
 <p class="fine mf">${MODELLED_FOOTER}</p>
 <h2>Ways to buy</h2>
 <ul>
-<li>Sponsorship credit: ${DEPOSIT_TIERS.map((t) => `${price(t.usd, currency)} (+${t.bonusPct}% credit)`).join(" · ")} or your own amount. <a href="/sponsor?currency=${currency}">Sponsor</a></li>
-<li>7-day look: ${price(190, currency)} · Shared category reserve: ${price(490, currency)} (does not lock the category). <a href="/buycalc">Calculator</a></li>
+<li>Sponsorship credit (USD): ${DEPOSIT_TIERS.map((t) => `${money(t.usd, "usd")} (+${t.bonusPct}% credit)`).join(" · ")} or your own amount. <a href="/sponsor">Sponsor</a></li>
+<li>${priceLadder(currency).map((s) => `${s.name}: ${s.price}`).join(" · ")} (the exclusive reserve locks a $5K–$50K ${currency.toUpperCase()} package; the shared reserve does not lock the category). <a href="/buycalc">Calculator</a> · <a href="/exclusive">Exclusive</a></li>
 <li>Multi-hub or annual programs: book a call at <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></li>
 </ul>
 <h2>What to send</h2>
@@ -252,7 +250,7 @@ ${statsStrip()}
 }
 
 router.get(["/sponsor", "/sponsor/"], (req: Request, res: Response) => {
-  const currency = pickCurrency(req);
+  const currency = pageCurrency(req, res).currency;
   // The payout table varies by visitor country, so no shared cache may serve one country's copy to another.
   const payout = payoutRegionForCountry(req.headers["x-vercel-ip-country"]);
   res.vary("x-vercel-ip-country");
@@ -267,13 +265,13 @@ router.get(["/sponsor", "/sponsor/"], (req: Request, res: Response) => {
   }
   const status = req.query.deposit === "success" ? "success" : req.query.deposit === "cancelled" ? "cancelled" : null;
   const pack = typeof req.query.pack === "string" ? req.query.pack : null;
-  res.type("html").send(shell("Sponsorship packs — Birch Reserve", "Prepay a $1,500, $3,000 or $6,000 USD sponsorship pack with up to 15% bonus media credit. Card now, insertion order before anything runs.", "/sponsor", currency, sponsorHtml(currency, { open: sponsorDepositsOpen(), pack, prefill, status, payout, sessionId: typeof req.query.session_id === "string" && /^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(req.query.session_id) ? req.query.session_id : null })));
+  res.type("html").send(shell("Sponsorship packs — Birch Reserve", "Prepay a $1,500, $3,000 or $6,000 USD sponsorship pack with up to 15% bonus media credit. Card now, insertion order before anything runs.", "/sponsor", currency, sponsorHtml(currency, { open: sponsorDepositsOpen(), pack, prefill, status, payout, sessionId: typeof req.query.session_id === "string" && /^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(req.query.session_id) ? req.query.session_id : null }), req.query as Record<string, unknown>));
 });
 
 router.get(["/kit", "/kit/"], (req: Request, res: Response) => {
-  const currency = pickCurrency(req);
+  const currency = pageCurrency(req, res).currency;
   res.set("Cache-Control", "private, no-cache");
-  res.type("html").send(shell("Marketing kit — Birch Reserve", "Per-hub display inventory, modelled impressions and pricing for Birch Reserve.", "/kit", currency, kitHtml(currency)));
+  res.type("html").send(shell("Marketing kit — Birch Reserve", "Per-hub display inventory, modelled impressions and pricing for Birch Reserve.", "/kit", currency, kitHtml(currency), req.query as Record<string, unknown>));
 });
 
 export type DepositRequest = { tier?: string; amount?: number; currency?: string; brand?: string; email?: string; agree?: boolean };

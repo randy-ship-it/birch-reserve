@@ -22,6 +22,7 @@ import { DoorRoute } from "@/components/br/door-route";
 import { Details } from "@/components/br/details";
 import { AnnotatedHubMock, NextStep } from "@/components/br/next-step";
 import { KitBuilder } from "@/components/br/kit-builder";
+import { PriceLadder } from "@/components/br/price-ladder";
 import { BirchAdSlot } from "@/components/br/birch-ad-slot";
 import { AvailabilityStrip, CategoryRequestForm, FaceBeforeFlight, FounderNote, NETWORK_HUBS, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import {
@@ -232,6 +233,7 @@ export default function BrMediaKit() {
       {/* How to start */}
       <section id="start-small" className="scroll-mt-20 border-b border-border/70 bg-background">
         <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14">
+          <PriceLadder />
           {/* Collapsed: NextStep above already shows the $190/$490 and mid-tier cards (no duplicate blocks). */}
           <Details label="Compare every small package side by side" testId="mk-start-small-compare">
             <StartSmall page="media-kit" id="start-small-tiers" heading={false} />
@@ -291,12 +293,12 @@ export default function BrMediaKit() {
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-foreground/55">{MEDIA_KIT_OFFERS.look.name}</p>
-                <p className="mt-1 font-display text-4xl leading-none">{usd(MEDIA_KIT_OFFERS.look.spendUsd)} <span className="text-lg">USD</span></p>
+                <p className="mt-1 font-display text-4xl leading-none">{price.look.replace(/ (USD|CAD)$/, "")} <span className="text-lg">{price.look.slice(-3)}</span></p>
                 <p className="mt-1 text-xs text-muted-foreground">Holds your spot 7 days. 100% credit if you reserve within 7 days; otherwise a cash refund.</p>
               </div>
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-foreground/55">{MEDIA_KIT_OFFERS.seat.name}</p>
-                <p className="mt-1 font-display text-4xl leading-none">{usd(MEDIA_KIT_OFFERS.seat.spendUsd)} <span className="text-lg">USD</span></p>
+                <p className="mt-1 font-display text-4xl leading-none">{price.seat.replace(/ (USD|CAD)$/, "")} <span className="text-lg">{price.seat.slice(-3)}</span></p>
                 <p className="mt-1 text-xs text-muted-foreground">Reserves your share of the network. Fully refundable until 14 days before launch. <EstimateTag /> Modelled estimate, not a guarantee: about {impr(seatEx.imprLo)}–{impr(seatEx.imprHi)} impressions at {cpm}.</p>
               </div>
             </div>

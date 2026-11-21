@@ -1,5 +1,5 @@
 /**
- * Visitor currency for the two public SKUs (USD; CAD stays off while PUBLIC_CAD_ENABLED is false).
+ * Visitor currency for the public prices: CAD for Canada, USD elsewhere, switchable.
  *
  * The server decides (GET /api/currency: ?currency, then the br_currency
  * cookie, then Canada -> CAD, else USD). A visible toggle lets anyone switch;
@@ -11,11 +11,10 @@ import { useSyncExternalStore } from "react";
 
 export type Currency = "usd" | "cad";
 /**
- * Randy, Mon Nov 16 2026 8:48 AM ET: USD for everyone until the CAD checkout is
- * tested. Mirrors PUBLIC_CAD_ENABLED in api-server/src/lib/currency.ts. While
- * false, the page always shows and sends the existing USD price (no toggle).
+ * Mirrors PUBLIC_CAD_ENABLED in api-server/src/lib/currency.ts. On since Randy, Nov 21 2026 3:34 PM ET
+ * ("it is based on where you are coming from"): Canada sees CAD, everyone else USD, with a toggle.
  */
-export const PUBLIC_CAD_ENABLED = false;
+export const PUBLIC_CAD_ENABLED = true;
 export const CURRENCIES: readonly Currency[] = PUBLIC_CAD_ENABLED ? (["usd", "cad"] as const) : (["usd"] as const);
 export const CURRENCY_COOKIE = "br_currency";
 
@@ -94,6 +93,12 @@ function start(): void {
       emit({ currency: next, prices });
     })
     .catch(() => undefined);
+}
+
+/** Current visitor currency without subscribing (pair with useCurrency() to re-render on change). */
+export function currentCurrency(): Currency {
+  start();
+  return state.currency;
 }
 
 export function setCurrency(requested: Currency): void {

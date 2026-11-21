@@ -8,14 +8,12 @@ import {
 export const CURRENCY_COOKIE = "br_currency";
 
 /**
- * Randy, Mon Nov 16 2026 8:48 AM ET: quote everyone in USD until the CAD checkout
- * is tested. While this is false every visitor (Canada included, any old
- * br_currency=cad cookie or ?currency=cad link) is shown and checked out on the
- * existing USD price. No Stripe price, webhook or env change: this only picks
- * which of the two existing prices the page shows and sends to checkout.
- * Flip to true once a CAD checkout has been verified end to end.
+ * Randy, Mon Nov 16 2026 8:48 AM ET: USD for everyone until the CAD checkout was tested.
+ * Randy, Sat Nov 21 2026 3:34 PM ET: "it is based on where you are coming from". Currency follows the
+ * visitor: Canada (x-vercel-ip-country CA) sees and pays CAD, everyone else USD, with a visible toggle
+ * that persists (br_currency cookie). CAD uses the existing CAD table ($270 look, $690 reserve).
  */
-export const PUBLIC_CAD_ENABLED = false;
+export const PUBLIC_CAD_ENABLED = true;
 
 /** Currencies advertised on public pages and feeds. CAD stays in the offer table for existing checkouts. */
 export const PUBLIC_CURRENCIES: readonly ReserveCurrency[] = PUBLIC_CAD_ENABLED
@@ -88,4 +86,18 @@ export function decideCurrency(req: Pick<Request, "headers" | "query">): Currenc
 
 export function currencyCookieHeader(currency: ReserveCurrency): string {
   return `${CURRENCY_COOKIE}=${currency}; Path=/; Max-Age=31536000; SameSite=Lax; Secure`;
+}
+
+/**
+ * One call for server-rendered price pages: decide the currency, remember an explicit ?currency= choice,
+ * and tell caches the page varies by visitor country and cookie.
+ */
+export function pageCurrency(
+  req: Pick<Request, "headers" | "query">,
+  res: { append(name: string, value: string): unknown; setHeader(name: string, value: string): unknown },
+): CurrencyDecision {
+  const d = decideCurrency(req);
+  if (d.source === "query") res.append("Set-Cookie", currencyCookieHeader(d.currency));
+  res.setHeader("Vary", "Cookie, x-vercel-ip-country");
+  return d;
 }
