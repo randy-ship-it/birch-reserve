@@ -109,6 +109,10 @@ test("full flow on Postgres: serve → viewable → click → conversion, ledger
   await store.setCreativeStatus(cr.id, "approved", "test");
   await store.updateCampaign(campaign.id, { status: "active", flightStart: new Date(now - 19 * DAY), flightEnd: new Date(now + DAY), clickUrl: "https://brand.com/offer" }, "test");
   resetServeCacheForTests();
+  // Hub guard: SOLE is OFF by default, so nothing serves until Randy or Jon turns it on.
+  const off = await serve({ slot: "sole.post_purchase", vid: "abcdefabcdefabcdef12", ua: UA, origin: "https://birchreserve.net", now });
+  assert.deepEqual(off, { fill: false, reason: "hub_not_enabled" });
+  await store.setHubServing("sole", true, "Randy", "randy@silverbirchgrowth.com", "test: Randy approved");
   // Bots never fill.
   assert.equal((await serve({ slot: "sole.post_purchase", ua: "Googlebot/2.1 (+http://www.google.com/bot.html)", origin: "https://birchreserve.net", now })).fill, false);
   const s = await serve({ slot: "sole.post_purchase", vid: "abcdefabcdefabcdef12", ua: UA, origin: "https://birchreserve.net", now });
@@ -426,6 +430,37 @@ test("stripe replay helpers: claimOnce is one-shot; hold-190 confirmation has no
   assert.match(m.text, /100% credit if you convert within 7 days\. Otherwise it is a cash refund\. It does not lock a category\./);
   assert.match(m.text, /not an impression guarantee/);
   assert.doesNotMatch(m.text + m.html.replace(/<[^>]+>/g, ""), /https?:\/\/|www\./);
+});
+
+test("where ads run: hubs OFF by default; ON needs a Randy/Jon row (audited); OFF again stops serving; marketing slots never auto-move", async () => {
+  const { MARKETING_SLOTS, findSlot } = await import("../src/lib/adserver/config");
+  const db = new PGlite();
+  store.setAdPoolForTests(db as unknown as store.Queryable, "ads_where_test");
+  resetServeCacheForTests();
+  store.resetHubServingCache();
+  const now = Date.now();
+  assert.equal(await store.hubServingEnabled("sole"), false);
+  const { campaign } = await store.createCampaign({ accountEmail: "w@brand.com", brand: "Where Co", orderRef: "cs_where", budgetMicros: 50_000_000, currency: "usd", primaryPlacement: "dashboard", allowSubstitute: true, actor: "test" });
+  const png = Buffer.from("89504e470d0a1a0a0000000d49484452000001f4000001f40806000000", "hex");
+  const cr = await store.addCreative({ campaignId: campaign.id, mime: "image/png", width: 500, height: 500, data: png, alt: "Where Co ad", uploadedBy: "test" });
+  await store.setCreativeStatus(cr.id, "approved", "test");
+  await store.updateCampaign(campaign.id, { status: "active", flightStart: new Date(now - DAY), flightEnd: new Date(now + DAY) }, "test");
+  resetServeCacheForTests();
+  // Auto-move onto a hub landing slot is refused while the hub is off.
+  assert.deepEqual(await serve({ slot: "sole.landing", ua: UA, origin: "https://birchreserve.net", now }), { fill: false, reason: "hub_not_enabled" });
+  // Marketing slots: defined, live, but never reached by auto-move.
+  assert.ok(MARKETING_SLOTS.length >= 4 && MARKETING_SLOTS.every((m) => findSlot(m.key)?.kind === "marketing" && m.partner === ""));
+  assert.equal((await serve({ slot: "mkt-birch.media_kit", ua: UA, origin: "https://birchreserve.net", now })).fill, false);
+  // Randy turns SOLE on: it serves; then off again: refused.
+  await store.setHubServing("sole", true, "Randy", "randy@silverbirchgrowth.com", "Randy approved SOLE");
+  resetServeCacheForTests();
+  assert.equal((await serve({ slot: "sole.landing", ua: UA, origin: "https://birchreserve.net", now })).fill, true);
+  await store.setHubServing("sole", false, "Randy", "randy@silverbirchgrowth.com", null);
+  assert.deepEqual(await serve({ slot: "sole.landing", ua: UA, origin: "https://birchreserve.net", now }), { fill: false, reason: "hub_not_enabled" });
+  const log = await store.auditLog(20);
+  assert.ok(log.some((x) => x.action === "hub.serving_on" && x.target === "sole" && /approved by Randy/.test(x.detail ?? "")));
+  assert.ok(log.some((x) => x.action === "hub.serving_off" && x.target === "sole"));
+  store.setAdPoolForTests(null);
 });
 
 test("new-hub alert: never says open/unclaimed, one per hub per email, unsubscribe turns alerts off", async () => {

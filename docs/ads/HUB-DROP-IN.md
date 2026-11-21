@@ -1,5 +1,10 @@
 # Hub drop-in kit (handoff for hub builders)
 
+> **Paused / not in use (Randy, Nov 21 2026 3:42 PM).** No ads run on any hub today. A hub goes live only after Randy or Jon
+> approves that hub in /ads/admin → "Where ads run" (`ad_hub_serving`, default OFF, audited with who approved it). Until then
+> the ad server answers `{"fill":false,"reason":"hub_not_enabled"}` for every slot on that hub, even if the tag is pasted.
+> Don't send this kit to a hub without that approval.
+
 Send this link: **https://birchreserve.net/ads/hub-kit** (unlisted, `noindex`; mirror https://www.scalehealth.ca/ads/hub-kit).
 This file is the same content for people working in the repo.
 

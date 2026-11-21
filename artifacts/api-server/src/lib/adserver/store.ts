@@ -15,6 +15,7 @@ export function setAdPoolForTests(p: Queryable | null, schema: string | null = n
   poolOverride = p;
   schemaOverride = schema;
   ready = null;
+  hubServingCache = null;
   invAt = 0;
 }
 
@@ -98,6 +99,8 @@ const DDL = (s: string) => [
     status text NOT NULL DEFAULT 'live', is_test boolean NOT NULL DEFAULT false, created_by text, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now())`,
   `ALTER TABLE ${s}.ad_campaigns ADD COLUMN IF NOT EXISTS seller text NOT NULL DEFAULT 'birch'`,
   `ALTER TABLE ${s}.ad_campaigns ADD COLUMN IF NOT EXISTS internal boolean NOT NULL DEFAULT false`,
+  // Per-hub ad serving switch (default OFF). Only Randy or Jon turn it on; every change is a new row (history) + audit line.
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_hub_serving (id bigserial PRIMARY KEY, hub text NOT NULL, enabled boolean NOT NULL, approved_by text NOT NULL, actor text NOT NULL, note text, at timestamptz NOT NULL DEFAULT now())`,
   // Channel is stamped on each charge when it is charged, so editing a campaign's seller / internal flag later never rewrites past lines. NULL (older lines) = brokerage.
   `ALTER TABLE ${s}.ad_ledger ADD COLUMN IF NOT EXISTS channel text`,
   `CREATE TABLE IF NOT EXISTS ${s}.ad_channel_rates (
@@ -397,6 +400,27 @@ export async function reservationForConfirmation(id: string): Promise<{ email: s
   const r = rows[0];
   return r ? { email: String(r.email).toLowerCase(), offerKey: String(r.offer_key), brandName: (r.brand_name as string) ?? null, amountCents: num(r.amount_cents), currency: String(r.currency) } : null;
 }
+export type HubServing = { hub: string; enabled: boolean; approvedBy: string; actor: string; note: string | null; at: Date };
+let hubServingCache: { at: number; map: Map<string, HubServing> } | null = null;
+export function resetHubServingCache(): void { hubServingCache = null; }
+/** Latest switch per hub. Missing = OFF. */
+export async function hubServing(): Promise<Map<string, HubServing>> {
+  if (hubServingCache && Date.now() - hubServingCache.at < 15_000) return hubServingCache.map;
+  const p = await db();
+  const { rows } = await p.query(`SELECT DISTINCT ON (hub) * FROM ${S()}.ad_hub_serving ORDER BY hub, at DESC, id DESC`);
+  const map = new Map<string, HubServing>(rows.map((r) => [String(r.hub), { hub: String(r.hub), enabled: Boolean(r.enabled), approvedBy: String(r.approved_by), actor: String(r.actor), note: (r.note as string) ?? null, at: new Date(String(r.at)) }]));
+  hubServingCache = { at: Date.now(), map };
+  return map;
+}
+export async function hubServingEnabled(hub: string): Promise<boolean> {
+  return (await hubServing()).get(hub)?.enabled === true;
+}
+export async function setHubServing(hub: string, enabled: boolean, approvedBy: "Randy" | "Jon", actor: string, note: string | null): Promise<void> {
+  const p = await db();
+  await p.query(`INSERT INTO ${S()}.ad_hub_serving (hub, enabled, approved_by, actor, note) VALUES ($1,$2,$3,$4,$5)`, [hub, enabled, approvedBy, actor, note]);
+  hubServingCache = null;
+  await audit(actor, enabled ? "hub.serving_on" : "hub.serving_off", hub, `approved by ${approvedBy}${note ? ` · ${note}` : ""}`);
+}
 export async function setCreativeStatus(id: string, status: Creative["status"], actor: string, note: string | null = null): Promise<boolean> {
   const p = await db();
   const { rows } = await p.query(`UPDATE ${S()}.ad_creatives SET status = $2, reviewed_by = $3, reviewed_at = now(), review_note = $4 WHERE id = $1 RETURNING id`, [id, status, actor, note]);
@@ -472,7 +496,7 @@ export async function chargeEvent(eventId: number, c: Campaign, slotKey: string,
     `INSERT INTO ${S()}.ad_ledger AS l (campaign_id, at, kind, bucket, slot_key, partner, units, amount_micros, currency, note, actor, is_test, channel)
      VALUES ($1,$2,'charge',$3,$4,$5,1,$6,$7,$8,'engine',$9,$10)
      ON CONFLICT (bucket) DO UPDATE SET units = l.units + 1, amount_micros = l.amount_micros + EXCLUDED.amount_micros`,
-    [c.id, hour.toISOString(), `charge:${c.id}:${hour.toISOString()}:${slotKey}:${c.pricing}`, slotKey, slot?.partner ?? null, -costMicros, c.currency,
+    [c.id, hour.toISOString(), `charge:${c.id}:${hour.toISOString()}:${slotKey}:${c.pricing}`, slotKey, slot?.partner || null, -costMicros, c.currency,
       `${c.pricing === "cpm" ? "Viewable impressions" : "Clicks"} on ${slot?.label ?? slotKey} (hourly)`, c.isTest, channelOf(c.seller, c.internal)],
   );
   // Fully spent: close the campaign so it stops being a candidate.

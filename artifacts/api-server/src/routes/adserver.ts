@@ -513,7 +513,7 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
           return pend.map((x) => ({ ...x, brand: brand.get(x.campaignId) ?? "", variants: vs.filter((y) => y.creativeId === x.id) }));
         })(),
         creativesByCampaign: byC, slotTotals, ledger: led, royalties: roy, shares, alerts, audit, day: dayT, friday: fridayReady(), schema: store.adSchema(),
-        promoHtml: await promoPanels(), hubs, testRoyalties, summary: realSt.summary, testSummary: testSt.summary, rates, recipients: recips, gates: gateMap, timing, channelRates,
+        promoHtml: await promoPanels(), hubServing: await store.hubServing(), hubs, testRoyalties, summary: realSt.summary, testSummary: testSt.summary, rates, recipients: recips, gates: gateMap, timing, channelRates,
         orders: orders.map((o) => ({ id: o.id, at: o.createdAt, email: o.email, company: o.company, website: o.website, plan: o.plan, format: o.format, creativeId: o.creativeId })),
       }),
     );
@@ -857,6 +857,25 @@ router.post("/ads/admin/hubs", json, (req, res) =>
     await store.upsertContractHub({ key, name, category, url, partner: str(b.partner, 120) || name, contractRef, status: "live", isTest }, who);
     if (!isTest) void alertNewHub(origin(req), key);
     res.json({ message: `${name} is on contract. Its placements are sellable now (slot keys ${key}.landing … ${key}.post_purchase).` });
+  }),
+);
+
+/* Hub ad serving switch (Randy Nov 21 2026 3:43 PM t397u): default OFF; only Randy or Jon may turn a hub on, with a note. Audited. */
+const HUB_APPROVERS: Record<string, "Randy" | "Jon"> = { "randy@silverbirchgrowth.com": "Randy", "randy@scalehealth.ca": "Randy", "john@scalehealth.ca": "Jon" };
+router.post("/ads/admin/hubs/:key/serving", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const hub = String(req.params.key);
+    if (!AD_SLOTS.some((s) => s.hub === hub && s.kind !== "marketing")) return void res.status(404).json({ message: "Unknown hub." });
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const enabled = b.enabled === true || b.enabled === "on";
+    const approver = HUB_APPROVERS[who.toLowerCase()];
+    const note = str(b.note, 300) || null;
+    if (enabled && !approver) return void res.status(403).json({ message: "Only Randy or Jon can turn ads on for a hub." });
+    if (enabled && !note) return void res.status(400).json({ message: "Add a note: who approved it and why (e.g. Randy's message)." });
+    await store.setHubServing(hub, enabled, approver ?? "Randy", who, note);
+    res.json({ message: enabled ? `Ads ON for ${hub} (approved by ${approver}).` : `Ads OFF for ${hub}.` });
   }),
 );
 
