@@ -485,9 +485,12 @@ function ClerkProviderWithRoutes() {
   );
 }
 
+// Pages opened at scalehealth.ca/intake/_m/<path> (checkout returns, receipts) route as /<path>: strip the mirror prefix.
+const mirrorBase = typeof window !== "undefined" && /^\/intake\/_m(?:\/|$)/.test(window.location.pathname) ? "/intake/_m" : "";
+
 function App() {
   return (
-    <WouterRouter base={basePath}>
+    <WouterRouter base={`${basePath}${mirrorBase}`}>
       <ClerkProviderWithRoutes />
     </WouterRouter>
   );
