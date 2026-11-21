@@ -405,7 +405,7 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, desktopInli
       data-blocked={blocked ? "1" : "0"}
       aria-hidden={visible ? undefined : true}
     >
-      <div className={`flex ${inline ? "w-full max-w-md" : "w-[15.5rem] max-w-[calc(100vw-1rem)]"} ${slim ? "min-h-[3rem]" : ""} items-center gap-2 rounded-xl bg-white/80 px-3 py-1.5 shadow-sm ring-1 ring-foreground/5 backdrop-blur md:w-[22rem]`} role="status" aria-live="off">
+      <div className={`flex ${inline ? "w-full max-w-md" : "w-[15.5rem] max-w-[calc(100vw-1rem)]"} ${slim ? "min-h-[3rem]" : ""} items-center gap-2 rounded-xl bg-white/80 px-3 py-1.5 shadow-sm ring-1 ring-foreground/5 backdrop-blur ${desktopInline ? "md:w-[26rem]" : "md:w-[22rem]"}`} role="status" aria-live="off">
         <span className="inline-flex size-1.5 shrink-0 rounded-full bg-lime-500/70" aria-hidden />
         {/* One text flow (no flex gaps between fragments), left-aligned, normal spacing, so it wraps naturally on phones. */}
         <span className={`block min-w-0 flex-1 ${slim ? "line-clamp-2" : "whitespace-normal"} text-left text-[13px] font-normal normal-case tracking-normal opacity-90 transition-opacity ease-out [hyphens:none] [text-align-last:auto] [word-spacing:normal] motion-reduce:transition-none md:text-[13px] ${fading ? "opacity-0" : ""}`} style={{ color: NAVY, lineHeight: 1.35, transitionDuration: `${FADE_MS}ms` }} data-testid="activity-pulse-text">
@@ -427,7 +427,7 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, desktopInli
             </>
           )}
           {" · "}
-          <span className="text-foreground/60">{e.ago}</span>
+          <span className="whitespace-nowrap text-foreground/60">{e.ago}</span>
           <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className={`ml-2 mt-0.5 ${slim ? "hidden" : "inline-flex"} min-h-8 items-center text-left text-[12px] leading-tight text-foreground/55 underline underline-offset-2 hover:text-foreground/70`} data-testid="activity-pulse-hide">
             Hide activity
           </button>
