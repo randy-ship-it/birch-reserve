@@ -51,6 +51,7 @@ import {
   type RandyModelMessage,
   type RandyReplyFailure,
 } from "@/lib/randy-model-client";
+import { startDockYield } from "@/lib/dock-yield";
 import { RichText } from "@/components/randy-rich-text";
 import { SQUIRREL_STYLES, SquirrelBadge } from "@/components/birch-squirrel";
 import { BIRCH_SQUIRREL } from "@/lib/birch-squirrel-config";
@@ -91,7 +92,9 @@ html:has([data-testid="mobile-sticky-reserve-cta"]) { --birch-dock-bottom: calc(
 @media (max-width: 767px) { html:has([data-testid="post-kit-sticky"]) { --birch-dock-bottom: calc(5rem + env(safe-area-inset-bottom)); } }
 @media (max-width: 767px) {
   .birch-dock-squirrel { bottom: calc(var(--birch-dock-bottom) + 4px); right: calc(12px + 56px + 8px); }
-  body { padding-bottom: 76px; }
+  body { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+  .birch-dock-squirrel { transform: scale(0.88); transform-origin: bottom right; }
+  html.br-dock-yield .birch-dock-squirrel, html.br-dock-yield elevenlabs-convai { visibility: hidden !important; pointer-events: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .randy-bob, .randy-teaser, .randy-wave, .randy-chip, .randy-msg, .randy-dot, .randy-ping { animation: none !important; }
@@ -154,6 +157,7 @@ function toHistory(messages: ChatMessage[]): RandyModelMessage[] {
 }
 
 export function RandyChat() {
+  useEffect(() => startDockYield(), []);
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("chat");
   const [messages, setMessages] = useState<ChatMessage[]>([]);

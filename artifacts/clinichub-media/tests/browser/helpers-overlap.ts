@@ -4,9 +4,10 @@ export type Hit = { kind: "overflow" | "overlap" | "clip"; a: string; b?: string
 
 /** Open every <details>, then report horizontal overflow and overlapping / clipped text boxes. Runs in the page. */
 export async function auditPage(page: Page): Promise<Hit[]> {
+  const dockHits = await dockAudit(page);
   await page.evaluate(() => document.querySelectorAll("details").forEach((d) => d.setAttribute("open", "")));
   await page.waitForTimeout(400);
-  return page.evaluate(() => {
+  const main = await page.evaluate(() => {
     const hits: { kind: "overflow" | "overlap" | "clip"; a: string; b?: string; detail: string }[] = [];
     const vw = document.documentElement.clientWidth;
     const de = document.documentElement;
@@ -102,6 +103,52 @@ export async function auditPage(page: Page): Promise<Hit[]> {
           if (hits.length > 60) return hits;
         }
       }
+    }
+    return hits;
+  });
+  return [...dockHits, ...main];
+}
+
+/** Floating dock check (separate pass: it scrolls). */
+async function dockAudit(page: Page): Promise<Hit[]> {
+  return page.evaluate(async () => {
+    const hits: { kind: "overflow" | "overlap" | "clip"; a: string; b?: string; detail: string }[] = [];
+    const vw = document.documentElement.clientWidth;
+    const name = (e: Element) => `${e.tagName.toLowerCase()}${(e.textContent || "").trim().slice(0, 30) ? ":" + (e.textContent || "").trim().slice(0, 30) : ""}`;
+    // Floating dock (squirrel + call button) must not cover a button, link, field, heading or card, on the first screen
+    // and at the bottom of the page. A dock that yielded (visibility hidden) is fine.
+    if (vw <= 767) {
+      const dock = (): DOMRect[] => {
+        const out: DOMRect[] = [];
+        const sq = document.querySelector(".birch-dock-squirrel");
+        if (sq && getComputedStyle(sq).visibility !== "hidden") out.push(sq.getBoundingClientRect());
+        const host = document.querySelector("elevenlabs-convai");
+        if (host && getComputedStyle(host).visibility !== "hidden") {
+          const b = host.shadowRoot?.querySelector("button");
+          out.push(b ? b.getBoundingClientRect() : new DOMRect(vw - 68, innerHeight - 70, 56, 56));
+        }
+        return out.filter((r) => r.width > 0);
+      };
+      const coverable = "a[href],button,input,select,textarea,summary,h1,h2,h3,h4,h5,h6,[role=button]";
+      const check = (where: string) => {
+        for (const d of dock()) {
+          document.querySelectorAll(coverable).forEach((e) => {
+            if (e.closest(".birch-dock-squirrel,elevenlabs-convai,[data-testid^=activity-pulse],[aria-hidden=true],.sr-only")) return;
+            const cs = getComputedStyle(e);
+            if (cs.visibility === "hidden" || cs.display === "none" || cs.position === "fixed" || cs.position === "sticky" || Number(cs.opacity) === 0) return;
+            const r = e.getBoundingClientRect();
+            if (r.width < 4 || r.height < 4 || r.bottom < 0 || r.top > innerHeight) return;
+            const w = Math.min(d.right, r.right) - Math.max(d.left, r.left), h = Math.min(d.bottom, r.bottom) - Math.max(d.top, r.top);
+            if (w > 6 && h > 6) hits.push({ kind: "overlap", a: "dock", b: name(e), detail: `${where}: ${Math.round(w)}x${Math.round(h)}px under the floating dock` });
+          });
+        }
+      };
+      await new Promise((r) => setTimeout(r, 1800)); // let the dock settle / yield
+      check("first screen");
+      scrollTo(0, document.documentElement.scrollHeight);
+      await new Promise((r) => setTimeout(r, 600));
+      check("page bottom");
+      scrollTo(0, 0);
     }
     return hits;
   });
