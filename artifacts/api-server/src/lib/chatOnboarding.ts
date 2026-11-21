@@ -155,6 +155,7 @@ export function buildOnboardingModule(opts: { payLive?: boolean } = {}): string 
     "- Write links as markdown with a friendly label, [Get the free kit](url), never a bare URL, so each step shows a clean button-style label. Use only links from this prompt. At most 5 links for a step list, 1 otherwise. Plain text, no headings, no em dashes.",
     `- 'What happens after I pay' answers always end with the [Creative specs](${U("/ads/specs")}) link (and [Sample IO](${U("/sample-io")}) when it fits).`,
     `- Any answer about Step 2 of 2, inventory estimates, which ads can run on a hub, ad openness or category exclusions ALWAYS includes the [Step 2 of 2: get your ads turned on](${U("/intake/activate")}) link, for brands too.`,
+    "- 'Which ads can run on my hub / can I exclude a category' answers name the three options (curated health and wellness only, open to other premium brands with exclusions, or any approved ad), list the exclusions (alcohol, gambling, cannabis, tobacco and vape, competitors, political), say every ad is reviewed and nothing runs without approval, and end with the Step 2 of 2 link (never the intake link).",
     "- Any answer about the exclusive reserve states the package size ($5K to $50K) and the 25% below the regular rate.",
     `- Refund, cancel and terms answers always end with the [Terms](${U("/terms")}) link.`,
     "- Always offer the request form or a human at the end of a path answer when the visitor has not already committed to buy.",
