@@ -51,6 +51,10 @@ export function CategoriesWeServe({ dark = false }: { dark?: boolean }) {
 }
 
 const landing = RATE_SURFACES.find((s) => s.key === "landing")!;
+const kShort = (n: number) => fmtUsd(n).replace(/,(\d)00$/, ".$1K").replace(/\.0K$/, "K");
+const packRange = `${kShort(DEPOSIT_TIERS[0]!.usd)}–${kShort(DEPOSIT_TIERS[DEPOSIT_TIERS.length - 1]!.usd)}`;
+const packRangeCad = `${kShort(DEPOSIT_TIERS[0]!.cad)}–${kShort(DEPOSIT_TIERS[DEPOSIT_TIERS.length - 1]!.cad)}`;
+const packsCad = DEPOSIT_TIERS.map((t) => `${fmtUsd(t.cad)} (${fmtUsd(Math.round(t.cad * (1 + t.bonusPct / 100)))} credit)`).join(", ");
 const packs = DEPOSIT_TIERS.map((t) => `${fmtUsd(t.usd)} (${fmtUsd(Math.round(t.usd * (1 + t.bonusPct / 100)))} credit)`).join(", ");
 
 /** Evergreen FAQ, answered against the live terms. Not presented as recent or specific brands' questions. */
@@ -70,7 +74,14 @@ function useFaqText(): (text: string) => string {
   const { currency } = useCurrency();
   const t = usePriceText();
   const C = currency.toUpperCase();
-  return (text: string) => t(text).replace("$1,900 exclusive reserve", `$1,900 ${C} exclusive reserve`).replace(/\$5K–\$50K package( in your currency)?/, `$5K–$50K ${C} package`);
+  return (text: string) => {
+    let out = t(text).replace("$1,900 exclusive reserve", `$1,900 ${C} exclusive reserve`).replace(/\$5K–\$50K package( in your currency)?/, `$5K–$50K ${C} package`);
+    if (currency === "cad") {
+      // Packs use the DEPOSIT_TIERS CAD table; amounts with no CAD table keep the number in CAD (Randy, Nov 21 2026).
+      out = out.split(`${packs} USD`).join(`${packsCad} CAD`).split(packRange).join(packRangeCad).replace(/ USD\b/g, " CAD");
+    }
+    return out;
+  };
 }
 
 export function QuestionsBrandsAsk() {
@@ -82,7 +93,7 @@ export function QuestionsBrandsAsk() {
         {BRAND_QUESTIONS.map((x) => (
           <details key={x.q} className="group rounded-2xl bg-white p-4 shadow-sm ring-1 ring-foreground/10" data-testid="brand-question">
             <summary className="flex cursor-pointer list-none items-start justify-between gap-3 text-[15px] font-bold leading-snug text-[#0b1f3a] [&::-webkit-details-marker]:hidden">
-              {x.q}
+              {t(x.q)}
               <ChevronDown className="mt-0.5 size-4 shrink-0 text-[#0b1f3a]/60 transition group-open:rotate-180" aria-hidden />
             </summary>
             <p className="mt-2 text-[13px] leading-relaxed text-foreground/75">{t(x.a)}</p>
@@ -116,7 +127,7 @@ export function CategoryStrip({ className = "", testId = "category-strip" }: { c
   );
 }
 
-const packRange = `${fmtUsd(DEPOSIT_TIERS[0]!.usd).replace(",500", ".5K").replace(/,000$/, "K")}–${fmtUsd(DEPOSIT_TIERS[DEPOSIT_TIERS.length - 1]!.usd).replace(/,000$/, "K")}`;
+
 
 /**
  * Compact 6-question version (Randy Nov 21 10:20 AM): one-line answers, checked against /terms and the live offer.
@@ -139,7 +150,7 @@ export function QuestionsBrandsAskCompact({ className = "", testId = "questions-
       <dl className="mt-3 grid gap-x-6 gap-y-3 md:grid-cols-2">
         {BRAND_QUESTIONS_COMPACT.map((x) => (
           <div key={x.q} className="rounded-2xl bg-white p-3.5 shadow-sm ring-1 ring-foreground/10" data-testid="brand-question-compact">
-            <dt className="text-[14px] font-bold leading-snug text-[#0b1f3a]">{x.q}</dt>
+            <dt className="text-[14px] font-bold leading-snug text-[#0b1f3a]">{t(x.q)}</dt>
             <dd className="mt-1 text-[13px] leading-snug text-foreground/75">{t(x.a)}</dd>
           </div>
         ))}
