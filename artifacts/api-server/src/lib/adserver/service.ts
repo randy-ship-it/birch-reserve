@@ -221,7 +221,7 @@ export async function draftCampaignFromCheckoutSafe(session: Stripe.Checkout.Ses
       }
     }
     try {
-      await afterOrderCampaign(session, { id: r.campaign.id, currency: r.campaign.currency, brand: r.campaign.brand }, isTest);
+      await afterOrderCampaign(session, { id: r.campaign.id, currency: r.campaign.currency, brand: r.campaign.brand, orderKind: r.campaign.orderKind }, isTest);
     } catch (err) {
       await store.audit("stripe-webhook", "promo.error", session.id, err instanceof Error ? err.message : String(err));
     }

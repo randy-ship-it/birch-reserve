@@ -27,7 +27,9 @@ import { buildHoldConfirmationEmail, buildPrepayConfirmationEmail } from "../lib
 import { AD_SLOTS, ALERT_CATEGORIES, AD_DEFAULTS, PROMO_RATE_BPS, isPromoCampaign, MICROS, PLACEMENTS, adminEmails, adsLoginEmailEnabled, findSlot, placementLabel, type Placement } from "../lib/adserver/config";
 import { pixelId, postbackKey, safeEqual, sign, verify } from "../lib/adserver/auth";
 import * as store from "../lib/adserver/store";
-import { maxPoolAllocationBps, recipientsAt } from "../lib/adserver/payoutSplit";
+import { maxPoolAllocationBps, maxReferrerAllocationBps, recipientsAt, splitReferralOrders } from "../lib/adserver/payoutSplit";
+import { listReferralOrders, toLine as toReferralLine } from "../lib/adserver/referrals";
+import { referralAdminHtml } from "../lib/adserver/referralAdmin";
 import { draftCampaignFromCheckoutSafe, recordClick, recordConversion, recordView, serve } from "../lib/adserver/service";
 import { EMBED_JS, PIXEL_JS } from "../lib/adserver/embed";
 import { dashboardPage, loginPage } from "../lib/adserver/accountPage";
@@ -83,6 +85,13 @@ const dntHeader = (req: Request) => req.get("dnt") === "1" || req.get("sec-gpc")
 const promoPanels = async () => {
   const [codes, redemptions, street, qrs] = await Promise.all([promoLib.listCodes(), promoLib.listRedemptions(300), promoLib.streetStats(true), promoLib.listQrs()]);
   return promoAdminHtml({ codes, redemptions, street, qrs }) + hubProofAdminHtml(await listProofs());
+};
+/** Referral orders (QR / street team / partner links) with their commission detail, for the payouts view. */
+const referralPanel = async (recips: Awaited<ReturnType<typeof store.recipientHistory>>) => {
+  const [orders, rates, chRates, members] = await Promise.all([listReferralOrders({ includeTest: true, limit: 2000 }), store.rateHistory(), store.channelRateHistory(), promoLib.members()]);
+  const { detail } = splitReferralOrders(orders.map(toReferralLine), rates, recips, chRates);
+  const refMembers = members.map((m) => ({ id: m.id, label: m.label }));
+  return { referralHtml: referralAdminHtml({ orders, detail, members: refMembers, recipients: recips }), referrers: refMembers };
 };
 const promoAttach = (email: string) => attachPendingForAccount(email).catch(() => 0);
 const noStore = (res: Response) => res.set("Cache-Control", "no-store");
@@ -515,7 +524,7 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
           return pend.map((x) => ({ ...x, brand: brand.get(x.campaignId) ?? "", variants: vs.filter((y) => y.creativeId === x.id) }));
         })(),
         creativesByCampaign: byC, slotTotals, ledger: led, royalties: roy, shares, alerts, audit, day: dayT, friday: fridayReady(), schema: store.adSchema(),
-        promoHtml: await promoPanels(), hubServing: await store.hubServing(), hubs, testRoyalties, summary: realSt.summary, testSummary: testSt.summary, rates, recipients: recips, gates: gateMap, timing, channelRates,
+        promoHtml: await promoPanels(), ...(await referralPanel(recips)), hubServing: await store.hubServing(), hubs, testRoyalties, summary: realSt.summary, testSummary: testSt.summary, rates, recipients: recips, gates: gateMap, timing, channelRates,
         orders: orders.map((o) => ({ id: o.id, at: o.createdAt, email: o.email, company: o.company, website: o.website, plan: o.plan, format: o.format, creativeId: o.creativeId })),
       }),
     );
@@ -1032,13 +1041,18 @@ router.post("/ads/admin/payout/recipients", json, (req, res) =>
     if (!name || !rkey || pct === undefined || pct === null) return void res.status(400).json({ message: "Add a name and a % of the override pool (0–100)." });
     if (!eff) return void res.status(400).json({ message: "Pick today or a future date. Changes are never retroactive." });
     const active = b.active === "on" || b.active === true;
-    const next = { rkey, name, kind, pctBps: pct, scopePartner: str(b.scopePartner, 120) || null, scopeCampaign: str(b.scopeCampaign, 40) || null, active, payoutRef: str(b.payoutRef, 200) || null, effectiveAt: eff } as const;
+    const scopeReferrer = (await promoLib.resolveMember(str(b.scopeReferrer, 40))) ?? null;
+    if (str(b.scopeReferrer, 40) && !scopeReferrer) return void res.status(400).json({ message: "Pick an active street-team / partner member as the referrer." });
+    const next = { rkey, name, kind, pctBps: pct, scopePartner: scopeReferrer ? null : str(b.scopePartner, 120) || null, scopeCampaign: scopeReferrer ? null : str(b.scopeCampaign, 40) || null, scopeReferrer, active, payoutRef: str(b.payoutRef, 200) || null, effectiveAt: eff } as const;
     const hist = await store.recipientHistory();
     const at = recipientsAt([...hist, next], eff.getTime() + 1).filter((r) => r.active);
     const campaigns = (await store.listCampaigns()).map((c) => c.id);
     const max = maxPoolAllocationBps(at, [...new Set(AD_SLOTS.map((x) => x.partner))], campaigns);
     if (max > 10_000) return void res.status(400).json({ message: `That would hand out ${(max / 100).toFixed(2)}% of the override pool on some hub or campaign. Keep the total at or under 100%.` });
+    const maxRef = maxReferrerAllocationBps(at);
+    if (maxRef > 10_000) return void res.status(400).json({ message: `That would hand out ${(maxRef / 100).toFixed(2)}% of one referrer's referral pool. Keep the total at or under 100%.` });
     await store.addRecipientVersion({ ...next }, who);
+    if (scopeReferrer) return void res.json({ message: `${name} saved: ${pct / 100}% of the referral pool on orders ${scopeReferrer} refers (sale-time; never on delivery).` });
     res.json({ message: `${name} saved (${pct / 100}% of the pool). Up to ${(max / 100).toFixed(2)}% of the pool is now allocated on any one hub; the rest stays with Birch.` });
   }),
 );
@@ -1118,6 +1132,14 @@ router.get("/ads/admin/export/:what", (req, res) =>
       rows = (await store.ledger({ limit: 50_000 })).map((l) => ({ at: l.at, campaign_id: l.campaignId, kind: l.kind, slot: l.slotKey, partner: l.partner, units: l.units, amount: (l.amountMicros / MICROS).toFixed(6), currency: l.currency, note: l.note, actor: l.actor, test: l.isTest }));
     } else if (what === "royalties") {
       rows = (await store.royalties(13)).map((r) => ({ type: r.kind, payee: r.label, hub: r.hub, source: r.source, due: r.dueAt ? r.dueAt.toISOString().slice(0, 10) : "", held: r.heldReason ?? "", partner: r.partner, month: r.month, currency: r.currency, delivered: (r.grossMicros / MICROS).toFixed(2), share_pct: r.shareBps === null ? "" : (r.shareBps / 100).toFixed(2), override: r.overrideNote ?? "", payable: r.payableMicros === null ? "" : (r.payableMicros / MICROS).toFixed(2), status: r.status, approved_by: r.approvedBy, approved_at: r.approvedAt }));
+    } else if (what === "referrals") {
+      const orders = await listReferralOrders({ includeTest: true, limit: 50_000 });
+      const { detail } = splitReferralOrders(orders.map(toReferralLine), await store.rateHistory(), await store.recipientHistory(), await store.channelRateHistory());
+      const d = new Map(detail.map((x) => [x.sessionId, x]));
+      rows = orders.map((o) => {
+        const x = d.get(o.sessionId);
+        return { paid_at: o.paidAt.toISOString(), session_id: o.sessionId, campaign_id: o.campaignId, brand: o.brand, order_kind: o.orderKind, referrer: o.member, qr: o.qr, code: o.code, site: o.site, channel: o.channel, collected: (o.amountCents / 100).toFixed(2), currency: o.currency, override_pct: x?.overrideBps != null ? (x.overrideBps / 100).toFixed(2) : "", pool: x?.poolMicros != null ? (x.poolMicros / MICROS).toFixed(2) : "", commission: x ? (x.commissions.reduce((s, c) => s + c.micros, 0) / MICROS).toFixed(2) : "", recipients: x ? x.commissions.map((c) => `${c.name} ${c.pctBps / 100}%`).join("; ") : "", test: o.isTest };
+      });
     } else if (what.startsWith("batch-batch_")) {
       rows = (await store.batchRows(what.slice(6))).map((r) => ({ batch_id: r.batch_id, payee: r.label ?? r.partner, payee_key: r.partner, type: r.kind ?? "hub", destination_stripe_account: "", amount_cents: Math.round(Number(r.payable_micros) / 10_000), currency: r.currency, description: `Birch Reserve ${r.kind ?? "hub"} payout ${r.month}`, "metadata[month]": r.month, "metadata[payee_key]": r.partner, payout_reference: r.payee_ref ?? "", status: r.status }));
     } else if (what === "payouts") {

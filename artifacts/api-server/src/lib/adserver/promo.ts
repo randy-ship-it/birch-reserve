@@ -11,6 +11,7 @@ import { MEMBER_RE } from "./promoContext";
 import * as store from "./store";
 import { db, S, audit } from "./store";
 import { isTestIdentity } from "../testTraffic";
+import { recordReferralOrder } from "./referrals";
 
 export const normKey = (s: string): string => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 /** Spoken forms: "street team hundred" and "street team 100" normalise to the same key. */
@@ -245,13 +246,19 @@ export async function attachPendingForAccount(email: string, actor = "account"):
 }
 
 /** Paid order hook (webhook or thank-you page). Idempotent. Records street attribution and the order's promo line. */
-export async function afterOrderCampaign(session: Stripe.Checkout.Session, campaign: { id: string; currency: string; brand: string }, isTest: boolean): Promise<void> {
+export async function afterOrderCampaign(session: Stripe.Checkout.Session, campaign: { id: string; currency: string; brand: string; orderKind?: string | null }, isTest: boolean): Promise<void> {
   const md = session.metadata ?? {};
   const email = (session.customer_details?.email || session.customer_email || "").trim().toLowerCase();
   const site = md.site === "scale" ? "scale" : "birch";
   const st = await resolveMember(md.st);
   if (st) {
     await streetEvent({ member: st, kind: "order", site, ref: session.id, amountCents: session.amount_total ?? 0, currency: session.currency ?? "usd", isTest, dedupeKey: `order:${session.id}` });
+    // Commission basis: stamp the order with its referrer and write the referral row (referrals.ts). Never blocks the promo step.
+    try {
+      await recordReferralOrder(session, campaign, st, isTest);
+    } catch (err) {
+      await audit("stripe-webhook", "referral.error", session.id, err instanceof Error ? err.message : String(err));
+    }
   }
   if (!email) return;
   const p = await db();

@@ -19,7 +19,7 @@ import { qrPng, qrSvg } from "../lib/adserver/qr";
 import { draftCampaignFromCheckoutSafe } from "../lib/adserver/service";
 import * as store from "../lib/adserver/store";
 import { toCsv } from "../lib/adserver/ui";
-import { hasValidQaHeader } from "../lib/testTraffic";
+import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
 
 const router: IRouter = Router();
 const json = express.json({ limit: "8kb" });
@@ -89,7 +89,7 @@ router.post("/v1/promo/validate", json, (req, res) =>
   }),
 );
 
-/** A street team link opened. Aggregate only: one row per device per day, bots dropped. */
+/** A street team link opened. Aggregate only: one row per device per day, bots dropped. Answers { member } for an active member, else 204. */
 router.post("/v1/promo/scan", json, (req, res) =>
   safe(res, async () => {
     noStore(res);
@@ -104,7 +104,8 @@ router.post("/v1/promo/scan", json, (req, res) =>
     const qrLabel = typeof b.qr === "string" && /^[a-z0-9_-]{1,40}$/i.test(b.qr) ? (b.qr === "1" ? "qr" : b.qr.toLowerCase()) : b.qr === true ? "qr" : null;
     await promo.streetEvent({ member, kind: "visit", site, isTest: test, dedupeKey: `v:${member}:${site}:${vid}:${day}` });
     if (qrLabel) await promo.streetEvent({ member, kind: "scan", qr: qrLabel, site, isTest: test, dedupeKey: `q:${member}:${site}:${qrLabel}:${vid}:${day}` });
-    res.status(204).end();
+    // The browser only lets ?ref= / ?via= take over attribution once this confirms an active member (member ids are name-only).
+    res.json({ ok: true, member });
   }),
 );
 
@@ -146,6 +147,31 @@ router.post("/v1/promo/order", json, (req, res) =>
     const code = session.metadata?.promo;
     const found = code ? await promo.findCode(code) : null;
     res.json(found && !promo.codeProblem(found) ? { applied: false, pending: true, code: found.code, label: promo.creditLabel(found.creditMicros) } : { applied: false });
+  }),
+);
+
+/**
+ * QA proof for the referral e2e (Playwright on birchreserve.net and the Scale mirror): the attribution fields Stripe holds on an
+ * OPEN, unpaid Checkout Session created in the last hour for a qa+ / test identity. Anything else is a 404. Returns only the
+ * name-only member id, QR label, code and site; never an email, amount or anything about real buyers.
+ */
+router.post("/v1/promo/attribution", json, (req, res) =>
+  safe(res, async () => {
+    noStore(res);
+    if (oLim.hit(`a:${ip(req)}`).limited) return void res.status(429).json({ ok: false });
+    const sid = str((req.body as Record<string, unknown>)?.session_id, 220);
+    if (!/^cs_(test|live)_[A-Za-z0-9]{10,200}$/.test(sid)) return void res.status(400).json({ ok: false });
+    let s;
+    try {
+      s = await getStripeClient().checkout.sessions.retrieve(sid);
+    } catch {
+      return void res.status(404).json({ ok: false });
+    }
+    const email = s.customer_details?.email || s.customer_email || "";
+    const fresh = Date.now() / 1000 - (s.created ?? 0) < 3600;
+    if (s.status !== "open" || s.payment_status === "paid" || !fresh || !isTestIdentity({ email })) return void res.status(404).json({ ok: false });
+    const md = s.metadata ?? {};
+    res.json({ ok: true, st: md.st ?? null, st_qr: md.st_qr ?? null, promo: md.promo ?? null, site: md.site ?? null });
   }),
 );
 

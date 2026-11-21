@@ -1,17 +1,21 @@
 /**
- * Request-scoped street team + promo context (cookies br_st / br_pc, set first-party by the site for 30 days, last touch).
+ * Request-scoped street team + promo context (cookies br_st / br_pc / br_qr, set first-party by the site for 30 days, last touch;
+ * see docs/ads/ARCHITECTURE.md "Referral attribution").
  * Read by the Stripe session builders so every Checkout Session carries st / promo / site in its metadata.
  * No imports: safe to load from anywhere.
  */
 import { AsyncLocalStorage } from "node:async_hooks";
 import type { NextFunction, Request, Response } from "express";
 
-export type PromoCtx = { st: string | null; code: string | null; site: "birch" | "scale" };
+export type PromoCtx = { st: string | null; code: string | null; site: "birch" | "scale"; qr?: string | null };
 const als = new AsyncLocalStorage<PromoCtx>();
 
 export const ST_COOKIE = "br_st";
 export const PC_COOKIE = "br_pc";
+export const QR_COOKIE = "br_qr";
 export const MEMBER_RE = /^[a-z0-9][a-z0-9_-]{1,31}$/;
+/** QR / link label carried with a member (e.g. "scale-intake-digital"). */
+export const QR_RE = /^[a-z0-9][a-z0-9_-]{0,39}$/;
 const SCALE_HOSTS = new Set(["scalehealth.ca", "www.scalehealth.ca"]);
 
 function cookieOf(req: Pick<Request, "get">, name: string): string | null {
@@ -78,7 +82,10 @@ export function promoCtxOf(req: Pick<Request, "get" | "query">): PromoCtx {
   const hdr = new URLSearchParams(req.get("x-br-attr") ?? "");
   const st = (hdr.get("st") ?? cookieOf(req, ST_COOKIE) ?? "").trim().toLowerCase();
   const code = (hdr.get("code") ?? cookieOf(req, PC_COOKIE) ?? "").trim().slice(0, 40);
-  return { st: MEMBER_RE.test(st) ? st : null, code: /^[A-Za-z0-9 _-]{2,40}$/.test(code) ? code : null, site: siteOf(req) };
+  // The QR label always travels with the member it came from (header pair, or cookie pair), never mixed.
+  const qr = ((hdr.has("st") ? hdr.get("qr") : cookieOf(req, QR_COOKIE)) ?? "").trim().toLowerCase();
+  const okSt = MEMBER_RE.test(st);
+  return { st: okSt ? st : null, code: /^[A-Za-z0-9 _-]{2,40}$/.test(code) ? code : null, site: siteOf(req), qr: okSt && QR_RE.test(qr) ? qr : null };
 }
 
 export function promoContext() {
@@ -95,7 +102,16 @@ export function promoMetadata(): Record<string, string> {
   if (!c) return {};
   const out: Record<string, string> = {};
   if (c.st) out.st = c.st;
+  if (c.st && c.qr) out.st_qr = c.qr;
   if (c.code) out.promo = c.code;
   if (c.st || c.code) out.site = c.site;
   return out;
+}
+
+/** Merge the request's referral metadata into Checkout Session params. */
+export function withPromoMetadata<T>(params: T): T {
+  const carried = promoMetadata();
+  if (!Object.keys(carried).length || !params || typeof params !== "object") return params;
+  const p = params as { metadata?: Record<string, string> | null };
+  return { ...params, metadata: { ...(p.metadata ?? {}), ...carried } };
 }

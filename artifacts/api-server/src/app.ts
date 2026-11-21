@@ -18,7 +18,7 @@ import exclusiveReserveRouter from "./routes/exclusiveReserve";
 import adserverRouter from "./routes/adserver";
 import promoRouter from "./routes/promo";
 import hubProofRouter from "./routes/hubProof";
-import { promoContext } from "./lib/adserver/promoContext";
+import { promoContext, withPromoMetadata } from "./lib/adserver/promoContext";
 import sponsorPageRouter from "./routes/sponsorPage";
 import { createOverhaulRouter } from "./routes/overhaul";
 import { createBrandIntakeProxy } from "./routes/brandIntakeProxy";
@@ -97,7 +97,8 @@ app.use(
 app.use(
   createOverhaulRouter({
     createSession: async (params) => {
-      const session = await getStripeClient().checkout.sessions.create(params as never);
+      // Referral attribution (st / st_qr / promo / site) rides on every Checkout Session, like the other session builders.
+      const session = await getStripeClient().checkout.sessions.create(withPromoMetadata(params) as never);
       return { url: session.url, livemode: session.livemode };
     },
     log: (msg, extra) => logger.info({ extra }, `overhaul ${msg}`),
@@ -106,7 +107,7 @@ app.use(
 app.use(
   createAgentRouter({
     createSession: async (params) => {
-      const s = await getStripeClient().checkout.sessions.create(params as never);
+      const s = await getStripeClient().checkout.sessions.create(withPromoMetadata(params) as never);
       return { url: s.url, livemode: s.livemode };
     },
   }),
