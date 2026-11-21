@@ -50,8 +50,8 @@ function css(){if(document.getElementById("brpromo-css"))return;var s=document.c
 function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function mountForm(host,o){
  css();host.innerHTML="";var s=state(),d=el("details","brpromo");d.setAttribute("data-testid","promo-box");
- d.appendChild(el("summary",null,"Have a Street 100 code?"));var b=el("div","bp-b"),row=el("div","bp-r"),inp=el("input");
- inp.type="text";inp.name="promo_code";inp.placeholder="Enter your code";inp.autocomplete="off";inp.setAttribute("aria-label","Promo code");inp.setAttribute("data-testid","promo-input");inp.value=(s.code||"").toUpperCase();
+ d.appendChild(el("summary",null,"Have a code?"));var b=el("div","bp-b"),row=el("div","bp-r"),inp=el("input");
+ inp.type="text";inp.name="promo_code";inp.placeholder="Promo or street-team code";inp.autocomplete="off";inp.setAttribute("aria-label","Promo code");inp.setAttribute("data-testid","promo-input");inp.value=(s.code||"").toUpperCase();
  var btn=el("button",null,"Apply");btn.type="button";btn.setAttribute("data-testid","promo-apply");
  var msg=el("p","bp-m");msg.setAttribute("role","status");msg.setAttribute("aria-live","polite");msg.setAttribute("data-testid","promo-msg");
  var fine=el("p","bp-f","Free ad credit: ad spend only, no cash value, not transferable. One per business.");
