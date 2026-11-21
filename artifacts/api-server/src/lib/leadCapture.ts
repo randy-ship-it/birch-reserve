@@ -86,6 +86,9 @@ export async function captureEmailLead(input: {
   pagePath?: string | null;
   isTest?: boolean;
   attribution?: Attribution;
+  /** brochure_inline | brochure_slidein (media kit capture); st = street-team tag. */
+  captureSource?: string | null;
+  st?: string | null;
   now?: Date;
 }): Promise<{ lead: Lead | undefined; created: boolean }> {
   const email = input.email.trim().toLowerCase();
@@ -96,7 +99,8 @@ export async function captureEmailLead(input: {
     sourceRef: id.slice("email:".length),
     email,
     company: input.company ?? undefined,
-    need: "Birch Reserve media kit + seat updates",
+    need: input.captureSource ? "Brochure + rate card (" + input.captureSource + ")" : "Birch Reserve media kit + seat updates",
+    meta: { ...(input.captureSource ? { capture_source: input.captureSource } : {}), ...(input.st ? { st: input.st } : {}) },
     pagePath: input.pagePath ?? undefined,
     isTest: Boolean(input.isTest) || isTestIdentity({ email, name: input.company ?? null }),
     ...(input.attribution ?? {}),

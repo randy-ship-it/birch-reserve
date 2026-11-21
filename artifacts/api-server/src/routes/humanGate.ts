@@ -68,7 +68,7 @@ router.post("/launch/email-capture", async (req, res): Promise<void> => {
     return;
   }
   for (const k of Object.keys(body)) {
-    if (!["email", "company", "pagePath"].includes(k)) {
+    if (!["email", "company", "pagePath", "source", "st"].includes(k)) {
       res.status(400).json({ error: "Unknown field." });
       return;
     }
@@ -86,6 +86,15 @@ router.post("/launch/email-capture", async (req, res): Promise<void> => {
   const company = typeof companyRaw === "string" && companyRaw.trim() ? companyRaw.trim() : null;
   const pagePath = typeof body["pagePath"] === "string" && PAGE_PATH_RE.test(body["pagePath"]) ? body["pagePath"] : null;
 
+  const sourceRaw = body["source"];
+  const captureSource = sourceRaw === "brochure_inline" || sourceRaw === "brochure_slidein" ? sourceRaw : null;
+  if (sourceRaw !== undefined && !captureSource) {
+    res.status(400).json({ error: "Unknown source." });
+    return;
+  }
+  const stRaw = body["st"];
+  const st = typeof stRaw === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(stRaw) ? stRaw : null;
+
   const qa = hasValidQaHeader(req);
   if (!qa) {
     const hit = captureLimiter.hit(req.ip || "unknown");
@@ -96,7 +105,7 @@ router.post("/launch/email-capture", async (req, res): Promise<void> => {
     }
   }
   const isTest = qa || isTestIdentity({ email, name: company });
-  const { lead, created } = await captureEmailLead({ email, company, pagePath, isTest, attribution: attributionFrom(res) });
+  const { lead, created } = await captureEmailLead({ email, company, pagePath, isTest, captureSource, st, attribution: attributionFrom(res) });
   if (lead && created && !lead.isTest) {
     // Bounded (mailer has a 10s timeout); awaited so Autoscale can't freeze before it sends.
     await notifyEmailCapture(lead).catch((error) =>

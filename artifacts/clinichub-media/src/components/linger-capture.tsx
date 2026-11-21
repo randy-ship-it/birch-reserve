@@ -29,7 +29,7 @@ const DESKTOP_MIN_DWELL_MS = 4_000;
 const MEDIA_KIT_PDF = "/birch-reserve-one-pager.pdf";
 const MEDIA_KIT_PAGE = "/kit";
 const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[A-Za-z]{2,24}$/;
-const HIDDEN_PREFIXES = ["/kit", "/marketplace", "/sales", "/editorial", "/success", "/splash", "/sign-in", "/sign-up"];
+const HIDDEN_PREFIXES = ["/media-kit", "/kit", "/marketplace", "/sales", "/editorial", "/success", "/splash", "/sign-in", "/sign-up"];
 
 function seenRecently(): boolean {
   try {

@@ -3,6 +3,7 @@ import { StartSmall } from "@/components/br/start-small";
 import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAsk } from "@/components/br/market-pulse";
 import { EstimateTag } from "@/components/br/intake-kit";
 import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPath";
+import { BrochureInline, BrochureSlideIn } from "@/components/br/brochure-capture";
 import { GtmSetup } from "@/components/br/gtm-setup";
 import { KitCta } from "@/components/br/kit-cta";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
@@ -180,6 +181,9 @@ export default function BrMediaKit() {
           <NextStep where="media_kit" showMock={false} />
         </div>
       </section>
+
+      <BrochureInline />
+      <BrochureSlideIn />
 
       {/* Categories we serve + Questions brands ask (Randy t291u, Nov 20 2026) */}
       <section className="border-b border-border/70 bg-background" data-testid="mk-market-signals">

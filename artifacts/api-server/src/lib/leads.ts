@@ -56,8 +56,11 @@ export type LeadMeta = {
   intake_role?: string;
   hub_status?: string;
   hub_slug?: string;
+  /** Brochure capture (Nov 21 2026): which block captured the email, and the street-team tag if any. */
+  capture_source?: string;
+  st?: string;
 };
-const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id", "stage", "friday_intake_id", "nudged_at", "unsub", "intake_role", "hub_status", "hub_slug"] as const;
+const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id", "stage", "friday_intake_id", "nudged_at", "unsub", "intake_role", "hub_status", "hub_slug", "capture_source", "st"] as const;
 
 /** Keep only well-typed, non-empty keys (never empty strings). */
 export function cleanLeadMeta(raw: unknown): LeadMeta {
