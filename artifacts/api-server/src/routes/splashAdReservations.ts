@@ -65,7 +65,7 @@ import { attributionFrom } from "../lib/publicGuards";
 import { recordPaidCheckoutSafe } from "../lib/checkoutLead";
 import { EXCLUSIVE_RESERVE, recordPaidExclusiveReserveSafe } from "../lib/exclusiveReserve";
 import { draftCampaignFromCheckoutSafe } from "../lib/adserver/service";
-import { sendPrepayConfirmationSafe } from "../lib/prepayConfirmationEmail";
+import { sendPaidConfirmationSafe } from "../lib/paidConfirmationEmail";
 import { handleChargeRefundedSafe, handleDisputeCreatedSafe } from "../lib/stripeRefunds";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { logger } from "../lib/logger";
@@ -595,11 +595,13 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
       // $1,900 CAD exclusive display reserve (Nov 21 2026): leads row + Friday, then the sales alert so the IO goes out.
       await recordPaidExclusiveReserveSafe(session);
       if (firstDelivery) await sendPaidSalesAlertSafe(session);
+      await sendPaidConfirmationSafe(session); // branded buyer confirmation, once per session (lib/paidConfirmationEmail.ts)
       return;
     }
     if (session.payment_status === "paid" && session.metadata?.kind === "sponsorship_credit") {
       // Sponsorship pack (Nov 20 2026): no splash reservation row. Alert sales so the IO goes out (internal email only).
       if (firstDelivery) await sendPaidSalesAlertSafe(session);
+      await sendPaidConfirmationSafe(session);
       return;
     }
     if (session.payment_status === "paid") {
@@ -607,8 +609,9 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
       // 7:21pm: paid checkout → Friday (never throws; Stripe still gets its 2xx).
       if (paid === "paid") {
         await recordPaidCheckoutSafe(session);
-        // Buyer prepay confirmation (no URLs; off unless PREPAY_CONFIRMATION_EMAIL=true; never throws).
-        await sendPrepayConfirmationSafe(session);
+        // Branded buyer confirmation (Randy, Nov 21 2026 6:12 PM): Birch or Scale layout, once per paid session, never throws.
+        // Replaces the URL-free reserve-490 prepay email (lib/prepayConfirmationEmail.ts, which was never switched on).
+        await sendPaidConfirmationSafe(session);
         // Randy 9:41pm Nov 13: every paid seat emails randy@scalehealth.ca + randy@silverbirchgrowth.com.
         await sendPaidSalesAlertSafe(session);
       }

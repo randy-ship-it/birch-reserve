@@ -1,3 +1,4 @@
+import { mirrorPathOf } from "../lib/adserver/promoContext";
 import { decideCurrency } from "../lib/currency";
 /**
  * Birch Reserve ad system routes (Randy t330u, Nov 21 2026).
@@ -345,7 +346,8 @@ router.get("/account/login", (req, res) =>
     await draftCampaignFromCheckoutSafe(session);
     await promoAttach(email);
     setCookie(res, ACCT, sign("a", { e: email }, 14 * 864e5), 14 * 86400);
-    res.redirect(302, "/account");
+    // On the Scale mirror (scalehealth.ca/intake/_m/…, tagged br_mirror=scale) stay on the mirror instead of scalehealth.ca/account.
+    res.redirect(302, mirrorPathOf(req, "/account"));
   }),
 );
 
