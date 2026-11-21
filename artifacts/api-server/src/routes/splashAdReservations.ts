@@ -1405,6 +1405,7 @@ router.post("/launch/splash/checkout", async (req, res): Promise<void> => {
         offerKey: checkoutOffer.offerKey,
         sku: checkoutOffer.sku,
         checkoutAttempt: String(nextAttempt),
+        currency: reservationCurrency,
       },
       payment_intent_data: {
         ...birchPaymentIntentBrand(checkoutOffer.name),
@@ -1413,6 +1414,7 @@ router.post("/launch/splash/checkout", async (req, res): Promise<void> => {
           offerKey: checkoutOffer.offerKey,
           sku: checkoutOffer.sku,
           checkoutAttempt: String(nextAttempt),
+          currency: reservationCurrency,
         },
       },
       success_url: `${returnBaseOf(req, baseUrl)}/splash/activation?token=${encodeURIComponent(parsed.data.activationToken)}&session_id={CHECKOUT_SESSION_ID}`,
