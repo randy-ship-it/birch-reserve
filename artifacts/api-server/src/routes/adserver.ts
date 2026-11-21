@@ -868,7 +868,9 @@ router.post("/ads/admin/payouts/batch", json, (req, res) =>
   safe(res, async () => {
     const who = guard(req, res);
     if (!who) return;
-    const r = await store.createPayoutBatch(who);
+    const raw = (req.body as Record<string, unknown> | undefined)?.payees;
+    const payees = Array.isArray(raw) ? raw.map((x) => str(x, 160)).filter(Boolean) : undefined; // optional: batch only these payees (e.g. one QA test hub)
+    const r = await store.createPayoutBatch(who, payees);
     if (!r.rows.length) return void res.json({ message: "No approved, unbatched lines to pay." });
     res.json({ message: `Batch ${r.batchId}: ${r.rows.length} lines. Download the CSV, pay each line, then Mark paid with the reference. Nothing was sent.`, copy: `${origin(req)}/ads/admin/export/batch-${r.batchId}.csv` });
   }),

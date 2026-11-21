@@ -612,8 +612,9 @@ export async function setPartnerShare(partner: string, bps: number | null, actor
 
 /** Approve a statement line: freezes basis, rate and payable. Held or pending lines can't be approved. Records only; no money moves. */
 export async function approvePayout(partner: string, month: string, currency: string, actor: string): Promise<RoyaltyRow | null> {
-  const rows = await royalties(13);
-  const r = rows.find((x) => x.partner === partner && x.month === month && x.currency === currency);
+  const pick = (rows: RoyaltyRow[]) => rows.find((x) => x.partner === partner && x.month === month && x.currency === currency);
+  // Real lines first; test hubs (QA) fall back to the test statements so the full flow can be proven in production.
+  const r = pick(await royalties(13)) ?? pick(await royalties(13, { testOnly: true }));
   if (!r || r.shareBps === null || r.payableMicros === null || r.status !== "calculated") return null;
   const p = await db();
   await p.query(
@@ -738,10 +739,14 @@ export async function payoutRows(): Promise<Array<Record<string, unknown>>> {
 }
 
 /** Payout batch: every approved, unpaid line gets one batch id (records only). Returns the rows for the Stripe-ready CSV. */
-export async function createPayoutBatch(actor: string): Promise<{ batchId: string; rows: Array<Record<string, unknown>> }> {
+export async function createPayoutBatch(actor: string, payees?: string[]): Promise<{ batchId: string; rows: Array<Record<string, unknown>> }> {
   const p = await db();
   const batchId = `batch_${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "")}`;
-  const { rows } = await p.query(`UPDATE ${S()}.ad_payouts SET batch_id = $1 WHERE status = 'approved' AND batch_id IS NULL RETURNING *`, [batchId]);
+  const only = payees?.length ? payees : null;
+  const { rows } = await p.query(
+    `UPDATE ${S()}.ad_payouts SET batch_id = $1 WHERE status = 'approved' AND batch_id IS NULL AND ($2::text[] IS NULL OR partner = ANY($2)) RETURNING *`,
+    [batchId, only],
+  );
   if (rows.length) await audit(actor, "payout.batch", batchId, `${rows.length} lines`);
   return { batchId, rows };
 }
