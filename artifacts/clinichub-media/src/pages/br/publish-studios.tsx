@@ -1,3 +1,4 @@
+import { HubDemandCard } from "@/components/br/hundred";
 import type { ReactNode } from "react";
 import { LeadForm } from "@/components/br/lead-form";
 import { Cta, Eyebrow, Faq, H1, Section, usePageMeta } from "@/components/br/ui";
@@ -37,6 +38,7 @@ export default function BrPublishStudios() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Cta href={P.clinicHubsUrl} testId="cta-clinichubs">Activate your hub</Cta>
             </div>
+            <HubDemandCard className="mt-6 max-w-xl" />
           </div>
           <div className="border-2 border-foreground bg-white p-6" data-testid="publisher-offer">
             <div className="grid grid-cols-2 gap-4">

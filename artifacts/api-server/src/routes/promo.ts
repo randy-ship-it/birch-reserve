@@ -12,6 +12,7 @@ import { FixedWindowLimiter } from "../lib/rateLimit";
 import { getStripeClient } from "../lib/stripeClient";
 import { adminEmails, isBotUa, regularRateSummary } from "../lib/adserver/config";
 import { verify } from "../lib/adserver/auth";
+import { publicSampleReport } from "../lib/adserver/publicReport";
 import * as promo from "../lib/adserver/promo";
 import { promoCtxOf, siteOf } from "../lib/adserver/promoContext";
 import { qrPng, qrSvg } from "../lib/adserver/qr";
@@ -70,6 +71,14 @@ async function safe(res: Response, fn: () => Promise<void>): Promise<void> {
 }
 
 /* ------------------------------------------------------------------------------------------ public */
+/** Anonymized aggregate sample report from the real ad-event store (no test traffic). Cached 5 minutes. */
+router.get("/v1/ads/sample-report", (_req, res) =>
+  safe(res, async () => {
+    res.set("Cache-Control", "public, max-age=300");
+    res.json(await publicSampleReport());
+  }),
+);
+
 router.post("/v1/promo/validate", json, (req, res) =>
   safe(res, async () => {
     noStore(res);

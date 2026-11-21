@@ -1,3 +1,4 @@
+import { WhatHundredGets, MeasuredReport, YourCardHere, PremiumSpendDown } from "@/components/br/hundred";
 import { Tam2027 } from "@/components/br/inventory-plan";
 import { StartSmall } from "@/components/br/start-small";
 import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAsk } from "@/components/br/market-pulse";
@@ -298,6 +299,7 @@ export default function BrMediaKit() {
               <Cta href={RESERVE_HREF} testId="mk-cta-seat" className="w-full sm:w-auto">Reserve your space — {price.seat}</Cta>
               <Cta href={LOOK_HREF} variant="line" testId="mk-cta-look" className="w-full sm:w-auto">Take a 7-day look — {price.look}</Cta>
             </div>
+            <WhatHundredGets />
           </article>
           <article id="premium" className="flex flex-col border-2 border-foreground bg-foreground p-5 text-background md:p-6" data-testid="mk-card-premium">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -311,6 +313,7 @@ export default function BrMediaKit() {
               <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden /><span><EstimateTag /> Modelled estimate, not a guarantee: about {impr(premLo.imprLo)}–{impr(premHi.imprHi)} impressions at {cpm}</span></li>
               <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />{UPGRADE_PATH_LINE}</li>
             </ul>
+            <PremiumSpendDown />
             <div className="mt-6">
               <BookCall variant="lime" testId="mk-premium-inquire" />
             </div>
@@ -340,6 +343,8 @@ export default function BrMediaKit() {
       {/* Sample report layout (buyer comfort, Nov 17 2026) */}
       <Block id="sample-report" eyebrow={SAMPLE_REPORT.kicker} title={SAMPLE_REPORT.title} tone="soft">
         <SampleReport />
+        <MeasuredReport />
+        <YourCardHere />
       </Block>
 
       {/* Categories */}

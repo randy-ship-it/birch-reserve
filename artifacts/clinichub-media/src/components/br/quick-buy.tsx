@@ -5,6 +5,7 @@
  * amounts come from the existing $190 look / $490 seat offers and starter CPMs
  * from overhaul/pricing.ts. Views are modelled estimates, never guaranteed.
  */
+import { WhatHundredGets } from "./hundred";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { priceLabel, useCurrency } from "@/lib/currency";
@@ -180,6 +181,7 @@ export function QuickBuy() {
         </p>
       </div>
     </div>
+    <WhatHundredGets />
     {inquiry ? <PremiumInquiry ref={inquiryRef} picks={inquiry} currency={currency} /> : null}
     </div>
   );

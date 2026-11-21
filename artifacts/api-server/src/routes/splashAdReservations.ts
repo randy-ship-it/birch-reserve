@@ -1,3 +1,4 @@
+import { expectedAmountTotal, withStreetNet } from "../lib/adserver/promoNet";
 import { birchCheckoutCustomText, birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import { randomBytes, timingSafeEqual } from "node:crypto";
 import { ReplitConnectors } from "@replit/connectors-sdk";
@@ -848,7 +849,7 @@ router.post(
       if (
         !session.url ||
         session.currency !== currency ||
-        session.amount_total !== offerAmountCents(offer, currency)
+        session.amount_total !== expectedAmountTotal(session, offerAmountCents(offer, currency))
       ) {
         throw new Error("Stripe returned a checkout session that does not match the selected offer.");
       }
@@ -1298,7 +1299,7 @@ router.post("/launch/splash/checkout", async (req, res): Promise<void> => {
         currentSession.metadata?.reservationId !== reservation.id ||
         currentSession.metadata?.offerKey !== reservation.offerKey ||
         currentSession.currency !== reservation.currency ||
-        currentSession.amount_total !== reservation.amountCents
+        currentSession.amount_total !== expectedAmountTotal(currentSession, reservation.amountCents)
       ) {
         res.status(409).json({
           error: "The existing checkout does not match this reservation. Please contact Birch Reserve.",
@@ -1438,7 +1439,7 @@ router.post("/launch/splash/checkout", async (req, res): Promise<void> => {
     if (
       !session.url ||
       session.currency !== claimedReservation.currency ||
-      session.amount_total !== claimedReservation.amountCents
+      session.amount_total !== expectedAmountTotal(session, claimedReservation.amountCents)
     ) {
       throw new Error("Stripe returned a checkout session that does not match the reservation.");
     }

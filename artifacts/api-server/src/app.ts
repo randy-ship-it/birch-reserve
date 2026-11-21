@@ -17,6 +17,7 @@ import buyRouter, { buyStaffRouter } from "./routes/buy";
 import exclusiveReserveRouter from "./routes/exclusiveReserve";
 import adserverRouter from "./routes/adserver";
 import promoRouter from "./routes/promo";
+import hubProofRouter from "./routes/hubProof";
 import { promoContext } from "./lib/adserver/promoContext";
 import sponsorPageRouter from "./routes/sponsorPage";
 import { createOverhaulRouter } from "./routes/overhaul";
@@ -118,6 +119,7 @@ app.use(sponsorPageRouter);
 app.use(exclusiveReserveRouter);
 // Ad system (Nov 21 2026): embed + pixel + serving, /account customer dashboard, /ads/admin. Own body parsers.
 app.use(promoRouter);
+app.use(hubProofRouter);
 app.use(adserverRouter);
 app.use(publicPagesRouter);
 app.use(advertiserGuidesRouter);

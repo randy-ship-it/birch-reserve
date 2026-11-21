@@ -1,3 +1,4 @@
+import { expectedAmountTotal } from "./adserver/promoNet";
 import {
   db,
   pool,
@@ -88,7 +89,7 @@ export function stripeSessionMatchesReservation(
     session.metadata?.reservationId !== reservation.id ||
     session.metadata?.offerKey !== reservation.offerKey ||
     session.currency !== reservation.currency ||
-    session.amount_total !== reservation.amountCents
+    session.amount_total !== expectedAmountTotal(session, reservation.amountCents)
   ) {
     return false;
   }
@@ -1159,7 +1160,7 @@ async function reconcileCheckoutCreation(
       session.metadata?.reservationId !== reservation.id ||
       session.metadata?.checkoutAttempt !== String(reservation.checkoutAttempt) ||
       session.currency !== reservation.currency ||
-      session.amount_total !== reservation.amountCents
+      session.amount_total !== expectedAmountTotal(session, reservation.amountCents)
     ) {
       throw new Error("Recovered Stripe checkout does not match its reservation.");
     }

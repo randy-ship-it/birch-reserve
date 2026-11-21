@@ -1,3 +1,6 @@
+import { hundredHtml } from "../lib/overhaul/hundred";
+import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
+import { withStreetNet } from "../lib/adserver/promoNet";
 import { CHECKOUT_TAGLINE, birchCheckoutCustomText, birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import { HERO_MOCK_CSS, heroMockHtml } from "../lib/heroMock";
 import { URGENCY_LINE } from "../lib/overhaul/pilotPath";
@@ -1050,7 +1053,7 @@ async function handleMachineCheckout(
     }, database);
     return;
   }
-  const checkoutRequest: Stripe.Checkout.SessionCreateParams = {
+  const checkoutRequest: Stripe.Checkout.SessionCreateParams = await withStreetNet({
     mode: "payment",
     client_reference_id: reservation.id,
     customer_email:
@@ -1075,7 +1078,7 @@ async function handleMachineCheckout(
     cancel_url: `${baseUrl}/buycalc?checkout=cancelled`,
     allow_promotion_codes: false,
     custom_text: birchCheckoutCustomText(),
-  };
+  }, offerAmountCents(offer, currency), currency, res.locals.ucpAnonymousBuyer === true ? null : reservation.email);
   const checkoutIdempotencyKey = `birch-reserve-v1:${reservation.id}:${nextAttempt}`;
   const checkoutAttemptStartedAt = new Date();
   const [claimed] = await database
@@ -2379,6 +2382,7 @@ ${heroInquireHtml()}</div>${heroMockHtml("buycalc-hero-mock")}</div></section>
 <section class="band" id="offers"><div class="wrap"><p class="kicker">Two ways in</p><h2>Pick your start.</h2>
 <div class="offers">${offerCard(look, { eyebrow: "7-day look", name: "See it before you commit", lines: ["See your placement for 7 days while you decide.", "Converts in full to the reserve within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Reserve", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the hub network. Credit lasts 12 months.`, "Placements are curated as hubs launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Reserve your space · ${price(seat)}` })}</div>
 ${offersSampleIoHtml()}
+${hundredHtml()}
 <!--BONUS_TIER_DRAFT-->
 </div></section>
 ${currency === "usd" ? startSmallHtml() : ""}
@@ -2405,6 +2409,7 @@ ${category ? `<input type="hidden" name="category" value="${category}">` : ""}
 <label for="f-brand">Brand</label><input id="f-brand" name="brand" required maxlength="160" autocomplete="organization">
 <label for="f-email">Work email</label><input id="f-email" name="email" type="email" required autocomplete="email">
 <div class="row2"><div><label for="f-web">Website <span class="fine">(optional)</span></label><input id="f-web" name="website_url" type="text" inputmode="url" autocomplete="url" autocapitalize="none" spellcheck="false" placeholder="yourbrand.com"></div><div><label for="f-format">Where it shows</label><select id="f-format" name="format_pref">${FORMATS.map((f) => `<option value="${f}"${(isFormat(input.format) ? input.format : DEFAULT_SELF_SERVE_FORMAT) === f ? " selected" : ""}${isPremiumFormat(f) ? ' data-inquire="1"' : ""}>${BUYCALC_FORMAT_LABELS[f]}${isPremiumFormat(f) ? " · Inquire" : ""}</option>`).join("")}</select></div></div>
+<div data-promo-box></div>
 <label class="check"><input id="terms" type="checkbox" required><span>I agree to the draft <a href="/terms">terms</a> before any charge.</span></label>
 ${sampleIoCheckoutHtml()}
 <button id="submit" class="btn" type="submit">${submitLabel}</button>
@@ -2446,7 +2451,7 @@ document.querySelectorAll("[data-request-category]").forEach(function(a){a.addEv
 rq.addEventListener("submit",async function(e){e.preventDefault();if(!rq.reportValidity())return;rs.disabled=true;rm.textContent="Sending…";var d=Object.fromEntries(new FormData(rq));d.path="/buycalc";try{var q=new URLSearchParams(location.search);d.utm={utm_source:q.get("utm_source")||"",utm_medium:q.get("utm_medium")||"",utm_campaign:q.get("utm_campaign")||""}}catch(_){}try{var r=await fetch("/v1/category-request",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(d)});var o=await r.json().catch(function(){return{}});if(r.ok&&o.ok){rm.textContent="Got it. Your request is in. We'll reply to "+d.email+" shortly. No card was charged.";rq.querySelectorAll("input,select,textarea,button").forEach(function(el){el.disabled=true});return}rm.textContent=o.error||"We could not send that. Call (647) 931-6278 or email sales@silverbirchgrowth.com.";rs.disabled=false}catch(err){rm.textContent="We could not send that. Call (647) 931-6278 or email sales@silverbirchgrowth.com.";rs.disabled=false}});
 try{var pf=JSON.parse(sessionStorage.getItem("br_quick_reserve")||"null");if(pf&&typeof pf==="object"){if(typeof pf.brand==="string"&&!form.elements.brand.value)form.elements.brand.value=pf.brand.slice(0,160);if(typeof pf.email==="string"&&!form.elements.email.value)form.elements.email.value=pf.email.slice(0,320);sessionStorage.removeItem("br_quick_reserve")}}catch(_){}
 refresh();if(location.hash==="#reserve"&&/[?&]format=/.test(location.search)){setTimeout(function(){document.getElementById("f-brand").focus({preventScroll:true})},350)}})();
-</script></body></html>`;
+</script>${PROMO_SCRIPT_TAG}</body></html>`;
 }
 
 router.get("/buycalc", async (req, res): Promise<void> => {
