@@ -593,7 +593,7 @@ function patchFrom(b: Record<string, unknown>): { patch: CampaignPatch; error?: 
   if (b.category !== undefined) p.category = str(b.category, 80) || null;
   if (b.pricing !== undefined) p.pricing = b.pricing === "cpc" ? "cpc" : "cpm";
   if (b.primaryPlacement !== undefined && (PLACEMENTS as readonly string[]).includes(String(b.primaryPlacement))) p.primaryPlacement = String(b.primaryPlacement) as Placement;
-  if (b.hubs !== undefined || b.allowSubstitute !== undefined) p.hubs = (Array.isArray(b.hubs) ? b.hubs : []).map(String).filter((h) => findSlot(`${h}.landing`));
+  if (b.hubs !== undefined || b.allowSubstitute !== undefined) p.hubs = (Array.isArray(b.hubs) ? b.hubs : []).map(String).filter((h) => AD_SLOTS.some((s) => s.hub === h)); // hub keys and marketing keys (mkt-birch, mkt-scale)
   if (b.allowSubstitute !== undefined) p.allowSubstitute = b.allowSubstitute === true;
   if (b.exclusive !== undefined) p.exclusive = b.exclusive === true;
   if (b.seller === "birch" || b.seller === "scale") p.seller = b.seller;

@@ -22,6 +22,7 @@ import { DoorRoute } from "@/components/br/door-route";
 import { Details } from "@/components/br/details";
 import { AnnotatedHubMock, NextStep } from "@/components/br/next-step";
 import { KitBuilder } from "@/components/br/kit-builder";
+import { BirchAdSlot } from "@/components/br/birch-ad-slot";
 import { AvailabilityStrip, CategoryRequestForm, FaceBeforeFlight, FounderNote, NETWORK_HUBS, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import {
   AGENCY_CASH_PCT,
@@ -359,6 +360,11 @@ export default function BrMediaKit() {
           <CategoryRequestForm path="/media-kit" />
         </div>
       </Block>
+
+      {/* Sponsored: one Birch-served ad on our own media kit (Randy, Nov 21 2026 4:02 PM). Reserved box, no layout shift. */}
+      <section className="border-b border-border/70 bg-background" data-testid="mk-sponsored">
+        <div className="container mx-auto max-w-5xl px-5 py-8 md:px-6"><BirchAdSlot slot="mkt-birch.media_kit" testId="mk-ad-slot" /></div>
+      </section>
 
       {/* Five questions buyers ask (buyer comfort, Nov 17 2026) */}
       <section id="doors" className="scroll-mt-20 border-b border-border/70 bg-foreground text-background">
