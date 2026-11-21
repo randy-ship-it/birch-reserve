@@ -16,6 +16,14 @@ test("exclusive reserve session is CAD 1,900 with a plain description and the RE
   assert.match(p.success_url, /\/exclusive\?reserve=success&session_id=\{CHECKOUT_SESSION_ID\}/);
 });
 
+test("exclusive reserve uses the live Price ID when configured", () => {
+  process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD = "price_test_x";
+  const r = buildExclusiveReserveSession({ brand: "Acme", email: "a@acme.com", agree: true }, "https://birchreserve.net");
+  delete process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD;
+  assert.ok(r.ok);
+  assert.deepEqual((r.params as any).line_items[0], { price: "price_test_x", quantity: 1 });
+});
+
 test("exclusive reserve needs brand, email and agreement", () => {
   assert.equal(buildExclusiveReserveSession({ brand: "", email: "a@b.co", agree: true }, "x").ok, false);
   assert.equal(buildExclusiveReserveSession({ brand: "A", email: "a@b.co", agree: false }, "x").ok, false);
