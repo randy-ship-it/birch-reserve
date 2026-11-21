@@ -336,7 +336,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       return;
     }
     noteLead(eff, prep.stage, out, undefined, coarseRegion((h) => req.get(h)));
-    if (prep.stage === "submitted" && out.status < 300) void onIntakeSubmitted(promoCtxOf(req), String((eff as Record<string, unknown>).email ?? ""), typeof (eff as Record<string, unknown>).website === "string" ? ((eff as Record<string, unknown>).website as string) : null);
+    if (prep.stage === "submitted" && out.status < 300) await onIntakeSubmitted(promoCtxOf(req), String((eff as Record<string, unknown>).email ?? ""), typeof (eff as Record<string, unknown>).website === "string" ? ((eff as Record<string, unknown>).website as string) : null);
     send(res, out);
   });
   router.patch("/v1/brand-intake/:id", body, async (req, res) => {
@@ -350,7 +350,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     const out = await forward(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, await shaped(prep.body));
     if (!out) return;
     noteLead(prep.body, prep.stage, out, id);
-    if (prep.stage === "submitted" && out.status < 300) void onIntakeSubmitted(promoCtxOf(req), String((prep.body as Record<string, unknown>)?.email ?? ""), typeof (prep.body as Record<string, unknown>)?.website === "string" ? ((prep.body as Record<string, unknown>).website as string) : null);
+    if (prep.stage === "submitted" && out.status < 300) await onIntakeSubmitted(promoCtxOf(req), String((prep.body as Record<string, unknown>)?.email ?? ""), typeof (prep.body as Record<string, unknown>)?.website === "string" ? ((prep.body as Record<string, unknown>).website as string) : null);
     send(res, out);
   });
   router.post("/v1/brand-intake/:id/kit", body, async (req, res) => {
