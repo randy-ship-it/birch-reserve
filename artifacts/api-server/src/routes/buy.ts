@@ -339,7 +339,7 @@ ${publicSeoTags(BUY_PATH, TITLE, DESCRIPTION)}
 
 <form class="card step" id="s3" data-step="3" novalidate><h2>Your ad, then confirm</h2>
 <p class="hint">Upload your ad now, or send it later. Then tick the box and press the green button.</p>
-<div class="adpick" role="radiogroup" aria-label="Your ad"><label class="pick"><input type="radio" name="admode" value="now" checked><strong>Upload it now</strong><small>PNG, JPG, WebP or GIF · up to 2 MB</small></label><label class="pick"><input type="radio" name="admode" value="later"><strong>Send it later</strong><small>We'll ask for it with your insertion order. Nothing runs until it's approved.</small></label></div>
+<div class="adpick" role="radiogroup" aria-label="Your ad"><label class="pick"><input type="radio" name="admode" value="now" checked><strong>Upload it now</strong><small>PNG, JPG, WebP or GIF · up to 2 MB · <a href="/ads/specs" target="_blank" rel="noopener">sizes &amp; templates</a></small></label><label class="pick"><input type="radio" name="admode" value="later"><strong>Send it later</strong><small>We'll ask for it with your insertion order. Nothing runs until it's approved.</small></label></div>
 <div id="ad-now"><label class="drop" id="drop"><strong>Drop your image here, or tap to choose</strong><span>PNG, JPG, WebP or GIF · up to 2 MB · at least ${CREATIVE_MIN_PX} px a side</span>
 <input type="file" id="b-file" accept="${CREATIVE_TYPES.join(",")}" aria-label="Choose your ad image"></label>
 <div class="preview" id="pv"><img id="pv-img" alt="Your ad preview"><div><strong id="pv-name"></strong><br><small id="pv-meta"></small></div></div>
