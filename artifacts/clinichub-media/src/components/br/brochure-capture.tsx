@@ -245,7 +245,7 @@ export function BrochureSlideIn() {
       style={{ marginBottom: "env(safe-area-inset-bottom)" }}
       data-testid="brochure-slidein"
     >
-      <button type="button" onClick={dismiss} aria-label="Close" className="absolute right-2 top-2 flex size-8 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900" data-testid="brochure-slidein-close">
+      <button type="button" onClick={dismiss} aria-label="Close" className="absolute right-2 top-2 z-10 flex size-8 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900" data-testid="brochure-slidein-close">
         <X className="size-4" aria-hidden />
       </button>
       {f.state === "done" ? (
