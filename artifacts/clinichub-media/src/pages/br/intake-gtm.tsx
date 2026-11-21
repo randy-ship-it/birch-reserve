@@ -6,9 +6,11 @@
 import { LeadForm } from "@/components/br/lead-form";
 import { usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF } from "@/components/br/pricing";
+import { isScaleSkin, SCALE_HOME } from "@/lib/siteSkin";
 import { GTM_PARTNER_TYPES, GTM_SETUP, GTM_SETUP_KIND } from "../../../../api-server/src/lib/overhaul/gtmSetup";
 
 export default function BrIntakeGtm() {
+  const scale = isScaleSkin();
   usePageMeta("GTM setup packages from $3,500 USD | Birch Reserve", "We set up the partnership / B2B go-to-market bot and console we use, get your motion running, then hand over the keys.");
   return (
     <div className="bg-[radial-gradient(ellipse_at_top,_#ecfccb_0%,_transparent_55%)]" data-testid="gtm-intake">
@@ -30,7 +32,7 @@ export default function BrIntakeGtm() {
               { name: "name", label: "Your name", required: true },
               { name: "company", label: "Company", required: true },
               { name: "email", label: "Work email", type: "email", required: true },
-              { name: "what_they_sell", label: "What do you sell?", required: true, placeholder: "e.g. a recovery product, a clinic service" },
+              { name: "what_they_sell", label: "What do you sell?", required: true, placeholder: "e.g. recovery product" },
               { name: "partner_type", label: "Who do you want partnerships with?", type: "select", required: true, options: [...GTM_PARTNER_TYPES] },
               { name: "website", label: "Website", type: "url" },
               { name: "message", label: "Anything else we should know", type: "textarea" },
@@ -38,7 +40,7 @@ export default function BrIntakeGtm() {
             ]}
           />
         </div>
-        <p className="mt-4 text-center text-sm"><a href="/" className="font-semibold text-foreground/70 underline-offset-2 hover:underline">Back to birchreserve.net</a></p>
+        <p className="mt-4 text-center text-sm">{scale ? <a href={SCALE_HOME} data-mirror-keep="" className="font-semibold text-foreground/70 underline-offset-2 hover:underline">Back to scalehealth.ca</a> : <a href="/" className="font-semibold text-foreground/70 underline-offset-2 hover:underline">Back to birchreserve.net</a>}</p>
       </section>
     </div>
   );

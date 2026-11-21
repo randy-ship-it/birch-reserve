@@ -67,7 +67,7 @@ export default function BrGtmBot() {
               { name: "name", label: "Your name", required: true },
               { name: "company", label: "Company", required: true },
               { name: "email", label: "Work email", type: "email", required: true },
-              { name: "what_they_sell", label: "What do you sell?", required: true, placeholder: "e.g. a recovery product, a clinic service" },
+              { name: "what_they_sell", label: "What do you sell?", required: true, placeholder: "e.g. recovery product" },
               { name: "stage", label: "Where is the product today?", type: "select", required: true, options: [...GTM_BOT_STAGES] },
               { name: "bots_preference", label: "Your bots or ours?", type: "select", required: true, options: [...GTM_BOT_PREFS] },
               { name: "website", label: "Website", type: "url" },
