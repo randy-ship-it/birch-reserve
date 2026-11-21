@@ -6,6 +6,7 @@
  * Everything shown in admin comes from rows written here. Nothing is modelled.
  */
 import type Stripe from "stripe";
+import { createHmac, randomBytes } from "node:crypto";
 import { MICROS, PROMO_RATE_BPS, regularRateSummary } from "./config";
 import { MEMBER_RE } from "./promoContext";
 import * as store from "./store";
@@ -47,10 +48,23 @@ function toRed(r: Record<string, unknown>): Redemption {
 }
 const CODE_SELECT = (s: string) => `SELECT c.*, (SELECT count(*) FROM ${s}.ad_promo_redemptions r WHERE r.code_key = c.code_key AND r.status <> 'void') AS used FROM ${s}.ad_promo_codes c`;
 
+/** Opaque per-member link token for NEW street-team URLs (?c=...). The server maps it to the street credit; the code string never appears in a URL. */
+let tokenSecret: string | null = null;
+const secretOf = (): string => (tokenSecret ??= process.env.SESSION_SECRET?.trim() || randomBytes(32).toString("hex"));
+export const memberToken = (member: string): string => "sc" + createHmac("sha256", secretOf()).update(`street-link:${member}`).digest("hex").slice(0, 12);
+const TOKEN_RE = /^sc[0-9a-f]{12}$/;
+async function tokenOwner(k0: string): Promise<string | null> {
+  if (!TOKEN_RE.test(k0)) return null;
+  const p = await db();
+  const { rows } = await p.query(`SELECT id FROM ${S()}.ad_street_members WHERE active`);
+  for (const r of rows) if (memberToken(String(r.id)) === k0) return String(r.id);
+  return null;
+}
+
 export async function findCode(input: string): Promise<PromoCode | null> {
   const k0 = normKey(input);
   if (!k0 || k0.length > 40) return null;
-  const k = SPOKEN[k0] ?? k0;
+  const k = (await tokenOwner(k0)) ? "street100" : (SPOKEN[k0] ?? k0);
   const p = await db();
   const { rows } = await p.query(`${CODE_SELECT(S())} WHERE c.code_key = $1 OR $1 = ANY (c.aliases)`, [k]);
   return rows[0] ? toCode(rows[0]) : null;
@@ -87,7 +101,7 @@ export async function validateCode(input: string, email?: string): Promise<Valid
   if (bad) return { ok: false, reason: bad, message: PROBLEM_COPY[bad] };
   if (email && validEmail(email) && (await existing(c!.codeKey, email))) return { ok: false, reason: "already", message: PROBLEM_COPY.already };
   const label = creditLabel(c!.creditMicros);
-  return { ok: true, code: c!.code, creditUsd: c!.creditMicros / MICROS, label, message: `${c!.codeKey === "street100" ? "Code applied — $100 media credit. Use it to test the shelf after the receipt. " : ""}Code ${c!.code} accepted: ${label}. Ad spend only, no cash value, not transferable. ${regularRateSummary().line}` };
+  return { ok: true, code: c!.code, creditUsd: c!.creditMicros / MICROS, label, message: `${c!.codeKey === "street100" ? "Code applied — $100 media credit. Use it to test the shelf after the receipt. " : `Code accepted: ${label}. `}Ad spend only, no cash value, not transferable. ${regularRateSummary().line}` };
 }
 
 /* ------------------------------------------------------------------------------------------ street team */
@@ -170,8 +184,9 @@ export async function listQrs(): Promise<QrRow[]> {
 }
 const SITE_BASE = { birch: "https://birchreserve.net/intake", scale: "https://scalehealth.ca/intake" } as const;
 /** Shareable link: prefilled code + member. qr=1 marks a QR scan (vs a pasted link). */
-export function shareUrl(member: string, site: "birch" | "scale", code = "STREET100", qrLabel: string | null = "qr"): string {
-  const q = new URLSearchParams({ code, st: member });
+export function shareUrl(member: string, site: "birch" | "scale", code: string | null = null, qrLabel: string | null = "qr"): string {
+  // New links carry an opaque per-member token (?c=), never the code itself. An explicit code (legacy / one-off) is still honoured.
+  const q = new URLSearchParams(code ? { code, st: member } : { c: memberToken(member), st: member });
   if (qrLabel) q.set("qr", qrLabel);
   return `${SITE_BASE[site]}?${q.toString()}`;
 }
