@@ -122,8 +122,8 @@ export function RoleTabs({ active }: { active?: IntakeRole }) {
   }, [active, side]);
   return (
     <>
-      <nav aria-label="Choose your side" className="sticky top-16 z-30 border-b border-border/70 bg-background/90 backdrop-blur">
-        <div className="container mx-auto flex items-center gap-3 overflow-x-auto px-4 py-2">
+      <nav aria-label="Choose your side" className="border-b border-border/70 sm:sticky sm:top-16 sm:z-30 bg-background/90 backdrop-blur">
+        <div className="container mx-auto flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2 sm:flex-nowrap sm:overflow-x-auto">
           {ROLE_SIDES.map((g) => (
             <div key={g.side} data-testid={`role-side-${g.side}`} className={`flex shrink-0 items-center gap-1 rounded-full p-1 ${side === g.side && active ? "bg-foreground/[0.06]" : ""}`}>
               <span className="px-2 text-[10px] font-bold uppercase tracking-wider text-foreground/55">{g.label}</span>
