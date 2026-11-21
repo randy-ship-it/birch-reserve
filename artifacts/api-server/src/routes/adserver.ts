@@ -980,8 +980,13 @@ router.post("/ads/admin/email-test", json, (req, res) =>
           buildPrepayConfirmationEmail({ brandName: "Northline Recovery (test)", amountCents: 49000, currency: "usd" } as never),
         ]
       : [];
+    const skip = Math.max(0, Math.min(20, Number((req.body as Record<string, unknown> | undefined)?.skip) || 0));
     const ids: Array<string | null> = [];
-    for (const m of [login, alert, ...extra]) ids.push((await sendBuyerEmail({ from: ADS_FROM(), to: [EMAIL_TEST_TO], subject: `[Test] ${m.subject}`, text: m.text, html: m.html })).id);
+    for (const [i, m] of [login, alert, ...extra].entries()) {
+      if (i < skip) continue;
+      if (ids.length) await new Promise((r) => setTimeout(r, 600)); // Resend rate limit
+      ids.push(await sendBuyerEmail({ from: ADS_FROM(), to: [EMAIL_TEST_TO], subject: `[Test] ${m.subject}`, text: m.text, html: m.html }).then((x) => x.id, (e: unknown) => `failed: ${String(e).slice(0, 80)}`));
+    }
     await store.audit(who, "email.test", EMAIL_TEST_TO, ids.join(","));
     res.json({ message: `Sent ${ids.length} test emails to ${EMAIL_TEST_TO}.`, ids });
   }),
