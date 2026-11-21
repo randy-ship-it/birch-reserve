@@ -27,7 +27,7 @@ for (const width of WIDTHS) {
       await page.goto(path, { waitUntil: "networkidle" });
       await page.waitForTimeout(1500);
       const body = await page.locator("body").innerText();
-      expect(body).not.toMatch(/our plan, not a guarantee|Reach counted with the Street Team/);
+      expect(body).not.toMatch(/a plan, not a guarantee|Reach counted with the Street Team/);
       const hits = await auditPage(page);
       await ctx.close();
       expect(hits, JSON.stringify(hits.slice(0, 8), null, 1)).toEqual([]);
