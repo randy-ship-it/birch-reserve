@@ -70,6 +70,24 @@ export function Layout({ children }: { children: ReactNode }) {
   useEffect(() => logArrival(), [location]);
 
 
+  // Staff screens (/sales/*): a plain internal shell. No public nav, kit CTA, phone button or chat squirrel (BR-15).
+  if (/^\/sales(\/|$)/.test(location)) {
+    return (
+      <div className="min-h-[100dvh] flex flex-col bg-background text-foreground font-sans" data-shell="staff">
+        <header className="border-b border-border bg-background print:hidden">
+          <div className="container mx-auto px-6 h-14 flex items-center justify-between gap-4">
+            <Link href="/" className="flex min-h-10 items-center gap-2">
+              <img src={birchReserveMark} alt="" aria-hidden="true" className="h-7 w-7" />
+              <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-[#071A39]">Birch Reserve</span>
+              <span className="text-[13px] text-muted-foreground">Staff</span>
+            </Link>
+          </div>
+        </header>
+        <main className="flex-1 flex flex-col">{children}</main>
+      </div>
+    );
+  }
+
   // Scale skin (scalehealth.ca/intake): Scale's own header + footer around the unchanged intake (lib/siteSkin.ts).
   if (isScaleSkin()) {
     return (
