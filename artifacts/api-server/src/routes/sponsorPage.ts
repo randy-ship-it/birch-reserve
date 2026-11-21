@@ -10,7 +10,7 @@
  * create test-mode sessions. All impression figures are modelled.
  */
 import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
-import { promoMetadata } from "../lib/adserver/promoContext";
+import { promoMetadata, withScaleReturn } from "../lib/adserver/promoContext";
 import { MODELLED_FOOTER, URGENCY_LINE } from "../lib/overhaul/pilotPath";
 import { CARRY_OVER_CLAUSE, SPONSOR_PACK_TERMS, SPONSOR_TERMS_VERSION, customLineItem, packLineItem } from "../lib/sponsorTerms";
 import { openPrefill } from "../lib/buyFlow";
@@ -352,7 +352,7 @@ router.post("/v1/sponsor/deposit", express.json({ limit: "8kb" }), async (req: R
     return;
   }
   try {
-    const session = await getStripeClient().checkout.sessions.create({ ...built.params, metadata: { ...(built.params.metadata ?? {}), ...promoMetadata() } } as never);
+    const session = await getStripeClient().checkout.sessions.create({ ...withScaleReturn(req, built.params), metadata: { ...(built.params.metadata ?? {}), ...promoMetadata() } } as never);
     const em = String((req.body as Record<string, unknown> | undefined)?.email ?? "").trim().toLowerCase();
     if (session.livemode) void recordPulse("sponsor_checkout", null, { isTest: hasValidQaHeader(req) || isTestIdentity({ email: em }) || /@(silverbirchgrowth\.com|scalehealth\.ca|birchreserve\.net|example\.(com|org))$/.test(em), region: coarseRegion((h) => req.get(h)) });
     res.json({ url: session.url, livemode: session.livemode });

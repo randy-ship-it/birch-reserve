@@ -42,6 +42,37 @@ export function siteOf(req: Pick<Request, "get" | "query">): "birch" | "scale" {
   return String(req.query?.br_mirror ?? "") === "scale" ? "scale" : "birch";
 }
 
+/** Origin that carries Scale mirror traffic back from Stripe (the request's own Scale host, else scalehealth.ca). */
+export function scaleOriginOf(req: Pick<Request, "get" | "query">): string {
+  for (const h of ["origin", "referer"]) {
+    try {
+      const u = new URL(req.get(h) ?? "");
+      if (SCALE_HOSTS.has(u.host)) return `https://${u.host}`;
+    } catch {
+      /* ignore */
+    }
+  }
+  return "https://scalehealth.ca";
+}
+
+/** A Birch path for a redirect: through /intake/_m on the Scale mirror, unchanged on birchreserve.net. */
+export function mirrorPathOf(req: Pick<Request, "get" | "query">, path: string): string {
+  return siteOf(req) === "scale" ? `/intake/_m${path}` : path;
+}
+
+/** Base for Stripe return URLs: the Scale mirror when the checkout started there, else the given Birch base. */
+export function returnBaseOf(req: Pick<Request, "get" | "query">, birchBase: string): string {
+  return siteOf(req) === "scale" ? `${scaleOriginOf(req)}/intake/_m` : birchBase;
+}
+
+/** Checkout started from the Scale mirror returns to the matching scalehealth.ca/intake/_m page, not birchreserve.net. */
+export function withScaleReturn<T extends { success_url?: string | null; cancel_url?: string | null }>(req: Pick<Request, "get" | "query">, params: T): T {
+  if (siteOf(req) !== "scale") return params;
+  const base = `${scaleOriginOf(req)}/intake/_m`;
+  const swap = (u?: string | null) => (u ? u.replace(/^https?:\/\/[^/]+/, base) : u);
+  return { ...params, success_url: swap(params.success_url), cancel_url: swap(params.cancel_url) };
+}
+
 export function promoCtxOf(req: Pick<Request, "get" | "query">): PromoCtx {
   // The x-br-attr header (set by the site script on same-origin API calls) wins over cookies: cookies do not survive every proxy path (Scale mirror).
   const hdr = new URLSearchParams(req.get("x-br-attr") ?? "");

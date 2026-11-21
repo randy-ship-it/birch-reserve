@@ -1,6 +1,7 @@
 import { hundredHtml } from "../lib/overhaul/hundred";
 import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
 import { withStreetNet } from "../lib/adserver/promoNet";
+import { returnBaseOf } from "../lib/adserver/promoContext";
 import { CHECKOUT_TAGLINE, birchCheckoutCustomText, birchPaymentIntentBrand } from "../lib/checkoutCopy";
 import { HERO_MOCK_CSS, heroMockHtml } from "../lib/heroMock";
 import { URGENCY_LINE } from "../lib/overhaul/pilotPath";
@@ -1074,8 +1075,8 @@ async function handleMachineCheckout(
         checkoutAttempt: String(nextAttempt),
       },
     },
-    success_url: `${baseUrl}/success?order=${reservation.id}&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${baseUrl}/buycalc?checkout=cancelled`,
+    success_url: `${returnBaseOf(req, baseUrl)}/success?order=${reservation.id}&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${returnBaseOf(req, baseUrl)}/buycalc?checkout=cancelled`,
     allow_promotion_codes: false,
     custom_text: birchCheckoutCustomText(),
   }, offerAmountCents(offer, currency), currency, res.locals.ucpAnonymousBuyer === true ? null : reservation.email);
