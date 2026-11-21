@@ -298,7 +298,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   const supplierOnly = r.supplier && !r.hub;
   return (
     <form onSubmit={submit} noValidate data-testid="intake-short-form" data-roles={roles.join(",")} className="rounded-3xl border border-foreground/10 bg-white p-5 shadow-xl md:p-6">
-      <StepHeader step={1} total={2} title="Your free kit" hint={sup ? "Pick your level, add your website and work email, then press the green button." : "Both boxes are on (most brands are both). Add your website and work email, then press Get my Monetization Kit."} testId="intake-steps" />
+      <StepHeader step={1} total={2} title="Your free kit" hint={sup ? "Pick your level, add your website and work email, then press the green button." : "Both boxes are on (most brands are both). Add your website and work email, then press Get my free Monetization Kit."} testId="intake-steps" />
       <SavedNote show={localRestored && !resumed} onClear={startOver} />
       {sup ? <ExposureLadder level={levelOf(r)} onPick={(l) => { setR(rolesForLevel(l)); trackIntake("advertiser", "field_start", l === 3 ? "accelerate" : l === 2 ? "add_hub" : "supplier", { dedupe: true }); }} /> : null}
       {sup ? null : <fieldset>
