@@ -22,7 +22,7 @@ export function GtmSetup({ where }: { where: "home" | "media_kit" | "intake" }) 
           </li>
         ))}
       </ol>
-      <div className="mt-5 grid gap-3 md:grid-cols-3" data-testid={`gtm-cases-${where}`}>
+      <div className="mt-5 grid gap-3 md:grid-cols-2" data-testid={`gtm-cases-${where}`}>
         {GTM_SETUP.cases.map((c) => (
           <p key={c} className="rounded-2xl border border-[#0b1f3a]/10 bg-[#0b1f3a]/[0.03] p-4 text-sm font-semibold text-[#0b1f3a]">{c}</p>
         ))}
