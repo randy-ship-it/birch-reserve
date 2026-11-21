@@ -75,3 +75,21 @@ test("mirror links: DOM <a href> that leave /intake are rewritten to Birch; abso
   assert.match(out, /hasAttribute\("data-mirror-keep"\)\|\|a\.hasAttribute\("download"\)\)return;var p=raw/);
   assert.match(out, /var p=raw\(a\.getAttribute\("href"\)\);if\(p===null\|\|own\(p\)\)return;e\.preventDefault/, "click handler ignores absolute same-origin links");
 });
+
+test("any Birch page opened through /intake/_m with the Scale tag gets the mirror-aware fetch base (buycalc, hub-proof)", async () => {
+  const { default: express } = await import("express");
+  const { mirrorHost } = await import("../src/middlewares/mirrorHost");
+  const app = express();
+  app.use(mirrorHost());
+  app.get("/buycalc", (_q, r) => r.type("html").send(`<!doctype html><html><head><title>Buy | Birch Reserve</title></head><body></body></html>`));
+  const srv = app.listen(0);
+  try {
+    const port = (srv.address() as { port: number }).port;
+    const get = (p: string) => fetch(`http://127.0.0.1:${port}${p}`).then((r) => r.text());
+    assert.match(await get("/intake/_m/buycalc?br_mirror=scale"), /window\.__BR_MIRROR/);
+    assert.doesNotMatch(await get("/buycalc"), /__BR_MIRROR/);
+    assert.doesNotMatch(await get("/intake/_m/buycalc"), /__BR_MIRROR/);
+  } finally {
+    srv.close();
+  }
+});
