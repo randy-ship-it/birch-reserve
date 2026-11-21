@@ -89,10 +89,12 @@ for (const action of ["approve", "reject"] as const) {
 
 const PAGE_CSS = `*{box-sizing:border-box}body{margin:0;background:#F9F8F6;color:#071A39;font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif}main{max-width:620px;margin:0 auto;padding:24px 16px 56px}h1{font:400 clamp(1.8rem,7vw,2.4rem)/1.12 Fraunces,Georgia,serif;margin:6px 0 8px}.eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;opacity:.65;margin:0}.pill{display:inline-block;background:#C8F55A;border-radius:999px;padding:2px 10px;font-weight:700;font-size:13px}.card{background:#fff;border:1px solid #d5d9df;border-radius:20px;padding:20px;margin-top:16px}label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}input,select,textarea{width:100%;min-height:46px;padding:10px 12px;border:1px solid #071A39;border-radius:12px;font:inherit;background:#fff}button{min-height:50px;width:100%;margin-top:16px;border:0;border-radius:999px;background:#C8F55A;color:#071A39;font:700 16px inherit;cursor:pointer}button:disabled{opacity:.6}.fine{font-size:13px;opacity:.75}.msg{margin-top:10px;font-weight:600}.hp{position:absolute;left:-9999px}details{margin-top:12px}summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}ul{padding-left:20px}`;
 
-router.get("/hub-proof", (req, res) => {
+router.get(["/hub-proof", "/intake/hub-proof"], (req, res) => {
   const scale = siteOf(req) === "scale";
+  const base = scale ? "/intake/_m" : "";
   const brand = scale ? "Scale Health" : "Birch Reserve";
   res.set("Cache-Control", "no-store").type("html").send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Activate your hub, earn $100 | ${brand}</title><style>${PAGE_CSS}</style></head><body><main>
+<img src="${base}${scale ? "/brand/scale/favicon.svg" : "/favicon.svg"}" alt="${brand}" width="36" height="36" style="display:block;border-radius:8px;margin-bottom:10px">
 <p class="eyebrow">${brand} · Hub owners</p><h1>Activate your own hub. <span class="pill">Earn $100</span></h1>
 <p>Brands are already buying placements, so your hub can earn from ads from day one. Send your hub to 1,000 or more people, show us it went out, and we add a $100 ad credit to your account.</p>
 <form class="card" id="f" novalidate><label for="hn">Hub name</label><input id="hn" name="hub_name" required maxlength="160" autocomplete="organization">
@@ -110,7 +112,7 @@ router.get("/hub-proof", (req, res) => {
 <script>(function(){var f=document.getElementById("f"),m=document.getElementById("m"),b=document.getElementById("go");
 f.addEventListener("submit",function(e){e.preventDefault();m.textContent="";if(!f.reportValidity())return;var fl=document.getElementById("fl").files[0];if(!fl){m.textContent="Add your proof screenshot.";return}if(fl.size>3*1024*1024){m.textContent="That file is over 3 MB.";return}if(!document.getElementById("tm").checked){m.textContent="Tick the box to accept the terms.";return}
 b.disabled=true;m.textContent="Sending…";var r=new FileReader();r.onload=function(){var d=String(r.result).split(",")[1]||"";var q=Object.fromEntries(new FormData(f));q.reach=Number(q.reach);q.terms=true;q.file={data:d};
-fetch("/v1/hub-proof",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(q)}).then(function(x){return x.json().catch(function(){return{}}).then(function(j){if(j.ok){f.innerHTML='<h2 style="font-family:Fraunces,Georgia,serif;font-weight:400">Got it.</h2><p>'+j.message+'</p>'}else{m.textContent=j.message||"That didn't work. Try again.";b.disabled=false}})}).catch(function(){m.textContent="Could not send. Try again or email sales@silverbirchgrowth.com.";b.disabled=false})};r.readAsDataURL(fl)})})();</script></body></html>`);
+fetch("${base}/v1/hub-proof",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(q)}).then(function(x){return x.json().catch(function(){return{}}).then(function(j){if(j.ok){f.innerHTML='<h2 style="font-family:Fraunces,Georgia,serif;font-weight:400">Got it.</h2><p>'+j.message+'</p>'}else{m.textContent=j.message||"That didn't work. Try again.";b.disabled=false}})}).catch(function(){m.textContent="Could not send. Try again or email sales@silverbirchgrowth.com.";b.disabled=false})};r.readAsDataURL(fl)})})();</script></body></html>`);
 });
 
 export default router;
