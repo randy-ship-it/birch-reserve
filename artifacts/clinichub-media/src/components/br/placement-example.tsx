@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { HUB_MOCKS, HUB_KEYS, type HubKey } from "@/lib/hub-mocks";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 /** The five rate-card surfaces (same keys as RATE_SURFACES in overhaul/pricing.ts). */
@@ -59,15 +60,31 @@ function Shot({ src, alt, children }: { src: string; alt: string; children: Reac
   );
 }
 
+/** Landing example on any of the 4 live hubs (16:10 captures, nothing cropped). Banner sits in the header gap; tile in a blank corner. */
+const LANDING_BANNER: Record<HubKey, string> = { drho: "top-[18.6%]", sole: "top-[12.6%]", effortless: "top-[12.4%]", calmjoints: "top-[13.2%]" };
+const LANDING_TILE: Record<HubKey, string> = { drho: "right-[4%] top-[27%] w-[30%]", sole: "left-[4%] top-[24%] w-[30%]", effortless: "right-[2%] top-[29%] w-[34%]", calmjoints: "left-[4%] top-[22%] w-[30%]" };
+function LandingShot() {
+  const [hub, setHub] = useState<HubKey>("drho");
+  const H = HUB_MOCKS[hub];
+  return (
+    <div>
+      <div className="mb-1.5 flex max-w-full gap-1 overflow-x-auto [scrollbar-width:none]" role="group" aria-label="Example hub" data-testid="placement-hub-tabs">
+        {HUB_KEYS.map((k) => (
+          <button key={k} type="button" aria-pressed={hub === k} onClick={() => setHub(k)} className={`shrink-0 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${hub === k ? "bg-foreground text-background" : "bg-white ring-1 ring-foreground/15 text-foreground/70"}`}>{HUB_MOCKS[k].tab}</button>
+        ))}
+      </div>
+      <Shot src={H.img} alt={`${H.name} hub home page, with an example banner and tile drawn on top`}>
+        <Unit className={`absolute left-[4%] right-[4%] ${LANDING_BANNER[hub]} py-1`} label="Your brand · hub banner" />
+        <Unit className={`absolute ${LANDING_TILE[hub]}`} label="Your brand · native tile" />
+      </Shot>
+    </div>
+  );
+}
+
 export function PlacementVisual({ k }: { k: PlacementKey }) {
   switch (k) {
     case "landing":
-      return (
-        <Shot src="/hub-gallery/drho.webp" alt="DR-HO'S physio hub home page, with an example banner and tile drawn on top">
-          <Unit className="absolute left-[4%] right-[4%] top-[14%] py-2" label="Your brand · hub banner" />
-          <Unit className="absolute bottom-[6%] left-[6%] w-[36%]" label="Your brand · native tile" />
-        </Shot>
-      );
+      return <LandingShot />;
     case "products":
       return (
         <Shot src="/hub-proof/roll-marketplace-grid.webp" alt="ROLL Recovery member marketplace product grid, with an example sponsored card drawn on top">

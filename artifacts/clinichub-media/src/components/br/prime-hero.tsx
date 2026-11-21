@@ -150,6 +150,8 @@ export function FaceBeforeFlight({ compact = false }: { compact?: boolean }) {
         {[
           { href: LIVE_HUB_URL, img: LIVE_HUB_IMAGE, name: "DR-HO'S physio", host: "physio.drhonow.com", tid: "live-hub-drho" },
           { href: SOLE_HUB_URL, img: SOLE_HUB_IMAGE, name: "SOLE", host: "scalehealth.ca/sole", tid: "live-hub-sole" },
+          { href: "https://www.scalehealth.ca/effortlessadmin", img: "/hub-gallery/effortless.webp", name: "Effortless Admin", host: "scalehealth.ca/effortlessadmin", tid: "live-hub-effortless" },
+          { href: "https://www.scalehealth.ca/calmjoints", img: "/hub-gallery/calmjoints.webp", name: "Calm Joints", host: "scalehealth.ca/calmjoints", tid: "live-hub-calmjoints" },
         ].map((h) => (
           <a key={h.tid} href={h.href} target="_blank" rel="noopener" data-testid={h.tid} className="group block border border-foreground/15 bg-white p-2 shadow-sm" aria-label={`Open the live ${h.name} hub`}>
             <img src={h.img} alt={`${h.name} members-only hub, live`} width={1440} height={900} loading="lazy" decoding="async" className="block h-auto w-full" />

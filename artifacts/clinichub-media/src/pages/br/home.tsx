@@ -45,6 +45,8 @@ const STATS = [
 const HUBS = [
   { href: LIVE_HUB_URL, img: LIVE_HUB_IMAGE, name: "DR-HO'S physio", host: "physio.drhonow.com", tid: "live-hub-drho" },
   { href: SOLE_HUB_URL, img: SOLE_HUB_IMAGE, name: "SOLE", host: "scalehealth.ca/sole", tid: "live-hub-sole" },
+  { href: "https://www.scalehealth.ca/effortlessadmin", img: "/hub-gallery/effortless.webp", name: "Effortless Admin", host: "scalehealth.ca/effortlessadmin", tid: "live-hub-effortless" },
+  { href: "https://www.scalehealth.ca/calmjoints", img: "/hub-gallery/calmjoints.webp", name: "Calm Joints", host: "scalehealth.ca/calmjoints", tid: "live-hub-calmjoints" },
 ];
 
 const TILES = [
