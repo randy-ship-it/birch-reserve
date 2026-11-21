@@ -9,7 +9,9 @@ test("frame-ancestors always allows Birch + Scale mirror hosts, and folds valid 
   assert.equal(frameAncestors({ MIRROR_FRAME_HOSTS: "*, javascript:alert(1), https://partner.example.com" }), "frame-ancestors 'self' https://scalehealth.ca https://www.scalehealth.ca https://partner.example.com");
   assert.match(enforcedCsp({}), /base-uri 'self'; object-src 'none'; frame-ancestors/);
   assert.doesNotMatch(enforcedCsp({}), /script-src|default-src/);
-  assert.match(reportOnlyCsp({}), /report-uri \/v1\/csp-report/);
+  assert.match(reportOnlyCsp({}), /report-uri https:\/\/birchreserve\.net\/v1\/csp-report/);
+  assert.match(reportOnlyCsp({}), /script-src 'self' https:\/\/birchreserve\.net/);
+  assert.match(reportOnlyCsp({}), /connect-src 'self' https:\/\/birchreserve\.net/);
 });
 
 test("every response carries the security headers and no X-Powered-By", async () => {

@@ -23,24 +23,28 @@ export function enforcedCsp(env: NodeJS.ProcessEnv = process.env): string {
 }
 
 export const CSP_REPORT_PATH = "/v1/csp-report";
+// Absolute so reports from the Scale mirror (www.scalehealth.ca/intake) reach Birch instead of Scale's own /v1.
+export const CSP_REPORT_URI = `https://birchreserve.net${CSP_REPORT_PATH}`;
+// The Scale mirror page loads Birch scripts/API (embed.js, /v1/ads/serve, Clerk proxy) cross-origin.
+const BIRCH = "https://birchreserve.net https://www.birchreserve.net";
 
 /** Report-only allow-list. Kept wide on purpose (inline scripts, analytics, chat, voice, Stripe, Clerk, Turnstile). */
 export function reportOnlyCsp(env: NodeJS.ProcessEnv = process.env): string {
   return [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' blob: https://plausible.io https://unpkg.com https://challenges.cloudflare.com https://js.stripe.com https://*.clerk.accounts.dev https://clerk.birchreserve.net https://www.googletagmanager.com https://va.vercel-scripts.com",
+    `script-src 'self' ${BIRCH} 'unsafe-inline' blob: https://plausible.io https://unpkg.com https://challenges.cloudflare.com https://js.stripe.com https://*.clerk.accounts.dev https://clerk.birchreserve.net https://www.googletagmanager.com https://va.vercel-scripts.com`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' data: https://fonts.gstatic.com",
     "img-src 'self' data: blob: https:",
     "media-src 'self' blob: data: https://*.elevenlabs.io",
-    "connect-src 'self' https://plausible.io https://*.elevenlabs.io wss://*.elevenlabs.io https://api.x.ai wss://api.x.ai https://challenges.cloudflare.com https://api.stripe.com https://*.clerk.accounts.dev https://clerk.birchreserve.net https://*.google-analytics.com https://*.analytics.google.com https://vitals.vercel-insights.com",
-    "frame-src 'self' https://challenges.cloudflare.com https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://cal.com https://*.elevenlabs.io",
+    `connect-src 'self' ${BIRCH} https://plausible.io https://*.elevenlabs.io wss://*.elevenlabs.io https://api.x.ai wss://api.x.ai https://challenges.cloudflare.com https://api.stripe.com https://*.clerk.accounts.dev https://clerk.birchreserve.net https://*.google-analytics.com https://*.analytics.google.com https://vitals.vercel-insights.com`,
+    `frame-src 'self' ${BIRCH} https://challenges.cloudflare.com https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://cal.com https://*.elevenlabs.io`,
     "worker-src 'self' blob:",
     "form-action 'self' https://checkout.stripe.com",
     "base-uri 'self'",
     "object-src 'none'",
     frameAncestors(env),
-    `report-uri ${CSP_REPORT_PATH}`,
+    `report-uri ${CSP_REPORT_URI}`,
   ].join("; ");
 }
 
