@@ -24,8 +24,9 @@ export function RateCard({ currency }: { currency: Currency }) {
     return k ? <PlacementTrigger k={k} onOpen={setEx} className={cls}>{s.label}</PlacementTrigger> : s.label;
   };
   return (
-    <div data-testid="rate-card">
-      <p className="mb-3 text-xs text-muted-foreground">Tap or hover a placement to see an example inside a hub.</p>
+    // Hub totals are modelled from USD CPMs (no CAD table), so they stay labelled in the currency they were built in.
+    <div data-testid="rate-card" data-currency-fixed>
+      <p className="mb-3 text-xs text-muted-foreground">Tap or hover a placement to see an example inside a hub.{currency === "usd" ? " Modelled from USD CPMs, shown in USD." : ""}</p>
       {/* Mobile: one card per hub (no sideways scroll) */}
       <div className="grid gap-3 md:hidden" data-testid="rate-card-mobile">
         {hubs.map((h) => (
