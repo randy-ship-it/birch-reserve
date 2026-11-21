@@ -10,7 +10,7 @@ const WIDTHS = [320, 375, 390, 430, 1280, 1440];
 const PATHS = (process.env.AUDIT_PATHS ?? [
   "/", "/advertise/brands", "/advertise/local", "/publish/brands", "/publish/studios", "/rates", "/match", "/hubs", "/media-kit",
   "/agencies", "/brand-kit", "/intake", "/intake/publisher", "/intake/supplier", "/intake/sponsor", "/intake/gtm", "/gtm-bot", "/intake/street-team",
-  "/street-team", "/media-buyers", "/audiences", "/audiences/sample-profile", "/buyers", "/ai-buyers", "/about", "/terms", "/privacy",
+  "/street-team", "/partners", "/media-buyers", "/audiences", "/audiences/sample-profile", "/buyers", "/ai-buyers", "/about", "/terms", "/privacy",
   "/insights", "/inventory",
   // Server-rendered (api-server) pages: only exist on a live/preview host.
   ...(process.env.PLAYWRIGHT_BASE_URL ? ["/hub-proof", "/sponsor", "/ads/docs", "/reel", "/buy", "/buycalc"] : []),

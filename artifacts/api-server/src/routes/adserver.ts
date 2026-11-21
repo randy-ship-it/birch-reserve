@@ -30,6 +30,8 @@ import * as store from "../lib/adserver/store";
 import { maxPoolAllocationBps, maxReferrerAllocationBps, recipientsAt, splitReferralOrders } from "../lib/adserver/payoutSplit";
 import { listReferralOrders, toLine as toReferralLine } from "../lib/adserver/referrals";
 import { referralAdminHtml } from "../lib/adserver/referralAdmin";
+import { partnersAdminHtml } from "../lib/adserver/partnersAdmin";
+import { getLeadStore } from "../lib/leads";
 import { draftCampaignFromCheckoutSafe, recordClick, recordConversion, recordView, serve } from "../lib/adserver/service";
 import { EMBED_JS, PIXEL_JS } from "../lib/adserver/embed";
 import { dashboardPage, loginPage } from "../lib/adserver/accountPage";
@@ -524,7 +526,7 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
           return pend.map((x) => ({ ...x, brand: brand.get(x.campaignId) ?? "", variants: vs.filter((y) => y.creativeId === x.id) }));
         })(),
         creativesByCampaign: byC, slotTotals, ledger: led, royalties: roy, shares, alerts, audit, day: dayT, friday: fridayReady(), schema: store.adSchema(),
-        promoHtml: await promoPanels(), ...(await referralPanel(recips)), hubServing: await store.hubServing(), hubs, testRoyalties, summary: realSt.summary, testSummary: testSt.summary, rates, recipients: recips, gates: gateMap, timing, channelRates,
+        promoHtml: await promoPanels(), partnersHtml: partnersAdminHtml(await getLeadStore().listBySource("partners", 300).catch(() => []), str(req.query["ptrack"], 20)), ...(await referralPanel(recips)), hubServing: await store.hubServing(), hubs, testRoyalties, summary: realSt.summary, testSummary: testSt.summary, rates, recipients: recips, gates: gateMap, timing, channelRates,
         orders: orders.map((o) => ({ id: o.id, at: o.createdAt, email: o.email, company: o.company, website: o.website, plan: o.plan, format: o.format, creativeId: o.creativeId })),
       }),
     );

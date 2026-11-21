@@ -30,7 +30,7 @@
 import { logger } from "./logger";
 import { applyAdditiveColumns } from "./schemaEnsure";
 
-export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture" | "checkout" | "local_biz" | "inventory_signup" | "brand_intake";
+export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture" | "checkout" | "local_biz" | "inventory_signup" | "brand_intake" | "partners";
 
 /** Friday deal metadata carried on the lead (unknown keys are simply absent). */
 export type LeadMeta = {
@@ -59,8 +59,10 @@ export type LeadMeta = {
   /** Brochure capture (Nov 21 2026): which block captured the email, and the street-team tag if any. */
   capture_source?: string;
   st?: string;
+  /** Partnerships form (Nov 21 2026): flyer | adbuying | media. */
+  partner_track?: string;
 };
-const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id", "stage", "friday_intake_id", "nudged_at", "unsub", "intake_role", "hub_status", "hub_slug", "capture_source", "st"] as const;
+const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id", "stage", "friday_intake_id", "nudged_at", "unsub", "intake_role", "hub_status", "hub_slug", "capture_source", "st", "partner_track"] as const;
 
 /** Keep only well-typed, non-empty keys (never empty strings). */
 export function cleanLeadMeta(raw: unknown): LeadMeta {
@@ -133,6 +135,8 @@ export interface LeadStore {
   /** Merge-upsert; returns the stored row and whether any lead field changed. */
   upsert(input: LeadInput): Promise<{ lead: Lead; created: boolean; changed: boolean }>;
   get(id: string): Promise<Lead | undefined>;
+  /** Newest first. Admin views only. */
+  listBySource(source: LeadSource, limit: number): Promise<Lead[]>;
   /** Atomically claim a Friday push (status → sending, attempts + 1). */
   claimFriday(id: string, now: Date, staleMs: number): Promise<Lead | undefined>;
   /** afterClaim (default true): a lead edited mid-send stays pending so it is re-pushed. */
@@ -164,6 +168,7 @@ const SOURCE_RANK: Record<LeadSource, number> = {
   advertiser_intake: 0,
   inventory_signup: 0,
   brand_intake: 0,
+  partners: 0,
   chat_intake: 1,
   chat_callback: 2,
   voice: 2,
@@ -266,6 +271,10 @@ export class MemoryLeadStore implements LeadStore {
   async get(id: string) {
     const l = this.rows.get(id);
     return l ? { ...l } : undefined;
+  }
+
+  async listBySource(source: LeadSource, limit: number) {
+    return [...this.rows.values()].filter((l) => l.source === source).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, limit).map((l) => ({ ...l }));
   }
 
   async claimFriday(id: string, now: Date, staleMs: number) {
@@ -536,6 +545,12 @@ export class PgLeadStore implements LeadStore {
     const m = await leadsDb();
     const res = await m.pool.query("SELECT * FROM leads WHERE id = $1", [id]);
     return res.rows[0] ? rowToLead(res.rows[0] as RawRow) : undefined;
+  }
+
+  async listBySource(source: LeadSource, limit: number) {
+    const m = await leadsDb();
+    const res = await m.pool.query("SELECT * FROM leads WHERE source = $1 ORDER BY created_at DESC LIMIT $2", [source, Math.max(1, Math.min(500, limit))]);
+    return (res.rows as RawRow[]).map(rowToLead);
   }
 
   async claimFriday(id: string, now: Date, staleMs: number) {

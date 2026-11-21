@@ -16,6 +16,7 @@ import { MediaKitPdfLink, ProofStrip, SalesContact, TRUST_FAQ, TrustBand, TrustF
 import { GtmSetup } from "@/components/br/gtm-setup";
 import { GtmBotTeaser } from "@/components/br/gtm-bot-teaser";
 import { StreetTeamProgram } from "@/components/br/street-team";
+import { PartnersTeaser } from "@/components/br/partners";
 import { KitCta } from "@/components/br/kit-cta";
 import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
@@ -185,6 +186,11 @@ export default function BrHome() {
       {/* 2e. Street team program, coming 2027 (Randy, voice, Nov 21 2026 2:03 PM ET). */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-street-team">
         <StreetTeamProgram where="home" />
+      </section>
+
+      {/* 2f. Partnerships teaser (Randy, voice, Nov 21 2026 4:51 PM ET). */}
+      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-partners">
+        <PartnersTeaser />
       </section>
 
       {/* 3. Two ways in (same cards as the intake). */}
