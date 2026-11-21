@@ -19,7 +19,7 @@ import { qrPng, qrSvg } from "../lib/adserver/qr";
 import { draftCampaignFromCheckoutSafe } from "../lib/adserver/service";
 import * as store from "../lib/adserver/store";
 import { toCsv } from "../lib/adserver/ui";
-import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
+import { hasQaUaToken, hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
 
 const router: IRouter = Router();
 const json = express.json({ limit: "8kb" });
@@ -100,7 +100,7 @@ router.post("/v1/promo/scan", json, (req, res) =>
     const day = new Date().toISOString().slice(0, 10);
     const vid = createHash("sha256").update(`${ip(req)}|${req.get("user-agent")}|${day}`).digest("hex").slice(0, 16);
     const site = siteOf(req);
-    const test = hasValidQaHeader(req);
+    const test = hasValidQaHeader(req) || hasQaUaToken(req);
     const qrLabel = typeof b.qr === "string" && /^[a-z0-9_-]{1,40}$/i.test(b.qr) ? (b.qr === "1" ? "qr" : b.qr.toLowerCase()) : b.qr === true ? "qr" : null;
     await promo.streetEvent({ member, kind: "visit", site, isTest: test, dedupeKey: `v:${member}:${site}:${vid}:${day}` });
     if (qrLabel) await promo.streetEvent({ member, kind: "scan", qr: qrLabel, site, isTest: test, dedupeKey: `q:${member}:${site}:${qrLabel}:${vid}:${day}` });
@@ -171,7 +171,7 @@ router.post("/v1/promo/attribution", json, (req, res) =>
     const fresh = Date.now() / 1000 - (s.created ?? 0) < 3600;
     if (s.status !== "open" || s.payment_status === "paid" || !fresh || !isTestIdentity({ email })) return void res.status(404).json({ ok: false });
     const md = s.metadata ?? {};
-    res.json({ ok: true, st: md.st ?? null, st_qr: md.st_qr ?? null, promo: md.promo ?? null, site: md.site ?? null });
+    res.json({ ok: true, st: md.st ?? null, st_qr: md.st_qr ?? null, promo: md.promo ?? null, site: md.site ?? null, sold_by: md.sold_by ?? null });
   }),
 );
 

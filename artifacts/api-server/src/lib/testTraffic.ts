@@ -37,6 +37,15 @@ export function hasValidQaHeader(req: Pick<Request, "get">): boolean {
   return constantTimeEquals(given, expected);
 }
 
+/**
+ * Automated QA browsers (the live referral e2e) add this token to their user agent so the visits / scans they cause are
+ * stored is_test and never count in street-team stats or pulse. It only marks the sender's own traffic as test.
+ */
+export const BIRCH_QA_UA_TOKEN = "BirchQA/1" as const;
+export function hasQaUaToken(req: Pick<Request, "get">): boolean {
+  return /\bBirchQA\/\d/.test(req.get("user-agent") ?? "");
+}
+
 export type TestIdentity = {
   email?: string | null;
   name?: string | null;

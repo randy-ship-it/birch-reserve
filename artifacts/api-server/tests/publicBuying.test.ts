@@ -29,6 +29,7 @@ import app from "../src/app";
 import {
   buildUcpBusinessProfile,
   buildUcpCheckoutView,
+  checkoutAdInterest,
 } from "../src/routes/publicBuying";
 import {
   cleanupSplashReservations,
@@ -3802,6 +3803,44 @@ test("quote and checkout reject unsupported contract values", async () => {
     }),
   });
   assert.equal(response.status, 400);
+});
+
+test("same-key retry that omits format_pref replays the stored seat instead of 409ing", async () => {
+  const prev = { d: process.env.STRIPE_CHECKOUT_DISABLED, k: process.env.STRIPE_SECRET_KEY, u: process.env.PUBLIC_BASE_URL, t: process.env.SEATS_TOTAL };
+  process.env.STRIPE_CHECKOUT_DISABLED = "false";
+  process.env.PUBLIC_BASE_URL = "https://reserve.example.com";
+  process.env.SEATS_TOTAL = "100";
+  process.env.STRIPE_SECRET_KEY = "sk_test_birch_checkout_wiring_only";
+  let creates = 0;
+  setStripeCheckoutFunctionsForTests({
+    create: async (params) => {
+      creates += 1;
+      const priceData = params.line_items?.[0]?.price_data;
+      return { id: `cs_test_nofmt_${randomUUID().replaceAll("-", "")}`, url: `https://checkout.stripe.test/nofmt-${creates}`, client_reference_id: params.client_reference_id, currency: priceData?.currency, amount_total: priceData?.unit_amount, metadata: params.metadata } as never;
+    },
+  });
+  const body = JSON.stringify({ sku: "hold-190", email: `nofmt-${randomUUID()}@example.com`, brand: "No Format Agent", currency: "usd", idempotency_key: randomUUID() });
+  const send = () => fetch(`${origin}/v1/checkout`, { method: "POST", headers: { "content-type": "application/json" }, body });
+  try {
+    const first = await send();
+    assert.equal(first.status, 200);
+    const a = (await first.json()) as Record<string, unknown>;
+    createdIds.push(String(a.order_id));
+    const retry = await send();
+    assert.equal(retry.status, 200, "an agent retry without format_pref must not get 'idempotency key was used for a different checkout request'");
+    const b = (await retry.json()) as Record<string, unknown>;
+    assert.equal(b.order_id, a.order_id);
+    const [row] = await db.select().from(splashAdReservationsTable).where(eq(splashAdReservationsTable.id, String(a.order_id)));
+    assert.equal(row?.adInterest, checkoutAdInterest(undefined));
+    assert.notEqual(checkoutAdInterest(undefined), "post_checkout");
+    assert.equal(checkoutAdInterest("member_hub"), "member_hub");
+  } finally {
+    setStripeCheckoutFunctionsForTests();
+    for (const [k, v] of [["STRIPE_CHECKOUT_DISABLED", prev.d], ["STRIPE_SECRET_KEY", prev.k], ["PUBLIC_BASE_URL", prev.u], ["SEATS_TOTAL", prev.t]] as const) {
+      if (v === undefined) delete process.env[k];
+      else process.env[k] = v;
+    }
+  }
 });
 
 test("catalog and quotes expose every exact canonical tier", async () => {

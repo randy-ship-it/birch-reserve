@@ -10,9 +10,11 @@ import { expect, test, type Page } from "@playwright/test";
 const LIVE = process.env.REFERRAL_E2E_LIVE === "1";
 const BIRCH = process.env.REFERRAL_E2E_BIRCH ?? "https://birchreserve.net";
 const SCALE = process.env.REFERRAL_E2E_SCALE ?? "https://scalehealth.ca";
-const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+// A real-browser UA (Vercel 429s bots) plus the BirchQA/1 token, so the server stores every visit / scan this run causes as
+// is_test: street-team stats and pulse stay real-only (lib/testTraffic.ts hasQaUaToken). BIRCH_QA_SECRET, when set, also sends X-Birch-QA.
+const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 BirchQA/1";
 
-test.use({ userAgent: UA });
+test.use({ userAgent: UA, ...(process.env.BIRCH_QA_SECRET ? { extraHTTPHeaders: { "x-birch-qa": process.env.BIRCH_QA_SECRET } } : {}) });
 test.skip(!LIVE, "live referral e2e is opt-in (REFERRAL_E2E_LIVE=1)");
 
 type Host = { name: string; qr: string; browse: string[]; checkoutFrom: string; cookieDomain: string; site: "birch" | "scale"; st: string; qrLabel: string };
@@ -52,5 +54,7 @@ for (const h of HOSTS) {
     const sid = await startCheckout(page, `qa+referral-${h.site}-${Date.now()}@silverbirchgrowth.com`);
     const md = await page.evaluate(async (s) => (await fetch("/v1/promo/attribution", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ session_id: s }) })).json(), sid);
     expect(md).toMatchObject({ ok: true, st: h.st, st_qr: h.qrLabel, site: h.site });
+    // Scale-mirror checkouts open as Scale Health direct (5% channel); birchreserve.net stays Birch brokerage.
+    expect(md.sold_by).toBe(h.site === "scale" ? "scale" : null);
   });
 }

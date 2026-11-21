@@ -150,6 +150,17 @@ const DDL = (s: string) => [
     amount_cents bigint NOT NULL, currency text NOT NULL, order_kind text, brand text, is_test boolean NOT NULL DEFAULT false, paid_at timestamptz NOT NULL DEFAULT now(), created_at timestamptz NOT NULL DEFAULT now())`,
   `CREATE INDEX IF NOT EXISTS ad_referral_orders_member ON ${s}.ad_referral_orders (member, paid_at)`,
   `ALTER TABLE ${s}.ad_override_recipients ADD COLUMN IF NOT EXISTS scope_referrer text`,
+  // One-shot QA hygiene (Nov 21 2026): the live referral e2e (4:25:34–4:28:31 PM ET, before it marked itself as test) logged
+  // visit / scan rows for bridget (birch, birch-intake) and mona (scale, scale-intake-digital). Flag them is_test (never deleted;
+  // reversible from the ids in the audit row) so street-team stats stay real-only. Runs once, guarded by its audit row.
+  `WITH upd AS (UPDATE ${s}.ad_street_events SET is_test = true
+     WHERE is_test = false AND kind IN ('visit','scan') AND at >= '2026-11-21T21:25:00Z' AND at <= '2026-11-21T21:29:00Z'
+       AND ((member = 'bridget' AND site = 'birch' AND (qr IS NULL OR qr = 'birch-intake')) OR (member = 'mona' AND site = 'scale' AND (qr IS NULL OR qr = 'scale-intake-digital')))
+       AND NOT EXISTS (SELECT 1 FROM ${s}.ad_audit WHERE action = 'street.qa_flag' AND target = 'referral-e2e-2026-11-21')
+     RETURNING id)
+   INSERT INTO ${s}.ad_audit (actor, action, target, detail)
+   SELECT 'migration', 'street.qa_flag', 'referral-e2e-2026-11-21', 'flagged ' || count(*) || ' street events as test: ids ' || coalesce(string_agg(id::text, ',' ORDER BY id), 'none')
+   FROM upd HAVING NOT EXISTS (SELECT 1 FROM ${s}.ad_audit WHERE action = 'street.qa_flag' AND target = 'referral-e2e-2026-11-21')`,
   `INSERT INTO ${s}.ad_audit (actor, action, target, detail) SELECT 'seed','street.qr','mona/scale-intake-digital','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake-digital (Mona digital Scale intake QR registered)' WHERE NOT EXISTS (SELECT 1 FROM ${s}.ad_audit WHERE action = 'street.qr' AND target = 'mona/scale-intake-digital')`,
 ];
 

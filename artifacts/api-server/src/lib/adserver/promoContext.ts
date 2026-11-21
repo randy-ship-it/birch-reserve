@@ -105,6 +105,12 @@ export function promoMetadata(): Record<string, string> {
   if (c.st && c.qr) out.st_qr = c.qr;
   if (c.code) out.promo = c.code;
   if (c.st || c.code) out.site = c.site;
+  // Randy, Nov 21 2026 4:30 PM: a checkout started on the Scale mirror is Scale Health direct (5% channel), going forward only.
+  // Stamped at session creation so sessions opened before this shipped keep Birch; the webhook reads it (service.ts).
+  if (c.site === "scale") {
+    out.site = "scale";
+    out.sold_by = "scale";
+  }
   return out;
 }
 

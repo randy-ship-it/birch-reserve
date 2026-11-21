@@ -75,13 +75,13 @@ Every rate is dated (`effective_at`, next full hour or a date you pick) and neve
   - Their lines (`ref:<recipient>`) join the royalty statements without the hub gate, so Approve, Pay batch and Mark paid work as usual.
 - **Where Randy sees it:** `/ads/admin` → Money → **Referral orders**: per referrer (paid orders, collected, pool, share, commission) and per order (brand, session, member, QR, Birch / Scale mirror, channel, override, commission). There's also `/ads/admin/export/referrals.csv`. Campaign rows show "Referred by …".
 
-**Which channel applies when a referred buyer pays through the Scale mirror** (rule as found, unchanged):
-- A Stripe checkout always opens its campaign with `seller = birch`. `draftCampaignFromCheckoutSafe` never sets a seller, and the mirror is the same Birch form, Stripe account and checkout.
-- So a sale through `scalehealth.ca/intake/_m/…` is **Birch brokerage (20% override)**, with `site = scale` recorded on the order.
-- It becomes **Scale direct (5%)** only when an admin sets "Sold by: Scale Health (direct)" on the campaign. For delivery that applies from then on. A referral line follows the campaign's current flag until it is approved, and approval freezes it.
-- If Scale-mirror sales should default to Scale direct, that's a one-line change in `draftCampaignFromCheckoutSafe` (`seller: md.site === "scale" ? "scale" : "birch"`) and needs Randy's call.
+**Which channel applies to a sale through the Scale mirror** (Randy, Nov 21 2026 4:30 PM, going forward only):
+- A checkout started on `scalehealth.ca/intake/_m/…` (request site `scale`) is **Scale Health direct (5% override)**, referred or not. `promoMetadata()` stamps `sold_by=scale` (and `site=scale`) on the Checkout Session when it is created, and `draftCampaignFromCheckoutSafe` opens the campaign with `seller = scale` when it sees `sold_by=scale`.
+- Checkouts on birchreserve.net stay **Birch brokerage (20%)**.
+- Never backdated: campaigns that already exist keep their seller, and a session opened before this shipped (no `sold_by`) still opens as Birch even if it is paid later.
+- Admin can still override per campaign ("Sold by"). Delivery charges are stamped with the channel at charge time. A referral line follows the campaign's current flag until it is approved, and approval freezes it.
 
-**QA.** `tests/referralAttribution.test.ts` covers the server context, metadata, webhook stamp, commission math and statements, plus the browser script in a VM (Scale cookie scope, mirror routing, `?ref=home_tile` not wiping a referrer). The live e2e on both hosts is `artifacts/clinichub-media/tests/browser/referral-attribution.spec.ts` (opt-in `REFERRAL_E2E_LIVE=1`). It uses a qa+ email and never pays. `POST /v1/promo/attribution` echoes `st` / `st_qr` / `promo` / `site` only for an open, unpaid, under-an-hour-old session with a qa+ email.
+**QA.** `tests/referralAttribution.test.ts` covers the server context, metadata, webhook stamp, commission math and statements, plus the browser script in a VM (Scale cookie scope, mirror routing, `?ref=home_tile` not wiping a referrer). The live e2e on both hosts is `artifacts/clinichub-media/tests/browser/referral-attribution.spec.ts` (opt-in `REFERRAL_E2E_LIVE=1`). It uses a qa+ email and never pays. `POST /v1/promo/attribution` echoes `st` / `st_qr` / `promo` / `site` / `sold_by` only for an open, unpaid, under-an-hour-old session with a qa+ email. The e2e browser sends the user-agent token `BirchQA/1` (and `X-Birch-QA` when `BIRCH_QA_SECRET` is set), so every visit and scan it causes is stored `is_test` and never counts in street-team stats. The Nov 21 4:25–4:28 PM ET e2e rows were flagged by a one-shot migration in `store.ts` (audit `street.qa_flag`, which lists the ids).
 
 ## Where ads run (Randy, Nov 21 2026 3:42 PM t396u + 3:43 PM t397u)
 - **Allowed:** Birch / Scale marketing and intake pages that sell ads, listed explicitly in `config.ts` `MARKETING_SLOTS`:
