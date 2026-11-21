@@ -40,6 +40,8 @@ export function buildExclusiveReserveSession(body: ReserveRequest, origin: strin
     ok: true,
     params: {
       mode: "payment",
+      // Charge exactly the currency the page showed: no Stripe Adaptive Pricing re-pricing at checkout.
+      adaptive_pricing: { enabled: false },
       customer_email: email,
       customer_creation: "always",
       // Live Price when STRIPE_PRICE_EXCLUSIVE_1900_<CUR> is set (CAD has one); inline price_data in the shown currency otherwise.

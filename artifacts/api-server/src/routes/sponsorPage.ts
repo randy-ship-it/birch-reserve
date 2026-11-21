@@ -317,6 +317,8 @@ export function buildDepositSession(body: DepositRequest, origin: string):
     currency,
     params: {
       mode: "payment",
+      // Charge exactly the currency the page showed: no Stripe Adaptive Pricing re-pricing at checkout.
+      adaptive_pricing: { enabled: false },
       customer_email: email,
       customer_creation: "always",
       line_items: [{ quantity: 1, price_data: { currency, unit_amount: amountCents, product_data: tierKey === "custom" ? customLineItem(amount) : packLineItem({ usd: amount, bonusPct }) } }],

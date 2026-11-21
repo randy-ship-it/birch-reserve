@@ -1264,7 +1264,7 @@ router.post("/ads/admin/stripe/replay", json, (req, res) =>
   }),
 );
 
-/* Expire a webhook-verification checkout session (metadata.purpose = webhook_verification*), never a real order. Fires a signed checkout.session.expired. */
+/* Expire a webhook-verification checkout session (metadata.purpose = webhook_verification*) or an unpaid qa+ test session, never a real order. Fires a signed checkout.session.expired. */
 router.post("/ads/admin/stripe/expire-verification", json, (req, res) =>
   safe(res, async () => {
     const who = guard(req, res);
@@ -1273,7 +1273,9 @@ router.post("/ads/admin/stripe/expire-verification", json, (req, res) =>
     if (!/^cs_(live|test)_[A-Za-z0-9]+$/.test(id)) return void res.status(400).json({ message: "Pass a checkout session id." });
     const stripe = getStripeClient();
     const s = await stripe.checkout.sessions.retrieve(id);
-    if (!String(s.metadata?.purpose ?? "").startsWith("webhook_verification") || s.metadata?.reservationId) return void res.status(403).json({ message: "Only webhook-verification sessions can be expired here." });
+    // Also allowed: an unpaid QA checkout opened with a qa+ address on our own domain (live currency checks).
+    const qaSession = /^qa\+[^@\s]*@silverbirchgrowth\.com$/i.test(String(s.customer_email ?? "")) && s.payment_status === "unpaid";
+    if ((!String(s.metadata?.purpose ?? "").startsWith("webhook_verification") && !qaSession) || s.metadata?.reservationId) return void res.status(403).json({ message: "Only webhook-verification or unpaid qa+ sessions can be expired here." });
     if (s.status !== "open") return void res.json({ message: `Already ${s.status}.`, status: s.status });
     const x = await stripe.checkout.sessions.expire(id);
     await store.audit(who, "stripe.expire_verification", id);

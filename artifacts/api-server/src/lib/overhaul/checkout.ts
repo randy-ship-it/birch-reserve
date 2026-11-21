@@ -51,6 +51,8 @@ export function buildAreaLockSession(body: AreaCheckoutRequest, origin: string):
     currency: q.currency,
     params: {
       mode: "payment",
+      // Charge exactly the currency the page showed: no Stripe Adaptive Pricing re-pricing at checkout.
+      adaptive_pricing: { enabled: false },
       customer_email: email,
       customer_creation: "always",
       line_items: [
