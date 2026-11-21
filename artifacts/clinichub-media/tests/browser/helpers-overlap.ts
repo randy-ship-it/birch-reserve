@@ -145,8 +145,10 @@ async function dockAudit(page: Page): Promise<Hit[]> {
       };
       await new Promise((r) => setTimeout(r, 1800)); // let the dock settle / yield
       check("first screen");
-      scrollTo(0, document.documentElement.scrollHeight);
-      await new Promise((r) => setTimeout(r, 600));
+      for (let k = 0; k < 4; k++) { // lazy sections grow the page as we reach the end: settle first
+        scrollTo(0, document.documentElement.scrollHeight);
+        await new Promise((r) => setTimeout(r, 700));
+      }
       check("page bottom");
       scrollTo(0, 0);
     }

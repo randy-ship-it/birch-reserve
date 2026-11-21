@@ -405,13 +405,19 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, desktopInli
       data-blocked={blocked ? "1" : "0"}
       aria-hidden={visible ? undefined : true}
     >
-      <div className={`flex ${inline ? "w-full max-w-md" : "w-[15.5rem] max-w-[calc(100vw-1rem)]"} ${slim ? "min-h-[3rem]" : ""} items-center gap-2 rounded-xl bg-white/80 px-3 py-1.5 shadow-sm ring-1 ring-foreground/5 backdrop-blur ${desktopInline ? "md:w-[26rem]" : "md:w-[22rem]"}`} role="status" aria-live="off">
-        <span className="inline-flex size-1.5 shrink-0 rounded-full bg-lime-500/70" aria-hidden />
-        {/* One text flow (no flex gaps between fragments), left-aligned, normal spacing, so it wraps naturally on phones. */}
-        <span className={`block min-w-0 flex-1 ${slim ? "line-clamp-2" : "whitespace-normal"} text-left text-[13px] font-normal normal-case tracking-normal opacity-90 transition-opacity ease-out [hyphens:none] [text-align-last:auto] [word-spacing:normal] motion-reduce:transition-none md:text-[13px] ${fading ? "opacity-0" : ""}`} style={{ color: NAVY, lineHeight: 1.35, transitionDuration: `${FADE_MS}ms` }} data-testid="activity-pulse-text">
+      <div className={`flex ${inline ? "w-full max-w-md" : "w-[15.5rem] max-w-[calc(100vw-1rem)]"} ${slim ? "min-h-[4.5rem]" : ""} flex-col justify-center gap-0.5 rounded-xl bg-white/85 px-3 py-1.5 shadow-sm ring-1 ring-foreground/5 backdrop-blur ${desktopInline ? "md:w-[26rem]" : "md:w-[22rem]"}`} role="status" aria-live="off">
+        {/* Row 1: what this is (Randy Nov 21 4:33 PM). Live dot beside the label, close on the right. */}
+        <div className="flex items-center gap-1.5">
+          <span className="inline-flex size-1.5 shrink-0 rounded-full bg-lime-500" aria-hidden />
+          <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-foreground/60" data-testid="activity-pulse-label">Market pulse <span aria-hidden>🔥</span></span>
+          <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className="-my-2 -mr-2 ml-auto grid size-8 shrink-0 place-items-center rounded-full text-foreground/40 hover:text-foreground/70" aria-label="Turn off recent activity" data-testid="activity-pulse-close">
+            <X className="size-3" />
+          </button>
+        </div>
+        {/* Row 2: one text flow, left-aligned, no indent. */}
+        <p className={`min-w-0 ${slim ? "line-clamp-2" : "whitespace-normal"} text-left text-[13px] font-normal normal-case tracking-normal opacity-90 transition-opacity ease-out [hyphens:none] [text-align-last:auto] [word-spacing:normal] motion-reduce:transition-none ${fading ? "opacity-0" : ""}`} style={{ color: NAVY, lineHeight: 1.35, transitionDuration: `${FADE_MS}ms` }}>
           {e.kind === "launch" ? (
             <>
-              {/* Launch highlight (Randy Nov 20 5:24 PM): small accent badge, place type only, never a business name. */}
               <span className="mr-1 inline-block rounded-full bg-lime-400/80 px-1.5 align-[1px] text-[9px] font-semibold uppercase leading-[1.5] tracking-normal text-[#0b1f3a]" data-testid="activity-pulse-badge">New hub</span>
               <span className="font-medium" data-testid="activity-pulse-who">{e.who}{e.region ? `, ${e.region}` : ""}</span>
               {" "}
@@ -419,7 +425,6 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, desktopInli
             </>
           ) : (
             <>
-              <span className="mr-1 inline-block h-2.5 w-10 rounded-full bg-foreground/15 align-[-1px] blur-[2px]" aria-hidden data-testid="activity-pulse-blur" />
               <span className="sr-only">Someone </span>
               <span className="font-medium" data-testid="activity-pulse-who">{e.who}{e.region ? `, ${e.region}` : ""}</span>
               {" · "}
@@ -428,13 +433,12 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, desktopInli
           )}
           {" · "}
           <span className="whitespace-nowrap text-foreground/60">{e.ago}</span>
-          <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className={`ml-2 mt-0.5 ${slim ? "hidden" : "inline-flex"} min-h-8 items-center text-left text-[12px] leading-tight text-foreground/55 underline underline-offset-2 hover:text-foreground/70`} data-testid="activity-pulse-hide">
+        </p>
+        {slim ? null : (
+          <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className="inline-flex min-h-6 items-center self-start text-[11px] leading-tight text-foreground/55 underline underline-offset-2 hover:text-foreground/70" data-testid="activity-pulse-hide">
             Hide activity
           </button>
-        </span>
-        <button type="button" onClick={() => setOffPersist(true)} tabIndex={visible ? 0 : -1} className="-mr-2 -mt-2 grid size-10 shrink-0 place-items-center self-start rounded-full text-foreground/40 hover:text-foreground/70" aria-label="Turn off recent activity" data-testid="activity-pulse-close">
-          <X className="size-3" />
-        </button>
+        )}
       </div>
     </div>
   );

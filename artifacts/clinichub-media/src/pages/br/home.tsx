@@ -110,7 +110,7 @@ export default function BrHome() {
       {/* 1. Hero: one line + the kit CTA. */}
       <section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]" data-testid="home-hero">
         {/* Mobile first screen (Randy, Nov 21 2:26 PM): one slim line of real recent activity above the headline. In flow, never over the preview card. */}
-        <div className="container mx-auto min-h-[3.75rem] max-w-6xl px-4 pt-3 md:hidden" data-testid="home-pulse-slim"><ActivityPulse mode="inline" slim /></div>
+        <div className="container mx-auto min-h-[5.25rem] max-w-6xl px-4 pt-3 md:hidden" data-testid="home-pulse-slim"><ActivityPulse mode="inline" slim /></div>
         <div className="container mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-x-8 gap-y-5 px-4 pb-8 pt-4 md:grid-cols-[1fr_1.05fr] md:grid-rows-[auto_auto] md:content-center md:pb-12 md:pt-14">
           <div className="md:col-start-1 md:row-start-1 md:self-end">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · Private wellness hubs</p>
@@ -130,7 +130,7 @@ export default function BrHome() {
         </div>
       </section>
       {/* Light continuous category strip under the hero (Randy Nov 21 10:20 AM). */}
-      <div className="container mx-auto max-w-6xl px-4 pb-5"><div className="hidden mb-3 min-h-[5.25rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div><CategoryStrip testId="home-category-strip" /></div>
+      <div className="container mx-auto max-w-6xl px-4 pb-5"><div className="hidden mb-3 min-h-[6.5rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div><CategoryStrip testId="home-category-strip" /></div>
 
       {/* 2. Big numbers. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-stats">
