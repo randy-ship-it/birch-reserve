@@ -11,7 +11,7 @@ export const HOW_WE_GOT_HERE = {
     "That clinic layer became the foundation. Hubs are now turning into inventory that can be monetized immediately, at low or zero incremental cost to the brand.",
     "The same systems and GTM expertise we use to sign and onboard partners are what we now offer as the ad product and the $3,500+ partnership bot setup.",
   ],
-  note: "Internal testing that informed the product. Not Birch Reserve campaign results or current sold performance.",
+  note: "Internal testing that informed the product, not campaign results or current sold performance.",
   cta: "Start with the $190 USD 7-day look",
 } as const;
 
