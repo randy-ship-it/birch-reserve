@@ -1,6 +1,7 @@
 import { WhatHundredGets, MeasuredReport, YourCardHere, PremiumSpendDown } from "@/components/br/hundred";
 import { WatchHowItWorks } from "@/components/br/reel-button";
 import { Tam2027 } from "@/components/br/inventory-plan";
+import { HubAlerts } from "@/components/br/hub-alerts";
 import { StartSmall } from "@/components/br/start-small";
 import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAsk } from "@/components/br/market-pulse";
 import { EstimateTag } from "@/components/br/intake-kit";
@@ -196,6 +197,7 @@ export default function BrMediaKit() {
       <section className="border-b border-border/70 bg-background" data-testid="mk-market-signals">
         <div className="container mx-auto max-w-5xl space-y-8 px-5 py-10 md:px-6 md:py-14">
           <Tam2027 testId="mk-tam-2027" />
+          <HubAlerts where="media_kit" pagePath="/media-kit" />
           <div className="hidden min-h-[6.5rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div>
           <CategoriesWeServe />
           <QuestionsBrandsAsk />

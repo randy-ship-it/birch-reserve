@@ -73,11 +73,25 @@ function tamCase(key: "low" | "base", label: string, hubs: number): Tam2027Case 
   return { key, label, hubs, viewsYear, usdYear: (viewsYear / 1000) * BLENDED_STARTER_CPM };
 }
 
+/**
+ * Randy t422u (Nov 21 2026), explicit override of the no-forecast rule for THIS figure only: 2027 inventory is pegged at an
+ * expected $50MM+. It is an expectation, always labelled as an estimate. Today's contract-based range is "available to spend now".
+ */
+export const EXPECTED_2027 = {
+  headline: "$50MM+",
+  headlineUsd: "$50MM+ USD",
+  label: "Expected 2027 ad inventory",
+  note: "Estimate, not a guarantee.",
+  conservative: "Conservative: new hubs are launching that aren't counted yet.",
+  pipeline: "Retail hubs could reach 500+ locations. Street teams reach homes door to door and sample on site.",
+  availableNow: "Available to spend now",
+} as const;
+
 export const TAM_2027 = {
   label: "Based on signed partnership contracts, not a commitment",
   cases: [tamCase("low", "Low case: 120 hubs", 120), tamCase("base", "Base case: 300 hubs", 300)] as const,
   basis: [
-    `~${(HUB_VIEWS_MONTHLY / 1_000_000).toFixed(2)}MM hub-placement views a month, based on signed partnership contracts, across ${TAM.listedPartners} listed partners (TAM feed, part of ~128MM total modelled views). This pricing inventory is based on signed partnership contracts and is separate from the audience channels (700MM+ captive page views activating).`,
+    `~${(HUB_VIEWS_MONTHLY / 1_000_000).toFixed(2)}MM hub-placement views a month across ${TAM.listedPartners} listed partners (TAM feed, part of ~128MM total modelled views). This pricing inventory is separate from the audience channels (700MM+ captive page views activating).`,
     `≈ ${VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} modelled views per hub a month.`,
     `× 12 months × hubs × $${BLENDED_STARTER_CPM.toFixed(2)} blended starter CPM (rate card).`,
     "Hubs live today: DR-HO'S physio (June) and SOLE (October). Queued categories: Longevity, Sleep, Food & Nutrition, Medi/Spa, Pets.",
@@ -102,7 +116,8 @@ export function tam2027Views(): string {
 export function tam2027Text(): string {
   const [lo, base] = TAM_2027.cases;
   return [
-    `2027 available ad inventory, based on signed partnership contracts: ${tam2027Headline()} a year (${tam2027Views()}). ${TAM_2027.label}.`,
+    `${EXPECTED_2027.label}: expected ${EXPECTED_2027.headlineUsd} a year in hub display. ${EXPECTED_2027.note} ${EXPECTED_2027.pipeline} It is an expectation, not a promise.`,
+    `${EXPECTED_2027.availableNow}: ${tam2027Headline()} a year (${tam2027Views()}). ${TAM_2027.label}. ${EXPECTED_2027.conservative}`,
     `- ${lo.label}: ${lo.hubs} hubs × ${VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} views/hub/mo × 12 × $${BLENDED_STARTER_CPM.toFixed(2)} CPM = ${money(lo.usdYear)}.`,
     `- ${base.label}: ${base.hubs} hubs × same = ${money(base.usdYear)}.`,
     ...TAM_2027.basis.map((b) => `- ${b}`),

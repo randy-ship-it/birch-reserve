@@ -17,6 +17,7 @@ import { attributionFrom } from "../lib/publicGuards";
 import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
 import { captureEmailLead } from "../lib/leadCapture";
 import { notifyEmailCapture } from "../lib/emailCapture";
+import { cleanHubAlertCategories, HUB_ALERT_SOURCE } from "../lib/overhaul/hubAlerts";
 
 const router: IRouter = Router();
 
@@ -68,7 +69,7 @@ router.post("/launch/email-capture", async (req, res): Promise<void> => {
     return;
   }
   for (const k of Object.keys(body)) {
-    if (!["email", "company", "pagePath", "source", "st"].includes(k)) {
+    if (!["email", "company", "pagePath", "source", "st", "categories"].includes(k)) {
       res.status(400).json({ error: "Unknown field." });
       return;
     }
@@ -87,9 +88,20 @@ router.post("/launch/email-capture", async (req, res): Promise<void> => {
   const pagePath = typeof body["pagePath"] === "string" && PAGE_PATH_RE.test(body["pagePath"]) ? body["pagePath"] : null;
 
   const sourceRaw = body["source"];
-  const captureSource = sourceRaw === "brochure_inline" || sourceRaw === "brochure_slidein" ? sourceRaw : null;
+  const captureSource = sourceRaw === "brochure_inline" || sourceRaw === "brochure_slidein" || sourceRaw === HUB_ALERT_SOURCE ? sourceRaw : null;
   if (sourceRaw !== undefined && !captureSource) {
     res.status(400).json({ error: "Unknown source." });
+    return;
+  }
+  let hubCategories: string[] | null = null;
+  if (captureSource === HUB_ALERT_SOURCE) {
+    hubCategories = cleanHubAlertCategories(body["categories"]);
+    if (!hubCategories) {
+      res.status(400).json({ error: "Pick at least one category." });
+      return;
+    }
+  } else if (body["categories"] !== undefined) {
+    res.status(400).json({ error: "Unknown field." });
     return;
   }
   const stRaw = body["st"];
@@ -105,7 +117,7 @@ router.post("/launch/email-capture", async (req, res): Promise<void> => {
     }
   }
   const isTest = qa || isTestIdentity({ email, name: company });
-  const { lead, created } = await captureEmailLead({ email, company, pagePath, isTest, captureSource, st, attribution: attributionFrom(res) });
+  const { lead, created } = await captureEmailLead({ email, company, pagePath, isTest, captureSource, st, hubCategories, attribution: attributionFrom(res) });
   if (lead && created && !lead.isTest) {
     // Bounded (mailer has a 10s timeout); awaited so Autoscale can't freeze before it sends.
     await notifyEmailCapture(lead).catch((error) =>

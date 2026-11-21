@@ -22,7 +22,7 @@ export const INTAKE_DETAILS = [
   // two-lane conversion layer (Randy t227u, Nov 19 2026): card reserve + big block / agency IO
   "lane_card", "lane_block", "agency_test", "big_block", "io_pdf",
   // media kit brochure capture (Nov 21 2026)
-  "brochure_inline", "brochure_slidein",
+  "brochure_inline", "brochure_slidein", "hub_alerts",
   // formats / errors
   "pdf", "png", "too_fast", "invalid_email", "invalid_website", "rate_limited", "unreachable",
 ] as const;

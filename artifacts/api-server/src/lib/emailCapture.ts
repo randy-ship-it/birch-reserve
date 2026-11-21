@@ -26,10 +26,12 @@ function esc(v: string): string {
 }
 
 export function renderEmailCaptureEmail(lead: Lead): RenderedEmail {
+  const hubAlert = lead.meta?.capture_source === "hub_alerts";
   const rows: Array<[string, string]> = [
     ["Email", lead.email ?? "(not given)"],
     ["Company", lead.company ?? "(not given)"],
-    ["Wants", "Birch Reserve media kit + seat updates"],
+    ["Wants", hubAlert ? "Hub launch alerts" : "Birch Reserve media kit + seat updates"],
+    ...(hubAlert ? ([["Categories", lead.meta?.category ?? "(none)"]] as Array<[string, string]>) : []),
     ["Page", lead.pagePath ?? "/"],
     ["UTM source / medium / campaign", [lead.utmSource, lead.utmMedium, lead.utmCampaign].map((x) => x ?? "-").join(" / ")],
     ["UTM term / content", [lead.utmTerm, lead.utmContent].map((x) => x ?? "-").join(" / ")],
@@ -37,9 +39,9 @@ export function renderEmailCaptureEmail(lead: Lead): RenderedEmail {
     ["Landing page", lead.landingPage ?? "(unknown)"],
     ["Lead id", lead.id],
   ];
-  const subject = `Birch email capture: ${lead.company || lead.email || "anon"}`;
-  const text = ["Birch email capture (site pop-up)", "", ...rows.map(([k, v]) => `${k}: ${v}`)].join("\n");
-  const html = emailLayout({ title: "Birch email capture", eyebrow: "Birch email capture", body: emailH1("Birch email capture (site pop-up)") + emailRows(rows.map(([k, v]) => [k, esc(v)])) });
+  const subject = hubAlert ? `Birch hub alerts signup: ${lead.meta?.category ?? ""}`.slice(0, 120) : `Birch email capture: ${lead.company || lead.email || "anon"}`;
+  const text = [hubAlert ? "Birch hub launch alerts signup" : "Birch email capture (site pop-up)", "", ...rows.map(([k, v]) => `${k}: ${v}`)].join("\n");
+  const html = emailLayout({ title: hubAlert ? "Birch hub alerts signup" : "Birch email capture", eyebrow: hubAlert ? "Hub launch alerts" : "Birch email capture", body: emailH1(hubAlert ? "Hub launch alerts signup" : "Birch email capture (site pop-up)") + emailRows(rows.map(([k, v]) => [k, esc(v)])) });
   return { subject, text, html, ...(lead.email ? { replyTo: lead.email } : {}) };
 }
 

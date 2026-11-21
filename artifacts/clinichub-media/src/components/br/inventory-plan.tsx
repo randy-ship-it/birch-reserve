@@ -5,7 +5,7 @@
  */
 import { ArrowRight } from "lucide-react";
 import { Details } from "@/components/br/details";
-import { PACING_ROWS, SPEND_DOWN_LINE, TAM_2027, VIEWS_PER_HUB_MONTHLY, BLENDED_STARTER_CPM, tam2027Headline, tam2027Views } from "../../../../api-server/src/lib/inventoryPlan";
+import { PACING_ROWS, SPEND_DOWN_LINE, TAM_2027, EXPECTED_2027, VIEWS_PER_HUB_MONTHLY, BLENDED_STARTER_CPM, tam2027Headline, tam2027Views } from "../../../../api-server/src/lib/inventoryPlan";
 import { EXCLUSIVE_RESERVE, exclusiveReserveFor } from "../../../../api-server/src/lib/exclusiveReserveTerms";
 import { useCurrency } from "@/lib/currency";
 
@@ -45,17 +45,28 @@ export function SpendDown({ dark = false, testId = "spend-down" }: { dark?: bool
 export function Tam2027({ compact = false, dark = false, testId = "tam-2027" }: { compact?: boolean; dark?: boolean; testId?: string }) {
   const [lo, base] = TAM_2027.cases;
   const money = (n: number) => `$${(n / 1_000_000).toFixed(1)}M`;
+  const sub = dark ? "text-white/70" : "text-foreground/70";
   return (
     <div className={compact ? "" : `rounded-2xl p-5 ${dark ? "bg-white/[0.06] ring-1 ring-white/15 text-white" : "border border-[#0b1f3a]/10 bg-white shadow-sm"}`} data-testid={testId} data-currency-fixed>
       <div className="flex flex-wrap items-center gap-2">
-        <span className={`text-[11px] font-bold uppercase tracking-[0.18em] ${dark ? "text-lime-300" : "text-[#0b1f3a]/70"}`}>2027 ad inventory, based on signed partnership contracts</span>
-        <span className={`${chip} ${dark ? "bg-white/10 text-lime-200" : "border border-[#F1D58F] bg-[#FFF4DB] text-[#8A5A00]"}`}>Signed contracts</span>
+        <span className={`text-[11px] font-bold uppercase tracking-[0.18em] ${dark ? "text-lime-300" : "text-[#0b1f3a]/70"}`}>{EXPECTED_2027.label}</span>
+        <span className={`${chip} ${dark ? "bg-white/10 text-lime-200" : "border border-[#F1D58F] bg-[#FFF4DB] text-[#8A5A00]"}`}>Expected · estimate</span>
       </div>
-      <p className={`mt-2 font-display leading-none tabular-nums ${compact ? "text-[1.9rem] md:text-[2.4rem]" : "text-4xl md:text-5xl"}`} data-testid={`${testId}-figure`}>{tam2027Headline()}</p>
-      <p className={`mt-1.5 text-[12px] md:text-sm ${dark ? "text-white/70" : "text-foreground/70"}`}>a year in hub display, growing with the network. {TAM_2027.label}.</p>
-      <Details dark={dark} label="How we get there" testId={`${testId}-math`}>
-        <p><b>{lo.label}:</b> {lo.hubs} hubs × {VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} views/hub/mo × 12 × ${BLENDED_STARTER_CPM.toFixed(2)} CPM ÷ 1,000 = {money(lo.usdYear)}.</p>
-        <p><b>{base.label}:</b> {base.hubs} hubs × the same = {money(base.usdYear)}.</p>
+      <p className={`mt-2 font-display leading-none tabular-nums ${compact ? "text-[2.2rem] md:text-[2.8rem]" : "text-4xl md:text-5xl"}`} data-testid={`${testId}-figure`}>{EXPECTED_2027.headline} <span className={`text-base font-semibold ${sub}`}>USD a year in hub display</span></p>
+      <div className={`mt-3 grid gap-2.5 sm:grid-cols-2 ${dark ? "" : ""}`}>
+        <div className={`rounded-xl px-3.5 py-2.5 ${dark ? "bg-white/[0.08]" : "bg-[#0b1f3a]/[0.04]"}`} data-testid={`${testId}-now`}>
+          <p className={`text-[11px] font-bold uppercase tracking-wider ${dark ? "text-lime-300" : "text-[#0b1f3a]/70"}`}>{EXPECTED_2027.availableNow}</p>
+          <p className="mt-0.5 font-display text-xl tabular-nums md:text-2xl">{tam2027Headline()} <span className={`text-[12px] font-normal ${sub}`}>a year</span></p>
+          <p className={`text-[12px] ${sub}`}>{TAM_2027.label}. {EXPECTED_2027.conservative}</p>
+        </div>
+        <div className={`rounded-xl px-3.5 py-2.5 ${dark ? "bg-white/[0.08]" : "bg-[#0b1f3a]/[0.04]"}`} data-testid={`${testId}-pipeline`}>
+          <p className={`text-[11px] font-bold uppercase tracking-wider ${dark ? "text-lime-300" : "text-[#0b1f3a]/70"}`}>Coming on</p>
+          <p className={`mt-0.5 text-[13px] ${dark ? "text-white/85" : "text-foreground/80"}`}>{EXPECTED_2027.pipeline}</p>
+        </div>
+      </div>
+      <Details dark={dark} label="Estimate, not a guarantee: how we get there" testId={`${testId}-math`}>
+        <p>{EXPECTED_2027.headline} is our expectation for 2027, an estimate and not a guarantee or a promise of delivery. It counts hubs and channels we expect to add; hubs launching later are not in today's figure.</p>
+        <p>Available now, built from the hubs we count today: <b>{lo.label}:</b> {lo.hubs} hubs × {VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} views/hub/mo × 12 × ${BLENDED_STARTER_CPM.toFixed(2)} CPM ÷ 1,000 = {money(lo.usdYear)}. <b>{base.label}:</b> {base.hubs} hubs × the same = {money(base.usdYear)}.</p>
         <p>Range: {tam2027Views()} a year.</p>
         {TAM_2027.basis.map((b) => <p key={b}>{b}</p>)}
       </Details>

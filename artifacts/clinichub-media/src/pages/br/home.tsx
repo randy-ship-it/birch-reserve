@@ -7,6 +7,7 @@
  */
 import { WatchHowItWorks } from "@/components/br/reel-button";
 import { Tam2027 } from "@/components/br/inventory-plan";
+import { HubAlerts } from "@/components/br/hub-alerts";
 import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPath";
 import { useEffect, type ReactNode } from "react";
 import { ArrowRight, BookOpen, Building2, ChevronDown, FileText, Handshake, LayoutGrid, Package, Sparkles, Store, Users } from "lucide-react";
@@ -158,7 +159,7 @@ export default function BrHome() {
             </div>
           </a>
         </div>
-        <div className="mt-3 rounded-2xl border border-[#0b1f3a]/10 bg-white p-5 shadow-sm md:p-6"><Tam2027 compact testId="home-tam-2027" /></div>
+        <div className="mt-3 rounded-2xl border border-[#0b1f3a]/10 bg-white p-5 shadow-sm md:p-6"><Tam2027 compact testId="home-tam-2027" /><div className="mt-3"><HubAlerts compact where="home" pagePath="/" /></div></div>
         <p className="mt-2 text-[12px] text-foreground/60" data-testid="home-stats-label">{MODELLED_FOOTER}</p>
       </section>
 

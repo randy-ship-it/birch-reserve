@@ -182,7 +182,7 @@ export function llmsTxt(): string {
     "- Premium slots (exclusivity, priority placement, area locks): inquire-only · https://birchreserve.net/media-kit#premium",
     `- Spend-down: ${SPEND_DOWN_LINE} Modelled pacing: ${PACING_ROWS.map((r) => `${r.label} ${r.perMonth}`).join("; ")}.`,
     "",
-    "## 2027 available ad inventory (based on signed partnership contracts)",
+    "## 2027 ad inventory: expected $50MM+ (estimate), available to spend now below",
     ...tam2027Text().split("\n").map((l, i) => (i === 0 ? `- ${l}` : `  ${l}`)),
     "",
     "## Live hubs",
