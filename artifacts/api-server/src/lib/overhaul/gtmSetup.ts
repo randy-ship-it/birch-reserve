@@ -19,9 +19,8 @@ export const GTM_SETUP = {
   ],
   separate: "Separate from the ad inventory product (the $190 USD look, reserves and packs), and it runs on the same systems.",
   cases: [
-    "Health brand signed and launched a partnership motion in under two weeks.",
-    "Recovery company is now running its own console after setup.",
     "Virtual care partner: first email to ready to sign in 19 days, run by our field sales bot.",
+    "Same thread: prospect tone rose from 55 on the first reply to 94 at ready to sign, across 12 scored emails (our read of the wording).",
   ],
   casesNote: "Examples are anonymous. No outcomes are guaranteed.",
   cta: "Start with a $3,500 setup",
@@ -38,7 +37,7 @@ export const GTM_PARTNER_TYPES = ["Clinics & studios", "Retailers", "Brands", "D
 
 /** One short paragraph for the chat prompt and llms.txt. */
 export const GTM_SETUP_FACT =
-  "GTM setup packages start at $3,500 USD: we set up the same in-house partnership / B2B go-to-market bot and console we use, get the client's motion running, then hand over the keys so they run it themselves. For health and wellness businesses. Separate from the ad inventory product but runs on the same systems. Nothing is charged online; start at https://birchreserve.net/intake/gtm and the team replies by email. Examples are anonymous (a health brand signed and launched a partnership motion in under two weeks; a recovery company now runs its own console after setup; a virtual care partner went from first email to ready to sign in 19 days). No outcomes are guaranteed.";
+  "GTM setup packages start at $3,500 USD: we set up the same in-house partnership / B2B go-to-market bot and console we use, get the client's motion running, then hand over the keys so they run it themselves. For health and wellness businesses. Separate from the ad inventory product but runs on the same systems. Nothing is charged online; start at https://birchreserve.net/intake/gtm and the team replies by email. Examples are anonymous (a virtual care partner went from first email to ready to sign in 19 days through our field sales bot, across 12 scored emails). No outcomes are guaranteed.";
 
 /** Chat-only guardrail. */
 export const GTM_SETUP_CHAT_RULE = "If asked who the examples are, say they are anonymous and you can't share client details. Never name, describe or hint at any client, and never promise outcomes or give numbers for them.";
