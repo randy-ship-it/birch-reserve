@@ -100,12 +100,12 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
         {sup || !isScaleSkin() ? null : <div className="mt-10" data-testid="intake-sponsored"><BirchAdSlot slot="mkt-scale.intake" testId="intake-ad-slot" /></div>}
         {sup ? null : (
           <div className="mt-10 space-y-8" style={{ fontFamily: "inherit" }} data-testid="intake-market-signals">
+            <ActivityPulse desktopInline className="-mb-3" />
             <CategoriesWeServe />
             <QuestionsBrandsAskCompact testId="intake-questions-compact" />
           </div>
         )}
       </div>
-      {sup ? null : <ActivityPulse desktopOnly />}
     </div>
   );
 }

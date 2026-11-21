@@ -6,7 +6,7 @@ import { auditPage } from "./helpers-overlap";
  * Birch pages run locally; set PLAYWRIGHT_BASE_URL to audit a live host, and AUDIT_PATHS to override the list.
  * On scalehealth.ca the mirror serves /intake, /intake/street-team etc. (same deployment, Scale skin).
  */
-const WIDTHS = [320, 375, 390, 430];
+const WIDTHS = [320, 375, 390, 430, 1280, 1440];
 const PATHS = (process.env.AUDIT_PATHS ?? [
   "/", "/advertise/brands", "/advertise/local", "/publish/brands", "/publish/studios", "/rates", "/match", "/hubs", "/media-kit",
   "/agencies", "/brand-kit", "/intake", "/intake/publisher", "/intake/supplier", "/intake/sponsor", "/intake/gtm", "/intake/street-team",
