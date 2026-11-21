@@ -211,7 +211,10 @@ export function BrochureSlideIn() {
       document.addEventListener("mouseout", onOut);
       cleanups.push(() => document.removeEventListener("mouseout", onOut));
     }
-    const onSubmitted = () => { shownRef.current = true; setOpen(false); };
+    const onSubmitted = (e: Event) => {
+      shownRef.current = true;
+      if ((e as CustomEvent<{ source: Src }>).detail?.source !== "brochure_slidein") setOpen(false); // own thank-you stays up
+    };
     window.addEventListener(BROCHURE_EVENT, onSubmitted);
     cleanups.push(() => window.removeEventListener(BROCHURE_EVENT, onSubmitted));
     return () => cleanups.forEach((c) => c());
