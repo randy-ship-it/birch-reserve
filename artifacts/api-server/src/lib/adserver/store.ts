@@ -101,6 +101,7 @@ const DDL = (s: string) => [
   `CREATE TABLE IF NOT EXISTS ${s}.ad_override_recipients (
     id bigserial PRIMARY KEY, rkey text NOT NULL, name text NOT NULL, kind text NOT NULL, pct_bps integer NOT NULL, scope_partner text, scope_campaign text,
     active boolean NOT NULL DEFAULT true, payout_ref text, effective_at timestamptz NOT NULL DEFAULT now(), actor text, created_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_hub_alerts_sent (hub_key text NOT NULL, email text NOT NULL, sent_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY (hub_key, email))`,
   `CREATE TABLE IF NOT EXISTS ${s}.ad_hub_gates (
     partner text PRIMARY KEY, live boolean NOT NULL DEFAULT false, has_transactions boolean NOT NULL DEFAULT false, audience_activated boolean NOT NULL DEFAULT false,
     override boolean NOT NULL DEFAULT false, override_note text, updated_by text, updated_at timestamptz NOT NULL DEFAULT now())`,
@@ -612,8 +613,9 @@ export async function setPartnerShare(partner: string, bps: number | null, actor
 
 /** Approve a statement line: freezes basis, rate and payable. Held or pending lines can't be approved. Records only; no money moves. */
 export async function approvePayout(partner: string, month: string, currency: string, actor: string): Promise<RoyaltyRow | null> {
-  const rows = await royalties(13);
-  const r = rows.find((x) => x.partner === partner && x.month === month && x.currency === currency);
+  const pick = (rows: RoyaltyRow[]) => rows.find((x) => x.partner === partner && x.month === month && x.currency === currency);
+  // Real lines first; test hubs (QA) fall back to the test statements so the full flow can be proven in production.
+  const r = pick(await royalties(13)) ?? pick(await royalties(13, { testOnly: true }));
   if (!r || r.shareBps === null || r.payableMicros === null || r.status !== "calculated") return null;
   const p = await db();
   await p.query(
@@ -641,6 +643,18 @@ export async function alertSubscribers(): Promise<Array<{ email: string; categor
   const p = await db();
   const { rows } = await p.query(`SELECT email, categories FROM ${S()}.ad_alert_prefs WHERE opted_in = true`);
   return rows.map((r) => ({ email: String(r.email), categories: arr(r.categories) }));
+}
+
+/** One new-hub alert per hub per email: true the first time only. */
+export async function claimHubAlert(hubKey: string, email: string): Promise<boolean> {
+  const p = await db();
+  const { rows } = await p.query(`INSERT INTO ${S()}.ad_hub_alerts_sent (hub_key, email) VALUES ($1,$2) ON CONFLICT DO NOTHING RETURNING hub_key`, [hubKey, email.toLowerCase()]);
+  return rows.length > 0;
+}
+export async function alertsOff(email: string): Promise<void> {
+  const p = await db();
+  await p.query(`UPDATE ${S()}.ad_alert_prefs SET opted_in = false, updated_at = now() WHERE email = $1`, [email.toLowerCase()]);
+  await audit(email.toLowerCase(), "alerts.unsubscribe", email.toLowerCase());
 }
 
 export async function auditLog(limit = 100): Promise<Array<{ at: Date; actor: string | null; action: string; target: string | null; detail: string | null }>> {
@@ -738,10 +752,14 @@ export async function payoutRows(): Promise<Array<Record<string, unknown>>> {
 }
 
 /** Payout batch: every approved, unpaid line gets one batch id (records only). Returns the rows for the Stripe-ready CSV. */
-export async function createPayoutBatch(actor: string): Promise<{ batchId: string; rows: Array<Record<string, unknown>> }> {
+export async function createPayoutBatch(actor: string, payees?: string[]): Promise<{ batchId: string; rows: Array<Record<string, unknown>> }> {
   const p = await db();
   const batchId = `batch_${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "")}`;
-  const { rows } = await p.query(`UPDATE ${S()}.ad_payouts SET batch_id = $1 WHERE status = 'approved' AND batch_id IS NULL RETURNING *`, [batchId]);
+  const only = payees?.length ? payees : null;
+  const { rows } = await p.query(
+    `UPDATE ${S()}.ad_payouts SET batch_id = $1 WHERE status = 'approved' AND batch_id IS NULL AND ($2::text[] IS NULL OR partner = ANY($2)) RETURNING *`,
+    [batchId, only],
+  );
   if (rows.length) await audit(actor, "payout.batch", batchId, `${rows.length} lines`);
   return { batchId, rows };
 }

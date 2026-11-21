@@ -15,6 +15,7 @@ import { checkCreative, buyStore } from "../lib/buyFlow";
 import { cronAuthorized } from "../lib/cronAuth";
 import { FixedWindowLimiter } from "../lib/rateLimit";
 import { ADS_FROM, hubAlertEmail, loginLinkEmail, siteMail } from "../lib/adserver/mail";
+import { sendBuyerEmail } from "../lib/siteMail";
 import { AD_SLOTS, ALERT_CATEGORIES, AD_DEFAULTS, PROMO_RATE_BPS, isPromoCampaign, MICROS, PLACEMENTS, adminEmails, adsLoginEmailEnabled, findSlot, placementLabel, type Placement } from "../lib/adserver/config";
 import { pixelId, postbackKey, safeEqual, sign, verify } from "../lib/adserver/auth";
 import * as store from "../lib/adserver/store";
@@ -679,6 +680,7 @@ router.post("/ads/admin/hubs", json, (req, res) =>
     }
     const isTest = b.isTest === "on" || b.isTest === true;
     await store.upsertContractHub({ key, name, category, url, partner: str(b.partner, 120) || name, contractRef, status: "live", isTest }, who);
+    if (!isTest) void alertNewHub(origin(req), key);
     res.json({ message: `${name} is on contract. Its placements are sellable now (slot keys ${key}.landing … ${key}.post_purchase).` });
   }),
 );
@@ -693,6 +695,7 @@ router.post("/ads/admin/hubs/:key/status", json, (req, res) =>
       return;
     }
     const ok = await store.setHubStatus(String(req.params.key), to, who);
+    if (ok && to === "live") void alertNewHub(origin(req), String(req.params.key));
     res.status(ok ? 200 : 404).json({ message: ok ? `Hub ${to}.` : "Not found." });
   }),
 );
@@ -868,7 +871,9 @@ router.post("/ads/admin/payouts/batch", json, (req, res) =>
   safe(res, async () => {
     const who = guard(req, res);
     if (!who) return;
-    const r = await store.createPayoutBatch(who);
+    const raw = (req.body as Record<string, unknown> | undefined)?.payees;
+    const payees = Array.isArray(raw) ? raw.map((x) => str(x, 160)).filter(Boolean) : undefined; // optional: batch only these payees (e.g. one QA test hub)
+    const r = await store.createPayoutBatch(who, payees);
     if (!r.rows.length) return void res.json({ message: "No approved, unbatched lines to pay." });
     res.json({ message: `Batch ${r.batchId}: ${r.rows.length} lines. Download the CSV, pay each line, then Mark paid with the reference. Nothing was sent.`, copy: `${origin(req)}/ads/admin/export/batch-${r.batchId}.csv` });
   }),
@@ -917,6 +922,49 @@ router.get("/ads/admin/export/:what", (req, res) =>
   }),
 );
 
+/* New-hub alerts: once per hub per opted-in subscriber whose categories match. Test hubs never alert. */
+async function alertNewHub(base: string, key: string): Promise<void> {
+  try {
+    if (process.env.ADS_HUB_ALERT_EMAIL_ENABLED !== "true") return;
+    const h = (await store.listContractHubs()).find((x) => x.key === key);
+    if (!h || h.isTest || h.status !== "live") return;
+    for (const s of await store.alertSubscribers()) {
+      if (!s.categories.includes(h.category)) continue;
+      if (!(await store.claimHubAlert(h.key, s.email))) continue;
+      const off = `${base}/account/alerts/off?t=${encodeURIComponent(sign("u", { e: s.email }, 365 * 864e5))}`;
+      await siteMail.hubAlert(s.email, { hubName: h.name, category: h.category, hubUrl: h.url }, off).catch((err: unknown) => logger.warn({ err: String(err) }, "hub alert email failed"));
+    }
+  } catch (err) {
+    logger.warn({ err: String(err) }, "hub alerts failed");
+  }
+}
+
+router.get("/account/alerts/off", (req, res) =>
+  safe(res, async () => {
+    noStore(res);
+    const t = verify<{ e: string }>("u", req.query.t);
+    if (t) await store.alertsOff(t.e);
+    res.type("html").send(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Alerts</title><body style="font:16px/1.6 Arial,sans-serif;color:#071A39;padding:32px;max-width:520px">${t ? "<h1>You're unsubscribed</h1><p>No more new-hub alerts. You can turn them back on from your dashboard.</p>" : "<h1>That link has expired</h1><p>Sign in to your dashboard to change alerts.</p>"}<p><a href="/account#alerts">Open my dashboard</a></p></body>`);
+  }),
+);
+
+/* QA: send both system emails for real, only ever to Randy's own inbox (Randy voice Nov 21 1:10 PM). */
+const EMAIL_TEST_TO = "randy@silverbirchgrowth.com";
+router.post("/ads/admin/email-test", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const base = origin(req);
+    const login = loginLinkEmail(`${base}/account/auth?t=${encodeURIComponent(sign("l", { e: EMAIL_TEST_TO }, 864e5))}`);
+    const off = `${base}/account/alerts/off?t=${encodeURIComponent(sign("u", { e: EMAIL_TEST_TO }, 365 * 864e5))}`;
+    const alert = hubAlertEmail({ hubName: "Example Physio Hub", category: "Recovery hardware", hubUrl: "https://scalehealth.ca", unsubscribeUrl: off });
+    const ids: Array<string | null> = [];
+    for (const m of [login, alert]) ids.push((await sendBuyerEmail({ from: ADS_FROM(), to: [EMAIL_TEST_TO], ...m, subject: `[Test] ${m.subject}` })).id);
+    await store.audit(who, "email.test", EMAIL_TEST_TO, ids.join(","));
+    res.json({ message: `Sent 2 test emails to ${EMAIL_TEST_TO}.`, ids });
+  }),
+);
+
 router.get("/ads/admin/email-preview", (req, res) => {
   if (!admin(req)) {
     res.redirect(302, "/ads/admin");
@@ -925,7 +973,7 @@ router.get("/ads/admin/email-preview", (req, res) => {
   const a = loginLinkEmail("https://birchreserve.net/account/auth?t=PREVIEW");
   const b = hubAlertEmail({ hubName: "Example Physio Hub", category: "Recovery hardware", hubUrl: "https://scalehealth.ca" });
   noStore(res);
-  res.type("html").send(`<!doctype html><meta charset="utf-8"><title>Ad email previews (not sending)</title><body style="font-family:Arial;background:#f8f6ef;padding:24px"><h1>Ad system emails (preview only)</h1>
+  res.type("html").send(`<!doctype html><meta charset="utf-8"><title>Ad email previews</title><body style="font-family:Arial;background:#f8f6ef;padding:24px"><h1>Ad system emails</h1>
 <p>Login links send: <b>${adsLoginEmailEnabled() ? "ON" : "OFF"}</b> (ADS_LOGIN_EMAIL_ENABLED). Hub alerts send: <b>${process.env.ADS_HUB_ALERT_EMAIL_ENABLED === "true" ? "ON" : "OFF"}</b> (ADS_HUB_ALERT_EMAIL_ENABLED). From: ${ADS_FROM().replace(/</g, "&lt;")}</p>
 <h2>Subject: ${a.subject}</h2><div style="background:#fff;padding:16px;border-radius:12px">${a.html}</div><h2>Subject: ${b.subject}</h2><div style="background:#fff;padding:16px;border-radius:12px">${b.html}</div></body>`);
 });

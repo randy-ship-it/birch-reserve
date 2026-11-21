@@ -297,3 +297,17 @@ test("statements: promo delivery earns nothing, gate holds until live+transactio
   assert.equal((await store.royalties(1))[0]!.status, "paid");
   store.setAdPoolForTests(null);
 });
+
+test("new-hub alert: never says open/unclaimed, one per hub per email, unsubscribe turns alerts off", async () => {
+  const { hubAlertEmail } = await import("../src/lib/adserver/mail");
+  const m = hubAlertEmail({ hubName: "SOLE", category: "Recovery hardware", hubUrl: "https://scalehealth.ca/sole", unsubscribeUrl: "https://birchreserve.net/account/alerts/off?t=x" });
+  for (const t of [m.subject, m.text, m.html]) assert.ok(!/\bopen(ed|ing)?\b|unclaimed/i.test(t.replace(/Open my dashboard/g, "")), t);
+  assert.ok(m.html.includes("/account/alerts/off?t=x"));
+  const db = new PGlite();
+  store.setAdPoolForTests(db as unknown as store.Queryable, "ads_alert_test");
+  await store.setAlertPrefs("A@b.co", ["Recovery hardware"], true);
+  assert.equal(await store.claimHubAlert("sole", "a@b.co"), true);
+  assert.equal(await store.claimHubAlert("sole", "A@b.co"), false);
+  await store.alertsOff("a@b.co");
+  assert.deepEqual(await store.alertSubscribers(), []);
+});
