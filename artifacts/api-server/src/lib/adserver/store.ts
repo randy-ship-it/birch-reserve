@@ -5,7 +5,8 @@
  */
 import { AD_DEFAULTS, AD_SLOTS, findSlot, setContractHubs, type ContractHub, type Placement } from "./config";
 import type { Campaign, CampaignStatus, Pricing } from "./engine";
-import { channelOf, dueDate, gatePassed, overrideLabel, ratesAt, splitCharges, type Channel, type ChannelRateRow, type ChargeLine, type Gate, type MonthAgg, type RateRow, type RecipientRow, type Tier } from "./payoutSplit";
+import { channelOf, dueDate, gatePassed, overrideLabel, ratesAt, splitCharges, splitReferralOrders, type Channel, type ChannelRateRow, type ChargeLine, type Gate, type MonthAgg, type RateRow, type RecipientRow, type Tier } from "./payoutSplit";
+import { listReferralOrders, toLine } from "./referrals";
 
 export type Queryable = { query: (sql: string, params?: unknown[]) => Promise<{ rows: Array<Record<string, unknown>> }> };
 
@@ -139,6 +140,16 @@ const DDL = (s: string) => [
   `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS batch_id text`,
   `CREATE TABLE IF NOT EXISTS ${s}.ad_audit (id bigserial PRIMARY KEY, at timestamptz NOT NULL DEFAULT now(), actor text, action text NOT NULL, target text, detail text)`,
   `INSERT INTO ${s}.ad_street_qrs (member, label, site, url, created_by) VALUES ('bridget','birch-intake','birch','https://birchreserve.net/intake?code=STREET100&st=bridget&qr=birch-intake','seed'),('bridget','scale-intake','scale','https://scalehealth.ca/intake?code=STREET100&st=bridget&qr=scale-intake','seed'),('mona','birch-intake','birch','https://birchreserve.net/intake?code=STREET100&st=mona&qr=birch-intake','seed'),('mona','scale-intake','scale','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake','seed'),('mona','scale-intake-digital','scale','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake-digital','seed') ON CONFLICT DO NOTHING`,
+  // Referral attribution (Randy, Nov 21 2026 4:07 PM): every paid order a street-team / partner link or QR brought in is stamped on the
+  // order (campaign) and gets one row in ad_referral_orders, the basis for referral commission lines. docs/ads/ARCHITECTURE.md "Referral attribution".
+  `ALTER TABLE ${s}.ad_campaigns ADD COLUMN IF NOT EXISTS referrer text`,
+  `ALTER TABLE ${s}.ad_campaigns ADD COLUMN IF NOT EXISTS referrer_qr text`,
+  `ALTER TABLE ${s}.ad_campaigns ADD COLUMN IF NOT EXISTS referrer_site text`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_referral_orders (
+    id bigserial PRIMARY KEY, session_id text NOT NULL UNIQUE, campaign_id uuid, member text NOT NULL, qr text, code text, site text NOT NULL DEFAULT 'birch',
+    amount_cents bigint NOT NULL, currency text NOT NULL, order_kind text, brand text, is_test boolean NOT NULL DEFAULT false, paid_at timestamptz NOT NULL DEFAULT now(), created_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE INDEX IF NOT EXISTS ad_referral_orders_member ON ${s}.ad_referral_orders (member, paid_at)`,
+  `ALTER TABLE ${s}.ad_override_recipients ADD COLUMN IF NOT EXISTS scope_referrer text`,
   `INSERT INTO ${s}.ad_audit (actor, action, target, detail) SELECT 'seed','street.qr','mona/scale-intake-digital','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake-digital (Mona digital Scale intake QR registered)' WHERE NOT EXISTS (SELECT 1 FROM ${s}.ad_audit WHERE action = 'street.qr' AND target = 'mona/scale-intake-digital')`,
 ];
 
@@ -163,7 +174,7 @@ const arr = (v: unknown): string[] => (Array.isArray(v) ? v.map(String) : typeof
 function toCampaign(r: Record<string, unknown>): Campaign {
   return {
     id: String(r.id), accountEmail: String(r.account_email), brand: String(r.brand), category: (r.category as string) ?? null,
-    orderRef: (r.order_ref as string) ?? null, orderKind: (r.order_kind as string) ?? null, seller: r.seller === "scale" ? "scale" : "birch", internal: Boolean(r.internal), currency: r.currency === "cad" ? "cad" : "usd",
+    orderRef: (r.order_ref as string) ?? null, orderKind: (r.order_kind as string) ?? null, seller: r.seller === "scale" ? "scale" : "birch", internal: Boolean(r.internal), referrer: (r.referrer as string) ?? null, referrerQr: (r.referrer_qr as string) ?? null, referrerSite: (r.referrer_site as string) ?? null, currency: r.currency === "cad" ? "cad" : "usd",
     budgetMicros: num(r.budget_micros), spentMicros: num(r.spent_micros), pricing: r.pricing === "cpc" ? "cpc" : "cpm",
     primaryPlacement: String(r.primary_placement) as Placement, hubs: arr(r.hubs), allowSubstitute: Boolean(r.allow_substitute),
     rateMultiplierBps: num(r.rate_multiplier_bps), flightStart: date(r.flight_start), flightEnd: date(r.flight_end),
@@ -606,7 +617,7 @@ export async function ledger(opts: { campaignId?: string; limit?: number } = {})
 /* --------------------------------------------------------------------------------------------- royalties */
 export type RoyaltyRow = {
   partner: string; // payee key: hub partner name, "<hub>#transaction", or "rcpt:<recipient>@<hub>"
-  kind: "hub" | "brokerage" | "commission"; label: string; hub: string; source: "ad" | "transaction";
+  kind: "hub" | "brokerage" | "commission"; label: string; hub: string; source: "ad" | "transaction" | "referral";
   month: string; currency: string; grossMicros: number; units: number; shareBps: number | null; payableMicros: number | null;
   status: "calculated" | "held" | "approved" | "paid"; heldReason: string | null; dueAt: Date | null;
   approvedBy: string | null; approvedAt: Date | null; overrideNote?: string | null; isTest?: boolean; batchId?: string | null; paidRef?: string | null; paidAt?: Date | null; paidBy?: string | null; payoutRef?: string | null;
@@ -621,7 +632,7 @@ const toRate = (r: Record<string, unknown>): RateRow => ({
 });
 const toRecipient = (r: Record<string, unknown>): RecipientRow => ({
   rkey: String(r.rkey), name: String(r.name), kind: r.kind === "commission" ? "commission" : "brokerage", pctBps: num(r.pct_bps), scopePartner: (r.scope_partner as string) || null,
-  scopeCampaign: (r.scope_campaign as string) || null, active: Boolean(r.active), payoutRef: (r.payout_ref as string) ?? null, effectiveAt: new Date(String(r.effective_at)),
+  scopeCampaign: (r.scope_campaign as string) || null, scopeReferrer: (r.scope_referrer as string) || null, active: Boolean(r.active), payoutRef: (r.payout_ref as string) ?? null, effectiveAt: new Date(String(r.effective_at)),
 });
 export async function rateHistory(): Promise<Array<RateRow & { actor: string | null; note: string | null; id: number }>> {
   const p = await db();
@@ -653,9 +664,9 @@ export async function addRate(r: { partner: string | null; overrideBps: number |
 }
 export async function addRecipientVersion(r: RecipientRow, actor: string): Promise<void> {
   const p = await db();
-  await p.query(`INSERT INTO ${S()}.ad_override_recipients (rkey, name, kind, pct_bps, scope_partner, scope_campaign, active, payout_ref, effective_at, actor) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
-    [r.rkey, r.name, r.kind, r.pctBps, r.scopePartner, r.scopeCampaign, r.active, r.payoutRef, r.effectiveAt.toISOString(), actor]);
-  await audit(actor, "recipient.set", r.rkey, `${r.name} ${r.kind} ${r.pctBps / 100}% of pool scope=${r.scopePartner ?? "all hubs"}/${r.scopeCampaign ?? "all campaigns"} active=${r.active} effective=${r.effectiveAt.toISOString()}`);
+  await p.query(`INSERT INTO ${S()}.ad_override_recipients (rkey, name, kind, pct_bps, scope_partner, scope_campaign, scope_referrer, active, payout_ref, effective_at, actor) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+    [r.rkey, r.name, r.kind, r.pctBps, r.scopePartner, r.scopeCampaign, r.scopeReferrer ?? null, r.active, r.payoutRef, r.effectiveAt.toISOString(), actor]);
+  await audit(actor, "recipient.set", r.rkey, `${r.name} ${r.kind} ${r.pctBps / 100}% of pool scope=${r.scopeReferrer ? `referrals by ${r.scopeReferrer}` : `${r.scopePartner ?? "all hubs"}/${r.scopeCampaign ?? "all campaigns"}`} active=${r.active} effective=${r.effectiveAt.toISOString()}`);
 }
 export async function purgeTestRecipient(rkey: string, actor: string): Promise<boolean> {
   const p = await db();
@@ -718,13 +729,17 @@ export async function statements(months = 6, opts: { testOnly?: boolean } = {}):
   const chRates = await channelRateHistory();
   const lines: ChargeLine[] = rows.map((r) => ({ partner: String(r.partner), campaignId: String(r.cid), at: new Date(String(r.at)), currency: String(r.currency), grossMicros: num(r.gross), source: "ad", channel: (["brokerage", "scale_direct", "internal"].includes(String(r.channel)) ? r.channel : "brokerage") as Channel }));
   const split = splitCharges(lines, rates.rows.map(toRate), recips.rows.map(toRecipient), chRates);
+  // Referral commissions (sale-time, per referred paid order) join the same statements, so approve / batch / mark paid work unchanged.
+  const refs = splitReferralOrders((await listReferralOrders({ since, testOnly: opts.testOnly })).map(toLine), rates.rows.map(toRate), recips.rows.map(toRecipient), chRates);
+  split.payees.push(...refs.payees);
   const appr = new Map(approved.rows.map((r) => [`${r.partner}|${r.month}|${r.currency}`, r]));
   const out: RoyaltyRow[] = split.payees.map((a) => {
     // Frozen payouts overlay test and real rows alike (test hubs have their own payee keys), so QA shows the real approved/batched/paid status.
     const fz = appr.get(`${a.key}|${a.month}|${a.currency}`);
     const bps = a.bpsSeen.size === 1 ? [...a.bpsSeen][0]! : a.bpsSeen.size ? Math.max(...a.bpsSeen) : null;
     const open = !fz;
-    const held = open && !a.pending && !gatePassed(g.get(a.partner));
+    // Referral lines are on collected sales, not hub delivery, so the hub payout gate does not apply to them.
+    const held = open && !a.pending && a.source !== "referral" && !gatePassed(g.get(a.partner));
     return {
       partner: a.key, kind: a.kind, label: a.label, hub: a.partner, source: a.source, month: a.month, currency: a.currency,
       grossMicros: fz ? num(fz.gross_micros) : a.basis, units: a.units, shareBps: fz ? num(fz.share_bps) : a.pending ? null : bps,

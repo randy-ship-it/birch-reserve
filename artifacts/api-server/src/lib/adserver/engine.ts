@@ -24,6 +24,10 @@ export type Campaign = {
   seller?: "birch" | "scale";
   /** Birch only runs it internally as cost accounting (Randy 2:45 PM): its own, lower override rate. */
   internal?: boolean;
+  /** Street-team / partner member whose link or QR brought this order in (30-day last click), its QR label and the site it was bought on. */
+  referrer?: string | null;
+  referrerQr?: string | null;
+  referrerSite?: string | null;
   currency: "usd" | "cad";
   budgetMicros: number;
   spentMicros: number;

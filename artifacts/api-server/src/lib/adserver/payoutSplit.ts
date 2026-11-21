@@ -12,9 +12,11 @@
 /** Volume tier: once a hub's monthly gross (per currency, per source) reaches fromMicros, further gross earns hubBps. Progressive. */
 export type Tier = { fromMicros: number; hubBps: number };
 export type RateRow = { partner: string | null; overrideBps: number | null; hubBps: number | null; tiers?: Tier[] | null; effectiveAt: Date };
-export type SourceType = "ad" | "transaction";
+export type SourceType = "ad" | "transaction" | "referral";
 export type RecipientRow = {
   rkey: string; name: string; kind: "brokerage" | "commission"; pctBps: number; scopePartner: string | null; scopeCampaign: string | null;
+  /** Street-team / partner member id: this recipient earns its share on orders that member referred (sale-time), never on delivery. */
+  scopeReferrer?: string | null;
   active: boolean; payoutRef: string | null; effectiveAt: Date;
 };
 export type Channel = "brokerage" | "scale_direct" | "internal";
@@ -74,8 +76,9 @@ export function recipientsAt(rows: RecipientRow[], t: number): RecipientRow[] {
   return [...by.values()].map((v) => latest(v, t)).filter((r): r is RecipientRow => Boolean(r));
 }
 
+/** Delivery-time recipients. Referrer-scoped recipients are paid on the referred sale instead (splitReferralOrders), never twice. */
 export const applies = (r: RecipientRow, partner: string, campaignId: string) =>
-  r.active && (r.scopePartner === null || r.scopePartner === partner) && (r.scopeCampaign === null || r.scopeCampaign === campaignId);
+  r.active && !r.scopeReferrer && (r.scopePartner === null || r.scopePartner === partner) && (r.scopeCampaign === null || r.scopeCampaign === campaignId);
 
 /** Largest share of the pool any one charge could hand out (every hub × campaign scope combination). Must be ≤ 10000. */
 export function maxPoolAllocationBps(active: RecipientRow[], partners: string[], campaigns: string[]): number {
@@ -170,4 +173,60 @@ export function dueDate(month: string, cadence: "monthly" | "quarterly", netDays
   const endMonth = cadence === "quarterly" ? Math.ceil(m / 3) * 3 : m;
   const end = new Date(Date.UTC(y, endMonth, 1)); // first day after the period
   return new Date(end.getTime() + netDays * 864e5);
+}
+
+/* ------------------------------------------------------------------------------------- referral commissions (Randy, Nov 21 2026 4:07 PM) */
+/** One paid order a street-team / partner link or QR brought in (ad_referral_orders + the order's current channel). */
+export type ReferralOrderLine = { sessionId: string; campaignId: string | null; member: string; at: Date; currency: string; amountMicros: number; channel: Channel };
+export type ReferralDetail = ReferralOrderLine & { overrideBps: number | null; poolMicros: number | null; commissions: Array<{ rkey: string; name: string; pctBps: number; micros: number }> };
+
+/** Largest share of a referral pool any one member's recipients could take. Must be ≤ 10000. */
+export function maxReferrerAllocationBps(active: RecipientRow[]): number {
+  const by = new Map<string, number>();
+  for (const r of active) if (r.active && r.scopeReferrer) by.set(r.scopeReferrer, (by.get(r.scopeReferrer) ?? 0) + r.pctBps);
+  return Math.max(0, ...by.values());
+}
+
+/**
+ * Referral commission on a paid, referred order, using the existing rates only (nothing new is invented):
+ *   pool = amount collected × the Birch override for the order's channel at payment time
+ *          (brokerage = default Birch override, 20% now; Scale direct / internal = their dated channel rate, 5% now);
+ *   each active recipient scoped to that member (scope_referrer) earns its % of that pool; the rest stays with Birch.
+ * No recipient for the member → the order is still listed with its pool, and no payout line is made.
+ */
+export function splitReferralOrders(orders: ReferralOrderLine[], rates: RateRow[], recipients: RecipientRow[], channelRates: ChannelRateRow[] = []): { payees: PayeeAgg[]; detail: ReferralDetail[] } {
+  const payees = new Map<string, PayeeAgg>();
+  const detail: ReferralDetail[] = [];
+  for (const o of [...orders].sort((a, b) => a.at.getTime() - b.at.getTime())) {
+    const t = o.at.getTime();
+    const g = ratesAt(rates, "\u0000referral", t);
+    if (!g) {
+      detail.push({ ...o, overrideBps: null, poolMicros: null, commissions: [] });
+      continue;
+    }
+    const ovBps = overrideFor(o.channel, g.overrideBps, channelRates, t);
+    const pool = (o.amountMicros * ovBps) / 10_000;
+    const month = o.at.toISOString().slice(0, 7);
+    const commissions: ReferralDetail["commissions"] = [];
+    for (const rc of recipientsAt(recipients, t).filter((x) => x.active && x.scopeReferrer === o.member)) {
+      const amt = (pool * rc.pctBps) / 10_000;
+      commissions.push({ rkey: rc.rkey, name: rc.name, pctBps: rc.pctBps, micros: Math.floor(amt) });
+      const key = `ref:${rc.rkey}`;
+      const k = `${key}|${month}|${o.currency}`;
+      const a = payees.get(k) ?? { key, kind: rc.kind, label: `${rc.name} (referrals by ${o.member})`, partner: "", source: "referral" as const, month, currency: o.currency, basis: 0, payable: 0, pending: false, units: 0, bpsSeen: new Set<number>(), payoutRef: rc.payoutRef, overrides: new Map<string, number>() };
+      a.basis += pool;
+      a.payable += amt;
+      a.units += 1;
+      a.bpsSeen.add(rc.pctBps);
+      const ov = `${o.channel}:${ovBps}`;
+      a.overrides.set(ov, (a.overrides.get(ov) ?? 0) + pool);
+      payees.set(k, a);
+    }
+    detail.push({ ...o, overrideBps: ovBps, poolMicros: Math.round(pool), commissions });
+  }
+  for (const p of payees.values()) {
+    p.payable = Math.floor(p.payable);
+    p.basis = Math.round(p.basis);
+  }
+  return { payees: [...payees.values()], detail };
 }

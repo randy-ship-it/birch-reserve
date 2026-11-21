@@ -1,36 +1,46 @@
 /**
  * Browser side of promo codes + street team attribution (one script, used by the React site and the server-rendered pages).
- *   BRPromo.capture()      reads ?st= / ?ref= and ?code= (also ?qr=1), keeps them 30 days, last touch (localStorage + first-party
- *                          cookies br_st / br_pc that the server reads), and sends one aggregate scan beacon per session.
+ *   BRPromo.capture()      reads ?st= (and ?ref= / ?via= once the server confirms an active member), ?qr= and ?code=; keeps
+ *                          them 30 days from the referring click, last click wins (localStorage + first-party cookies br_st /
+ *                          br_qr / br_pc / br_at scoped to .birchreserve.net or .scalehealth.ca, which the server reads), and sends
+ *                          one aggregate scan beacon per session. Rule: docs/ads/ARCHITECTURE.md "Referral attribution".
  *   BRPromo.mount(el, o)   o.mode "form" (collapsible "Have a code?"), "account" (applies to the signed-in account) or
  *                          "success" (thank-you banner for ?session_id=).
  * No dependencies, no storage of anything but a member id and a code. Same-origin fetches go through the Scale mirror boot script.
  */
 export const PROMO_BOX_JS = String.raw`(function(){
 if(window.BRPromo)return;
-var KEY="br_promo_v1",MAXAGE=30*86400,MEMBER=/^[a-z0-9][a-z0-9_-]{1,31}$/;
+var KEY="br_promo_v1",MAXAGE=30*86400,MEMBER=/^[a-z0-9][a-z0-9_-]{1,31}$/,QRL=/^[a-z0-9][a-z0-9_-]{0,39}$/,CODE=/^[A-Za-z0-9 _-]{2,40}$/;
 function rd(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){return{}}}
 function wr(o){try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}}
-function ck(n,v){try{document.cookie=n+"="+encodeURIComponent(v)+"; Max-Age="+(v?MAXAGE:0)+"; Path=/; SameSite=Lax"+(location.protocol==="https:"?"; Secure":"")}catch(e){}}
-function state(){var s=rd();if(s.at&&Date.now()-s.at>MAXAGE*1000)s={};return s}
-function sync(s){wr(s);ck("br_st",s.st||"");ck("br_pc",s.code||"")}
+function dom(){var h=location.hostname;return /(^|\.)scalehealth\.ca$/.test(h)?".scalehealth.ca":/(^|\.)birchreserve\.net$/.test(h)?".birchreserve.net":""}
+function ck(n,v,age){try{var sec=location.protocol==="https:"?"; Secure":"",d=dom(),a=v?(age>0?age:MAXAGE):0;if(d)document.cookie=n+"=; Max-Age=0; Path=/; SameSite=Lax"+sec;document.cookie=n+"="+encodeURIComponent(v)+"; Max-Age="+a+"; Path=/; SameSite=Lax"+sec+(d?"; Domain="+d:"")}catch(e){}}
+function gc(n){var m=document.cookie.match(new RegExp("(?:^|; )"+n+"=([^;]*)"));try{return m?decodeURIComponent(m[1]):""}catch(e){return""}}
+function state(){var s=rd();if(s.at&&Date.now()-s.at>MAXAGE*1000)s={};
+ if(!s.st&&!s.code){var cs=gc("br_st"),cc=gc("br_pc"),ca=Number(gc("br_at"))||0;if((cs&&MEMBER.test(cs))||(cc&&CODE.test(cc))){s={st:MEMBER.test(cs)?cs:undefined,qr:QRL.test(gc("br_qr"))?gc("br_qr"):undefined,code:CODE.test(cc)?cc:undefined,at:ca||Date.now()};if(Date.now()-s.at>MAXAGE*1000)s={};else wr(s)}}
+ return s}
+function sync(s){wr(s);var left=s.at?Math.max(1,Math.floor(MAXAGE-(Date.now()-s.at)/1000)):MAXAGE;ck("br_st",s.st||"",left);ck("br_qr",s.st&&s.qr||"",left);ck("br_pc",s.code||"",left);ck("br_at",s.st||s.code?String(s.at||Date.now()):"",left)}
 function post(u,b){return fetch(u,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(b||{}),credentials:"same-origin"}).then(function(r){return r.json().catch(function(){return{}}).then(function(j){j.__status=r.status;return j})})}
+function qlab(v){v=(v||"").trim().toLowerCase();return v==="1"||v==="true"?"qr":QRL.test(v)?v:""}
+function setMember(st,qr){var s=state();s.st=st;s.qr=qr||undefined;s.at=Date.now();sync(s)}
 function capture(){
  var q;try{q=new URLSearchParams(location.search)}catch(e){return}
- var s=state(),st=(q.get("st")||q.get("ref")||"").trim().toLowerCase(),code=(q.get("code")||"").trim().slice(0,40),changed=false;
- if(st&&MEMBER.test(st)){s.st=st;s.at=Date.now();changed=true}
- else st="";
- if(code&&/^[A-Za-z0-9 _-]{2,40}$/.test(code)){s.code=code;if(!s.at)s.at=Date.now();changed=true}
+ var s=state(),st=(q.get("st")||"").trim().toLowerCase(),alt=(q.get("ref")||q.get("via")||"").trim().toLowerCase(),code=(q.get("code")||"").trim().slice(0,40),qr=qlab(q.get("qr")),changed=false;
+ // ?st= is the street-team member param: last click wins. ?ref= / ?via= are also used by our own internal links (home_tile, share_*),
+ // so they only take over once the server confirms an active member; an unknown value never wipes a real referrer.
+ if(st&&MEMBER.test(st)){s.st=st;s.qr=qr||undefined;s.at=Date.now();changed=true}else st="";
+ if(code&&CODE.test(code)){s.code=code;if(!s.at)s.at=Date.now();changed=true}
  if(changed||s.st||s.code)sync(s);
- if(st){var k="br_st_b_"+st;try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1")}catch(e){}
-  post("/v1/promo/scan",{st:st,qr:q.get("qr")||undefined,code:code||undefined}).catch(function(){})}
+ var who=st||(alt&&MEMBER.test(alt)?alt:"");if(!who)return;
+ var k="br_st_b_"+who+"_"+(qr||"");try{if(!st&&sessionStorage.getItem(k)==="0")return;if(st&&sessionStorage.getItem(k))return}catch(e){}
+ post("/v1/promo/scan",{st:who,qr:qr||undefined,code:code||undefined}).then(function(j){var ok=j&&j.member===who;try{sessionStorage.setItem(k,ok?"1":"0")}catch(e){}if(ok&&!st)setMember(who,qr)}).catch(function(){})
 }
 function install(){
  if(window.__brPromoFetch||typeof window.fetch!=="function")return;window.__brPromoFetch=1;var of=window.fetch;
  window.fetch=function(i,o){try{
   var u=typeof i==="string"?i:(i&&i.url)||"",m=((o&&o.method)||(i&&i.method)||"GET").toUpperCase();
-  if(m!=="GET"&&m!=="HEAD"&&/(^|\/)v1\//.test(u)&&(u.charAt(0)==="/"||u.indexOf(location.origin)===0)){
-   var s=state(),h=[];if(s.st&&MEMBER.test(s.st))h.push("st="+s.st);if(s.code&&/^[A-Za-z0-9 _-]{2,40}$/.test(s.code))h.push("code="+encodeURIComponent(s.code));
+  if(m!=="GET"&&m!=="HEAD"&&/(^|\/)(v1|launch)\//.test(u)&&(u.charAt(0)==="/"||u.indexOf(location.origin)===0)){
+   var s=state(),h=[];if(s.st&&MEMBER.test(s.st)){h.push("st="+s.st);if(s.qr&&QRL.test(s.qr))h.push("qr="+s.qr)}if(s.code&&CODE.test(s.code))h.push("code="+encodeURIComponent(s.code));
    if(h.length){var hd=new Headers((o&&o.headers)||(i&&i.headers)||undefined);if(!hd.has("x-br-attr"))hd.set("x-br-attr",h.join("&"));o=Object.assign({},o||{},{headers:hd})}}
  }catch(e){}return of.call(this,i,o)}
 }
