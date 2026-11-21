@@ -61,12 +61,12 @@ export default function BrIntakePublisher() {
           </div>
           <div className="mt-5 grid grid-cols-2 gap-4">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">At ramp</p>
-              <CountUp value={p.monthlyTotalUsd[0]} className="font-display text-4xl md:text-6xl" />
+              <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-white/60">At ramp</p>
+              <CountUp value={p.monthlyTotalUsd[0]} className="block pt-1 font-display text-4xl md:text-6xl" />
             </div>
             <div>
-              <p className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-lime-200"><TrendingUp className="size-3.5" /> Pricing normalized</p>
-              <CountUp value={p.monthlyTotalUsd[1]} className="font-display text-4xl text-lime-200 md:text-6xl" />
+              <p className="mb-1 flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-lime-200"><TrendingUp className="size-3.5" /> Pricing normalized</p>
+              <CountUp value={p.monthlyTotalUsd[1]} className="block pt-1 font-display text-4xl text-lime-200 md:text-6xl" />
             </div>
           </div>
           <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10" aria-hidden>

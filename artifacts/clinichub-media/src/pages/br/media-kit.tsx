@@ -198,7 +198,7 @@ export default function BrMediaKit() {
       <section className="border-b border-border/70 bg-background" data-testid="mk-market-signals">
         <div className="container mx-auto max-w-5xl space-y-8 px-5 py-10 md:px-6 md:py-14">
           <Tam2027 testId="mk-tam-2027" />
-          <div className="hidden min-h-[5.25rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div>
+          <div className="hidden min-h-[6.5rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div>
           <CategoriesWeServe />
           <QuestionsBrandsAsk />
         </div>
