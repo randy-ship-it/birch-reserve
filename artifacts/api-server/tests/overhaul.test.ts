@@ -418,3 +418,34 @@ test("sponsor deposits gate + /sponsor packs page (audit #6)", () => {
   assert.doesNotMatch(html, /CAD 1|C\$|paused right now/);
   assert.match(sponsorHtml("usd", { open: false }), /paused right now/);
 });
+
+import { setSalesAlertDepsForTests } from "../src/lib/salesAlert";
+test("GTM bot lead: validated, honeypotted, tagged SBG, alert to randy@silverbirchgrowth.com only", async () => {
+  const sent: Array<{ to: string[]; subject: string; html: string }> = [];
+  setSalesAlertDepsForTests({ send: async (m) => { sent.push({ to: m.to as string[], subject: m.subject, html: m.html }); return { id: "x" }; }, ready: () => true });
+  const app = express();
+  app.use(createOverhaulRouter());
+  const server = app.listen(0);
+  const port = (server.address() as { port: number }).port;
+  const post = (b: unknown) => fetch(`http://127.0.0.1:${port}/v1/gtm-bot-lead`, { method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": `9.9.9.${Math.floor(Math.random() * 200)}` }, body: JSON.stringify(b) });
+  try {
+    const good = { name: "QA", company: "Acme TEST", email: "qa+gtmbot@silverbirchgrowth.com", fields: { what_they_sell: "a product", stage: "Growing", bots_preference: "Our bots (we run)" } };
+    const r = await post(good);
+    assert.equal(r.status, 200);
+    const j = (await r.json()) as { ok: boolean; alert: string };
+    assert.equal(j.alert, "sent");
+    assert.deepEqual(sent[0].to, ["randy@silverbirchgrowth.com"]);
+    assert.match(sent[0].subject, /^\[TEST\] \[SBG GTM BOT\]/);
+    assert.match(sent[0].html, /Business line[^]*SBG/);
+    assert.equal((await post({ ...good, email: "bad" })).status, 400);
+    assert.equal((await post({ ...good, company: "" })).status, 400);
+    assert.equal((await post({ ...good, fields: { ...good.fields, stage: "x" } })).status, 400);
+    const n = sent.length;
+    const hp = await post({ ...good, company_url: "http://spam" });
+    assert.equal(hp.status, 200);
+    assert.equal(sent.length, n);
+  } finally {
+    server.close();
+    setSalesAlertDepsForTests({ send: null, ready: null });
+  }
+});

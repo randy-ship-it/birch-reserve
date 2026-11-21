@@ -19,6 +19,7 @@ import { PREMIUM_INQUIRY_MESSAGE, isPremiumOffer } from "../lib/premiumInquireOn
 import { sendSalesAlert } from "../lib/salesAlert";
 import { isTestIdentity, isTestLead } from "../lib/testTraffic";
 import { coarseRegion, recordPulse } from "../lib/activityPulse";
+import { GTM_BOT_ALERT_TO, GTM_BOT_BUSINESS_LINE, GTM_BOT_KIND, GTM_BOT_SOURCE, GTM_BOT_STAGES, GTM_BOT_PREFS } from "../lib/overhaul/gtmBot";
 import { MEDIA_KIT_CATEGORIES } from "../lib/overhaul/mediaKit";
 
 export type CreateSession = (params: Record<string, unknown>) => Promise<{ url: string | null; livemode: boolean }>;
@@ -228,6 +229,53 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
       isTest: leadTest,
     });
     res.json({ ok: true, stored: friday.status, alert: alert.status });
+  });
+
+  /**
+   * GTM bot inquiry (Randy t416u, Nov 21 2026): SBG side, separate from Birch ad-buyer leads. Server-side validation,
+   * honeypot, own rate limit. Tagged source=gtm_bot / business_line=SBG; alert goes to randy@silverbirchgrowth.com only.
+   */
+  router.post("/v1/gtm-bot-lead", json, async (req: Request, res: Response) => {
+    if (limited(req, 6)) {
+      res.status(429).json({ error: "Too many requests. Try again shortly." });
+      return;
+    }
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    if (str(body.company_url, 200) || str(body.hp, 200)) {
+      res.json({ ok: true }); // honeypot: look successful, send nothing
+      return;
+    }
+    const email = str(body.email, 320).toLowerCase();
+    const name = str(body.name, 120);
+    const company = str(body.company, 160);
+    const fields = (body.fields ?? {}) as Record<string, unknown>;
+    const sell = str(fields.what_they_sell, 500);
+    const stage = str(fields.stage, 60);
+    const pref = str(fields.bots_preference, 60);
+    if (!name) { res.status(400).json({ error: "Add your name." }); return; }
+    if (!company) { res.status(400).json({ error: "Add your company." }); return; }
+    if (!EMAIL_RE.test(email)) { res.status(400).json({ error: "Add a work email." }); return; }
+    if (!sell) { res.status(400).json({ error: "Tell us what you sell." }); return; }
+    if (stage && !(GTM_BOT_STAGES as readonly string[]).includes(stage)) { res.status(400).json({ error: "Pick a stage from the list." }); return; }
+    if (pref && !(GTM_BOT_PREFS as readonly string[]).includes(pref)) { res.status(400).json({ error: "Pick an option from the list." }); return; }
+    const websiteRaw = str(body.website, 400);
+    const website = websiteRaw ? normalizeUrl(websiteRaw) ?? undefined : undefined;
+    if (websiteRaw && !website) { res.status(400).json({ error: "That website doesn't look right." }); return; }
+    const leadTest = isTestLead({ email, name, company, test: body.test });
+    const meta: Record<string, string> = { source: GTM_BOT_SOURCE, business_line: GTM_BOT_BUSINESS_LINE, what_they_sell: sell, ...(stage ? { stage } : {}), ...(pref ? { bots_preference: pref } : {}) };
+    const intake = { kind: GTM_BOT_KIND, email, name, company, website, message: str(body.message, 2000) || undefined, path: "/gtm-bot", meta, utm: utmOf(body) };
+    const friday = leadTest ? { status: "skipped" as const, externalId: intakeExternalId(intake) } : await sendIntake(intake);
+    const alert = await sendSalesAlert({
+      event: "inquiry",
+      tag: "SBG GTM BOT",
+      to: [...GTM_BOT_ALERT_TO],
+      title: `GTM bot inquiry: ${company}`,
+      rows: [["Business line", GTM_BOT_BUSINESS_LINE], ["Source", GTM_BOT_SOURCE], ["Company", company], ["Name", name], ["Email", email], ["Website", website], ["What they sell", sell], ["Stage", stage], ["Bots", pref], ["Message", str(body.message, 2000)], ["Reference", friday.externalId]],
+      replyTo: email,
+      isTest: leadTest,
+    });
+    log("gtm_bot_lead", { friday: friday.status, alert: alert.status, test: leadTest });
+    res.json({ ok: true, id: friday.externalId, stored: friday.status, alert: alert.status });
   });
 
   /**

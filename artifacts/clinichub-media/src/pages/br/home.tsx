@@ -14,6 +14,7 @@ import { DoorRoute } from "@/components/br/door-route";
 import { FounderNote, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import { MediaKitPdfLink, ProofStrip, SalesContact, TRUST_FAQ, TrustBand, TrustFaq } from "@/components/br/trust";
 import { GtmSetup } from "@/components/br/gtm-setup";
+import { GtmBotTeaser } from "@/components/br/gtm-bot-teaser";
 import { StreetTeamProgram } from "@/components/br/street-team";
 import { KitCta } from "@/components/br/kit-cta";
 import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
@@ -178,6 +179,7 @@ export default function BrHome() {
       {/* 2d. GTM setup packages (Randy t332u, Nov 21 2026): separate from the ad product, same systems. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-gtm-setup">
         <GtmSetup where="home" />
+        <div className="mt-4"><GtmBotTeaser /></div>
       </section>
 
       {/* 2e. Street team program, coming 2027 (Randy, voice, Nov 21 2026 2:03 PM ET). */}
