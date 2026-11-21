@@ -61,6 +61,14 @@ test("claim: pending per email, once per business domain, applies as its own reg
   assert.equal(s.applied, 1);
 });
 
+test("Mona's digital Scale intake QR is registered and audited", async () => {
+  store.setAdPoolForTests(new PGlite() as unknown as store.Queryable, "ads_promo_t5");
+  const q = (await promo.listQrs()).find((x) => x.member === "mona" && x.label === "scale-intake-digital")!;
+  assert.equal(q.site, "scale");
+  assert.equal(q.url, "https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake-digital");
+  assert.ok((await store.auditLog(20)).some((a) => a.action === "street.qr" && a.target === "mona/scale-intake-digital"));
+});
+
 test("disabled / expired / exhausted codes give a clear message", async () => {
   store.setAdPoolForTests(new PGlite() as unknown as store.Queryable, "ads_promo_t3");
   await promo.saveCode({ code: "ONEUSE", creditUsd: 25, maxRedemptions: 1 }, "t");

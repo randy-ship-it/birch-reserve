@@ -32,7 +32,7 @@ export function promoAdminHtml(v: PromoAdminView): string {
       const links = v.qrs.filter((q) => q.member === m.id);
       return `<tr><td><b>${esc(m.label)}</b><div class="fine">${esc(m.id)}</div></td><td class="n">${fmtInt(m.visits)}</td><td class="n">${fmtInt(m.scans)}</td><td class="n">${fmtInt(m.intakes)}</td><td class="n">${fmtInt(m.redemptions)}</td><td class="n">${fmtInt(m.applied)}</td><td class="n">${fmtInt(m.orders)}</td>
 <td class="n">${m.revenue.length ? m.revenue.map(money).join("<br>") : "0"}</td>
-<td>${links.map((q) => `<div class="fine"><b>${esc(q.label)}</b> (${esc(q.site)})<br><a href="${esc(q.url)}" target="_blank" rel="noopener">${esc(q.url)}</a><br><a href="/ads/admin/street/qr.png?member=${encodeURIComponent(q.member)}&label=${encodeURIComponent(q.label)}" target="_blank">QR PNG</a></div>`).join("") || `<span class="fine">no link yet</span>`}</td></tr>`;
+<td>${links.map((q) => `<div class="fine"><b>${esc(q.label)}</b> (${esc(q.site)})<br><a href="${esc(q.url)}" target="_blank" rel="noopener">${esc(q.url)}</a><br>${fmtInt(m.byQr[q.url.split("qr=")[1]?.split("&")[0] ?? ""] ?? 0)} scans · <a href="/ads/admin/street/qr.png?member=${encodeURIComponent(q.member)}&label=${encodeURIComponent(q.label)}" target="_blank">QR PNG</a></div>`).join("") || `<span class="fine">no link yet</span>`}</td></tr>`;
     })
     .join("");
   return `<section id="promo"><h2>Promo codes</h2><p class="fine">Free ad credit: ad spend only, no cash value, not transferable, one per business (email and company domain). The credit lands on the ad ledger as bonus credit; it never reduces a Stripe price. Codes match case- and space-insensitively.</p>

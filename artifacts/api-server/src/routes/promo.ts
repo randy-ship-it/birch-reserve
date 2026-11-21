@@ -92,9 +92,9 @@ router.post("/v1/promo/scan", json, (req, res) =>
     const vid = createHash("sha256").update(`${ip(req)}|${req.get("user-agent")}|${day}`).digest("hex").slice(0, 16);
     const site = siteOf(req);
     const test = hasValidQaHeader(req);
-    const qr = b.qr === true;
+    const qrLabel = typeof b.qr === "string" && /^[a-z0-9_-]{1,40}$/i.test(b.qr) ? (b.qr === "1" ? "qr" : b.qr.toLowerCase()) : b.qr === true ? "qr" : null;
     await promo.streetEvent({ member, kind: "visit", site, isTest: test, dedupeKey: `v:${member}:${site}:${vid}:${day}` });
-    if (qr) await promo.streetEvent({ member, kind: "scan", qr: "qr", site, isTest: test, dedupeKey: `q:${member}:${site}:${vid}:${day}` });
+    if (qrLabel) await promo.streetEvent({ member, kind: "scan", qr: qrLabel, site, isTest: test, dedupeKey: `q:${member}:${site}:${qrLabel}:${vid}:${day}` });
     res.status(204).end();
   }),
 );
@@ -195,7 +195,7 @@ router.post("/ads/admin/street/member", json, (req, res) =>
     if (!r.ok) return void res.status(400).json({ message: r.message });
     const site = b.site === "scale" ? "scale" : "birch";
     const label = str(b.qrLabel, 60) || (site === "scale" ? "scale-intake-digital" : "birch-intake");
-    const url = promo.shareUrl(id, site, str(b.code, 60) || "STREET100");
+    const url = promo.shareUrl(id, site, str(b.code, 60) || "STREET100", label.toLowerCase().replace(/[^a-z0-9_-]/g, "-").slice(0, 40));
     await promo.registerQr(id, label, site, url, who);
     res.json({ message: `${r.message} Link copied; reload to see it in the table.`, copy: `${url}\nQR PNG: ${`${origin(req)}/ads/admin/street/qr.png?member=${encodeURIComponent(id)}&label=${encodeURIComponent(label)}`}`, url, png: `/ads/admin/street/qr.png?member=${encodeURIComponent(id)}&label=${encodeURIComponent(label)}` });
   }),
