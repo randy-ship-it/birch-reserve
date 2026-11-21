@@ -52,7 +52,7 @@ export function seeTheUnitHtml(lookPrice: string, seatPrice: string): string {
     esc(SEE_THE_UNIT.gets[0]),
     `${esc(SEE_THE_UNIT.gets[1])} ${hubs}.`,
     `The <a href="${CREATIVE_BRIEF_HREF}">creative brief</a> and the <a href="${SAMPLE_IO_HREF}">sample insertion order</a>, so you know what the next step asks for.`,
-    `A real person: <a href="tel:+16479316278">(647) 931-6278</a> or <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a>.`,
+    `A real person: <a href="tel:+16479316278">(647) 931-6278</a> or <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a>.`,
   ];
   return `<section class="band" id="see-the-unit" data-testid="see-the-unit"><div class="wrap"><p class="kicker">${esc(SEE_THE_UNIT.kicker)}</p><h2>${esc(SEE_THE_UNIT.title)}</h2>
 <div class="unit"><div><p>${esc(swap(SEE_THE_UNIT.body))}</p><p><strong>${esc(SEE_THE_UNIT.getTitle)}</strong></p><ul>${gets.map((g) => `<li>${g}</li>`).join("")}</ul><p>${esc(swap(SEE_THE_UNIT.decide))}</p></div>

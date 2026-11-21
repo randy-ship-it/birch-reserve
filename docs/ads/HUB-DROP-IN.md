@@ -91,7 +91,7 @@ On our side: `/ads/admin#inventory` shows served / viewable / clicks per slot ke
 
 ## 7. Contact
 
-sales@silverbirchgrowth.com, subject "Hub drop-in kit", with hub id and page URL.
+randy@scalehealth.ca, subject "Hub drop-in kit", with hub id and page URL.
 
 ## Don'ts (for the hub team)
 

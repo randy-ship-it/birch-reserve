@@ -25,7 +25,7 @@ import type { Campaign } from "./adserver/engine";
 
 /** Paid sessions created before this (Nov 21 2026 6:30 PM ET) never get a confirmation: no retro-sends. */
 export const PAID_CONFIRMATION_SINCE = Date.UTC(2026, 10, 21, 23, 30, 0) / 1000;
-export const SUPPORT_EMAIL = "sales@silverbirchgrowth.com";
+export const SUPPORT_EMAIL = "randy@scalehealth.ca";
 export const SUPPORT_PHONE = "(647) 931-6278";
 const OWN_QA = /^qa\+[^@\s]*@silverbirchgrowth\.com$/i;
 

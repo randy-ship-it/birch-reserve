@@ -334,7 +334,7 @@ router.get("/account/login", (req, res) =>
     try {
       session = await getStripeClient().checkout.sessions.retrieve(sid);
     } catch {
-      res.type("html").send(loginPage({ error: "We couldn't find that payment. Email sales@silverbirchgrowth.com and we'll send your dashboard link." }));
+      res.type("html").send(loginPage({ error: "We couldn't find that payment. Email randy@scalehealth.ca and we'll send your dashboard link." }));
       return;
     }
     const email = (session.customer_details?.email || session.customer_email || "").trim().toLowerCase();
@@ -365,7 +365,7 @@ router.post("/account/login", json, (req, res) =>
     }
     const generic = { message: "If that email has a Birch Reserve campaign, a sign-in link is on its way. It expires in 24 hours." };
     if (!adsLoginEmailEnabled()) {
-      res.status(503).json({ message: "Email sign-in links are switching on shortly. Email sales@silverbirchgrowth.com for your dashboard link." });
+      res.status(503).json({ message: "Email sign-in links are switching on shortly. Email randy@scalehealth.ca for your dashboard link." });
       return;
     }
     const has = (await store.listCampaigns({ email })).length > 0;

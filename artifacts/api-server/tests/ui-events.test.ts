@@ -1113,7 +1113,7 @@ test("legal and insights routes return readable HTML instead of the SPA shell", 
     assert.match(kit, /Square still/);
     assert.match(kit, /Pain relief \/ topicals/);
     assert.match(kit, /post_checkout/);
-    assert.match(kit, /sales@silverbirchgrowth\.com/);
+    assert.match(kit, /randy@scalehealth\.ca/);
     assert.doesNotMatch(kit, /id="root"/);
     assert.doesNotMatch(kit, /\$899/);
 

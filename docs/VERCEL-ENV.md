@@ -33,7 +33,7 @@ Set these in the Vercel project (Preview and Production). Do not commit values.
 | `RANDY_TEL` | Transcript matching uses `+16479316278`. |
 | `RANDY_TRANSCRIPTS_DISABLED` | Transcript rows are written. Set to `true` to skip them. |
 | `RESEND_API_KEY` | Outbound mail is skipped. |
-| `BIRCH_REPLY_TO` | Buyer mail Reply-To is `sales@silverbirchgrowth.com`. |
+| `BIRCH_REPLY_TO` | Buyer mail Reply-To is `randy@scalehealth.ca`. |
 | `VOICE_WEBHOOK_SECRET` | `POST /api/voice/call-ended` stays closed. Also the fallback for `BIRCH_QA_SECRET`. |
 | `BIRCH_LOCAL_BIZ_SECRET` | `POST /api/launch/local-biz-lead` stays closed. |
 | `BIRCH_QA_SECRET` | QA header checks fall back to `VOICE_WEBHOOK_SECRET`, then fail. |

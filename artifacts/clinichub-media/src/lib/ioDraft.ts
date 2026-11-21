@@ -85,6 +85,6 @@ export function ioDraftSvg(r: BlockRequest, ref: string, opts: { issued?: Date; 
   <text x="96" y="1430" font-family="${SANS}" font-size="20" font-weight="700" fill="${INK}">Signatures</text>
   <line x1="96" x2="560" y1="1500" y2="1500" stroke="${INK}" stroke-width="2"/><line x1="640" x2="1104" y1="1500" y2="1500" stroke="${INK}" stroke-width="2"/>
   <text x="96" y="1530" font-family="${SANS}" font-size="18" fill="${MUTE}">Client / agency</text><text x="640" y="1530" font-family="${SANS}" font-size="18" fill="${MUTE}">Silver Birch Growth Inc.</text>
-  <text x="600" y="1580" text-anchor="middle" font-family="${SANS}" font-size="16" fill="${MUTE}">Draft for discussion. Not binding until signed by both parties. sales@silverbirchgrowth.com · (647) 931-6278</text>
+  <text x="600" y="1580" text-anchor="middle" font-family="${SANS}" font-size="16" fill="${MUTE}">Draft for discussion. Not binding until signed by both parties. randy@scalehealth.ca · (647) 931-6278</text>
 </svg>`;
 }

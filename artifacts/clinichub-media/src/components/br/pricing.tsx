@@ -174,7 +174,7 @@ export function PackPicker() {
   const [block, setBlock] = useState<number>(250_000);
   const q = useMemo(() => quotePack(keys, block), [keys, block]);
   const toggle = (k: RateSurface["key"]) => setKeys((cur) => (cur.includes(k) ? cur.filter((x) => x !== k) : [...cur, k]));
-  const ioHref = `mailto:sales@silverbirchgrowth.com?subject=${encodeURIComponent("Birch Reserve IO request")}&body=${encodeURIComponent(
+  const ioHref = `mailto:randy@scalehealth.ca?subject=${encodeURIComponent("Birch Reserve IO request")}&body=${encodeURIComponent(
     `Pack: ${fmtViews(block)} views on ${keys.length} surface(s) (${RATE_SURFACES.filter((s) => keys.includes(s.key)).map((s) => s.short).join(", ")}).\nStarting estimate: ${fmtUsd(q.startingUsd)} USD.\nBrand / category:\nTiming:\n`,
   )}`;
   return (

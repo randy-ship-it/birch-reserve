@@ -23,7 +23,7 @@ ${o.error ? `<p class="warn" role="alert">${esc(o.error)}</p>` : ""}${o.message 
 <div class="card" style="margin-top:12px"><h3>Sign in with your email</h3>
 ${emailOn
       ? `<form class="f" data-post="/account/login"><label>Work email<input type="email" name="email" required autocomplete="email" placeholder="you@brand.com"></label><button type="submit">Email me a sign-in link</button></form><p class="fine">The link works once and expires in 24 hours.</p>`
-      : `<p>Email sign-in links are switching on shortly. Until then, reply to your Birch Reserve receipt or email <a href="mailto:sales@silverbirchgrowth.com?subject=Ad%20dashboard%20link">sales@silverbirchgrowth.com</a> and we'll send your personal dashboard link.</p>`}
+      : `<p>Email sign-in links are switching on shortly. Until then, reply to your Birch Reserve receipt or email <a href="mailto:randy@scalehealth.ca?subject=Ad%20dashboard%20link">randy@scalehealth.ca</a> and we'll send your personal dashboard link.</p>`}
 </div></div>`,
   });
 }

@@ -51,7 +51,7 @@ test("every paid SKU gets one Birch email with paid amount, credit (bonus + medi
     assert.match(m.html!, /cid:br-mark/);
     assert.doesNotMatch(m.html!, /cid:scale-logo/);
     assert.match(m.text, /Open your ad dashboard: https:\/\/birchreserve\.net\/account\/login\?session_id=cs_live_/);
-    assert.match(m.text, /sales@silverbirchgrowth\.com/);
+    assert.match(m.text, /randy@scalehealth\.ca/);
     assert.match(m.text, /\(647\) 931-6278/);
     assert.match(m.text, /Next steps:/);
     assert.doesNotMatch(m.subject + m.text + visible(m.html!), BANNED, "no promo code, partner names, counts or guarantees");

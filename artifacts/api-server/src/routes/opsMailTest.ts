@@ -3,8 +3,8 @@
  *
  * Requires header X-Birch-QA == BIRCH_QA_SECRET (falls back to VOICE_WEBHOOK_SECRET;
  * constant-time compare in hasValidQaHeader). Sends exactly ONE fixed email to the
- * hard-coded sales@silverbirchgrowth.com (nothing is taken from the request), with
- * Reply-To sales@. Returns { accepted, id, sentAt } from the provider (Resend).
+ * hard-coded randy@scalehealth.ca (nothing is taken from the request), with
+ * Reply-To randy@. Returns { accepted, id, sentAt } from the provider (Resend).
  * Rate limit: 3 per hour (global).
  */
 import { Router, type IRouter } from "express";
@@ -14,8 +14,8 @@ import { DEFAULT_BIRCH_REPLY_TO, birchReplyTo, resendKeyConfigured, resendSend }
 import { transcriptFrom } from "../lib/randyChatTranscripts";
 import { logger } from "../lib/logger";
 
-export const MAIL_TEST_TO = "sales@silverbirchgrowth.com" as const;
-export const MAIL_TEST_SUBJECT = "Birch site test — sales@ routing";
+export const MAIL_TEST_TO = "randy@scalehealth.ca" as const;
+export const MAIL_TEST_SUBJECT = "Birch site test — randy@ routing";
 const mailTestLimiter = limiter({ max: 3, windowMs: 60 * 60_000 });
 
 const router: IRouter = Router();
@@ -42,13 +42,13 @@ router.post("/ops/mail-test", async (req, res): Promise<void> => {
       to: [MAIL_TEST_TO],
       subject: MAIL_TEST_SUBJECT,
       text: [
-        "This is a test from birchreserve.net to confirm site email reaches sales@silverbirchgrowth.com.",
+        "This is a test from birchreserve.net to confirm site email reaches randy@scalehealth.ca.",
         `Reply-To is set to ${birchReplyTo() || DEFAULT_BIRCH_REPLY_TO}.`,
         `Sent ${sentAt}. No action needed.`,
       ].join("\n\n"),
       replyTo: birchReplyTo(),
     });
-    logger.info({ id, sentAt }, "Ops mail test sent to sales@");
+    logger.info({ id, sentAt }, "Ops mail test sent to randy@");
     res.status(200).json({ accepted: true, id, sentAt });
   } catch (error) {
     const msg = error instanceof Error ? error.message : "send_failed";

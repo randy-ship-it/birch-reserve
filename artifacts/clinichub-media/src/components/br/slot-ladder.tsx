@@ -24,7 +24,7 @@ export function SlotLadder({ currency, audience }: { currency: Currency; audienc
       if (!r.data.held) await postJson("/v1/leads", { kind: "deposit_interest", email: fd.get("email"), company: fd.get("brand"), fields: { tier: tier.key, currency, audience } });
       setMsg("Reserved by inquiry. We'll confirm your slot within 1 business day. No charge today.");
     } catch {
-      setMsg("Couldn't open checkout. Email sales@silverbirchgrowth.com.");
+      setMsg("Couldn't open checkout. Email randy@scalehealth.ca.");
     } finally {
       setBusy(false);
     }

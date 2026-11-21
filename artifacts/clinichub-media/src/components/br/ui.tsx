@@ -78,7 +78,7 @@ export async function postJson<T = Record<string, unknown>>(path: string, body: 
   try {
     data = (await res.json()) as T;
   } catch {
-    data = { error: "Something went wrong. Email sales@silverbirchgrowth.com." } as T;
+    data = { error: "Something went wrong. Email randy@scalehealth.ca." } as T;
   }
   return { ok: res.ok, status: res.status, data };
 }

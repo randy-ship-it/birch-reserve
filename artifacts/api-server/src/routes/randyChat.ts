@@ -730,7 +730,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
     if (faq.callback) {
       const alert = await sendChatCallbackAlert(faq.callback, body, qa);
       req.log?.info({ kind: "chat_callback", alert: alert.status, source: "faq" }, "Randy chat call-back submitted");
-      if (alert.status !== "sent") text = `Sorry, that didn't go through. Please call ${BIRCH_SALES_PHONE} or email sales@silverbirchgrowth.com.`;
+      if (alert.status !== "sent") text = `Sorry, that didn't go through. Please call ${BIRCH_SALES_PHONE} or email randy@scalehealth.ca.`;
     }
     if (body.sessionId) {
       void recordTranscript({ id: body.sessionId, messages: [...body.messages, { role: "assistant", content: text }], ...testFlag, ...(body.pagePath ? { pagePath: body.pagePath } : {}) });

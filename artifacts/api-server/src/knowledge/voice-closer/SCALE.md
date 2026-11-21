@@ -95,13 +95,13 @@ Features-first: free store, monetize more, supply deals already on. Brand-hub fl
 | **Canada** clinic / provider outbound | **ON** (HARD REOPEN) |
 | **US** clinic outbound | **STOP** until Randy reopens. Wave 1 counsel gate still on. |
 | US counsel gate | No NY / CA / IL / FL-insurance or gov payors until cleared |
-| Outbound identity | Randy-only from randy@silverbirchgrowth.com; conversation first; chill; no em dashes |
+| Outbound identity | Randy-only from randy@scalehealth.ca; conversation first; chill; no em dashes |
 
 If a US clinic asks to join rails: do not promise commercial launch timing. Capture interest → Book a call / Randy.
 
 ## Handoff from Birch voice
 
-If caller is a clinician wanting bookings: stop the Birch pitch, give https://scalehealth.ca/providers. Studio / audience wanting a free store: https://scalehealth.ca/clinichubs. One URL, then offer to text or email it. Franchise / multi-loc complexity → Jon (jon@silverbirchgrowth.com).
+If caller is a clinician wanting bookings: stop the Birch pitch, give https://scalehealth.ca/providers. Studio / audience wanting a free store: https://scalehealth.ca/clinichubs. One URL, then offer to text or email it. Franchise / multi-loc complexity → Jon (john@scalehealth.ca).
 
 ## UNKNOWN
 

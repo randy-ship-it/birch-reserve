@@ -72,9 +72,9 @@ ${open ? `<form id="f"><label>Brand<input name="brand" required maxlength="160" 
 ${priceLadderHtml(currency, { title: "Where the reserve sits", current: "exclusive" })}
 <details><summary>Reserve terms</summary><ul>${EXCLUSIVE_RESERVE_TERMS.map((t) => `<li>${esc(t)}</li>`).join("")}</ul></details>
 <details><summary>How the 6-month spend-down works</summary><p><span class="mc">Modelled</span>A ${esc(pace.credit)} package paced over 6 months is ${esc(pace.perMonth)}, about ${esc(pace.viewsPerMonth)} at today's blended starter CPM. Spend faster if you like. No impression guarantee; reporting is aggregate only.</p></details>
-</main><footer class="fine">Silver Birch Growth Inc. · Toronto, Ontario · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · (647) 931-6278</footer>
+</main><footer class="fine">Silver Birch Growth Inc. · Toronto, Ontario · <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a> · (647) 931-6278</footer>
 ${PROMO_SCRIPT_TAG}
-<script>(function(){var f=document.getElementById("f"),b=document.getElementById("b"),m=document.getElementById("m");f.addEventListener("submit",async function(e){e.preventDefault();var d=Object.fromEntries(new FormData(f));var body={brand:d.brand,email:d.email,category:d.category||"",agree:d.agree==="on",currency:d.currency||"${currency}"};if(!body.agree){m.textContent="Please agree to the reserve terms.";return}b.disabled=true;m.textContent="Opening secure checkout…";try{var r=await fetch("/v1/exclusive/reserve",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});var o=await r.json().catch(function(){return{}});if(o.url){location.assign(o.url);return}if(o.held){m.textContent=o.message;f.querySelectorAll("input,select,button").forEach(function(x){x.disabled=true});return}m.textContent=o.error||"Checkout could not open. Email sales@silverbirchgrowth.com.";b.disabled=false}catch(err){m.textContent="Checkout could not open. No charge was made.";b.disabled=false}})})();</script>
+<script>(function(){var f=document.getElementById("f"),b=document.getElementById("b"),m=document.getElementById("m");f.addEventListener("submit",async function(e){e.preventDefault();var d=Object.fromEntries(new FormData(f));var body={brand:d.brand,email:d.email,category:d.category||"",agree:d.agree==="on",currency:d.currency||"${currency}"};if(!body.agree){m.textContent="Please agree to the reserve terms.";return}b.disabled=true;m.textContent="Opening secure checkout…";try{var r=await fetch("/v1/exclusive/reserve",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});var o=await r.json().catch(function(){return{}});if(o.url){location.assign(o.url);return}if(o.held){m.textContent=o.message;f.querySelectorAll("input,select,button").forEach(function(x){x.disabled=true});return}m.textContent=o.error||"Checkout could not open. Email randy@scalehealth.ca.";b.disabled=false}catch(err){m.textContent="Checkout could not open. No charge was made.";b.disabled=false}})})();</script>
 </body></html>`;
 }
 
@@ -117,7 +117,7 @@ router.post("/v1/exclusive/reserve", express.json({ limit: "8kb" }), async (req:
     res.json({ url: session.url, livemode: session.livemode });
   } catch (err) {
     logger.warn({ err: err instanceof Error ? err.message : String(err) }, "exclusive reserve session failed");
-    res.status(502).json({ error: "Checkout could not open. Email sales@silverbirchgrowth.com." });
+    res.status(502).json({ error: "Checkout could not open. Email randy@scalehealth.ca." });
   }
 });
 

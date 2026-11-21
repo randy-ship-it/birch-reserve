@@ -87,7 +87,7 @@ export function llmsFullTxt(): string {
     "## What it is",
     `Network: ${AI_NETWORK_LINE}.`,
     "Brands (supplements, recovery devices, wellness products and similar) reserve display space shown to recovery customers inside retail hubs. Placements are curated by hand. It is not an open auction and is not sold through a DSP.",
-    "Seller: Silver Birch Growth Inc. · Toronto, Ontario · sales@silverbirchgrowth.com · (647) 931-6278",
+    "Seller: Silver Birch Growth Inc. · Toronto, Ontario · randy@scalehealth.ca · (647) 931-6278",
     "",
     "## What you can buy (USD)",
     "- $190 · 7-day category look · credited in full toward the $490 reserve if you convert within 7 days, otherwise refunded · does not lock in a slot",
@@ -131,7 +131,7 @@ export function llmsFullTxt(): string {
 }
 
 export function jsonLdGraph(): Record<string, unknown> {
-  const org = { "@type": "Organization", description: POSITIONING, "@id": `${AI_SITE}/#org`, name: "Birch Reserve", legalName: "Silver Birch Growth Inc.", url: `${AI_SITE}/`, email: "sales@silverbirchgrowth.com", telephone: "+1-647-931-6278", address: { "@type": "PostalAddress", addressLocality: "Toronto", addressRegion: "ON", addressCountry: "CA" } };
+  const org = { "@type": "Organization", description: POSITIONING, "@id": `${AI_SITE}/#org`, name: "Birch Reserve", legalName: "Silver Birch Growth Inc.", url: `${AI_SITE}/`, email: "randy@scalehealth.ca", telephone: "+1-647-931-6278", address: { "@type": "PostalAddress", addressLocality: "Toronto", addressRegion: "ON", addressCountry: "CA" } };
   const offer = (sku: string, price: number, name: string, desc: string) => ({
     "@type": "Offer", name, description: desc, price, priceCurrency: "USD", url: `${AI_SITE}/buycalc?sku=${sku}`, seller: { "@id": `${AI_SITE}/#org` },
   });

@@ -73,13 +73,13 @@ export function LeadForm({ kind, fields, submitLabel, done, testId, next, endpoi
     setBusy(true);
     try {
       const r = await postJson<{ ok?: boolean; error?: string }>(endpoint, { kind, ...Object.fromEntries(CORE.map((k) => [k, (all[k] ?? "").trim()])), path: typeof window === "undefined" ? "" : window.location.pathname, company_url: hp, fields: extra });
-      if (!r.ok) setError(r.data.error ?? "Couldn't send. Email sales@silverbirchgrowth.com.");
+      if (!r.ok) setError(r.data.error ?? "Couldn't send. Email randy@scalehealth.ca.");
       else {
         saved.clear();
         setOk(true);
       }
     } catch {
-      setError("Couldn't send. Check your connection and press the button again, or email sales@silverbirchgrowth.com.");
+      setError("Couldn't send. Check your connection and press the button again, or email randy@scalehealth.ca.");
     } finally {
       setBusy(false);
     }

@@ -59,7 +59,7 @@ export default function Terms() {
         <p>
           Checkout is Stripe-hosted. Silver Birch Growth Inc. does not store
           full card numbers. Questions:{" "}
-          <a className="text-foreground underline" href="mailto:sales@silverbirchgrowth.com">
+          <a className="text-foreground underline" href="mailto:randy@scalehealth.ca">
             Email sales
           </a>
           .

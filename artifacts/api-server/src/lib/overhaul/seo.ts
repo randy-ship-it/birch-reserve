@@ -217,7 +217,7 @@ export function llmsTxt(): string {
     "- Smallest test: hold-190 ($190 USD 7-day look). Then reserve-490 ($490 USD). Premium slots inquire-only.",
     "",
     "Rules: aggregate reporting only, no patient data, no clinical pixels. Modelled figures are labelled. No impression guarantees.",
-    "Seller: Silver Birch Growth Inc. · Toronto, Ontario · sales@silverbirchgrowth.com",
+    "Seller: Silver Birch Growth Inc. · Toronto, Ontario · randy@scalehealth.ca",
     llmsFasterSection(),
   ].join("\n");
 }

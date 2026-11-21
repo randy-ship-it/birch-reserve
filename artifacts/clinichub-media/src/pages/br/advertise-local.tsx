@@ -55,9 +55,9 @@ export default function BrAdvertiseLocal() {
         setCheckoutMsg(r.data.message ?? "Reserved by inquiry. We'll confirm within 1 business day.");
         return;
       }
-      setCheckoutMsg(r.data.error ?? "Couldn't open checkout. Email sales@silverbirchgrowth.com and we'll hold your area.");
+      setCheckoutMsg(r.data.error ?? "Couldn't open checkout. Email randy@scalehealth.ca and we'll hold your area.");
     } catch {
-      setCheckoutMsg("Couldn't open checkout. Email sales@silverbirchgrowth.com.");
+      setCheckoutMsg("Couldn't open checkout. Email randy@scalehealth.ca.");
     } finally {
       setBusy(false);
     }

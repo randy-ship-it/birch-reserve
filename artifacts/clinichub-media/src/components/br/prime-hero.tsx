@@ -21,7 +21,7 @@ export const EARLY_RATE_LINE = "Prepaid credit keeps today's rate for its term. 
 
 export const SALES_PHONE_DISPLAY = "(647) 931-6278";
 export const SALES_PHONE_HREF = "tel:+16479316278";
-export const SALES_EMAIL = "sales@silverbirchgrowth.com";
+export const SALES_EMAIL = "randy@scalehealth.ca";
 export const LIVE_HUB_URL = "https://physio.drhonow.com";
 /** Second live hub (Randy, Nov 19 2026 11:10 AM ET). */
 export const SOLE_HUB_URL = "https://www.scalehealth.ca/sole";

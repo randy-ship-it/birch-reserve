@@ -35,7 +35,7 @@ export const EARLY_SLOTS = {
  */
 export const SALES_PHONE_DISPLAY = "(647) 931-6278";
 export const SALES_PHONE_HREF = "tel:+16479316278";
-export const SALES_EMAIL = "sales@silverbirchgrowth.com";
+export const SALES_EMAIL = "randy@scalehealth.ca";
 export const REQUEST_HREF = "/buycalc#request";
 export const REPLY_LINE = "We reply within 1 business day.";
 
@@ -86,7 +86,7 @@ export const SEE_THE_UNIT = {
     "A custom mock of your card on the hub surface, made by Birch from your square still. Illustrative, not a live ad.",
     "The live hubs, open to anyone right now.",
     "The creative brief and the sample insertion order, so you know what the next step asks for.",
-    "A real person: (647) 931-6278 or sales@silverbirchgrowth.com.",
+    "A real person: (647) 931-6278 or randy@scalehealth.ca.",
   ],
   decide: "Then decide: move to the $490 USD reserve within 7 days and all $190 USD carries over, otherwise it is refunded. The look does not lock a category; seats are shared, not exclusive.",
   imageAlt: "Illustrative mock: an example brand card drawn beside the recovery path on the live DR-HO'S hub dashboard",

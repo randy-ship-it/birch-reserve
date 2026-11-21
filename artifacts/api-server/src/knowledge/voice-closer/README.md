@@ -61,7 +61,7 @@ Paste into Voice Agent Builder / `session.instructions` in this order:
 - internal CRM portfolio doc
 - Live portfolio JSON-LD on https://rdgdh.com/portfolio
 
-Anything not in those files → mark **UNKNOWN** and offer Book a call / email randy@silverbirchgrowth.com.
+Anything not in those files → mark **UNKNOWN** and offer Book a call / email randy@scalehealth.ca.
 
 ## Checkout / voice status (ops)
 

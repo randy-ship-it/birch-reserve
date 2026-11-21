@@ -145,7 +145,7 @@ export default function Kit() {
           <h2 className="font-display text-2xl tracking-tight">Contact</h2>
           <p className="mt-4 text-base">
             <a href={SELLER_EMAIL_HREF} className="underline underline-offset-4 hover:text-accent">
-              sales@silverbirchgrowth.com
+              randy@scalehealth.ca
             </a>
             {" · "}
             <a href="/buycalc" className="underline underline-offset-4 hover:text-accent">

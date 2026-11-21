@@ -205,7 +205,7 @@ ${SLOT_MAP.map((r) => `<tr><td><code>.${r.placement}</code><div class="fine">${e
 
 <section id="dont"><h2>Please don't</h2><ul><li>Crop, stretch or overlay the ad, or wrap it in your own link.</li><li>Hide or restyle the "Sponsored" label.</li><li>Copy ad files to your own server (counts and approvals depend on ours).</li><li>Add slots that aren't in your agreement.</li></ul></section>
 
-<section id="contact"><h2>Questions</h2><div class="card"><p>Email <a href="mailto:sales@silverbirchgrowth.com?subject=Hub%20drop-in%20kit">sales@silverbirchgrowth.com</a> with the subject "Hub drop-in kit", your hub id and the page link. We'll check the slot from our side.</p></div></section>`;
+<section id="contact"><h2>Questions</h2><div class="card"><p>Email <a href="mailto:randy@scalehealth.ca?subject=Hub%20drop-in%20kit">randy@scalehealth.ca</a> with the subject "Hub drop-in kit", your hub id and the page link. We'll check the slot from our side.</p></div></section>`;
   return shell({
     title: `Hub drop-in kit · ${b.name}`,
     nav: "Hub drop-in kit",
