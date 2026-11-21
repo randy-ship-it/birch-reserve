@@ -15,7 +15,7 @@ export function WhatHundredGets() {
     <details className="group mt-4 max-w-xl rounded-2xl border border-foreground/20 bg-white px-4 py-1" data-testid="what-100">
       <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 text-sm font-semibold [&::-webkit-details-marker]:hidden">
         <span>{HUNDRED_TITLE}</span>
-        <span className="rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold text-accent-foreground">Street 100</span>
+        <span className="rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold text-accent-foreground">$100 credit</span>
       </summary>
       <ul className="divide-y divide-border text-sm">
         {HUNDRED_ROWS.map((r) => (

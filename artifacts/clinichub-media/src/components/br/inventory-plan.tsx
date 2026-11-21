@@ -46,7 +46,7 @@ export function Tam2027({ compact = false, dark = false, testId = "tam-2027" }: 
   const [lo, base] = TAM_2027.cases;
   const money = (n: number) => `$${(n / 1_000_000).toFixed(1)}M`;
   return (
-    <div className={compact ? "" : `rounded-2xl p-5 ${dark ? "bg-white/[0.06] ring-1 ring-white/15 text-white" : "border border-[#0b1f3a]/10 bg-white shadow-sm"}`} data-testid={testId}>
+    <div className={compact ? "" : `rounded-2xl p-5 ${dark ? "bg-white/[0.06] ring-1 ring-white/15 text-white" : "border border-[#0b1f3a]/10 bg-white shadow-sm"}`} data-testid={testId} data-currency-fixed>
       <div className="flex flex-wrap items-center gap-2">
         <span className={`text-[11px] font-bold uppercase tracking-[0.18em] ${dark ? "text-lime-300" : "text-[#0b1f3a]/70"}`}>2027 ad inventory, based on signed partnership contracts</span>
         <span className={`${chip} ${dark ? "bg-white/10 text-lime-200" : "border border-[#F1D58F] bg-[#FFF4DB] text-[#8A5A00]"}`}>Signed contracts</span>

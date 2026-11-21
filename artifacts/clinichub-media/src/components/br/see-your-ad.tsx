@@ -40,7 +40,7 @@ export function SeeYourAd({ testId = "see-your-ad", initial = "drho" }: { testId
   };
   return (
     <div data-testid={testId}>
-      <form className="flex flex-col gap-2 sm:flex-row" onSubmit={(e) => e.preventDefault()} aria-label="Preview your brand on a live hub">
+      <form className="flex gap-2" onSubmit={(e) => e.preventDefault()} aria-label="Preview your brand on a live hub">
         <label className="sr-only" htmlFor={`${testId}-name`}>Your brand name</label>
         <input
           id={`${testId}-name`}

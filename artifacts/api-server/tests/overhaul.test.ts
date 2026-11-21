@@ -99,9 +99,11 @@ test("checkout gate: live key needs the live flag", () => {
 
 test("deposit ladder sessions (non-exclusive slots buy down the rate)", () => {
   assert.deepEqual(SLOT_LADDER.map((s) => s.usd), [490, 1500, 3000, 6000]);
-  // USD only (Nov 20 2026): a CAD request still charges the USD pack.
+  // Geo pricing (Randy, Nov 21 2026 3:34 PM): a CAD page charges the CAD table; anything else charges USD.
   const t = buildDepositSession({ tier: "sponsor-3000", currency: "cad", brand: "Acme", email: "a@acme.com", agree: true }, "https://birchreserve.net");
-  assert.ok(t.ok && t.amountCents === 300000 && t.currency === "usd");
+  assert.ok(t.ok && t.amountCents === 420000 && t.currency === "cad");
+  const tu = buildDepositSession({ tier: "sponsor-3000", currency: "usd", brand: "Acme", email: "a@acme.com", agree: true }, "https://birchreserve.net");
+  assert.ok(tu.ok && tu.amountCents === 300000 && tu.currency === "usd");
   const starter = buildDepositSession({ amount: 490, currency: "usd", brand: "Acme", email: "a@acme.com", agree: true }, "https://birchreserve.net");
   assert.ok(starter.ok && starter.amountCents === 49000);
 });
@@ -403,8 +405,11 @@ test("sponsor deposits gate + /sponsor packs page (audit #6)", () => {
   assert.equal(sponsorDepositsOpen(E({ STRIPE_SECRET_KEY: "sk_test_x" })), false);
   const html = sponsorHtml("cad", { open: true, pack: "sponsor-6000", prefill: { email: "a@acme.com", company: "Acme <x>" } });
   // Guided form (Nov 21 2026): every pack is priced on its card; one primary button pays for the picked pack.
-  for (const n of ["1,500", "3,000", "6,000"]) assert.match(html, new RegExp(`data-testid="pack-sponsor-${n.replace(",", "")}"[^]*?\\$${n} USD`));
-  assert.match(html, /id="sp-go"[^>]*>Prepay \$6,000/);
+  // Geo pricing: a CAD visitor sees the CAD table and is charged in CAD.
+  for (const [k, n] of [["1500", "2,100"], ["3000", "4,200"], ["6000", "8,400"]]) assert.match(html, new RegExp(`data-testid="pack-sponsor-${k}"[^]*?\\$${n} CAD`));
+  assert.match(html, /id="sp-go"[^>]*>Prepay \$8,400/);
+  assert.match(html, /currency:'cad'/);
+  for (const n of ["1,500", "3,000", "6,000"]) assert.match(sponsorHtml("usd", { open: true }), new RegExp(`\\$${n} USD`));
   assert.match(html, /Step 1 of 2[^]*Step 2 of 2/);
   assert.match(html, /value="sponsor-6000" checked/);
   assert.match(html, /value="Acme &lt;x&gt;"/);
@@ -412,4 +417,35 @@ test("sponsor deposits gate + /sponsor packs page (audit #6)", () => {
   assert.match(html, /refundable until 14 days before the launch date in your IO/);
   assert.doesNotMatch(html, /CAD 1|C\$|paused right now/);
   assert.match(sponsorHtml("usd", { open: false }), /paused right now/);
+});
+
+import { setSalesAlertDepsForTests } from "../src/lib/salesAlert";
+test("GTM bot lead: validated, honeypotted, tagged SBG, alert to randy@silverbirchgrowth.com only", async () => {
+  const sent: Array<{ to: string[]; subject: string; html: string }> = [];
+  setSalesAlertDepsForTests({ send: async (m) => { sent.push({ to: m.to as string[], subject: m.subject, html: m.html }); return { id: "x" }; }, ready: () => true });
+  const app = express();
+  app.use(createOverhaulRouter());
+  const server = app.listen(0);
+  const port = (server.address() as { port: number }).port;
+  const post = (b: unknown) => fetch(`http://127.0.0.1:${port}/v1/gtm-bot-lead`, { method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": `9.9.9.${Math.floor(Math.random() * 200)}` }, body: JSON.stringify(b) });
+  try {
+    const good = { name: "QA", company: "Acme TEST", email: "qa+gtmbot@silverbirchgrowth.com", fields: { what_they_sell: "a product", stage: "Growing", bots_preference: "Our bots (we run)" } };
+    const r = await post(good);
+    assert.equal(r.status, 200);
+    const j = (await r.json()) as { ok: boolean; alert: string };
+    assert.equal(j.alert, "sent");
+    assert.deepEqual(sent[0].to, ["randy@silverbirchgrowth.com"]);
+    assert.match(sent[0].subject, /^\[TEST\] \[SBG GTM BOT\]/);
+    assert.match(sent[0].html, /Business line[^]*SBG/);
+    assert.equal((await post({ ...good, email: "bad" })).status, 400);
+    assert.equal((await post({ ...good, company: "" })).status, 400);
+    assert.equal((await post({ ...good, fields: { ...good.fields, stage: "x" } })).status, 400);
+    const n = sent.length;
+    const hp = await post({ ...good, company_url: "http://spam" });
+    assert.equal(hp.status, 200);
+    assert.equal(sent.length, n);
+  } finally {
+    server.close();
+    setSalesAlertDepsForTests({ send: null, ready: null });
+  }
 });

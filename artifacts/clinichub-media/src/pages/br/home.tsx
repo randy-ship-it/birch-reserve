@@ -5,6 +5,7 @@
  * FAQs and terms stay on the page but collapsed (native <details>), and the full detail lives on the linked pages.
  * Visual language matches /intake and the kit report (lime wash, navy cards, lime pills, report serif/forest).
  */
+import { WatchHowItWorks } from "@/components/br/reel-button";
 import { Tam2027 } from "@/components/br/inventory-plan";
 import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPath";
 import { useEffect, type ReactNode } from "react";
@@ -13,6 +14,7 @@ import { DoorRoute } from "@/components/br/door-route";
 import { FounderNote, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import { MediaKitPdfLink, ProofStrip, SalesContact, TRUST_FAQ, TrustBand, TrustFaq } from "@/components/br/trust";
 import { GtmSetup } from "@/components/br/gtm-setup";
+import { GtmBotTeaser } from "@/components/br/gtm-bot-teaser";
 import { StreetTeamProgram } from "@/components/br/street-team";
 import { KitCta } from "@/components/br/kit-cta";
 import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
@@ -125,6 +127,7 @@ export default function BrHome() {
           <p className="mt-3 text-[13px] text-foreground/60">
             or <a href={LOOK_HREF} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-look" onClick={() => trackAttn("hero_cta.look")}>start with a {price.look} 7-day look</a>
           </p>
+          <div className="mt-4"><WatchHowItWorks placement="hero_home" testId="home-watch-reel" /></div>
           </div>
           <div className="order-2 md:order-none md:col-start-2 md:row-span-2 md:row-start-1 md:self-center"><SeeYourAd testId="home-hero-mock" /></div>
         </div>
@@ -176,6 +179,7 @@ export default function BrHome() {
       {/* 2d. GTM setup packages (Randy t332u, Nov 21 2026): separate from the ad product, same systems. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-gtm-setup">
         <GtmSetup where="home" />
+        <div className="mt-4"><GtmBotTeaser /></div>
       </section>
 
       {/* 2e. Street team program, coming 2027 (Randy, voice, Nov 21 2026 2:03 PM ET). */}

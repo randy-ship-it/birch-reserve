@@ -108,6 +108,8 @@ export function AgencyPrepayForm({ where, dark = false }: { where: string; dark?
   const [ref, setRef] = useState("");
   const b = clampAgencyBudget(budget);
   const cash = Math.round((b * AGENCY_TEST.cashPct) / 100);
+  const cur = useCurrency().currency;
+  const C = cur.toUpperCase();
   const send = async (e: FormEvent) => {
     e.preventDefault();
     if (!EMAIL_RE.test(email.trim())) { setState("error"); return; }
@@ -118,7 +120,7 @@ export function AgencyPrepayForm({ where, dark = false }: { where: string; dark?
     if (twoLaneMock()) { setState("sent"); return; }
     try {
       const path = typeof window === "undefined" ? "/" : window.location.pathname;
-      const res = await fetch("/v1/leads", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(agencyPrepayLeadPayload({ email, agency, client, budgetUsd: b, where }, r, path)) });
+      const res = await fetch("/v1/leads", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(agencyPrepayLeadPayload({ email, agency, client, budgetUsd: b, where, currency: cur }, r, path)) });
       setState(res.ok ? "sent" : "error");
     } catch { setState("error"); }
   };
@@ -126,7 +128,7 @@ export function AgencyPrepayForm({ where, dark = false }: { where: string; dark?
   if (state === "sent")
     return (
       <p className={`text-sm font-semibold ${txt}`} data-testid="agency-prepay-sent">
-        <Check className="mr-1 inline size-4 text-lime-400" />Request in ({ref}). We reply with a pre-filled IO for {fmtUsd(b)} USD. No card was charged.
+        <Check className="mr-1 inline size-4 text-lime-400" />Request in ({ref}). We reply with a pre-filled IO for {fmtUsd(b)} {C}. No card was charged.
       </p>
     );
   return (
@@ -140,8 +142,8 @@ export function AgencyPrepayForm({ where, dark = false }: { where: string; dark?
         <label className={`flex h-11 items-center gap-2 rounded-xl px-3 text-sm ${dark ? "bg-white/10 text-white" : "bg-foreground/[0.04] text-[#0b1f3a]"}`}>
           <span className="text-[11px] font-bold uppercase tracking-wide opacity-70">Budget</span>
           <span aria-hidden>$</span>
-          <input aria-label="Client test budget in USD" type="number" min={AGENCY_TEST.lowUsd} max={AGENCY_TEST.highUsd} step={250} value={budget} onChange={(e) => setBudget(Number(e.target.value))} onBlur={() => setBudget(b)} className="w-20 bg-transparent font-bold outline-none" data-testid="agency-prepay-budget" />
-          <span className="text-[11px] opacity-70">USD</span>
+          <input aria-label={`Client test budget in ${C}`} type="number" min={AGENCY_TEST.lowUsd} max={AGENCY_TEST.highUsd} step={250} value={budget} onChange={(e) => setBudget(Number(e.target.value))} onBlur={() => setBudget(b)} className="w-20 bg-transparent font-bold outline-none" data-testid="agency-prepay-budget" />
+          <span className="text-[11px] opacity-70">{C}</span>
         </label>
       </div>
       <input tabIndex={-1} aria-hidden autoComplete="off" name="company_url" value={hp} onChange={(e) => setHp(e.target.value)} className="absolute -left-[9999px] h-0 w-0 opacity-0" />
@@ -149,7 +151,7 @@ export function AgencyPrepayForm({ where, dark = false }: { where: string; dark?
         {state === "busy" ? <Loader2 className="size-4 animate-spin" /> : null}Get a pre-filled IO <ArrowRight className="size-4" />
       </button>
       <p className={`text-[12px] ${dark ? "text-white/65" : "text-foreground/60"}`}>
-        {fmtUsd(b)} USD budget · agency earns <b>{fmtUsd(cash)} USD</b> cash ({AGENCY_TEST.cashPct}%). No card today: we send a pre-filled IO to sign.
+        {fmtUsd(b)} {C} budget · agency earns <b>{fmtUsd(cash)} {C}</b> cash ({AGENCY_TEST.cashPct}%). No card today: we send a pre-filled IO to sign.
       </p>
       {state === "error" ? <p className="text-[12px] font-semibold text-red-400" role="alert">Add a work email, or email sales@silverbirchgrowth.com.</p> : null}
     </form>
@@ -157,6 +159,7 @@ export function AgencyPrepayForm({ where, dark = false }: { where: string; dark?
 }
 
 function TwoSurfaceExample({ dark = false }: { dark?: boolean }) {
+  const C = useCurrency().currency.toUpperCase();
   const rows = [1_500, 5_000].map((c) => ({ c, parts: twoSurfaceExample(c) }));
   return (
     <div className="mt-2 overflow-x-auto" data-testid="two-surface-example">
@@ -165,7 +168,7 @@ function TwoSurfaceExample({ dark = false }: { dark?: boolean }) {
         <tbody>
           {rows.map(({ c, parts }) => (
             <tr key={c} className={`border-t ${dark ? "border-white/15" : "border-foreground/10"}`}>
-              <td className="py-1.5 pr-3 font-bold">{fmtUsd(c)} USD</td>
+              <td className="py-1.5 pr-3 font-bold">{fmtUsd(c)} {C}</td>
               {parts.map((p) => <td key={p.key} className="py-1.5 pr-3">{fmtUsd(p.spend)} ≈ {views(p.lo)}–{views(p.hi)} views</td>)}
             </tr>
           ))}
@@ -192,7 +195,7 @@ async function openSponsorPack(key: string, where: string, kit?: KitPrefill | nu
 
 /**
  * Mid-tier band (Randy, Nov 20 2026 audit #6): three sponsorship packs, each "Prepay $X" (card on /sponsor, existing
- * deposit checkout), plus the agency $1K–$5K client test (pre-filled IO, no card). USD only.
+ * deposit checkout), plus the agency $1K–$5K client test (pre-filled IO, no card). Visitor currency (Nov 21 2026 geo pricing).
  */
 /** Static annotated sample card on the live SOLE hub, beside the deposit CTAs (Randy t291u). Labelled "Illustrative mock". */
 export function DepositMock({ hub = "sole" }: { hub?: HubKey }) {
@@ -206,7 +209,9 @@ export function DepositMock({ hub = "sole" }: { hub?: HubKey }) {
 }
 
 export function MidTier({ where, kit, showMock = true }: { where: string; compact?: boolean; kit?: KitPrefill | null; showMock?: boolean }) {
-  const X = exclusiveReserveFor(useCurrency().currency);
+  const cur = useCurrency().currency;
+  const C = cur.toUpperCase();
+  const X = exclusiveReserveFor(cur);
   const [agencyOpen, setAgencyOpen] = useState(false);
   const [busy, setBusy] = useState("");
   const cardCls = "flex flex-col rounded-2xl bg-white/[0.06] p-4 ring-1 ring-white/15";
@@ -230,15 +235,17 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
       </div>
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         {DEPOSIT_TIERS.map((t) => {
-          const credit = Math.round(t.usd * (1 + t.bonusPct / 100));
+          // Geo pricing: the CAD table in Canada, USD elsewhere; /sponsor charges the same currency (cookie).
+          const price = cur === "cad" ? t.cad : t.usd;
+          const credit = Math.round(price * (1 + t.bonusPct / 100));
           const href = `${withUtm(`/sponsor?pack=${t.key}`, where, t.key)}#prepay`;
           return (
             <article key={t.key} className={`${cardCls} ${t.bonusPct === 10 ? "ring-2 ring-lime-300/70" : ""}`} data-testid={`mid-tier-pack-${t.usd}`}>
               <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">{t.label}</p>
-              <p className="mt-1 font-display text-3xl leading-none">{fmtUsd(t.usd)} <span className="text-sm">USD</span></p>
-              <p className="mb-3 mt-1.5 text-[13px] text-white/75">+{t.bonusPct}% bonus media credit · {fmtUsd(credit)} USD to spend.</p>
+              <p className="mt-1 font-display text-3xl leading-none">{fmtUsd(price)} <span className="text-sm">{C}</span></p>
+              <p className="mb-3 mt-1.5 text-[13px] text-white/75">+{t.bonusPct}% bonus media credit · {fmtUsd(credit)} {C} to spend.</p>
               <a href={href} onClick={prepay(t.key)} className="mt-auto inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-lime-300 px-4 text-sm font-bold text-[#0b1f3a] hover:bg-white" data-testid={`mid-tier-prepay-${t.usd}`}>
-                {busy === t.key ? <Loader2 className="size-4 animate-spin" /> : null}Prepay {fmtUsd(t.usd)} <ArrowRight className="size-4" />
+                {busy === t.key ? <Loader2 className="size-4 animate-spin" /> : null}Prepay {fmtUsd(price)} <ArrowRight className="size-4" />
               </a>
             </article>
           );
@@ -247,7 +254,7 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
       <article className={`${cardCls} mt-3 md:flex-row md:items-center md:justify-between md:gap-4`} data-testid="mid-tier-agency">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">Agency client test</p>
-          <p className="mt-1 font-display text-2xl leading-none">$1K–$5K <span className="text-sm">USD</span></p>
+          <p className="mt-1 font-display text-2xl leading-none">$1K–$5K <span className="text-sm">{C}</span></p>
           <p className="mt-1 text-[13px] text-white/75">{AGENCY_TEST.cashPct}% cash to the agency. Pre-filled IO, no card.</p>
         </div>
         <button type="button" onClick={() => setAgencyOpen((v) => !v)} aria-expanded={agencyOpen} className="mt-3 inline-flex h-10 items-center justify-center gap-1.5 rounded-full px-4 text-sm font-bold text-white ring-1 ring-white/40 hover:bg-white hover:text-[#0b1f3a] md:mt-0" data-testid="mid-tier-agency-cta">
@@ -261,7 +268,7 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
       <Details dark label="Agency terms, view blocks and a $1.5K–$5K example" testId="mid-tier-details">
         <p data-testid="mid-tier-agency-terms">{MID_TIER_LINE} One IO per client. {AGENCY_REPORTING_LINE}.</p>
         <p data-testid="mid-tier-refund">{MID_TIER_REFUND}</p>
-        <p>View block: from {fmtUsd(STARTER_BLOCK.startingUsd)} USD for 100K modelled views. <a href={withUtm("/?inquire=pack&block=100000&surfaces=landing#quick-buy", where, "block")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-block-cta">Request a block</a></p>
+        <p>View block: from {fmtUsd(STARTER_BLOCK.startingUsd)} {C} for 100K modelled views. <a href={withUtm("/?inquire=pack&block=100000&surfaces=landing#quick-buy", where, "block")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-block-cta">Request a block</a></p>
         <p>Premium, one brand per category: lock a {X.packageLabel} package with the <a href={withUtm("https://birchreserve.net/exclusive", where, "exclusive-1900")} className="font-semibold text-lime-300 underline underline-offset-2">{X.label} reserve</a>, or ask about a $25K–$50K premium slot by invoice. <a href={withUtm("/buy?plan=exclusive", where, "exclusive")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-exclusive">Reserve on /buy</a></p>
         <TwoSurfaceExample dark />
       </Details>
