@@ -6,7 +6,7 @@
  */
 import { createHash } from "node:crypto";
 
-export type IntakeKind = "match_tool" | "hub_access" | "cobranded_hub_inquiry" | "display_cpc_inquiry" | "publisher_studio" | "area_lock_interest" | "agency_inquiry" | "deposit_interest" | "agent_checkout" | "premium_inquiry" | "category_request" | "brand_intake";
+export type IntakeKind = "match_tool" | "hub_access" | "cobranded_hub_inquiry" | "display_cpc_inquiry" | "publisher_studio" | "area_lock_interest" | "agency_inquiry" | "deposit_interest" | "agent_checkout" | "premium_inquiry" | "category_request" | "brand_intake" | "gtm_setup_inquiry";
 
 export type IntakeInput = {
   kind: IntakeKind;
@@ -38,6 +38,7 @@ const SOURCE: Record<IntakeKind, string> = {
   premium_inquiry: "Birch premium slot inquiry (inquire-only, IO)",
   category_request: "Birch request-this-category form",
   brand_intake: "Birch brand intake (brand-intake-v1 fallback)",
+  gtm_setup_inquiry: "Birch GTM setup package inquiry (from $3,500 USD)",
 };
 
 export function intakeExternalId(input: IntakeInput): string {

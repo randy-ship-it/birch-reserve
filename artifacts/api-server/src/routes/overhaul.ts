@@ -36,7 +36,7 @@ function limited(req: Request, max: number, windowMs = 60_000): boolean {
 
 const str = (v: unknown, max = 500) => String(v ?? "").trim().slice(0, max);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const LEAD_KINDS: IntakeKind[] = ["hub_access", "cobranded_hub_inquiry", "display_cpc_inquiry", "publisher_studio", "area_lock_interest", "agency_inquiry", "deposit_interest", "premium_inquiry"];
+const LEAD_KINDS: IntakeKind[] = ["hub_access", "cobranded_hub_inquiry", "display_cpc_inquiry", "publisher_studio", "area_lock_interest", "agency_inquiry", "deposit_interest", "premium_inquiry", "gtm_setup_inquiry"];
 
 function originOf(req: Request): string {
   const host = String(req.headers["x-forwarded-host"] ?? req.headers.host ?? "birchreserve.net");
