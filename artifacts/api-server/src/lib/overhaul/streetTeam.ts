@@ -57,3 +57,8 @@ export const STREET_TEAM_FACT =
 /** One line for llms.txt. */
 export const STREET_TEAM_LLMS =
   "Door-to-door by route: join a running campaign, run your own on specific routes, or door drop. The high-touch version (QR offers, sample bags, GPS-tracked reps) runs today only for in-house brand Calm Joints; outside brands from 2027.";
+
+/** One-line mention for the media kit and site chat. */
+export const STREET_TEAM_ONE_LINE = "Coming soon, 2027: street team program for outside brands (minimum campaign size applies). The high-touch version runs today only for Calm Joints.";
+/** Chat-only guardrail. */
+export const STREET_TEAM_CHAT_RULE = "Say it is coming soon in 2027 and link https://birchreserve.net/street-team. Never give a dollar minimum, never say a slot is open, never promise impressions, clicks or results, and don't call it gig or on-demand.";

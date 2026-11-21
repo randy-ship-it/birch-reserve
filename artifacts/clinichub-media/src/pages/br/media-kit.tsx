@@ -6,6 +6,7 @@ import { AudienceChannels } from "@/components/br/audience-channels";
 import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPath";
 import { BrochureInline, BrochureSlideIn } from "@/components/br/brochure-capture";
 import { GtmSetup } from "@/components/br/gtm-setup";
+import { STREET_TEAM_ONE_LINE } from "../../../../api-server/src/lib/overhaul/streetTeam";
 import { KitCta } from "@/components/br/kit-cta";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { Check, Mail, Phone } from "lucide-react";
@@ -198,7 +199,9 @@ export default function BrMediaKit() {
 
       {/* GTM setup packages (Randy t332u, Nov 21 2026) */}
       <section className="border-b border-border/70 bg-background" data-testid="mk-gtm-setup">
-        <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14"><GtmSetup where="media_kit" /></div>
+        <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14"><GtmSetup where="media_kit" />
+          <p className="mt-4 text-sm text-foreground/75" data-testid="mk-street-team-line"><strong className="text-[#0b1f3a]">Street team.</strong> {STREET_TEAM_ONE_LINE} <a href="/street-team" className="font-semibold underline underline-offset-2">See the program</a></p>
+        </div>
       </section>
 
       <BrochureInline />
