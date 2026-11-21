@@ -570,6 +570,22 @@ router.post("/ads/admin/campaigns/:id/login-link", json, (req, res) =>
   }),
 );
 
+/* Dashboard link by email (promo-only buyers have no campaign until they sign in; login emails stay OFF until Randy previews them). */
+router.post("/ads/admin/account-link", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const email = str((req.body as Record<string, unknown> | undefined)?.email, 200).toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      res.status(400).json({ message: "Enter the customer's email." });
+      return;
+    }
+    const link = `${origin(req)}/account/auth?t=${encodeURIComponent(sign("l", { e: email }, 7 * 864e5))}`;
+    await store.audit(who, "account.link", email, "by email");
+    res.json({ message: "Dashboard link copied (valid 7 days). Send it to the customer yourself.", copy: link });
+  }),
+);
+
 router.post("/ads/admin/campaigns/:id/purge", json, (req, res) =>
   safe(res, async () => {
     const who = guard(req, res);
