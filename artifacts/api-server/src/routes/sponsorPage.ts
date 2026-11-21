@@ -9,6 +9,7 @@
  * is refused unless SPONSOR_DEPOSITS_LIVE=true, so a preview can only ever
  * create test-mode sessions. All impression figures are modelled.
  */
+import { BUYER_HEADER_CSS, TOKENS_CSS, buyerHeaderHtml } from "../lib/brandTokens";
 import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
 import { promoMetadata } from "../lib/adserver/promoContext";
 import { MODELLED_FOOTER, URGENCY_LINE } from "../lib/overhaul/pilotPath";
@@ -85,7 +86,7 @@ a{color:#071A39}nav{display:flex;flex-wrap:wrap;gap:14px;font-size:.92rem}.fine{
 .stat{border:1px solid #ccd2d8;border-radius:12px;padding:14px;background:#fff}.stat b{display:block;font:600 1.7rem Fraunces,serif}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
 .card{border:1px solid #ccd2d8;border-radius:14px;padding:18px;background:#fff;display:flex;flex-direction:column;gap:6px}
-.card .amt{font:600 2rem Fraunces,serif}.card button,.btn{margin-top:auto;background:#071A39;color:#fff;border:0;border-radius:999px;padding:12px 16px;font:600 .95rem "IBM Plex Sans";cursor:pointer;text-decoration:none;text-align:center}
+.card .amt{font:600 2rem Fraunces,serif}.card button,.btn{margin-top:auto;background:#071A39;color:#fff;border:0;border-radius:6px;min-height:44px;padding:12px 18px;font:600 .95rem "IBM Plex Sans";cursor:pointer;text-decoration:none;text-align:center}
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;counter-reset:s;padding:0;list-style:none}
 .steps li{border-left:3px solid #071A39;padding:4px 12px}
 .tw{overflow-x:auto;border:1px solid #ccd2d8;border-radius:12px;background:#fff}table{border-collapse:collapse;width:100%;font-size:.92rem}
@@ -99,8 +100,8 @@ form.dep input,form.dep select{width:100%;padding:10px;border:1px solid #b9c1c9;
 .ok{background:#BFF3D6;color:#0B6B43;font-weight:600;padding:8px 14px;border-radius:8px;margin:12px 0}.urg{font-weight:600;color:#3b4a12}
 form.dep.wide{max-width:none}.dep .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.dep .row{grid-template-columns:1fr}}
 .lede{font-size:1.05rem;margin:.2em 0 1em}.boxes{margin-top:18px;border-top:1px solid #ccd2d8}.boxes details{border-bottom:1px solid #ccd2d8;padding:14px 0}.boxes summary{cursor:pointer;font:400 1.25rem Fraunces,serif;list-style:none;display:flex;justify-content:space-between}.boxes summary::-webkit-details-marker{display:none}.boxes summary::after{content:"+";font-size:1.5rem;line-height:1}.boxes details[open] summary::after{content:"\\2212"}.stats.pay .btn{display:inline-block;margin-top:10px}label.pack{cursor:pointer}label.pack.on{border:2px solid #071A39}.amt small{font-size:.9rem}.sr{position:absolute;top:0;left:0;opacity:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}label.pack{position:relative;cursor:pointer}label.pack.on{outline:3px solid #9fd13a;outline-offset:-1px}.pack .pick{margin-top:auto;font-weight:700;font-size:.85rem;opacity:.75}.pack.on .pick{opacity:1}.sp-step{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#4d5b6a;margin:4px 0 0}.sp-hint{font-weight:600;color:#24412a;margin:2px 0 6px}.sp-go{width:100%;min-height:54px;font-size:1.05rem!important;margin-top:4px}.sp-err{color:#a12b1f;font-weight:600;font-size:.88rem;display:block;margin-top:2px}.sp-err:empty{display:none}#prepay input[aria-invalid=true]{border-color:#a12b1f}
-</style></head><body>
-<header><a href="/"><strong>BIRCH RESERVE</strong></a><nav><a href="/sponsor?currency=${currency}">Sponsor</a><a href="/kit?currency=${currency}">Marketing kit</a><a href="/terms">Terms</a><span class="cur">Prices in ${currency.toUpperCase()}${PUBLIC_CAD_ENABLED ? ` · <a href="?currency=${other}">Show ${other.toUpperCase()}</a>` : ""}</span></nav></header>
+form.dep>button[type=submit]{justify-self:start;width:auto;max-width:100%}@media(max-width:640px){form.dep>button[type=submit]{justify-self:stretch}}${TOKENS_CSS}${BUYER_HEADER_CSS}</style></head><body>
+${buyerHeaderHtml(path === "/sponsor" ? "sponsor" : null, `<span class="cur">Prices in ${currency.toUpperCase()}${PUBLIC_CAD_ENABLED ? ` · <a href="?currency=${other}">Show ${other.toUpperCase()}</a>` : ""}</span>`)}
 <main><div data-promo-box="success"></div>${body}</main>
 ${PROMO_SCRIPT_TAG}
 <footer class="fine">${esc(SELLER)} · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a></footer>
