@@ -1,6 +1,8 @@
 import { KitCta } from "@/components/br/kit-cta";
 import { useEffect, useState, type FormEvent } from "react";
 import { ArrowRight, Mail, Phone } from "lucide-react";
+import { FieldError, SavedNote, SuccessPanel } from "@/components/br/form-steps";
+import { fieldError, useSavedState } from "@/lib/form-save";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 
 /**
@@ -177,12 +179,23 @@ export function FounderNote() {
 }
 
 export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path?: string; defaultCategory?: string }) {
+  // Guided (Randy, voice, Nov 21 2026): two required fields, notes behind "Add details", inline checks,
+  // answers kept in this browser until sent, and a success panel that says what happens next.
+  const [v, setV, saved] = useSavedState<{ brand: string; email: string; notes: string }>(`category-request:${path}`, { brand: "", email: "", notes: "" });
+  const [restored, setRestored] = useState(saved.restored);
+  const [touched, setTouched] = useState<{ brand?: boolean; email?: boolean }>({});
+  const [more, setMore] = useState(() => Boolean(v.notes.trim()));
+  const [hp, setHp] = useState("");
   const [state, setState] = useState<{ status: "idle" | "sending" | "done" | "error"; msg?: string }>({ status: "idle" });
+  const errs = { brand: v.brand.trim().length < 2 ? "Add your brand name." : "", email: fieldError("email", v.email) };
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const form = e.currentTarget;
-    if (!form.reportValidity()) return;
-    const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+    setTouched({ brand: true, email: true });
+    if (errs.brand || errs.email) {
+      (e.currentTarget.querySelector(errs.brand ? '[name="brand"]' : '[name="email"]') as HTMLElement | null)?.focus();
+      return;
+    }
+    if (hp) return setState({ status: "done", msg: "" });
     setState({ status: "sending" });
     let utm: Record<string, string> = {};
     try {
@@ -192,48 +205,61 @@ export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path
       /* ignore */
     }
     try {
-      const r = await fetch("/v1/category-request", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...data, path, utm }) });
+      const r = await fetch("/v1/category-request", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ brand: v.brand.trim(), email: v.email.trim(), notes: v.notes.trim(), category: defaultCategory || "other", company_website: hp, path, utm }) });
       const o = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (r.ok && o.ok) {
-        setState({ status: "done", msg: `Got it. Your request is in. We'll reply to ${data.email} shortly. No card was charged.` });
+        saved.clear();
+        setState({ status: "done", msg: `We'll reply to ${v.email.trim()} within 1 business day. No card was charged.` });
         return;
       }
       setState({ status: "error", msg: o.error ?? `We could not send that. Call ${SALES_PHONE_DISPLAY} or email ${SALES_EMAIL}.` });
     } catch {
-      setState({ status: "error", msg: `We could not send that. Call ${SALES_PHONE_DISPLAY} or email ${SALES_EMAIL}.` });
+      setState({ status: "error", msg: `We could not send that. Check your connection and press Send again, or call ${SALES_PHONE_DISPLAY}.` });
     }
   }
-  const done = state.status === "done";
   const input = "h-12 w-full border border-foreground/25 bg-white px-3 text-base text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-accent disabled:opacity-60";
+  if (state.status === "done")
+    return (
+      <SuccessPanel title="Request sent." testId="category-request-done" next={<p>Our sales team reads it today and replies by email with options and an insertion order draft. Nothing runs until you approve it. Want to move now? <a className="font-semibold underline" href={LOOK_HREF}>Start the $190 look</a>.</p>}>
+        <p data-testid="cr-message">{state.msg}</p>
+      </SuccessPanel>
+    );
+  const err = (k: "brand" | "email") => (touched[k] ? errs[k] : "");
   return (
     <form onSubmit={submit} noValidate className="relative border border-foreground bg-white p-5 md:p-6" data-testid="category-request-form">
-      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">No card needed</p>
+      <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">No card needed · 1 step</p>
       <h3 className="mt-1 font-display text-2xl md:text-3xl">Ask about a placement</h3>
-      <p className="mt-1 text-sm text-muted-foreground">Want to talk first, need something custom, or interested in a premium slot? Tell us your brand and what you sell. Our sales team gets it right away.</p>
+      <p className="mt-1 text-sm font-semibold text-[#0b1f3a]" data-testid="form-step-hint">Add your brand and work email, then press Send request. That's it.</p>
+      <SavedNote show={restored} onClear={() => { saved.clear(); setV({ brand: "", email: "", notes: "" }); setRestored(false); setTouched({}); }} />
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <label className="block text-sm">
           <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-foreground/70">Brand name</span>
-          <input name="brand" required maxLength={160} autoComplete="organization" className={input} disabled={done} data-testid="cr-brand" />
+          <input name="brand" required maxLength={160} autoComplete="organization" value={v.brand} onChange={(e) => setV({ ...v, brand: e.target.value })} onBlur={() => setTouched((t) => ({ ...t, brand: true }))} aria-invalid={err("brand") ? true : undefined} className={input} data-testid="cr-brand" />
+          <FieldError msg={err("brand")} />
         </label>
         <input type="hidden" name="category" value={defaultCategory || "other"} data-testid="cr-category" />
         <label className="block text-sm">
           <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-foreground/70">Work email</span>
-          <input name="email" type="email" required autoComplete="email" className={input} disabled={done} data-testid="cr-email" />
-        </label>
-        <label className="block text-sm sm:col-span-2">
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-foreground/70">What you sell, timing or questions <span className="normal-case tracking-normal text-foreground/50">(optional)</span></span>
-          <textarea name="notes" maxLength={1000} rows={3} className="w-full border border-foreground/25 bg-white p-3 text-base outline-none focus:border-foreground focus:ring-2 focus:ring-accent disabled:opacity-60" disabled={done} data-testid="cr-notes" />
+          <input name="email" type="email" inputMode="email" required autoComplete="email" placeholder="you@yourbrand.com" value={v.email} onChange={(e) => setV({ ...v, email: e.target.value })} onBlur={() => setTouched((t) => ({ ...t, email: true }))} aria-invalid={err("email") ? true : undefined} className={input} data-testid="cr-email" />
+          <FieldError msg={err("email")} />
         </label>
       </div>
+      <button type="button" onClick={() => setMore((m) => !m)} aria-expanded={more} className="mt-3 text-sm font-semibold text-foreground/70 underline-offset-2 hover:underline" data-testid="cr-more">{more ? "Hide details" : "+ Add details (optional)"}</button>
+      {more ? (
+        <label className="mt-2 block text-sm">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-foreground/70">What you sell, timing or questions</span>
+          <textarea name="notes" maxLength={1000} rows={3} value={v.notes} onChange={(e) => setV({ ...v, notes: e.target.value })} className="w-full border border-foreground/25 bg-white p-3 text-base outline-none focus:border-foreground focus:ring-2 focus:ring-accent" data-testid="cr-notes" />
+        </label>
+      ) : null}
       <div className="absolute -left-[9999px]" aria-hidden="true">
-        <label>Company website<input name="company_website" tabIndex={-1} autoComplete="off" /></label>
+        <label>Company website<input name="company_website" tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} /></label>
       </div>
-      <button type="submit" disabled={done || state.status === "sending"} className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 bg-foreground px-6 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-70" data-testid="cr-submit">
-        {state.status === "sending" ? "Sending…" : done ? "Request sent" : "Send request"} {done ? null : <ArrowRight className="size-4" aria-hidden />}
+      <button type="submit" disabled={state.status === "sending"} className="mt-4 inline-flex h-14 w-full items-center justify-center gap-2 bg-foreground px-6 text-base font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-70" data-testid="cr-submit">
+        {state.status === "sending" ? "Sending…" : "Send request"} <ArrowRight className="size-4" aria-hidden />
       </button>
-      <p role="status" aria-live="polite" className={`mt-3 min-h-5 text-sm font-semibold ${state.status === "error" ? "text-[#b42318]" : "text-[#2f6b00]"}`} data-testid="cr-message">{state.msg ?? ""}</p>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Or call <a className="underline" href={SALES_PHONE_HREF}>{SALES_PHONE_DISPLAY}</a> · <a className="underline" href={`mailto:${SALES_EMAIL}`}>{SALES_EMAIL}</a>
+      {state.status === "error" ? <p role="alert" className="mt-3 text-sm font-semibold text-[#b42318]" data-testid="cr-message">{state.msg}</p> : null}
+      <p className="mt-2 text-xs text-muted-foreground">
+        Saved in this browser until you send it. Or call <a className="underline" href={SALES_PHONE_HREF}>{SALES_PHONE_DISPLAY}</a> · <a className="underline" href={`mailto:${SALES_EMAIL}`}>{SALES_EMAIL}</a>
       </p>
     </form>
   );

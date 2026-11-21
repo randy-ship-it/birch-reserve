@@ -140,9 +140,11 @@ router.post("/v1/buy/order", express.json({ limit: "16kb" }), async (req, res): 
     res.json({ ok: true, order_id: randomUUID(), next: "review" });
     return;
   }
-  const crv = verifyToken<CreativeClaims>("crv", body.creative);
-  if (!crv || crv.a !== acct.id) {
-    res.status(400).json({ error: "Upload your ad image in step 2." });
+  // "Send it later" (Nov 21 2026): the order can go in without an image. Nothing runs until one is sent and approved.
+  const later = body.creative_later === true && !body.creative;
+  const crv = later ? null : verifyToken<CreativeClaims>("crv", body.creative);
+  if (!later && (!crv || crv.a !== acct.id)) {
+    res.status(400).json({ error: "Upload your ad image, or pick Send it later." });
     return;
   }
   const plan = findPlan(body.plan);
@@ -160,7 +162,7 @@ router.post("/v1/buy/order", express.json({ limit: "16kb" }), async (req, res): 
   const isTest = isTestIdentity({ email: acct.e, name: acct.n });
   void recordPulse("buy_order", null, { isTest: isTest || hasValidQaHeader(req) || /@(silverbirchgrowth\.com|scalehealth\.ca|birchreserve\.net|example\.(com|org))$/i.test(acct.e), region: coarseRegion((h) => req.get(h)) });
   try {
-    await buyStore().putOrder({ id: orderId, accountId: acct.id, name: acct.n, email: acct.e, company: acct.c, website: acct.w, domainCheck: acct.d, plan: plan!.key, format: format!.key, creativeId: crv.id, reviewStatus: "pending_review", ip: ipOf(req), createdAt: new Date() });
+    await buyStore().putOrder({ id: orderId, accountId: acct.id, name: acct.n, email: acct.e, company: acct.c, website: acct.w, domainCheck: acct.d, plan: plan!.key, format: format!.key, creativeId: crv?.id ?? null, reviewStatus: "pending_review", ip: ipOf(req), createdAt: new Date() });
   } catch (err) {
     logger.error({ err }, "buy order store failed");
   }
@@ -173,9 +175,9 @@ router.post("/v1/buy/order", express.json({ limit: "16kb" }), async (req, res): 
     ["Email", acct.e],
     ["Website", acct.w],
     ["Email vs website", acct.d === "match" ? "match" : `${acct.d}: check before approval`],
-    ["Creative", `${crv.w}×${crv.h} ${crv.m}, ${Math.round(crv.b / 1024)} KB · ${origin}/api/sales/buy-creatives/${crv.id}`],
+    ["Creative", crv ? `${crv.w}×${crv.h} ${crv.m}, ${Math.round(crv.b / 1024)} KB · ${origin}/api/sales/buy-creatives/${crv.id}` : "Sending later: ask for it with the insertion order"],
     ["Order", orderId],
-    ["Review", "Creative held for approval. Nothing runs until approved."],
+    ["Review", crv ? "Creative held for approval. Nothing runs until approved." : "No creative yet. Nothing runs until one is sent and approved."],
   ];
   // Internal alert to the sales inbox only. No email goes to the buyer.
   void sendSalesAlert({ event: plan!.pay === "card" ? "seat_hold" : "inquiry", title: `/buy ${plan!.name}: ${acct.c}`, rows, replyTo: acct.e, isTest }).catch((err) =>
@@ -184,8 +186,8 @@ router.post("/v1/buy/order", express.json({ limit: "16kb" }), async (req, res): 
   if (plan!.pay === "invoice") {
     void sendIntake({
       kind: "premium_inquiry", email: acct.e, name: acct.n, company: acct.c, website: acct.w, path: BUY_PATH,
-      message: `Exclusive display via /buy. Slot: ${format!.label}. Creative ${crv.id} held for review. Email vs website: ${acct.d}.`,
-      meta: { buy_order_id: orderId, format_pref: format!.key, creative_id: crv.id, domain_check: acct.d, is_test: isTest },
+      message: `Exclusive display via /buy. Slot: ${format!.label}. ${crv ? `Creative ${crv.id} held for review.` : "Creative: sending later."} Email vs website: ${acct.d}.`,
+      meta: { buy_order_id: orderId, format_pref: format!.key, creative_id: crv?.id ?? "later", domain_check: acct.d, is_test: isTest },
     }).catch((err) => logger.warn({ err }, "buy intake failed"));
     res.json({ ok: true, order_id: orderId, next: "invoice" });
     return;
@@ -242,111 +244,165 @@ const MOCK: Record<string, string> = {
 };
 
 const CSS = `*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:#f8f6ef;color:#071A39;font:16px/1.5 "IBM Plex Sans",system-ui,sans-serif}
-a{color:inherit}.wrap{max-width:980px;margin:0 auto;padding:0 18px}
+a{color:inherit}.wrap{max-width:860px;margin:0 auto;padding:0 18px}
 header.top{border-bottom:1px solid #d8dccf}header.top .wrap{display:flex;justify-content:space-between;align-items:center;min-height:56px;gap:12px}
 .logo{font-weight:600;letter-spacing:.14em;font-size:.84rem;text-decoration:none}header nav{display:flex;gap:14px;font-size:.9rem}header nav a{text-decoration:none;opacity:.8}
-.hero{padding:34px 0 10px}h1,h2{font-family:Fraunces,Georgia,serif;font-weight:400;line-height:1.08;margin:0}h1{font-size:clamp(2rem,6.4vw,3.3rem);max-width:15em}
-.lede{color:#33445c;margin:10px 0 0;font-size:1.05rem}
-.prog{display:flex;gap:8px;margin:22px 0 8px;list-style:none;padding:0}.prog li{flex:1;display:flex;align-items:center;gap:8px;font-size:.86rem;font-weight:600;opacity:.45}
-.prog li b{display:inline-flex;width:28px;height:28px;border-radius:50%;border:2px solid #071A39;align-items:center;justify-content:center;flex:none}
-.prog li.on{opacity:1}.prog li.done{opacity:1}.prog li.done b{background:#071A39;color:#f8f6ef}.prog li span{white-space:nowrap}
-.card{background:#fff;border:1px solid #dfe2d8;border-radius:22px;padding:22px;margin:16px 0}.card[aria-disabled=true]{opacity:.5;pointer-events:none}
-.card h2{font-size:1.55rem;margin-bottom:12px;display:flex;align-items:center;gap:10px}.card h2 em{font-style:normal;font-size:.8rem;font-family:"IBM Plex Sans",system-ui;background:#e9efe0;border-radius:999px;padding:3px 10px;color:#24412a}
-label{display:block;font-size:.86rem;font-weight:600;margin:10px 0 4px}input[type=text],input[type=email]{width:100%;min-height:48px;border:1.5px solid #c9cfc2;border-radius:12px;padding:0 14px;font:inherit;background:#fbfbf8}
+.hero{padding:28px 0 4px}h1,h2{font-family:Fraunces,Georgia,serif;font-weight:400;line-height:1.08;margin:0}h1{font-size:clamp(1.9rem,6vw,3rem);max-width:15em}
+.lede{color:#33445c;margin:8px 0 0;font-size:1.02rem}
+.prog{margin:18px 0 0}.prog .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#4d5b6a}
+.prog .row span:last-child{letter-spacing:0;text-transform:none;font-weight:600}
+.bar{height:7px;border-radius:99px;background:#e1e4da;margin-top:6px;overflow:hidden}.bar i{display:block;height:100%;background:#9fd13a;border-radius:99px;transition:width .3s}
+.card{background:#fff;border:1px solid #dfe2d8;border-radius:22px;padding:22px;margin:16px 0}.step{display:none}.step.on{display:block}
+.card h2{font-size:1.6rem;margin-bottom:4px}.hint{margin:0 0 14px;font-weight:600;font-size:.95rem;color:#24412a}
+.sub{font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#4d5b6a;margin:18px 0 8px}
+label.f{display:block;font-size:.86rem;font-weight:600;margin:12px 0 4px}input[type=text],input[type=email]{width:100%;min-height:52px;border:1.5px solid #c9cfc2;border-radius:12px;padding:0 14px;font:inherit;font-size:16px;background:#fbfbf8}
+input[aria-invalid=true]{border-color:#a12b1f;background:#fff8f6}.fe{display:block;min-height:0;font-size:.85rem;font-weight:600;color:#a12b1f;margin-top:4px}.fe:empty{display:none}
 input:focus{outline:3px solid #C8F55A;border-color:#071A39}.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 24px;border-radius:999px;border:0;background:#071A39;color:#f8f6ef;font:600 16px "IBM Plex Sans",system-ui;cursor:pointer;margin-top:16px;text-decoration:none}
-.btn[disabled]{opacity:.5;cursor:wait}.btn.alt{background:#C8F55A;color:#071A39}
-.msg{min-height:1.4em;font-size:.92rem;margin:10px 0 0}.msg.err{color:#a12b1f}.msg.ok{color:#24412a}
-.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:2px dashed #9aa79a;border-radius:18px;min-height:170px;padding:18px;text-align:center;cursor:pointer;background:#fbfbf8}
-.drop.over{background:#eef5e2;border-color:#071A39}.drop strong{font-size:1.05rem}.drop span{font-size:.86rem;color:#4d5b6a}.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:0 28px;border-radius:999px;border:0;background:#071A39;color:#f8f6ef;font:700 17px "IBM Plex Sans",system-ui;cursor:pointer;text-decoration:none;flex:1 1 auto;max-width:420px}
+.btn[disabled]{opacity:.55;cursor:wait}.btn.alt{background:#C8F55A;color:#071A39;box-shadow:0 8px 24px rgba(159,209,58,.35)}
+.back{min-height:56px;padding:0 20px;border-radius:999px;border:1.5px solid #c9cfc2;background:#fff;font:600 15px "IBM Plex Sans",system-ui;color:#071A39;cursor:pointer}
+.msg{min-height:1.4em;font-size:.92rem;margin:10px 0 0}.msg.err{color:#a12b1f;font-weight:600}.msg.ok{color:#24412a}
+.drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border:2px dashed #9aa79a;border-radius:18px;min-height:150px;padding:18px;text-align:center;cursor:pointer;background:#fbfbf8;margin:0}
+.drop.over{background:#eef5e2;border-color:#071A39}.drop strong{font-size:1.05rem}.drop span{font-size:.86rem;color:#4d5b6a}.drop input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
 .preview{display:none;gap:14px;align-items:center;margin-top:12px}.preview.on{display:flex}.preview img{max-width:160px;max-height:120px;border-radius:10px;border:1px solid #dfe2d8}
-.picks{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.adpick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.picks{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .pick{position:relative;display:block;border:1.5px solid #dfe2d8;border-radius:16px;padding:12px;cursor:pointer;background:#fbfbf8;margin:0;font-weight:400}
-.pick input{position:absolute;opacity:0}.pick:has(input:checked){border-color:#071A39;box-shadow:4px 4px 0 #C8F55A;background:#fff}.pick:has(input:disabled){opacity:.4;cursor:not-allowed}
+.pick input{position:absolute;opacity:0;top:0;left:0;width:1px;height:1px}.pick:has(input:checked){border-color:#071A39;box-shadow:4px 4px 0 #C8F55A;background:#fff}.pick:has(input:disabled){opacity:.45;cursor:not-allowed}
+.pick:has(input:focus-visible){outline:3px solid #C8F55A}
 .pick strong{display:block;font-size:.98rem}.pick small{display:block;font-size:.8rem;color:#4d5b6a;line-height:1.3;margin-top:2px}
 .pick .price{font-family:Fraunces,Georgia,serif;font-size:1.9rem;line-height:1;display:block;margin-bottom:6px}.pick .tag{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:#071A39;color:#f8f6ef;border-radius:999px;padding:2px 8px;margin-top:6px}
-.mk{height:86px;border-radius:10px;background:#eef0ea;padding:8px;display:flex;flex-direction:column;gap:5px;margin-bottom:8px;overflow:hidden}
+.pick .lock{display:none;font-size:.72rem;font-weight:700;color:#8a5a00;margin-top:4px}.pick:has(input:disabled) .lock{display:block}
+.mk{height:76px;border-radius:10px;background:#eef0ea;padding:8px;display:flex;flex-direction:column;gap:5px;margin-bottom:8px;overflow:hidden}
 .mk .l{display:block;height:6px;border-radius:3px;background:#c9cfc2}.w5{width:50%}.w6{width:60%}.w7{width:70%}
 .mk .ad{display:flex;align-items:center;justify-content:center;background:#C8F55A;border-radius:6px;font-size:.7rem;font-weight:700;min-height:22px}.mk .ad.big{flex:1}
 .mk .slots,.mk .tiles{display:flex;gap:4px}.mk .slots i{flex:1;height:12px;border-radius:4px;background:#fff}.mk .tiles i{flex:1;height:18px;border-radius:5px;background:#fff}
 .mk .ok{font-size:.9rem;font-weight:700;color:#24412a}
-.check{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;margin-top:14px}.check input{width:20px;height:20px;margin-top:2px}
-.trust{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0;padding:0;list-style:none}.trust li{font-size:.8rem;background:#e9efe0;border-radius:999px;padding:4px 10px}
+.sum{background:#f3f5ee;border-radius:14px;padding:12px 14px;font-size:.92rem;margin:14px 0 0}.sum b{font-weight:700}.sum a{font-weight:600}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:.95rem;margin-top:16px;font-weight:500}.check input{width:22px;height:22px;margin-top:1px;flex:none}
+.trust{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0;padding:0;list-style:none}.trust li{font-size:.8rem;background:#e9efe0;border-radius:999px;padding:4px 10px}
 details{margin:14px 0 0;font-size:.86rem;color:#4d5b6a}details summary{cursor:pointer;font-weight:600;color:#071A39}details ul{padding-left:18px;margin:8px 0}
-.done-box{display:none;text-align:center;padding:28px 18px}.done-box.on{display:block}.done-box h2{font-size:1.8rem;margin-bottom:8px}
+.done-box{display:none;padding:26px 20px}.done-box.on{display:block}.done-box h2{font-size:1.9rem;margin-bottom:8px}.done-box ol{padding-left:20px;margin:10px 0 0}.done-box li{margin:4px 0}
+.saved{display:none;background:#eef5e2;border-radius:12px;padding:8px 12px;font-size:.88rem;margin:0 0 12px}.saved.on{display:block}.saved button{background:none;border:0;padding:0;font:inherit;font-weight:600;text-decoration:underline;cursor:pointer;color:inherit}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 footer{border-top:1px solid #d8dccf;margin-top:30px;padding:20px 0 36px;font-size:.84rem;color:#4d5b6a}
-@media(max-width:760px){header nav a[href^=tel]{display:none}.picks{grid-template-columns:1fr 1fr}.plans{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.prog li span{display:none}.prog li.on span{display:inline}.card{padding:18px}}`;
+@media(max-width:760px){header nav a[href^=tel]{display:none}.picks{grid-template-columns:1fr 1fr}.plans{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.card{padding:18px}.btn{max-width:none;width:100%}.back{flex:0 0 auto}.actions .btn{flex:1 1 0}.adpick{grid-template-columns:1fr}}`;
 
+/**
+ * Guided buy (Randy, voice, Nov 21 2026: "really, really easy to complete"): one step on screen at a time,
+ * "Step N of 3" + a one-line hint, plan first (preselected from the link), then contact, then the ad, which can
+ * now be sent later (nothing runs until a person approves it). Answers are kept in this browser until the order
+ * is sent; Back on every step; inline checks; a clear success screen with what happens next.
+ */
 export function renderBuyPage(opts: { checkoutLive: boolean; plan?: unknown; prefill?: import("../lib/buyFlow").BuyPrefill | null }): string {
   const pf = opts.prefill ?? {};
   const val = (v?: string) => (v ? ` value="${esc(v)}"` : "");
   // ?plan= preselects a plan (deep links from the kit / media kit). Unknown values keep the default.
   const pre = findPlan(opts.plan)?.key ?? BUY_PLANS[0]!.key;
   const formats = BUY_FORMATS.map(
-    (f, i) => `<label class="pick" data-premium="${f.premium ? 1 : 0}"><input type="radio" name="format" value="${f.key}"${i === 0 ? " checked" : ""}>${MOCK[f.key] ?? ""}<strong>${esc(f.label)}</strong><small>${esc(f.hint)}</small></label>`,
+    (f, i) => `<label class="pick" data-premium="${f.premium ? 1 : 0}"><input type="radio" name="format" value="${f.key}"${i === 0 ? " checked" : ""}>${MOCK[f.key] ?? ""}<strong>${esc(f.label)}</strong><small>${esc(f.hint)}</small>${f.premium ? `<span class="lock">Pick Exclusive display above to use this spot</span>` : ""}</label>`,
   ).join("");
   const plans = BUY_PLANS.map(
     (p) => `<label class="pick" data-pay="${p.pay}"><input type="radio" name="plan" value="${p.key}"${p.key === pre ? " checked" : ""}><span class="price">${esc(p.price)}</span><strong>${esc(p.name)}</strong><small>${esc(p.line)}</small><span class="tag">${p.pay === "card" ? "Card" : "Invoice"}</span></label>`,
   ).join("");
+  const planMeta = Object.fromEntries(BUY_PLANS.map((p) => [p.key, { name: p.name, price: p.price, pay: p.pay }]));
+  const formatMeta = Object.fromEntries(BUY_FORMATS.map((f) => [f.key, f.label]));
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(TITLE)} | Birch Reserve</title><meta name="description" content="${esc(DESCRIPTION)}">
 ${publicSeoTags(BUY_PATH, TITLE, DESCRIPTION)}
 <link rel="icon" href="/favicon.svg"><style>${CSS}</style></head><body>
 <header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav><a href="/rates">Rates</a><a href="/media-kit">Media kit</a><a href="tel:+16479316278">(647) 931-6278</a></nav></div></header>
 <main class="wrap">
-<section class="hero"><h1>${esc(BUY_TAGLINE)}</h1><p class="lede">3 steps · about 2 minutes · USD</p>
-<ol class="prog" id="prog"><li class="on" data-s="1"><b>1</b><span>Your account</span></li><li data-s="2"><b>2</b><span>Your ad</span></li><li data-s="3"><b>3</b><span>Where it shows</span></li></ol></section>
+<section class="hero"><h1>${esc(BUY_TAGLINE)}</h1><p class="lede">3 short steps · about 1 minute · USD · nothing runs until a person approves your ad</p>
+<div class="prog" id="prog" aria-live="polite"><div class="row"><span id="prog-n">Step 1 of 3</span><span id="prog-t">Your plan</span></div><div class="bar" role="progressbar" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1" id="prog-bar"><i style="width:33%"></i></div></div></section>
 
-<form class="card" id="s1" novalidate autocomplete="on"><h2>1 · Your account</h2>${opts.prefill ? `<p class="msg ok" id="s1-pf">Filled in from your kit. Check it, add your name, and continue.</p>` : ""}
-<div class="g2"><div><label for="b-name">Your name</label><input type="text" id="b-name" name="name" required maxlength="120" autocomplete="name"${val(pf.name)}></div>
-<div><label for="b-email">Work email</label><input type="email" id="b-email" name="email" required maxlength="200" autocomplete="email" inputmode="email"${val(pf.email)}></div>
-<div><label for="b-company">Company</label><input type="text" id="b-company" name="company" required maxlength="160" autocomplete="organization"${val(pf.company)}></div>
-<div><label for="b-web">Company website</label><input type="text" id="b-web" name="website" required maxlength="300" placeholder="yourbrand.com" autocomplete="url" inputmode="url"${val(pf.website)}></div></div>
-<div class="hp" aria-hidden="true"><label for="b-fax">Fax</label><input type="text" id="b-fax" name="fax" tabindex="-1" autocomplete="off"></div>
-<button class="btn" id="s1-go" type="submit">Continue</button><p class="msg" id="s1-msg" role="status" aria-live="polite"></p></form>
-
-<div class="card" id="s2" aria-disabled="true"><h2>2 · Your ad</h2>
-<label class="drop" id="drop" for="b-file"><strong>Drop your image here, or tap to choose</strong><span>PNG, JPG, WebP or GIF · up to 2 MB · at least ${CREATIVE_MIN_PX} px a side</span>
-<input type="file" id="b-file" accept="${CREATIVE_TYPES.join(",")}"></label>
-<div class="preview" id="pv"><img id="pv-img" alt="Your ad preview"><div><strong id="pv-name"></strong><br><small id="pv-meta"></small></div></div>
-<p class="msg" id="s2-msg" role="status" aria-live="polite"></p>
-<details><summary>Ad rules</summary><ul><li>Every ad is checked by a person before it runs. We'll reply if anything needs a change.</li><li>No medical claims, before-and-after photos or prices that are not real.</li><li>Need a size made for you? Upload what you have and say so; we'll help.</li></ul></details></div>
-
-<form class="card" id="s3" aria-disabled="true" novalidate><h2>3 · Where it shows</h2>
-<div class="picks" role="radiogroup" aria-label="Where it shows">${formats}</div>
+<form class="card step on" id="s1" data-step="1" novalidate><h2>Pick your plan</h2>
+<p class="hint" id="s1-hint">We picked the plan from the link you clicked. Change it if you like, then press Next.</p>
+<p class="saved" id="saved">We kept what you entered last time. <button type="button" id="start-over">Start over</button></p>
 <div class="plans" role="radiogroup" aria-label="Plan">${plans}</div>
+<p class="sub">Where your ad shows</p>
+<div class="picks" role="radiogroup" aria-label="Where it shows">${formats}</div>
+<div class="actions"><button class="btn" id="s1-go" type="submit">Next: your details →</button></div>
+<p class="msg" id="s1-msg" role="status" aria-live="polite"></p></form>
+
+<form class="card step" id="s2" data-step="2" novalidate autocomplete="on"><h2>Your details</h2>
+<p class="hint">Four quick fields for your receipt and insertion order. No password, no account to manage.</p>${opts.prefill ? `<p class="msg ok" id="s1-pf">Filled in from your kit. Check it, add your name, and continue.</p>` : ""}
+<div class="g2"><div><label class="f" for="b-name">Your name</label><input type="text" id="b-name" name="name" required maxlength="120" autocomplete="name" autocapitalize="words"${val(pf.name)}><span class="fe" id="e-name"></span></div>
+<div><label class="f" for="b-email">Work email</label><input type="email" id="b-email" name="email" required maxlength="200" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@yourbrand.com"${val(pf.email)}><span class="fe" id="e-email"></span></div>
+<div><label class="f" for="b-company">Company</label><input type="text" id="b-company" name="company" required maxlength="160" autocomplete="organization"${val(pf.company)}><span class="fe" id="e-company"></span></div>
+<div><label class="f" for="b-web">Company website</label><input type="text" id="b-web" name="website" required maxlength="300" placeholder="yourbrand.com" autocomplete="url" inputmode="url" autocapitalize="none" spellcheck="false"${val(pf.website)}><span class="fe" id="e-website"></span></div></div>
+<div class="hp" aria-hidden="true"><label for="b-fax">Fax</label><input type="text" id="b-fax" name="fax" tabindex="-1" autocomplete="off"></div>
+<div class="actions"><button class="back" type="button" data-back="1">← Back</button><button class="btn" id="s2-go" type="submit">Next: your ad →</button></div>
+<p class="msg" id="s2-msg" role="status" aria-live="polite"></p></form>
+
+<form class="card step" id="s3" data-step="3" novalidate><h2>Your ad, then confirm</h2>
+<p class="hint">Upload your ad now, or send it later. Then tick the box and press the green button.</p>
+<div class="adpick" role="radiogroup" aria-label="Your ad"><label class="pick"><input type="radio" name="admode" value="now" checked><strong>Upload it now</strong><small>PNG, JPG, WebP or GIF · up to 2 MB</small></label><label class="pick"><input type="radio" name="admode" value="later"><strong>Send it later</strong><small>We'll ask for it with your insertion order. Nothing runs until it's approved.</small></label></div>
+<div id="ad-now"><label class="drop" id="drop"><strong>Drop your image here, or tap to choose</strong><span>PNG, JPG, WebP or GIF · up to 2 MB · at least ${CREATIVE_MIN_PX} px a side</span>
+<input type="file" id="b-file" accept="${CREATIVE_TYPES.join(",")}" aria-label="Choose your ad image"></label>
+<div class="preview" id="pv"><img id="pv-img" alt="Your ad preview"><div><strong id="pv-name"></strong><br><small id="pv-meta"></small></div></div>
+<details><summary>Ad rules</summary><ul><li>Every ad is checked by a person before it runs. We'll reply if anything needs a change.</li><li>No medical claims, before-and-after photos or prices that are not real.</li><li>Need a size made for you? Upload what you have and say so; we'll help.</li></ul></details></div>
+<p class="msg" id="s2b-msg" role="status" aria-live="polite"></p>
+<div class="sum" id="sum" data-testid="buy-summary"></div>
 <label class="check"><input type="checkbox" id="b-terms" required><span>I agree to the <a href="/terms" target="_blank" rel="noopener">terms</a>. My ad is reviewed before it runs.</span></label>
-<button class="btn alt" id="s3-go" type="submit">${opts.checkoutLive ? "Continue to secure checkout" : "Send my order"}</button>
+<span class="fe" id="e-terms"></span>
+<div class="actions"><button class="back" type="button" data-back="2">← Back</button><button class="btn alt" id="s3-go" type="submit">${opts.checkoutLive ? "Continue to secure checkout" : "Send my order"}</button></div>
 <p class="msg" id="s3-msg" role="status" aria-live="polite"></p>
 <ul class="trust"><li>Card checkout by Stripe</li><li>Bank check when your bank asks</li><li>Ad reviewed by a person</li><li>USD</li></ul>
 <details><summary>Small print</summary><ul><li>Card plans open Stripe Checkout. Stripe verifies the card and screens for fraud; your bank may ask you to confirm.</li><li>The $490 reserve is 100% media credit, refundable until 14 days before launch. The $190 look converts in full to the reserve within 7 days, or is refunded.</li><li>Exclusive display is one brand per category for its term. We send an insertion order and an invoice (card, cheque or wire). No card today.</li><li>Your ad shows inside private retail hubs. Placement is named in your insertion order before anything runs.</li><li>No impression guarantee. Aggregate reporting only. No patient data.</li></ul></details></form>
 
-<div class="card done-box" id="done"><h2 id="done-h">Got it.</h2><p id="done-p"></p><a class="btn" href="/">Back to Birch Reserve</a></div>
+<div class="card done-box" id="done" role="status"><h2 id="done-h">Got it.</h2><p id="done-p"></p><p class="sub">What happens next</p><ol id="done-next"><li>We email your insertion order within 1 business day. It names the hub, placement and dates.</li><li>A person checks your ad. No ad yet? Reply to that email with it.</li><li>You approve the insertion order. Then it runs.</li></ol><div class="actions"><a class="btn" href="/media-kit">See the media kit</a><a class="back" href="/" style="display:inline-flex;align-items:center;text-decoration:none">Back to Birch Reserve</a></div></div>
 </main>
 <footer><div class="wrap">Silver Birch Growth Inc. · Toronto · <a href="mailto:sales@silverbirchgrowth.com">sales@silverbirchgrowth.com</a> · <a href="tel:+16479316278">(647) 931-6278</a></div></footer>
 <script>
-(function(){var acct=null,crv=null,live=${opts.checkoutLive ? "true" : "false"};
+(function(){var acct=null,crv=null,live=${opts.checkoutLive ? "true" : "false"},cur=1,hasPf=${opts.prefill ? "true" : "false"};
+var PLANS=${JSON.stringify(planMeta).replaceAll("<", "\\u003c")},FORMATS=${JSON.stringify(formatMeta).replaceAll("<", "\\u003c")};
+var TITLES=["Your plan","Your details","Your ad + confirm"],KEY="br-form:buy",SKEY="br-buy-session";
 function $(id){return document.getElementById(id)}
 function msg(el,t,err){el.textContent=t||"";el.className="msg"+(t?(err?" err":" ok"):"")}
-function step(n){[1,2,3].forEach(function(i){var li=document.querySelector('#prog li[data-s="'+i+'"]');li.className=i<n?"done":i===n?"on":"";var c=$("s"+i);if(i<=n)c.removeAttribute("aria-disabled");else c.setAttribute("aria-disabled","true")});var c=$("s"+n);if(c&&n>1)c.scrollIntoView({behavior:"smooth",block:"start"})}
+var EM=/^[^\\s@]{1,64}@[a-z0-9-]+(\\.[a-z0-9-]+)*\\.[a-z]{2,}$/i,WS=/^(https?:\\/\\/)?([a-z0-9-]+\\.)+[a-z]{2,}(\\/.*)?$/i;
+function ferr(name,v){v=(v||"").trim();if(name==="name")return v.length<2?"Add your name.":"";if(name==="company")return v.length<2?"Add your company name.":"";if(name==="email")return !v?"Add your work email.":EM.test(v)?"":"That email looks off. Check for a typo, like name@company.com.";if(name==="website")return !v?"Add your website, like yourbrand.com.":WS.test(v)?"":"Use a web address like yourbrand.com.";return""}
+function show(name,t){var i=$("s2").elements[name],e=$("e-"+name);if(e)e.textContent=t||"";if(i){if(t)i.setAttribute("aria-invalid","true");else i.removeAttribute("aria-invalid")}}
+function step(n,noScroll){cur=n;[1,2,3].forEach(function(i){$("s"+i).classList.toggle("on",i===n)});$("prog-n").textContent="Step "+n+" of 3";$("prog-t").textContent=TITLES[n-1];$("prog-bar").setAttribute("aria-valuenow",String(n));$("prog-bar").firstChild.style.width=Math.round(n/3*100)+"%";if(n===3)summary();save();if(!noScroll){$("prog").scrollIntoView({behavior:"smooth",block:"start"});var f=$("s"+n).querySelector("input:not([type=hidden]):not([tabindex='-1'])");if(f&&n===2&&!f.value)setTimeout(function(){f.focus({preventScroll:true})},250)}}
 async function post(url,body,headers){var r=await fetch(url,{method:"POST",headers:Object.assign({"content-type":"application/json"},headers||{}),body:body});var o={};try{o=await r.json()}catch(_){}return{ok:r.ok,status:r.status,body:o}}
-$("s1").addEventListener("submit",async function(e){e.preventDefault();var f=e.target,m=$("s1-msg");if(!f.reportValidity())return;var b=$("s1-go");b.disabled=true;msg(m,"Setting up your account…");var d=Object.fromEntries(new FormData(f));try{var r=await post("/v1/buy/account",JSON.stringify(d));if(r.ok&&r.body.account){acct=r.body.account;msg(m,r.body.note||"Account ready.",false);f.querySelectorAll("input").forEach(function(i){i.readOnly=true});b.textContent="Edit";b.disabled=false;b.type="button";b.onclick=function(){f.querySelectorAll("input").forEach(function(i){i.readOnly=false});acct=null;crv=null;b.type="submit";b.textContent="Continue";b.onclick=null;step(1)};step(crv?3:2);return}msg(m,r.body.error||"That didn't work. Try again.",true);if(r.body.field){var el=f.elements[r.body.field];if(el)el.focus()}}catch(_){msg(m,"Network problem. Try again.",true)}b.disabled=false});
+function pick(name){var x=document.querySelector("input[name="+name+"]:checked");return x?x.value:""}
+function fields(){var f=$("s2");return{name:f.name.value,email:f.email.value,company:f.company.value,website:f.website.value}}
+function save(){try{var d=fields();d.plan=pick("plan");d.format=pick("format");localStorage.setItem(KEY,JSON.stringify({at:Date.now(),v:d}));sessionStorage.setItem(SKEY,JSON.stringify({acct:acct,crv:crv,step:cur}))}catch(_){}}
+function clearSave(){try{localStorage.removeItem(KEY);sessionStorage.removeItem(SKEY)}catch(_){}}
+function summary(){var p=PLANS[pick("plan")]||{},d=fields(),later=pick("admode")==="later";$("sum").innerHTML="";var add=function(k,v){var r=document.createElement("div");var b=document.createElement("b");b.textContent=k+": ";r.appendChild(b);r.appendChild(document.createTextNode(v));$("sum").appendChild(r)};add("Plan",(p.name||"")+" · "+(p.price||""));add("Where it shows",FORMATS[pick("format")]||"");add("For",(d.company||"")+" · "+(d.email||""));add("Your ad",later?"Sending later":(crv?"Uploaded, held for review":"Not uploaded yet"));var e=document.createElement("a");e.href="#";e.textContent="Change plan";e.onclick=function(ev){ev.preventDefault();step(1)};$("sum").appendChild(e);$("s3-go").textContent=p.pay==="invoice"?"Request invoice →":(live?"Continue to secure checkout · "+(p.price||""):"Send my order →")}
+// restore: kit prefill wins for contact fields; plan from the URL wins for the plan.
+(function(){try{var o=JSON.parse(localStorage.getItem(KEY)||"null");if(o&&o.v&&Date.now()-o.at<6048e5){var f=$("s2"),v=o.v,any=false;["name","email","company","website"].forEach(function(k){if(v[k]&&!f[k].value){f[k].value=String(v[k]).slice(0,300);any=true}});if(v.format){var fm=document.querySelector("input[name=format][value='"+String(v.format).replace(/[^a-z_]/g,"")+"']");if(fm)fm.checked=true}if(v.plan&&!/[?&]plan=/.test(location.search)){var pl=document.querySelector("input[name=plan][value='"+String(v.plan).replace(/[^a-z0-9-]/g,"")+"']");if(pl)pl.checked=true}if(any&&!hasPf)$("saved").classList.add("on")}}catch(_){}
+try{var q=JSON.parse(sessionStorage.getItem("br_quick_reserve")||"null");if(q){var f2=$("s2");if(q.brand&&!f2.company.value)f2.company.value=String(q.brand).slice(0,160);if(q.email&&!f2.email.value)f2.email.value=String(q.email).slice(0,200)}}catch(_){}
+try{var ss=JSON.parse(sessionStorage.getItem(SKEY)||"null");if(ss&&ss.acct){acct=ss.acct;crv=ss.crv||null}}catch(_){}})();
+$("start-over").addEventListener("click",function(){clearSave();["name","email","company","website"].forEach(function(k){$("s2")[k].value=""});acct=null;crv=null;$("saved").classList.remove("on")});
+document.querySelectorAll("[data-back]").forEach(function(b){b.addEventListener("click",function(){step(Number(b.getAttribute("data-back")))})});
+// Step 1: plan + spot. A card plan cannot use an exclusive-only spot: that spot is disabled with a note, never silently switched.
+var s1=$("s1");function sync(){var plan=pick("plan"),card=(PLANS[plan]||{}).pay==="card";s1.querySelectorAll(".picks .pick").forEach(function(p){var inp=p.querySelector("input"),prem=p.getAttribute("data-premium")==="1";inp.disabled=card&&prem;if(inp.disabled&&inp.checked){inp.checked=false;s1.querySelector(".picks .pick:not([data-premium='1']) input").checked=true}});save()}
+s1.addEventListener("change",sync);sync();
+s1.addEventListener("submit",function(e){e.preventDefault();if(!pick("plan")||!pick("format")){msg($("s1-msg"),"Pick a plan and a spot.",true);return}msg($("s1-msg"),"");step(acct?3:2)});
+// Step 2: contact → signed account token (no password, no visitor email).
+var s2=$("s2");["name","email","company","website"].forEach(function(k){var i=s2.elements[k];i.addEventListener("blur",function(){if(i.value.trim())show(k,ferr(k,i.value))});i.addEventListener("input",function(){if(i.getAttribute("aria-invalid"))show(k,ferr(k,i.value));if(acct){acct=null;crv=null}save()})});
+s2.addEventListener("submit",async function(e){e.preventDefault();var m=$("s2-msg"),bad=null;["name","email","company","website"].forEach(function(k){var t=ferr(k,s2.elements[k].value);show(k,t);if(t&&!bad)bad=k});if(bad){s2.elements[bad].focus();msg(m,"");return}
+var b=$("s2-go");b.disabled=true;msg(m,"Saving…");var d=Object.fromEntries(new FormData(s2));try{var r=await post("/v1/buy/account",JSON.stringify(d));if(r.ok&&r.body.account){acct=r.body.account;msg(m,"");msg($("s2b-msg"),r.body.note||"",false);b.disabled=false;step(3);return}msg(m,r.body.error||"That didn't work. Try again.",true);if(r.body.field){show(r.body.field,r.body.error);var el=s2.elements[r.body.field];if(el)el.focus()}}catch(_){msg(m,"Network problem. Check your connection and press Next again.",true)}b.disabled=false});
+// Step 3: ad (now or later) + terms → order.
+var s3=$("s3");s3.querySelectorAll("input[name=admode]").forEach(function(r){r.addEventListener("change",function(){$("ad-now").style.display=pick("admode")==="later"?"none":"";msg($("s2b-msg"),"");summary()})});
 var drop=$("drop"),file=$("b-file");
 ["dragenter","dragover"].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.add("over")})});["dragleave","drop"].forEach(function(t){drop.addEventListener(t,function(e){e.preventDefault();drop.classList.remove("over")})});
 drop.addEventListener("drop",function(e){if(e.dataTransfer.files[0])upload(e.dataTransfer.files[0])});file.addEventListener("change",function(){if(file.files[0])upload(file.files[0])});
-async function upload(fl){var m=$("s2-msg");if(!acct){msg(m,"Finish step 1 first.",true);return}if(${JSON.stringify(CREATIVE_TYPES)}.indexOf(fl.type)<0){msg(m,"Use a PNG, JPG, WebP or GIF image.",true);return}if(fl.size>${CREATIVE_MAX_BYTES}){msg(m,"That file is over 2 MB. Export a smaller one.",true);return}
+async function upload(fl){var m=$("s2b-msg");if(!acct){msg(m,"Add your details first.",true);step(2);return}if(${JSON.stringify(CREATIVE_TYPES)}.indexOf(fl.type)<0){msg(m,"Use a PNG, JPG, WebP or GIF image. Or pick Send it later.",true);return}if(fl.size>${CREATIVE_MAX_BYTES}){msg(m,"That file is over 2 MB. Export a smaller one, or pick Send it later.",true);return}
 msg(m,"Uploading…");var url=URL.createObjectURL(fl);$("pv-img").src=url;$("pv-name").textContent=fl.name;$("pv").classList.add("on");
-try{var r=await fetch("/v1/buy/creative",{method:"POST",headers:{"content-type":fl.type,"x-buy-account":acct},body:fl});var o={};try{o=await r.json()}catch(_){}if(r.ok&&o.creative){crv=o.creative;$("pv-meta").textContent=o.width+" × "+o.height+" px · "+Math.max(1,Math.round(o.bytes/1024))+" KB · held for review";msg(m,"Uploaded. A person checks it before it runs.",false);step(3);return}crv=null;msg(m,o.error||"Upload failed. Try again.",true)}catch(_){crv=null;msg(m,"Upload failed. Try again.",true)}}
-var s3=$("s3");function sync(){var fmt=s3.querySelector("input[name=format]:checked"),prem=fmt&&fmt.closest(".pick").getAttribute("data-premium")==="1";s3.querySelectorAll(".plans .pick").forEach(function(p){var inp=p.querySelector("input");inp.disabled=prem&&p.getAttribute("data-pay")==="card";if(inp.disabled&&inp.checked){inp.checked=false;s3.querySelector('input[name=plan][value=exclusive]').checked=true}});var plan=s3.querySelector("input[name=plan]:checked"),inv=plan&&plan.closest(".pick").getAttribute("data-pay")==="invoice";$("s3-go").textContent=inv?"Request invoice":(live?"Continue to secure checkout":"Send my order")}
-s3.addEventListener("change",sync);sync();
-s3.addEventListener("submit",async function(e){e.preventDefault();var m=$("s3-msg"),b=$("s3-go");if(!acct){msg(m,"Finish step 1 first.",true);step(1);return}if(!crv){msg(m,"Upload your ad in step 2.",true);return}if(!$("b-terms").checked){msg(m,"Please accept the terms first.",true);return}
-b.disabled=true;msg(m,"Saving your order…");var plan=s3.querySelector("input[name=plan]:checked").value,fmt=s3.querySelector("input[name=format]:checked").value;
-try{var r=await post("/v1/buy/order",JSON.stringify({account:acct,creative:crv,plan:plan,format:fmt,terms:true}));if(!r.ok){msg(m,r.body.error||"That didn't work. Try again.",true);b.disabled=false;return}
-if(r.body.next==="checkout"&&r.body.checkout){msg(m,"Opening secure checkout…");var c=await post("/v1/checkout",JSON.stringify(r.body.checkout));if(c.body.checkout_url){location.assign(c.body.checkout_url);return}if(c.body.order_id){finish("Order saved.","No card was charged. We'll confirm by email or call (647) 931-6278. Ref "+r.body.order_id.slice(0,8)+".");return}msg(m,c.body.error||"Checkout could not open. Call (647) 931-6278.",true);b.disabled=false;return}
+try{var r=await fetch("/v1/buy/creative",{method:"POST",headers:{"content-type":fl.type,"x-buy-account":acct},body:fl});var o={};try{o=await r.json()}catch(_){}if(r.ok&&o.creative){crv=o.creative;$("pv-meta").textContent=o.width+" × "+o.height+" px · "+Math.max(1,Math.round(o.bytes/1024))+" KB · held for review";msg(m,"Uploaded. A person checks it before it runs.",false);save();summary();return}crv=null;if(r.status===401){msg(m,"Your session timed out. Press Back and Next to refresh it.",true);acct=null;return}msg(m,(o.error||"Upload failed.")+" Or pick Send it later.",true)}catch(_){crv=null;msg(m,"Upload failed. Try again, or pick Send it later.",true)}summary()}
+$("b-terms").addEventListener("change",function(){if(this.checked)$("e-terms").textContent=""});
+s3.addEventListener("submit",async function(e){e.preventDefault();var m=$("s3-msg"),b=$("s3-go"),later=pick("admode")==="later";if(!acct){msg(m,"");step(2);msg($("s2-msg"),"Press Next to confirm your details.",true);return}if(!later&&!crv){msg(m,"Upload your ad, or pick Send it later.",true);drop.scrollIntoView({behavior:"smooth",block:"center"});return}if(!$("b-terms").checked){$("e-terms").textContent="Tick the box to agree to the terms.";$("b-terms").focus();return}
+b.disabled=true;msg(m,"Saving your order…");var plan=pick("plan"),fmt=pick("format");
+try{var r=await post("/v1/buy/order",JSON.stringify({account:acct,creative:later?null:crv,creative_later:later,plan:plan,format:fmt,terms:true}));if(!r.ok){if(r.status===401){acct=null;msg(m,"");step(2);msg($("s2-msg"),"Your session timed out. Press Next to refresh it. Your answers are still here.",true);b.disabled=false;return}msg(m,r.body.error||"That didn't work. Try again.",true);b.disabled=false;return}
+if(r.body.next==="checkout"&&r.body.checkout){msg(m,"Opening secure checkout…");var c=await post("/v1/checkout",JSON.stringify(r.body.checkout));if(c.body.checkout_url){save();location.assign(c.body.checkout_url);return}if(c.body.order_id){finish("Order saved.","No card was charged. We'll confirm by email or call (647) 931-6278. Ref "+r.body.order_id.slice(0,8)+".");return}msg(m,c.body.error||"Checkout could not open. Call (647) 931-6278.",true);b.disabled=false;return}
 finish("Invoice on the way.","We'll send your insertion order and invoice within 1 business day. Your ad is held for review. No card was charged. Ref "+r.body.order_id.slice(0,8)+".")}catch(_){msg(m,"Network problem. No payment was taken. Try again.",true);b.disabled=false}});
-function finish(h,p){["s1","s2","s3"].forEach(function(id){$(id).style.display="none"});$("prog").querySelectorAll("li").forEach(function(li){li.className="done"});$("done-h").textContent=h;$("done-p").textContent=p;$("done").classList.add("on");$("done").scrollIntoView({behavior:"smooth"})}
-if(/[?&]checkout=cancelled/.test(location.search))msg($("s1-msg"),"Checkout was cancelled. No payment was taken.",false);
+function finish(h,p){clearSave();["s1","s2","s3"].forEach(function(id){$(id).classList.remove("on")});$("prog-n").textContent="Done";$("prog-t").textContent="Order received";$("prog-bar").firstChild.style.width="100%";$("done-h").textContent=h;$("done-p").textContent=p;$("done").classList.add("on");$("done").scrollIntoView({behavior:"smooth"})}
+if(/[?&]checkout=cancelled/.test(location.search)){step(acct?3:1,true);msg($("s"+(acct?3:1)+"-msg"),"Checkout was cancelled. No payment was taken. Your answers are still here.",false)}
+else if(acct){step(3,true)}
+summary();
 })();
 </script></body></html>`;
 }

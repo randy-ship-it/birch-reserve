@@ -185,10 +185,21 @@ test("routes: account → upload → order (card hands back the /v1/checkout bod
     const inv = await json("/v1/buy/order", { account: acct.account, creative: crv.creative, plan: "exclusive", format: "post_checkout", terms: true });
     assert.equal(((await inv.json()) as { next: string }).next, "invoice");
     assert.equal((await store.listOrders(10)).length, 2);
+
+    // "Send it later" (Nov 21 2026): no image needed to order; the order carries no creative and stays pending review.
+    const laterAcct = (await (await json("/v1/buy/account", { name: "QA Later", email: "qa+later@acme.com", company: "Acme", website: "acme.com" })).json()) as { account: string };
+    assert.equal((await json("/v1/buy/order", { account: laterAcct.account, plan: "hold-190", format: "member_hub", terms: true })).status, 400);
+    const later = await json("/v1/buy/order", { account: laterAcct.account, creative_later: true, plan: "hold-190", format: "member_hub", terms: true });
+    assert.equal(later.status, 200);
+    assert.equal(((await later.json()) as { next: string }).next, "checkout");
+    const lo = (await store.listOrders(10))[0]!;
+    assert.equal(lo.creativeId, null);
+    assert.equal(lo.reviewStatus, "pending_review");
+    assert.equal((await store.listOrders(10)).length, 3);
     assert.ok((await store.listOrders(10)).every((o) => o.reviewStatus === "pending_review"));
 
     let last = 200;
-    for (let i = 0; i < 6; i++) last = (await json("/v1/buy/order", { account: acct.account, creative: crv.creative, plan: "hold-190", format: "member_hub", terms: true })).status;
+    for (let i = 0; i < 7; i++) last = (await json("/v1/buy/order", { account: acct.account, creative: crv.creative, plan: "hold-190", format: "member_hub", terms: true })).status;
     assert.equal(last, 429);
   } finally {
     server.close();

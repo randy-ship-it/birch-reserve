@@ -281,7 +281,7 @@ export type CreativeClaims = { id: string; a: string; e: string; m: CreativeType
 export type StoredCreative = { id: string; accountId: string; email: string; mime: string; width: number; height: number; bytes: number; sha256: string; data: Buffer; createdAt: Date };
 export type StoredOrder = {
   id: string; accountId: string; name: string; email: string; company: string; website: string; domainCheck: DomainCheck;
-  plan: string; format: string; creativeId: string; reviewStatus: "pending_review"; ip: string; createdAt: Date;
+  plan: string; format: string; creativeId: string | null; reviewStatus: "pending_review"; ip: string; createdAt: Date;
 };
 
 export type BuyStore = {
@@ -329,7 +329,8 @@ export function postgresBuyStore(getPool: () => Promise<Pool>): BuyStore {
         id uuid PRIMARY KEY, account_id text NOT NULL, name text NOT NULL, email text NOT NULL, company text NOT NULL,
         website text NOT NULL, domain_check text NOT NULL, plan text NOT NULL, format text NOT NULL, creative_id uuid NOT NULL,
         review_status text NOT NULL DEFAULT 'pending_review', ip text, created_at timestamptz NOT NULL DEFAULT now());
-      CREATE INDEX IF NOT EXISTS buy_orders_created_idx ON buy_orders (created_at);`)
+      CREATE INDEX IF NOT EXISTS buy_orders_created_idx ON buy_orders (created_at);
+      ALTER TABLE buy_orders ALTER COLUMN creative_id DROP NOT NULL;`)
       .then(() => undefined)
       .catch((e) => {
         ready = null;
@@ -366,7 +367,7 @@ export function postgresBuyStore(getPool: () => Promise<Pool>): BuyStore {
       const { rows } = await pool.query("SELECT * FROM buy_orders ORDER BY created_at DESC LIMIT $1", [limit]);
       return rows.map((r) => ({
         id: String(r.id), accountId: String(r.account_id), name: String(r.name), email: String(r.email), company: String(r.company), website: String(r.website),
-        domainCheck: r.domain_check as DomainCheck, plan: String(r.plan), format: String(r.format), creativeId: String(r.creative_id), reviewStatus: "pending_review" as const,
+        domainCheck: r.domain_check as DomainCheck, plan: String(r.plan), format: String(r.format), creativeId: r.creative_id == null ? null : String(r.creative_id), reviewStatus: "pending_review" as const,
         ip: String(r.ip ?? ""), createdAt: new Date(String(r.created_at)),
       }));
     },

@@ -373,6 +373,13 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       res.send("/* analytics unavailable */");
     }
   });
+  /**
+   * The same-origin analytics snippet (/br-t.js) posts page/form events to /api/track on THIS host, which had no
+   * route: a 404 in the console on every page (Nov 21 2026 forms audit). Accept and drop: 204, nothing stored or sent.
+   */
+  router.post("/api/track", (_req, res) => {
+    res.status(204).end();
+  });
   /** v1.2 §6 shared category keys (Friday's list when it serves one, else the static copy of the contract table). */
   router.get("/v1/brand-categories", async (_req, res) => {
     const p = await fridayV12();

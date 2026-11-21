@@ -29,6 +29,8 @@ import { FastReport, type QuickResult } from "@/components/br/fast-report";
 import { numOrU, type SharedAnswers } from "@/components/br/intake-details";
 import { Details } from "@/components/br/details";
 import { cleanPhysical, inLocationReach, type PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
+import { FieldError, SavedNote, StepHeader } from "@/components/br/form-steps";
+import { clearSaved, fieldError, loadSaved, saveForm } from "@/lib/form-save";
 import { ExposureLadder, SupplierDone, SupplierFees, brandFromUrl, hubSlugOf, levelOf, rolesForLevel, type IntakePreset } from "@/components/br/supplier-mode";
 
 /** "Do you have physical locations?" (Randy, Nov 19 2026 10:54 AM ET): yes/no; if yes, how many + monthly visitors. */
@@ -144,6 +146,33 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
     fetch(`/v1/kit-resume?t=${encodeURIComponent(t)}`).then((r) => (r.ok ? r.json() : null)).then((x) => x && apply(x)).catch(() => undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // Save-as-you-type (Randy, voice, Nov 21 2026): a refresh keeps the answers. This browser only; cleared on submit.
+  // A ?resume= link wins over local answers.
+  const SAVE_KEY = `intake:${sup ? "supplier" : "default"}`;
+  const [localRestored, setLocalRestored] = useState(false);
+  const [touched, setTouched] = useState<{ website?: boolean; email?: boolean }>({});
+  const loaded = useRef(false);
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("resume")) { loaded.current = true; return; }
+    const x = loadSaved<{ website: string; email: string; r: OneFormRoles; phys: PhysForm; shared: SharedAnswers }>(SAVE_KEY);
+    if (x && (x.website || x.email)) {
+      if (x.website) setWebsite(String(x.website));
+      if (x.email) setEmail(String(x.email));
+      if (x.r && typeof x.r === "object" && (x.r.supplier || x.r.hub)) setR({ supplier: Boolean(x.r.supplier), hub: Boolean(x.r.hub), accelerate: Boolean(x.r.accelerate) });
+      if (x.phys && typeof x.phys === "object") setPhys({ ...EMPTY_PHYS, ...x.phys });
+      if (x.shared && typeof x.shared === "object") setShared((cur) => ({ ...cur, ...x.shared, categories: Array.isArray(x.shared!.categories) ? x.shared!.categories.slice(0, 3) : cur.categories }));
+      setLocalRestored(true);
+    }
+    loaded.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    if (!loaded.current || submitted.current) return;
+    if (website.trim() || email.trim()) saveForm(SAVE_KEY, { website, email, r, phys, shared });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [website, email, r, phys, shared]);
+  const startOver = () => { clearSaved(SAVE_KEY); setWebsite(""); setEmail(""); setPhys(EMPTY_PHYS); setShared(sup ? { ...EMPTY_SHARED, brand: brandFromUrl() } : EMPTY_SHARED); setLocalRestored(false); setTouched({}); };
+  const fieldErrs = { website: fieldError("website", website), email: fieldError("email", email) };
   const flip = (k: keyof OneFormRoles) => {
     setR((cur) => {
       const next = { ...cur, [k]: !cur[k] };
@@ -200,6 +229,11 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
     e.preventDefault();
     setErr(null);
     if (hp) return setDone({ ref: { id: "", editToken: "", reportToken: "", version: 0 }, held: false, gates: null }); // honeypot: send nothing
+    if (fieldErrs.website || fieldErrs.email) {
+      setTouched({ website: true, email: true });
+      (document.querySelector(fieldErrs.website ? '[data-testid="intake-website"]' : '[data-testid="intake-email"]') as HTMLElement | null)?.focus();
+      return;
+    }
     trackIntake(side, "step_complete", "contact");
     if (r.supplier && !r.hub && !r.accelerate) trackIntake("advertiser", "submit", "supply_only");
     setBusy(true);
@@ -212,6 +246,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
       const fr = partialRef.current ? await api.finishPartial(partialRef.current, payload, contact) : await api.fast(payload, contact);
       const { ref: next, sub, autofill } = fr;
       saveRef(roles[0]!, next);
+      clearSaved(SAVE_KEY);
       if (r.supplier && r.accelerate) saveRef("kit", next); // Expanded (kit builder) upgrades this same record
       const af = autofill?.fields ?? {};
       const afMarket = af.geo?.value?.sells?.length ? { sells_in: af.geo.value.sells.filter((c): c is "CA" | "US" => c === "CA" || c === "US"), ships_to: (af.geo.value.ships ?? af.geo.value.sells).filter((c): c is "CA" | "US" => c === "CA" || c === "US"), regions: [] } : undefined;
@@ -260,7 +295,9 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
 
   const supplierOnly = r.supplier && !r.hub;
   return (
-    <form onSubmit={submit} data-testid="intake-short-form" data-roles={roles.join(",")} className="rounded-3xl border border-foreground/10 bg-white p-5 shadow-xl md:p-6">
+    <form onSubmit={submit} noValidate data-testid="intake-short-form" data-roles={roles.join(",")} className="rounded-3xl border border-foreground/10 bg-white p-5 shadow-xl md:p-6">
+      <StepHeader step={1} total={2} title="Your free kit" hint={sup ? "Pick your level, add your website and work email, then press the green button." : "Both boxes are on (most brands are both). Add your website and work email, then press Get my Monetization Kit."} testId="intake-steps" />
+      <SavedNote show={localRestored && !resumed} onClear={startOver} />
       {sup ? <ExposureLadder level={levelOf(r)} onPick={(l) => { setR(rolesForLevel(l)); trackIntake("advertiser", "field_start", l === 3 ? "accelerate" : l === 2 ? "add_hub" : "supplier", { dedupe: true }); }} /> : null}
       {sup ? null : <fieldset>
         <legend className="text-[11px] font-bold uppercase tracking-wider text-foreground/60">You are… <span className="font-semibold normal-case tracking-normal text-foreground/50">(most brands are both)</span></legend>
@@ -283,10 +320,16 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
       {resumed ? <p className="mt-3 rounded-xl bg-lime-50 p-3 text-sm font-semibold text-[#0b1f3a]" data-testid="intake-resumed">Welcome back. We saved your answers: check them and get your kit.</p> : null}
       <LocationsQuestion value={phys} onChange={setPhys} side={side} />
 
-      <div className={`mt-4 grid gap-3 ${sup ? "md:grid-cols-[1fr_1fr_1fr_auto]" : "md:grid-cols-[1fr_1fr_auto]"}`}>
+      <div className={`mt-4 grid items-start gap-3 ${sup ? "md:grid-cols-[1fr_1fr_1fr_auto]" : "md:grid-cols-[1fr_1fr_auto]"}`}>
         {sup ? <input data-testid="intake-brand" aria-label="Brand name" value={shared.brand} onFocus={fieldStart(side, "brand")} onChange={(e) => setShared({ ...shared, brand: e.target.value })} placeholder="Brand name" autoComplete="organization" className={input} /> : null}
-        <input data-testid="intake-website" aria-label="Website" required value={website} onFocus={fieldStart(side, "website")} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" autoComplete="url" className={input} />
-        <input data-testid="intake-email" aria-label="Work email" required type="email" value={email} onFocus={fieldStart(side, "email")} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourbrand.com" autoComplete="email" className={input} />
+        <div className="min-w-0">
+          <input data-testid="intake-website" aria-label="Website" required value={website} onFocus={fieldStart(side, "website")} onBlur={() => website.trim() && setTouched((t) => ({ ...t, website: true }))} onChange={(e) => setWebsite(e.target.value)} placeholder="yourbrand.com" autoComplete="url" inputMode="url" autoCapitalize="none" spellCheck={false} aria-invalid={touched.website && fieldErrs.website ? true : undefined} className={`${input} ${touched.website && fieldErrs.website ? "border-[#b42318]" : ""}`} />
+          <FieldError msg={touched.website ? fieldErrs.website : ""} />
+        </div>
+        <div className="min-w-0">
+          <input data-testid="intake-email" aria-label="Work email" required type="email" value={email} onFocus={fieldStart(side, "email")} onBlur={() => email.trim() && setTouched((t) => ({ ...t, email: true }))} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourbrand.com" autoComplete="email" inputMode="email" autoCapitalize="none" spellCheck={false} aria-invalid={touched.email && fieldErrs.email ? true : undefined} className={`${input} ${touched.email && fieldErrs.email ? "border-[#b42318]" : ""}`} />
+          <FieldError msg={touched.email ? fieldErrs.email : ""} />
+        </div>
         <button type="submit" disabled={busy} data-testid="intake-submit" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 transition hover:bg-[#0b1f3a] hover:text-white">
           {busy ? <Loader2 className="size-5 animate-spin" /> : null} {sup && r.hub ? "Create my hub" : "Get my Monetization Kit"} <ArrowRight className="size-5" />
         </button>

@@ -96,7 +96,7 @@ form.dep input,form.dep select{width:100%;padding:10px;border:1px solid #b9c1c9;
 .mf{font-weight:600;color:#071A39}
 .ok{background:#BFF3D6;color:#0B6B43;font-weight:600;padding:8px 14px;border-radius:8px;margin:12px 0}.urg{font-weight:600;color:#3b4a12}
 form.dep.wide{max-width:none}.dep .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.dep .row{grid-template-columns:1fr}}
-.lede{font-size:1.05rem;margin:.2em 0 1em}.boxes{margin-top:18px;border-top:1px solid #ccd2d8}.boxes details{border-bottom:1px solid #ccd2d8;padding:14px 0}.boxes summary{cursor:pointer;font:400 1.25rem Fraunces,serif;list-style:none;display:flex;justify-content:space-between}.boxes summary::-webkit-details-marker{display:none}.boxes summary::after{content:"+";font-size:1.5rem;line-height:1}.boxes details[open] summary::after{content:"\\2212"}.stats.pay .btn{display:inline-block;margin-top:10px}label.pack{cursor:pointer}label.pack.on{border:2px solid #071A39}.amt small{font-size:.9rem}.sr{position:absolute;opacity:0;width:1px;height:1px}
+.lede{font-size:1.05rem;margin:.2em 0 1em}.boxes{margin-top:18px;border-top:1px solid #ccd2d8}.boxes details{border-bottom:1px solid #ccd2d8;padding:14px 0}.boxes summary{cursor:pointer;font:400 1.25rem Fraunces,serif;list-style:none;display:flex;justify-content:space-between}.boxes summary::-webkit-details-marker{display:none}.boxes summary::after{content:"+";font-size:1.5rem;line-height:1}.boxes details[open] summary::after{content:"\\2212"}.stats.pay .btn{display:inline-block;margin-top:10px}label.pack{cursor:pointer}label.pack.on{border:2px solid #071A39}.amt small{font-size:.9rem}.sr{position:absolute;top:0;left:0;opacity:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}label.pack{position:relative;cursor:pointer}label.pack.on{outline:3px solid #9fd13a;outline-offset:-1px}.pack .pick{margin-top:auto;font-weight:700;font-size:.85rem;opacity:.75}.pack.on .pick{opacity:1}.sp-step{font-size:.75rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#4d5b6a;margin:4px 0 0}.sp-hint{font-weight:600;color:#24412a;margin:2px 0 6px}.sp-go{width:100%;min-height:54px;font-size:1.05rem!important;margin-top:4px}.sp-err{color:#a12b1f;font-weight:600;font-size:.88rem;display:block;margin-top:2px}.sp-err:empty{display:none}#prepay input[aria-invalid=true]{border-color:#a12b1f}
 </style></head><body>
 <header><a href="/"><strong>BIRCH RESERVE</strong></a><nav><a href="/sponsor?currency=${currency}">Sponsor</a><a href="/kit?currency=${currency}">Marketing kit</a><a href="/terms">Terms</a><span class="cur">Prices in ${currency.toUpperCase()}${PUBLIC_CAD_ENABLED ? ` · <a href="?currency=${other}">Show ${other.toUpperCase()}</a>` : ""}</span></nav></header>
 <main>${body}</main>
@@ -144,7 +144,7 @@ export function sponsorHtml(_currency: Currency, opts: SponsorPageOpts = {}): st
   const val = (v?: string) => (v ? ` value="${esc(v)}"` : "");
   const tiers = DEPOSIT_TIERS.map((t) => {
     const credit = Math.round(t.usd * (1 + t.bonusPct / 100));
-    return `<label class="card pack${t.key === picked ? " on" : ""}" data-testid="pack-${t.key}"><input type="radio" name="tier" value="${t.key}"${t.key === picked ? " checked" : ""} class="sr"><strong>${esc(t.label)}</strong><span class="amt">${money(t.usd, currency)}</span><span>+${t.bonusPct}% bonus: ${money(credit, currency)} credit</span><button type="button" class="btn" data-tier="${t.key}">Prepay ${money(t.usd, currency).replace(/ USD$/, "")}</button></label>`;
+    return `<label class="card pack${t.key === picked ? " on" : ""}" data-testid="pack-${t.key}"><input type="radio" name="tier" value="${t.key}"${t.key === picked ? " checked" : ""} class="sr"><strong>${esc(t.label)}</strong><span class="amt">${money(t.usd, currency)}</span><span>+${t.bonusPct}% bonus: ${money(credit, currency)} credit</span><span class="pick" aria-hidden="true">${t.key === picked ? "✓ Selected" : "Tap to choose"}</span></label>`;
   }).join("");
   const payout: PayoutRegion = opts.payout ?? "ca";
   const ladder = SMB_LADDER.map((r) => `<tr><td>${r.customers} activated customers</td><td class="n">${payoutAmount(r.cashCad, payout)} cash</td><td class="n">${payoutAmount(r.creditCad, payout)} ad credit</td></tr>`).join("");
@@ -157,11 +157,14 @@ export function sponsorHtml(_currency: Currency, opts: SponsorPageOpts = {}): st
   return `${status}${open ? "" : `<p class="draft" data-testid="sponsor-inquiry">Card checkout for packs is paused right now. Send the form and we'll confirm by email within 1 business day. No charge today.</p>`}
 <h1>Prepay ad credit. Up to 15% bonus.</h1>
 <p class="lede">Insertion order before anything runs. <span data-testid="sponsor-urgency">${esc(URGENCY_LINE)}</span></p>
-<form class="dep wide" id="prepay" data-testid="sponsor-prepay-form">
-<div class="cards">${tiers}</div>
-<div class="row"><label>Brand<input name="brand" required maxlength="160" autocomplete="organization"${val(pf.company)}></label>
-<label>Work email<input name="email" type="email" required autocomplete="email"${val(pf.email)}></label></div>
-<label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the <a href="#terms-pack" data-open="terms-pack">pack terms</a>.</label>
+<form class="dep wide" id="prepay" data-testid="sponsor-prepay-form" novalidate>
+<p class="sp-step">Step 1 of 2 · Pick a pack</p><p class="sp-hint">Tap the pack you want. You can change it before you pay.</p>
+<div class="cards" role="radiogroup" aria-label="Pack">${tiers}</div>
+<p class="sp-step">Step 2 of 2 · Your details</p><p class="sp-hint">Add your brand and work email, tick the box, then press the button.</p>
+<div class="row"><label>Brand<input name="brand" required maxlength="160" autocomplete="organization"${val(pf.company)}><span class="sp-err" id="e-brand"></span></label>
+<label>Work email<input name="email" type="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@yourbrand.com" required autocomplete="email"${val(pf.email)}><span class="sp-err" id="e-email"></span></label></div>
+<label class="fine"><input id="terms" type="checkbox" required style="width:auto;margin-right:8px">I agree to the <a href="#terms-pack" data-open="terms-pack">pack terms</a>.</label><span class="sp-err" id="e-terms"></span>
+${(() => { const amt = money(DEPOSIT_TIERS.find((t) => t.key === picked)!.usd, currency).replace(/ USD$/, ""); return `<button type="submit" class="btn sp-go" id="sp-go" data-testid="sponsor-go">${open ? `Prepay ${amt} →` : `Send ${amt} pack request →`}</button>`; })()}
 <p id="msg" role="status" class="fine"></p>
 </form>
 <div class="stats pay" data-testid="payout-key-figures">
@@ -190,12 +193,25 @@ ${hubPackageTable(currency)}
 </div>
 <script>
 (function(){
-var msg=document.getElementById('msg');var f=document.getElementById('prepay');
-function go(body){msg.textContent='Opening secure checkout…';fetch('/v1/sponsor/deposit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){if(x.ok&&x.j.url){location.href=x.j.url}else{msg.textContent=x.j.message||x.j.error||'Email sales@silverbirchgrowth.com and we will confirm within 1 business day.'}}).catch(function(){msg.textContent='Network error. Email sales@silverbirchgrowth.com.'})}
-function pick(k){f.querySelectorAll('label.pack').forEach(function(l){var r=l.querySelector('input');var on=r.value===k;r.checked=on;l.classList.toggle('on',on)})}
+var msg=document.getElementById('msg');var f=document.getElementById('prepay');var go=document.getElementById('sp-go');var OPEN=${open ? "true" : "false"};
+var AMT=${JSON.stringify(Object.fromEntries(DEPOSIT_TIERS.map((t) => [t.key, money(t.usd, currency).replace(/ USD$/, "")])))};
+var KEY='br-form:sponsor';var EM=/^[^\\s@]{1,64}@[a-z0-9-]+(\\.[a-z0-9-]+)*\\.[a-z]{2,}$/i;
+function cur(){var r=f.querySelector('input[name=tier]:checked');return r?r.value:''}
+function label(){var k=cur();go.textContent=OPEN?('Prepay '+(AMT[k]||'')+' →'):('Send '+(AMT[k]||'')+' pack request →')}
+function save(){try{localStorage.setItem(KEY,JSON.stringify({at:Date.now(),v:{brand:f.brand.value,email:f.email.value,tier:cur()}}))}catch(_){}}
+function err(n,t){var e=document.getElementById('e-'+n);if(e)e.textContent=t||'';var i=n==='terms'?document.getElementById('terms'):f[n];if(i){if(t)i.setAttribute('aria-invalid','true');else i.removeAttribute('aria-invalid')}}
+function pick(k){f.querySelectorAll('label.pack').forEach(function(l){var r=l.querySelector('input');var on=r.value===k;r.checked=on;l.classList.toggle('on',on);var p=l.querySelector('.pick');if(p)p.textContent=on?'✓ Selected':'Tap to choose'});label();save()}
 f.querySelectorAll('label.pack input').forEach(function(r){r.addEventListener('change',function(){pick(r.value)})});
-f.querySelectorAll('button[data-tier]').forEach(function(b){b.addEventListener('click',function(e){e.preventDefault();var k=b.getAttribute('data-tier');pick(k);var d={currency:'usd',tier:k,brand:f.brand.value.trim(),email:f.email.value.trim(),agree:document.getElementById('terms').checked};if(!d.brand||!d.email||!d.agree){msg.textContent='Add your brand and work email, and tick the terms box, then press Prepay again.';(d.brand?(d.email?document.getElementById('terms'):f.email):f.brand).focus();return}go(d)})});
-f.addEventListener('submit',function(e){e.preventDefault()});
+try{var o=JSON.parse(localStorage.getItem(KEY)||'null');if(o&&o.v&&Date.now()-o.at<6048e5){if(o.v.brand&&!f.brand.value)f.brand.value=String(o.v.brand).slice(0,160);if(o.v.email&&!f.email.value)f.email.value=String(o.v.email).slice(0,320);if(o.v.tier&&!/[?&]pack=/.test(location.search)&&AMT[o.v.tier])pick(o.v.tier)}}catch(_){}
+label();
+['brand','email'].forEach(function(n){f[n].addEventListener('input',function(){save();if(f[n].getAttribute('aria-invalid'))err(n,'')})});
+document.getElementById('terms').addEventListener('change',function(){if(this.checked)err('terms','')});
+function send(body){msg.textContent=OPEN?'Opening secure checkout…':'Sending…';go.disabled=true;fetch('/v1/sponsor/deposit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){if(x.ok&&x.j.url){try{localStorage.removeItem(KEY)}catch(_){}location.href=x.j.url}else if(x.ok){try{localStorage.removeItem(KEY)}catch(_){}msg.textContent=x.j.message||'Request sent. We confirm by email within 1 business day. No charge today.';f.querySelectorAll('input,button').forEach(function(el){el.disabled=true})}else{go.disabled=false;msg.textContent=x.j.message||x.j.error||'Email sales@silverbirchgrowth.com and we will confirm within 1 business day.'}}).catch(function(){go.disabled=false;msg.textContent='Network error. Press the button again, or email sales@silverbirchgrowth.com.'})}
+f.addEventListener('submit',function(e){e.preventDefault();var d={currency:'usd',tier:cur(),brand:f.brand.value.trim(),email:f.email.value.trim(),agree:document.getElementById('terms').checked};var bad=null;
+if(d.brand.length<2){err('brand','Add your brand name.');bad=bad||f.brand}else err('brand','');
+if(!EM.test(d.email)){err('email',d.email?'That email looks off. Check for a typo.':'Add your work email.');bad=bad||f.email}else err('email','');
+if(!d.agree){err('terms','Tick the box to agree to the pack terms.');bad=bad||document.getElementById('terms')}else err('terms','');
+if(bad){bad.focus();return}msg.textContent='';send(d)});
 function op(){var h=location.hash.slice(1);var d=h&&document.getElementById(h);if(d&&d.tagName==='DETAILS')d.open=true}op();window.addEventListener('hashchange',op);document.querySelectorAll('[data-open]').forEach(function(a){a.addEventListener('click',function(){var d=document.getElementById(a.getAttribute('data-open'));if(d)d.open=true})});
 if(location.hash==='#prepay'){f.scrollIntoView({block:'start'})}
 })();
