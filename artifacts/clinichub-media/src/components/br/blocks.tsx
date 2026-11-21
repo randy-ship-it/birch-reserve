@@ -149,7 +149,7 @@ export function MetaComparison() {
             <tr>
               <td className="py-3 pr-4 font-medium">Cost per lead, health &amp; fitness</td>
               <td className="py-3 pr-4 text-muted-foreground">$52.98 USD³</td>
-              <td className="py-3">Reported per campaign with UTM links and promo codes. No claim until pilots report.</td>
+              <td className="py-3">Reported per campaign with UTM links and promo codes. No performance claims until campaigns report.</td>
             </tr>
             <tr>
               <td className="py-3 pr-4 font-medium">Bidding</td>
@@ -168,7 +168,7 @@ export function MetaComparison() {
             </a>
           </li>
         ))}
-        <li>Our CPMs are illustrative starting-at estimates, not sold rates, and any view figures are modelled estimates. Hub ads are expected to work better because of trust and timing; we will prove it with pilot reporting, not claim it.</li>
+        <li>Our CPMs are illustrative starting-at estimates, not sold rates, and any view figures are modelled estimates. Hub ads are expected to work better because of trust and timing; we will prove it with campaign reporting, not claim it.</li>
       </ol>
     </div>
   );

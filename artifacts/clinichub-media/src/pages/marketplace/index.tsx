@@ -22,7 +22,7 @@ export default function Marketplace() {
       <div className="border-b border-border bg-secondary/20">
         <div className="container mx-auto px-6 pt-24 pb-16 max-w-5xl">
           <div className="flex items-center gap-3 mb-8">
-             <span className="font-medium text-muted-foreground tracking-widest uppercase text-xs">Birch Reserve Pilot</span>
+             <span className="font-medium text-muted-foreground tracking-widest uppercase text-xs">Birch Reserve</span>
           </div>
           <h1 className="text-5xl md:text-7xl font-display tracking-tight text-foreground mb-6 italic">
             Partner Workspace.
