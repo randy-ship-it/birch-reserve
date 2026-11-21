@@ -7,7 +7,7 @@ import { Details } from "@/components/br/details";
 import { LOOK_HREF } from "@/components/br/pricing";
 import { GTM_SETUP, GTM_SETUP_HREF } from "../../../../api-server/src/lib/overhaul/gtmSetup";
 
-export function GtmSetup({ where }: { where: "home" | "media_kit" }) {
+export function GtmSetup({ where }: { where: "home" | "media_kit" | "intake" }) {
   return (
     <div className="rounded-3xl border border-[#0b1f3a]/10 bg-white p-5 shadow-sm md:p-8" data-testid={`gtm-setup-${where}`} id="gtm-setup">
       <p className="text-xs font-bold uppercase tracking-[0.18em] text-foreground/60">{GTM_SETUP.eyebrow}</p>
