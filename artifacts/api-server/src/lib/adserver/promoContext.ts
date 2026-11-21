@@ -96,7 +96,7 @@ export function promoContext() {
 
 export const currentPromoCtx = (): PromoCtx | undefined => als.getStore();
 
-/** Stripe metadata for the current request (empty when there is nothing to carry). */
+/** Stripe metadata for the current request (empty outside a request). Inside one, site and sold_by are always stamped. */
 export function promoMetadata(): Record<string, string> {
   const c = als.getStore();
   if (!c) return {};
@@ -104,20 +104,43 @@ export function promoMetadata(): Record<string, string> {
   if (c.st) out.st = c.st;
   if (c.st && c.qr) out.st_qr = c.qr;
   if (c.code) out.promo = c.code;
-  if (c.st || c.code) out.site = c.site;
   // Randy, Nov 21 2026 4:30 PM: a checkout started on the Scale mirror is Scale Health direct (5% channel), going forward only.
   // Stamped at session creation so sessions opened before this shipped keep Birch; the webhook reads it (service.ts).
-  if (c.site === "scale") {
-    out.site = "scale";
-    out.sold_by = "scale";
-  }
+  // Stripe audit (Nov 21 2026 5:30 PM): Birch sessions now say so explicitly too, so every session in the Stripe dashboard
+  // shows which site sold it (site=birch, sold_by=birch) instead of a blank that means Birch.
+  out.site = c.site;
+  out.sold_by = c.site === "scale" ? "scale" : "birch";
   return out;
 }
 
-/** Merge the request's referral metadata into Checkout Session params. */
+/** Keys mirrored onto the PaymentIntent (and so the Charge), so a payment found in the Stripe dashboard explains itself. The promo code itself never rides here. */
+export const PAYMENT_INTENT_METADATA_KEYS = ["reservationId", "order_id", "sku", "offerKey", "kind", "tier", "site", "sold_by", "st", "currency", "format_pref"] as const;
+
+type SessionLike = {
+  mode?: string | null;
+  currency?: string | null;
+  metadata?: Record<string, string> | null;
+  line_items?: Array<{ price_data?: { currency?: string | null } | null }> | null;
+  payment_intent_data?: { metadata?: Record<string, string> | null } | null;
+};
+
+/**
+ * Merge the request's referral metadata into Checkout Session params, stamp the session currency, and mirror the
+ * order keys onto payment_intent_data.metadata (payment mode only). Never overwrites a value the builder already set.
+ */
 export function withPromoMetadata<T>(params: T): T {
-  const carried = promoMetadata();
-  if (!Object.keys(carried).length || !params || typeof params !== "object") return params;
-  const p = params as { metadata?: Record<string, string> | null };
-  return { ...params, metadata: { ...(p.metadata ?? {}), ...carried } };
+  if (!params || typeof params !== "object") return params;
+  const p = params as SessionLike;
+  const md: Record<string, string> = { ...(p.metadata ?? {}), ...promoMetadata() };
+  const currency = String(p.currency ?? p.line_items?.find((li) => li?.price_data?.currency)?.price_data?.currency ?? "").trim().toLowerCase();
+  if (!md.currency && /^[a-z]{3}$/.test(currency)) md.currency = currency;
+  const piMd: Record<string, string> = { ...(p.payment_intent_data?.metadata ?? {}) };
+  for (const k of PAYMENT_INTENT_METADATA_KEYS) if (md[k] && !piMd[k]) piMd[k] = md[k];
+  const mirrorPi = (p.mode ?? "payment") === "payment" && Object.keys(piMd).length > Object.keys(p.payment_intent_data?.metadata ?? {}).length;
+  if (!Object.keys(md).length || (Object.keys(md).length === Object.keys(p.metadata ?? {}).length && !mirrorPi)) return params;
+  return {
+    ...params,
+    metadata: md,
+    ...(mirrorPi ? { payment_intent_data: { ...(p.payment_intent_data ?? {}), metadata: piMd } } : {}),
+  } as T;
 }
