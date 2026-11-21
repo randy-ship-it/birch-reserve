@@ -317,6 +317,81 @@ test("statements: promo delivery earns nothing, gate holds until live+transactio
   store.setAdPoolForTests(null);
 });
 
+test("channel override: Birch brokerage 20%, Scale direct 5%, internal 5% (internal wins); dated, never retroactive; label per line", async () => {
+  const { splitCharges, channelOf, overrideLabel } = await import("../src/lib/adserver/payoutSplit");
+  assert.equal(channelOf("birch", false), "brokerage");
+  assert.equal(channelOf(undefined, undefined), "brokerage");
+  assert.equal(channelOf("scale", false), "scale_direct");
+  assert.equal(channelOf("scale", true), "internal");
+  assert.equal(channelOf("birch", true), "internal");
+  const t0 = new Date(Date.UTC(2026, 10, 1));
+  const rates = [{ partner: null, overrideBps: 2000, hubBps: 3500, effectiveAt: t0 }];
+  const ch = [{ channel: "scale_direct" as const, overrideBps: 500, effectiveAt: t0 }, { channel: "internal" as const, overrideBps: 500, effectiveAt: t0 }];
+  const recips = [{ rkey: "b", name: "Broker", kind: "brokerage" as const, pctBps: 5000, scopePartner: null, scopeCampaign: null, active: true, payoutRef: null, effectiveAt: t0 }];
+  const at = t0.getTime() + 1000;
+  const line = (channel: "brokerage" | "scale_direct" | "internal", when = at) => ({ partner: "SOLE", campaignId: channel, at: new Date(when), currency: "usd", grossMicros: 1_000_000_000, channel });
+  const one = (c: "brokerage" | "scale_direct" | "internal", chRates = ch, when = at) => {
+    const r = splitCharges([line(c, when)], rates, recips, chRates);
+    const m = r.months[0]!;
+    return { override: m.override, hub: r.payees.find((p) => p.kind === "hub")!.payable, broker: r.payees.find((p) => p.kind === "brokerage")!.payable, retained: Math.round(m.gross - m.override - m.hub), label: overrideLabel(r.payees.find((p) => p.kind === "hub")!.overrides) };
+  };
+  // $1,000 brokerage: $200 override, $800 net, $280 hub, $520 retained.
+  assert.deepEqual(one("brokerage"), { override: 200_000_000, hub: 280_000_000, broker: 100_000_000, retained: 520_000_000, label: "20% Birch brokerage" });
+  // $1,000 Scale direct / internal: $50 fee, $950 net, $332.50 hub, $617.50 retained.
+  for (const c of ["scale_direct", "internal"] as const) {
+    const r = one(c);
+    assert.deepEqual([r.override, r.hub, r.broker, r.retained], [50_000_000, 332_500_000, 25_000_000, 617_500_000]);
+  }
+  assert.equal(one("scale_direct").label, "5% Scale direct");
+  assert.equal(one("internal").label, "5% Internal (cost accounting)");
+  // No channel rate in effect yet: falls back to the 5% default.
+  assert.equal(one("scale_direct", []).override, 50_000_000);
+  // Dated: Scale direct goes to 8% from day 2; day-1 delivery keeps 5%.
+  const later = [...ch, { channel: "scale_direct" as const, overrideBps: 800, effectiveAt: new Date(t0.getTime() + 864e5) }];
+  assert.equal(one("scale_direct", later).override, 50_000_000);
+  assert.equal(one("scale_direct", later, t0.getTime() + 2 * 864e5).override, 80_000_000);
+  // Changing the channel rate never touches brokerage.
+  assert.equal(one("brokerage", later, t0.getTime() + 2 * 864e5).override, 200_000_000);
+  // Mixed month on one hub: label shows both rates.
+  const mixed = splitCharges([line("brokerage"), line("scale_direct")], rates, [], ch);
+  const hub = mixed.payees.find((p) => p.kind === "hub")!;
+  assert.equal(hub.payable, 280_000_000 + 332_500_000);
+  assert.equal(overrideLabel(hub.overrides), "20% Birch brokerage · 5% Scale direct");
+  assert.deepEqual(Object.keys(mixed.months[0]!.byChannel).sort(), ["brokerage", "scale_direct"]);
+});
+
+test("channel override on Postgres: seeded 5%, channel stamped at charge time (seller edit not retroactive), override note on the royalty line", async () => {
+  const db = new PGlite();
+  store.setAdPoolForTests(db as unknown as store.Queryable, "ads_channel_test");
+  resetServeCacheForTests();
+  const now = Date.now();
+  await store.addRate({ partner: null, overrideBps: 2000, hubBps: 3500, tiers: null, effectiveAt: new Date(now - 864e5) }, "test");
+  const seeded = await store.channelRateHistory();
+  assert.deepEqual(seeded.map((r) => `${r.channel}:${r.overrideBps}`).sort(), ["internal:500", "scale_direct:500"]);
+  await store.setGate("SOLE", { live: true, hasTransactions: true, audienceActivated: true, override: false, note: null }, "test");
+  const mk = async (brand: string, seller: "birch" | "scale", internal: boolean) =>
+    (await store.createCampaign({ accountEmail: `${brand}@brand.com`, brand, orderRef: `cs_${brand}`, orderKind: "sponsor pack", budgetMicros: 100_000_000, currency: "usd", primaryPlacement: "post_purchase", seller, internal, actor: "test" })).campaign;
+  const scale = await mk("ScaleCo", "scale", false);
+  assert.equal((await store.getCampaign(scale.id))!.internal, false);
+  const id = await store.insertEvent({ kind: "view", campaignId: scale.id, slotKey: "sole.post_purchase", dedupeKey: `v:${scale.id}`, isTest: false, at: new Date(now) });
+  assert.ok(await store.chargeEvent(id!, scale, "sole.post_purchase", 100_000, new Date(now)));
+  let rows = await store.royalties(1);
+  assert.equal(rows[0]!.payableMicros, Math.floor(100_000 * 0.95 * 0.35));
+  assert.equal(rows[0]!.overrideNote, "5% Scale direct");
+  // Flip the campaign to Birch brokerage afterwards: the earlier charge keeps its channel.
+  await store.updateCampaign(scale.id, { seller: "birch", internal: false }, "test");
+  rows = await store.royalties(1);
+  assert.equal(rows[0]!.payableMicros, Math.floor(100_000 * 0.95 * 0.35));
+  assert.equal((await store.getCampaign(scale.id))!.seller, "birch");
+  // A future-dated internal change does not touch today's lines.
+  await store.addChannelRate({ channel: "scale_direct", overrideBps: 1000, effectiveAt: new Date(now + 864e5) }, "test");
+  rows = await store.royalties(1);
+  assert.equal(rows[0]!.overrideNote, "5% Scale direct");
+  const internal = await mk("InHouse", "birch", true);
+  assert.equal((await store.getCampaign(internal.id))!.internal, true);
+  store.setAdPoolForTests(null);
+});
+
 test("new-hub alert: never says open/unclaimed, one per hub per email, unsubscribe turns alerts off", async () => {
   const { hubAlertEmail } = await import("../src/lib/adserver/mail");
   const m = hubAlertEmail({ hubName: "SOLE", category: "Recovery hardware", hubUrl: "https://scalehealth.ca/sole", unsubscribeUrl: "https://birchreserve.net/account/alerts/off?t=x" });

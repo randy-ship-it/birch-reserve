@@ -375,7 +375,7 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
       store.totalsByCampaign("all"), store.listCreatives({}), store.bySlotFor("all", 30), store.ledger({ limit: 300 }), store.royalties(6), store.partnerShares(),
       store.alertSubscribers(), store.auditLog(80), store.totalsByCampaign("all", 1), buyStore().listOrders(50).catch(() => []),
     ]);
-    const [hubs, testSt, realSt, rates, recips, gateMap, timing] = await Promise.all([store.listContractHubs(), store.statements(6, { testOnly: true }), store.statements(6), store.rateHistory(), store.recipientHistory(), store.gates(), store.payoutSettings()]);
+    const [hubs, testSt, realSt, rates, recips, gateMap, timing, channelRates] = await Promise.all([store.listContractHubs(), store.statements(6, { testOnly: true }), store.statements(6), store.rateHistory(), store.recipientHistory(), store.gates(), store.payoutSettings(), store.channelRateHistory()]);
     const testRoyalties = testSt.lines;
     const byC = new Map<string, typeof creatives>();
     for (const cr of creatives) byC.set(cr.campaignId, [...(byC.get(cr.campaignId) ?? []), cr]);
@@ -387,7 +387,7 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
         who, campaigns: campaigns.map((c) => ({ c, t: totals.get(c.id) ?? { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 } })),
         pending: creatives.filter((x) => x.status === "pending" && ids.includes(x.campaignId)).map((x) => ({ ...x, brand: brand.get(x.campaignId) ?? "" })),
         creativesByCampaign: byC, slotTotals, ledger: led, royalties: roy, shares, alerts, audit, day: dayT, friday: fridayReady(), schema: store.adSchema(),
-        promoHtml: await promoPanels(), hubs, testRoyalties, summary: realSt.summary, testSummary: testSt.summary, rates, recipients: recips, gates: gateMap, timing,
+        promoHtml: await promoPanels(), hubs, testRoyalties, summary: realSt.summary, testSummary: testSt.summary, rates, recipients: recips, gates: gateMap, timing, channelRates,
         orders: orders.map((o) => ({ id: o.id, at: o.createdAt, email: o.email, company: o.company, plan: o.plan, format: o.format, creativeId: o.creativeId })),
       }),
     );
@@ -470,6 +470,8 @@ function patchFrom(b: Record<string, unknown>): { patch: CampaignPatch; error?: 
   if (b.hubs !== undefined || b.allowSubstitute !== undefined) p.hubs = (Array.isArray(b.hubs) ? b.hubs : []).map(String).filter((h) => findSlot(`${h}.landing`));
   if (b.allowSubstitute !== undefined) p.allowSubstitute = b.allowSubstitute === true;
   if (b.exclusive !== undefined) p.exclusive = b.exclusive === true;
+  if (b.seller === "birch" || b.seller === "scale") p.seller = b.seller;
+  if (b.internal !== undefined || b.internalSet !== undefined) p.internal = b.internal === true || b.internal === "on";
   const m = int(b.rateMultiplierBps, 1000, 10000);
   if (m !== undefined) p.rateMultiplierBps = m;
   const fs = day(b.flightStart);
@@ -512,7 +514,7 @@ router.post("/ads/admin/campaigns", json, (req, res) =>
     const { campaign } = await store.createCampaign({
       accountEmail: email, brand: str(b.brand, 160), category: patch.category ?? null, currency: b.currency === "cad" ? "cad" : "usd", budgetMicros: Math.round(budget * MICROS),
       pricing: patch.pricing, primaryPlacement: patch.primaryPlacement, hubs: patch.hubs, allowSubstitute: patch.allowSubstitute ?? true, rateMultiplierBps: patch.rateMultiplierBps,
-      clickUrl: patch.clickUrl ?? null, exclusive: patch.exclusive, isTest: b.isTest === true, notes: patch.notes ?? null, orderKind: "manual (admin)", seller: b.seller === "scale" ? "scale" : "birch", actor: who,
+      clickUrl: patch.clickUrl ?? null, exclusive: patch.exclusive, isTest: b.isTest === true, notes: patch.notes ?? null, orderKind: "manual (admin)", seller: b.seller === "scale" ? "scale" : "birch", internal: b.internal === true || b.internal === "on", actor: who,
     });
     const { status: _s, ...rest } = patch;
     await store.updateCampaign(campaign.id, rest, who);
@@ -813,6 +815,23 @@ router.post("/ads/admin/payout/rates", json, (req, res) =>
   }),
 );
 
+/* Per-channel Birch override (Randy voice Nov 21 2026 2:45 PM): Scale direct / internal rates, dated, never retroactive. Brokerage = default override. */
+router.post("/ads/admin/payout/channel-rates", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const channel = b.channel === "scale_direct" || b.channel === "internal" ? b.channel : null;
+    const ov = pctBps(b.overridePct);
+    const eff = effectiveFrom(b.effective);
+    if (!channel) return void res.status(400).json({ message: "Pick Scale direct or Internal. Brokerage uses the default Birch override." });
+    if (ov === undefined || ov === null) return void res.status(400).json({ message: "Override runs 0–100%." });
+    if (!eff) return void res.status(400).json({ message: "Pick today or a future date. Rate changes are never retroactive." });
+    await store.addChannelRate({ channel, overrideBps: ov, effectiveAt: eff, note: str(b.note, 300) || null }, who);
+    res.json({ message: `${channel === "internal" ? "Internal" : "Scale direct"} override ${ov / 100}% saved, effective ${eff.toISOString().slice(0, 16).replace("T", " ")} UTC. Earlier delivery keeps its old rate.` });
+  }),
+);
+
 router.post("/ads/admin/payout/recipients", json, (req, res) =>
   safe(res, async () => {
     const who = guard(req, res);
@@ -911,7 +930,7 @@ router.get("/ads/admin/export/:what", (req, res) =>
     } else if (what === "ledger") {
       rows = (await store.ledger({ limit: 50_000 })).map((l) => ({ at: l.at, campaign_id: l.campaignId, kind: l.kind, slot: l.slotKey, partner: l.partner, units: l.units, amount: (l.amountMicros / MICROS).toFixed(6), currency: l.currency, note: l.note, actor: l.actor, test: l.isTest }));
     } else if (what === "royalties") {
-      rows = (await store.royalties(13)).map((r) => ({ type: r.kind, payee: r.label, hub: r.hub, source: r.source, due: r.dueAt ? r.dueAt.toISOString().slice(0, 10) : "", held: r.heldReason ?? "", partner: r.partner, month: r.month, currency: r.currency, delivered: (r.grossMicros / MICROS).toFixed(2), share_pct: r.shareBps === null ? "" : (r.shareBps / 100).toFixed(2), payable: r.payableMicros === null ? "" : (r.payableMicros / MICROS).toFixed(2), status: r.status, approved_by: r.approvedBy, approved_at: r.approvedAt }));
+      rows = (await store.royalties(13)).map((r) => ({ type: r.kind, payee: r.label, hub: r.hub, source: r.source, due: r.dueAt ? r.dueAt.toISOString().slice(0, 10) : "", held: r.heldReason ?? "", partner: r.partner, month: r.month, currency: r.currency, delivered: (r.grossMicros / MICROS).toFixed(2), share_pct: r.shareBps === null ? "" : (r.shareBps / 100).toFixed(2), override: r.overrideNote ?? "", payable: r.payableMicros === null ? "" : (r.payableMicros / MICROS).toFixed(2), status: r.status, approved_by: r.approvedBy, approved_at: r.approvedAt }));
     } else if (what.startsWith("batch-batch_")) {
       rows = (await store.batchRows(what.slice(6))).map((r) => ({ batch_id: r.batch_id, payee: r.label ?? r.partner, payee_key: r.partner, type: r.kind ?? "hub", destination_stripe_account: "", amount_cents: Math.round(Number(r.payable_micros) / 10_000), currency: r.currency, description: `Birch Reserve ${r.kind ?? "hub"} payout ${r.month}`, "metadata[month]": r.month, "metadata[payee_key]": r.partner, payout_reference: r.payee_ref ?? "", status: r.status }));
     } else if (what === "payouts") {

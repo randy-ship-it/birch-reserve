@@ -2,7 +2,7 @@
 import { AD_SLOTS, PLACEMENTS, placementLabel } from "./config";
 import { flightProgress, pacingState, type Campaign } from "./engine";
 import type { Creative, LedgerLine, MonthSummary, PayoutSettings, RoyaltyRow, Totals } from "./store";
-import { gatePassed, ratesAt, recipientsAt, workedExample, type Gate, type RateRow, type RecipientRow } from "./payoutSplit";
+import { CHANNEL_DEFAULT_BPS, CHANNEL_LABEL, gatePassed, overrideFor, ratesAt, recipientsAt, workedExample, type ChannelRateRow, type Gate, type RateRow, type RecipientRow } from "./payoutSplit";
 import { esc, fmtDate, fmtDateTime, fmtInt, fmtMoney, fmtPct, isoDay, shell } from "./ui";
 
 export function adminLoginPage(error?: string): string {
@@ -24,6 +24,7 @@ export type AdminView = {
   slotTotals: Map<string, Totals>;
   ledger: LedgerLine[];
   royalties: RoyaltyRow[];
+  channelRates?: Array<ChannelRateRow & { actor: string | null; note: string | null }>;
   shares: Map<string, number | null>;
   orders: Array<{ id: string; at: Date; email: string; company: string; plan: string; format: string; creativeId: string | null }>;
   alerts: Array<{ email: string; categories: string[] }>;
@@ -44,6 +45,28 @@ export type AdminView = {
 
 const pct = (bps: number | null | undefined) => (bps == null ? "–" : `${(bps / 100).toFixed(bps % 100 ? 2 : 0)}%`);
 const usd0 = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+/** Per-channel Birch override (Randy voice Nov 21 2026 2:45 PM): brokerage = the default override above; Scale direct and internal have their own dated rates. */
+function channelRatesHtml(v: AdminView, g: { overrideBps: number; hubBps: number } | null): string {
+  const now = Date.now();
+  const rows = v.channelRates ?? [];
+  const cur = (ch: "scale_direct" | "internal") => overrideFor(ch, 0, rows, now);
+  const ex = (ov: number) => {
+    if (!g) return "";
+    const e = workedExample(ov, g.hubBps, []);
+    return `${usd0(e.gross)} → override ${usd0(e.override)} · net ${usd0(e.net)} · hub ${usd0(e.hub)} · retained ${usd0(e.retained)}`;
+  };
+  const pct = (b: number) => `${(b / 100).toFixed(b % 100 ? 2 : 0)}%`;
+  const hist = rows.slice(0, 12).map((r) => `<tr><td>${esc(CHANNEL_LABEL[r.channel])}</td><td class="n">${pct(r.overrideBps)}</td><td>${fmtDateTime(r.effectiveAt)}</td><td class="fine">${esc(r.actor ?? "")}${r.note ? ` · ${esc(r.note)}` : ""}</td></tr>`).join("");
+  return `<h3>Birch override by sales channel</h3><p class="fine">Picked per campaign when each charge is made: <b>internal</b> flag first, then who sold it. Dated; never retroactive.</p>
+<div class="tw"><table><thead><tr><th>Channel</th><th>When</th><th class="n">Birch override now</th><th>On $1,000 collected (hub ${g ? pct(g.hubBps) : "–"} of net)</th></tr></thead><tbody>
+<tr><td>${CHANNEL_LABEL.brokerage}</td><td class="fine">Sold through Birch Reserve (seller Birch)</td><td class="n">${g ? pct(g.overrideBps) : "–"} <span class="fine">(default above; per hub below)</span></td><td class="fine">${g ? ex(g.overrideBps) : ""}</td></tr>
+<tr><td>${CHANNEL_LABEL.scale_direct}</td><td class="fine">Sold organically off the Scale Health site (seller Scale)</td><td class="n">${pct(cur("scale_direct"))}</td><td class="fine">${ex(cur("scale_direct"))}</td></tr>
+<tr><td>${CHANNEL_LABEL.internal}</td><td class="fine">Birch runs it internally as cost accounting (campaign flag)</td><td class="n">${pct(cur("internal"))}</td><td class="fine">${ex(cur("internal"))}</td></tr>
+</tbody></table></div>
+<form class="f" data-post="/ads/admin/payout/channel-rates" data-reload><div class="row"><label>Channel<select name="channel"><option value="scale_direct">${CHANNEL_LABEL.scale_direct}</option><option value="internal">${CHANNEL_LABEL.internal}</option></select></label><label>Birch override % of gross<input name="overridePct" type="number" min="0" max="100" step="0.01" required placeholder="${CHANNEL_DEFAULT_BPS.scale_direct / 100}"></label><label>Effective from (blank = now)<input type="date" name="effective"></label><label>Note<input name="note" maxlength="300"></label></div><button class="ghost sm" type="submit">Save channel rate</button> <span class="fine">Brokerage uses the default Birch override above.</span></form>
+${hist ? `<details><summary class="fine">Channel rate history</summary><div class="tw"><table><thead><tr><th>Channel</th><th class="n">Override</th><th>Effective</th><th>By</th></tr></thead><tbody>${hist}</tbody></table></div></details>` : ""}`;
+}
 
 function payoutSettingsHtml(v: AdminView, partners: string[]): string {
   const now = Date.now();
@@ -75,6 +98,7 @@ ${ex.recipients.map((r) => `<tr><td class="fine">↳ ${esc(r.name)}</td><td clas
 <tr><td>Net after override</td><td class="n">${usd0(ex.net)}</td></tr><tr><td>Hub royalty (${pct(g!.hubBps)} of net = ${pct(Math.round((g!.hubBps * (10_000 - g!.overrideBps)) / 10_000))} of gross)</td><td class="n">${usd0(ex.hub)}</td></tr>
 <tr><td><b>Retained by Birch/SBG</b> (net after hub)</td><td class="n"><b>${usd0(ex.retained)}</b></td></tr></tbody></table></div></div>` : `<p class="warn">No default rate set.</p>`}
 <form class="f" data-post="/ads/admin/payout/rates" data-reload><div class="row"><label>Default Birch override % of gross<input name="overridePct" type="number" min="0" max="100" step="0.01" required value="${g ? g.overrideBps / 100 : ""}"></label><label>Default hub % of net<input name="hubPct" type="number" min="0" max="100" step="0.01" required value="${g ? g.hubBps / 100 : ""}"></label><label>Effective from (blank = now)<input type="date" name="effective"></label><label>Note<input name="note" maxlength="300"></label></div><button class="ghost sm" type="submit">Save default rates</button></form>
+${channelRatesHtml(v, g)}
 <form class="f" data-post="/ads/admin/payout/timing" data-reload style="margin-top:8px"><div class="row"><label>Payout cadence<select name="cadence"><option value="monthly"${t.cadence === "monthly" ? " selected" : ""}>Monthly</option><option value="quarterly"${t.cadence === "quarterly" ? " selected" : ""}>Quarterly</option></select></label><label>Net days after period end<input name="netDays" type="number" min="0" max="120" value="${t.netDays}"></label></div><button class="ghost sm" type="submit">Save payout timing</button> <span class="fine">Now: ${t.cadence}, Net ${t.netDays}.</span></form>
 <h3>Hubs: rates, tiers and payout gate</h3><p class="fine">No hub or override payout for a hub until it is live, has transactions and has activated its own customer audience. Until then lines accrue as <b>held: not activated</b> and release when the gate passes or you override with a note.</p>
 <div class="tw"><table><thead><tr><th>Hub</th><th class="n">Override</th><th class="n">Hub % of net</th><th>Tiers</th><th>Payout gate</th><th></th></tr></thead><tbody>${hubRows.join("")}</tbody></table></div>
@@ -94,8 +118,8 @@ const hubList = () => [...new Map(AD_SLOTS.map((s) => [s.hub, s] as const)).valu
 function campaignForm(c: Campaign | null): string {
   const v = c;
   return `<div class="row">
-${c ? "" : `<label>Customer email<input name="accountEmail" type="email" required></label><label>Brand<input name="brand" required maxlength="160"></label><label>Sold by<select name="seller"><option value="birch">Birch Reserve</option><option value="scale">Scale Health (direct)</option></select></label>`}
-${c ? `<label>Brand<input name="brand" value="${esc(v!.brand)}" maxlength="160"></label>` : ""}
+${c ? "" : `<label>Customer email<input name="accountEmail" type="email" required></label><label>Brand<input name="brand" required maxlength="160"></label><label>Sold by<select name="seller"><option value="birch">Birch Reserve</option><option value="scale">Scale Health (direct)</option></select></label><label><input type="checkbox" name="internal"> Internal / cost accounting (Birch fee at the internal rate)</label>`}
+${c ? `<label>Brand<input name="brand" value="${esc(v!.brand)}" maxlength="160"></label><label>Sold by${sel("seller", [["birch", "Birch Reserve"], ["scale", "Scale Health (direct)"]], v!.seller ?? "birch")}</label><label><input type="checkbox" name="internal"${v!.internal ? " checked" : ""}> Internal / cost accounting</label><input type="hidden" name="internalSet" value="1"><p class="fine">Changing who sold it applies to delivery from now on; past lines keep the channel they were charged under.</p>` : ""}
 <label>Category<input name="category" value="${esc(v?.category ?? "")}" maxlength="80"></label>
 ${c ? `<label>Status${sel("status", [["draft", "Draft"], ["active", "Active (serving)"], ["paused", "Paused"], ["completed", "Completed"]], v!.status)}</label>` : `<label>Budget (major units)<input name="budget" type="number" min="1" step="0.01" required></label><label>Currency${sel("currency", [["usd", "USD"], ["cad", "CAD"]], "usd")}</label>`}
 <label>Pricing${sel("pricing", [["cpm", "CPM (viewable impressions)"], ["cpc", "CPC (clicks)"]], v?.pricing ?? "cpm")}</label>
@@ -121,7 +145,7 @@ export function adminPage(v: AdminView, now = Date.now()): string {
     const sp = c.budgetMicros > 0 ? (c.spentMicros / c.budgetMicros) * 100 : 0;
     const fp = flightProgress(c, now) * 100;
     const crs = v.creativesByCampaign.get(c.id) ?? [];
-    return `<tr><td><b>${esc(c.brand)}</b>${c.isTest ? ` <span class="chip c-test">Test</span>` : ""}${c.exclusive ? ` <span class="chip c-ahead">Excl.</span>` : ""}<div class="fine">${esc(c.accountEmail)}<br>${c.seller === "scale" ? "Scale direct" : "Birch"} · ${esc(c.orderKind ?? "manual")} · ${esc(c.id.slice(0, 8))}</div></td>
+    return `<tr><td><b>${esc(c.brand)}</b>${c.isTest ? ` <span class="chip c-test">Test</span>` : ""}${c.exclusive ? ` <span class="chip c-ahead">Excl.</span>` : ""}<div class="fine">${esc(c.accountEmail)}<br>${c.internal ? "Internal" : c.seller === "scale" ? "Scale direct" : "Birch"} · ${esc(c.orderKind ?? "manual")} · ${esc(c.id.slice(0, 8))}</div></td>
 <td><span class="chip c-${esc(c.status)}">${esc(c.status)}</span><br><span class="chip c-${esc(st)}" style="margin-top:4px">${esc(st.replace("_", " "))}</span></td>
 <td>${esc(placementLabel(c.primaryPlacement))}<div class="fine">${c.pricing.toUpperCase()}${c.allowSubstitute ? " · auto-move on" : ""}${c.rateMultiplierBps !== 10000 ? ` · ${c.rateMultiplierBps / 100}% of card` : ""}<br>${c.hubs.length ? esc(c.hubs.join(", ")) : "all live hubs"}</div></td>
 <td class="n">${fmtMoney(c.budgetMicros, c.currency)}<div class="fine">spent ${fmtMoney(c.spentMicros, c.currency)}</div><div class="bar" style="min-width:120px"><i style="width:${sp.toFixed(1)}%"></i>${c.flightStart ? `<em style="left:${fp.toFixed(1)}%"></em>` : ""}</div></td>
@@ -143,7 +167,7 @@ ${c.isTest ? `<form data-post="/ads/admin/campaigns/${esc(c.id)}/purge" data-rel
     return `<tr><td>${esc(s.hubName)}</td><td>${esc(placementLabel(s.placement))}<div class="fine"><code>${esc(s.key)}</code></div></td><td><span class="chip ${s.live ? "c-active" : "c-pending"}">${s.live ? "live" : "not live"}</span></td><td class="n">$${s.cpmUsd.toFixed(2)}</td><td class="n">$${s.cpcUsd.toFixed(2)}</td><td class="n">${fmtInt(t?.serves ?? 0)}</td><td class="n">${fmtInt(t?.views ?? 0)}</td><td class="n">${fmtInt(t?.clicks ?? 0)}</td><td class="n">${fmtPct(t?.clicks ?? 0, t?.views ?? 0)}</td></tr>`;
   });
   const partners = [...new Set(AD_SLOTS.map((s) => s.partner))];
-  const royRow = (r: RoyaltyRow, test = false) => `<tr><td>${esc(r.label)}${test ? ` <span class="chip c-test">test</span>` : ""}<div class="fine">${esc(r.kind)}${r.kind !== "hub" ? ` · on ${esc(r.hub)}` : ""}${r.payoutRef ? ` · ${esc(r.payoutRef)}` : ""}</div></td><td>${esc(r.month)}<div class="fine">due ${r.dueAt ? fmtDate(r.dueAt) : "–"}</div></td><td class="n">${fmtMoney(r.grossMicros, r.currency)}<div class="fine">${r.kind === "hub" ? "delivered" : "pool basis"}</div></td><td class="n">${r.shareBps === null ? `<span class="chip c-pending">pending rate</span>` : `${(r.shareBps / 100).toFixed(2)}%${r.kind === "hub" ? " of net" : " of pool"}`}</td><td class="n">${r.payableMicros === null ? "–" : fmtMoney(r.payableMicros, r.currency)}</td>
+  const royRow = (r: RoyaltyRow, test = false) => `<tr><td>${esc(r.label)}${test ? ` <span class="chip c-test">test</span>` : ""}<div class="fine">${esc(r.kind)}${r.kind !== "hub" ? ` · on ${esc(r.hub)}` : ""}${r.payoutRef ? ` · ${esc(r.payoutRef)}` : ""}</div></td><td>${esc(r.month)}<div class="fine">due ${r.dueAt ? fmtDate(r.dueAt) : "–"}</div></td><td class="n">${fmtMoney(r.grossMicros, r.currency)}<div class="fine">${r.kind === "hub" ? "delivered" : "pool basis"}</div></td><td class="n">${r.shareBps === null ? `<span class="chip c-pending">pending rate</span>` : `${(r.shareBps / 100).toFixed(2)}%${r.kind === "hub" ? " of net" : " of pool"}`}${r.overrideNote ? `<div class="fine">override ${esc(r.overrideNote)}</div>` : ""}</td><td class="n">${r.payableMicros === null ? "–" : fmtMoney(r.payableMicros, r.currency)}</td>
 <td><span class="chip c-${r.status === "held" ? "pending" : r.status}">${r.status === "held" ? "held: not activated" : r.status === "approved" && r.batchId ? "batched" : r.status}</span>${r.batchId ? `<div class="fine">${esc(r.batchId)}</div>` : ""}${r.approvedBy ? `<div class="fine">${esc(r.approvedBy)} · ${fmtDateTime(r.approvedAt)}</div>` : ""}${r.paidRef ? `<div class="fine">paid · ${esc(r.paidRef)} · ${fmtDateTime(r.paidAt ?? null)}</div>` : ""}</td>
 <td>${test ? `<div class="fine">Test hub: never in the real Pay batch or exports</div>` : ""}${r.status === "calculated" && r.shareBps !== null ? `<form data-post="/ads/admin/payouts/approve" data-reload><input type="hidden" name="partner" value="${esc(r.partner)}"><input type="hidden" name="month" value="${esc(r.month)}"><input type="hidden" name="currency" value="${esc(r.currency)}"><button class="sm" type="submit">Approve</button></form>` : r.status === "approved" ? `<form data-post="/ads/admin/payouts/paid" data-reload style="display:flex;gap:6px"><input type="hidden" name="partner" value="${esc(r.partner)}"><input type="hidden" name="month" value="${esc(r.month)}"><input type="hidden" name="currency" value="${esc(r.currency)}"><input name="ref" required maxlength="120" placeholder="e-transfer / Stripe ref"><button class="ghost sm" type="submit">Mark paid</button></form>` : ""}</td></tr>`;
   const roy = v.royalties.map((r) => royRow(r));

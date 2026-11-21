@@ -5,7 +5,7 @@
  */
 import { AD_DEFAULTS, AD_SLOTS, findSlot, setContractHubs, type ContractHub, type Placement } from "./config";
 import type { Campaign, CampaignStatus, Pricing } from "./engine";
-import { dueDate, gatePassed, ratesAt, splitCharges, type ChargeLine, type Gate, type RateRow, type RecipientRow, type Tier } from "./payoutSplit";
+import { channelOf, dueDate, gatePassed, overrideLabel, ratesAt, splitCharges, type Channel, type ChannelRateRow, type ChargeLine, type Gate, type MonthAgg, type RateRow, type RecipientRow, type Tier } from "./payoutSplit";
 
 export type Queryable = { query: (sql: string, params?: unknown[]) => Promise<{ rows: Array<Record<string, unknown>> }> };
 
@@ -90,6 +90,12 @@ const DDL = (s: string) => [
     key text PRIMARY KEY, name text NOT NULL, category text NOT NULL DEFAULT '', url text NOT NULL, partner text NOT NULL, contract_ref text NOT NULL,
     status text NOT NULL DEFAULT 'live', is_test boolean NOT NULL DEFAULT false, created_by text, created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now())`,
   `ALTER TABLE ${s}.ad_campaigns ADD COLUMN IF NOT EXISTS seller text NOT NULL DEFAULT 'birch'`,
+  `ALTER TABLE ${s}.ad_campaigns ADD COLUMN IF NOT EXISTS internal boolean NOT NULL DEFAULT false`,
+  // Channel is stamped on each charge when it is charged, so editing a campaign's seller / internal flag later never rewrites past lines. NULL (older lines) = brokerage.
+  `ALTER TABLE ${s}.ad_ledger ADD COLUMN IF NOT EXISTS channel text`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_channel_rates (
+    id bigserial PRIMARY KEY, channel text NOT NULL, override_bps integer NOT NULL, effective_at timestamptz NOT NULL DEFAULT now(), actor text, note text, created_at timestamptz NOT NULL DEFAULT now())`,
+  `INSERT INTO ${s}.ad_channel_rates (channel, override_bps, effective_at, actor, note) SELECT ch, 500, date_trunc('hour', now()), 'seed', 'Randy voice Nov 21 2026 2:45 PM: Birch fee 5% when sold organically off Scale Health or run internally (cost accounting)' FROM (VALUES ('scale_direct'), ('internal')) v(ch) WHERE NOT EXISTS (SELECT 1 FROM ${s}.ad_channel_rates)`,
   `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS review_note text`,
   `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS source_ref text`,
   `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS paid_ref text`,
@@ -137,7 +143,7 @@ const arr = (v: unknown): string[] => (Array.isArray(v) ? v.map(String) : typeof
 function toCampaign(r: Record<string, unknown>): Campaign {
   return {
     id: String(r.id), accountEmail: String(r.account_email), brand: String(r.brand), category: (r.category as string) ?? null,
-    orderRef: (r.order_ref as string) ?? null, orderKind: (r.order_kind as string) ?? null, seller: r.seller === "scale" ? "scale" : "birch", currency: r.currency === "cad" ? "cad" : "usd",
+    orderRef: (r.order_ref as string) ?? null, orderKind: (r.order_kind as string) ?? null, seller: r.seller === "scale" ? "scale" : "birch", internal: Boolean(r.internal), currency: r.currency === "cad" ? "cad" : "usd",
     budgetMicros: num(r.budget_micros), spentMicros: num(r.spent_micros), pricing: r.pricing === "cpc" ? "cpc" : "cpm",
     primaryPlacement: String(r.primary_placement) as Placement, hubs: arr(r.hubs), allowSubstitute: Boolean(r.allow_substitute),
     rateMultiplierBps: num(r.rate_multiplier_bps), flightStart: date(r.flight_start), flightEnd: date(r.flight_end),
@@ -159,7 +165,7 @@ export async function audit(actor: string | null, action: string, target: string
 export type NewCampaign = {
   accountEmail: string; brand: string; category?: string | null; orderRef?: string | null; orderKind?: string | null;
   currency?: "usd" | "cad"; budgetMicros: number; pricing?: Pricing; primaryPlacement?: Placement; hubs?: string[];
-  allowSubstitute?: boolean; rateMultiplierBps?: number; clickUrl?: string | null; exclusive?: boolean; isTest?: boolean; notes?: string | null; actor?: string | null; seller?: "birch" | "scale";
+  allowSubstitute?: boolean; rateMultiplierBps?: number; clickUrl?: string | null; exclusive?: boolean; isTest?: boolean; notes?: string | null; actor?: string | null; seller?: "birch" | "scale"; internal?: boolean;
 };
 
 /** Idempotent per order_ref: a repeat (webhook retry) returns the existing campaign and adds no second credit. */
@@ -171,11 +177,11 @@ export async function createCampaign(n: NewCampaign): Promise<{ campaign: Campai
   }
   const { rows } = await p.query(
     `INSERT INTO ${S()}.ad_campaigns (account_email, brand, category, order_ref, order_kind, currency, budget_micros, pricing, primary_placement, hubs,
-      allow_substitute, rate_multiplier_bps, click_url, exclusive, is_test, notes, seller)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) ON CONFLICT DO NOTHING RETURNING *`,
+      allow_substitute, rate_multiplier_bps, click_url, exclusive, is_test, notes, seller, internal)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) ON CONFLICT DO NOTHING RETURNING *`,
     [n.accountEmail.trim().toLowerCase(), n.brand.slice(0, 160), n.category ?? null, n.orderRef ?? null, n.orderKind ?? null, n.currency ?? "usd",
       Math.max(0, Math.round(n.budgetMicros)), n.pricing ?? "cpm", n.primaryPlacement ?? "post_purchase", n.hubs ?? [], n.allowSubstitute ?? true,
-      n.rateMultiplierBps ?? 10_000, n.clickUrl ?? null, n.exclusive ?? false, n.isTest ?? false, n.notes ?? null, n.seller === "scale" ? "scale" : "birch"],
+      n.rateMultiplierBps ?? 10_000, n.clickUrl ?? null, n.exclusive ?? false, n.isTest ?? false, n.notes ?? null, n.seller === "scale" ? "scale" : "birch", n.internal === true],
   );
   if (!rows[0]) {
     const again = await p.query(`SELECT * FROM ${S()}.ad_campaigns WHERE order_ref = $1`, [n.orderRef]);
@@ -210,12 +216,12 @@ export async function listCampaigns(opts: { email?: string; includeTest?: boolea
   return rows.map(toCampaign);
 }
 
-export type CampaignPatch = Partial<Pick<Campaign, "status" | "brand" | "category" | "pricing" | "primaryPlacement" | "hubs" | "allowSubstitute" | "rateMultiplierBps" | "flightStart" | "flightEnd" | "clickUrl" | "freqCapPerDay" | "clickWindowDays" | "viewWindowDays" | "exclusive" | "notes">>;
+export type CampaignPatch = Partial<Pick<Campaign, "status" | "brand" | "category" | "pricing" | "primaryPlacement" | "hubs" | "allowSubstitute" | "rateMultiplierBps" | "flightStart" | "flightEnd" | "clickUrl" | "freqCapPerDay" | "clickWindowDays" | "viewWindowDays" | "exclusive" | "notes" | "seller" | "internal">>;
 const COLS: Record<keyof CampaignPatch, string> = {
   status: "status", brand: "brand", category: "category", pricing: "pricing", primaryPlacement: "primary_placement", hubs: "hubs",
   allowSubstitute: "allow_substitute", rateMultiplierBps: "rate_multiplier_bps", flightStart: "flight_start", flightEnd: "flight_end",
   clickUrl: "click_url", freqCapPerDay: "freq_cap_per_day", clickWindowDays: "click_window_days", viewWindowDays: "view_window_days",
-  exclusive: "exclusive", notes: "notes",
+  exclusive: "exclusive", notes: "notes", seller: "seller", internal: "internal",
 };
 export async function updateCampaign(id: string, patch: CampaignPatch, actor: string): Promise<Campaign | null> {
   const p = await db();
@@ -362,11 +368,11 @@ export async function chargeEvent(eventId: number, c: Campaign, slotKey: string,
   hour.setUTCMinutes(0, 0, 0);
   const slot = findSlot(slotKey);
   await p.query(
-    `INSERT INTO ${S()}.ad_ledger AS l (campaign_id, at, kind, bucket, slot_key, partner, units, amount_micros, currency, note, actor, is_test)
-     VALUES ($1,$2,'charge',$3,$4,$5,1,$6,$7,$8,'engine',$9)
+    `INSERT INTO ${S()}.ad_ledger AS l (campaign_id, at, kind, bucket, slot_key, partner, units, amount_micros, currency, note, actor, is_test, channel)
+     VALUES ($1,$2,'charge',$3,$4,$5,1,$6,$7,$8,'engine',$9,$10)
      ON CONFLICT (bucket) DO UPDATE SET units = l.units + 1, amount_micros = l.amount_micros + EXCLUDED.amount_micros`,
     [c.id, hour.toISOString(), `charge:${c.id}:${hour.toISOString()}:${slotKey}:${c.pricing}`, slotKey, slot?.partner ?? null, -costMicros, c.currency,
-      `${c.pricing === "cpm" ? "Viewable impressions" : "Clicks"} on ${slot?.label ?? slotKey} (hourly)`, c.isTest],
+      `${c.pricing === "cpm" ? "Viewable impressions" : "Clicks"} on ${slot?.label ?? slotKey} (hourly)`, c.isTest, channelOf(c.seller, c.internal)],
   );
   // Fully spent: close the campaign so it stops being a candidate.
   if (num(rows[0].spent_micros) >= num(rows[0].budget_micros)) {
@@ -478,10 +484,10 @@ export type RoyaltyRow = {
   kind: "hub" | "brokerage" | "commission"; label: string; hub: string; source: "ad" | "transaction";
   month: string; currency: string; grossMicros: number; units: number; shareBps: number | null; payableMicros: number | null;
   status: "calculated" | "held" | "approved" | "paid"; heldReason: string | null; dueAt: Date | null;
-  approvedBy: string | null; approvedAt: Date | null; isTest?: boolean; batchId?: string | null; paidRef?: string | null; paidAt?: Date | null; paidBy?: string | null; payoutRef?: string | null;
+  approvedBy: string | null; approvedAt: Date | null; overrideNote?: string | null; isTest?: boolean; batchId?: string | null; paidRef?: string | null; paidAt?: Date | null; paidBy?: string | null; payoutRef?: string | null;
 };
 /** retained = net remainder after the hub share; Birch also keeps override − recipients. */
-export type MonthSummary = { month: string; currency: string; grossMicros: number; overrideMicros: number; recipientsMicros: number; hubMicros: number; retainedMicros: number; pendingMicros: number };
+export type MonthSummary = { month: string; currency: string; grossMicros: number; overrideMicros: number; recipientsMicros: number; hubMicros: number; retainedMicros: number; pendingMicros: number; byChannel?: MonthAgg["byChannel"] };
 export type PayoutSettings = { cadence: "monthly" | "quarterly"; netDays: number };
 
 const toRate = (r: Record<string, unknown>): RateRow => ({
@@ -501,6 +507,18 @@ export async function recipientHistory(): Promise<Array<RecipientRow & { actor: 
   const p = await db();
   const { rows } = await p.query(`SELECT * FROM ${S()}.ad_override_recipients ORDER BY effective_at DESC, id DESC`);
   return rows.map((r) => ({ ...toRecipient(r), actor: (r.actor as string) ?? null, id: num(r.id) }));
+}
+export async function channelRateHistory(): Promise<Array<ChannelRateRow & { actor: string | null; note: string | null; id: number }>> {
+  const p = await db();
+  const { rows } = await p.query(`SELECT * FROM ${S()}.ad_channel_rates ORDER BY effective_at DESC, id DESC`);
+  return rows
+    .filter((r) => r.channel === "scale_direct" || r.channel === "internal")
+    .map((r) => ({ channel: r.channel as ChannelRateRow["channel"], overrideBps: num(r.override_bps), effectiveAt: new Date(String(r.effective_at)), actor: (r.actor as string) ?? null, note: (r.note as string) ?? null, id: num(r.id) }));
+}
+export async function addChannelRate(r: ChannelRateRow & { note?: string | null }, actor: string): Promise<void> {
+  const p = await db();
+  await p.query(`INSERT INTO ${S()}.ad_channel_rates (channel, override_bps, effective_at, actor, note) VALUES ($1,$2,$3,$4,$5)`, [r.channel, r.overrideBps, r.effectiveAt.toISOString(), actor, r.note ?? null]);
+  await audit(actor, "rate.channel", r.channel, `override=${r.overrideBps} effective=${r.effectiveAt.toISOString()}`);
 }
 export async function addRate(r: { partner: string | null; overrideBps: number | null; hubBps: number | null; tiers: Tier[] | null; effectiveAt: Date; note?: string | null }, actor: string): Promise<void> {
   const p = await db();
@@ -561,7 +579,7 @@ export async function statements(months = 6, opts: { testOnly?: boolean } = {}):
   since.setUTCMonth(since.getUTCMonth() - (months - 1));
   const [{ rows }, rates, recips, approved, g, ps] = await Promise.all([
     p.query(
-      `SELECT l.partner, l.campaign_id::text AS cid, l.at, l.currency, (-l.amount_micros)::bigint AS gross
+      `SELECT l.partner, l.campaign_id::text AS cid, l.at, l.currency, (-l.amount_micros)::bigint AS gross, coalesce(l.channel, 'brokerage') AS channel
          FROM ${S()}.ad_ledger l JOIN ${S()}.ad_campaigns c ON c.id = l.campaign_id
         WHERE l.kind = 'charge' AND l.is_test = ${opts.testOnly ? "true" : "false"} AND l.partner IS NOT NULL AND l.at >= $1 AND coalesce(c.order_kind, '') NOT LIKE 'promo %'`,
       [since.toISOString()],
@@ -572,8 +590,9 @@ export async function statements(months = 6, opts: { testOnly?: boolean } = {}):
     gates(),
     payoutSettings(),
   ]);
-  const lines: ChargeLine[] = rows.map((r) => ({ partner: String(r.partner), campaignId: String(r.cid), at: new Date(String(r.at)), currency: String(r.currency), grossMicros: num(r.gross), source: "ad" }));
-  const split = splitCharges(lines, rates.rows.map(toRate), recips.rows.map(toRecipient));
+  const chRates = await channelRateHistory();
+  const lines: ChargeLine[] = rows.map((r) => ({ partner: String(r.partner), campaignId: String(r.cid), at: new Date(String(r.at)), currency: String(r.currency), grossMicros: num(r.gross), source: "ad", channel: (["brokerage", "scale_direct", "internal"].includes(String(r.channel)) ? r.channel : "brokerage") as Channel }));
+  const split = splitCharges(lines, rates.rows.map(toRate), recips.rows.map(toRecipient), chRates);
   const appr = new Map(approved.rows.map((r) => [`${r.partner}|${r.month}|${r.currency}`, r]));
   const out: RoyaltyRow[] = split.payees.map((a) => {
     // Frozen payouts overlay test and real rows alike (test hubs have their own payee keys), so QA shows the real approved/batched/paid status.
@@ -587,13 +606,13 @@ export async function statements(months = 6, opts: { testOnly?: boolean } = {}):
       payableMicros: fz ? num(fz.payable_micros) : a.pending ? null : a.payable,
       status: fz ? (fz.status === "paid" ? "paid" : "approved") : held ? "held" : "calculated", heldReason: held ? "held: not activated" : null,
       dueAt: dueDate(a.month, ps.cadence, ps.netDays), approvedBy: fz ? String(fz.approved_by) : null, approvedAt: fz ? new Date(String(fz.approved_at)) : null,
-      isTest: Boolean(opts.testOnly), batchId: fz ? ((fz.batch_id as string) ?? null) : null, paidRef: fz ? ((fz.paid_ref as string) ?? null) : null, paidAt: fz?.paid_at ? new Date(String(fz.paid_at)) : null, paidBy: fz ? ((fz.paid_by as string) ?? null) : null, payoutRef: a.payoutRef,
+      overrideNote: overrideLabel(a.overrides) || null, isTest: Boolean(opts.testOnly), batchId: fz ? ((fz.batch_id as string) ?? null) : null, paidRef: fz ? ((fz.paid_ref as string) ?? null) : null, paidAt: fz?.paid_at ? new Date(String(fz.paid_at)) : null, paidBy: fz ? ((fz.paid_by as string) ?? null) : null, payoutRef: a.payoutRef,
     };
   });
   out.sort((x, y) => (x.month === y.month ? (x.kind === y.kind ? x.label.localeCompare(y.label) : x.kind === "hub" ? -1 : 1) : x.month < y.month ? 1 : -1));
   const summary = split.months.map((m) => {
     const hub = Math.floor(m.hub), rec = Math.floor(m.recipients);
-    return { month: m.month, currency: m.currency, grossMicros: Math.round(m.gross), overrideMicros: Math.floor(m.override), recipientsMicros: rec, hubMicros: hub, retainedMicros: Math.round(m.gross - m.pendingGross) - Math.floor(m.override) - hub, pendingMicros: Math.round(m.pendingGross) };
+    return { month: m.month, currency: m.currency, grossMicros: Math.round(m.gross), overrideMicros: Math.floor(m.override), recipientsMicros: rec, hubMicros: hub, retainedMicros: Math.round(m.gross - m.pendingGross) - Math.floor(m.override) - hub, pendingMicros: Math.round(m.pendingGross), byChannel: m.byChannel };
   });
   return { lines: out, summary };
 }
