@@ -33,6 +33,7 @@ import { Details } from "@/components/br/details";
 import { cleanPhysical, inLocationReach, type PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
 import { FieldError, SavedNote, StepHeader } from "@/components/br/form-steps";
 import { clearSaved, fieldError, loadSaved, saveForm } from "@/lib/form-save";
+import { AdActivation } from "@/components/br/ad-activation";
 import { ExposureLadder, SupplierDone, SupplierFees, brandFromUrl, hubSlugOf, levelOf, rolesForLevel, type IntakePreset } from "@/components/br/supplier-mode";
 
 /** "Do you have physical locations?" (Randy, Nov 19 2026 10:54 AM ET): yes/no; if yes, how many + monthly visitors. */
@@ -270,6 +271,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
     return (
       <>
       {sup ? <SupplierDone brand={quick.brand ?? ""} level={levelOf(r)} /> : null}
+      <div className="mb-4" data-testid="intake-activation-step"><AdActivation role={sup ? "supplier" : "brand"} email={quick.contact?.email ?? ""} company={quick.brand ?? ""} hubSlug={sup && levelOf(r) >= 2 ? hubSlugOf(quick.brand ?? "") : ""} fridayId={quick.ref?.id ?? ""} /></div>
       <FastReport
         q={quick}
         onAddDetail={() => {

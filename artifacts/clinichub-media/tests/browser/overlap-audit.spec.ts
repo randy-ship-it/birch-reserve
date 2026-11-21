@@ -9,7 +9,7 @@ import { auditPage } from "./helpers-overlap";
 const WIDTHS = [320, 375, 390, 430, 1280, 1440];
 const PATHS = (process.env.AUDIT_PATHS ?? [
   "/", "/advertise/brands", "/advertise/local", "/publish/brands", "/publish/studios", "/rates", "/match", "/hubs", "/media-kit",
-  "/agencies", "/brand-kit", "/intake", "/intake/publisher", "/intake/supplier", "/intake/sponsor", "/intake/gtm", "/gtm-bot", "/intake/street-team",
+  "/agencies", "/brand-kit", "/intake", "/intake/publisher", "/intake/supplier", "/intake/activate", "/intake/sponsor", "/intake/gtm", "/gtm-bot", "/intake/street-team",
   "/street-team", "/partners", "/media-buyers", "/audiences", "/audiences/sample-profile", "/buyers", "/ai-buyers", "/about", "/terms", "/privacy",
   "/insights", "/inventory",
   // Server-rendered (api-server) pages: only exist on a live/preview host.

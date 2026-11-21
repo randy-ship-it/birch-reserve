@@ -59,7 +59,7 @@ function shell(title: string, pre: string, inner: string, foot: string): string 
 }
 const button = (href: string, label: string) => emailButton(href, label);
 
-export type KitEmailInput = { brand?: string | null; reportUrl: string; headline?: { exposureMonth?: string; earningsMonth?: string } | null; hasPdf: boolean };
+export type KitEmailInput = { brand?: string | null; reportUrl: string; headline?: { exposureMonth?: string; earningsMonth?: string } | null; hasPdf: boolean; /** Prefilled /intake/activate link: the "ads turned on" step. */ activateUrl?: string };
 export function renderKitEmail(i: KitEmailInput): { subject: string; html: string; text: string } {
   const who = i.brand?.trim() ? esc(i.brand.trim()) : "your brand";
   const stats = [i.headline?.exposureMonth ? [i.headline.exposureMonth, "page-view exposures a month, likely"] : null, i.headline?.earningsMonth ? [i.headline.earningsMonth, "hub earnings a month, likely"] : null].filter(Boolean) as string[][];
@@ -69,9 +69,9 @@ export function renderKitEmail(i: KitEmailInput): { subject: string; html: strin
   const inner = `<h1 style="font-family:${EMAIL_TOKENS.serif};font-weight:400;font-size:28px;line-height:1.18;margin:0 0 10px;color:${EMAIL_TOKENS.ink}">Your Monetization Kit is ready.</h1>
 <p style="font-size:15px;line-height:1.55;margin:0;color:${MUTE}">Here is what ${who} could reach and earn across health and wellness hubs. Estimates, reviewed by a person.</p>
 ${statHtml}<div>${button(i.reportUrl, "Open my Monetization Kit")}</div>
-${i.hasPdf ? `<p style="font-size:13px;color:${MUTE};margin:0">Your kit is attached as a PDF.</p>` : ""}`;
+${i.hasPdf ? `<p style="font-size:13px;color:${MUTE};margin:0 0 14px">Your kit is attached as a PDF.</p>` : ""}${i.activateUrl ? `<p style="font-size:14px;line-height:1.5;margin:14px 0 8px;color:${MUTE}"><b style="color:${FOREST}">Next step: getting your ads turned on.</b> Two quick questions about your inventory and which ads can run on your hubs. Ranges are fine.</p><div>${button(i.activateUrl, "Answer the two questions")}</div>` : ""}`;
   const foot = `Estimates in USD, not guarantees. A person at Birch Reserve reviews every request; nothing is booked or charged automatically.<br>Birch Reserve · birchreserve.net · Reply to this email to reach the team.`;
-  const text = `Your Monetization Kit is ready.\n\nHere is what ${i.brand?.trim() || "your brand"} could reach and earn across health and wellness hubs. Estimates, reviewed by a person.\n${stats.map(([v, l]) => `- ${v} ${l}`).join("\n")}\n\nOpen your Monetization Kit: ${i.reportUrl}\n${i.hasPdf ? "Your kit is attached as a PDF.\n" : ""}\nEstimates in USD, not guarantees. Birch Reserve · birchreserve.net`;
+  const text = `Your Monetization Kit is ready.\n\nHere is what ${i.brand?.trim() || "your brand"} could reach and earn across health and wellness hubs. Estimates, reviewed by a person.\n${stats.map(([v, l]) => `- ${v} ${l}`).join("\n")}\n\nOpen your Monetization Kit: ${i.reportUrl}\n${i.hasPdf ? "Your kit is attached as a PDF.\n" : ""}${i.activateUrl ? `\nNext step, getting your ads turned on (two quick questions): ${i.activateUrl}\n` : ""}\nEstimates in USD, not guarantees. Birch Reserve · birchreserve.net`;
   return { subject: "Your free Monetization Kit from Birch Reserve", html: shell("Your Monetization Kit", "Your exposure and earnings estimate, plus the PDF.", inner, foot), text };
 }
 

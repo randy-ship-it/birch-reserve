@@ -7,6 +7,7 @@ import { flightProgress, pacingState, type Campaign } from "./engine";
 import type { Creative, LedgerLine, MonthSummary, PayoutSettings, RoyaltyRow, Totals } from "./store";
 import { CHANNEL_DEFAULT_BPS, CHANNEL_LABEL, gatePassed, overrideFor, ratesAt, recipientsAt, workedExample, type ChannelRateRow, type Gate, type RateRow, type RecipientRow } from "./payoutSplit";
 import { esc, fmtDate, fmtDateTime, fmtInt, fmtMoney, fmtPct, isoDay, shell } from "./ui";
+import { activationUrl } from "../overhaul/adActivation";
 
 export function adminLoginPage(error?: string): string {
   return shell({
@@ -214,7 +215,7 @@ ${x.kind === "video" && !poster ? `<form class="f" data-post="/ads/admin/creativ
   const sums = [...(v.summary ?? []).map((m) => sumRow(m)), ...(v.testSummary ?? []).map((m) => sumRow(m, true))];
   const testRoy = (v.testRoyalties ?? []).map((r) => royRow(r, true));
   const hubRows = (v.hubs ?? []).map((h) => `<tr><td><b>${esc(h.name)}</b>${h.isTest ? ` <span class="chip c-test">test</span>` : ""}<div class="fine"><code>${esc(h.key)}</code> · ${esc(h.category)}</div></td><td class="fine"><a href="${esc(h.url)}" target="_blank" rel="noopener">${esc(h.url)}</a></td><td>${esc(h.partner)}<div class="fine">rate: ${v.shares.get(h.partner) != null ? `${(v.shares.get(h.partner)! / 100).toFixed(2)}%` : "pending rate"}</div></td><td class="fine">${esc(h.contractRef)}<br>${esc(h.createdBy ?? "")} · ${fmtDate(h.createdAt)}</td><td><span class="chip ${h.status === "live" ? "c-active" : "c-paused"}">${esc(h.status)}</span></td>
-<td><form data-post="/ads/admin/hubs/${esc(h.key)}/status?to=${h.status === "live" ? "paused" : "live"}" data-reload style="display:inline"><button class="ghost sm" type="submit">${h.status === "live" ? "Pause" : "Set live"}</button></form>${h.isTest ? ` <form data-post="/ads/admin/hubs/${esc(h.key)}/purge" data-reload style="display:inline"><button class="danger sm" type="submit">Delete test hub</button></form>` : ""}</td></tr>`);
+<td><a class="ghost sm" style="text-decoration:none" data-testid="hub-activation-link" href="${esc(activationUrl({ company: h.name, hub: h.key, role: "provider" }, ""))}" target="_blank" rel="noopener">Ads-on questions</a> <form data-post="/ads/admin/hubs/${esc(h.key)}/status?to=${h.status === "live" ? "paused" : "live"}" data-reload style="display:inline"><button class="ghost sm" type="submit">${h.status === "live" ? "Pause" : "Set live"}</button></form>${h.isTest ? ` <form data-post="/ads/admin/hubs/${esc(h.key)}/purge" data-reload style="display:inline"><button class="danger sm" type="submit">Delete test hub</button></form>` : ""}</td></tr>`);
   const led = v.ledger.slice(0, 300).map((l) => `<tr><td class="fine">${fmtDateTime(l.at)}</td><td>${esc(l.kind)}${l.isTest ? ` <span class="chip c-test">test</span>` : ""}</td><td class="fine">${esc(l.campaignId.slice(0, 8))}</td><td class="fine">${esc(l.slotKey ?? "")}</td><td class="n">${l.units || ""}</td><td class="n">${fmtMoney(l.amountMicros, l.currency)}</td><td class="fine">${esc(l.note ?? "")} · ${esc(l.actor ?? "")}</td></tr>`);
   const catCount = new Map<string, number>();
   for (const a of v.alerts) for (const c of a.categories) catCount.set(c, (catCount.get(c) ?? 0) + 1);
@@ -275,7 +276,7 @@ const COCKPIT_CSS = `main.wrap{max-width:1360px}.cockpit{display:grid;grid-templ
 @media(max-width:900px){.cockpit{grid-template-columns:1fr;gap:8px}.ck-rail{position:static}.ck-rail nav{display:flex;flex-wrap:wrap;gap:4px}.ck-rail a{flex:1 1 auto;justify-content:center;gap:6px;border:1px solid var(--br-line);background:var(--br-surface)}.ck-kpis{position:static}}
 @media(max-width:640px){.ck-kpis .k{grid-template-columns:repeat(2,minmax(0,1fr))}}`;
 
-const COCKPIT_JS = `(function(){var G={overview:"*",campaigns:"campaigns",creatives:"creatives",inventory:"inventory",onboard:"hubs",hubproof:"hubs","payout-settings":"money",royalties:"money",referrals:"money",ledger:"money",orders:"money",exports:"money",promo:"promo",street:"promo",alerts:"promo",audit:"audit"};
+const COCKPIT_JS = `(function(){var G={overview:"*",campaigns:"campaigns",creatives:"creatives",inventory:"inventory",onboard:"hubs",hubproof:"hubs",activation:"hubs","payout-settings":"money",royalties:"money",referrals:"money",ledger:"money",orders:"money",exports:"money",promo:"promo",street:"promo",alerts:"promo",audit:"audit"};
 var secs=[].slice.call(document.querySelectorAll(".ck-pane>section[id]"));var tabs={};secs.forEach(function(s){var g=G[s.id]||"campaigns";s.setAttribute("data-g",g);tabs[g]=1});
 var links=[].slice.call(document.querySelectorAll(".ck-rail a[data-tab]"));
 function show(h){var id=(h||"").replace(/^#/,"");var g=tabs[id]?id:(G[id]&&G[id]!=="*"?G[id]:"campaigns");

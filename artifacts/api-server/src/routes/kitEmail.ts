@@ -9,6 +9,7 @@
  */
 import express, { Router, type IRouter, type Request } from "express";
 import { cronAuthorized } from "../lib/cronAuth";
+import { activationUrl } from "../lib/overhaul/adActivation";
 import { kitFlags, kitFrom, readToken, recipientAllowed, renderKitEmail, sweepNudges, SITE, type Mailer, type NudgeStore } from "../lib/kitEmails";
 
 type Env = NodeJS.ProcessEnv;
@@ -72,7 +73,7 @@ export function createKitEmailRouter(deps: KitEmailDeps = {}): IRouter {
     const brand = typeof b.brand === "string" ? b.brand.slice(0, 80) : null;
     const h = (b.headline ?? {}) as Record<string, unknown>;
     const s = (x: unknown) => (typeof x === "string" && /^[\w$.,–\- +%MKB/]{1,24}$/.test(x) ? x : undefined);
-    const m = renderKitEmail({ brand, reportUrl: `${SITE}${reportPath}`, headline: { exposureMonth: s(h.exposureMonth), earningsMonth: s(h.earningsMonth) }, hasPdf: !!pdf });
+    const m = renderKitEmail({ brand, reportUrl: `${SITE}${reportPath}`, headline: { exposureMonth: s(h.exposureMonth), earningsMonth: s(h.earningsMonth) }, hasPdf: !!pdf, activateUrl: activationUrl({ email, company: brand, role: "supplier" }, SITE) });
     try {
       await mail({ from: kitFrom(e), to: [email], subject: m.subject, html: m.html, text: m.text, ...(pdf ? { attachments: [{ filename: "birch-reserve-monetization-kit.pdf", content: pdf }] } : {}) });
       res.json({ sent: true });

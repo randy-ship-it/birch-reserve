@@ -83,6 +83,7 @@ const SOURCE_LABEL: Record<Lead["source"], string> = {
   inventory_signup: "Birch ads-only inventory signup",
   brand_intake: "Birch Monetization Kit intake",
   partners: "Birch partnership inquiry",
+  activation: "Birch ad activation (inventory estimate + ad openness)",
 };
 
 /** meta.source buckets Emma asked for. */
@@ -98,6 +99,7 @@ const META_SOURCE: Record<Lead["source"], "chat" | "voice" | "form" | "email_cap
   inventory_signup: "form",
   brand_intake: "form",
   partners: "form",
+  activation: "form",
 };
 
 /** Public SKUs only: $190 hold, $490 seat. */
@@ -131,6 +133,11 @@ export function buildFridayMeta(lead: Lead): Record<string, string | number | bo
   meta["is_test"] = lead.isTest;
   if (lead.meta.paid) meta["paid"] = true;
   put("stripe_session_id", lead.meta.stripe_session_id);
+  if (lead.source === "activation") {
+    put("act_role", lead.meta.act_role); put("act_pages", lead.meta.act_pages); put("act_views", lead.meta.act_views); put("act_list", lead.meta.act_list);
+    put("ads_allowed", lead.meta.act_openness); put("ads_excluded", lead.meta.act_excl);
+    meta["open_to_non_core"] = lead.meta.act_openness === "premium" || lead.meta.act_openness === "any";
+  }
   return meta;
 }
 
@@ -201,6 +208,7 @@ export function buildFridayPayload(lead: Lead, cfg: Pick<FridayConfig, "workspac
       "stage:birch-inbound",
       `birch:${lead.source.replace(/_/g, "-")}`,
       ...(lead.source === "inventory_signup" ? ["door:sell-ads"] : []),
+      ...(lead.source === "activation" ? [lead.meta.act_openness === "curated" ? "birch:curated-only" : "birch:open-non-core"] : []),
       ...(lead.meta.sku && SKU_VALUE[lead.meta.sku] ? [`birch:${lead.meta.sku}`] : []),
       ...(lead.isTest ? ["birch:qa-test"] : []),
     ],

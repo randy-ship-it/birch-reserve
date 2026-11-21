@@ -23,6 +23,8 @@ import { GTM_BOT_ALERT_TO, GTM_BOT_BUSINESS_LINE, GTM_BOT_KIND, GTM_BOT_SOURCE, 
 import { MEDIA_KIT_CATEGORIES } from "../lib/overhaul/mediaKit";
 import { PARTNERS_KIND, PARTNER_LIMITS, PARTNER_TRACK_KEYS, partnerTrackName, partnerTrackKey } from "../lib/overhaul/partners";
 import { upsertLeadSafe } from "../lib/leads";
+import { queueFridayPush } from "../lib/fridayPush";
+import { ACT_OPENNESS, ACT_ROLES, activationMeta, activationSummary, parseActivation } from "../lib/overhaul/adActivation";
 import { createHash } from "node:crypto";
 
 export type CreateSession = (params: Record<string, unknown>) => Promise<{ url: string | null; livemode: boolean }>;
@@ -271,6 +273,58 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
       isTest: leadTest,
     });
     res.json({ ok: true, stored: friday.status, alert: alert.status, ...(leadTest ? { alertId: alert.id ?? null, ...(partnerLeadId ? { leadId: partnerLeadId } : {}) } : {}) });
+  });
+
+  /**
+   * Ad activation (Randy voice, Nov 21 2026 6:02 PM ET): asked when a partner is getting ads turned on, not at the
+   * start of intake. Inventory estimate (ranges) + which ads can run on their hubs. One lead row per partner and role
+   * (`activation:<hash>`, source activation): shown in /ads/admin (internal inventory roll-up, open-to-non-core filter)
+   * and pushed to Friday with the existing lead push. Never changes public inventory figures; never turns an ad on.
+   */
+  router.post("/v1/activation", json, async (req: Request, res: Response) => {
+    if (limited(req, 10)) {
+      res.status(429).json({ error: "Too many requests. Try again shortly." });
+      return;
+    }
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    if (str(body.company_url, 200) || str(body.hp, 200)) {
+      res.json({ ok: true, stored: "skipped" }); // honeypot: look successful, store nothing
+      return;
+    }
+    const email = str(body.email, 320).toLowerCase();
+    if (!EMAIL_RE.test(email)) {
+      res.status(400).json({ error: "Add the work email you used for intake." });
+      return;
+    }
+    const parsed = parseActivation(body);
+    if (!parsed.ok) {
+      res.status(400).json({ error: parsed.error });
+      return;
+    }
+    const v = parsed.v;
+    const company = str(body.company, 160) || null;
+    const leadTest = isTestLead({ email, name: str(body.name, 120), company: company ?? "", test: body.test });
+    const id = `activation:${createHash("sha256").update(`${email}|${v.role}`).digest("hex").slice(0, 24)}`;
+    const { need, size } = activationSummary(v);
+    const lead = await upsertLeadSafe({
+      id, source: "activation", sourceRef: id, email, company, need, size, pagePath: str(body.path, 200) || "/intake/activate", isTest: leadTest,
+      meta: activationMeta(v),
+    } as Parameters<typeof upsertLeadSafe>[0]);
+    if (lead && !leadTest) queueFridayPush(lead.id);
+    const open = ACT_OPENNESS.find((o) => o.key === v.openness)!;
+    const alert = await sendSalesAlert({
+      event: "inquiry",
+      title: `Ad activation: ${company || email}${v.openness === "curated" ? "" : " (open to non-core ads)"}`,
+      rows: [["Who", ACT_ROLES.find((r) => r.key === v.role)!.label], ["Company", company ?? ""], ["Email", email], ["Pages or hub screens", size.split(" · ")[0]!.replace("Pages/screens ", "")], ["Views and list", size.split(" · ").slice(1).join(" · ")], ["Ads allowed", open.label], ["Excluded", v.exclusions.join(", ") || "none"], ["Other ad data", v.other], ["Hub", v.hubSlug], ["Admin", "https://birchreserve.net/ads/admin#activation"]],
+      replyTo: email,
+      isTest: leadTest,
+    });
+    log("activation", { stored: Boolean(lead), alert: alert.status, openness: v.openness });
+    if (!lead && alert.status !== "sent") {
+      res.status(502).json({ error: "Couldn't save that. Email sales@silverbirchgrowth.com and we'll add it for you." });
+      return;
+    }
+    res.json({ ok: true, stored: lead ? "saved" : "alert_only", alert: alert.status, ...(leadTest && lead ? { leadId: lead.id } : {}) });
   });
 
   /**

@@ -30,7 +30,7 @@
 import { logger } from "./logger";
 import { applyAdditiveColumns } from "./schemaEnsure";
 
-export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture" | "checkout" | "local_biz" | "inventory_signup" | "brand_intake" | "partners";
+export type LeadSource = "chat_intake" | "chat_callback" | "voice" | "web_voice" | "advertiser_intake" | "email_capture" | "checkout" | "local_biz" | "inventory_signup" | "brand_intake" | "partners" | "activation";
 
 /** Friday deal metadata carried on the lead (unknown keys are simply absent). */
 export type LeadMeta = {
@@ -61,8 +61,19 @@ export type LeadMeta = {
   st?: string;
   /** Partnerships form (Nov 21 2026): flyer | adbuying | media. */
   partner_track?: string;
+  /** Ad activation (Nov 21 2026): inventory estimate ranges + which ads may run on the partner's hubs. act_*_mid are range midpoints for the internal roll-up only. */
+  act_role?: string;
+  act_pages?: string;
+  act_views?: string;
+  act_list?: string;
+  act_openness?: string;
+  act_excl?: string;
+  act_pages_mid?: number;
+  act_views_mid?: number;
+  act_list_mid?: number;
 };
-const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id", "stage", "friday_intake_id", "nudged_at", "unsub", "intake_role", "hub_status", "hub_slug", "capture_source", "st", "partner_track"] as const;
+const META_STRING_KEYS = ["category", "hubs", "sku", "currency", "stripe_session_id", "friday_external_id", "stage", "friday_intake_id", "nudged_at", "unsub", "intake_role", "hub_status", "hub_slug", "capture_source", "st", "partner_track", "act_role", "act_pages", "act_views", "act_list", "act_openness", "act_excl"] as const;
+const META_NUMBER_KEYS = ["act_pages_mid", "act_views_mid", "act_list_mid"] as const;
 
 /** Keep only well-typed, non-empty keys (never empty strings). */
 export function cleanLeadMeta(raw: unknown): LeadMeta {
@@ -72,6 +83,10 @@ export function cleanLeadMeta(raw: unknown): LeadMeta {
   for (const k of META_STRING_KEYS) {
     const v = src[k];
     if (typeof v === "string" && v.trim()) out[k] = v.trim().slice(0, 200);
+  }
+  for (const k of META_NUMBER_KEYS) {
+    const v = src[k];
+    if (typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= 1e9) out[k] = v;
   }
   if (typeof src["value"] === "number" && Number.isFinite(src["value"]) && src["value"] >= 0) out.value = src["value"];
   if (src["paid"] === true) out.paid = true;
@@ -169,6 +184,7 @@ const SOURCE_RANK: Record<LeadSource, number> = {
   inventory_signup: 0,
   brand_intake: 0,
   partners: 0,
+  activation: 0,
   chat_intake: 1,
   chat_callback: 2,
   voice: 2,

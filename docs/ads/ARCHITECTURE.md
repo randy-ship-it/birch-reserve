@@ -128,3 +128,8 @@ Vercel function, so files stay under its 4.5 MB body limit (images 2 MB, video 4
 - Code and project names still say "birch" (repo, Vercel project, `/ads/admin` on birchreserve.net). Moving the core under a Scale domain would be a hosting change, not a data change.
 - No Stripe test keys on Preview yet. Once `STRIPE_SECRET_KEY` (sk_test) is there, `scripts/stripe-test-setup.mjs` creates the test prices + webhook and sets `STRIPE_WEBHOOK_SECRET` / `STRIPE_PRICE_*` on Preview (dry run unless `--apply`; refuses live keys).
 - Stripe Connect isn't set up, so payouts are a batch + CSV.
+
+## Ad activation answers (Nov 21 2026)
+Asked at the "getting your ads turned on" stage (after intake submit, and standalone at `/intake/activate`; Scale mirror serves the same page).
+`POST /v1/activation` -> one `leads` row per email + role (`activation:<hash>`, source `activation`, meta `act_*`), Friday push with tags `birch:open-non-core` / `birch:curated-only`, sales alert.
+`/ads/admin#activation` lists the answers (filter: open to non-core) and an admin-only internal inventory roll-up from range midpoints. Public inventory figures are never changed by these answers. Nothing here turns an ad on: every ad is reviewed and needs our ad system plus Randy or Jon permission.
