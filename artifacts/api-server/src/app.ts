@@ -15,6 +15,7 @@ import blogRouter from "./routes/blog";
 import aiDiscoveryRouter from "./routes/aiDiscovery";
 import buyRouter, { buyStaffRouter } from "./routes/buy";
 import exclusiveReserveRouter from "./routes/exclusiveReserve";
+import adserverRouter from "./routes/adserver";
 import sponsorPageRouter from "./routes/sponsorPage";
 import { createOverhaulRouter } from "./routes/overhaul";
 import { createBrandIntakeProxy } from "./routes/brandIntakeProxy";
@@ -112,6 +113,8 @@ app.use(createBrandIntakeProxy({ log: (msg, extra) => logger.info(extra ?? {}, m
 app.use(createKitEmailRouter());
 app.use(sponsorPageRouter);
 app.use(exclusiveReserveRouter);
+// Ad system (Nov 21 2026): embed + pixel + serving, /account customer dashboard, /ads/admin. Own body parsers.
+app.use(adserverRouter);
 app.use(publicPagesRouter);
 app.use(advertiserGuidesRouter);
 app.use(blogRouter);
