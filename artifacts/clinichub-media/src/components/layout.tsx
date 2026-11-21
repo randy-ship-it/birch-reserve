@@ -141,7 +141,7 @@ export function Layout({ children }: { children: ReactNode }) {
             {NAV_LINKS.map((l) => (
               <a key={l.href} href={l.href} className="hover:text-foreground/70 transition-colors">{l.label}</a>
             ))}
-            <CurrencyToggle className="hidden xl:inline-flex [&_button]:min-h-8 [&_button]:min-w-9" />
+            <span className="hidden xl:inline-flex"><CurrencyToggle className="[&_button]:min-h-8 [&_button]:min-w-9" /></span>
             <a href="tel:+16479316278" className="hidden xl:inline font-medium whitespace-nowrap underline-offset-2 hover:underline" data-testid="header-call-birch">(647) 931-6278</a>
             <KitCta placement="nav" size="sm" sub={null} testId="nav-kit-cta" />
           </nav>
