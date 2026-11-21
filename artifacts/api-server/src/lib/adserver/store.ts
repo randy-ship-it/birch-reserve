@@ -5,6 +5,7 @@
  */
 import { AD_DEFAULTS, AD_SLOTS, findSlot, setContractHubs, type ContractHub, type Placement } from "./config";
 import type { Campaign, CampaignStatus, Pricing } from "./engine";
+import { dueDate, gatePassed, ratesAt, splitCharges, type ChargeLine, type Gate, type RateRow, type RecipientRow, type Tier } from "./payoutSplit";
 
 export type Queryable = { query: (sql: string, params?: unknown[]) => Promise<{ rows: Array<Record<string, unknown>> }> };
 
@@ -93,6 +94,21 @@ const DDL = (s: string) => [
   `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS paid_ref text`,
   `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS paid_by text`,
   `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS paid_at timestamptz`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_rate_history (
+    id bigserial PRIMARY KEY, partner text, override_bps integer, hub_bps integer, tiers jsonb, source text NOT NULL DEFAULT 'ad',
+    effective_at timestamptz NOT NULL DEFAULT now(), actor text, note text, created_at timestamptz NOT NULL DEFAULT now())`,
+  `INSERT INTO ${s}.ad_rate_history (partner, override_bps, hub_bps, effective_at, actor, note) SELECT NULL, 2000, 3500, date_trunc('hour', now()), 'seed', 'Randy voice Nov 21 2026 1:09 PM: 20% Birch override off the top, hub 35% of net' WHERE NOT EXISTS (SELECT 1 FROM ${s}.ad_rate_history WHERE partner IS NULL)`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_override_recipients (
+    id bigserial PRIMARY KEY, rkey text NOT NULL, name text NOT NULL, kind text NOT NULL, pct_bps integer NOT NULL, scope_partner text, scope_campaign text,
+    active boolean NOT NULL DEFAULT true, payout_ref text, effective_at timestamptz NOT NULL DEFAULT now(), actor text, created_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_hub_gates (
+    partner text PRIMARY KEY, live boolean NOT NULL DEFAULT false, has_transactions boolean NOT NULL DEFAULT false, audience_activated boolean NOT NULL DEFAULT false,
+    override boolean NOT NULL DEFAULT false, override_note text, updated_by text, updated_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_settings (key text PRIMARY KEY, value text NOT NULL, updated_by text, updated_at timestamptz NOT NULL DEFAULT now())`,
+  `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS kind text`,
+  `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS label text`,
+  `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS payee_ref text`,
+  `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS batch_id text`,
   `CREATE TABLE IF NOT EXISTS ${s}.ad_audit (id bigserial PRIMARY KEY, at timestamptz NOT NULL DEFAULT now(), actor text, action text NOT NULL, target text, detail text)`,
   `INSERT INTO ${s}.ad_street_qrs (member, label, site, url, created_by) VALUES ('bridget','birch-intake','birch','https://birchreserve.net/intake?code=STREET100&st=bridget&qr=birch-intake','seed'),('bridget','scale-intake','scale','https://scalehealth.ca/intake?code=STREET100&st=bridget&qr=scale-intake','seed'),('mona','birch-intake','birch','https://birchreserve.net/intake?code=STREET100&st=mona&qr=birch-intake','seed'),('mona','scale-intake','scale','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake','seed'),('mona','scale-intake-digital','scale','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake-digital','seed') ON CONFLICT DO NOTHING`,
   `INSERT INTO ${s}.ad_audit (actor, action, target, detail) SELECT 'seed','street.qr','mona/scale-intake-digital','https://scalehealth.ca/intake?code=STREET100&st=mona&qr=scale-intake-digital (Mona digital Scale intake QR registered)' WHERE NOT EXISTS (SELECT 1 FROM ${s}.ad_audit WHERE action = 'street.qr' AND target = 'mona/scale-intake-digital')`,
@@ -455,64 +471,154 @@ export async function ledger(opts: { campaignId?: string; limit?: number } = {})
 }
 
 /* --------------------------------------------------------------------------------------------- royalties */
-export type RoyaltyRow = { isTest?: boolean; paidRef?: string | null; paidAt?: Date | null; paidBy?: string | null; partner: string; month: string; currency: string; grossMicros: number; units: number; shareBps: number | null; payableMicros: number | null; status: "calculated" | "approved" | "paid"; approvedBy: string | null; approvedAt: Date | null };
+export type RoyaltyRow = {
+  partner: string; // payee key: hub partner name, "<hub>#transaction", or "rcpt:<recipient>@<hub>"
+  kind: "hub" | "brokerage" | "commission"; label: string; hub: string; source: "ad" | "transaction";
+  month: string; currency: string; grossMicros: number; units: number; shareBps: number | null; payableMicros: number | null;
+  status: "calculated" | "held" | "approved" | "paid"; heldReason: string | null; dueAt: Date | null;
+  approvedBy: string | null; approvedAt: Date | null; isTest?: boolean; paidRef?: string | null; paidAt?: Date | null; paidBy?: string | null; payoutRef?: string | null;
+};
+/** retained = net remainder after the hub share; Birch also keeps override − recipients. */
+export type MonthSummary = { month: string; currency: string; grossMicros: number; overrideMicros: number; recipientsMicros: number; hubMicros: number; retainedMicros: number; pendingMicros: number };
+export type PayoutSettings = { cadence: "monthly" | "quarterly"; netDays: number };
 
-/** Per hub partner and month, from delivered (charged) spend on that partner's slots. Test campaigns excluded. */
-export async function royalties(months = 6, opts: { testOnly?: boolean } = {}): Promise<RoyaltyRow[]> {
+const toRate = (r: Record<string, unknown>): RateRow => ({
+  partner: (r.partner as string) ?? null, overrideBps: r.override_bps === null ? null : num(r.override_bps), hubBps: r.hub_bps === null ? null : num(r.hub_bps),
+  tiers: Array.isArray(r.tiers) ? (r.tiers as Tier[]) : typeof r.tiers === "string" ? (JSON.parse(r.tiers) as Tier[]) : null, effectiveAt: new Date(String(r.effective_at)),
+});
+const toRecipient = (r: Record<string, unknown>): RecipientRow => ({
+  rkey: String(r.rkey), name: String(r.name), kind: r.kind === "commission" ? "commission" : "brokerage", pctBps: num(r.pct_bps), scopePartner: (r.scope_partner as string) || null,
+  scopeCampaign: (r.scope_campaign as string) || null, active: Boolean(r.active), payoutRef: (r.payout_ref as string) ?? null, effectiveAt: new Date(String(r.effective_at)),
+});
+export async function rateHistory(): Promise<Array<RateRow & { actor: string | null; note: string | null; id: number }>> {
+  const p = await db();
+  const { rows } = await p.query(`SELECT * FROM ${S()}.ad_rate_history ORDER BY effective_at DESC, id DESC`);
+  return rows.map((r) => ({ ...toRate(r), actor: (r.actor as string) ?? null, note: (r.note as string) ?? null, id: num(r.id) }));
+}
+export async function recipientHistory(): Promise<Array<RecipientRow & { actor: string | null; id: number }>> {
+  const p = await db();
+  const { rows } = await p.query(`SELECT * FROM ${S()}.ad_override_recipients ORDER BY effective_at DESC, id DESC`);
+  return rows.map((r) => ({ ...toRecipient(r), actor: (r.actor as string) ?? null, id: num(r.id) }));
+}
+export async function addRate(r: { partner: string | null; overrideBps: number | null; hubBps: number | null; tiers: Tier[] | null; effectiveAt: Date; note?: string | null }, actor: string): Promise<void> {
+  const p = await db();
+  await p.query(`INSERT INTO ${S()}.ad_rate_history (partner, override_bps, hub_bps, tiers, effective_at, actor, note) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+    [r.partner, r.overrideBps, r.hubBps, r.tiers && r.tiers.length ? JSON.stringify(r.tiers) : null, r.effectiveAt.toISOString(), actor, r.note ?? null]);
+  await audit(actor, "rate.set", r.partner ?? "global", `override=${r.overrideBps ?? "inherit"} hub=${r.hubBps ?? "inherit"} tiers=${JSON.stringify(r.tiers ?? [])} effective=${r.effectiveAt.toISOString()}`);
+}
+export async function addRecipientVersion(r: RecipientRow, actor: string): Promise<void> {
+  const p = await db();
+  await p.query(`INSERT INTO ${S()}.ad_override_recipients (rkey, name, kind, pct_bps, scope_partner, scope_campaign, active, payout_ref, effective_at, actor) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+    [r.rkey, r.name, r.kind, r.pctBps, r.scopePartner, r.scopeCampaign, r.active, r.payoutRef, r.effectiveAt.toISOString(), actor]);
+  await audit(actor, "recipient.set", r.rkey, `${r.name} ${r.kind} ${r.pctBps / 100}% of pool scope=${r.scopePartner ?? "all hubs"}/${r.scopeCampaign ?? "all campaigns"} active=${r.active} effective=${r.effectiveAt.toISOString()}`);
+}
+export async function purgeTestRecipient(rkey: string, actor: string): Promise<boolean> {
+  const p = await db();
+  const { rows } = await p.query(`DELETE FROM ${S()}.ad_override_recipients WHERE rkey = $1 AND rkey LIKE 'qa-%' RETURNING id`, [rkey]);
+  if (rows.length) await audit(actor, "recipient.purge_test", rkey);
+  return rows.length > 0;
+}
+export async function gates(): Promise<Map<string, Gate & { updatedBy: string | null; updatedAt: Date | null }>> {
+  const p = await db();
+  const { rows } = await p.query(`SELECT * FROM ${S()}.ad_hub_gates`);
+  return new Map(rows.map((r) => [String(r.partner), { live: Boolean(r.live), hasTransactions: Boolean(r.has_transactions), audienceActivated: Boolean(r.audience_activated), override: Boolean(r.override), note: (r.override_note as string) ?? null, updatedBy: (r.updated_by as string) ?? null, updatedAt: r.updated_at ? new Date(String(r.updated_at)) : null }]));
+}
+export async function setGate(partner: string, g: Gate, actor: string): Promise<void> {
+  const p = await db();
+  await p.query(`INSERT INTO ${S()}.ad_hub_gates (partner, live, has_transactions, audience_activated, override, override_note, updated_by) VALUES ($1,$2,$3,$4,$5,$6,$7)
+    ON CONFLICT (partner) DO UPDATE SET live = EXCLUDED.live, has_transactions = EXCLUDED.has_transactions, audience_activated = EXCLUDED.audience_activated, override = EXCLUDED.override, override_note = EXCLUDED.override_note, updated_by = EXCLUDED.updated_by, updated_at = now()`,
+    [partner, g.live, g.hasTransactions, g.audienceActivated, g.override, g.note, actor]);
+  await audit(actor, "gate.set", partner, `live=${g.live} transactions=${g.hasTransactions} audience=${g.audienceActivated} override=${g.override}${g.note ? ` note=${g.note}` : ""}`);
+}
+export async function purgeTestGate(partner: string): Promise<void> {
+  const p = await db();
+  await p.query(`DELETE FROM ${S()}.ad_hub_gates WHERE partner = $1`, [partner]);
+}
+export async function payoutSettings(): Promise<PayoutSettings> {
+  const p = await db();
+  const { rows } = await p.query(`SELECT key, value FROM ${S()}.ad_settings WHERE key IN ('payout_cadence','payout_net_days')`);
+  const m = new Map(rows.map((r) => [String(r.key), String(r.value)]));
+  return { cadence: m.get("payout_cadence") === "quarterly" ? "quarterly" : "monthly", netDays: Math.max(0, Math.min(120, Number(m.get("payout_net_days") ?? 30) || 0)) };
+}
+export async function setPayoutSettings(v: PayoutSettings, actor: string): Promise<void> {
+  const p = await db();
+  for (const [k, val] of [["payout_cadence", v.cadence], ["payout_net_days", String(v.netDays)]] as const)
+    await p.query(`INSERT INTO ${S()}.ad_settings (key, value, updated_by) VALUES ($1,$2,$3) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_by = EXCLUDED.updated_by, updated_at = now()`, [k, val, actor]);
+  await audit(actor, "payout.timing", `${v.cadence}`, `Net ${v.netDays}`);
+}
+
+/**
+ * Statements per payee and month from collected, delivered ad revenue (charged ledger lines). Promo-credit delivery is free credit, not
+ * collected revenue, so it earns no royalty or override. Each line uses the rate and recipients in effect at its own time.
+ */
+export async function statements(months = 6, opts: { testOnly?: boolean } = {}): Promise<{ lines: RoyaltyRow[]; summary: MonthSummary[] }> {
   const p = await db();
   const since = new Date();
   since.setUTCDate(1);
   since.setUTCHours(0, 0, 0, 0);
   since.setUTCMonth(since.getUTCMonth() - (months - 1));
-  const [{ rows }, shares, approved] = await Promise.all([
+  const [{ rows }, rates, recips, approved, g, ps] = await Promise.all([
     p.query(
-      `SELECT partner, to_char(date_trunc('month', at), 'YYYY-MM') AS m, currency, (-sum(amount_micros))::bigint AS gross, sum(units)::int AS u
-         FROM ${S()}.ad_ledger WHERE kind = 'charge' AND is_test = ${opts.testOnly ? "true" : "false"} AND partner IS NOT NULL AND at >= $1 GROUP BY 1,2,3 ORDER BY 2 DESC, 1`,
+      `SELECT l.partner, l.campaign_id::text AS cid, l.at, l.currency, (-l.amount_micros)::bigint AS gross
+         FROM ${S()}.ad_ledger l JOIN ${S()}.ad_campaigns c ON c.id = l.campaign_id
+        WHERE l.kind = 'charge' AND l.is_test = ${opts.testOnly ? "true" : "false"} AND l.partner IS NOT NULL AND l.at >= $1 AND coalesce(c.order_kind, '') NOT LIKE 'promo %'`,
       [since.toISOString()],
     ),
-    p.query(`SELECT partner, share_bps FROM ${S()}.ad_partners`),
+    p.query(`SELECT * FROM ${S()}.ad_rate_history`),
+    p.query(`SELECT * FROM ${S()}.ad_override_recipients`),
     p.query(`SELECT * FROM ${S()}.ad_payouts`),
+    gates(),
+    payoutSettings(),
   ]);
-  const share = new Map(shares.rows.map((r) => [String(r.partner), r.share_bps === null ? null : num(r.share_bps)]));
+  const lines: ChargeLine[] = rows.map((r) => ({ partner: String(r.partner), campaignId: String(r.cid), at: new Date(String(r.at)), currency: String(r.currency), grossMicros: num(r.gross), source: "ad" }));
+  const split = splitCharges(lines, rates.rows.map(toRate), recips.rows.map(toRecipient));
   const appr = new Map(approved.rows.map((r) => [`${r.partner}|${r.month}|${r.currency}`, r]));
-  return rows.map((r) => {
-    const key = `${r.partner}|${r.m}|${r.currency}`;
-    const a = appr.get(key);
-    const bps = a ? num(a.share_bps) : (share.get(String(r.partner)) ?? null);
-    const gross = num(r.gross);
+  const out: RoyaltyRow[] = split.payees.map((a) => {
+    const fz = opts.testOnly ? undefined : appr.get(`${a.key}|${a.month}|${a.currency}`);
+    const bps = a.bpsSeen.size === 1 ? [...a.bpsSeen][0]! : a.bpsSeen.size ? Math.max(...a.bpsSeen) : null;
+    const open = !fz;
+    const held = open && !a.pending && !gatePassed(g.get(a.partner));
     return {
-      partner: String(r.partner), month: String(r.m), currency: String(r.currency), grossMicros: gross, units: num(r.u), shareBps: bps,
-      payableMicros: bps === null ? null : Math.floor((gross * bps) / 10_000), status: opts.testOnly ? "calculated" : a ? (a.status === "paid" ? "paid" : "approved") : "calculated",
-      approvedBy: a && !opts.testOnly ? String(a.approved_by) : null, approvedAt: a && !opts.testOnly ? new Date(String(a.approved_at)) : null,
-      isTest: Boolean(opts.testOnly), paidRef: a && !opts.testOnly ? ((a.paid_ref as string) ?? null) : null, paidAt: a && !opts.testOnly && a.paid_at ? new Date(String(a.paid_at)) : null, paidBy: a && !opts.testOnly ? ((a.paid_by as string) ?? null) : null,
+      partner: a.key, kind: a.kind, label: a.label, hub: a.partner, source: a.source, month: a.month, currency: a.currency,
+      grossMicros: fz ? num(fz.gross_micros) : a.basis, units: a.units, shareBps: fz ? num(fz.share_bps) : a.pending ? null : bps,
+      payableMicros: fz ? num(fz.payable_micros) : a.pending ? null : a.payable,
+      status: fz ? (fz.status === "paid" ? "paid" : "approved") : held ? "held" : "calculated", heldReason: held ? "held: not activated" : null,
+      dueAt: dueDate(a.month, ps.cadence, ps.netDays), approvedBy: fz ? String(fz.approved_by) : null, approvedAt: fz ? new Date(String(fz.approved_at)) : null,
+      isTest: Boolean(opts.testOnly), paidRef: fz ? ((fz.paid_ref as string) ?? null) : null, paidAt: fz?.paid_at ? new Date(String(fz.paid_at)) : null, paidBy: fz ? ((fz.paid_by as string) ?? null) : null, payoutRef: a.payoutRef,
     };
   });
+  out.sort((x, y) => (x.month === y.month ? (x.kind === y.kind ? x.label.localeCompare(y.label) : x.kind === "hub" ? -1 : 1) : x.month < y.month ? 1 : -1));
+  const summary = split.months.map((m) => {
+    const hub = Math.floor(m.hub), rec = Math.floor(m.recipients);
+    return { month: m.month, currency: m.currency, grossMicros: Math.round(m.gross), overrideMicros: Math.floor(m.override), recipientsMicros: rec, hubMicros: hub, retainedMicros: Math.round(m.gross - m.pendingGross) - Math.floor(m.override) - hub, pendingMicros: Math.round(m.pendingGross) };
+  });
+  return { lines: out, summary };
 }
 
+export async function royalties(months = 6, opts: { testOnly?: boolean } = {}): Promise<RoyaltyRow[]> {
+  return (await statements(months, opts)).lines;
+}
+
+/** Legacy: per-hub royalty % (now a dated per-hub rate row; override % inherits the global default). */
 export async function partnerShares(): Promise<Map<string, number | null>> {
-  const p = await db();
-  const { rows } = await p.query(`SELECT partner, share_bps FROM ${S()}.ad_partners`);
-  return new Map(rows.map((r) => [String(r.partner), r.share_bps === null ? null : num(r.share_bps)]));
+  const now = Date.now();
+  const rates = (await rateHistory());
+  const parts = new Set(AD_SLOTS.map((s) => s.partner));
+  return new Map([...parts].map((p) => [p, ratesAt(rates, p, now)?.hubBps ?? null]));
 }
-
 export async function setPartnerShare(partner: string, bps: number | null, actor: string): Promise<void> {
-  const p = await db();
-  await p.query(
-    `INSERT INTO ${S()}.ad_partners (partner, share_bps, updated_by) VALUES ($1,$2,$3) ON CONFLICT (partner) DO UPDATE SET share_bps = EXCLUDED.share_bps, updated_by = EXCLUDED.updated_by, updated_at = now()`,
-    [partner, bps, actor],
-  );
-  await audit(actor, "partner.share", partner, String(bps));
+  await addRate({ partner, overrideBps: null, hubBps: bps, tiers: null, effectiveAt: new Date() }, actor);
 }
 
-/** Approve a statement: freezes gross, share and payable. Records the approval only; no money moves. */
+/** Approve a statement line: freezes basis, rate and payable. Held or pending lines can't be approved. Records only; no money moves. */
 export async function approvePayout(partner: string, month: string, currency: string, actor: string): Promise<RoyaltyRow | null> {
   const rows = await royalties(13);
   const r = rows.find((x) => x.partner === partner && x.month === month && x.currency === currency);
   if (!r || r.shareBps === null || r.payableMicros === null || r.status !== "calculated") return null;
   const p = await db();
   await p.query(
-    `INSERT INTO ${S()}.ad_payouts (partner, month, currency, gross_micros, share_bps, payable_micros, approved_by) VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT DO NOTHING`,
-    [partner, month, currency, r.grossMicros, r.shareBps, r.payableMicros, actor],
+    `INSERT INTO ${S()}.ad_payouts (partner, month, currency, gross_micros, share_bps, payable_micros, approved_by, kind, label, payee_ref) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT DO NOTHING`,
+    [partner, month, currency, r.grossMicros, r.shareBps, r.payableMicros, actor, r.kind, r.label, r.payoutRef ?? null],
   );
   await audit(actor, "payout.approve", `${partner}|${month}|${currency}`, String(r.payableMicros));
   return { ...r, status: "approved", approvedBy: actor, approvedAt: new Date() };
@@ -601,7 +707,13 @@ export async function setHubStatus(key: string, status: "live" | "paused", actor
 /** Remove a QA hub. Refuses real hubs. Test ledger lines on it go with their test campaigns (purgeTestCampaign). */
 export async function purgeTestHub(key: string, actor: string): Promise<boolean> {
   const p = await db();
-  const { rows } = await p.query(`DELETE FROM ${S()}.ad_hubs WHERE key = $1 AND is_test = true RETURNING key`, [key]);
+  const { rows } = await p.query(`DELETE FROM ${S()}.ad_hubs WHERE key = $1 AND is_test = true RETURNING key, partner`, [key]);
+  if (rows[0]) {
+    const partner = String(rows[0].partner);
+    await p.query(`DELETE FROM ${S()}.ad_hub_gates WHERE partner = $1`, [partner]);
+    await p.query(`DELETE FROM ${S()}.ad_rate_history WHERE partner = $1`, [partner]);
+    await p.query(`DELETE FROM ${S()}.ad_payouts WHERE partner = $1 OR partner LIKE $2`, [partner, `rcpt:%@${partner}`]);
+  }
   await refreshInventory(p, true);
   if (rows.length) await audit(actor, "hub.purge_test", key);
   return rows.length > 0;
@@ -623,4 +735,22 @@ export async function payoutRows(): Promise<Array<Record<string, unknown>>> {
   const p = await db();
   const { rows } = await p.query(`SELECT * FROM ${S()}.ad_payouts ORDER BY month DESC, partner`);
   return rows;
+}
+
+/** Payout batch: every approved, unpaid line gets one batch id (records only). Returns the rows for the Stripe-ready CSV. */
+export async function createPayoutBatch(actor: string): Promise<{ batchId: string; rows: Array<Record<string, unknown>> }> {
+  const p = await db();
+  const batchId = `batch_${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "")}`;
+  const { rows } = await p.query(`UPDATE ${S()}.ad_payouts SET batch_id = $1 WHERE status = 'approved' AND batch_id IS NULL RETURNING *`, [batchId]);
+  if (rows.length) await audit(actor, "payout.batch", batchId, `${rows.length} lines`);
+  return { batchId, rows };
+}
+export async function batchRows(batchId: string): Promise<Array<Record<string, unknown>>> {
+  const p = await db();
+  const { rows } = await p.query(`SELECT * FROM ${S()}.ad_payouts WHERE batch_id = $1 ORDER BY partner`, [batchId]);
+  return rows;
+}
+export async function purgeTestPayouts(prefix: string): Promise<void> {
+  const p = await db();
+  await p.query(`DELETE FROM ${S()}.ad_payouts WHERE partner LIKE $1`, [`${prefix}%`]);
 }

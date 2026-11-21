@@ -128,8 +128,8 @@ export const adsLoginEmailEnabled = (env: NodeJS.ProcessEnv = process.env) => en
 export const adsAlertEmailEnabled = (env: NodeJS.ProcessEnv = process.env) => env.ADS_HUB_ALERT_EMAIL_ENABLED === "true";
 
 /** Admin allowlist (Randy and Jon). ADS_ADMIN_EMAILS overrides; the key lives in ADS_ADMIN_KEY. */
-/** Jon's address is added through ADS_ADMIN_EMAILS once Randy confirms it (not guessed here). */
-export const DEFAULT_ADMIN_EMAILS = ["randy@silverbirchgrowth.com", "randy@scalehealth.ca"] as const;
+/** Jon = john@scalehealth.ca (confirmed by Randy). ADS_ADMIN_EMAILS, if set, overrides this list. */
+export const DEFAULT_ADMIN_EMAILS = ["randy@silverbirchgrowth.com", "randy@scalehealth.ca", "john@scalehealth.ca"] as const; // Randy voice Nov 21 1:10 PM: these three, nobody else
 export function adminEmails(env: NodeJS.ProcessEnv = process.env): string[] {
   const raw = env.ADS_ADMIN_EMAILS?.trim();
   return (raw ? raw.split(/[,\s]+/) : [...DEFAULT_ADMIN_EMAILS]).map((e) => e.trim().toLowerCase()).filter(Boolean);
