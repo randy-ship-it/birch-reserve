@@ -436,6 +436,28 @@ test("email capture: leads row (email_capture) with attribution, Friday push, Ra
   assert.equal(captureEmails.length, 1);
 });
 
+test("hub alerts: validated categories, own lead row, branded alert, bad input rejected", async () => {
+  const bad1 = await post("/launch/email-capture", { email: "pat@brandco.example", source: "hub_alerts" });
+  assert.equal(bad1.status, 400);
+  const bad2 = await post("/launch/email-capture", { email: "pat@brandco.example", source: "hub_alerts", categories: ["Sleep", "Bogus"] });
+  assert.equal(bad2.status, 400);
+  const bad3 = await post("/launch/email-capture", { email: "pat@brandco.example", categories: ["Sleep"] });
+  assert.equal(bad3.status, 400);
+  const before = captureEmails.length;
+  const res = await post("/launch/email-capture", { email: "pat@brandco.example", company: "Brand Co", source: "hub_alerts", categories: ["Sleep", "Recovery", "Sleep"], pagePath: "/media-kit" });
+  assert.equal(res.status, 202);
+  assert.doesNotMatch(await res.text(), /brandco/i);
+  await flush();
+  const lead = await leadStore.get(`hubalert:${emailCaptureLeadId("pat@brandco.example").slice("email:".length)}`);
+  assert.equal(lead?.meta?.capture_source, "hub_alerts");
+  assert.equal(lead?.meta?.category, "Recovery, Sleep");
+  assert.equal(captureEmails.length, before + 1);
+  assert.match(captureEmails.at(-1)!.subject, /hub alerts/i);
+  assert.match(captureEmails.at(-1)!.text, /Recovery, Sleep/);
+  // does not touch a brochure/media-kit lead for the same email
+  assert.equal(await leadStore.get(emailCaptureLeadId("pat@brandco.example")), undefined);
+});
+
 test("email capture: qa+ email or X-Birch-QA → stored is_test, no email, Friday skipped", async () => {
   assert.equal((await post("/launch/email-capture", { email: "qa+linger@silverbirchgrowth.com" })).status, 202);
   assert.equal((await post("/launch/email-capture", { email: "real.looking@example.com" }, { "x-birch-qa": QA_SECRET })).status, 202);

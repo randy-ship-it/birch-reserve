@@ -18,7 +18,7 @@ import { STREET_TEAM_CHAT_RULE, STREET_TEAM_ONE_LINE } from "./overhaul/streetTe
 import { AREA_LOCK } from "./overhaul/model";
 import { PREPAY_REFUND_CUTOFF_DAYS } from "./reserveOffers";
 import { BIRCH_SALES_EMAIL, BIRCH_SALES_PHONE, SELF_SERVE_LIMIT_USD } from "./birchFacts";
-import { SPEND_DOWN_LINE } from "./inventoryPlan";
+import { SPEND_DOWN_LINE, TAM_2027, tam2027Headline } from "./inventoryPlan";
 import type { SiteCheckoutState } from "./checkoutState";
 
 export const BIRCH_CHAT_PROMPT_VERSION = "2026-11-21-gtm-setup" as const;
@@ -159,6 +159,7 @@ export function buildBirchChatSystemPrompt(opts: BirchChatPromptOptions): string
     "- Private means the ads sit inside members-only, co-branded hubs that customers chose to join, not on the open web, a social feed or an ad exchange. No bidding.",
     "- Audience line (homepage wording; use it as written and don't break it down): three channels. 1) Branded ScaleHealth.ca hubs: 700MM+ captive page views activating. 2) Our private network of digital and brick-and-mortar fitness & recovery retailers: 200+ locations, 500+ soon, 1MM+ captive recovery consumers. 3) Our owned digital clinic Calm Joints and our Street Team Ambassadors (on-site product sampling and door-to-door): 2MM+ homes reached by 2027. Say these figures are based on signed partnership contracts, and present them as reach and audience, never as delivered impressions, a forecast or a guarantee. Only DR-HO'S and SOLE are live brand hubs today.",
     "- Placement in one line: the brand picks a category, the team curates which hubs and which of the four placements fit, the IO names them, the brand approves the creative, and it runs from the IO launch date.",
+    `- 2027 inventory (Randy t422u, Nov 21 2026; the one forecast figure we may state): we EXPECT $50MM+ of display inventory in 2027. Always call it an expectation and an estimate, not a guarantee or a promise. Available to spend now is ${tam2027Headline()} a year, ${TAM_2027.label}, and it is conservative because new hubs are launching that aren't counted yet. Retail hubs could reach 500+ locations (say could, no promise) and street teams reach homes door to door and sample on site. People can get hub launch alerts by category on https://birchreserve.net/media-kit#hub-alerts. Never say a hub is open before it is.`,
     `- Spend-down: ${SPEND_DOWN_LINE} Any monthly figure is a modelled illustration, not a delivery promise.`,
     `- Sponsorship packs: $1,500, $3,000 or $6,000 USD, with +5%, +10% or +15% bonus media credit ($1,575, $3,300 or $6,900 of credit). Nothing runs until an IO; refundable until 14 days before the IO launch date; bonus credit has no cash value. A paid $190 look or $490 reserve counts in full toward a pack bought within 30 days. Page: ${BIRCH_LINKS.sponsor}`,
     `- Exclusive display (one brand per category): a premium slot, or the exclusive display reserve, which locks an exclusive package in their category at 25% below the regular rate, with the full reserve counting toward the package. That reserve is the one offer priced in Canadian dollars, so don't quote its amount: send ${BIRCH_LINKS.exclusive} for the price and terms.`,

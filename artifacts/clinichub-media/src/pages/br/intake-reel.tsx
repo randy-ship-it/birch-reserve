@@ -7,6 +7,7 @@
  */
 import { useEffect, useRef } from "react";
 import { usePageMeta } from "@/components/br/ui";
+import { HubAlerts } from "@/components/br/hub-alerts";
 import { SurfaceTypes } from "@/components/br/surface-types";
 import { useCurrency } from "@/lib/currency";
 import { isScaleSkin } from "@/lib/siteSkin";
@@ -97,6 +98,7 @@ export default function BrIntakeReel() {
         <p className="mt-2.5 text-[13px] text-foreground/60">Captions on. Example brand and figures in the video are labelled EXAMPLE, not results.</p>
       </section>
       <div className="container mx-auto max-w-5xl px-4 pt-9"><SurfaceTypes /></div>
+      <div className="container mx-auto max-w-5xl px-4 pt-6"><HubAlerts compact where="reel" pagePath="/intake/reel" /></div>
       <section className="container mx-auto max-w-5xl px-4 pb-12 pt-9">
         <h2 className="font-display text-2xl md:text-3xl">How it works, in four steps.</h2>
         <div className="mt-4 grid grid-cols-1 gap-3 min-[481px]:grid-cols-2 lg:grid-cols-4" data-testid="reel-tiles">{TILES.map((t) => <Tile key={t.k} t={t} />)}</div>

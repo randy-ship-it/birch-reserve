@@ -89,18 +89,26 @@ export async function captureEmailLead(input: {
   /** brochure_inline | brochure_slidein (media kit capture); st = street-team tag. */
   captureSource?: string | null;
   st?: string | null;
+  /** hub_alerts only: validated category names. */
+  hubCategories?: string[] | null;
   now?: Date;
 }): Promise<{ lead: Lead | undefined; created: boolean }> {
   const email = input.email.trim().toLowerCase();
-  const id = emailCaptureLeadId(email);
+  const hubAlert = input.captureSource === "hub_alerts" && Boolean(input.hubCategories?.length);
+  // Hub alerts get their own lead row so they never overwrite a brochure or media-kit capture for the same email.
+  const id = hubAlert ? `hubalert:${emailCaptureLeadId(email).slice("email:".length)}` : emailCaptureLeadId(email);
   const res = await upsertLeadSafeDetailed({
     id,
     source: "email_capture",
     sourceRef: id.slice("email:".length),
     email,
     company: input.company ?? undefined,
-    need: input.captureSource ? "Brochure + rate card (" + input.captureSource + ")" : "Birch Reserve media kit + seat updates",
-    meta: { ...(input.captureSource ? { capture_source: input.captureSource } : {}), ...(input.st ? { st: input.st } : {}) },
+    need: hubAlert ? "Hub launch alerts: " + (input.hubCategories ?? []).join(", ") : input.captureSource ? "Brochure + rate card (" + input.captureSource + ")" : "Birch Reserve media kit + seat updates",
+    meta: {
+      ...(input.captureSource ? { capture_source: input.captureSource } : {}),
+      ...(hubAlert ? { category: (input.hubCategories ?? []).join(", ") } : {}),
+      ...(input.st ? { st: input.st } : {}),
+    },
     pagePath: input.pagePath ?? undefined,
     isTest: Boolean(input.isTest) || isTestIdentity({ email, name: input.company ?? null }),
     ...(input.attribution ?? {}),
