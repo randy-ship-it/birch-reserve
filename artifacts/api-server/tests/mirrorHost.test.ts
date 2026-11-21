@@ -108,3 +108,22 @@ test("checkout started from the Scale mirror returns to scalehealth.ca/intake/_m
   assert.equal(mirrorPathOf(mk({ origin: "https://scalehealth.ca" }), "/?reserve=confirmed"), "/intake/_m/?reserve=confirmed");
   assert.equal(mirrorPathOf(mk({}), "/?reserve=confirmed"), "/?reserve=confirmed");
 });
+
+test("account sign-in fallbacks on the Scale mirror stay on scalehealth.ca/intake/_m/account, Birch unchanged", async () => {
+  const { default: express } = await import("express");
+  const { default: adserver } = await import("../src/routes/adserver");
+  const app = express();
+  app.use(adserver);
+  const srv = app.listen(0);
+  try {
+    const port = (srv.address() as { port: number }).port;
+    const loc = (p: string) => fetch(`http://127.0.0.1:${port}${p}`, { redirect: "manual" }).then((r) => r.headers.get("location"));
+    assert.equal(await loc("/account/login?br_mirror=scale"), "/intake/_m/account");
+    assert.equal(await loc("/account/auth?t=bad&br_mirror=scale"), "/intake/_m/account?e=expired");
+    assert.equal(await loc("/account/report.csv?br_mirror=scale"), "/intake/_m/account");
+    assert.equal(await loc("/account/login"), "/account");
+    assert.equal(await loc("/account/auth?t=bad"), "/account?e=expired");
+  } finally {
+    srv.close();
+  }
+});
