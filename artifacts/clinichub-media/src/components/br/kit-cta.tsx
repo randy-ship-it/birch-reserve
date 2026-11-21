@@ -15,9 +15,9 @@ export function KitCta({ placement, size = "lg", tone = "lime", label = KIT_CTA_
   const colors = tone === "lime" ? "bg-lime-300 text-[#0b1f3a] shadow-lime-400/40 hover:bg-white" : "bg-[#0b1f3a] text-white shadow-black/20 hover:bg-lime-300 hover:text-[#0b1f3a]";
   return (
     <span className={`inline-flex flex-col gap-1 ${className}`}>
-      <a href={intakeHref(placement)} onClick={() => { logCtaClick(placement); onClick?.(); }} data-testid={testId ?? `kit-cta-${placement}`} className={`group inline-flex items-center justify-center gap-2 rounded-full font-bold shadow-lg ring-2 ring-[#0b1f3a]/10 transition ${h} ${colors}`}>
+      <a href={intakeHref(placement)} onClick={() => { logCtaClick(placement); onClick?.(); }} data-testid={testId ?? `kit-cta-${placement}`} className={`group inline-flex items-center justify-center gap-2 rounded-full font-bold shadow-lg ring-2 ring-[#0b1f3a]/10 transition ${h} ${colors}${size === "sm" ? " shrink-0 whitespace-nowrap" : ""}`}>
         <Sparkles className={size === "sm" ? "size-4" : "size-5"} aria-hidden />
-        {size === "sm" && label === KIT_CTA_LABEL ? <><span className="sm:hidden">Get my free kit</span><span className="hidden sm:inline">{label}</span></> : label}
+        {size === "sm" && label === KIT_CTA_LABEL ? <><span className="2xl:hidden">Get my free kit</span><span className="hidden 2xl:inline">{label}</span></> : label}
         <ArrowRight className={`${size === "sm" ? "size-4" : "size-5"} transition-transform group-hover:translate-x-0.5`} aria-hidden />
       </a>
       {sub === null ? null : sub ? <span className="text-xs opacity-75">{sub}</span> : null}

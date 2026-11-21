@@ -122,7 +122,7 @@ export function Layout({ children }: { children: ReactNode }) {
           </Link>
 
           {/* Desktop Nav: Advertise (Brands / Local) · Publish (Brands / Studios) · tools */}
-          <nav className="hidden lg:flex items-center gap-6 text-sm text-foreground" data-testid="main-nav">
+          <nav className="hidden lg:flex items-center gap-4 xl:gap-5 text-sm [&>a]:whitespace-nowrap text-foreground" data-testid="main-nav">
             {NAV_GROUPS.map((g) => (
               <div key={g.label} className="group relative">
                 <button type="button" className="inline-flex items-center gap-1 py-5 font-medium hover:text-foreground/70" aria-haspopup="true">
@@ -142,7 +142,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <a key={l.href} href={l.href} className="hover:text-foreground/70 transition-colors">{l.label}</a>
             ))}
             <CurrencyToggle className="hidden xl:inline-flex [&_button]:min-h-8 [&_button]:min-w-9" />
-            <a href="tel:+16479316278" className="font-medium whitespace-nowrap underline-offset-2 hover:underline" data-testid="header-call-birch">(647) 931-6278</a>
+            <a href="tel:+16479316278" className="hidden xl:inline font-medium whitespace-nowrap underline-offset-2 hover:underline" data-testid="header-call-birch">(647) 931-6278</a>
             <KitCta placement="nav" size="sm" sub={null} testId="nav-kit-cta" />
           </nav>
 
