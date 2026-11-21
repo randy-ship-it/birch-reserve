@@ -84,7 +84,7 @@ export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
     const baseLater = c?.later ? c.later.min / s.min : null;
     const range = base && base > 0 ? llh(base * lo, base * hi) : null;
     const later = baseLater && base && baseLater > base ? llh(baseLater * lo, baseLater * hi) : null;
-    const note = c?.needs_figure ? "Figures to come" : !c?.eligible_now ? (c?.reason ?? "Not in your markets yet") : null;
+    const note = c?.needs_figure ? "Reach counted with the Street Team: 2MM+ homes by 2027" : !c?.eligible_now ? (c?.reason ?? "Not in your markets yet") : null;
     return { key, name: n.name, unit: n.unit, monthly: n.monthly, geo: c?.geo_label ?? "", range, later, note };
   });
 }
@@ -154,7 +154,7 @@ function ChannelTable({ rows, extra, testId }: { rows: ChannelRow[]; extra?: Rea
               </span>
             </>
           ) : (
-            <span className="text-right text-[12px] md:col-span-2" style={{ color: RT.mute }}>{r.note ?? "Figures to come"}</span>
+            <span className="text-right text-[12px] md:col-span-2" style={{ color: RT.mute }}>{r.note ?? "Counted with the Street Team"}</span>
           )}
         </div>
       ))}
