@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<title>Brand onboarding build spec | Birch Reserve + Scale Health</title>
+<meta name="description" content="Internal build spec for the brand SKU onboarding form. Unlisted.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Sans:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f9f8f6;--ink:#071a39;--navy:#0b1f3a;--mute:#52617a;--line:#d3d7de;--lime:#c8f55a;--lime300:#bef264;--lime400:#a3e635;--lime50:#f7fee7;--card:#fff;--err:#b42318}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Fraunces,serif;font-weight:400;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(36px,6vw,60px);line-height:1.02}
+h2{font-size:clamp(28px,4vw,42px);line-height:1.1}
+h3{font-size:22px;line-height:1.2}
+a{color:var(--navy);text-underline-offset:3px}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.88em}
+code{overflow-wrap:anywhere;background:#fff;border:1px solid var(--line);padding:1px 6px}
+.top{position:sticky;top:0;z-index:20;background:rgba(249,248,246,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .in{max-width:1180px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:14px}
+.top img{width:32px;height:32px;border-radius:8px}
+.top b{font-weight:700}
+.top .tag{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.hero{background:radial-gradient(ellipse at top left,#ecfccb 0%,transparent 55%);border-bottom:1px solid var(--line);padding:56px 0 44px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(7,26,57,.6);margin:0 0 12px}
+.lede{font-size:18px;color:var(--mute);max-width:720px;margin:18px 0 0}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#fef3c7;color:#451a03;box-shadow:inset 0 0 0 1px #fcd34d;padding:4px 12px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+nav.toc a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:999px;background:#fff;box-shadow:inset 0 0 0 1px rgba(7,26,57,.15);font-size:14px;font-weight:600;text-decoration:none}
+nav.toc a:hover{background:var(--navy);color:#fff}
+section{border-bottom:1px solid rgba(211,215,222,.7);padding:56px 0;scroll-margin-top:72px}
+section>.wrap>p.intro{max-width:760px;color:var(--mute);margin:12px 0 28px}
+.num{display:inline-flex;width:30px;height:30px;border-radius:50%;background:var(--navy);color:var(--lime300);font:700 14px/30px "IBM Plex Sans";justify-content:center;margin-right:10px;vertical-align:middle}
+.card{background:#fff;border:1px solid rgba(7,26,57,.1);border-radius:24px;padding:24px;box-shadow:0 20px 25px -5px rgba(0,0,0,.08),0 8px 10px -6px rgba(0,0,0,.08)}
+.grid2>*,.grid3>*,.skins>*,.shotrow>*,ul.check li>*{min-width:0}
+ul.check li{min-width:0;overflow-wrap:anywhere}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+ul.check{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+ul.check li{display:flex;gap:10px;align-items:flex-start}
+ul.check li::before{content:"";flex:none;margin-top:4px;width:18px;height:18px;border-radius:5px;background:var(--lime300) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23071a39' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/12px no-repeat}
+ul.dont li::before{background:#fee2e2 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b42318' stroke-width='3.5' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") center/12px no-repeat}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px}
+.sw{border:1px solid var(--line);background:#fff;border-radius:16px;overflow:hidden;font-size:13px}
+.sw i{display:block;height:56px;border-bottom:1px solid var(--line)}
+.sw div{padding:8px 10px}.sw b{display:block;font-size:13px}.sw span{color:var(--mute);display:block;font-size:12px}
+.sw code{border:0;padding:0;background:none}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);font-size:14px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);background:#f1efe9}
+.tw{overflow-x:auto;border-radius:12px}
+.tw table{min-width:640px}
+.tag{display:inline-block;border-radius:999px;padding:1px 9px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.t-req{background:var(--navy);color:#fff}.t-opt{background:rgba(7,26,57,.07);color:rgba(7,26,57,.7)}.t-gap{background:#fef3c7;color:#451a03}.t-ok{background:#dcfce7;color:#14532d}
+/* live specimens (built from the real values) */
+.spec{display:grid;gap:18px}
+.spec .lab{display:block;margin-bottom:6px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:rgba(7,26,57,.6)}
+.spec input,.spec select{height:48px;width:100%;border:1px solid rgba(7,26,57,.2);background:#fff;padding:0 12px;font:400 16px "IBM Plex Sans";color:var(--ink);border-radius:0;outline:0}
+.spec input:focus{border-color:var(--ink);box-shadow:0 0 0 2px var(--lime)}
+.spec .help{display:block;margin-top:4px;font-size:12px;color:var(--mute)}
+.spec .err{display:block;margin-top:4px;font-size:13px;font-weight:600;color:var(--err)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 24px;border:0;border-radius:999px;font:700 16px "IBM Plex Sans";cursor:pointer;transition:.15s}
+.btn.go{background:var(--lime300);color:var(--navy);box-shadow:0 10px 15px -3px rgba(132,204,22,.3),0 4px 6px -4px rgba(132,204,22,.3)}
+.btn.go:hover,.btn.go.h{background:var(--navy);color:#fff}
+.btn.nav{height:56px;background:var(--navy);color:#fff;box-shadow:0 10px 15px -3px rgba(0,0,0,.1)}
+.btn.nav:hover,.btn.nav.h{background:var(--lime300);color:var(--navy)}
+.btn.dis{opacity:.6;cursor:not-allowed}
+.btn.back{height:48px;background:transparent;color:rgba(7,26,57,.7);box-shadow:inset 0 0 0 1px rgba(7,26,57,.2);font-size:14px;font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.step .c{display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(7,26,57,.6)}
+.step .c span:last-child{letter-spacing:0;font-weight:600;color:rgba(7,26,57,.5)}
+.step .bar{height:6px;border-radius:999px;background:rgba(7,26,57,.1);margin-top:6px;overflow:hidden}
+.step .bar i{display:block;height:100%;width:50%;border-radius:999px;background:var(--lime400)}
+.step p{margin:8px 0 0;font-size:14px;font-weight:600;color:var(--navy)}
+.ok{border:1px solid rgba(7,26,57,.15);background:var(--lime50);border-radius:16px;padding:20px}
+.ok .t{font:400 24px Fraunces,serif;color:var(--navy);display:flex;gap:8px;align-items:center}
+.ok .n{border-top:1px solid rgba(7,26,57,.1);margin-top:14px;padding-top:12px;font-size:14px}
+.ok .n b{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(7,26,57,.55);font-weight:700}
+.ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:640px){.ladder{grid-template-columns:1fr}}
+.rung{border:2px solid rgba(7,26,57,.15);background:#fff;border-radius:16px;padding:12px}.rung.on{background:var(--navy);border-color:var(--navy);color:#fff;box-shadow:0 10px 15px -3px rgba(0,0,0,.1)}
+.rung b{font-size:14px}.rung small{display:block;font-size:12px;opacity:.75;margin-top:4px;line-height:1.35}
+.chip{display:inline-block;margin-top:8px;border-radius:999px;padding:2px 8px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(7,26,57,.07);color:rgba(7,26,57,.65)}
+.rung.on .chip{background:var(--lime300);color:var(--navy)}
+.skins{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:860px){.skins{grid-template-columns:1fr}}
+.skin{border-radius:24px;padding:22px;border:1px solid var(--line)}
+.skin.scale{background:#f9fafb;color:#0d1426;font-family:"Plus Jakarta Sans",sans-serif}
+.skin.scale h3{font-family:"Plus Jakarta Sans",sans-serif;font-weight:700;letter-spacing:-.025em}
+.skin.scale .btn{font-family:"Plus Jakarta Sans",sans-serif}
+.skin.scale .btn.go{background:#34d399;color:#0b1f3a;box-shadow:0 10px 15px -3px rgba(16,185,129,.3)}
+.skin.scale .btn.go:hover{background:#0b1f3a;color:#fff}
+.skin.scale .btn.navcta{height:44px;border-radius:10px;background:#1d875c;color:#fff;font-size:14px;font-weight:600;padding:0 16px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.skin.scale .btn.navcta:hover{background:#176f4b}
+.skin.scale .bar i{background:#34d399}
+.skin.scale input:focus{border-color:#0d1426;box-shadow:0 0 0 2px #1d875c}
+.shotset{margin-top:36px}
+.shotset .src{color:var(--mute);font-size:14px;margin:4px 0 14px;word-break:break-all}
+.shotrow{display:grid;grid-template-columns:1.7fr 1fr;gap:20px;align-items:start}
+@media(max-width:900px){.shotrow{grid-template-columns:1fr}}
+figure{margin:0;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px}
+figcaption{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.scroll{max-height:560px;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#f1efe9}
+.scroll img{display:block;width:100%;height:auto}
+.legend{margin:12px 0 4px;padding:0;list-style:none;display:grid;gap:4px;font-size:13px}
+.legend b{display:inline-flex;width:20px;height:20px;border-radius:50%;background:#e11d48;color:#fff;font-size:11px;align-items:center;justify-content:center;margin-right:8px}
+.dl{font-size:13px;font-weight:600}
+.logos{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.logo{background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px}
+.logo .pv{height:96px;display:flex;align-items:center;justify-content:center;background:#f1efe9;border-radius:12px;margin-bottom:12px}
+.logo .pv img{max-height:72px;max-width:80%}
+.logo p{margin:0 0 8px;font-size:13px;color:var(--mute)}
+.logo a{display:inline-flex;min-height:44px;align-items:center;margin-right:14px;font-weight:600;font-size:14px}
+pre{margin:0;background:#0b1f3a;color:#e8eefc;border-radius:16px;padding:18px;overflow:auto;font:400 13px/1.6 "IBM Plex Mono",monospace}
+.url{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin-bottom:10px}
+.url b{font-size:14px}.url a{font-weight:600;word-break:break-all}
+.note{border-left:4px solid var(--lime400);background:#fff;padding:12px 16px;border-radius:0 12px 12px 0;margin:16px 0;font-size:14px}
+footer{padding:36px 0 60px;color:var(--mute);font-size:13px}
+</style>
+</head>
+<body>
+<div class="top"><div class="in"><img src="assets/logos/birch-reserve-mark.svg" alt=""><b>Brand onboarding build spec</b><span class="tag">Unlisted · not indexed</span></div></div>
+
+<header class="hero"><div class="wrap">
+<span class="pill">Working document · Nov 21 2026</span>
+<h1>Make the brand onboarding form look and behave like ours.</h1>
+<p class="lede">Everything the brand partner onboarding build needs to match the Birch Reserve and Scale Health intake: Randy's feedback, real design tokens, logos, annotated screenshots, field copy, the data handoff and the house rules. Values below were read from the production code and measured on the live pages.</p>
+<nav class="toc" aria-label="Sections">
+<a href="#feedback">1 Feedback</a><a href="#tokens">2 Design tokens</a><a href="#logos">3 Logos</a><a href="#shots">4 Screenshots</a><a href="#fields">5 Fields and copy</a><a href="#handoff">6 Data handoff</a><a href="#rules">7 Do / don't</a><a href="#urls">8 Main URLs</a>
+</nav>
+</div></header>
+
+<section id="feedback"><div class="wrap">
+<h2><span class="num">1</span>Randy's feedback</h2>
+<p class="intro">From the team thread on the first cut of the brand partners page (scalehealth.ca/brand-partners). One note so far; the checklist below turns it into things to verify.</p>
+<div class="grid2">
+<div class="card"><p class="eyebrow">What Randy said</p>
+<p style="margin:0 0 10px">Make the part about where your products go match our intake. It is not positioned for gyms and clinics. It is three channels:</p>
+<ol style="margin:0;padding-left:20px;display:grid;gap:6px"><li>Branded ScaleHealth.ca hubs</li><li>Our private retail network of fitness and recovery retailers</li><li>Our owned digital clinic, Calm Joints, and our Street Team Ambassadors</li></ol>
+<p class="help" style="font-size:13px;color:var(--mute);margin:12px 0 0">Stat chips and the fine print for each channel live on our intake (Where your products go). Copy them verbatim from there; do not restate, round or extend them anywhere else.</p></div>
+<div class="card"><p class="eyebrow">Checklist</p>
+<ul class="check">
+<li>"Where your products go" lists exactly those three channels, in that order, with the same names as our intake.</li>
+<li>Nothing on the page positions the offer for gyms or clinics as the audience for products.</li>
+<li>The channel stat chips and the "based on signed partnership contracts, reach and audience, not delivered impressions" fine print are copied verbatim from the live intake.</li>
+<li>Look and feel follows the tokens in section 2, in the Scale variant on scalehealth.ca.</li>
+<li>Any form that collects brand details uses the field names, labels, helper text and validation in section 5.</li>
+<li>The brand-partner submit hands data over as described in section 6.</li>
+<li>Section 7 do / don't list is clean on every page.</li>
+</ul>
+<p class="help" style="font-size:13px;color:var(--mute);margin:14px 0 0">Status when this page was written: the live brand partners page already shows the three channels in this order. Re-check the stat chips and the fine print against the intake.</p></div>
+</div>
+</div></section>
+
+<section id="tokens"><div class="wrap">
+<h2><span class="num">2</span>Design tokens</h2>
+<p class="intro">Source: <code>artifacts/clinichub-media/src/index.css</code>, <code>components/br/ui.tsx</code>, <code>form-steps.tsx</code>, <code>scale-chrome.tsx</code>, plus computed styles measured on the live pages at 1440. The Scale pages are the same form with a skin: data-skin="scale" swaps palette and type only. Fields, logic, validation and payloads are identical.</p>
+
+<h3>Colour</h3>
+<p class="eyebrow" style="margin-top:14px">Birch Reserve</p>
+<div class="swatches">
+<div class="sw"><i style="background:#f9f8f6"></i><div><b>Page</b><code>#f9f8f6</code><span>hsl(40 20% 97%)</span></div></div>
+<div class="sw"><i style="background:#071a39"></i><div><b>Ink / foreground</b><code>#071a39</code><span>text, borders at 10–20%</span></div></div>
+<div class="sw"><i style="background:#0b1f3a"></i><div><b>Navy (buttons, selected)</b><code>#0b1f3a</code><span>primary button, selected cards</span></div></div>
+<div class="sw"><i style="background:#c8f55a"></i><div><b>Accent / focus ring</b><code>#c8f55a</code><span>2px focus ring</span></div></div>
+<div class="sw"><i style="background:#bef264"></i><div><b>Lime 300 (CTA fill)</b><code>#bef264</code><span>submit button, chips</span></div></div>
+<div class="sw"><i style="background:#a3e635"></i><div><b>Lime 400</b><code>#a3e635</code><span>progress fill</span></div></div>
+<div class="sw"><i style="background:#f7fee7"></i><div><b>Lime 50</b><code>#f7fee7</code><span>success panel, notes</span></div></div>
+<div class="sw"><i style="background:#52617a"></i><div><b>Muted text</b><code>#52617a</code><span>hsl(217 20% 40%)</span></div></div>
+<div class="sw"><i style="background:#d3d7de"></i><div><b>Border</b><code>#d3d7de</code><span>hsl(217 15% 85%)</span></div></div>
+<div class="sw"><i style="background:#e9e7e2"></i><div><b>Secondary</b><code>#e9e7e2</code><span>soft bands</span></div></div>
+<div class="sw"><i style="background:#b42318"></i><div><b>Error text</b><code>#b42318</code><span>13px, 600, role="alert"</span></div></div>
+<div class="sw"><i style="background:#fef3c7"></i><div><b>Pending chip</b><code>#fef3c7</code><span>text #451a03, ring #fcd34d</span></div></div>
+</div>
+<p class="eyebrow" style="margin-top:26px">Scale Health skin</p>
+<div class="swatches">
+<div class="sw"><i style="background:#f9fafb"></i><div><b>Page</b><code>#f9fafb</code></div></div>
+<div class="sw"><i style="background:#0d1426"></i><div><b>Ink / foreground</b><code>#0d1426</code></div></div>
+<div class="sw"><i style="background:#1d875c"></i><div><b>Scale green</b><code>#1d875c</code><span>focus ring, nav CTA; hover #176f4b</span></div></div>
+<div class="sw"><i style="background:#34d399"></i><div><b>Emerald 400 (CTA fill)</b><code>#34d399</code><span>submit button, progress fill</span></div></div>
+<div class="sw"><i style="background:#ecfdf5"></i><div><b>Emerald 50</b><code>#ecfdf5</code><span>success panel</span></div></div>
+<div class="sw"><i style="background:#047857"></i><div><b>Emerald 700</b><code>#047857</code></div></div>
+<div class="sw"><i style="background:#5d636f"></i><div><b>Muted text</b><code>#5d636f</code></div></div>
+<div class="sw"><i style="background:#dfe2e7"></i><div><b>Border</b><code>#dfe2e7</code></div></div>
+<div class="sw"><i style="background:#f3f4f6"></i><div><b>Secondary</b><code>#f3f4f6</code></div></div>
+<div class="sw"><i style="background:#0b1f3a"></i><div><b>Navy (kept)</b><code>#0b1f3a</code><span>selected cards and hover stay navy</span></div></div>
+</div>
+
+<h3 style="margin-top:40px">Type</h3>
+<div class="tw"><table>
+<tr><th>Role</th><th>Birch Reserve</th><th>Scale Health</th></tr>
+<tr><td>Body</td><td>IBM Plex Sans 400, 16px / 24px</td><td>Plus Jakarta Sans 400, 16px / 24px</td></tr>
+<tr><td>Headings</td><td>Fraunces 400 (serif display). H1 36px, 60px from 768px, line-height 1.02, tight tracking. H2 30px, 48px from 768px.</td><td>Plus Jakarta Sans 700, letter-spacing -0.025em (H1 60px = -1.5px). Same sizes.</td></tr>
+<tr><td>Eyebrow</td><td colspan="2">12px, 600, uppercase, tracking 0.2em, ink at 60%</td></tr>
+<tr><td>Lede</td><td colspan="2">18px / 1.6, muted, max-width 42rem</td></tr>
+<tr><td>Field label</td><td colspan="2">11px, 700, uppercase, tracking 0.05em, ink at 60%</td></tr>
+<tr><td>Helper text</td><td colspan="2">12px, muted</td></tr>
+<tr><td>Step count</td><td colspan="2">11px, 700, uppercase, tracking 0.18em, ink at 60%</td></tr>
+<tr><td>Step hint</td><td colspan="2">14px, 600, #0b1f3a</td></tr>
+<tr><td>Error</td><td colspan="2">13px, 600, #b42318</td></tr>
+<tr><td>Primary button text</td><td colspan="2">16px, 700 (nav CTA on Scale: 14px, 600)</td></tr>
+</table></div>
+<p class="note">Fonts load from Google Fonts: <code>Fraunces</code>, <code>IBM Plex Sans</code>, <code>Plus Jakarta Sans</code>. On Scale pages every <code>.font-display</code> heading also uses Plus Jakarta Sans 700.</p>
+
+<h3 style="margin-top:40px">Spacing, radii, shadows</h3>
+<div class="tw"><table>
+<tr><th>Token</th><th>Value</th><th>Where</th></tr>
+<tr><td>Section padding</td><td>64px vertical (96px from 768px), 24px sides, container centred</td><td>every section, 1px bottom border at 70%</td></tr>
+<tr><td>Form card</td><td>padding 20px (24px from 768px), radius <b>24px</b>, 1px border ink at 10%, shadow-xl (0 20px 25px -5px / 0 8px 10px -6px at 10%)</td><td>the intake card</td></tr>
+<tr><td>Option / role card</td><td>padding 12–16px, radius <b>16px</b>, 2px border</td><td>exposure ladder, role cards</td></tr>
+<tr><td>Inputs and selects</td><td>height 48px (44px for secondary fields), padding 0 12px, radius <b>0 (square)</b>, 1px border ink at 20%</td><td>all fields</td></tr>
+<tr><td>Buttons, chips, progress</td><td>radius <b>full pill</b></td><td>all buttons, chips, bars</td></tr>
+<tr><td>Scale nav CTA</td><td>radius 10px, height 44px, padding 0 16px</td><td>Scale header only</td></tr>
+<tr><td>Grid gaps</td><td>8px between options, 12px between fields, 16–20px between cards</td><td></td></tr>
+<tr><td>Touch targets</td><td>minimum 44px high</td><td>links, chips, buttons</td></tr>
+<tr><td>Header</td><td>fixed, 64px high, 1px bottom border, page colour at 80–90% with blur</td><td>anchor jumps offset 80px</td></tr>
+</table></div>
+<p class="note">Careful: the site sets Tailwind's small radius steps to zero, so anything written as "rounded-md/lg/xl" renders square. Only 2xl (16px), 3xl (24px) and full (pill) round. Match the numbers above, not class names.</p>
+
+<h3 style="margin-top:40px">Components, live specimens</h3>
+<div class="skins">
+<div class="skin"><p class="eyebrow">Birch Reserve</p>
+<div class="spec">
+<div class="step"><div class="c"><span>Step 1 of 2</span><span>Your free kit</span></div><div class="bar"><i></i></div><p>Add your website and work email, then press the button.</p></div>
+<div><label class="lab">Website</label><input value="yourbrand.com" aria-label="Website"><span class="help">Helper text sits 4px under the field.</span></div>
+<div><label class="lab">Work email</label><input value="bad" aria-label="Work email (error state)" style="border-color:rgba(7,26,57,.2)"><span class="err" role="alert">That email looks off. Check for a typo, like name@company.com.</span></div>
+<div class="row"><button class="btn go" type="button">Get my free Monetization Kit →</button><button class="btn go h" type="button">Hover</button><button class="btn go dis" type="button">Disabled</button></div>
+<div class="row"><button class="btn nav" type="button">Full-width primary (h56)</button><button class="btn nav h" type="button">Hover</button><button class="btn back" type="button">← Back</button></div>
+<div class="ladder"><div class="rung on"><b>✓ Performance only</b><small>Placed where curation needs it</small><span class="chip">Pay on results</span></div><div class="rung"><b>+ Own hub</b><small>Your own shelf</small><span class="chip">Pending approval</span></div><div class="rung"><b>+ Display</b><small>Optional paid display</small><span class="chip">Optional</span></div></div>
+<div class="ok" role="status"><div class="t">✓ Got it. Check your inbox.</div><div class="n"><b>What happens next</b>A person reviews every request. Nothing is published, booked or charged automatically.</div></div>
+</div></div>
+<div class="skin scale"><p class="eyebrow">Scale Health skin</p>
+<div class="spec">
+<div class="step"><div class="c"><span>Step 1 of 2</span><span>Your free kit</span></div><div class="bar"><i></i></div><p>Add your website and work email, then press the button.</p></div>
+<div><label class="lab">Website</label><input value="yourbrand.com" aria-label="Website"><span class="help">Helper text sits 4px under the field.</span></div>
+<div><label class="lab">Work email</label><input value="bad" aria-label="Work email (error state)"><span class="err" role="alert">That email looks off. Check for a typo, like name@company.com.</span></div>
+<div class="row"><button class="btn go" type="button">Get my free Monetization Kit →</button><button class="btn navcta" type="button">Get my kit</button></div>
+<div class="ok" style="background:#ecfdf5" role="status"><div class="t" style="font-family:'Plus Jakarta Sans';font-weight:700">✓ Got it. Check your inbox.</div><div class="n"><b>What happens next</b>A person reviews every request. Nothing is published, booked or charged automatically.</div></div>
+<p class="help" style="font-size:12px;color:#5d636f;margin:0">Scale pages swap the whole lime ramp for emerald, set the focus ring to Scale green, and keep navy for selected states.</p>
+</div></div>
+</div>
+
+<h3 style="margin-top:40px">States and patterns</h3>
+<div class="tw"><table>
+<tr><th>Item</th><th>Spec</th></tr>
+<tr><td>Focus (inputs)</td><td>border becomes ink (#071a39 Birch, #0d1426 Scale) plus a 2px ring: #c8f55a on Birch, #1d875c on Scale. No default outline.</td></tr>
+<tr><td>Primary button</td><td>Lime/emerald fill, navy #0b1f3a text, 700. Hover: navy fill, white text. Disabled: 60% opacity while sending, with a spinner before the label. Height 48px (56px for the full-width variant). Label ends with an arrow.</td></tr>
+<tr><td>Back button</td><td>Pill, 48px, transparent, ink at 70%, 1px ring ink at 20%, ring goes to 50% on hover.</td></tr>
+<tr><td>Validation timing</td><td>An error shows after the field loses focus (blur) with a value present, never on first keystroke. On submit, focus jumps to the first invalid field.</td></tr>
+<tr><td>Error</td><td>Message directly under the field, 13px 600 #b42318, role="alert". Plain sentence, says what to do. Form-level errors use the same tone ("Too many tries. Please wait a minute.").</td></tr>
+<tr><td>Success</td><td>Panel replaces the form: radius 16px, 1px border ink at 15%, light fill (lime-50 / emerald-50), check icon, Fraunces 24px title (Plus Jakarta Sans 700 on Scale), role="status", then a "What happens next" block (11px label, 0.18em tracking).</td></tr>
+<tr><td>Saved progress</td><td>Answers are kept in the browser. On return a note reads "We kept what you typed last time." with a Start over link.</td></tr>
+<tr><td>Step pattern</td><td>"Step 1 of 2" left, step title right, a 6px pill progress bar (track ink at 10%, fill lime-400 / emerald-400, 300ms ease), then a one-line hint in 14px 600. The intake is two steps: (1) free kit with website and work email, (2) optional "Sharpen your numbers", saved onto the same request.</td></tr>
+<tr><td>Chips and toggles</td><td>Pill, 12px 600. Selected: navy fill, white text. Unselected: white with a 1px ring ink at 15%. Up to 3 categories selectable.</td></tr>
+<tr><td>Pending state</td><td>Amber pill "Pending approval" (#fef3c7, text #451a03, ring #fcd34d). A hub never goes live without Birch Reserve approval.</td></tr>
+</table></div>
+
+<h3 style="margin-top:40px">Breakpoints</h3>
+<div class="tw"><table>
+<tr><th>Width</th><th>Behaviour</th></tr>
+<tr><td>under 640</td><td>Single column. Primary button full width. Ladder and chips stack. Headline 36px.</td></tr>
+<tr><td>640 (sm)</td><td>Ladder goes 3-up. Button stops being full width.</td></tr>
+<tr><td>768 (md)</td><td>Section padding grows, H1 60px, H2 48px. Fields sit in one row: brand, website, email, button.</td></tr>
+<tr><td>1024 (lg)</td><td>Two-column detail grids (hub and supplier sections side by side).</td></tr>
+<tr><td>1280+</td><td>Content max width 80rem, centred.</td></tr>
+</table></div>
+<p class="note">Every page is audited for horizontal overflow and overlapping text at 320, 375, 390, 430, 1280 and 1440, with all details open. Use inputMode, autocomplete and type hints on fields so phones show the right keyboard.</p>
+</div></section>
+
+<section id="logos"><div class="wrap">
+<h2><span class="num">3</span>Logos</h2>
+<p class="intro">Served from this page's own folder, so the links keep working.</p>
+<div class="logos">
+<div class="logo"><div class="pv"><img src="assets/logos/birch-reserve-mark.svg" alt="Birch Reserve mark"></div><p>Birch Reserve mark, 96×96 viewBox, navy tile with a birch branch.</p><a href="assets/logos/birch-reserve-mark.svg" download>SVG</a><a href="assets/logos/birch-reserve-mark-512.png" download>PNG 512</a></div>
+<div class="logo"><div class="pv" style="background:#fff"><img src="assets/logos/scalehealth-logo.png" alt="ScaleHealth logo"></div><p>ScaleHealth logo, 354×68 PNG. Header uses it at 28–32px high, footer 24px. Alt text "ScaleHealth".</p><a href="assets/logos/scalehealth-logo.png" download>PNG</a></div>
+<div class="logo"><div class="pv"><img src="assets/logos/scale-mark.svg" alt="Scale mark"></div><p>Scale square mark (plus sign), favicon and app tile use.</p><a href="assets/logos/scale-mark.svg" download>SVG</a><a href="assets/logos/scale-mark-512.png" download>PNG 512</a></div>
+</div>
+<p class="note">There is no Scale wordmark in SVG in the repo. Use the PNG, or ask for the source file. Chat name on Scale pages is "Scale Squirrel". On birchreserve.net it is "Birch Q&amp;A Squirrel". Brand name in visible copy follows the host: "Scale Health" on Scale, "Birch Reserve" on Birch.</p>
+</div></section>
+
+<section id="shots"><div class="wrap">
+<h2><span class="num">4</span>Annotated screenshots</h2>
+<p class="intro">The live intake at 1440 and 390 wide, taken Nov 21 2026. Red numbers match the legend under each image. Images scroll inside their frame. Phone images are captured at 2× density.</p>
+<div class="shotset"><h3>Birch /intake</h3><p class="src">Live page: <a href="https://birchreserve.net/intake">https://birchreserve.net/intake</a>. Captured Nov 21 2026.</p><div class="shotrow"><figure class="frame d"><figcaption>Desktop 1440</figcaption><div class="scroll"><img src="assets/shots/birch-intake-1440.webp" alt="Birch /intake at 1440px, annotated" loading="lazy"></div><ol class="legend"><li><b>1</b> Step header: Step 1 of 2 + progress bar + hint</li><li><b>2</b> Website field (required)</li><li><b>3</b> Work email field (required)</li><li><b>4</b> Primary button</li><li><b>5</b> Secondary link row</li></ol><a class="dl" href="assets/shots/birch-intake-1440.webp" download>Download image</a></figure><figure class="frame m"><figcaption>Phone 390</figcaption><div class="scroll"><img src="assets/shots/birch-intake-390.webp" alt="Birch /intake at 390px, annotated" loading="lazy"></div><ol class="legend"><li><b>1</b> Step header: Step 1 of 2 + progress bar + hint</li><li><b>2</b> Website field (required)</li><li><b>3</b> Work email field (required)</li><li><b>4</b> Primary button</li><li><b>5</b> Secondary link row</li></ol><a class="dl" href="assets/shots/birch-intake-390.webp" download>Download image</a></figure></div></div><div class="shotset"><h3>Scale /intake (Scale skin)</h3><p class="src">Live page: <a href="https://www.scalehealth.ca/intake">https://www.scalehealth.ca/intake</a>. Captured Nov 21 2026.</p><div class="shotrow"><figure class="frame d"><figcaption>Desktop 1440</figcaption><div class="scroll"><img src="assets/shots/scale-intake-1440.webp" alt="Scale /intake (Scale skin) at 1440px, annotated" loading="lazy"></div><ol class="legend"><li><b>1</b> Header (Scale skin only)</li><li><b>2</b> Step header: Step 1 of 2 + progress bar + hint</li><li><b>3</b> Website field (required)</li><li><b>4</b> Work email field (required)</li><li><b>5</b> Primary button</li><li><b>6</b> Secondary link row</li></ol><a class="dl" href="assets/shots/scale-intake-1440.webp" download>Download image</a></figure><figure class="frame m"><figcaption>Phone 390</figcaption><div class="scroll"><img src="assets/shots/scale-intake-390.webp" alt="Scale /intake (Scale skin) at 390px, annotated" loading="lazy"></div><ol class="legend"><li><b>1</b> Header (Scale skin only)</li><li><b>2</b> Step header: Step 1 of 2 + progress bar + hint</li><li><b>3</b> Website field (required)</li><li><b>4</b> Work email field (required)</li><li><b>5</b> Primary button</li><li><b>6</b> Secondary link row</li></ol><a class="dl" href="assets/shots/scale-intake-390.webp" download>Download image</a></figure></div></div><div class="shotset"><h3>Supplier intake, Birch</h3><p class="src">Live page: <a href="https://birchreserve.net/intake/supplier?brand=example">https://birchreserve.net/intake/supplier?brand=example</a>. Captured Nov 21 2026.</p><div class="shotrow"><figure class="frame d"><figcaption>Desktop 1440</figcaption><div class="scroll"><img src="assets/shots/supplier-intake-1440.webp" alt="Supplier intake, Birch at 1440px, annotated" loading="lazy"></div><ol class="legend"><li><b>1</b> Step header: Step 1 of 2 + progress bar + hint</li><li><b>2</b> Exposure ladder (supplier preset)</li><li><b>3</b> Brand name field</li><li><b>4</b> Website field (required)</li><li><b>5</b> Work email field (required)</li><li><b>6</b> Primary button</li><li><b>7</b> Secondary link row</li><li><b>8</b> Quiet fee chips</li></ol><a class="dl" href="assets/shots/supplier-intake-1440.webp" download>Download image</a></figure><figure class="frame m"><figcaption>Phone 390</figcaption><div class="scroll"><img src="assets/shots/supplier-intake-390.webp" alt="Supplier intake, Birch at 390px, annotated" loading="lazy"></div><ol class="legend"><li><b>1</b> Step header: Step 1 of 2 + progress bar + hint</li><li><b>2</b> Exposure ladder (supplier preset)</li><li><b>3</b> Brand name field</li><li><b>4</b> Website field (required)</li><li><b>5</b> Work email field (required)</li><li><b>6</b> Primary button</li><li><b>7</b> Secondary link row</li><li><b>8</b> Quiet fee chips</li></ol><a class="dl" href="assets/shots/supplier-intake-390.webp" download>Download image</a></figure></div></div><div class="shotset"><h3>Supplier intake, Scale skin</h3><p class="src">Live page: <a href="https://www.scalehealth.ca/intake/supplier?brand=example">https://www.scalehealth.ca/intake/supplier?brand=example</a>. Captured Nov 21 2026.</p><div class="shotrow"><figure class="frame d"><figcaption>Desktop 1440</figcaption><div class="scroll"><img src="assets/shots/scale-supplier-intake-1440.webp" alt="Supplier intake, Scale skin at 1440px, annotated" loading="lazy"></div><ol class="legend"><li><b>1</b> Header (Scale skin only)</li><li><b>2</b> Step header: Step 1 of 2 + progress bar + hint</li><li><b>3</b> Exposure ladder (supplier preset)</li><li><b>4</b> Brand name field</li><li><b>5</b> Website field (required)</li><li><b>6</b> Work email field (required)</li><li><b>7</b> Primary button</li><li><b>8</b> Secondary link row</li><li><b>9</b> Quiet fee chips</li></ol><a class="dl" href="assets/shots/scale-supplier-intake-1440.webp" download>Download image</a></figure><figure class="frame m"><figcaption>Phone 390</figcaption><div class="scroll"><img src="assets/shots/scale-supplier-intake-390.webp" alt="Supplier intake, Scale skin at 390px, annotated" loading="lazy"></div><ol class="legend"><li><b>1</b> Header (Scale skin only)</li><li><b>2</b> Step header: Step 1 of 2 + progress bar + hint</li><li><b>3</b> Exposure ladder (supplier preset)</li><li><b>4</b> Brand name field</li><li><b>5</b> Website field (required)</li><li><b>6</b> Work email field (required)</li><li><b>7</b> Primary button</li><li><b>8</b> Secondary link row</li><li><b>9</b> Quiet fee chips</li></ol><a class="dl" href="assets/shots/scale-supplier-intake-390.webp" download>Download image</a></figure></div></div>
+</div></section>
+
+<section id="fields"><div class="wrap">
+<h2><span class="num">5</span>Fields and copy for brand / supplier onboarding</h2>
+<p class="intro">What our supplier intake asks today, in order, with the exact labels. It is one form: <code>/intake/supplier</code> is the main intake opened in supplier mode. Prefill with <code>?brand=Your%20Brand</code>.</p>
+
+<h3>Step 1: your free kit</h3>
+<div class="tw"><table>
+<tr><th>Field (name)</th><th>Label / placeholder</th><th>Helper or note</th><th>Rule</th><th></th></tr>
+<tr><td>Exposure level</td><td>"Your exposure (start performance-only, add more any time)". Options: Performance only, + Own hub, + Display CPM/CPC</td><td>Notes: performance-only is limited to what curation needs; own hub goes live once the team approves it; you approve every placement.</td><td>One of three levels. Each includes the one before.</td><td><span class="tag t-opt">Optional</span></td></tr>
+<tr><td>Physical locations</td><td>"Physical locations?" Yes / No</td><td>If yes: number of locations, estimated visitors a month, per location or total.</td><td>Whole numbers, 0 or more.</td><td><span class="tag t-opt">Optional</span></td></tr>
+<tr><td>brand</td><td>Placeholder "Brand name" (autocomplete organization)</td><td></td><td>Free text, up to 120 chars. Prefilled from <code>?brand=</code>.</td><td><span class="tag t-opt">Optional</span></td></tr>
+<tr><td>website</td><td>Placeholder "yourbrand.com" (autocomplete url, url keyboard)</td><td></td><td>Matches a web address with or without https://. Empty: "Add your website, like yourbrand.com." Invalid: "Use a web address like yourbrand.com."</td><td><span class="tag t-req">Required</span></td></tr>
+<tr><td>email</td><td>Placeholder "you@yourbrand.com" (autocomplete email, email keyboard)</td><td></td><td>name@domain.tld, local part up to 64 chars. Empty: "Add your work email." Invalid: "That email looks off. Check for a typo, like name@company.com."</td><td><span class="tag t-req">Required</span></td></tr>
+<tr><td>Promo code</td><td>"Have a code?" (collapsed)</td><td>Never print or hint at the code anywhere.</td><td>Applied on demand.</td><td><span class="tag t-opt">Optional</span></td></tr>
+<tr><td>More detail (collapsed)</td><td>Products / SKUs (count), Customers (approx.), Categories (up to 3 of 12), Market (Canada / USA / Both, optional regions)</td><td>"Business-level only, no customer data. Every figure is an estimate, reviewed by a person. Nothing is booked or charged."</td><td>Numbers are whole, 0 or more. Categories: choose up to 3.</td><td><span class="tag t-opt">Optional</span></td></tr>
+<tr><td>Submit</td><td>"Create my hub" when own hub is on, otherwise "Get my free Monetization Kit"</td><td>Short-form error copy: "Add your website and a work email to get your free Monetization Kit." / "Too many tries. Please wait a minute."</td><td>A hidden honeypot field is ignored. Submitting too fast returns "One sec: give it a moment and try again."</td><td></td></tr>
+</table></div>
+<p class="note">Categories (12): Sports Nutrition &amp; Supplements · Wearables &amp; Fitness Tech · Pain Relief &amp; Topicals · Personal Care &amp; Skincare · Footwear, Insoles &amp; Compression · Recovery Devices &amp; Equipment · Wellness Marketplaces &amp; Retail · Active Apparel &amp; Athleisure · Health Testing &amp; Longevity · Digital Health &amp; Telehealth · Strength &amp; Home Fitness · Sleep &amp; Breathing.</p>
+
+<h3 style="margin-top:36px">Step 2: sharpen your numbers (optional, updates the same request)</h3>
+<div class="tw"><table>
+<tr><th>Label</th><th>Type</th><th>Options / example</th></tr>
+<tr><td>Typical price / cart (USD)</td><td>Number</td><td>e.g. 60</td></tr>
+<tr><td>Gross margin</td><td>Select, "Pick one"</td><td>Under 30% · 30–50% · 50–70% · 70%+</td></tr>
+<tr><td>In retail today?</td><td>Select</td><td>Yes, in stores · Online only · Not yet</td></tr>
+<tr><td>Fulfilment</td><td>Select</td><td>We ship direct · Wholesale to stores · Both</td></tr>
+<tr><td>Accelerate test budget (USD), only if display is on</td><td>Select</td><td>Test budget bands, or Not sure yet</td></tr>
+</table></div>
+<p class="note">Copy rules: plain words, no jargon, one idea per line, "Optional" labelled when optional, USD stated where money appears, nothing promises results. Heading above step 2: "Sharpen your numbers", kicker "Optional · 2 minutes · updates the same request".</p>
+
+<h3 style="margin-top:36px">Where the current brand partners flow maps to ours</h3>
+<p class="intro" style="margin-bottom:16px">The live brand partners page (scalehealth.ca/brand-partners) is a static explainer with no form on it. Brands reply to an email, then the team sends a private store-connection link and agrees a member price. That is what exists, so the map below is by information needed, not by existing input.</p>
+<div class="tw"><table>
+<tr><th>Information the partner flow needs</th><th>Our field</th><th>Status</th></tr>
+<tr><td>Brand name</td><td>brand</td><td><span class="tag t-ok">Maps</span></td></tr>
+<tr><td>Brand website / store address</td><td>website (required)</td><td><span class="tag t-ok">Maps</span></td></tr>
+<tr><td>Work email of the person who will connect the store</td><td>email (required)</td><td><span class="tag t-ok">Maps</span></td></tr>
+<tr><td>Short list of products to feature</td><td>Products / SKUs is a count only</td><td><span class="tag t-gap">Gap: we have no product list field</span></td></tr>
+<tr><td>Member price as a percentage</td><td>none</td><td><span class="tag t-gap">Gap: not on our intake</span></td></tr>
+<tr><td>Storefront platform and store domain</td><td>none (website only)</td><td><span class="tag t-gap">Gap: ask after approval, not on a public form</span></td></tr>
+<tr><td>Who can install apps on the store</td><td>none</td><td><span class="tag t-gap">Gap: a yes/no helper, optional</span></td></tr>
+<tr><td>Where you ship</td><td>Market (Canada / USA / Both, regions) and Fulfilment</td><td><span class="tag t-ok">Maps</span></td></tr>
+<tr><td>Category</td><td>Categories (up to 3 of 12)</td><td><span class="tag t-ok">Maps</span></td></tr>
+<tr><td>Where products appear</td><td>Exposure level plus the three channels</td><td><span class="tag t-ok">Maps</span> (verify copy)</td></tr>
+<tr><td>Store credentials or API secrets</td><td>never collected in a public form</td><td><span class="tag t-gap">Do not add</span></td></tr>
+</table></div>
+<p class="note">Style differences spotted on the live brand partners page versus the Scale skin: it uses a different type family and a slightly different green and ink than the Scale skin in section 2 (primary green #1b8258 vs #1d875c, ink #042414 vs #0d1426, Satoshi vs Plus Jakarta Sans, 6/10/12/20px radii vs 0 inputs, 16/24px cards). Decide which wins before building the form; the numbers in section 2 are what the intake on scalehealth.ca uses today.</p>
+</div></section>
+
+<section id="handoff"><div class="wrap">
+<h2><span class="num">6</span>Data handoff</h2>
+<p class="intro">What exists today, and what to build if the brand flow needs to pass data to us.</p>
+<div class="grid2">
+<div class="card"><p class="eyebrow">What exists</p>
+<ul class="check">
+<li>The intake posts to our own same-origin routes on birchreserve.net (and through the mirror on scalehealth.ca/intake): <code>POST /v1/brand-intake</code> (create or first autosave), <code>PATCH /v1/brand-intake/:id</code> (merge changes, or submit), <code>POST /v1/brand-intake/:id/kit</code>, <code>GET /v1/brand-categories</code>.</li>
+<li>Body is JSON, up to 64 KB. Nothing is sent without a valid email on a submit. Partial saves need a valid email. Responses are never cached.</li>
+<li>Auth: no login for visitors. Each record gets a per-record edit token returned on create and sent back in the <code>X-Edit-Token</code> header on later updates. The routes forward to the CRM server-side with a shared-secret header that never reaches the browser.</li>
+<li>Supplier hub requests are stored as "pending approval". Only Randy or Jon approves; nothing publishes from the browser.</li>
+</ul></div>
+<div class="card"><p class="eyebrow">What does not exist</p>
+<ul class="check dont">
+<li>No partner webhook, no partner API key, no documented external contract. The routes above are the site's own form plumbing and their body shape is strict and can change. Do not post to them from another app.</li>
+<li>No endpoint that sends a brand's data to a third-party form.</li>
+</ul>
+<p style="font-size:14px;color:var(--mute);margin:14px 0 0">Simplest working handoff today: send brands to <code>https://www.scalehealth.ca/intake/supplier?brand=Your%20Brand</code>. They get the same look and flow, and the request lands with us.</p></div>
+</div>
+<h3 style="margin-top:32px">Suggested payload if a server-to-server handoff is wanted</h3>
+<p class="intro" style="margin:8px 0 14px">A proposal only, for Randy and Jon to approve before anything is built. Authentication would be a signed request (HMAC signature header plus timestamp) with a secret kept in the host's environment variables, never in code or the browser.</p>
+<pre>POST /v1/partner/brand-onboarding        (does not exist yet)
+Content-Type: application/json
+X-Signature: &lt;HMAC of body + timestamp&gt;     X-Timestamp: &lt;unix seconds&gt;
+
+{
+  "source": "scale_brand_partners",
+  "brand": "string, up to 120",
+  "website": "yourbrand.com",
+  "contact_email": "name@yourbrand.com",
+  "categories": ["recovery_devices"],            // up to 3 keys from the 12 categories
+  "market": { "countries": ["CA","US"], "regions": ["Ontario"] },
+  "featured_products": [{ "name": "string", "url": "https://..." }],   // 3 to 5
+  "member_discount_pct": 15,                     // whole number, agreed with the team
+  "exposure_level": 1,                           // 1 performance only, 2 + own hub, 3 + display
+  "utm": { "source": "", "medium": "", "campaign": "" }
+}
+
+201 { "ok": true, "id": "string", "status": "pending_review" }
+400 { "ok": false, "error": "website" | "email" | "invalid" }
+429 { "ok": false, "error": "rate_limited" }</pre>
+<p class="note">Never include store credentials, client secrets or tokens in any payload, URL, screenshot or chat. Store connection stays an approved, in-app step on the brand's side.</p>
+</div></section>
+
+<section id="rules"><div class="wrap">
+<h2><span class="num">7</span>Do / don't</h2>
+<div class="grid2" style="margin-top:20px">
+<div class="card"><p class="eyebrow">Do</p><ul class="check">
+<li>Describe Scale as a distribution platform, starting in Recovery.</li>
+<li>Use "Scale Health" on Scale pages and "Birch Reserve" on Birch pages. Chat name on Scale is "Scale Squirrel".</li>
+<li>Keep claims plain and true. Label estimates as estimates, state USD when money appears.</li>
+<li>Say "reach and audience, not delivered impressions" wherever the channel figures appear.</li>
+<li>Copy figures only from the live intake, verbatim.</li>
+<li>Say "free monetization kit" naturally where the kit is offered.</li>
+<li>Say a person reviews every request and nothing is booked or charged automatically.</li>
+<li>Keep the page quick: website and work email first, everything else optional.</li>
+</ul></div>
+<div class="card"><p class="eyebrow">Don't</p><ul class="check dont">
+<li>Don't add counts, audience sizes, outcomes or forecasts that are not already on our intake.</li>
+<li>Don't promise results, placement, rankings or revenue.</li>
+<li>Don't name other companies, ventures or partners that are not on the public site, and don't mention internal tools, systems or vendors.</li>
+<li>Don't describe Scale as anything other than a distribution platform starting in Recovery.</li>
+<li>Don't position the offer for gyms and clinics as the buyers of products. Hubs are where products appear.</li>
+<li>Don't show or hint at any promo code.</li>
+<li>Don't put secrets, keys, tokens or store credentials anywhere public.</li>
+<li>Don't edit the production copy of the intake from this page. Ask first.</li>
+</ul></div>
+</div>
+</div></section>
+
+<section id="urls"><div class="wrap">
+<h2><span class="num">8</span>Main Scale URLs</h2>
+<p class="intro">The three links Randy shares most.</p>
+<div class="url"><b>Scale intake</b><a href="https://www.scalehealth.ca/intake">https://www.scalehealth.ca/intake</a></div>
+<div class="url"><b>Scale media kit</b><a href="https://www.scalehealth.ca/intake/_m/media-kit">https://www.scalehealth.ca/intake/_m/media-kit</a></div>
+<div class="url"><b>Reel</b><a href="https://birchreserve.net/reel">https://birchreserve.net/reel</a></div>
+<div class="url"><b>Supplier intake (Scale skin)</b><a href="https://www.scalehealth.ca/intake/supplier?brand=example">https://www.scalehealth.ca/intake/supplier?brand=example</a></div>
+<div class="url"><b>Current brand partners page</b><a href="https://www.scalehealth.ca/brand-partners">https://www.scalehealth.ca/brand-partners</a></div>
+<div class="url"><b>Reel on the Scale host</b><a href="https://www.scalehealth.ca/intake/_m/reel">https://www.scalehealth.ca/intake/_m/reel</a></div>
+<p class="note">The reel on scalehealth.ca is currently the same page as birchreserve.net/reel, shown under the Birch name with USD pricing. A Scale-branded reel page is being added; this list will point to it once it is live. Note that scalehealth.ca/reel (without /intake/_m) is a different page on the main Scale site.</p>
+</div></section>
+
+<footer><div class="wrap">This page is unlisted and asks search engines not to index it. Written by Birch Reserve for the brand onboarding build. Questions go to Randy.</div></footer>
+</body>
+</html>

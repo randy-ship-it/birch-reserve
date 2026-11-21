@@ -21,6 +21,7 @@ Disallow: /sales/
 Disallow: /sign-in/
 Disallow: /sign-up/
 Disallow: /for/
+Disallow: /dev/
 
 User-agent: *
 Allow: /
@@ -34,4 +35,5 @@ Disallow: /sales/
 Disallow: /sign-in/
 Disallow: /sign-up/
 Disallow: /for/
+Disallow: /dev/
 Sitemap: https://birchreserve.net/sitemap.xml
