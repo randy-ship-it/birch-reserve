@@ -3,6 +3,8 @@
  * Off unless MIRROR_FRAME_HOSTS is set (comma-separated https origins, e.g. "https://scalehealth.ca,https://www.scalehealth.ca").
  * When set, the intake pages may only be framed by Birch itself and those origins (CSP frame-ancestors). Other pages
  * are untouched. Invalid entries are ignored, so a typo can never open framing to everyone.
+ * Nov 21 2026: securityHeaders() now folds these hosts into the site-wide frame-ancestors, so app.ts no longer mounts
+ * mirrorFrame(); it stays exported for older callers and tests.
  */
 import type { NextFunction, Request, Response } from "express";
 

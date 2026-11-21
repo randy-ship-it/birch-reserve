@@ -63,7 +63,8 @@ function unlockIosVoiceGesture(event: Event) {
   );
 }
 
-const SCRIPT_SRC = "https://unpkg.com/@elevenlabs/convai-widget-embed";
+// Pinned (security audit Nov 21 2026): an unpinned unpkg URL runs whatever version is published next. Bump on purpose.
+const SCRIPT_SRC = "https://unpkg.com/@elevenlabs/convai-widget-embed@0.27.1";
 const SCRIPT_ATTR = "data-elevenlabs-convai-embed";
 const MOBILE_COMPACT_MQ = "(max-width: 767px)";
 
