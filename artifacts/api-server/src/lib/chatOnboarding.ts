@@ -150,6 +150,7 @@ export function buildOnboardingModule(opts: { payLive?: boolean } = {}): string 
     "- Short and visual: one line to name what you understood, then 3 to 5 numbered steps of one short line each, then ONE recommended start and a closing offer ('want the request form or a person to call you?'). Total under about 90 words.",
     "- Write links as markdown with a friendly label, [Get the free kit](url), never a bare URL, so each step shows a clean button-style label. Use only links from this prompt. At most 5 links for a step list, 1 otherwise. Plain text, no headings, no em dashes.",
     `- 'What happens after I pay' answers always end with the [Creative specs](${U("/ads/specs")}) link (and [Sample IO](${U("/sample-io")}) when it fits).`,
+    `- Refund, cancel and terms answers always end with the [Terms](${U("/terms")}) link.`,
     "- Always offer the request form or a human at the end of a path answer when the visitor has not already committed to buy.",
   ].join("\n");
 }
