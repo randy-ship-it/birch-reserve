@@ -531,15 +531,22 @@ async function callGrok(body: RandyChatBody, apiKey: string, brand: ChatBrand): 
   const themes = await currentPulseThemes().catch(() => [] as string[]);
 
   try {
-    const response = await fetch(`${XAI_BASE}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify(buildGrokRequest(body, undefined, themes, brand)),
-      signal: controller.signal,
-    });
+    const send = () =>
+      fetch(`${XAI_BASE}/chat/completions`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(buildGrokRequest(body, undefined, themes, brand)),
+        signal: controller.signal,
+      });
+    let response = await send();
+    // Provider rate limit (429) answers in under a second: one quiet retry keeps the live answer instead of the FAQ fallback.
+    if (response.status === 429) {
+      await new Promise((r) => setTimeout(r, 1200));
+      response = await send();
+    }
 
     if (!response.ok) {
       // Do not include response body in thrown message if it might echo auth errors with tokens.

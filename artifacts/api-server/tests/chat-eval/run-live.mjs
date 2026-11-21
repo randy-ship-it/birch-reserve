@@ -33,8 +33,9 @@ async function ask(site, q) {
     });
     if (r.status === 429) { await sleep(20000 * (attempt + 1)); continue; }
     const j = await r.json().catch(() => ({}));
-    if (r.ok && j.text) return { status: r.status, text: j.text, source: j.source };
-    await sleep(3000);
+    // source "faq" = the live model call failed upstream (429 / timeout) and the deterministic fallback answered: retry for a live answer, and record how many.
+    if (r.ok && j.text && (j.source === "grok" || attempt >= 3)) return { status: r.status, text: j.text, source: j.source, retries: attempt };
+    await sleep(6000);
   }
   return { status: 0, text: "", source: "none" };
 }
@@ -47,7 +48,7 @@ for (const brand of Object.keys(SITES)) {
     if (ids && !ids.includes(item.id)) continue;
     const a = await ask(SITES[brand], item.q);
     const fails = a.source === "grok" ? checkAnswer(item, a.text, brand) : [`source:${a.source}`, ...checkAnswer(item, a.text, brand)];
-    results.push({ brand, id: item.id, question: item.q, answer: a.text, source: a.source, pass: fails.length === 0, fails });
+    results.push({ brand, retries: a.retries ?? 0, id: item.id, question: item.q, answer: a.text, source: a.source, pass: fails.length === 0, fails });
     console.log(`${fails.length ? "FAIL" : "PASS"} ${brand} ${item.id}${fails.length ? "  " + fails.join(" ; ") : ""}`);
     await sleep(1800);
   }

@@ -42,7 +42,7 @@ export const RULES = (brand) => [
   { id: "no-promo-code", bad: /STREET\s?100|\bpromo code (is|:)|use code\b/i },
   { id: "no-internal-names", bad: /\b(Alset|MedVibe|pier\s?39|Clairvoyant)\b|\bAlign (Health|Wellness|Capital|Group|Clinics?|ops)\b|\bFriday\b(?!\s*(,|\.)?\s*(to|through|\d))/i },
   { id: "no-model-names", bad: /\b(grok|xai|x\.ai|openai|chat\s?gpt|claude|anthropic|gemini|llama)\b/i },
-  { id: "no-gig-uber-positioning", bad: /\b(we are|it'?s|is) (an )?(uber|gig)\b|\bon-demand (platform|service)\b/i },
+  { id: "no-gig-uber-positioning", bad: /\b(uber|gig[- ]?(economy|work|platform)?|on[- ]demand)\b/i },
   { id: "no-guarantee-claims", bad: /\b(we|will) guarantee\b|\bguaranteed (impressions|results|roi|sales|reach|clicks)\b/i },
   { id: "no-zero-counts", bad: /\b(0|zero) (clinics|hubs|locations|partners|brands|seats)\b|\$0 booked/i },
   { id: "no-booked-counts", bad: /\b\d+ (of \d+ )?(seats?|spots?|slots?) (are )?(left|open|remaining|available|taken|booked)\b/i },
@@ -81,7 +81,8 @@ export function checkAnswer(item, text, brand) {
   if (!text || text.trim().length < 20) fails.push("empty or too short");
   const words = text.replace(/\([^)]*\)/g, "").split(/\s+/).filter(Boolean).length;
   if (words > 190) fails.push(`too long (${words} words)`);
-  for (const r of RULES(brand)) if (r.bad.test(text)) fails.push(`rule:${r.id}`);
+  const GIG_DENIAL = /\b(not|never|isn'?t|aren'?t|no|neither|nor|nothing like|unlike|without)\b[^.\n]{0,80}\b(uber|gig|on[- ]demand)\b[^.\n]*/gi;
+  for (const r of RULES(brand)) if ((r.id === "no-gig-uber-positioning" ? r.bad.test(text.replace(GIG_DENIAL, "")) : r.bad.test(text))) fails.push(`rule:${r.id}`);
   for (const l of links) if (!ALLOWED_LINK(brand).test(l)) fails.push(`link-off-domain:${l}`);
   for (const m of text.matchAll(/(?:\bC\$|\bCA\$|\bCAD\s?\$?\s?)(\d[\d,]*)|\$\s?(\d[\d,]*(?:\.\d+)?)\s?CAD\b/gi)) {
     const n = Number((m[1] ?? m[2]).replace(/,/g, ""));
