@@ -459,6 +459,7 @@ test("paid /buy checkout: draft campaign takes the order's company + format, and
   const c = (await store.listCampaigns()).find((x) => x.orderRef === "cs_live_buylink")!;
   assert.equal(c.brand, "Brand Co Inc.");
   assert.equal(c.primaryPlacement, "dashboard");
+  assert.equal(c.clickUrl, "https://brand.co"); // landing URL = the website the buyer gave
   assert.equal(c.status, "draft");
   const crs = await store.listCreatives({ campaignId: c.id });
   assert.equal(crs.length, 1);
