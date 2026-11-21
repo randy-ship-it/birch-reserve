@@ -106,7 +106,7 @@ test("network figures (2:27 PM): shared constants site-wide, no homes figure, no
   const act = await import("../src/lib/kitCalc/activation");
   assert.equal(bi.RETAIL_COPY, "120+ retail hubs · 1MM+ recovery customers (est., growing to 300–500+ hubs) · Canada + USA");
   assert.equal(bi.RETAIL_TAG, "retail-network estimate");
-  assert.equal(bi.STREET_REACH_LINE, "reaches a few million doors targeted around the retail network");
+  assert.equal(bi.STREET_REACH_LINE, "reaches an estimated 2MM+ doors targeted around the retail network");
   const s = JSON.stringify([bi.CHANNEL_TILES, bi.EXPOSURE_CHANNELS, act]);
   assert.ok(!/500K|homes in reach/.test(s));
   assert.match(s, /growing to 300–500\+ hubs/);

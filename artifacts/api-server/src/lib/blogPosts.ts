@@ -33,7 +33,7 @@ export type BlogPost = {
 export const BLOG_INDEX_PATH = "/blog";
 export const BLOG_PUBLISHED = "2026-11-19";
 export const NETWORK_LINE = "120+ retail hubs · 1MM+ recovery customers (est., growing to 300–500+ hubs)";
-export const STREET_TEAM_LINE = "Our Street Team reaches a few million doors targeted around the retail network.";
+export const STREET_TEAM_LINE = "Our Street Team reaches an estimated 2MM+ doors targeted around the retail network.";
 
 export const BLOG_POSTS: readonly BlogPost[] = [
   {

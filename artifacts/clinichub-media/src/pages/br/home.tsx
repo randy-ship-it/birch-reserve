@@ -17,7 +17,7 @@ import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BuyCta } from "@/components/br/buy-cta";
 import { AnnotatedHubMock, MidTier } from "@/components/br/next-step";
-import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAsk } from "@/components/br/market-pulse";
+import { ActivityPulse, CategoryStrip, QuestionsBrandsAskCompact } from "@/components/br/market-pulse";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { INVENTORY, PUBLISHER_INCENTIVE } from "../../../../api-server/src/lib/overhaul/model";
 import { DOOR_ROUTE } from "../../../../api-server/src/lib/doorRoute";
@@ -112,8 +112,12 @@ export default function BrHome() {
           <AnnotatedHubMock testId="home-hero-mock" />
         </div>
       </section>
+      {/* Light continuous category strip under the hero (Randy Nov 21 10:20 AM). */}
+      <div className="container mx-auto max-w-6xl px-4 pb-5"><CategoryStrip testId="home-category-strip" /></div>
       {/* Mobile: the live feed sits in the gap between the hero and the stats (Randy, Nov 20 4:54 PM). */}
       <div className="container mx-auto max-w-5xl px-4 pb-6 md:hidden"><ActivityPulse mode="inline" /></div>
+      {/* Compact "Questions brands ask" next to the kit CTA (Randy Nov 21 10:20 AM): 6 one-line answers, checked against /terms. */}
+      <div className="container mx-auto max-w-5xl px-4 pb-10"><QuestionsBrandsAskCompact testId="home-questions-compact" /></div>
 
       {/* 2. Big numbers. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-stats">
@@ -141,8 +145,8 @@ export default function BrHome() {
                 <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#BFF3D6]">Street Team</span>
                 <Chip>Modelled</Chip>
               </div>
-              <p className="mt-2 font-display text-[2.4rem] leading-none md:text-5xl" data-testid="home-street-figure">A few million</p>
-              <p className="mt-1.5 text-sm text-white/75">doors targeted around the retail network <ArrowRight className="ml-1 inline size-3.5 transition group-hover:translate-x-0.5" aria-hidden /></p>
+              <p className="mt-2 font-display text-[2.4rem] leading-none md:text-5xl" data-testid="home-street-figure">2MM+</p>
+              <p className="mt-1.5 text-sm text-white/75">doors targeted around the retail network (est.) <ArrowRight className="ml-1 inline size-3.5 transition group-hover:translate-x-0.5" aria-hidden /></p>
             </div>
           </a>
         </div>
@@ -155,11 +159,7 @@ export default function BrHome() {
         <MidTier where="home" compact />
       </section>
 
-      {/* 2c. Categories we serve + Questions brands ask (Randy t291u, Nov 20 2026). Evergreen, answered against /terms. */}
-      <section className="container mx-auto max-w-5xl space-y-8 px-4 pb-10" data-testid="home-market-signals">
-        <CategoriesWeServe />
-        <QuestionsBrandsAsk />
-      </section>
+      {/* 2c. Categories + Questions brands ask moved up: strip under the hero, compact questions by the kit CTA (Nov 21). */}
       <ActivityPulse desktopOnly />
 
       {/* 3. Two ways in (same cards as the intake). */}

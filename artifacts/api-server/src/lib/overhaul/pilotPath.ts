@@ -11,7 +11,7 @@ import { PUBLIC_RESERVE_OFFERS } from "../reserveOffers";
 const LOOK = PUBLIC_RESERVE_OFFERS.find((o) => o.sku === "hold-190")!;
 
 export const PILOT_HERO = {
-  kicker: "Near-zero-risk pilot",
+  kicker: "Near-zero-risk start",
   title: "Start with the $190 USD 7-day look.",
   sub: "See a mock of your card on a live hub surface.",
   /** Existing terms, word for word. */

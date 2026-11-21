@@ -18,7 +18,7 @@ import { sampleReport } from "@/lib/fridayMockReport";
 import { RT, RT_SANS, RT_SERIF } from "@/lib/reportTokens";
 import { TwoLane } from "@/components/br/two-lane";
 import { NextStep } from "@/components/br/next-step";
-import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAsk } from "@/components/br/market-pulse";
+import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAskCompact } from "@/components/br/market-pulse";
 import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 import { brandFromUrl, presetOf, type IntakePreset } from "@/components/br/supplier-mode";
 import { RETAIL_COPY, RETAIL_TAG } from "../../../../api-server/src/lib/overhaul/brandIntake";
@@ -95,7 +95,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
         {sup ? null : (
           <div className="mt-10 space-y-8" style={{ fontFamily: "inherit" }} data-testid="intake-market-signals">
             <CategoriesWeServe />
-            <QuestionsBrandsAsk />
+            <QuestionsBrandsAskCompact testId="intake-questions-compact" />
           </div>
         )}
       </div>

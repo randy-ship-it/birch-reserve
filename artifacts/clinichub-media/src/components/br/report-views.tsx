@@ -73,7 +73,7 @@ export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
     const c = ex.channels.find((x) => x.key === key);
     const n = NAMES[key]!;
     if (key === "street_team") {
-      // Street Team: text reach only ("a few million doors targeted around the retail network"), never a homes figure.
+      // Street Team: text reach only ("an estimated 2MM+ doors targeted around the retail network"), never a homes figure.
       // Shown as text, never as a homes figure (Randy, Nov 19 2026 2:27 PM ET).
       const range = null;
       const later = null;
