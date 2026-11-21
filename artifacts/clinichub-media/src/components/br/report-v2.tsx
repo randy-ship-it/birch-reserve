@@ -208,7 +208,7 @@ export function ChannelTilesV2({ m, map }: { m: ReportModel; map?: string }) {
               ) : null}
             {t.fig.length ? (
               <p className="mt-2 text-[11px] font-semibold" style={{ color: RT.mute }} data-testid={`v2-tile-${t.key}-plan`}>{MODELLED_PLAN_LABEL}</p>
-            ) : <p className="mt-3 text-[34px] leading-none" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Figures to come</p>}
+            ) : <p className="mt-3 text-[20px] leading-none" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Counted with the Street Team: 2MM+ homes by 2027</p>}
             <FitMeter pct={t.fit} label={t.fitLabel} />
             <Details label="About this channel" testId={`v2-tile-${t.key}-details`}><p>{t.line}</p></Details>
           </article>
