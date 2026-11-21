@@ -206,6 +206,8 @@ const routes = [
   { src: "^/intake/_m/(.+)$", dest: "/$1", check: true },
   // The home page is served by the function so its Offer JSON-LD matches the visitor's currency.
   { src: "^/$", dest: "/api" },
+  // Unlisted reel page (static, noindex).
+  { src: "^/reel/?$", dest: "/reel/index.html", check: true },
   { handle: "filesystem" },
   ...API_PATHS.map((src) => ({ src, dest: "/api" })),
   ...SPA_INDEX_PATHS.map((src) => ({ src, dest: "/index.html" })),

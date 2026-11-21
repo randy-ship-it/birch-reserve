@@ -11,7 +11,7 @@ import { attachPendingForAccount } from "../lib/adserver/promo";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { logger } from "../lib/logger";
 import { getStripeClient } from "../lib/stripeClient";
-import { checkCreative, buyStore } from "../lib/buyFlow";
+import { buyStore } from "../lib/buyFlow";
 import { cronAuthorized } from "../lib/cronAuth";
 import { FixedWindowLimiter } from "../lib/rateLimit";
 import { ADS_FROM, hubAlertEmail, loginLinkEmail, siteMail } from "../lib/adserver/mail";
@@ -31,6 +31,8 @@ import { EMBED_JS, PIXEL_JS } from "../lib/adserver/embed";
 import { dashboardPage, loginPage } from "../lib/adserver/accountPage";
 import { adminLoginPage, adminPage } from "../lib/adserver/adminPage";
 import { docsPage } from "../lib/adserver/docsPage";
+import { checkUpload, checkVariant, findFormat, matchFormat, templateSvg, MAX_VIDEO_BYTES, VARIANT_ROLES, MAX_VARIANTS, type VariantRole } from "../lib/adserver/creativeSpec";
+import { specsPage, hubKitPage } from "../lib/adserver/specsPage";
 import { fridayReady, syncToFriday } from "../lib/adserver/friday";
 import { toCsv } from "../lib/adserver/ui";
 import type { CampaignPatch } from "../lib/adserver/store";
@@ -39,7 +41,7 @@ export const AD_CREATIVE_MIN = { width: 300, height: 50 } as const;
 
 const router: IRouter = Router();
 const json = express.json({ limit: "32kb" });
-const raw = express.raw({ type: ["image/*", "application/octet-stream"], limit: "2200kb" });
+const raw = express.raw({ type: ["image/*", "video/*", "application/octet-stream"], limit: MAX_VIDEO_BYTES + 64 * 1024 });
 const loginLimiter = new FixedWindowLimiter({ max: 8, windowMs: 15 * 60_000 });
 const pxLimiter = new FixedWindowLimiter({ max: 120, windowMs: 60_000 });
 
@@ -109,6 +111,33 @@ router.get(["/ads/docs", "/ads/docs/"], async (req, res) => {
   res.set("Cache-Control", "public, max-age=300").type("html").send(docsPage(origin(req)));
 });
 router.get(["/ads", "/ads/"], (_req, res) => res.redirect(302, "/ads/docs"));
+// Creative specs (public) and the hub drop-in kit (unlisted handoff for hub builders). ?br_mirror=scale = Scale skin.
+const skinOf = (req: Request) => (req.query.br_mirror === "scale" ? "scale" : "birch") as "scale" | "birch";
+router.get(["/ads/specs", "/ads/specs/", "/creative-specs"], (req, res) => {
+  const skin = skinOf(req);
+  res.set("Cache-Control", skin === "scale" ? "private, no-store" : "public, max-age=300").type("html").send(specsPage({ skin }));
+});
+router.get(["/ads/hub-kit", "/ads/hub-kit/"], (req, res) => {
+  const skin = skinOf(req);
+  res.set("Cache-Control", skin === "scale" ? "private, no-store" : "public, max-age=300").set("X-Robots-Tag", "noindex").type("html").send(hubKitPage({ skin }));
+});
+router.get("/ads/specs/templates/:file", (req, res) => {
+  const png = /^([a-z_]+)\.png$/.exec(String(req.params.file));
+  if (png && findFormat(png[1])) {
+    res.redirect(302, `/ads-specs/templates/${png[1]}.png`); // static file (artifacts/clinichub-media/public/ads-specs)
+    return;
+  }
+  const m = /^([a-z_]+)\.svg$/.exec(String(req.params.file));
+  const f = m ? findFormat(m[1]) : undefined;
+  if (!f) {
+    res.status(404).type("text").send("Unknown template");
+    return;
+  }
+  cors(res);
+  res.set({ "Cache-Control": "public, max-age=3600", "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'", "X-Content-Type-Options": "nosniff" });
+  if (req.query.download !== undefined) res.set("Content-Disposition", `attachment; filename="birch-${f.key}-${f.upload[0]}x${f.upload[1]}.svg"`);
+  res.type("image/svg+xml").send(templateSvg(f));
+});
 
 /* ------------------------------------------------------------------------------------------ serving */
 router.options("/v1/ads/*splat", (_req, res) => {
@@ -120,7 +149,8 @@ router.get("/v1/ads/serve", (req, res) =>
   safe(res, async () => {
     cors(res);
     noStore(res);
-    const r = await serve({ slot: str(req.query.slot, 80), vid: str(req.query.v, 64) || null, test: req.query.test === "1", ua: ua(req), dnt: req.query.dnt === "1" || dntHeader(req), origin: origin(req) });
+    const formats = str(req.query.fmt, 200).split(",").map((x) => x.trim()).filter((x) => findFormat(x));
+    const r = await serve({ slot: str(req.query.slot, 80), formats: formats.length ? formats : null, vid: str(req.query.v, 64) || null, test: req.query.test === "1", ua: ua(req), dnt: req.query.dnt === "1" || dntHeader(req), origin: origin(req) });
     res.json(r);
   }),
 );
@@ -182,26 +212,63 @@ const postbackHandler = (req: Request, res: Response) =>
 router.get("/v1/ads/postback", postbackHandler);
 router.post("/v1/ads/postback", json, postbackHandler);
 
+/** Sends creative bytes. Supports HTTP Range (Safari and iOS will not play a video without 206 responses). */
+function sendMedia(req: Request, res: Response, mime: string, data: Buffer): void {
+  res.set({ "Content-Type": mime, "X-Content-Type-Options": "nosniff", "Content-Security-Policy": "default-src 'none'", "Accept-Ranges": "bytes", "Cross-Origin-Resource-Policy": "cross-origin" });
+  const m = /^bytes=(\d*)-(\d*)$/.exec(req.get("range") ?? "");
+  if (m && (m[1] || m[2])) {
+    let start = m[1] ? Number(m[1]) : Math.max(0, data.length - Number(m[2]));
+    let end = m[1] && m[2] ? Math.min(Number(m[2]), data.length - 1) : data.length - 1;
+    if (start >= data.length || start > end) {
+      res.status(416).set("Content-Range", `bytes */${data.length}`).end();
+      return;
+    }
+    start = Math.max(0, start);
+    end = Math.max(start, end);
+    res.status(206).set("Content-Range", `bytes ${start}-${end}/${data.length}`).send(data.subarray(start, end + 1));
+    return;
+  }
+  res.send(data);
+}
+
+async function mediaAccess(req: Request, res: Response, row: { status: string; accountEmail: string }): Promise<boolean> {
+  if (row.status !== "approved") {
+    const mine = Boolean(admin(req)) || customer(req) === row.accountEmail;
+    if (!mine) {
+      res.status(404).end();
+      return false;
+    }
+    res.set("Cache-Control", "private, no-store");
+  } else {
+    cors(res);
+    res.set("Cache-Control", "public, max-age=86400");
+  }
+  return true;
+}
+
 router.get("/v1/ads/cr/:id", (req, res) =>
   safe(res, async () => {
-    const id = String(req.params.id).replace(/\.[a-z]+$/, "");
+    const id = String(req.params.id).replace(/\.[a-z0-9]+$/, "");
     const cr = await store.creativeData(id);
     if (!cr) {
       res.status(404).end();
       return;
     }
-    if (cr.status !== "approved") {
-      const mine = Boolean(admin(req)) || customer(req) === cr.accountEmail;
-      if (!mine) {
-        res.status(404).end();
-        return;
-      }
-      res.set("Cache-Control", "private, no-store");
-    } else {
-      cors(res);
-      res.set("Cache-Control", "public, max-age=86400");
+    if (!(await mediaAccess(req, res, cr))) return;
+    sendMedia(req, res, cr.mime, cr.data);
+  }),
+);
+
+/* Responsive variant (WebP / AVIF) or video poster of a creative. Same visibility rule as the creative itself. */
+router.get("/v1/ads/crv/:id", (req, res) =>
+  safe(res, async () => {
+    const v = await store.variantData(String(req.params.id).replace(/\.[a-z0-9]+$/, ""));
+    if (!v) {
+      res.status(404).end();
+      return;
     }
-    res.set({ "Content-Type": cr.mime, "X-Content-Type-Options": "nosniff", "Content-Security-Policy": "default-src 'none'" }).send(cr.data);
+    if (!(await mediaAccess(req, res, v))) return;
+    sendMedia(req, res, v.mime, v.data);
   }),
 );
 
@@ -323,12 +390,56 @@ router.post("/account/alerts", json, (req, res) =>
   }),
 );
 
-async function uploadCreative(req: Request, campaignId: string, actor: string, approve: boolean): Promise<{ ok: boolean; message: string }> {
+type UploadResult = { ok: boolean; message: string; field?: string; id?: string; kind?: string; format?: string | null; width?: number; height?: number; warnings?: string[] };
+async function uploadCreative(req: Request, campaignId: string, actor: string, approve: boolean, force = false): Promise<UploadResult> {
   const buf = Buffer.isBuffer(req.body) ? req.body : Buffer.alloc(0);
-  const chk = checkCreative(buf, AD_CREATIVE_MIN); // display banners (728×90, 320×50, 656×280) are wider than tall
-  if (!chk.ok) return { ok: false, message: chk.error };
-  await store.addCreative({ campaignId, mime: chk.value.mime, width: chk.value.width, height: chk.value.height, data: buf, alt: str(req.query.alt, 200), uploadedBy: actor, status: approve ? "approved" : "pending" });
-  return { ok: true, message: approve ? "Creative uploaded and approved." : "Creative sent for review. We'll approve it within 1 business day." };
+  const chk = checkUpload(buf, { alt: req.query.alt, headline: req.query.headline, cta: req.query.cta }, { force });
+  if (!chk.ok) return { ok: false, message: chk.error, field: chk.field };
+  const v = chk.value;
+  // A video needs a poster before it can run, so an admin "approve now" on a video waits for the poster.
+  const status = approve && v.kind === "image" ? "approved" : "pending";
+  const cr = await store.addCreative({ campaignId, mime: v.mime, width: v.width, height: v.height, data: buf, alt: v.alt, uploadedBy: actor, status, kind: v.kind, format: v.format, durationMs: v.durationMs, headline: v.headline, cta: v.cta, warnings: v.warnings });
+  const fmt = findFormat(v.format);
+  const head = `${fmt ? fmt.label : "Custom size"} ${v.width}×${v.height}${v.kind === "video" ? `, ${((v.durationMs ?? 0) / 1000).toFixed(1)}s` : ""}.`;
+  const tail = status === "approved" ? " Uploaded and approved." : approve && v.kind === "video" ? " Uploaded. Approve it once the poster frame is in." : " Sent for review. We approve within 1 business day.";
+  return { ok: true, message: `${head}${tail}${v.warnings.length ? ` Tip: ${v.warnings[0]}` : ""}`, id: cr.id, kind: v.kind, format: v.format, width: v.width, height: v.height, warnings: v.warnings };
+}
+
+/** Browser-made WebP / AVIF sizes and the video poster. Buyers can add them while the creative is in review; admins any time. */
+async function uploadVariant(req: Request, res: Response, creativeId: string, actor: string, isAdmin: boolean): Promise<void> {
+  const cr = await store.getCreative(creativeId);
+  if (!cr || (!isAdmin && cr.accountEmail !== actor)) {
+    res.status(404).json({ message: "Creative not found." });
+    return;
+  }
+  if (!isAdmin && cr.status !== "pending") {
+    res.status(409).json({ message: "This creative is already reviewed. Upload a new one to change it." });
+    return;
+  }
+  const role = String(req.query.role ?? "") as VariantRole;
+  if (!(VARIANT_ROLES as readonly string[]).includes(role)) {
+    res.status(400).json({ message: "Unknown variant." });
+    return;
+  }
+  if ((await store.listVariants([cr.id])).length >= MAX_VARIANTS && role !== "poster") {
+    res.status(409).json({ message: "This creative already has its variants." });
+    return;
+  }
+  const chk = checkVariant(Buffer.isBuffer(req.body) ? req.body : Buffer.alloc(0), role, { kind: cr.kind ?? "image", width: cr.width, height: cr.height });
+  if (!chk.ok) {
+    res.status(400).json({ message: chk.error });
+    return;
+  }
+  await store.addVariant({ creativeId: cr.id, role, mime: chk.value.mime, width: chk.value.width, height: chk.value.height, data: req.body as Buffer, actor });
+  res.json({ ok: true, message: role === "poster" ? "Poster frame saved." : `${role.toUpperCase()} ${chk.value.width}px saved.` });
+}
+
+function tooLarge(err: unknown, _req: Request, res: Response, next: (e?: unknown) => void): void {
+  if (err && typeof err === "object" && (err as { type?: string }).type === "entity.too.large") {
+    res.status(413).json({ message: "That file is too big. Images: up to 2 MB. Videos: up to 4 MB (6–10 seconds at about 2 Mbps). Specs: /ads/specs", field: "file" });
+    return;
+  }
+  next(err);
 }
 
 router.post("/account/creative", raw, (req, res) =>
@@ -340,7 +451,17 @@ router.post("/account/creative", raw, (req, res) =>
       return;
     }
     const r = await uploadCreative(req, c.id, email, false);
-    res.status(r.ok ? 200 : 400).json({ message: r.message });
+    res.status(r.ok ? 200 : 400).json(r);
+  }),
+);
+router.post("/account/creative/:id/variant", raw, (req, res) =>
+  safe(res, async () => {
+    const email = customer(req);
+    if (!email || !sameOrigin(req)) {
+      res.status(401).json({ message: "Sign in again." });
+      return;
+    }
+    await uploadVariant(req, res, String(req.params.id), email, false);
   }),
 );
 
@@ -385,7 +506,11 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
     res.type("html").send(
       adminPage({
         who, campaigns: campaigns.map((c) => ({ c, t: totals.get(c.id) ?? { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 } })),
-        pending: creatives.filter((x) => x.status === "pending" && ids.includes(x.campaignId)).map((x) => ({ ...x, brand: brand.get(x.campaignId) ?? "" })),
+        pending: await (async () => {
+          const pend = creatives.filter((x) => x.status === "pending" && ids.includes(x.campaignId));
+          const vs = await store.listVariants(pend.map((x) => x.id));
+          return pend.map((x) => ({ ...x, brand: brand.get(x.campaignId) ?? "", variants: vs.filter((y) => y.creativeId === x.id) }));
+        })(),
         creativesByCampaign: byC, slotTotals, ledger: led, royalties: roy, shares, alerts, audit, day: dayT, friday: fridayReady(), schema: store.adSchema(),
         promoHtml: await promoPanels(), hubs, testRoyalties, summary: realSt.summary, testSummary: testSt.summary, rates, recipients: recips, gates: gateMap, timing, channelRates,
         orders: orders.map((o) => ({ id: o.id, at: o.createdAt, email: o.email, company: o.company, plan: o.plan, format: o.format, creativeId: o.creativeId })),
@@ -615,10 +740,18 @@ router.post("/ads/admin/creatives", raw, (req, res) =>
       res.status(404).json({ message: "Campaign not found." });
       return;
     }
-    const r = await uploadCreative(req, c.id, who, req.query.approve === "true");
-    res.status(r.ok ? 200 : 400).json({ message: r.message });
+    const r = await uploadCreative(req, c.id, who, req.query.approve === "true", req.query.force === "true");
+    res.status(r.ok ? 200 : 400).json(r);
   }),
 );
+router.post("/ads/admin/creatives/:id/variant", raw, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    await uploadVariant(req, res, String(req.params.id), who, true);
+  }),
+);
+router.use(["/account/creative", "/ads/admin/creatives"], tooLarge);
 
 router.post("/ads/admin/creatives/:id/alt", json, (req, res) =>
   safe(res, async () => {
@@ -651,6 +784,13 @@ router.post("/ads/admin/creatives/:id/status", json, (req, res) =>
       if (!f?.isTest) {
         await store.audit(who, "creative.qa_approve_blocked", String(req.params.id));
         res.status(403).json({ message: "QA can only approve TEST creatives. Real ads are approved by hand." });
+        return;
+      }
+    }
+    if (to === "approved") {
+      const cr = await store.getCreative(String(req.params.id));
+      if (cr?.kind === "video" && !(await store.listVariants([cr.id])).some((x) => x.role === "poster")) {
+        res.status(400).json({ message: "Add a poster frame first (a still from the video, same size). It shows before the video plays and when motion is off." });
         return;
       }
     }
@@ -758,7 +898,7 @@ router.post("/ads/admin/orders/:id/attach", json, (req, res) =>
       res.status(404).json({ message: "The uploaded file is no longer stored. Ask the buyer to upload it on their dashboard." });
       return;
     }
-    await store.addCreative({ campaignId: c.id, mime: cr.mime, width: cr.width, height: cr.height, data: cr.data, alt: `${c.brand} ad`, uploadedBy: `${who} (from /buy)`, status: "pending", sourceRef: `buy:${order.id}` });
+    await store.addCreative({ campaignId: c.id, mime: cr.mime, width: cr.width, height: cr.height, data: cr.data, alt: `${c.brand} ad`, uploadedBy: `${who} (from /buy)`, status: "pending", sourceRef: `buy:${order.id}`, kind: "image", format: matchFormat("image", cr.width, cr.height)?.key ?? null });
     res.json({ message: "Sent to the approval queue." });
   }),
 );

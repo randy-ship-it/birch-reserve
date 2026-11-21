@@ -98,6 +98,16 @@ const DDL = (s: string) => [
   `INSERT INTO ${s}.ad_channel_rates (channel, override_bps, effective_at, actor, note) SELECT ch, 500, date_trunc('hour', now()), 'seed', 'Randy voice Nov 21 2026 2:45 PM: Birch fee 5% when sold organically off Scale Health or run internally (cost accounting)' FROM (VALUES ('scale_direct'), ('internal')) v(ch) WHERE NOT EXISTS (SELECT 1 FROM ${s}.ad_channel_rates)`,
   `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS review_note text`,
   `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS source_ref text`,
+  `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS kind text NOT NULL DEFAULT 'image'`,
+  `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS format text`,
+  `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS duration_ms integer`,
+  `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS headline text`,
+  `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS cta text`,
+  `ALTER TABLE ${s}.ad_creatives ADD COLUMN IF NOT EXISTS warnings text`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_creative_variants (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(), creative_id uuid NOT NULL, role text NOT NULL, mime text NOT NULL, width integer NOT NULL, height integer NOT NULL,
+    bytes integer NOT NULL, data bytea NOT NULL, created_by text, created_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE INDEX IF NOT EXISTS ad_creative_variants_creative ON ${s}.ad_creative_variants (creative_id)`,
   `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS paid_ref text`,
   `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS paid_by text`,
   `ALTER TABLE ${s}.ad_payouts ADD COLUMN IF NOT EXISTS paid_at timestamptz`,
@@ -254,21 +264,70 @@ export async function adjustBudget(id: string, deltaMicros: number, note: string
 }
 
 /* --------------------------------------------------------------------------------------------- creatives */
-export type Creative = { id: string; campaignId: string; mime: string; width: number; height: number; bytes: number; alt: string; status: "pending" | "approved" | "rejected"; uploadedBy: string | null; createdAt: Date; reviewNote?: string | null; sourceRef?: string | null };
+export type Creative = {
+  id: string; campaignId: string; mime: string; width: number; height: number; bytes: number; alt: string; status: "pending" | "approved" | "rejected"; uploadedBy: string | null; createdAt: Date;
+  reviewNote?: string | null; sourceRef?: string | null; kind?: "image" | "video"; format?: string | null; durationMs?: number | null; headline?: string | null; cta?: string | null; warnings?: string[];
+};
+const CR_COLS = "id, campaign_id, mime, width, height, bytes, alt, status, uploaded_by, created_at, review_note, source_ref, kind, format, duration_ms, headline, cta, warnings";
 const toCreative = (r: Record<string, unknown>): Creative => ({
   id: String(r.id), campaignId: String(r.campaign_id), mime: String(r.mime), width: num(r.width), height: num(r.height), bytes: num(r.bytes),
   alt: String(r.alt ?? ""), status: String(r.status) as Creative["status"], uploadedBy: (r.uploaded_by as string) ?? null, createdAt: new Date(String(r.created_at)),
   reviewNote: (r.review_note as string) ?? null, sourceRef: (r.source_ref as string) ?? null,
+  kind: r.kind === "video" ? "video" : "image", format: (r.format as string) ?? null, durationMs: r.duration_ms == null ? null : num(r.duration_ms),
+  headline: (r.headline as string) ?? null, cta: (r.cta as string) ?? null, warnings: r.warnings ? String(r.warnings).split("\n").filter(Boolean) : [],
 });
 
-export async function addCreative(c: { campaignId: string; mime: string; width: number; height: number; data: Buffer; alt: string; uploadedBy: string; status?: Creative["status"]; sourceRef?: string | null }): Promise<Creative> {
+export async function addCreative(c: {
+  campaignId: string; mime: string; width: number; height: number; data: Buffer; alt: string; uploadedBy: string; status?: Creative["status"]; sourceRef?: string | null;
+  kind?: "image" | "video"; format?: string | null; durationMs?: number | null; headline?: string | null; cta?: string | null; warnings?: string[];
+}): Promise<Creative> {
   const p = await db();
   const { rows } = await p.query(
-    `INSERT INTO ${S()}.ad_creatives (campaign_id, mime, width, height, bytes, data, alt, status, uploaded_by, source_ref) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id, campaign_id, mime, width, height, bytes, alt, status, uploaded_by, created_at, review_note, source_ref`,
-    [c.campaignId, c.mime, c.width, c.height, c.data.length, c.data, c.alt.slice(0, 200), c.status ?? "pending", c.uploadedBy, c.sourceRef ?? null],
+    `INSERT INTO ${S()}.ad_creatives (campaign_id, mime, width, height, bytes, data, alt, status, uploaded_by, source_ref, kind, format, duration_ms, headline, cta, warnings) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING ${CR_COLS}`,
+    [c.campaignId, c.mime, c.width, c.height, c.data.length, c.data, c.alt.slice(0, 200), c.status ?? "pending", c.uploadedBy, c.sourceRef ?? null, c.kind ?? "image", c.format ?? null, c.durationMs ?? null, c.headline ?? null, c.cta ?? null, c.warnings?.length ? c.warnings.join("\n") : null],
   );
-  await audit(c.uploadedBy, "creative.add", String(rows[0]!.id), c.campaignId);
+  await audit(c.uploadedBy, "creative.add", String(rows[0]!.id), `${c.campaignId}${c.format ? ` ${c.format}` : ""}`);
   return toCreative(rows[0]!);
+}
+
+export async function getCreative(id: string): Promise<(Creative & { accountEmail: string }) | null> {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+  const p = await db();
+  const { rows } = await p.query(`SELECT ${CR_COLS.split(", ").map((c) => `cr.${c}`).join(", ")}, c.account_email FROM ${S()}.ad_creatives cr JOIN ${S()}.ad_campaigns c ON c.id = cr.campaign_id WHERE cr.id = $1`, [id]);
+  return rows[0] ? { ...toCreative(rows[0]), accountEmail: String(rows[0].account_email) } : null;
+}
+
+/* Responsive variants (WebP / AVIF) and video posters, made by the uploader's browser and checked by creativeSpec.checkVariant. */
+export type CreativeVariant = { id: string; creativeId: string; role: string; mime: string; width: number; height: number; bytes: number };
+const toVariant = (r: Record<string, unknown>): CreativeVariant => ({ id: String(r.id), creativeId: String(r.creative_id), role: String(r.role), mime: String(r.mime), width: num(r.width), height: num(r.height), bytes: num(r.bytes) });
+
+export async function addVariant(v: { creativeId: string; role: string; mime: string; width: number; height: number; data: Buffer; actor: string }): Promise<CreativeVariant> {
+  const p = await db();
+  // One file per role + width; a poster replaces the previous poster.
+  if (v.role === "poster") await p.query(`DELETE FROM ${S()}.ad_creative_variants WHERE creative_id = $1 AND role = 'poster'`, [v.creativeId]);
+  else await p.query(`DELETE FROM ${S()}.ad_creative_variants WHERE creative_id = $1 AND role = $2 AND width = $3`, [v.creativeId, v.role, v.width]);
+  const { rows } = await p.query(
+    `INSERT INTO ${S()}.ad_creative_variants (creative_id, role, mime, width, height, bytes, data, created_by) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id, creative_id, role, mime, width, height, bytes`,
+    [v.creativeId, v.role, v.mime, v.width, v.height, v.data.length, v.data, v.actor],
+  );
+  await audit(v.actor, "creative.variant", v.creativeId, `${v.role} ${v.width}x${v.height}`);
+  return toVariant(rows[0]!);
+}
+
+export async function listVariants(creativeIds: string[]): Promise<CreativeVariant[]> {
+  const ids = creativeIds.filter((x) => /^[0-9a-f-]{36}$/i.test(x));
+  if (!ids.length) return [];
+  const p = await db();
+  const { rows } = await p.query(`SELECT id, creative_id, role, mime, width, height, bytes FROM ${S()}.ad_creative_variants WHERE creative_id = ANY($1::uuid[]) ORDER BY role, width`, [ids]);
+  return rows.map(toVariant);
+}
+
+export async function variantData(id: string): Promise<{ mime: string; data: Buffer; status: string; accountEmail: string } | null> {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+  const p = await db();
+  const { rows } = await p.query(`SELECT v.mime, v.data, cr.status, c.account_email FROM ${S()}.ad_creative_variants v JOIN ${S()}.ad_creatives cr ON cr.id = v.creative_id JOIN ${S()}.ad_campaigns c ON c.id = cr.campaign_id WHERE v.id = $1`, [id]);
+  const r = rows[0];
+  return r ? { mime: String(r.mime), data: Buffer.from(r.data as Buffer), status: String(r.status), accountEmail: String(r.account_email) } : null;
 }
 
 export async function listCreatives(opts: { campaignId?: string; status?: Creative["status"] } = {}): Promise<Creative[]> {
@@ -283,7 +342,7 @@ export async function listCreatives(opts: { campaignId?: string; status?: Creati
     params.push(opts.status);
     where.push(`status = $${params.length}`);
   }
-  const { rows } = await p.query(`SELECT id, campaign_id, mime, width, height, bytes, alt, status, uploaded_by, created_at, review_note, source_ref FROM ${S()}.ad_creatives ${where.length ? `WHERE ${where.join(" AND ")}` : ""} ORDER BY created_at DESC LIMIT 500`, params);
+  const { rows } = await p.query(`SELECT ${CR_COLS} FROM ${S()}.ad_creatives ${where.length ? `WHERE ${where.join(" AND ")}` : ""} ORDER BY created_at DESC LIMIT 500`, params);
   return rows.map(toCreative);
 }
 
@@ -333,16 +392,17 @@ export async function setCreativeStatus(id: string, status: Creative["status"], 
 
 /* --------------------------------------------------------------------------------------------- serving */
 /** Active campaigns with their approved creatives (decisioning input). */
-export async function servableCandidates(now = new Date()): Promise<Array<{ campaign: Campaign; creativeIds: string[] }>> {
+export async function servableCandidates(now = new Date()): Promise<Array<{ campaign: Campaign; creativeIds: string[]; creativeFormats: string[] }>> {
   const p = await db();
   const { rows } = await p.query(
-    `SELECT c.*, COALESCE(array_agg(cr.id::text) FILTER (WHERE cr.id IS NOT NULL), '{}') AS creative_ids
+    `SELECT c.*, COALESCE(array_agg(cr.id::text) FILTER (WHERE cr.id IS NOT NULL), '{}') AS creative_ids,
+            COALESCE(array_agg(COALESCE(cr.format, '-')) FILTER (WHERE cr.id IS NOT NULL), '{}') AS creative_formats
        FROM ${S()}.ad_campaigns c LEFT JOIN ${S()}.ad_creatives cr ON cr.campaign_id = c.id AND cr.status = 'approved'
       WHERE c.status = 'active' AND c.flight_start <= $1 AND c.flight_end > $1 AND c.spent_micros < c.budget_micros
       GROUP BY c.id`,
     [now.toISOString()],
   );
-  return rows.map((r) => ({ campaign: toCampaign(r), creativeIds: arr(r.creative_ids) }));
+  return rows.map((r) => ({ campaign: toCampaign(r), creativeIds: arr(r.creative_ids), creativeFormats: arr(r.creative_formats) }));
 }
 
 export async function viewsTodayFor(vidHash: string, campaignIds: string[]): Promise<Map<string, number>> {
@@ -718,6 +778,7 @@ export async function purgeTestCampaign(id: string, actor: string): Promise<bool
   const p = await db();
   await p.query(`DELETE FROM ${S()}.ad_events WHERE campaign_id = $1 AND is_test = true`, [id]);
   await p.query(`DELETE FROM ${S()}.ad_ledger WHERE campaign_id = $1 AND is_test = true`, [id]);
+  await p.query(`DELETE FROM ${S()}.ad_creative_variants WHERE creative_id IN (SELECT id FROM ${S()}.ad_creatives WHERE campaign_id = $1)`, [id]);
   await p.query(`DELETE FROM ${S()}.ad_creatives WHERE campaign_id = $1`, [id]);
   await p.query(`DELETE FROM ${S()}.ad_campaigns WHERE id = $1 AND is_test = true`, [id]);
   await audit(actor, "campaign.purge_test", id, c.brand);

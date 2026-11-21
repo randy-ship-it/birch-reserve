@@ -1,4 +1,7 @@
 /** Admin console (/ads/admin) for Randy and Jon. Real rows only; payouts are calculated and approved, never sent. */
+import { CREATIVE_UPLOAD_JS, creativeFields } from "./creativeUploadJs";
+import { findFormat } from "./creativeSpec";
+import type { CreativeVariant } from "./store";
 import { AD_SLOTS, PLACEMENTS, placementLabel } from "./config";
 import { flightProgress, pacingState, type Campaign } from "./engine";
 import type { Creative, LedgerLine, MonthSummary, PayoutSettings, RoyaltyRow, Totals } from "./store";
@@ -19,7 +22,7 @@ ${error ? `<p class="warn" role="alert">${esc(error)}</p>` : ""}
 export type AdminView = {
   who: string;
   campaigns: Array<{ c: Campaign; t: Totals }>;
-  pending: Array<Creative & { brand: string }>;
+  pending: Array<Creative & { brand: string; variants?: CreativeVariant[] }>;
   creativesByCampaign: Map<string, Creative[]>;
   slotTotals: Map<string, Totals>;
   ledger: LedgerLine[];
@@ -154,15 +157,27 @@ export function adminPage(v: AdminView, now = Date.now()): string {
 <td class="fine">${crs.length ? crs.map((x) => `<span class="chip c-${esc(x.status)}">${esc(x.status)}</span>`).join(" ") : "none"}</td>
 <td style="min-width:120px"><details class="ed"><summary>Edit</summary><form class="f" data-post="/ads/admin/campaigns/${esc(c.id)}" data-reload>${campaignForm(c)}<button type="submit">Save</button></form>
 <form class="f" data-post="/ads/admin/campaigns/${esc(c.id)}/budget" data-reload style="margin-top:8px"><div class="row"><label>Top up / adjust (±, ${c.currency.toUpperCase()})<input name="delta" type="number" step="0.01" required></label><label>Ledger note<input name="note" required maxlength="200" placeholder="IO #, top-up, refund"></label></div><button class="ghost sm" type="submit">Post to ledger</button></form>
-<form class="f" data-post="/ads/admin/creatives?campaign=${esc(c.id)}" data-reload style="margin-top:8px"><label>Add creative (image)<input type="file" name="file" accept="image/png,image/jpeg,image/webp,image/gif" required></label><label>Alt text<input name="alt" maxlength="200"></label><label style="display:flex;gap:6px;align-items:center;font-weight:500"><input type="checkbox" name="approve"> Approve now</label><button class="ghost sm" type="submit">Upload</button></form>
+<form class="f" data-creative-upload="/ads/admin/creatives?campaign=${esc(c.id)}" data-variant-base="/ads/admin/creatives/" style="margin-top:8px">${creativeFields()}<label style="display:flex;gap:6px;align-items:center;font-weight:500"><input type="checkbox" name="approve"> Approve now (stills; videos wait for the poster)</label><label style="display:flex;gap:6px;align-items:center;font-weight:500"><input type="checkbox" name="force"> Allow a size outside the specs</label><button class="ghost sm" type="submit">Upload</button><a class="fine" href="/ads/specs" target="_blank">Specs</a></form>
 <form data-post="/ads/admin/campaigns/${esc(c.id)}/login-link" style="margin-top:8px"><button class="ghost sm" type="submit">Copy customer dashboard link</button><pre data-out style="display:none;white-space:pre-wrap;word-break:break-all"></pre></form>
 ${v.friday ? `<form data-post="/ads/admin/friday-sync?campaign=${esc(c.id)}" style="margin-top:6px"><button class="ghost sm" type="submit">Push summary to Friday</button></form>` : ""}
 ${c.isTest ? `<form data-post="/ads/admin/campaigns/${esc(c.id)}/purge" data-reload style="margin-top:6px"><button class="danger sm" type="submit">Delete test campaign + its data</button></form>` : ""}</details></td></tr>`;
   });
-  const pending = v.pending.map((x) => `<div class="card" style="display:grid;gap:8px"><img src="/v1/ads/cr/${esc(x.id)}?preview=1" alt="${esc(x.alt)}" style="max-width:100%;border-radius:10px;border:1px solid #eee">
-<div><b>${esc(x.brand)}</b> <span class="fine">${x.width}×${x.height} · ${fmtInt(x.bytes / 1024)} KB · ${esc(x.uploadedBy ?? "")}</span><div class="fine">Alt: ${esc(x.alt || "–")}</div></div>
+  const pending = v.pending.map((x) => {
+    const vs = x.variants ?? [];
+    const poster = vs.find((y) => y.role === "poster");
+    const fmt = findFormat(x.format);
+    const preview = x.kind === "video"
+      ? `<video src="/v1/ads/cr/${esc(x.id)}" ${poster ? `poster="/v1/ads/crv/${esc(poster.id)}"` : ""} muted loop playsinline controls preload="metadata" style="max-width:100%;border-radius:10px;border:1px solid #eee;background:#071A39"></video>`
+      : `<img src="/v1/ads/cr/${esc(x.id)}?preview=1" alt="${esc(x.alt)}" style="max-width:100%;border-radius:10px;border:1px solid #eee">`;
+    return `<div class="card" style="display:grid;gap:8px">${preview}
+<div><b>${esc(x.brand)}</b> <span class="chip ${fmt ? "c-approved" : "c-pending"}">${esc(fmt ? fmt.label : "no format match")}</span> <span class="fine">${x.kind === "video" ? `video ${((x.durationMs ?? 0) / 1000).toFixed(1)}s · ` : ""}${x.width}×${x.height} · ${fmtInt(x.bytes / 1024)} KB · ${esc(x.mime)} · ${esc(x.uploadedBy ?? "")}</span>
+<div class="fine">Alt: ${esc(x.alt || "–")}${x.headline ? ` · Headline: ${esc(x.headline)}` : ""}${x.cta ? ` · Button: ${esc(x.cta)}` : ""}</div>
+<div class="fine">Variants: ${vs.filter((y) => y.role !== "poster").map((y) => `${esc(y.role)} ${y.width}px`).join(", ") || "none"}${x.kind === "video" ? ` · Poster: ${poster ? "yes" : "<b>missing (add one before approving)</b>"}` : ""}</div>
+${x.warnings?.length ? `<div class="fine">⚠ ${x.warnings.map(esc).join(" · ")}</div>` : ""}</div>
+${x.kind === "video" && !poster ? `<form class="f" data-post="/ads/admin/creatives/${esc(x.id)}/variant?role=poster" data-reload><label>Poster frame (JPG/WebP/PNG, same shape)<input type="file" name="file" accept="image/jpeg,image/webp,image/png" required></label><button class="ghost sm" type="submit">Add poster</button></form>` : ""}
 <form class="f" data-post="/ads/admin/creatives/${esc(x.id)}/alt" data-reload style="display:flex;gap:6px;margin:6px 0"><input name="alt" maxlength="200" value="${esc(x.alt ?? "")}" aria-label="Alt text"><button class="ghost sm" type="submit">Save alt</button></form>
-<div style="display:flex;gap:8px"><form data-post="/ads/admin/creatives/${esc(x.id)}/status?to=approved" data-reload><button class="sm" type="submit">Approve</button></form><form data-post="/ads/admin/creatives/${esc(x.id)}/status?to=rejected" data-reload style="display:flex;gap:6px"><input name="reason" required maxlength="300" placeholder="Reason (the buyer sees this)"><button class="ghost sm" type="submit">Reject</button></form></div></div>`);
+<div style="display:flex;gap:8px"><form data-post="/ads/admin/creatives/${esc(x.id)}/status?to=approved" data-reload><button class="sm" type="submit">Approve</button></form><form data-post="/ads/admin/creatives/${esc(x.id)}/status?to=rejected" data-reload style="display:flex;gap:6px"><input name="reason" required maxlength="300" placeholder="Reason (the buyer sees this)"><button class="ghost sm" type="submit">Reject</button></form></div></div>`;
+  });
   const slotRows = [...AD_SLOTS].sort((a, b) => Number(b.live) - Number(a.live)).map((s) => {
     const t = v.slotTotals.get(s.key);
     return `<tr><td>${esc(s.hubName)}</td><td>${esc(placementLabel(s.placement))}<div class="fine"><code>${esc(s.key)}</code></div></td><td><span class="chip ${s.live ? "c-active" : "c-pending"}">${s.live ? "live" : "not live"}</span></td><td class="n">$${s.cpmUsd.toFixed(2)}</td><td class="n">$${s.cpcUsd.toFixed(2)}</td><td class="n">${fmtInt(t?.serves ?? 0)}</td><td class="n">${fmtInt(t?.views ?? 0)}</td><td class="n">${fmtInt(t?.clicks ?? 0)}</td><td class="n">${fmtPct(t?.clicks ?? 0, t?.views ?? 0)}</td></tr>`;
@@ -219,6 +234,6 @@ ${v.friday ? `<form data-post="/ads/admin/friday-sync" style="display:inline"><b
     title: "Ads admin · Birch Reserve",
     nav: "Ads admin",
     right: `<nav class="tabs"><a href="#campaigns">Campaigns</a><a href="#creatives">Creatives${v.pending.length ? ` (${v.pending.length})` : ""}</a><a href="#onboard">Hubs</a><a href="#inventory">Inventory</a><a href="#payout-settings">Split</a><a href="#royalties">Royalties</a><a href="#ledger">Ledger</a><a href="#orders">Orders</a><a href="/ads/docs">Docs</a><form data-post="/ads/admin/logout" style="display:inline"><button class="ghost sm" type="submit">Sign out</button></form></nav>`,
-    body,
+    body: `${body}<script>${CREATIVE_UPLOAD_JS}</script>`,
   });
 }

@@ -23,7 +23,7 @@ export function docsPage(origin: string): string {
     title: "Ad embed and conversion pixel · Birch Reserve",
     nav: "Developer docs",
     robots: "index,follow",
-    right: `<nav class="tabs"><a href="#embed">Hub embed</a><a href="#pixel">CPA pixel</a><a href="#postback">Postback</a><a href="#privacy">Privacy</a><a href="/account">Your ads</a></nav>`,
+    right: `<nav class="tabs"><a href="#embed">Hub embed</a><a href="#pixel">CPA pixel</a><a href="#postback">Postback</a><a href="#privacy">Privacy</a><a href="/ads/specs">Creative specs</a><a href="/ads/hub-kit">Hub kit</a><a href="/account">Your ads</a></nav>`,
     body: `<h1 style="margin-top:26px">Ad embed and conversion pixel</h1>
 <p class="lede">How Birch Reserve placements render inside private hubs, how delivery is counted, and how a brand tracks cost per acquisition. Reporting is aggregate only. No impression guarantees.</p>
 <section id="embed"><h2>1. Hub embed (for hub pages)</h2><pre>${esc(embed)}</pre>

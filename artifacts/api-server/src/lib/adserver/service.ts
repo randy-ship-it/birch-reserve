@@ -10,11 +10,19 @@ import * as store from "./store";
 import { afterOrderCampaign } from "./promo";
 import { isTestIdentity } from "../testTraffic";
 import { buyStore } from "../buyFlow";
+import { fitsPlacement, findFormat, matchFormat } from "./creativeSpec";
 
-export type ServeInput = { slot: string; vid?: string | null; test?: boolean; ua?: string; dnt?: boolean; origin: string; now?: number };
+export type ServeInput = { slot: string; formats?: string[] | null; vid?: string | null; test?: boolean; ua?: string; dnt?: boolean; origin: string; now?: number };
 export type ServeResult =
   | { fill: false; reason: string }
-  | { fill: true; id: string; slot: string; campaign: string; brand: string; creative: { src: string; width: number; height: number; alt: string }; click: string; view: string; label: string; test: boolean };
+  | { fill: true; id: string; slot: string; campaign: string; brand: string; creative: ServedCreative; click: string; view: string; label: string; test: boolean };
+
+export type ServedCreative = {
+  src: string; width: number; height: number; alt: string;
+  /** Additive fields (embed v2). Older embeds read only src/width/height/alt and render the original image. */
+  kind: "image" | "video"; mime: string; format: string | null; ratio: string | null;
+  sources: Array<{ src: string; type: string; width: number }>; poster: string | null; headline: string | null; cta: string | null; durationMs: number | null;
+};
 
 type ServeClaims = { c: string; r: string; s: string; t: number; v: string | null; i: string; q: number };
 
@@ -42,10 +50,17 @@ export async function serve(input: ServeInput): Promise<ServeResult> {
   const rows = await candidates(now);
   const ids = rows.map((r) => r.campaign.id);
   const views = vidHash ? await store.viewsTodayFor(vidHash, ids) : new Map<string, number>();
-  const picked = pickAd(slot, rows.map((r) => ({ ...r, viewsToday: views.get(r.campaign.id) ?? 0 })), now, { test: Boolean(input.test) });
+  // Hub drop-in: a slot that declares its formats (data-br-format) only takes creatives made for them.
+  const only = input.formats?.length ? new Set(input.formats) : null;
+  const scoped = only ? rows.map((r) => ({ ...r, creativeIds: r.creativeIds.filter((_, k) => only.has(r.creativeFormats?.[k] ?? "")) })) : rows;
+  const picked = pickAd(slot, scoped.map((r) => ({ ...r, viewsToday: views.get(r.campaign.id) ?? 0 })), now, { test: Boolean(input.test) });
   if (!picked) return { fill: false, reason: "no_eligible_campaign" };
-  const creative = (await store.listCreatives({ campaignId: picked.campaign.id, status: "approved" })).find((c) => c.id === picked.creativeId);
+  // Prefer an approved creative made for this placement's shape; otherwise the picked one (the embed renders any shape uncropped).
+  const approved = await store.listCreatives({ campaignId: picked.campaign.id, status: "approved" });
+  const fitting = approved.filter((c) => c.format && (only ? only.has(c.format) : fitsPlacement(c.format, slot.placement)));
+  const creative = fitting.length ? fitting[Math.floor(Math.random() * fitting.length)]! : approved.find((c) => c.id === picked.creativeId);
   if (!creative) return { fill: false, reason: "no_creative" };
+  const variants = await store.listVariants([creative.id]);
   const i = randomId(12);
   const token = sign("s", { c: picked.campaign.id, r: creative.id, s: slot.key, t: now, v: vidHash, i, q: picked.campaign.isTest ? 1 : 0 } satisfies ServeClaims, AD_DEFAULTS.tokenTtlMs, now);
   await store.insertEvent({ kind: "serve", campaignId: picked.campaign.id, creativeId: creative.id, slotKey: slot.key, eligibility: picked.eligibility, isTest: picked.campaign.isTest, at: new Date(now) });
@@ -56,7 +71,13 @@ export async function serve(input: ServeInput): Promise<ServeResult> {
     slot: slot.key,
     campaign: picked.campaign.id.slice(0, 8),
     brand: picked.campaign.brand,
-    creative: { src: `${o}/v1/ads/cr/${creative.id}`, width: creative.width, height: creative.height, alt: creative.alt || `${picked.campaign.brand} (sponsored)` },
+    creative: {
+      src: `${o}/v1/ads/cr/${creative.id}`, width: creative.width, height: creative.height, alt: creative.alt || `${picked.campaign.brand} (sponsored)`,
+      kind: creative.kind ?? "image", mime: creative.mime, format: creative.format ?? null, ratio: findFormat(creative.format)?.ratio ?? null,
+      sources: variants.filter((v) => v.role !== "poster").map((v) => ({ src: `${o}/v1/ads/crv/${v.id}`, type: v.mime, width: v.width })),
+      poster: (() => { const p = variants.find((v) => v.role === "poster"); return p ? `${o}/v1/ads/crv/${p.id}` : null; })(),
+      headline: creative.headline ?? null, cta: creative.cta ?? null, durationMs: creative.durationMs ?? null,
+    },
     click: `${o}/v1/ads/c?t=${encodeURIComponent(token)}`,
     view: `${o}/v1/ads/v?t=${encodeURIComponent(token)}`,
     label: "Sponsored",
@@ -229,7 +250,7 @@ export async function linkBuyOrder(c: Campaign, session: Stripe.Checkout.Session
   await store.updateCampaign(c.id, { ...(order.company ? { brand: order.company.slice(0, 160) } : {}), ...(placement ? { primaryPlacement: placement } : {}) }, "stripe-webhook");
   if (order.creativeId && !(await store.listCreatives({ campaignId: c.id })).some((x) => x.sourceRef === `buy:${order.id}`)) {
     const cr = await buyStore().getCreative(order.creativeId);
-    if (cr) await store.addCreative({ campaignId: c.id, mime: cr.mime, width: cr.width, height: cr.height, data: cr.data, alt: `${order.company || c.brand} ad`, uploadedBy: `${c.accountEmail} (from /buy)`, status: "pending", sourceRef: `buy:${order.id}` });
+    if (cr) await store.addCreative({ campaignId: c.id, mime: cr.mime, width: cr.width, height: cr.height, data: cr.data, alt: `${order.company || c.brand} ad`, uploadedBy: `${c.accountEmail} (from /buy)`, status: "pending", sourceRef: `buy:${order.id}`, kind: "image", format: matchFormat("image", cr.width, cr.height)?.key ?? null });
   }
   await store.audit("stripe-webhook", "buy.linked", c.id, `order ${order.id} · ${order.format} · creative ${order.creativeId ?? "none"}`);
   return order.id;
