@@ -2266,7 +2266,7 @@ section.band{padding:52px 0}section.band+section.band{border-top:1px solid #d5d9
 footer{padding:28px 0 40px;font-size:13px;opacity:.75}footer p{margin:6px 0}
 .avail{display:inline-flex;align-items:center;gap:8px;margin:18px 0 0;padding:6px 12px;border:1px solid #C8F55A;font-size:15px}.avail strong{color:#C8F55A}.avail .dot{width:9px;height:9px;border-radius:50%;background:#C8F55A;box-shadow:0 0 0 3px rgba(200,245,90,.25)}.hero-contact{margin:16px 0 0;font-size:14px;opacity:.85}.hero-contact a{color:#F9F8F6}
 form#catreq{background:#fff;border:1px solid #071A39;padding:24px;position:relative}form textarea{width:100%;padding:10px 12px;border:1px solid #071A39;font:16px "IBM Plex Sans",system-ui,sans-serif;color:#071A39;border-radius:0}#r-message{font-weight:600;margin:14px 0 0;min-height:1em}.cat-strip a.req em{color:#8a5a00}.top nav a.tel{font-weight:600}
-@media(max-width:820px){.offers,.facts,.buy{grid-template-columns:1fr}.cat-strip{grid-template-columns:1fr 1fr}.hero{padding:40px 0 36px}section.band{padding:40px 0}.top nav a.tl{display:none}.ctas .btn{flex:1 1 100%}}
+@media(max-width:820px){.offers,.facts,.buy{grid-template-columns:minmax(0,1fr)}.buy>*{min-width:0}.cat-strip{grid-template-columns:1fr 1fr}.hero{padding:40px 0 36px}section.band{padding:40px 0}.top nav a.tl{display:none}.ctas .btn{flex:1 1 100%}}
 @media(max-width:380px){.row2{grid-template-columns:1fr}}`;
 
 function buycalcSelectedOffer(sku: unknown) {
