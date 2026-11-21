@@ -12,6 +12,8 @@ const PATHS = (process.env.AUDIT_PATHS ?? [
   "/agencies", "/brand-kit", "/intake", "/intake/publisher", "/intake/supplier", "/intake/sponsor", "/intake/gtm", "/intake/street-team",
   "/street-team", "/media-buyers", "/audiences", "/audiences/sample-profile", "/buyers", "/ai-buyers", "/about", "/terms", "/privacy",
   "/insights", "/inventory",
+  // Server-rendered (api-server) pages: only exist on a live/preview host.
+  ...(process.env.PLAYWRIGHT_BASE_URL ? ["/hub-proof", "/sponsor", "/ads/docs", "/reel", "/buy", "/buycalc"] : []),
 ].join(",")).split(",");
 
 for (const width of WIDTHS) {

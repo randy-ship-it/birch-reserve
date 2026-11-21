@@ -18,7 +18,12 @@ export async function auditPage(page: Page): Promise<Hit[]> {
     // Any element (fixed header included) poking past the viewport whose parent fits: a layout that ignores the width.
     document.querySelectorAll("body *").forEach((e) => {
       const r = e.getBoundingClientRect();
-      if (r.width < 2 || e.closest("[class*=overflow-x-auto],[class*=animate-marquee],elevenlabs-convai,svg,.sr-only,[aria-hidden=true]")) return;
+      if (r.width < 2) return;
+      for (let a: Element | null = e.parentElement; a && a !== document.body; a = a.parentElement) {
+        const o = getComputedStyle(a).overflowX;
+        if (o === "auto" || o === "scroll" || o === "hidden") return;
+      }
+      if (e.closest("[class*=overflow-x-auto],[class*=animate-marquee],elevenlabs-convai,svg,.sr-only,[aria-hidden=true]")) return;
       const cs = getComputedStyle(e);
       if (cs.display === "none" || cs.visibility === "hidden" || cs.position === "absolute") return;
       if (r.right > vw + 1 && (!e.parentElement || e.parentElement.getBoundingClientRect().right <= vw + 1) && (e.textContent || "").trim()) hits.push({ kind: "overflow", a: name(e), detail: `right ${Math.round(r.right)} > ${vw}` });
