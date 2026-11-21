@@ -111,10 +111,12 @@ export function HubMock({ brand, logo, hub, category, pins = false, badge }: { b
         <span className="size-2 rounded-full bg-red-300" /><span className="size-2 rounded-full bg-amber-300" /><span className="size-2 rounded-full bg-lime-400" />
         <span className="ml-2 truncate text-[11px] text-foreground/55">{hub === "drho" ? "physio.drhonow.com" : "scalehealth.ca/sole"}</span>
       </div>
-      <div className="relative aspect-[4/3] w-full">
-        <img src={hub === "drho" ? LIVE_HUB_IMAGE : SOLE_HUB_IMAGE} alt={`${hubName} live hub`} className="absolute inset-0 size-full object-cover object-top" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent" />
-        <div className="absolute bottom-3 right-3 w-[52%] max-w-[230px] rounded-xl bg-white p-3 shadow-2xl ring-2 ring-lime-300" data-testid="hub-mock-card">
+      {/* Randy Nov 21 11:03 AM: the frame matches the 1440x900 captures (16:10), so the whole page shows (logo, headline,
+          hub card) with no side crop; the 1440px source stays sharp at 2x for this width. */}
+      <div className="relative aspect-[16/10] w-full">
+        <img src={hub === "drho" ? LIVE_HUB_IMAGE : SOLE_HUB_IMAGE} alt={`${hubName} live hub`} width={1440} height={900} decoding="async" className="absolute inset-0 size-full object-cover object-center" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+        <div className="absolute bottom-3 right-3 w-[46%] max-w-[220px] rounded-xl bg-white p-2.5 shadow-2xl ring-2 ring-lime-300 sm:p-3" data-testid="hub-mock-card">
           {pins ? <><span className="absolute grid size-6 place-items-center rounded-full bg-lime-300 text-[11px] font-black text-[#0b1f3a] shadow-lg ring-2 ring-white -left-3 -top-3" aria-hidden>1</span><span className="absolute grid size-6 place-items-center rounded-full bg-lime-300 text-[11px] font-black text-[#0b1f3a] shadow-lg ring-2 ring-white -bottom-3 -right-2" aria-hidden>3</span></> : null}
           <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-foreground/45">Featured · {surface}</p>
           <div className="mt-2 flex items-center gap-2">

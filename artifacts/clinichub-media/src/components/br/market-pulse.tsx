@@ -234,6 +234,7 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, className =
   const [blocked, setBlocked] = useState(false);
   const [off, setOff] = useState(readOff);
   const boxRef = useRef<HTMLDivElement | null>(null);
+  const slotRef = useRef(-1); // chosen desktop spot, kept across item swaps
   const reduced = useMemo(() => typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches, []);
   useEffect(() => {
     let live = true;
@@ -282,41 +283,55 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, className =
   useEffect(() => {
     if (!feed || inline) return;
     let raf = 0;
-    // Try a few edge slots (left mid, lower, upper; then the right edge on desktop) and use the first one clear of
-    // every control. If none is clear, the toast steps aside until the page scrolls.
+    // Desktop (Randy Nov 21 11:03 AM): anchored, not floating mid-edge. First choice is bottom-left, aligned with the
+    // hero text's left edge (inside the content container), then bottom-right mirrored on the container's right edge,
+    // then both lifted above the call button / chat squirrel, then the empty top-right corner under the nav (intake form view).
+    // The chosen spot is sticky: it only moves when something interactive scrolls under it. Mobile keeps its slots.
+    type Slot = { top?: string; bottom?: string; left?: string; right?: string; text?: boolean };
+    const apply = (el: HTMLElement, x: Slot) => {
+      el.style.top = x.top ?? "auto";
+      el.style.bottom = x.bottom ?? "auto";
+      el.style.left = x.left ?? "auto";
+      el.style.right = x.right ?? "auto";
+    };
+    const slotsFor = (desktop: boolean): Slot[] => {
+      if (!desktop) return [{ top: "38%", left: "0.5rem" }, { top: "62%", left: "0.5rem" }, { top: "24%", left: "0.5rem" }];
+      const h1 = document.querySelector("main h1, h1");
+      const edge = Math.max(16, Math.round(h1?.getBoundingClientRect().left ?? 16));
+      const e = `${edge}px`;
+      return [
+        { bottom: "24px", left: e },
+        { bottom: "24px", right: e },
+        { bottom: "96px", left: e },
+        { bottom: "96px", right: e },
+        { top: "96px", right: e, text: true },
+        { top: "96px", right: "16px", text: true },
+      ];
+    };
+    const clear = (el: HTMLElement, x: Slot) => !overlapsControl(el) && !(x.text && overlapsText(el));
     const check = () => {
       raf = 0;
       const el = boxRef.current;
       if (!el) return;
-      const desktop = window.innerWidth >= 768;
-      const slots: Array<[string, "left" | "right"]> = desktop
-        ? [["50%", "left"], ["72%", "left"], ["30%", "left"], ["50%", "right"], ["30%", "right"], ["84%", "left"]]
-        : [["38%", "left"], ["62%", "left"], ["24%", "left"]];
-      for (const [top, side] of slots) {
-        el.style.top = top;
-        el.style.left = side === "left" ? "" : "auto";
-        el.style.right = side === "right" ? "1rem" : "";
-        if (!overlapsControl(el)) {
+      const slots = slotsFor(window.innerWidth >= 768);
+      const cur = slotRef.current;
+      if (cur >= 0 && cur < slots.length) {
+        apply(el, slots[cur]!);
+        if (clear(el, slots[cur]!)) {
           setBlocked(false);
           return;
         }
       }
-      // Desktop pages whose form fills the mid-height edges (intake): the empty top-right corner under the nav,
-      // outside the form column, as long as it covers no control and no heading or copy.
-      if (desktop) {
-        for (const top of ["96px", "120px"]) {
-          el.style.top = top;
-          el.style.left = "auto";
-          el.style.right = "1rem";
-          if (!overlapsControl(el) && !overlapsText(el)) {
-            setBlocked(false);
-            return;
-          }
+      for (let k = 0; k < slots.length; k++) {
+        apply(el, slots[k]!);
+        if (clear(el, slots[k]!)) {
+          slotRef.current = k;
+          setBlocked(false);
+          return;
         }
       }
-      el.style.top = slots[0]![0];
-      el.style.left = "";
-      el.style.right = "";
+      slotRef.current = -1;
+      apply(el, slots[0]!);
       setBlocked(true);
     };
     const schedule = () => {
@@ -345,7 +360,7 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, className =
   };
   const pos = inline
     ? `flex justify-center md:hidden ${className}`
-    : `fixed left-2 top-[38%] z-40 md:left-4 md:top-1/2 ${desktopOnly ? "max-md:hidden" : ""} ${className}`;
+    : `fixed bottom-6 left-4 z-40 max-md:bottom-auto max-md:left-2 max-md:top-[38%] ${desktopOnly ? "max-md:hidden" : ""} ${className}`;
   if (off) {
     return (
       <div ref={boxRef} className={`${pos} transition-opacity duration-300 ${blocked ? "pointer-events-none opacity-0" : "opacity-70 hover:opacity-100"}`} data-testid={inline ? "activity-pulse-on-inline" : "activity-pulse-on"}>
