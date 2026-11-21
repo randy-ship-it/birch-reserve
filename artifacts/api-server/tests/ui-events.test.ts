@@ -1179,3 +1179,17 @@ after(() => {
   setUiEventRecorderForTests(null);
   resetUiEventRateLimitForTests();
 });
+
+test("attention events: fixed list only, no user input, bucketed time to first interaction", async () => {
+  const { ATTENTION_EVENTS, isAttentionEvent, tfiBucket } = await import("../src/lib/attentionEvents");
+  for (const event of ["attn.view", "attn.scroll_25", "attn.scroll_100", "attn.first_touch", "attn.tfi_lt3s", "attn.hero_cta.kit", "attn.preview.type", "attn.beat.ladder", "attn.ladder.premium"]) {
+    assert.equal(isAttentionEvent(event), true, event);
+    assert.equal(parseUiEvent({ event, path: "/" })?.event, event);
+  }
+  for (const bad of ["attn.preview.Acme Corp", "attn.scroll_30", "attn.beat.x", "attn.", "scroll_25"]) {
+    assert.equal(isAttentionEvent(bad), false, bad);
+    assert.equal(parseUiEvent({ event: bad, path: "/" }), null, bad);
+  }
+  assert.ok(ATTENTION_EVENTS.length >= 25);
+  assert.deepEqual([tfiBucket(500), tfiBucket(5000), tfiBucket(15000), tfiBucket(60000)], ["tfi_lt3s", "tfi_3_10s", "tfi_10_30s", "tfi_gt30s"]);
+});

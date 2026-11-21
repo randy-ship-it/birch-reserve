@@ -6,6 +6,7 @@ import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import { logger } from "./logger";
 import { isIntakeEvent } from "./intakeEvents";
+import { isAttentionEvent } from "./attentionEvents";
 
 export const UI_EVENTS = [
   "cta_hero_reserve",
@@ -22,7 +23,7 @@ export const UI_EVENTS = [
 ] as const;
 
 /** Fixed CTA events, or an intake funnel event `intake.<side>.<action>[.<detail>]` from fixed lists (lib/intakeEvents.ts). */
-export type UiEventName = (typeof UI_EVENTS)[number] | `intake.${string}`;
+export type UiEventName = (typeof UI_EVENTS)[number] | `intake.${string}` | `attn.${string}`;
 export type UiEventOffer = "hold-190" | "reserve-490";
 
 export type ParsedUiEvent = {
@@ -79,7 +80,7 @@ export function parseUiEvent(body: unknown): ParsedUiEvent | null {
 
   const event = record.event;
   const path = record.path;
-  if (typeof event !== "string" || !(UI_EVENT_SET.has(event) || isIntakeEvent(event))) return null;
+  if (typeof event !== "string" || !(UI_EVENT_SET.has(event) || isIntakeEvent(event) || isAttentionEvent(event))) return null;
   if (typeof path !== "string" || path.length > 200 || !PATH_PATTERN.test(path)) return null;
 
   let offer: UiEventOffer | null = null;

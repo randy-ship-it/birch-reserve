@@ -10,12 +10,12 @@ import { logCtaClick } from "@/lib/shareTrack";
 export const KIT_CTA_LABEL = "Get my Monetization Kit";
 export const intakeHref = (ref: string) => `/intake?ref=${encodeURIComponent(ref)}`;
 
-export function KitCta({ placement, size = "lg", tone = "lime", label = KIT_CTA_LABEL, sub, className = "", testId }: { placement: string; size?: "sm" | "md" | "lg"; tone?: "lime" | "ink"; label?: string; sub?: string | null; className?: string; testId?: string }) {
+export function KitCta({ placement, size = "lg", tone = "lime", label = KIT_CTA_LABEL, sub, className = "", testId, onClick }: { placement: string; size?: "sm" | "md" | "lg"; tone?: "lime" | "ink"; label?: string; sub?: string | null; className?: string; testId?: string; onClick?: () => void }) {
   const h = size === "lg" ? "h-14 px-7 text-base md:text-lg" : size === "md" ? "h-12 px-5 text-base" : "h-9 px-3.5 text-sm";
   const colors = tone === "lime" ? "bg-lime-300 text-[#0b1f3a] shadow-lime-400/40 hover:bg-white" : "bg-[#0b1f3a] text-white shadow-black/20 hover:bg-lime-300 hover:text-[#0b1f3a]";
   return (
     <span className={`inline-flex flex-col gap-1 ${className}`}>
-      <a href={intakeHref(placement)} onClick={() => logCtaClick(placement)} data-testid={testId ?? `kit-cta-${placement}`} className={`group inline-flex items-center justify-center gap-2 rounded-full font-bold shadow-lg ring-2 ring-[#0b1f3a]/10 transition ${h} ${colors}`}>
+      <a href={intakeHref(placement)} onClick={() => { logCtaClick(placement); onClick?.(); }} data-testid={testId ?? `kit-cta-${placement}`} className={`group inline-flex items-center justify-center gap-2 rounded-full font-bold shadow-lg ring-2 ring-[#0b1f3a]/10 transition ${h} ${colors}`}>
         <Sparkles className={size === "sm" ? "size-4" : "size-5"} aria-hidden />
         {label}
         <ArrowRight className={`${size === "sm" ? "size-4" : "size-5"} transition-transform group-hover:translate-x-0.5`} aria-hidden />
