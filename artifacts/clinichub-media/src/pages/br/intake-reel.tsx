@@ -9,6 +9,7 @@ import { useEffect, useRef } from "react";
 import { usePageMeta } from "@/components/br/ui";
 import { HubAlerts } from "@/components/br/hub-alerts";
 import { SurfaceTypes } from "@/components/br/surface-types";
+import { ScaleAdUnitLockup } from "@/components/br/scale-ad-unit-lockup";
 import { useCurrency } from "@/lib/currency";
 import { isScaleSkin } from "@/lib/siteSkin";
 
@@ -79,11 +80,12 @@ export default function BrIntakeReel() {
     </div>
   );
   return (
-    <div className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_55%)]" data-testid="intake-reel">
-      <style>{`.reel-pl{max-width:min(420px,calc((100vh - 300px) * 9 / 16 + 18px));max-width:min(420px,calc((100dvh - 300px) * 9 / 16 + 18px))}@media (min-width:768px){.reel-pl{max-width:calc((100vh - 250px) * 16 / 9 + 18px);max-width:calc((100dvh - 250px) * 16 / 9 + 18px)}}`}</style>
+    <div className={`bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_55%)] ${scale ? "reel-s" : ""}`} data-testid="intake-reel">
+      <style>{`.reel-pl{max-width:min(420px,calc((100vh - 300px) * 9 / 16 + 18px));max-width:min(420px,calc((100dvh - 300px) * 9 / 16 + 18px))}@media (min-width:768px){.reel-pl{max-width:calc((100vh - 250px) * 16 / 9 + 18px);max-width:calc((100dvh - 250px) * 16 / 9 + 18px)}}.reel-s .reel-pl{max-width:min(420px,calc((100dvh - 380px) * 9 / 16 + 18px))}@media (min-width:768px){.reel-s .reel-pl{max-width:calc((100dvh - 300px) * 16 / 9 + 18px)}}`}</style>
       <section className="container mx-auto max-w-5xl px-4 pt-5 md:pt-8">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-foreground/55">51-second walkthrough<span className="hidden sm:inline"> · {scale ? "Scale Health + Birch Reserve" : "Birch Reserve + Scale Health"}</span></p>
         <h1 className="mt-1.5 font-display text-[2rem] leading-[1.05] md:text-5xl">One distribution system, for brands and hubs.</h1>
+        {scale ? <ScaleAdUnitLockup className="mt-3" /> : null}
         <div className="reel-pl mx-auto mt-4 rounded-[18px] border border-[#D3D7DE] bg-white p-2 shadow-[0_14px_34px_-18px_rgba(7,26,57,.25)]" data-testid="reel-player">
           <video ref={h} className="hidden aspect-video w-full rounded-xl bg-[#0B1B38] md:block" controls playsInline preload="metadata" poster={`${R}/poster-16x9.jpg`} aria-label="How the Scale Health ad system works, 16:9">
             <source src={`${R}/birch-scale-ad-system-16x9.mp4`} type="video/mp4" />
