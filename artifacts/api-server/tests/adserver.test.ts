@@ -233,6 +233,24 @@ test("hub on contract: becomes sellable at card rates, QA hub carries test campa
   assert.equal(tr[0]!.shareBps, 3500); // default hub share of net
   assert.equal(tr[0]!.status, "held"); // gate not passed
   assert.equal((await store.royalties(1)).length, 0); // never in real statements
+  // QA rows show the real status after approve / batch / mark paid, and the real Pay batch never takes them.
+  await store.setGate("QA Partner", { live: false, hasTransactions: false, audienceActivated: false, override: true, note: "QA release" }, "test");
+  assert.equal((await store.royalties(1, { testOnly: true }))[0]!.status, "calculated");
+  assert.ok(await store.approvePayout("QA Partner", tr[0]!.month, "usd", "test"));
+  let qa = (await store.royalties(1, { testOnly: true }))[0]!;
+  assert.equal(qa.status, "approved");
+  assert.equal(qa.batchId, null);
+  assert.equal((await store.createPayoutBatch("test")).rows.length, 0); // real batch skips test-hub lines
+  const qb = await store.createPayoutBatch("test", ["QA Partner"]);
+  assert.equal(qb.rows.length, 1);
+  qa = (await store.royalties(1, { testOnly: true }))[0]!;
+  assert.equal(qa.status, "approved");
+  assert.equal(qa.batchId, qb.batchId);
+  assert.ok(await store.markPayoutPaid("QA Partner", tr[0]!.month, "usd", "qa-ref", "test"));
+  qa = (await store.royalties(1, { testOnly: true }))[0]!;
+  assert.equal(qa.status, "paid");
+  assert.equal(qa.paidRef, "qa-ref");
+  await store.purgeTestPayouts("QA Partner");
   // Paused hub stops serving.
   await store.setHubStatus("calm-qa", "paused", "test");
   assert.equal(findSlot(slot.key)!.live, false);

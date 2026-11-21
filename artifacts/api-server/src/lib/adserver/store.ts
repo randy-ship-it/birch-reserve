@@ -478,7 +478,7 @@ export type RoyaltyRow = {
   kind: "hub" | "brokerage" | "commission"; label: string; hub: string; source: "ad" | "transaction";
   month: string; currency: string; grossMicros: number; units: number; shareBps: number | null; payableMicros: number | null;
   status: "calculated" | "held" | "approved" | "paid"; heldReason: string | null; dueAt: Date | null;
-  approvedBy: string | null; approvedAt: Date | null; isTest?: boolean; paidRef?: string | null; paidAt?: Date | null; paidBy?: string | null; payoutRef?: string | null;
+  approvedBy: string | null; approvedAt: Date | null; isTest?: boolean; batchId?: string | null; paidRef?: string | null; paidAt?: Date | null; paidBy?: string | null; payoutRef?: string | null;
 };
 /** retained = net remainder after the hub share; Birch also keeps override − recipients. */
 export type MonthSummary = { month: string; currency: string; grossMicros: number; overrideMicros: number; recipientsMicros: number; hubMicros: number; retainedMicros: number; pendingMicros: number };
@@ -576,7 +576,8 @@ export async function statements(months = 6, opts: { testOnly?: boolean } = {}):
   const split = splitCharges(lines, rates.rows.map(toRate), recips.rows.map(toRecipient));
   const appr = new Map(approved.rows.map((r) => [`${r.partner}|${r.month}|${r.currency}`, r]));
   const out: RoyaltyRow[] = split.payees.map((a) => {
-    const fz = opts.testOnly ? undefined : appr.get(`${a.key}|${a.month}|${a.currency}`);
+    // Frozen payouts overlay test and real rows alike (test hubs have their own payee keys), so QA shows the real approved/batched/paid status.
+    const fz = appr.get(`${a.key}|${a.month}|${a.currency}`);
     const bps = a.bpsSeen.size === 1 ? [...a.bpsSeen][0]! : a.bpsSeen.size ? Math.max(...a.bpsSeen) : null;
     const open = !fz;
     const held = open && !a.pending && !gatePassed(g.get(a.partner));
@@ -586,7 +587,7 @@ export async function statements(months = 6, opts: { testOnly?: boolean } = {}):
       payableMicros: fz ? num(fz.payable_micros) : a.pending ? null : a.payable,
       status: fz ? (fz.status === "paid" ? "paid" : "approved") : held ? "held" : "calculated", heldReason: held ? "held: not activated" : null,
       dueAt: dueDate(a.month, ps.cadence, ps.netDays), approvedBy: fz ? String(fz.approved_by) : null, approvedAt: fz ? new Date(String(fz.approved_at)) : null,
-      isTest: Boolean(opts.testOnly), paidRef: fz ? ((fz.paid_ref as string) ?? null) : null, paidAt: fz?.paid_at ? new Date(String(fz.paid_at)) : null, paidBy: fz ? ((fz.paid_by as string) ?? null) : null, payoutRef: a.payoutRef,
+      isTest: Boolean(opts.testOnly), batchId: fz ? ((fz.batch_id as string) ?? null) : null, paidRef: fz ? ((fz.paid_ref as string) ?? null) : null, paidAt: fz?.paid_at ? new Date(String(fz.paid_at)) : null, paidBy: fz ? ((fz.paid_by as string) ?? null) : null, payoutRef: a.payoutRef,
     };
   });
   out.sort((x, y) => (x.month === y.month ? (x.kind === y.kind ? x.label.localeCompare(y.label) : x.kind === "hub" ? -1 : 1) : x.month < y.month ? 1 : -1));
@@ -757,9 +758,12 @@ export async function createPayoutBatch(actor: string, payees?: string[]): Promi
   const p = await db();
   const batchId = `batch_${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "")}`;
   const only = payees?.length ? payees : null;
+  // The real Pay batch (no payees named) never picks up QA test-hub lines; a QA batch names its payees.
+  const testHubs = only ? [] : (await listContractHubs()).filter((h) => h.isTest).map((h) => h.partner);
   const { rows } = await p.query(
-    `UPDATE ${S()}.ad_payouts SET batch_id = $1 WHERE status = 'approved' AND batch_id IS NULL AND ($2::text[] IS NULL OR partner = ANY($2)) RETURNING *`,
-    [batchId, only],
+    `UPDATE ${S()}.ad_payouts SET batch_id = $1 WHERE status = 'approved' AND batch_id IS NULL AND ($2::text[] IS NULL OR partner = ANY($2))
+       AND NOT (regexp_replace(regexp_replace(partner, '^rcpt:[^@]*@', ''), '#transaction$', '') = ANY($3::text[])) RETURNING *`,
+    [batchId, only, testHubs],
   );
   if (rows.length) await audit(actor, "payout.batch", batchId, `${rows.length} lines`);
   return { batchId, rows };
