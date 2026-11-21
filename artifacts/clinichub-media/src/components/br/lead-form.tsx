@@ -141,7 +141,7 @@ export function LeadForm({ kind, fields, submitLabel, done, testId, next, endpoi
         step={step}
         total={steps}
         title={step === 1 ? "About you" : "Your picks"}
-        hint={step === 1 ? `Add ${contact.map((f) => f.label.toLowerCase()).join(", ").replace(/, ([^,]*)$/, " and $1")}, then press ${last ? submitLabel : "Next"}.` : `Tap the option that fits${picks.length > 1 ? " for each" : ""}, then press ${submitLabel}. You can change it later.`}
+        hint={step === 1 ? `Add ${contact.map((f) => f.label.toLowerCase().replace(/\?$/, "").replace(/^what do you /, "what you ")).join(", ").replace(/, ([^,]*)$/, " and $1")}, then press ${last ? submitLabel : "Next"}.` : `Tap the option that fits${picks.length > 1 ? " for each" : ""}, then press ${submitLabel}. You can change it later.`}
         testId={testId ? `${testId}-steps` : undefined}
       />
       <SavedNote show={restoredShown && step === 1} onClear={() => { saved.clear(); setV(initial); setRestoredShown(false); setTouched({}); }} />
