@@ -800,6 +800,8 @@ router.post(
         checkoutAttempt: 1,
         checkoutRequest: {
           mode: "payment",
+          // Charge exactly the currency the page showed: no Stripe Adaptive Pricing re-pricing at checkout.
+          adaptive_pricing: { enabled: false },
           client_reference_id: reservation.id,
           customer_email: reservation.email,
           line_items: [offerLineItem(offer, currency)],
@@ -1377,6 +1379,8 @@ router.post("/launch/splash/checkout", async (req, res): Promise<void> => {
     const nextAttempt = checkoutReservation.checkoutAttempt + 1;
     const checkoutRequest: Stripe.Checkout.SessionCreateParams = {
       mode: "payment",
+      // Charge exactly the currency the page showed: no Stripe Adaptive Pricing re-pricing at checkout.
+      adaptive_pricing: { enabled: false },
       client_reference_id: checkoutReservation.id,
       customer_email: checkoutReservation.email,
       line_items: [offerLineItem(checkoutOffer, reservationCurrency)],

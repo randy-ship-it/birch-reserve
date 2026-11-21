@@ -1058,6 +1058,8 @@ async function handleMachineCheckout(
   }
   const checkoutRequest: Stripe.Checkout.SessionCreateParams = await withStreetNet({
     mode: "payment",
+    // Charge exactly the currency the page showed: no Stripe Adaptive Pricing re-pricing at checkout.
+    adaptive_pricing: { enabled: false },
     client_reference_id: reservation.id,
     customer_email:
       res.locals.ucpAnonymousBuyer === true ? undefined : reservation.email,
