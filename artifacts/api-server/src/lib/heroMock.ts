@@ -7,7 +7,7 @@ const HUBS = {
   drho: { name: "DR-HO'S physio", host: "physio.drhonow.com", img: "/hub-gallery/drho.webp", surface: "Booking confirmation", card: "right:2.5%;bottom:3%", pin3: "right:-12px", pin2: "left:62%;top:19%" },
   sole: { name: "SOLE", host: "scalehealth.ca/sole", img: "/hub-gallery/sole.webp", surface: "Hub home", card: "right:2.5%;bottom:3%", pin3: "right:-12px", pin2: "left:3%;top:27%" },
   effortless: { name: "Effortless Admin", host: "scalehealth.ca/effortlessadmin", img: "/hub-gallery/effortless.webp", surface: "Hub home", card: "right:1.2%;top:27%", pin3: "left:-12px", pin2: "left:1.5%;top:74%" },
-  calmjoints: { name: "Calm Joints", host: "scalehealth.ca/calmjoints", img: "/hub-gallery/calmjoints.webp", surface: "Hub home", card: "left:57%;bottom:24%", pin3: "left:-12px", pin2: "left:3%;top:22%" },
+  calmjoints: { name: "Calm Joints", host: "scalehealth.ca/calmjoints", img: "/hub-gallery/calmjoints.webp", surface: "Hub home", card: "left:5%;bottom:4%;transform:scale(.64);transform-origin:bottom left", pin3: "right:-12px", pin2: "left:3%;top:22%" },
 } as const;
 export function mockBadge(hub: keyof typeof HUBS): string {
   return `Illustrative mock · your ad on the live ${HUBS[hub].name} hub`;
