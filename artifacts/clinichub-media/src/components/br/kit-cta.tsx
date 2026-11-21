@@ -3,6 +3,7 @@
  * used in heroes, the nav and a sticky mobile bar. Every placement carries its own ?ref so clicks and arrivals show
  * up in share/referral tracking (lib/shareTrack.ts).
  */
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { logCtaClick } from "@/lib/shareTrack";
 
@@ -24,12 +25,62 @@ export function KitCta({ placement, size = "lg", tone = "lime", label = KIT_CTA_
   );
 }
 
-/** Sticky bottom bar on phones (hidden on the intake itself, private reports and staff pages). */
+/** Pages that ARE a form: the sticky bar never shows there (Randy, Nov 21 2026: it covered the form's buttons on phones). */
+export const STICKY_HIDDEN_PATH = /^\/(intake|kit\/r|sales|sign-in|sign-up|success|agencies|media-buyers|buy|buycalc|sponsor|exclusive)(\/|$)/;
+const FORM_PRIMARY = "form button[type=submit], form input[type=submit], [data-form-primary]";
+const FIELD = "input:not([type=hidden]):not([type=checkbox]):not([type=radio]), textarea, select";
+
+/**
+ * Sticky bottom bar on phones. Hidden on form pages, private reports and staff pages. Elsewhere it steps aside
+ * while a form field is focused or any form's primary button is on screen, and while it shows, the page gets
+ * bottom padding equal to its height so nothing at the bottom is ever covered.
+ */
 export function StickyKitCta({ path }: { path: string }) {
-  if (/^\/(intake|kit\/r|sales|sign-in|sign-up|success)(\/|$)/.test(path)) return null;
+  const hiddenPath = STICKY_HIDDEN_PATH.test(path);
+  const ref = useRef<HTMLDivElement>(null);
+  const [focused, setFocused] = useState(false);
+  const [primaryInView, setPrimaryInView] = useState(false);
+  useEffect(() => {
+    if (hiddenPath) return;
+    const isField = (t: EventTarget | null) => t instanceof Element && t.matches(FIELD);
+    const onIn = (e: FocusEvent) => { if (isField(e.target)) setFocused(true); };
+    const onOut = (e: FocusEvent) => { if (isField(e.target) && !isField(e.relatedTarget)) setFocused(false); };
+    document.addEventListener("focusin", onIn);
+    document.addEventListener("focusout", onOut);
+    const visible = new Set<Element>();
+    const io = typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver((entries) => {
+      for (const en of entries) { if (en.isIntersecting) visible.add(en.target); else visible.delete(en.target); }
+      setPrimaryInView(visible.size > 0);
+    }, { rootMargin: "0px 0px 96px 0px" });
+    const watched = new Set<Element>();
+    const scan = () => {
+      if (!io) return;
+      document.querySelectorAll(FORM_PRIMARY).forEach((el) => { if (!watched.has(el) && !el.closest("[data-testid=sticky-kit-cta]")) { watched.add(el); io.observe(el); } });
+      for (const el of [...watched]) if (!el.isConnected) { watched.delete(el); visible.delete(el); io.unobserve(el); }
+      setPrimaryInView(visible.size > 0);
+    };
+    scan();
+    let t = 0;
+    const mo = new MutationObserver(() => { window.clearTimeout(t); t = window.setTimeout(scan, 150); });
+    mo.observe(document.body, { childList: true, subtree: true });
+    return () => { document.removeEventListener("focusin", onIn); document.removeEventListener("focusout", onOut); io?.disconnect(); mo.disconnect(); window.clearTimeout(t); };
+  }, [hiddenPath, path]);
+  const show = !hiddenPath && !focused && !primaryInView;
+  // Reserve the bar's height at the bottom of the page while it can show (phones only; the bar is lg:hidden).
+  useEffect(() => {
+    if (hiddenPath) return;
+    const apply = () => {
+      const h = ref.current && window.matchMedia("(max-width: 1023px)").matches ? ref.current.offsetHeight : 0;
+      document.body.style.paddingBottom = h ? `${h}px` : "";
+    };
+    apply();
+    window.addEventListener("resize", apply);
+    return () => { window.removeEventListener("resize", apply); document.body.style.paddingBottom = ""; };
+  }, [hiddenPath]);
+  if (hiddenPath) return null;
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#0b1f3a]/10 bg-[#0b1f3a]/95 px-4 py-2.5 backdrop-blur lg:hidden print:hidden" data-testid="sticky-kit-cta" style={{ paddingBottom: "max(0.625rem, env(safe-area-inset-bottom))" }}>
-      <a href={intakeHref("sticky_mobile")} onClick={() => logCtaClick("sticky_mobile")} className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-lime-300 text-base font-bold text-[#0b1f3a]">
+    <div ref={ref} aria-hidden={show ? undefined : true} className={`fixed inset-x-0 bottom-0 z-40 border-t border-[#0b1f3a]/10 bg-[#0b1f3a]/95 px-4 py-2.5 backdrop-blur transition-transform duration-200 lg:hidden print:hidden ${show ? "translate-y-0" : "pointer-events-none translate-y-full"}`} data-testid="sticky-kit-cta" data-state={show ? "shown" : "hidden"} style={{ paddingBottom: "max(0.625rem, env(safe-area-inset-bottom))" }}>
+      <a href={intakeHref("sticky_mobile")} tabIndex={show ? undefined : -1} onClick={() => logCtaClick("sticky_mobile")} className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-lime-300 text-base font-bold text-[#0b1f3a]">
         <Sparkles className="size-5" aria-hidden />{KIT_CTA_LABEL}<ArrowRight className="size-5" aria-hidden />
       </a>
     </div>
