@@ -1,6 +1,8 @@
 import { Link } from "wouter";
 import { SELLER_IDENTITY } from "@/lib/seller-identity";
 import { CARRY_OVER_CLAUSE, SPONSOR_PACK_TERMS } from "../../../api-server/src/lib/sponsorTerms";
+import { EXCLUSIVE_RESERVE_TERMS } from "../../../api-server/src/lib/exclusiveReserveTerms";
+import { SPEND_DOWN_TERM } from "../../../api-server/src/lib/inventoryPlan";
 
 export default function Terms() {
   return (
@@ -15,8 +17,8 @@ export default function Terms() {
           <span className="text-foreground">hold-190</span>, a 7-day category
           look that does not lock a category) and $490 USD (
           <span className="text-foreground">reserve-490</span>, a shared
-          self-serve category reserve; it does not lock the category). For now every public checkout is
-          in USD, including for buyers in Canada. The currency you see at checkout is the currency you are charged.
+          self-serve category reserve; it does not lock the category). Every public checkout is
+          in USD, including for buyers in Canada, except the exclusive display reserve ($1,900 CAD), which is charged in CAD. The currency you see at checkout is the currency you are charged.
         </p>
         <p>
           hold-190 is a 100% credit if the buyer converts within 7 days.
@@ -35,7 +37,7 @@ export default function Terms() {
           public sample is <Link href="/sample-io" className="text-foreground underline">/sample-io</Link>.
         </p>
         <p>
-          8 brand categories across hubs, not eight websites. reserve-490 is a shared self-serve category reserve; it does not lock the category. More than one brand can reserve in a category. Only a premium slot ($25,000 to $50,000 USD, inquire only, set on an insertion order) locks one brand per category for its term. Reporting is aggregate only. No PHI. No clinical pixels.
+          8 brand categories across hubs, not eight websites. reserve-490 is a shared self-serve category reserve; it does not lock the category. More than one brand can reserve in a category. Only exclusive display locks one brand per category for its term: a premium slot ($25,000 to $50,000 USD, set on an insertion order) or a package secured by the $1,900 CAD exclusive display reserve (below). Reporting is aggregate only. No PHI. No clinical pixels.
         </p>
         <h2 id="sponsorship-packs" className="pt-4 font-display text-2xl text-foreground">Sponsorship packs</h2>
         <ul className="list-disc space-y-2 pl-5" data-testid="terms-sponsor-packs">
@@ -44,6 +46,13 @@ export default function Terms() {
         <p id="carry-over" data-testid="terms-carry-over">
           <strong className="text-foreground">Carry-over.</strong> {CARRY_OVER_CLAUSE}
         </p>
+        <p id="spend-down" data-testid="terms-spend-down">
+          <strong className="text-foreground">Spend-down.</strong> {SPEND_DOWN_TERM}
+        </p>
+        <h2 id="exclusive" className="pt-4 font-display text-2xl text-foreground">Exclusive display reserve ($1,900 CAD)</h2>
+        <ul className="list-disc space-y-2 pl-5" data-testid="terms-exclusive">
+          {EXCLUSIVE_RESERVE_TERMS.map((t) => <li key={t}>{t}</li>)}
+        </ul>
         <p>
           Checkout is Stripe-hosted. Silver Birch Growth Inc. does not store
           full card numbers. Questions:{" "}

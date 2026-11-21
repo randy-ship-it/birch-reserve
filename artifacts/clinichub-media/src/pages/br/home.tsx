@@ -5,6 +5,7 @@
  * FAQs and terms stay on the page but collapsed (native <details>), and the full detail lives on the linked pages.
  * Visual language matches /intake and the kit report (lime wash, navy cards, lime pills, report serif/forest).
  */
+import { Tam2027 } from "@/components/br/inventory-plan";
 import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPath";
 import type { ReactNode } from "react";
 import { ArrowRight, BookOpen, Building2, ChevronDown, FileText, Handshake, LayoutGrid, Package, Sparkles, Store, Users } from "lucide-react";
@@ -28,7 +29,7 @@ const FAQ = [
   { q: "Where exactly do the ads run?", a: "Only inside co-branded hubs from Recovery Brands (recovery, longevity and food today; pets in queue) and inside health and wellness business hubs such as physio, gym, studio and clinic hubs. Each hub has four placements: post-purchase, the hub home page, product and services pages, and the member dashboard behind login." },
   { q: "Which hubs are live?", a: `${INVENTORY.line} More hubs launch over time.` },
   { q: "Is this display or cost-per-click?", a: "Both. Every placement can be bought as display (priced per thousand views) or CPC (priced per click). Deposits and area locks draw down against either." },
-  { q: "Are the audience numbers measured?", a: "Not yet. Any audience or view figure on this site is a modelled estimate, not measured delivery. We don't publish a network views figure; your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
+  { q: "Are the audience numbers measured?", a: "Not yet. Any audience or view figure on this site is a modelled estimate, not measured delivery. We don't publish a measured network views figure (the 2027 inventory estimate is modelled); your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
   { q: "Can a local business or studio buy?", a: "Yes. Start with the same $190 USD 7-day look or $490 USD reserve. Locking your area (a share of hub display near your postal code) is a premium option, by inquiry." },
   { q: "How does my business become a hub?", a: `Studios and retailers activate a hub at scalehealth.ca/clinichubs and earn cash or ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded hub.` },
   { q: "Do agencies get anything?", a: `Yes. ${AGENCY_SHARE.line} Agencies can also prepay a client test budget and get UTM and promo-code reporting per hub and surface.` },
@@ -145,6 +146,7 @@ export default function BrHome() {
             </div>
           </a>
         </div>
+        <div className="mt-3 rounded-2xl border border-[#0b1f3a]/10 bg-white p-5 shadow-sm md:p-6"><Tam2027 compact testId="home-tam-2027" /></div>
         <p className="mt-2 text-[12px] text-foreground/60" data-testid="home-stats-label">{MODELLED_FOOTER}</p>
       </section>
 

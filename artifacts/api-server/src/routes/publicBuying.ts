@@ -629,7 +629,7 @@ async function sendAvailabilityJson(
     inventory_model: "shared_reserve_pool",
     // HARD rule (Randy): never publish seat counts, open/held/paid numbers or "open"
     // category statuses. Counts stay internal (checkout still enforces the cap).
-    availability: "limited_early_placements",
+    availability: "accepting_placements",
     availability_note: PUBLIC_AVAILABILITY_NOTE,
     accepting_reservations: counts.seats_open > 0,
     categories: BUYCALC_CATEGORIES.map((c) => ({ slug: c.slug, label: c.label })),

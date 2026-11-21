@@ -1,3 +1,4 @@
+import { ExclusiveReserveCard, SpendDown, Tam2027 } from "@/components/br/inventory-plan";
 import { ChannelBenchmarks, MetaHook, PackPicker, ProveItLadder, RateCardV2, ScenarioCalculator, SeatCtas } from "@/components/br/pricing";
 import { BuyCta } from "@/components/br/buy-cta";
 import { Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
@@ -48,6 +49,13 @@ export default function BrRates() {
         <div className="mt-8">
           <PackPicker />
         </div>
+        <div className="mt-6 space-y-4" data-testid="rates-spend-down">
+          <SpendDown testId="rates-spend-down-block" />
+          <ExclusiveReserveCard where="rates" dark={false} />
+        </div>
+      </Section>
+      <Section id="inventory-2027">
+        <Tam2027 testId="rates-tam-2027" />
       </Section>
       <Section id="scenario">
         <Eyebrow>Scenario calculator</Eyebrow>

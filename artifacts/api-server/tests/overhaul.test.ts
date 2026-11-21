@@ -168,7 +168,10 @@ test("agent quote: public offers only, USD", () => {
   assert.match(llms, /\/v1\/agent\/catalog\.json/);
   assert.match(llms, /\$190 USD/);
   assert.match(llms, /\$490 USD/);
-  assert.doesNotMatch(llms, /CAD|sponsor-|All eight/);
+  // CAD appears only on the $1,900 CAD exclusive display reserve lines (Randy, voice, Nov 21 2026).
+  assert.doesNotMatch(llms.replace(/^.*exclusive.*$/gim, ""), /CAD|sponsor-|All eight/);
+  assert.match(llms, /exclusive-reserve-1900-cad · \$1,900 CAD/);
+  assert.match(llms, /Modelled 2027 estimate, not a commitment/);
 });
 
 test("agent checkout always holds (202, no charge) and points to the human checkout", async () => {

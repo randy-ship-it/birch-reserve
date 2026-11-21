@@ -1,4 +1,5 @@
 import { POSITIONING, POSITIONING_FOLLOW, llmsFasterSection } from "../aiDiscovery";
+import { PACING_ROWS, SPEND_DOWN_LINE, tam2027Text } from "../inventoryPlan";
 /** Per-route head + llms.txt for the overhaul routes (crawlable without JS). */
 import { slotOffers, areaLockOffer } from "./agent";
 import { AGENCY_FAQ, PLAIN_TERMS, faqPageJsonLd } from "./agencyShowcase";
@@ -167,7 +168,12 @@ export function llmsTxt(): string {
     "Prepay your category. Not an open auction.",
     "- hold-190 · $190 USD · 7-day category look · converts in full to the $490 USD reserve within 7 days, or refunded · does not lock in a slot · pay: https://birchreserve.net/buycalc?sku=hold-190",
     "- reserve-490 · $490 USD · category reserve · media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months · pay: https://birchreserve.net/buycalc?sku=reserve-490",
+    "- exclusive-reserve-1900-cad · $1,900 CAD · exclusive display reserve · locks a $5K–$50K CAD exclusive display package in one category at 25% below the regular rate · all $1,900 counts toward it · refundable until 14 days before the IO launch date · nothing runs before a signed IO · pay: https://birchreserve.net/exclusive · terms: https://birchreserve.net/terms#exclusive",
     "- Premium slots (exclusivity, priority placement, area locks): inquire-only · https://birchreserve.net/media-kit#premium",
+    `- Spend-down: ${SPEND_DOWN_LINE} Modelled pacing: ${PACING_ROWS.map((r) => `${r.label} ${r.perMonth}`).join("; ")}.`,
+    "",
+    "## 2027 expected available ad inventory (modelled)",
+    ...tam2027Text().split("\n").map((l, i) => (i === 0 ? `- ${l}` : `  ${l}`)),
     "",
     "## Live hubs",
     "- DR-HO'S physio and SOLE. More hubs launch over time; placements are curated as each goes live.",
