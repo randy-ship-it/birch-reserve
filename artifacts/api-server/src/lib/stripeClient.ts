@@ -318,6 +318,9 @@ function appendCheckoutSessionFormBody(
   if (submitText) body.set("custom_text[submit][message]", submitText);
   if (params.success_url) body.set("success_url", params.success_url);
   if (params.cancel_url) body.set("cancel_url", params.cancel_url);
+  (params.discounts ?? []).forEach((d, i) => {
+    if (d.coupon) body.set(`discounts[${i}][coupon]`, d.coupon);
+  });
   body.set(
     "allow_promotion_codes",
     params.allow_promotion_codes === true ? "true" : "false",
@@ -448,4 +451,25 @@ export function getStripeClient(): Stripe {
   }
 
   return new Stripe(secretKey);
+}
+
+
+/** Fixed-amount, once-per-order USD coupon used for the Street 100 net price. Created on first use with a stable id. */
+export async function ensureUsdAmountOffCoupon(id: string, amountCents: number, name: string): Promise<string> {
+  const get = (): Promise<Stripe.Coupon> =>
+    preferStripeSdk()
+      ? getStripeClient().coupons.retrieve(id)
+      : stripeProxy<Stripe.Coupon>(`/v1/coupons/${encodeURIComponent(id)}`);
+  try {
+    const c = await get();
+    if (c.amount_off === amountCents && c.currency === "usd" && c.valid !== false) return c.id;
+    throw new Error("coupon mismatch");
+  } catch (err) {
+    if (err instanceof Error && err.message === "coupon mismatch") throw err;
+    const body = new URLSearchParams({ id, amount_off: String(amountCents), currency: "usd", duration: "once", name });
+    if (preferStripeSdk()) {
+      return (await getStripeClient().coupons.create({ id, amount_off: amountCents, currency: "usd", duration: "once", name })).id;
+    }
+    return (await stripeProxy<Stripe.Coupon>("/v1/coupons", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() })).id;
+  }
 }

@@ -8,6 +8,7 @@
  *   optional here and asked ONCE for both sides. Role-specific detail comes after the submit (IntakeDetails), prefilled,
  *   updating the same record. Friday is contacted only on the final click (server routes add the secret).
  */
+import { HubDemandCard } from "@/components/br/hundred";
 import { PromoBox } from "@/components/br/promo-box";
 import { skinText } from "@/lib/siteSkin";
 import { IntakeWarnings } from "@/components/br/intake-warnings";
@@ -365,6 +366,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
       <div className="mt-4 border-t border-foreground/10 pt-3 text-[13px]" data-testid="intake-secondary">
         <a href="/intake/sponsor" className="text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-sponsor-link">Want to own a category or an area? See category and area locks</a>
       </div>
+      {sup ? <HubDemandCard className="mt-4" /> : null}
       {sup ? <SupplierFees /> : null}
       <Details testId="intake-fine"><p>Business-level only, no customer data. Every figure is an estimate, reviewed by a person. Nothing is booked or charged. Optional answers are asked once and used for both sides.</p></Details>
     </form>

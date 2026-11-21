@@ -82,11 +82,11 @@ async function existing(codeKey: string, email: string): Promise<Redemption | nu
 export type ValidateResult = { ok: true; code: string; creditUsd: number; label: string; message: string } | { ok: false; reason: CodeProblem; message: string };
 export async function validateCode(input: string, email?: string): Promise<ValidateResult> {
   const c = await findCode(input);
-  const bad = codeProblem(c);
+  const bad = codeProblem(c) ?? (c && c.codeKey.startsWith("internal") ? "unknown" : null);
   if (bad) return { ok: false, reason: bad, message: PROBLEM_COPY[bad] };
   if (email && validEmail(email) && (await existing(c!.codeKey, email))) return { ok: false, reason: "already", message: PROBLEM_COPY.already };
   const label = creditLabel(c!.creditMicros);
-  return { ok: true, code: c!.code, creditUsd: c!.creditMicros / MICROS, label, message: `Code ${c!.code} accepted: ${label}. Ad spend only, no cash value, not transferable. ${regularRateSummary().line}` };
+  return { ok: true, code: c!.code, creditUsd: c!.creditMicros / MICROS, label, message: `${c!.codeKey === "street100" ? "Street 100 applied — $100 media credit. Use it to test the shelf after the receipt. " : ""}Code ${c!.code} accepted: ${label}. Ad spend only, no cash value, not transferable. ${regularRateSummary().line}` };
 }
 
 /* ------------------------------------------------------------------------------------------ street team */
@@ -189,7 +189,7 @@ export type ClaimResult = { ok: true; redemption: Redemption; created: boolean; 
 export async function claimCode(i: ClaimInput): Promise<ClaimResult> {
   const email = cleanEmail(i.email);
   const c = await findCode(i.code);
-  const bad = codeProblem(c);
+  const bad = codeProblem(c) ?? (c && c.codeKey.startsWith("internal") && i.src !== "hub-proof" ? "unknown" : null);
   if (bad) return { ok: false, reason: bad, message: PROBLEM_COPY[bad] };
   const p = await db();
   const mine = await p.query(`SELECT * FROM ${S()}.ad_promo_redemptions WHERE code_key = $1 AND email = $2 AND status <> 'void'`, [c!.codeKey, email]);

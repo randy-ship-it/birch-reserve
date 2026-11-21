@@ -85,6 +85,13 @@ const DDL = (s: string) => [
   `CREATE INDEX IF NOT EXISTS ad_street_events_member ON ${s}.ad_street_events (member, kind)`,
   `INSERT INTO ${s}.ad_promo_codes (code_key, code, aliases, credit_micros, notes, created_by) VALUES
     ('street100','STREET100','{streetteam100,streetteamhundred,streethundred}',100000000,'Street team: $100 USD ad credit handed out by street team members. Ad spend only, no cash value, non-transferable.','seed') ON CONFLICT DO NOTHING`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_hub_proofs (
+    id text PRIMARY KEY, hub_key text NOT NULL, hub_name text NOT NULL, hub_url text, contact_name text, email text NOT NULL, channel text NOT NULL, reach integer NOT NULL, note text,
+    mime text NOT NULL, bytes integer NOT NULL, sha256 text, data bytea NOT NULL, status text NOT NULL DEFAULT 'pending', reviewer text, reviewed_at timestamptz, review_note text,
+    redemption_id bigint, is_test boolean NOT NULL DEFAULT false, site text NOT NULL DEFAULT 'birch', created_at timestamptz NOT NULL DEFAULT now())`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS ad_hub_proofs_hub ON ${s}.ad_hub_proofs (hub_key) WHERE status <> 'rejected'`,
+  `INSERT INTO ${s}.ad_promo_codes (code_key, code, credit_micros, notes, created_by) VALUES
+    ('internalhubproof100','HUBPROOF100',100000000,'Internal: hub activation proof, $100 ad credit issued by an admin after review. Not redeemable by the public.','seed') ON CONFLICT DO NOTHING`,
   `INSERT INTO ${s}.ad_street_members (id, label, created_by) VALUES ('bridget','Bridget','seed'),('mona','Mona','seed') ON CONFLICT DO NOTHING`,
   `CREATE TABLE IF NOT EXISTS ${s}.ad_hubs (
     key text PRIMARY KEY, name text NOT NULL, category text NOT NULL DEFAULT '', url text NOT NULL, partner text NOT NULL, contract_ref text NOT NULL,

@@ -6,6 +6,7 @@
  *   Cron:     /api/cron/ads-friday (daily aggregate push to Friday)
  */
 import * as promoLib from "../lib/adserver/promo";
+import { hubProofAdminHtml, listProofs } from "../lib/adserver/hubProof";
 import { promoAdminHtml } from "../lib/adserver/promoAdmin";
 import { attachPendingForAccount } from "../lib/adserver/promo";
 import express, { Router, type IRouter, type Request, type Response } from "express";
@@ -80,7 +81,7 @@ const ua = (req: Request) => req.get("user-agent");
 const dntHeader = (req: Request) => req.get("dnt") === "1" || req.get("sec-gpc") === "1";
 const promoPanels = async () => {
   const [codes, redemptions, street, qrs] = await Promise.all([promoLib.listCodes(), promoLib.listRedemptions(300), promoLib.streetStats(true), promoLib.listQrs()]);
-  return promoAdminHtml({ codes, redemptions, street, qrs });
+  return promoAdminHtml({ codes, redemptions, street, qrs }) + hubProofAdminHtml(await listProofs());
 };
 const promoAttach = (email: string) => attachPendingForAccount(email).catch(() => 0);
 const noStore = (res: Response) => res.set("Cache-Control", "no-store");
