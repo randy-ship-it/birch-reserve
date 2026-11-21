@@ -36,7 +36,7 @@ function page(open: boolean, status: Status): string {
 <meta name="description" content="Reserve $1,900 CAD to lock a $5K–$50K exclusive display package in your category at 25% below the regular rate. Insertion order before anything runs.">
 <link rel="canonical" href="https://birchreserve.net/exclusive"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>*{box-sizing:border-box}body{margin:0;background:#f8f6ef;color:#071A39;font:16px/1.6 "IBM Plex Sans",sans-serif}
+<style>*{box-sizing:border-box}body{margin:0;background:#F9F8F6;color:#071A39;font:16px/1.6 "IBM Plex Sans",sans-serif}
 header,main,footer{max-width:880px;margin:auto;padding:18px 22px}header{display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-bottom:1px solid #ccd2d8;flex-wrap:wrap}
 h1,h2{font-family:Fraunces,serif;font-weight:400;line-height:1.15}h1{font-size:clamp(2rem,5vw,3rem);margin:.3em 0}h2{font-size:1.5rem;margin:1.4em 0 .4em}a{color:#071A39}
 .fine{color:#4d5b6a;font-size:.88rem}.ok{background:#BFF3D6;color:#0B6B43;padding:10px 14px;border-radius:8px;margin:12px 0}.note{background:#fff;border:1px solid #ccd2d8;padding:10px 14px;border-radius:8px;margin:12px 0}

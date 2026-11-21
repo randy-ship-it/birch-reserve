@@ -76,11 +76,11 @@ function shell(title: string, description: string, path: string, currency: Curre
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f8f6ef;color:#071A39;font:16px/1.6 "IBM Plex Sans",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:#F9F8F6;color:#071A39;font:16px/1.6 "IBM Plex Sans",sans-serif}
 header,main,footer{max-width:1040px;margin:auto;padding:20px 24px}header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:baseline;border-bottom:1px solid #ccd2d8}
 h1,h2,h3{font-family:Fraunces,serif;font-weight:400;line-height:1.15}h1{font-size:clamp(2.1rem,5.5vw,3.3rem);margin:.3em 0}h2{font-size:clamp(1.5rem,3.5vw,2rem);margin:1.6em 0 .4em}
 a{color:#071A39}nav{display:flex;flex-wrap:wrap;gap:14px;font-size:.92rem}.fine{color:#4d5b6a;font-size:.88rem}
-.draft{background:#071A39;color:#f8f6ef;font-size:.85rem;padding:8px 14px;border-radius:8px;margin:12px 0}
+.draft{background:#071A39;color:#F9F8F6;font-size:.85rem;padding:8px 14px;border-radius:8px;margin:12px 0}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0}
 .stat{border:1px solid #ccd2d8;border-radius:12px;padding:14px;background:#fff}.stat b{display:block;font:600 1.7rem Fraunces,serif}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}

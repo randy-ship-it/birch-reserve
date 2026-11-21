@@ -70,7 +70,6 @@ import {
   useClerk,
 } from '@clerk/react';
 import { publishableKeyFromHost } from '@clerk/react/internal';
-import { dark } from '@clerk/themes';
 import TeamAccess from '@/pages/sales/team';
 import VoiceDemo from '@/pages/sales/voice-demo';
 import { notifyEditorialAccessDenied } from '@/lib/access-utils';
@@ -95,46 +94,46 @@ if (!clerkPubKey) {
 }
 
 const clerkAppearance = {
-  theme: dark,
   cssLayerName: 'clerk',
   options: {
     logoPlacement: 'inside' as const,
     logoLinkUrl: basePath || '/',
     logoImageUrl: `${window.location.origin}${basePath}/logo.svg`,
   },
+  // Intake tokens (Nov 21 2026): ink #071A39, paper #F9F8F6, lime #C8F55A, white rounded cards, serif headlines.
   variables: {
-    colorPrimary: '#8fd6a5',
-    colorForeground: '#f4f0e8',
-    colorMutedForeground: '#9cabb4',
-    colorDanger: '#e87979',
-    colorBackground: '#0b151c',
-    colorInput: '#14232d',
-    colorInputForeground: '#f4f0e8',
-    colorNeutral: 'rgba(255, 255, 255, 0.15)',
+    colorPrimary: '#071A39',
+    colorForeground: '#071A39',
+    colorMutedForeground: '#566476',
+    colorDanger: '#8a2b1f',
+    colorBackground: '#ffffff',
+    colorInput: '#ffffff',
+    colorInputForeground: '#071A39',
+    colorNeutral: '#071A39',
     fontFamily: 'var(--font-sans)',
-    borderRadius: '0rem',
+    borderRadius: '0.75rem',
   },
   elements: {
     rootBox: 'w-full flex justify-center',
-    cardBox: 'bg-[#0b151c] border border-white/10 shadow-2xl shadow-black/20 w-[440px] max-w-full overflow-hidden p-3 sm:p-7 md:p-10',
+    cardBox: 'bg-white border border-[#d9ddd2] shadow-[0_8px_30px_rgba(7,26,57,.08)] w-[440px] max-w-full overflow-hidden rounded-3xl p-3 sm:p-7 md:p-10',
     card: '!shadow-none !border-0 !bg-transparent !rounded-none',
     footer: '!shadow-none !border-0 !bg-transparent !rounded-none',
-    headerTitle: 'font-display text-3xl text-white md:text-4xl font-normal',
-    headerSubtitle: 'text-sm text-[#9cabb4]',
-    formFieldLabel: 'text-xs font-medium text-[#c1cbd1]',
-    formFieldInput: 'h-11 rounded-none border-white/15 bg-[#14232d] text-[#f4f0e8] focus-visible:ring-[#8fd6a5]',
-    formButtonPrimary: 'h-11 w-full rounded-none bg-[#8fd6a5] text-[#07130d] hover:bg-[#a8e8b9] transition-colors font-medium',
-    footerActionText: 'text-sm text-[#9cabb4]',
-    footerActionLink: 'text-sm font-medium text-[#8fd6a5] hover:text-[#a8e8b9]',
-    socialButtonsBlockButton: 'h-11 rounded-none border border-white/15 bg-transparent hover:bg-white/5 text-[#f4f0e8]',
-    dividerLine: 'bg-white/15',
-    dividerText: 'text-xs text-[#9cabb4]',
+    headerTitle: 'font-display text-3xl text-[#071A39] md:text-4xl font-normal',
+    headerSubtitle: 'text-sm text-[#566476]',
+    formFieldLabel: 'text-xs font-semibold text-[#071A39]',
+    formFieldInput: 'h-11 rounded-xl border-[#071A39]/20 bg-white text-[#071A39] focus-visible:ring-[#C8F55A]',
+    formButtonPrimary: 'h-11 w-full rounded-full bg-[#071A39] text-white hover:bg-[#C8F55A] hover:text-[#071A39] transition-colors font-bold',
+    footerActionText: 'text-sm text-[#566476]',
+    footerActionLink: 'text-sm font-semibold text-[#071A39] underline underline-offset-2 hover:text-[#071A39]',
+    socialButtonsBlockButton: 'h-11 rounded-full border border-[#071A39]/20 bg-white hover:bg-[#F9F8F6] text-[#071A39]',
+    dividerLine: 'bg-[#071A39]/15',
+    dividerText: 'text-xs text-[#566476]',
   },
 };
 
 function SignInPage() {
   return (
-    <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#101c25] px-6 py-16">
+    <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#F9F8F6] px-6 py-16">
       <SignIn
         routing="path"
         path={`${basePath}/sign-in`}
@@ -147,7 +146,7 @@ function SignInPage() {
 
 function SignUpPage() {
   return (
-    <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#101c25] px-6 py-16">
+    <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-[#F9F8F6] px-6 py-16">
       <SignUp
         routing="path"
         path={`${basePath}/sign-up`}

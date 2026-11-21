@@ -1000,7 +1000,7 @@ router.get("/ads/admin/email-preview", (req, res) => {
   const a = loginLinkEmail("https://birchreserve.net/account/auth?t=PREVIEW");
   const b = hubAlertEmail({ hubName: "Example Physio Hub", category: "Recovery hardware", hubUrl: "https://scalehealth.ca" });
   noStore(res);
-  res.type("html").send(`<!doctype html><meta charset="utf-8"><title>Ad email previews</title><body style="font-family:Arial;background:#f8f6ef;padding:24px"><h1>Ad system emails</h1>
+  res.type("html").send(`<!doctype html><meta charset="utf-8"><title>Ad email previews</title><body style="font-family:Arial;background:#F9F8F6;padding:24px"><h1>Ad system emails</h1>
 <p>Login links send: <b>${adsLoginEmailEnabled() ? "ON" : "OFF"}</b> (ADS_LOGIN_EMAIL_ENABLED). Hub alerts send: <b>${process.env.ADS_HUB_ALERT_EMAIL_ENABLED === "true" ? "ON" : "OFF"}</b> (ADS_HUB_ALERT_EMAIL_ENABLED). From: ${ADS_FROM().replace(/</g, "&lt;")}</p>
 <h2>Subject: ${a.subject}</h2><div style="background:#fff;padding:16px;border-radius:12px">${a.html}</div><h2>Subject: ${b.subject}</h2><div style="background:#fff;padding:16px;border-radius:12px">${b.html}</div></body>`);
 });

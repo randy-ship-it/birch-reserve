@@ -13,9 +13,9 @@ function esc(value: string): string {
   return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
 }
 
-const CSS = `*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:#f8f6ef;color:#071A39;font:17px/1.65 "IBM Plex Sans",system-ui,sans-serif}
+const CSS = `*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:#F9F8F6;color:#071A39;font:17px/1.65 "IBM Plex Sans",system-ui,sans-serif}
 .wrap{max-width:760px;margin:0 auto;padding:0 20px}
-header.top{border-bottom:1px solid #d8dccf;background:#f8f6ef;position:sticky;top:0;z-index:2}
+header.top{border-bottom:1px solid #d8dccf;background:#F9F8F6;position:sticky;top:0;z-index:2}
 header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px}
 .logo{font-weight:600;letter-spacing:.12em;font-size:.85rem;text-decoration:none;color:#071A39}
 nav.tn{display:flex;gap:14px;font-size:.88rem;flex-wrap:wrap;justify-content:flex-end}nav.tn a{color:#071A39}
@@ -24,7 +24,7 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:400;line-height:1.15}
 h1{font-size:clamp(2rem,7vw,3rem);margin:.35em 0 .3em}h2{font-size:clamp(1.35rem,4.5vw,1.7rem);margin:1.8em 0 .5em}
 .lede{font-size:1.12rem;color:#24364f}
 .cta{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 6px}
-.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 20px;border-radius:999px;background:#071A39;color:#f8f6ef;text-decoration:none;font-weight:600;font-size:.98rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 20px;border-radius:999px;background:#071A39;color:#F9F8F6;text-decoration:none;font-weight:600;font-size:.98rem}
 .btn.line{background:transparent;color:#071A39;border:1.5px solid #071A39}
 ul{padding-left:1.2em}li{margin:.4em 0}
 .card{background:#fff;border:1px solid #e1e4da;border-radius:16px;padding:18px 20px;margin:14px 0}
