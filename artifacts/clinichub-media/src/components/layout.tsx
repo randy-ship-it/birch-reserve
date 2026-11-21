@@ -129,13 +129,13 @@ export function Layout({ children }: { children: ReactNode }) {
             <a
               href={intakeHref('nav_mobile')}
               onClick={() => logCtaClick('nav_mobile')}
-              className="inline-flex items-center gap-1.5 rounded-full bg-lime-300 px-3.5 py-2 text-sm font-bold text-[#0b1f3a] shadow"
+              className="inline-flex items-center gap-1.5 rounded-full bg-lime-300 px-3 py-2 text-sm font-bold text-[#0b1f3a] shadow"
               data-testid="nav-kit-cta-mobile"
             >
               Get my kit
             </a>
             <button
-              className="p-2 -mr-2 text-foreground"
+              className="p-1.5 -mr-1.5 text-foreground"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle mobile menu"
               aria-expanded={mobileMenuOpen}
@@ -207,12 +207,12 @@ export function Layout({ children }: { children: ReactNode }) {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 sm:gap-16">
+          <div className="grid min-w-0 grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 sm:gap-16">
             {FOOTER_COLS.map((c) => (
-              <div key={c.label} className="flex flex-col gap-3 text-sm">
+              <div key={c.label} className="flex min-w-0 flex-col gap-3 text-sm">
                 <span className="text-xs font-medium uppercase tracking-widest text-foreground/50 mb-1">{c.label}</span>
                 {c.items.map((it) => (
-                  <a key={it.href} href={it.href} className="hover:text-foreground/70 transition-colors">{it.label}</a>
+                  <a key={it.href} href={it.href} className="break-words hover:text-foreground/70 transition-colors">{it.label}</a>
                 ))}
               </div>
             ))}

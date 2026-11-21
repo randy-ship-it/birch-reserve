@@ -48,7 +48,7 @@ const scale = (r: LLH, f: number): LLH => ({ low: r.low * f, likely: r.likely * 
 /* ------------------------------------------------------------------ model */
 const NAMES: Record<string, { name: string; unit: string; monthly: boolean }> = {
   hubs: { name: "Branded ScaleHealth.ca hubs", unit: "page views", monthly: true },
-  retail: { name: "Private retail network", unit: "captive recovery consumers", monthly: false },
+  retail: { name: "Private retail network", unit: "your slice of the 1MM+ captive recovery consumers", monthly: false },
   street_team: { name: "Calm Joints + Street Team", unit: "homes", monthly: false },
   calm_joints: { name: "Calm Joints", unit: "", monthly: false },
 };
@@ -64,7 +64,7 @@ export function sharesOf(ex: FridayExposure) {
 }
 /** Channel rows for one tier: base figure (= channel now.min ÷ min share) × the tier's share band. */
 /** Street Team row note: text reach, never a homes figure (Randy, Nov 19 2026 2:27 PM ET). */
-export const STREET_ROW_NOTE = "2MM+ homes reached by 2027 (our plan, not a guarantee)";
+export const STREET_ROW_NOTE = "2MM+ homes by 2027, based on signed partnership contracts";
 
 export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
   const s = sharesOf(ex);
@@ -84,7 +84,7 @@ export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
     const baseLater = c?.later ? c.later.min / s.min : null;
     const range = base && base > 0 ? llh(base * lo, base * hi) : null;
     const later = baseLater && base && baseLater > base ? llh(baseLater * lo, baseLater * hi) : null;
-    const note = c?.needs_figure ? "Reach counted with the Street Team: 2MM+ homes by 2027" : !c?.eligible_now ? (c?.reason ?? "Not in your markets yet") : null;
+    const note = c?.needs_figure ? "2MM+ homes by 2027, based on signed partnership contracts" : !c?.eligible_now ? (c?.reason ?? "Not in your markets yet") : null;
     return { key, name: n.name, unit: n.unit, monthly: n.monthly, geo: c?.geo_label ?? "", range, later, note };
   });
 }
@@ -154,7 +154,7 @@ function ChannelTable({ rows, extra, testId }: { rows: ChannelRow[]; extra?: Rea
               </span>
             </>
           ) : (
-            <span className="text-right text-[12px] md:col-span-2" style={{ color: RT.mute }}>{r.note ?? "Counted with the Street Team"}</span>
+            <span className="col-span-2 min-w-0 text-left text-[12px] md:text-right" style={{ color: RT.mute }}>{r.note ?? "Counted with the Street Team"}</span>
           )}
         </div>
       ))}
