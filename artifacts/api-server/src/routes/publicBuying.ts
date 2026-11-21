@@ -107,6 +107,10 @@ const WINDOWS = [30, 90, 180] as const;
 /** Omitted format_pref used to default to post_checkout, which is now inquire-only; default to the first self-serve format. */
 const DEFAULT_SELF_SERVE_FORMAT: (typeof FORMATS)[number] =
   FORMATS.find((f) => !isPremiumFormat(f)) ?? "recovery_plan";
+/** The ad format a /v1/checkout seat is stored with: the requested one, else the self-serve default. Also used to match same-key retries. */
+export function checkoutAdInterest(format: unknown): (typeof FORMATS)[number] {
+  return isFormat(format) ? format : DEFAULT_SELF_SERVE_FORMAT;
+}
 const EXCLUSIONS = ["no_phi", "no_clinical_pixels", "no_open_auction"] as const;
 
 type CheckoutReceipt = {
@@ -829,11 +833,13 @@ async function handleMachineCheckout(
     ? (res.locals
         .ucpLegacyPublicIdempotencyKeys as UcpLegacyPublicIdempotencyCandidate[])
     : [];
+  // One default for the stored seat and the same-key replay check, so a retry that omits format_pref replays instead of 409ing.
+  const adInterest = checkoutAdInterest(format);
   const claim = await claimSplashReserveSeat({
       brandName: brand,
       email,
       websiteUrl: website || null,
-      adInterest: isFormat(format) ? format : DEFAULT_SELF_SERVE_FORMAT,
+      adInterest,
       promotedOffer: `Birch Reserve ${offer.name}${category ? ` · ${category.label}` : ""}`,
       status: "seat_held",
       offerKey: offer.offerKey,
@@ -967,7 +973,7 @@ async function handleMachineCheckout(
     : reservation.email !== email ||
       reservation.brandName !== brand ||
       reservation.websiteUrl !== (website || null) ||
-      reservation.adInterest !== (isFormat(format) ? format : "post_checkout") ||
+      reservation.adInterest !== adInterest ||
       reservation.offerKey !== offer.offerKey ||
       reservation.amountCents !== amountCents ||
       reservation.currency !== currency;

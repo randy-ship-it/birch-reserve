@@ -212,6 +212,8 @@ export async function draftCampaignFromCheckoutSafe(session: Stripe.Checkout.Ses
     const r = await store.createCampaign({
       accountEmail: email, brand: clean(md.brand || session.customer_details?.name || email.split("@")[1] || "Brand"), category: clean(md.category, 80) || null,
       orderRef: session.id, orderKind, currency, budgetMicros: budgetCents * 10_000, exclusive, rateMultiplierBps: mult, isTest, notes, actor: "stripe-webhook",
+      // Scale-mirror checkouts carry sold_by=scale (promoContext.ts): Scale Health direct. Admin can still change "Sold by" per campaign.
+      seller: md.sold_by === "scale" ? "scale" : "birch",
     });
     if (r.created && md.reservationId && (md.sku === "hold-190" || md.sku === "reserve-490" || md.sku === "reserve-899")) {
       try {

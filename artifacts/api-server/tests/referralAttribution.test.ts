@@ -15,6 +15,7 @@ import { PROMO_BOX_JS } from "../src/lib/adserver/promoBoxJs";
 import { mirrorBootScript } from "../src/middlewares/mirrorHost";
 import { draftCampaignFromCheckoutSafe } from "../src/lib/adserver/service";
 import { referralAdminHtml } from "../src/lib/adserver/referralAdmin";
+import { BIRCH_QA_UA_TOKEN, hasQaUaToken } from "../src/lib/testTraffic";
 
 const req = (h: Record<string, string>, query: Record<string, string> = {}) => ({ get: (n: string) => h[n.toLowerCase()], query }) as never;
 
@@ -34,7 +35,9 @@ test("server context: header pair wins, cookie pair falls back, QR label never m
 test("Checkout Session metadata carries st / st_qr / promo / site through every builder", async () => {
   const mw = promoContext();
   const md = await new Promise<Record<string, string>>((resolve) => mw(req({ "x-br-attr": "st=mona&qr=scale-intake", origin: "https://scalehealth.ca" }) as never, {} as never, () => setTimeout(() => resolve(promoMetadata()), 1)));
-  assert.deepEqual(md, { st: "mona", st_qr: "scale-intake", site: "scale" });
+  assert.deepEqual(md, { st: "mona", st_qr: "scale-intake", site: "scale", sold_by: "scale" });
+  const plainScale = await new Promise<Record<string, string>>((resolve) => mw(req({ origin: "https://www.scalehealth.ca" }) as never, {} as never, () => resolve(promoMetadata())));
+  assert.deepEqual(plainScale, { site: "scale", sold_by: "scale" }, "every Scale-mirror checkout is Scale direct, referred or not");
   const merged = await new Promise<Record<string, unknown>>((resolve) => mw(req({ cookie: "br_st=bridget; br_qr=birch-intake" }) as never, {} as never, () => resolve(withPromoMetadata({ mode: "payment", metadata: { kind: "area_lock" } }) as never)));
   assert.deepEqual(merged.metadata, { kind: "area_lock", st: "bridget", st_qr: "birch-intake", site: "birch" });
   assert.deepEqual(withPromoMetadata({ metadata: { a: "1" } }), { metadata: { a: "1" } }, "outside a request nothing is added");
@@ -53,7 +56,7 @@ test("webhook: referred paid order is stamped with its referrer and gets one ref
   assert.equal(c.referrer, "mona");
   assert.equal(c.referrerQr, "scale-intake-digital");
   assert.equal(c.referrerSite, "scale");
-  assert.equal(c.seller, "birch", "the mirror does not change who sold it (see ARCHITECTURE.md)");
+  assert.equal(c.seller, "birch", "a session opened before the Scale-direct default (no sold_by) keeps Birch: never backdated");
   const rows = await listReferralOrders();
   assert.equal(rows.length, 1);
   assert.equal(rows[0]!.member, "mona");
@@ -75,6 +78,24 @@ test("webhook: referred paid order is stamped with its referrer and gets one ref
 const T = (iso: string) => new Date(iso);
 const rates: RateRow[] = [{ partner: null, overrideBps: 2000, hubBps: 3500, effectiveAt: T("2026-11-01T00:00:00Z") }];
 const rcpt = (p: Partial<RecipientRow>): RecipientRow => ({ rkey: "mona-ref", name: "Mona", kind: "commission", pctBps: 5000, scopePartner: null, scopeCampaign: null, scopeReferrer: "mona", active: true, payoutRef: "mona@example.com", effectiveAt: T("2026-11-01T00:00:00Z"), ...p });
+
+test("Scale-mirror checkout (sold_by=scale) opens as Scale Health direct: 5% channel on the referral line; admin can still flip it", async () => {
+  store.setAdPoolForTests(new PGlite() as unknown as store.Queryable, "ads_ref_scale_direct");
+  promo.resetMemberCache();
+  await draftCampaignFromCheckoutSafe(session("cs_live_scale_direct_1", { sku: "reserve-490", brand: "Mirror Brand", st: "mona", st_qr: "scale-intake", site: "scale", sold_by: "scale" }, 100_000, "ops@mirrorbrand.co"));
+  await draftCampaignFromCheckoutSafe(session("cs_live_scale_direct_2", { sku: "hold-190", brand: "Mirror Plain", site: "scale", sold_by: "scale" }, 19_000, "ops@plainbrand.co"));
+  await draftCampaignFromCheckoutSafe(session("cs_live_birch_still_1", { sku: "hold-190", brand: "Birch Brand", st: "mona", site: "birch" }, 19_000, "ops@birchbrand.co"));
+  const all = await store.listCampaigns();
+  const c = all.find((x) => x.orderRef === "cs_live_scale_direct_1")!;
+  assert.equal(c.seller, "scale");
+  assert.equal(all.find((x) => x.orderRef === "cs_live_scale_direct_2")!.seller, "scale", "unreferred Scale-mirror sales are Scale direct too");
+  assert.equal(all.find((x) => x.orderRef === "cs_live_birch_still_1")!.seller, "birch");
+  const rows = await listReferralOrders();
+  assert.equal(rows.find((r) => r.sessionId === "cs_live_scale_direct_1")!.channel, "scale_direct");
+  assert.equal(rows.find((r) => r.sessionId === "cs_live_birch_still_1")!.channel, "brokerage");
+  await store.updateCampaign(c.id, { seller: "birch" }, "admin@test");
+  assert.equal((await listReferralOrders()).find((r) => r.sessionId === "cs_live_scale_direct_1")!.channel, "brokerage", "the admin override still wins");
+});
 
 test("commission: existing channel override × the referrer's share; Scale direct / internal 5%; dated, never retroactive; never paid on delivery too", () => {
   const ch = [{ channel: "scale_direct" as const, overrideBps: 500, effectiveAt: T("2026-11-01T00:00:00Z") }, { channel: "internal" as const, overrideBps: 500, effectiveAt: T("2026-11-01T00:00:00Z") }];
@@ -215,4 +236,33 @@ test("browser: www and apex share attribution through the domain cookie; expired
   old.run(PROMO_BOX_JS);
   await (old.win.fetch as (u: string, o: object) => Promise<Response>)("/v1/checkout", { method: "POST" });
   assert.equal(old.fetches.find((f) => f.url === "/v1/checkout")!.attr, null, "past 30 days nothing is carried");
+});
+
+test("QA hygiene: the e2e's BirchQA UA token marks its own traffic as test; the one-shot migration flags only the Nov 21 e2e rows, once", async () => {
+  const ua = (v: string) => ({ get: (n: string) => (n.toLowerCase() === "user-agent" ? v : undefined) }) as never;
+  assert.equal(hasQaUaToken(ua(`Mozilla/5.0 (Macintosh) Chrome/131.0.0.0 Safari/537.36 ${BIRCH_QA_UA_TOKEN}`)), true);
+  assert.equal(hasQaUaToken(ua("Mozilla/5.0 (Macintosh) Chrome/131.0.0.0 Safari/537.36")), false);
+  const pg = new PGlite();
+  const sc = "ads_qa_flag";
+  await pg.query(`CREATE SCHEMA IF NOT EXISTS ${sc}`);
+  await pg.query(`CREATE TABLE ${sc}.ad_street_events (id bigserial PRIMARY KEY, at timestamptz NOT NULL DEFAULT now(), member text NOT NULL, kind text NOT NULL, qr text, site text, ref text, amount_cents bigint, currency text, is_test boolean NOT NULL DEFAULT false, dedupe_key text)`);
+  const ins = (at: string, member: string, kind: string, site: string, qr: string | null) => pg.query(`INSERT INTO ${sc}.ad_street_events (at, member, kind, site, qr) VALUES ($1,$2,$3,$4,$5)`, [at, member, kind, site, qr]);
+  await ins("2026-11-21T21:26:10Z", "bridget", "visit", "birch", null); // e2e
+  await ins("2026-11-21T21:26:10Z", "bridget", "scan", "birch", "birch-intake"); // e2e
+  await ins("2026-11-21T21:26:20Z", "mona", "visit", "scale", null); // e2e
+  await ins("2026-11-21T21:26:20Z", "mona", "scan", "scale", "scale-intake-digital"); // e2e
+  await ins("2026-11-21T21:26:30Z", "mona", "scan", "scale", "scale-intake"); // other QR: kept real
+  await ins("2026-11-21T21:26:30Z", "mona", "order", "scale", null); // not a visit/scan: kept
+  await ins("2026-11-21T20:00:00Z", "bridget", "scan", "birch", "birch-intake"); // outside the window: kept real
+  store.setAdPoolForTests(pg as unknown as store.Queryable, sc);
+  await store.listCampaigns(); // runs the DDL (and the one-shot flag)
+  const flagged = (await pg.query<{ id: number }>(`SELECT id FROM ${sc}.ad_street_events WHERE is_test ORDER BY id`)).rows.map((r) => Number(r.id));
+  assert.deepEqual(flagged, [1, 2, 3, 4]);
+  await ins("2026-11-21T21:27:00Z", "bridget", "visit", "birch", null);
+  store.setAdPoolForTests(pg as unknown as store.Queryable, sc);
+  await store.listCampaigns(); // second boot: guarded, no-op
+  assert.equal((await pg.query(`SELECT 1 FROM ${sc}.ad_street_events WHERE is_test`)).rows.length, 4);
+  const audit = (await pg.query<{ detail: string }>(`SELECT detail FROM ${sc}.ad_audit WHERE action = 'street.qa_flag'`)).rows;
+  assert.equal(audit.length, 1);
+  assert.equal(audit[0]!.detail, "flagged 4 street events as test: ids 1,2,3,4");
 });
