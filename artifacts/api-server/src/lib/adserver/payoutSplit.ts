@@ -2,6 +2,10 @@
  * Payout split (Randy voice Nov 21 2026 1:09 PM). Per delivered (charged) dollar of collected ad revenue:
  *   Birch override = override% of gross → distributed to brokerage / commission recipients (% of the pool); unallocated pool stays with Birch.
  *   net = gross − override; hub royalty = hub% of net; the remainder stays with Birch / SBG.
+ * The override depends on the sales channel (Randy voice Nov 21 2026 2:45 PM):
+ *   brokerage    = sold through Birch Reserve (campaign seller "birch") → the Birch override rate (default 20%, per hub editable);
+ *   scale_direct = sold organically off the Scale Health site (seller "scale") → its own rate (default 5%);
+ *   internal     = Birch only runs it internally as cost accounting (campaign flag) → its own rate (default 5%).
  * Rates and recipients are dated versions: a charge uses the version in effect at its own time, so changes are never retroactive.
  * Pure module (no DB).
  */
@@ -13,7 +17,15 @@ export type RecipientRow = {
   rkey: string; name: string; kind: "brokerage" | "commission"; pctBps: number; scopePartner: string | null; scopeCampaign: string | null;
   active: boolean; payoutRef: string | null; effectiveAt: Date;
 };
-export type ChargeLine = { partner: string; campaignId: string; at: Date; currency: string; grossMicros: number; source?: SourceType };
+export type Channel = "brokerage" | "scale_direct" | "internal";
+export const CHANNELS: readonly Channel[] = ["brokerage", "scale_direct", "internal"];
+export const CHANNEL_LABEL: Record<Channel, string> = { brokerage: "Birch brokerage", scale_direct: "Scale direct", internal: "Internal (cost accounting)" };
+/** Fallback rates before any dated row exists (Randy 2:45 PM: 5% for Scale direct / internal). Brokerage uses the Birch override in RateRow. */
+export const CHANNEL_DEFAULT_BPS: Record<Exclude<Channel, "brokerage">, number> = { scale_direct: 500, internal: 500 };
+export type ChannelRateRow = { channel: Exclude<Channel, "brokerage">; overrideBps: number; effectiveAt: Date };
+/** Campaign → channel: the internal flag wins, then the seller. */
+export const channelOf = (seller: string | null | undefined, internal: boolean | null | undefined): Channel => (internal ? "internal" : seller === "scale" ? "scale_direct" : "brokerage");
+export type ChargeLine = { partner: string; campaignId: string; at: Date; currency: string; grossMicros: number; source?: SourceType; channel?: Channel };
 /** Payout gate per hub: no hub or override payout until live + has transactions + own audience activated, unless overridden with a note. */
 export type Gate = { live: boolean; hasTransactions: boolean; audienceActivated: boolean; override: boolean; note: string | null };
 export const gatePassed = (g: Gate | undefined) => Boolean(g && (g.override || (g.live && g.hasTransactions && g.audienceActivated)));
@@ -31,6 +43,12 @@ export function ratesAt(rates: RateRow[], partner: string, t: number): { overrid
   const hubBps = h?.hubBps ?? g?.hubBps;
   const tiers = [...(h?.tiers ?? [])].sort((a, b) => a.fromMicros - b.fromMicros);
   return overrideBps == null || hubBps == null ? null : { overrideBps, hubBps, tiers };
+}
+
+/** Override bps for a charge: brokerage uses the Birch override (global / per hub); the other channels use their own dated rate. */
+export function overrideFor(channel: Channel, brokerageBps: number, channelRates: ChannelRateRow[], t: number): number {
+  if (channel === "brokerage") return brokerageBps;
+  return latest(channelRates.filter((r) => r.channel === channel), t)?.overrideBps ?? CHANNEL_DEFAULT_BPS[channel];
 }
 
 /** Hub amount for one line given the hub's month-to-date gross before it (progressive tiers on gross volume). */
@@ -68,15 +86,19 @@ export function maxPoolAllocationBps(active: RecipientRow[], partners: string[],
   return max;
 }
 
-export type PayeeAgg = { key: string; kind: "hub" | "brokerage" | "commission"; label: string; partner: string; source: SourceType; month: string; currency: string; basis: number; payable: number; pending: boolean; units: number; bpsSeen: Set<number>; payoutRef: string | null };
-export type MonthAgg = { month: string; currency: string; gross: number; override: number; recipients: number; hub: number; pendingGross: number };
+export type PayeeAgg = { key: string; kind: "hub" | "brokerage" | "commission"; label: string; partner: string; source: SourceType; month: string; currency: string; basis: number; payable: number; pending: boolean; units: number; bpsSeen: Set<number>; payoutRef: string | null; overrides: Map<string, number> };
+export type MonthAgg = { month: string; currency: string; gross: number; override: number; recipients: number; hub: number; pendingGross: number; byChannel: Partial<Record<Channel, { gross: number; override: number }>> };
+/** "20% Birch brokerage · 5% Scale direct" from a payee's overrides map (key "channel:bps" → gross). */
+export const overrideLabel = (m: Map<string, number>): string =>
+  [...m.keys()].map((k) => { const [ch, bps] = k.split(":"); return `${(Number(bps) / 100).toFixed(Number(bps) % 100 ? 2 : 0)}% ${CHANNEL_LABEL[ch as Channel] ?? ch}`; }).join(" · ");
 
 /** Split every charge line. Amounts accumulate in fractional micros and are floored once per payee. */
-export function splitCharges(lines: ChargeLine[], rates: RateRow[], recipients: RecipientRow[]): { payees: PayeeAgg[]; months: MonthAgg[] } {
+export function splitCharges(lines: ChargeLine[], rates: RateRow[], recipients: RecipientRow[], channelRates: ChannelRateRow[] = []): { payees: PayeeAgg[]; months: MonthAgg[] } {
   const payees = new Map<string, PayeeAgg>();
   const months = new Map<string, MonthAgg>();
-  const add = (k: string, init: () => PayeeAgg, basis: number, amt: number | null, bps: number | null) => {
+  const add = (k: string, init: () => PayeeAgg, basis: number, amt: number | null, bps: number | null, ov?: string) => {
     const a = payees.get(k) ?? init();
+    if (ov) a.overrides.set(ov, (a.overrides.get(ov) ?? 0) + basis);
     a.basis += basis;
     a.units += 1;
     if (amt === null) a.pending = true;
@@ -90,31 +112,37 @@ export function splitCharges(lines: ChargeLine[], rates: RateRow[], recipients: 
     const src: SourceType = l.source ?? "ad";
     const month = l.at.toISOString().slice(0, 7);
     const mk = `${month}|${l.currency}`;
-    const m = months.get(mk) ?? { month, currency: l.currency, gross: 0, override: 0, recipients: 0, hub: 0, pendingGross: 0 };
+    const m = months.get(mk) ?? { month, currency: l.currency, gross: 0, override: 0, recipients: 0, hub: 0, pendingGross: 0, byChannel: {} };
     m.gross += l.grossMicros;
     const r = ratesAt(rates, l.partner, t);
     const pkey = src === "ad" ? l.partner : `${l.partner}#${src}`;
     const hk = `${pkey}|${month}|${l.currency}`;
-    const hubInit = (): PayeeAgg => ({ key: pkey, kind: "hub", label: l.partner, partner: l.partner, source: src, month, currency: l.currency, basis: 0, payable: 0, pending: false, units: 0, bpsSeen: new Set(), payoutRef: null });
+    const hubInit = (): PayeeAgg => ({ key: pkey, kind: "hub", label: l.partner, partner: l.partner, source: src, month, currency: l.currency, basis: 0, payable: 0, pending: false, units: 0, bpsSeen: new Set(), payoutRef: null, overrides: new Map() });
     if (!r) {
       m.pendingGross += l.grossMicros;
       add(hk, hubInit, l.grossMicros, null, null);
       months.set(mk, m);
       continue;
     }
-    const pool = (l.grossMicros * r.overrideBps) / 10_000;
+    const channel: Channel = l.channel ?? "brokerage";
+    const ovBps = overrideFor(channel, r.overrideBps, channelRates, t);
+    const ovKey = `${channel}:${ovBps}`;
+    const pool = (l.grossMicros * ovBps) / 10_000;
+    const bc = (m.byChannel[channel] ??= { gross: 0, override: 0 });
+    bc.gross += l.grossMicros;
+    bc.override += pool;
     const vk = `${l.partner}|${src}|${month}|${l.currency}`;
     const before = mtd.get(vk) ?? 0;
     mtd.set(vk, before + l.grossMicros);
-    const { amt: hubAmt, topBps } = hubAmountFor(l.grossMicros, before, r.overrideBps, r.hubBps, r.tiers);
-    add(hk, hubInit, l.grossMicros, hubAmt, topBps);
+    const { amt: hubAmt, topBps } = hubAmountFor(l.grossMicros, before, ovBps, r.hubBps, r.tiers);
+    add(hk, hubInit, l.grossMicros, hubAmt, topBps, ovKey);
     m.override += pool;
     m.hub += hubAmt;
     for (const rc of recipientsAt(recipients, t).filter((x) => applies(x, l.partner, l.campaignId))) {
       const amt = (pool * rc.pctBps) / 10_000;
       m.recipients += amt;
       const key = `rcpt:${rc.rkey}@${pkey}`; // one line per recipient per hub, so each line follows its hub's payout gate
-      add(`${key}|${month}|${l.currency}`, () => ({ key, kind: rc.kind, label: `${rc.name} (on ${l.partner})`, partner: l.partner, source: src, month, currency: l.currency, basis: 0, payable: 0, pending: false, units: 0, bpsSeen: new Set(), payoutRef: rc.payoutRef }), pool, amt, rc.pctBps);
+      add(`${key}|${month}|${l.currency}`, () => ({ key, kind: rc.kind, label: `${rc.name} (on ${l.partner})`, partner: l.partner, source: src, month, currency: l.currency, basis: 0, payable: 0, pending: false, units: 0, bpsSeen: new Set(), payoutRef: rc.payoutRef, overrides: new Map() }), pool, amt, rc.pctBps, ovKey);
     }
     months.set(mk, m);
   }

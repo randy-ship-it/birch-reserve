@@ -22,6 +22,8 @@ export type Campaign = {
   orderKind: string | null;
   /** Who sold it: Birch Reserve (reseller channel) or Scale Health direct (its own proprietary ads). Same rig, one ledger. */
   seller?: "birch" | "scale";
+  /** Birch only runs it internally as cost accounting (Randy 2:45 PM): its own, lower override rate. */
+  internal?: boolean;
   currency: "usd" | "cad";
   budgetMicros: number;
   spentMicros: number;
