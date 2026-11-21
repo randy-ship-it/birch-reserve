@@ -369,6 +369,13 @@ export async function creativeTestFlag(id: string): Promise<{ isTest: boolean } 
   const { rows } = await p.query(`SELECT c.is_test FROM ${S()}.ad_creatives cr JOIN ${S()}.ad_campaigns c ON c.id = cr.campaign_id WHERE cr.id::text = $1`, [id]);
   return rows[0] ? { isTest: Boolean(rows[0].is_test) } : null;
 }
+/** Backfill a format for a creative uploaded before (or outside) the format table. Only sets it when empty. */
+export async function setCreativeFormatIfEmpty(id: string, format: string, actor: string): Promise<boolean> {
+  const p = await db();
+  const { rows } = await p.query(`UPDATE ${S()}.ad_creatives SET format = $2 WHERE id::text = $1 AND format IS NULL RETURNING id`, [id, format]);
+  if (rows.length) await audit(actor, "creative.format", id, format);
+  return rows.length > 0;
+}
 export async function setCreativeAlt(id: string, alt: string, actor: string): Promise<boolean> {
   const p = await db();
   const { rows } = await p.query(`UPDATE ${S()}.ad_creatives SET alt = $2 WHERE id::text = $1 RETURNING id`, [id, alt]);

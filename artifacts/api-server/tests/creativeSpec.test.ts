@@ -208,3 +208,10 @@ test("embed v2: drop-in attributes, test mode from the page URL, video muted/pla
   assert.doesNotMatch(EMBED_JS, /document\.cookie/);
   assert.match(EMBED_JS, /"video_vertical":\[360,640\]/);
 });
+
+test("1200×628 (1.91:1) matches the landscape format and fits landing + dashboard", async () => {
+  const { matchFormat, fitsPlacement } = await import("../src/lib/adserver/creativeSpec");
+  assert.equal(matchFormat("image", 1200, 628)?.key, "landscape");
+  assert.equal(matchFormat("image", 1280, 640)?.key, "hero_phone");
+  assert.ok(fitsPlacement("landscape", "landing") && fitsPlacement("landscape", "dashboard"));
+});

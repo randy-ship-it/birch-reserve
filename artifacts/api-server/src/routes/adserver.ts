@@ -796,6 +796,12 @@ router.post("/ads/admin/creatives/:id/status", json, (req, res) =>
       }
     }
     const ok = await store.setCreativeStatus(String(req.params.id), to, who, to === "rejected" ? reason : null);
+    if (ok && to === "approved") {
+      // No format yet (uploaded before the table, e.g. /buy): match it by shape so format-scoped slots can take it.
+      const cr = await store.getCreative(String(req.params.id));
+      const f = cr && !cr.format ? matchFormat(cr.kind ?? "image", cr.width, cr.height) : undefined;
+      if (cr && f) await store.setCreativeFormatIfEmpty(cr.id, f.key, who);
+    }
     res.status(ok ? 200 : 404).json({ message: ok ? (to === "approved" ? "Approved." : to === "pending" ? "Back in the approval queue." : "Rejected.") : "Not found." });
   }),
 );
