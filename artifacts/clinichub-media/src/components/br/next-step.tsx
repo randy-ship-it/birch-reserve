@@ -22,6 +22,7 @@ import { HubMock, twoLaneMock } from "@/components/br/two-lane";
 import { HUB_MOCKS, HUB_KEYS, type HubKey } from "@/lib/hub-mocks";
 import { STARTER_BLOCK } from "@/components/br/start-small";
 import { trackCta } from "@/lib/track-cta";
+import { usePriceText } from "@/lib/currency";
 import { MODELLED_PLAN_LABEL } from "@/components/br/modelled";
 export { MODELLED_PLAN_LABEL, PlanChip } from "@/components/br/modelled";
 import { RATE_SURFACES, fmtUsd } from "../../../../api-server/src/lib/overhaul/pricing";
@@ -287,6 +288,7 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
     window.addEventListener(POST_KIT_EVENT, on);
     return () => window.removeEventListener(POST_KIT_EVENT, on);
   }, [where, yieldToPostKit]);
+  const lookPrice = usePriceText()("$190 USD");
   if (hidden) return null;
   return (
     <section id={anchor ? "next-step" : undefined} className="scroll-mt-20" data-testid="next-step" data-where={where}>
@@ -294,7 +296,7 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
       <div className={`mt-4 grid grid-cols-[minmax(0,1fr)] items-center gap-5 ${showMock ? "md:grid-cols-[1.2fr_1fr]" : ""}`}>
         {showMock ? <AnnotatedHubMock brand={brand} initial="effortless" /> : null}
         <div>
-          <p className="font-display text-5xl leading-none text-[#0b1f3a]">$190 <span className="text-lg">USD</span></p>
+          <p className="font-display text-5xl leading-none text-[#0b1f3a]">{lookPrice.split(" ")[0]} <span className="text-lg">{lookPrice.split(" ")[1]}</span></p>
           <p className="mt-2 text-[15px] text-foreground/75">Your ad, live for 7 days.</p>
           <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={() => trackCta("cta_hold_190", { offer: "hold-190" })} className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 hover:bg-[#0b1f3a] hover:text-white sm:w-auto" data-testid="next-step-look">
             Start the $190 look <ArrowRight className="size-5" />

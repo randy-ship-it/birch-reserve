@@ -384,7 +384,7 @@ export default function BrMediaKit() {
         <div className="grid gap-6 md:grid-cols-2">
           <div className="border border-foreground/20 bg-white p-5" data-testid="mk-agency">
             <p className="text-sm text-foreground/80">Bring a brand into the network. The agency of record earns {AGENCY_CASH_PCT}% of media spend, paid in cash per the IO.</p>
-            <p className="mt-3 text-sm">
+            <p className="mt-3 text-sm" data-currency-fixed>
               <span className="text-muted-foreground">Example:</span> a ${MEDIA_KIT_OFFERS.seat.spendUsd} USD reserve pays you <strong>{usd(agencySeat)}</strong>; a {usdK(prem.spendLo)} premium slot pays you <strong>{usd(agencyPrem)}</strong> in cash.
             </p>
           </div>

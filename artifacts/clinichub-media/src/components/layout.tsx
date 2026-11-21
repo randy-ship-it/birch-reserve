@@ -8,6 +8,7 @@ import { RandyChat } from '@/components/randy-chat';
 import { HearRandyElevenLabs } from '@/components/hear-randy-elevenlabs';
 import { LingerCapture } from '@/components/linger-capture';
 import { CurrencyToggle } from '@/components/currency-toggle';
+import { CurrencyText } from '@/components/currency-text';
 import { KitCta, StickyKitCta, intakeHref } from '@/components/br/kit-cta';
 import { logArrival, logCtaClick } from '@/lib/shareTrack';
 import { isScaleSkin } from '@/lib/siteSkin';
@@ -101,6 +102,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <LingerCapture />
         </div>
         <StickyKitCta path={location} />
+        <CurrencyText />
       </div>
     );
   }
@@ -251,6 +253,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <LingerCapture />
       </div>
       <StickyKitCta path={location} />
+        <CurrencyText />
     </div>
   )
 }

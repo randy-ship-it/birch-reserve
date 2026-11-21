@@ -133,12 +133,12 @@ export function priceLabel(sku: string, currency: Currency, prices?: Prices): st
  */
 export function localizePrices(text: string, currency: Currency, prices: Prices = state.prices): string {
   // USD: label any bare "$190" / "$490" so every price names its currency.
-  if (currency === "usd") return text.replace(/\$(190|490)(?![0-9,.]| USD| CAD)/g, "$$$1 USD");
+  if (currency === "usd") return text.replace(/\$(190|490)(?![0-9,]|\.[0-9]| USD| CAD)/g, "$$$1 USD");
   let out = text;
   for (const [sku, usd] of [["hold-190", 190], ["reserve-490", 490]] as const) {
     const label = priceLabel(sku, currency, prices);
     out = out.split(`$${usd} USD`).join(label);
-    out = out.replace(new RegExp(`\\$${usd}(?![0-9,.])`, "g"), label);
+    out = out.replace(new RegExp(`\\$${usd}(?![0-9,]|\\.[0-9])`, "g"), label);
   }
   return out;
 }
