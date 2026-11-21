@@ -177,8 +177,7 @@ export function ExposureCard({ exposure, source, testId = "exposure-card", sync 
     <section data-testid={testId} data-source={source === "friday" ? "report" : source} data-h={h} data-expo={expo} className={v2 ? "mt-5 rounded-[10px] bg-[#FAF8F3] p-4 text-[#24332B]" : "rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm"}>
       <div className="flex flex-wrap items-center gap-2">
         <h3 className={v2 ? "text-xl text-[#0B1A13] [font-family:'Iowan_Old_Style',Charter,Georgia,serif]" : "font-display text-xl"}>Exposure value</h3>
-        {v2 ? null : <EstimateTag />}
-        <span className="rounded-full bg-foreground/[0.06] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">Modelled</span>
+        {v2 ? <span className="rounded-full bg-foreground/[0.06] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">Modelled</span> : <EstimateTag />}
         <span data-testid="exposure-source" className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${source === "friday" ? "bg-lime-300 text-[#0b1f3a]" : "bg-violet-100 text-violet-900"}`}>{srcLabel}</span>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
