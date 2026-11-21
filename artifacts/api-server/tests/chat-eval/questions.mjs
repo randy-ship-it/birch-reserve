@@ -50,7 +50,7 @@ export const RULES = (brand) => [
   { id: "no-revenue-split", bad: /\b(revenue|rev)[- ]?share\b|\bcommission (split|share)\b|\b(20|5|65)\s?%\s+(to\s+)?(birch|scale)\b/i },
   { id: "no-legacy-price", bad: /\$\s?899\b/ },
   { id: "no-em-dash", bad: /[\u2014\u2013]/ },
-  { id: "50mm-is-estimate", bad: /\$50\s?MM\+?(?![^.\n]{0,120}(expect|estimate|projected|forecast))/i },
+  { id: "50mm-is-estimate", bad: /(?<![^.\n]*(?:expect|estimate|projected|forecast)[^.\n]*)\$50\s?MM\+?(?![^.\n]*(?:expect|estimate|projected|forecast))/i },
   ...(brand === "scale"
     ? [
         { id: "scale-links-stay-on-scale", bad: /https?:\/\/(www\.)?birchreserve\.net/i },
