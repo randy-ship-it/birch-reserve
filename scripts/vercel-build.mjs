@@ -200,7 +200,24 @@ await writeFile(
   ),
 );
 
+// Security headers for static files too (the function sets the same set itself: middlewares/securityHeaders.ts).
+// Bundled from the TS source so there is one list. MIRROR_FRAME_HOSTS is read at build time here.
+const secBundle = await build({
+  entryPoints: [path.join(repoRoot, "artifacts", "api-server", "src", "middlewares", "securityHeaders.ts")],
+  bundle: true,
+  write: false,
+  format: "esm",
+  platform: "node",
+  external: ["express"],
+  logLevel: "silent",
+});
+const { securityHeaderSet } = await import(
+  `data:text/javascript;base64,${Buffer.from(secBundle.outputFiles[0].text).toString("base64")}`
+);
+const SECURITY_HEADERS = securityHeaderSet(process.env);
+
 const routes = [
+  { src: "/(.*)", headers: SECURITY_HEADERS, continue: true },
   // Scale mirror (artifacts/api-server/src/middlewares/mirrorHost.ts): every path is also served at /intake/_m/<path>,
   // so scalehealth.ca can forward only its /intake namespace. Static files resolve through the filesystem check;
   // everything else falls through to the function, which strips the same prefix.

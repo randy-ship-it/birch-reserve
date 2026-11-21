@@ -128,8 +128,11 @@ export function toCsv(rows: Array<Record<string, unknown>>): string {
   if (rows.length === 0) return "";
   const cols = Object.keys(rows[0]!);
   const cell = (v: unknown) => {
-    const s = v instanceof Date ? v.toISOString() : String(v ?? "");
-    return /[",\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s;
+    let s = v instanceof Date ? v.toISOString() : String(v ?? "");
+    // CSV/formula injection: a visitor-typed company or email starting with = + - @ (or tab/CR) would run as a
+    // formula when the export is opened in Excel/Sheets. Numbers (e.g. -12.50) are left alone.
+    if (typeof v === "string" && /^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s)) s = `'${s}`;
+    return /[",\n\r]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s;
   };
   return [cols.join(","), ...rows.map((r) => cols.map((c) => cell(r[c])).join(","))].join("\n") + "\n";
 }

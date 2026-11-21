@@ -27,7 +27,8 @@ import { promoCtxOf } from "../lib/adserver/promoContext";
 import { Router, json, type Request, type Response } from "express";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
 import { coarseRegion, recordPulse } from "../lib/activityPulse";
-import { isTestIdentity } from "../lib/testTraffic";
+import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
+import { FRIENDLY_429, limiter } from "../lib/rateLimit";
 import { isIP } from "node:net";
 import { FRIDAY_CATEGORIES, toV1Body } from "../lib/kitCalc/fridayV12";
 import { NEVER_HUB_NAME } from "../lib/overhaul/hubNameFilter";
@@ -231,6 +232,16 @@ export type IntakeLeadEvent = { fridayId: string | null; email: string; website:
 export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fetch; log?: (msg: string, extra?: Record<string, unknown>) => void; recordLead?: (e: IntakeLeadEvent) => Promise<void> } = {}) {
   const router = Router();
   const body = json({ limit: "64kb" });
+  // Per-IP cap on new intakes / kit sends (security audit Nov 21 2026). Autosave PATCHes stay unlimited here; they need
+  // the edit token and Friday applies its own limits. Valid X-Birch-QA traffic is exempt.
+  const createLimiter = limiter({ max: 30, windowMs: 10 * 60_000 });
+  const capped = (req: Request, res: Response, next: () => void) => {
+    if (hasValidQaHeader(req)) return next();
+    const hit = createLimiter.hit(req.ip || "unknown");
+    if (!hit.limited) return next();
+    res.setHeader("Retry-After", String(hit.retryAfterSec));
+    res.status(429).json({ ok: false, error: "rate_limited", message: FRIENDLY_429 });
+  };
   const env = opts.env ?? process.env;
   const f = opts.fetchImpl ?? fetch;
   const log = opts.log ?? (() => undefined);
@@ -305,7 +316,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     void recordLead({ fridayId: fid, email: b.email.trim().toLowerCase(), website: typeof b.website === "string" ? b.website.slice(0, 200) : null, stage, roles: Array.isArray(b.roles) ? (b.roles as unknown[]).map(String).slice(0, 6) : [], path: hubPendingOf(b) ? "/intake/supplier" : "/intake", hub: hubPendingOf(b) }).catch(() => undefined);
   }
 
-  router.post("/v1/brand-intake", body, async (req, res) => {
+  router.post("/v1/brand-intake", capped, body, async (req, res) => {
     const fast = (req.body as Record<string, unknown> | undefined)?.submit_mode === "fast";
     if (fast) {
       // v1.3 §1 fast mode: website + email required (checked here too, so nothing is sent without them).
@@ -353,13 +364,13 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     if (prep.stage === "submitted" && out.status < 300) await onIntakeSubmitted(promoCtxOf(req), String((prep.body as Record<string, unknown>)?.email ?? ""), typeof (prep.body as Record<string, unknown>)?.website === "string" ? ((prep.body as Record<string, unknown>).website as string) : null);
     send(res, out);
   });
-  router.post("/v1/brand-intake/:id/kit", body, async (req, res) => {
+  router.post("/v1/brand-intake/:id/kit", capped, body, async (req, res) => {
     const id = String(req.params.id);
     if (!ID_RE.test(id)) return void res.status(404).json({ ok: false, error: "not_found" });
     const out = await forward(req, res, "POST", `/api/public/brand-intake/${encodeURIComponent(id)}/kit`, req.body ?? {});
     if (out) send(res, out);
   });
-  router.post("/v1/brand-kit/download", body, async (req, res) => {
+  router.post("/v1/brand-kit/download", capped, body, async (req, res) => {
     const out = await forward(req, res, "POST", "/api/public/brand-kit/download", req.body ?? {});
     if (out) send(res, out);
   });
