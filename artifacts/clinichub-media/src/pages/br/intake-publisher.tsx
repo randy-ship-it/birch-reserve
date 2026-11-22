@@ -117,7 +117,7 @@ export default function BrIntakePublisher() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-[11px] text-muted-foreground">Navy = low case ({p.sellBand[0]}% sold, low end of the starter price). Lime = added up to the high case ({p.sellBand[2]}% sold, top of the range).</p>
+          <p className="text-[11px] text-muted-foreground">Navy = low case ({p.sellBand[0]}% sold, low end of the starter price). {isScaleSkin() ? "Green" : "Lime"} = added up to the high case ({p.sellBand[2]}% sold, top of the range).</p>
         </div>
       </section>
 
