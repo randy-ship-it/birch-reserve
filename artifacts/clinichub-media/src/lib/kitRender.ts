@@ -2,6 +2,7 @@
  * Two-sided personalized media kit: one SVG per side (1200×1600), shown on screen as-is and exported to
  * PNG (both sides, side by side) and a 2-page PDF. No dependencies: canvas + a minimal JPEG-in-PDF writer.
  */
+import { isScaleSkin } from "./siteSkin";
 import { KIT_FIT_FINE } from "../../../api-server/src/lib/overhaul/brandIntake";
 import type { KitView } from "./kitView";
 
@@ -87,7 +88,7 @@ export function kitSideA(d: KitData): string {
   ${d.formula
     .map((f, i) => `<text x="72" y="${1430 + i * 26}" font-family="${SANS}" font-size="16" fill="#fff" opacity=".6">${esc(f)}</text>`)
     .join("")}
-  <text x="72" y="1540" font-family="${SANS}" font-size="15" fill="#fff" opacity=".55">Estimates from your inputs and Birch Reserve modelled figures. Not a guarantee of views, clicks, sales or returns. USD.</text>
+  <text x="72" y="1540" font-family="${SANS}" font-size="15" fill="#fff" opacity=".55">Estimates from your inputs and ${isScaleSkin() ? "Scale Health" : "Birch Reserve"} modelled figures. Not a guarantee of views, clicks, sales or returns. USD.</text>
 </svg>`;
 }
 
@@ -345,6 +346,6 @@ export function kitCover(c: KitCover): string {
   <text x="72" y="925" font-family="${SANS}" font-size="20" font-weight="700" letter-spacing="2" fill="${LIME}">WHERE YOU GET SEEN</text>
   ${rowSvg}
   <text x="72" y="1500" font-family="${SANS}" font-size="20" fill="#fff" opacity=".85">${esc(c.reportUrl ? `Your kit online: ${c.reportUrl.replace(/^https?:\/\//, "")}` : "birchreserve.net/intake")}</text>
-  <text x="72" y="1540" font-family="${SANS}" font-size="15" fill="#fff" opacity=".55">Estimates from your inputs and Birch Reserve modelled figures (network figures and targets). Not a guarantee of views, sales or earnings. USD.</text>
+  <text x="72" y="1540" font-family="${SANS}" font-size="15" fill="#fff" opacity=".55">Estimates from your inputs and ${isScaleSkin() ? "Scale Health" : "Birch Reserve"} modelled figures (network figures and targets). Not a guarantee of views, sales or earnings. USD.</text>
 </svg>`;
 }
