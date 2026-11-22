@@ -7,6 +7,7 @@
  */
 import { TRACK_RECORD } from "./trackRecord";
 import { GTM_SETUP } from "./gtmSetup";
+import { PERFORMANCE_ONLY, PERF_ONLY_HREF, PERF_ONLY_URL } from "./performanceOnly";
 
 export const HOW_WE_GOT_HERE = {
   eyebrow: "How we got here",
@@ -113,10 +114,15 @@ function rangesHtml(): string {
   return `<section data-ssr="performance-ranges"><h2>${esc(r.eyebrow)}</h2><p><strong>${esc(RANGES_LABEL)}</strong></p><p>${esc(r.lede)}</p><ul>${r.rows.map((x) => `<li>${esc(x.placement)}: CTR ${fmtRange(x.ctr)}; engagement ${fmtRange(x.engagement)}; post-click conversion ${fmtRange(x.conversion)}. ${esc(r.hwLabel)}: CTR ${x.ctr.hwLo}% to ${x.ctr.hwHi}%, engagement ${x.engagement.hwLo}% to ${x.engagement.hwHi}%, conversion ${x.conversion.hwLo}% to ${x.conversion.hwHi}%.</li>`).join("")}</ul><p>${esc(r.note)}</p><ul>${RANGE_SOURCES.map((x) => `<li><a href="${x.url}" rel="noopener nofollow">${esc(x.label)}</a></li>`).join("")}</ul></section>`;
 }
 
+function perfOnlyHtml(): string {
+  const r = PERFORMANCE_ONLY;
+  return `<section data-ssr="performance-only"><h2>${esc(r.eyebrow)}</h2><h3>${esc(r.title)}</h3><p>${esc(r.sub)}</p><ul>${r.spots.map((x) => `<li>${esc(x)}</li>`).join("")}</ul><ol>${r.steps.map((x) => `<li><strong>${esc(x.t)}.</strong> ${esc(x.d)}</li>`).join("")}</ol><ul>${r.details.map((x) => `<li>${esc(x)}</li>`).join("")}</ul><p><a href="${PERF_ONLY_HREF}">${esc(r.cta)}</a></p></section>`;
+}
+
 /** Text-only blocks injected inside #root for "/" and "/media-kit". React replaces them on mount. */
 export function proofShellHtml(pathname: string): string {
   const p = pathname.replace(/\/+$/, "") || "/";
-  if (p === "/" || p === "/media-kit") return howHtml() + trackHtml() + gtmHtml() + reportHtml() + rangesHtml();
+  if (p === "/" || p === "/media-kit") return howHtml() + trackHtml() + gtmHtml() + reportHtml() + rangesHtml() + perfOnlyHtml();
   return "";
 }
 
@@ -162,5 +168,12 @@ export function llmsProofSection(): string {
     `- ${PERFORMANCE_RANGES.note}`,
     "- Sources:",
     ...RANGE_SOURCES.map((x) => `  - ${x.label}: ${x.url}`),
+    "",
+    "## Performance only (your own site, no clinic hub layer)",
+    `- ${PERFORMANCE_ONLY.title} ${PERFORMANCE_ONLY.sub}`,
+    `- Where our code goes: ${PERFORMANCE_ONLY.spots.join(", ")}.`,
+    ...PERFORMANCE_ONLY.steps.map((s) => `- ${s.n}. ${s.t}: ${s.d}`),
+    ...PERFORMANCE_ONLY.details.map((d) => `- ${d}`),
+    `- Start: ${PERF_ONLY_URL}`,
   ].join("\n");
 }
