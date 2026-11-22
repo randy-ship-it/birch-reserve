@@ -23,8 +23,33 @@ const BASE_ORDERS = surf("post_purchase").monthlyViews!;
 const BASE_VISITORS = surf("home").monthlyViews!;
 /** Which published band each surface uses. Post-purchase = row 0; everything else = Activation (row 2). The newsletter has no
  * band of its own on file, so it takes the lowest published one (Activation) rather than an invented number. */
-const BAND_ROW: Record<string, 0 | 2> = { post_purchase: 0, member_dashboard: 2, home: 2, product: 2, services: 2, newsletter: 2 };
 const pick = (b: { lo: number; hi: number }, l: Level) => (l === "low" ? b.lo : l === "high" ? b.hi : (b.lo + b.hi) / 2);
+type Band = { lo: number; hi: number };
+const avg = (a: Band, b: Band): Band => ({ lo: (a.lo + b.lo) / 2, hi: (a.hi + b.hi) / 2 });
+/** Bands per surface (all from PERFORMANCE_RANGES, #350). The post-purchase surface is the thank-you and booking-confirmation page,
+ * so it averages the Post-purchase row (2-5% / 4-8%) and the Thank-you row (1-3% / 3-6%). Hub home, member dashboard, product and
+ * services pages use the Activation row (0.5-2% / 2-5%); there is no separate published band for product/services pages. */
+const surfaceBand = (key: string): { ctr: Band; conversion: Band } => {
+  const r = PERFORMANCE_RANGES.rows;
+  if (key === "post_purchase") return { ctr: avg(r[0]!.ctr, r[1]!.ctr), conversion: avg(r[0]!.conversion, r[1]!.conversion) };
+  return { ctr: r[2]!.ctr, conversion: r[2]!.conversion };
+};
+/** Email band (public benchmarks, health and fitness / wellness). Views for email are OPENS (an ad is seen when the email is opened),
+ * so email views = list x sends x open rate. Clicks are per send, then restated per open. Sponsored-slot share of an email's clicks
+ * has no public benchmark: 15-35% (typical 25%) is OUR assumption for one sponsored slot among a newsletter's links. */
+export const EMAIL = {
+  openRate: { lo: 19.2, hi: 47.81 } as Band, // Campaign Monitor wellness and fitness 19.2% (2022); MailerLite health and fitness 47.81% (2026, inflated by Apple Mail Privacy)
+  clickPerSend: { lo: 0.72, hi: 1.45 } as Band, // Omnisend beauty and fitness 0.72%; Campaign Monitor 1.2%; Klaviyo health and beauty 1.24%; MailerLite health and fitness 1.45%
+  slotShare: { lo: 15, hi: 35 } as Band, // assumption, flagged
+  sources: [
+    { label: "MailerLite 2026 benchmarks, health and fitness: 47.81% open, 1.45% click (3.6M campaigns)", url: "https://www.mailerlite.com/blog/compare-your-email-performance-metrics-industry-benchmarks" },
+    { label: "Klaviyo 2026 benchmarks, health and beauty campaigns: 30.5% open, 1.24% click", url: "https://www.klaviyo.com/products/email-marketing/benchmarks" },
+    { label: "Campaign Monitor, wellness and fitness: 19.2% open, 1.2% click", url: "https://www.campaignmonitor.com/resources/guides/email-marketing-benchmarks/" },
+    { label: "Omnisend, beauty and fitness campaigns: 0.72% click (via The Retentionist)", url: "https://theretentionist.com/benchmarks/email-marketing-benchmarks-by-industry/" },
+  ],
+
+} as const;
+const emailOpen = (EMAIL.openRate.lo + EMAIL.openRate.hi) / 2;
 
 export type HubInputs = { orders: number; visitors: number | null; newsletter: boolean; list: number; cart: number; level: Level };
 export const DEFAULT_INPUTS: HubInputs = { orders: BASE_ORDERS, visitors: null, newsletter: true, list: Math.round(surf("newsletter").monthlyViews! / SENDS_PER_MONTH), cart: 80, level: "typical" };
@@ -50,17 +75,19 @@ export function estimateHub(inp: HubInputs): HubOut {
     home: visitors,
     product: (visitors * surf("product").monthlyViews!) / BASE_VISITORS,
     services: (visitors * surf("services").monthlyViews!) / BASE_VISITORS,
-    newsletter: list * SENDS_PER_MONTH,
+    newsletter: (list * SENDS_PER_MONTH * emailOpen) / 100, // opens, not sends
   };
-  const rows = PERFORMANCE_RANGES.rows;
   const earn = { low: 0, likely: 0, high: 0 };
   const surfaces: SurfaceOut[] = Object.keys(viewsOf).map((key) => {
     const s = surf(key);
     const views = viewsOf[key]!;
-    const band = rows[BAND_ROW[key]!]!;
+    const band = surfaceBand(key);
     const shown = (views * SELL_BAND[1]) / 100;
-    const clicks = (shown * pick(band.ctr, inp.level)) / 100;
-    const ord = (clicks * pick(band.conversion, inp.level)) / 100;
+    // Email: sponsored clicks per open = click rate per send / open rate x slot share (typical open rate, so earnings never move with the level).
+    const ctrPct = key === "newsletter" ? (pick(EMAIL.clickPerSend, inp.level) / emailOpen) * pick(EMAIL.slotShare, inp.level) : pick(band.ctr, inp.level);
+    const clicks = (shown * ctrPct) / 100;
+    const conv = key === "newsletter" ? pick(surfaceBand("home").conversion, inp.level) : pick(band.conversion, inp.level);
+    const ord = (clicks * conv) / 100;
     const cpm = s.cpm!;
     const pay = (pct: number, c: number) => (((views * pct) / 100) / 1000) * c * share;
     earn.low += pay(SELL_BAND[0], cpm[0]);

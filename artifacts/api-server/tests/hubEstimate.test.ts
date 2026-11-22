@@ -2,9 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { estimateHub, DEFAULT_INPUTS, SELL_BAND } from "../src/lib/overhaul/hubEstimate";
 
-test("typical hub reconciles with the media model (~$1,080 likely, 530-1,650 range)", () => {
+test("typical hub earnings: email priced on opens (~$412 likely)", () => {
   const r = estimateHub(DEFAULT_INPUTS);
-  assert.ok(Math.abs(r.earn.likely - 1084) < 15);
+  assert.ok(Math.abs(r.earn.likely - 412) < 15);
   assert.ok(r.earn.low < r.earn.likely && r.earn.likely < r.earn.high);
   assert.equal(Math.round(r.year), Math.round(r.earn.likely * 12));
 });
@@ -25,4 +25,13 @@ test("bigger inputs give bigger outputs; level moves clicks/orders but not earni
 test("no newsletter and zero inputs give no zero-division or NaN", () => {
   const r = estimateHub({ ...DEFAULT_INPUTS, newsletter: false, orders: 0, visitors: 0 });
   assert.ok(Number.isFinite(r.earn.likely) && r.earn.likely === 0 && r.views === 0);
+});
+test("email views are opens, email has its own click band, and every surface blended click rate is plausible", () => {
+  const r = estimateHub(DEFAULT_INPUTS);
+  const mail = r.surfaces.find((s) => s.key === "newsletter")!;
+  assert.ok(mail.views < DEFAULT_INPUTS.list * 4 * 0.5 && mail.views > DEFAULT_INPUTS.list * 4 * 0.19);
+  assert.ok(mail.clicks / mail.shown > 0.003 && mail.clicks / mail.shown < 0.02);
+  const pp = r.surfaces.find((s) => s.key === "post_purchase")!;
+  assert.ok(pp.clicks / pp.shown >= 0.015 && pp.clicks / pp.shown <= 0.04);
+  assert.ok(r.ctrPct > 0.5 && r.ctrPct < 3);
 });
