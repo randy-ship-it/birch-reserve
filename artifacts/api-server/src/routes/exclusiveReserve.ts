@@ -30,7 +30,9 @@ function page(open: boolean, status: Status, currency: ReserveCurrency = "cad", 
   const pace = exclusivePacing(currency);
   const X = exclusiveReserveFor(currency);
   const C = currency.toUpperCase();
-  const cats = TWO_LANE_CATEGORIES.map((c) => `<option value="${esc(c.label)}">${esc(c.label)}</option>`).join("");
+  // Category pages deep-link with ?category=<label> (buyer-answer pages, Nov 22 2026): preselect it when it is a real option.
+  const pre = typeof query.category === "string" ? query.category.replace(/['’]/g, "’").trim().toLowerCase() : "";
+  const cats = TWO_LANE_CATEGORIES.map((c) => `<option value="${esc(c.label)}"${pre && c.label.toLowerCase() === pre ? " selected" : ""}>${esc(c.label)}</option>`).join("");
   const banner =
     status?.kind === "success"
       ? `<div class="ok" role="status"><b>${status.paid ? "Payment received." : "Payment is processing."}</b> Your exclusive display reserve is recorded${status.livemode ? "" : " (test mode, no real charge)"}. Ref ${esc(status.ref)}. We email your insertion order within 1 business day. Nothing runs until you sign it.${status.paid && status.sid ? ` <a href="/account/login?session_id=${esc(status.sid)}" style="font-weight:700">Open your ad dashboard →</a>` : ""}</div>`

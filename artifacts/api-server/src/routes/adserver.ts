@@ -39,6 +39,7 @@ import { draftCampaignFromCheckoutSafe, recordClick, recordConversion, recordVie
 import { EMBED_JS, PIXEL_JS } from "../lib/adserver/embed";
 import { dashboardPage, loginPage } from "../lib/adserver/accountPage";
 import { adminGlanceHtml } from "../lib/adserver/adminGlance";
+import { aiSearchHtml, loadAiVisits } from "../lib/adserver/aiSearchAdmin";
 import { commissionRates, commissionsHtml, leadSiteOf, leadsHtml, loadReserveRows, reservesHtml, siteFilterHtml, siteFilterOf, type ReserveRow } from "../lib/adserver/adminBusiness";
 import { adminLoginPage, adminPage } from "../lib/adserver/adminPage";
 import { docsPage } from "../lib/adserver/docsPage";
@@ -542,7 +543,11 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
     } catch (err) {
       logger.warn({ err: err instanceof Error ? err.message : String(err) }, "admin reserves: Stripe read failed");
     }
-    const businessHtml = reservesHtml(reserveRows, siteSel) + commissionsHtml(reserveRows, commissionRates(rates, channelRates), siteSel) + leadsHtml(glanceLeads, siteSel);
+    const aiVisits = await loadAiVisits().catch((err) => {
+      logger.warn({ err: err instanceof Error ? err.message : String(err) }, "admin ai search: visits read failed");
+      return null;
+    });
+    const businessHtml = reservesHtml(reserveRows, siteSel) + commissionsHtml(reserveRows, commissionRates(rates, channelRates), siteSel) + leadsHtml(glanceLeads, siteSel) + aiSearchHtml(aiVisits, glanceLeads, siteSel);
     const siteHtml = siteFilterHtml(siteSel);
     res.type("html").send(
       adminPage({

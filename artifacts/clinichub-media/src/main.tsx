@@ -7,12 +7,15 @@ import './index.css';
 import { captureAttribution } from '@/lib/attribution';
 import { initAnalytics } from '@/lib/analytics';
 import { ensurePromo } from '@/lib/promo';
+import { trackAiReferral } from '@/lib/aiRef';
 
 // First-touch UTM / referrer / landing page, then analytics (both no-op safely).
 captureAttribution();
 initAnalytics();
 // Street team link + promo code: keep ?st= / ?code= for 30 days (last touch), count the visit.
 ensurePromo();
+// AI-search referral (ChatGPT, Perplexity, Grok, Gemini, Copilot...): one aggregate event per visit.
+trackAiReferral();
 
 createRoot(document.getElementById('root')!, {
   // Keeps caught errors off reportError(), which would raise the dev overlay.

@@ -2,19 +2,8 @@
 import { AD_DEFAULTS, AD_SLOTS, VIEWABILITY, placementLabel } from "./config";
 import { esc, shell } from "./ui";
 
-/** Scale skin: rename Birch Reserve in visible prose and slot names only. Code, pre, script, style, attributes and the footer's ad-partner disclosure are left alone (the embed host stays birchreserve.net). */
-export function scaleText(html: string): string {
-  let skip = 0;
-  return html.replace(/(<[^>]*>)|([^<]+)/g, (_m, tag: string | undefined, text: string | undefined) => {
-    if (tag) {
-      const t = /^<(\/?)(script|style|pre|code|footer)\b/i.exec(tag);
-      if (t) skip += t[1] ? -1 : 1;
-      return tag;
-    }
-    if (skip > 0 || !text) return text ?? "";
-    return text.replace(/Birch Reserve(?!, a Silver Birch)/g, "Scale Health").replace(/(?<!Silver )\bBirch\b(?! Growth)/g, "Scale Health");
-  });
-}
+export { scaleText } from "../scaleText";
+import { scaleText } from "../scaleText";
 
 export function docsPage(origin: string, skin: "birch" | "scale" = "birch"): string {
   const live = AD_SLOTS.filter((s) => s.live && !s.test);

@@ -84,6 +84,17 @@ const API_PATHS = [
   "/recovery-device-advertising/?",
   "/post-purchase-ads-health-brands/?",
   "/health-wellness-retail-media-canada/?",
+  // Buyer answers + category pages (Nov 22 2026), with Markdown mirrors.
+  "/advertise-to-recovery-patients-canada(?:/|\\.md)?",
+  "/clinic-waiting-room-advertising(?:/|\\.md)?",
+  "/meta-ads-alternatives-health-brands(?:/|\\.md)?",
+  "/advertise-recovery-brands(?:/|\\.md)?",
+  "/advertise-longevity-brands(?:/|\\.md)?",
+  "/advertise-sleep-brands(?:/|\\.md)?",
+  "/advertise-food-nutrition-brands(?:/|\\.md)?",
+  "/advertise-medi-spa-brands(?:/|\\.md)?",
+  "/advertise-pet-wellness-brands(?:/|\\.md)?",
+  "/(?:glp-1-brand-advertising|advertise-supplements-canada|recovery-device-advertising|post-purchase-ads-health-brands|health-wellness-retail-media-canada)\\.md",
   // Self-serve buy (server-rendered).
   "/buy/?",
   "/hub-proof/?",
