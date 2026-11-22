@@ -10,6 +10,7 @@
  * - Nothing runs during the 7-day look. No payment-to-IO turnaround time.
  * - The sample report uses placeholders only.
  */
+import { scaleVoiceDeep } from "./scaleVoice";
 
 export type BuyerLink = { label: string; href: string };
 
@@ -77,7 +78,7 @@ export const FLIGHT_TIMELINE = {
 } as const;
 
 /** 2. See the unit before you lock (the $190 USD 7-day look). */
-export const SEE_THE_UNIT = {
+const SEE_THE_UNIT_BASE = {
   kicker: "The 7-day look",
   title: "See the unit before you lock.",
   body: "Your $190 USD look gives you 7 days to see where your card would sit before you decide. During those 7 days, Birch sends you a custom mock of your card on a hub surface. It is a preview: nothing runs on a live hub during the look.",
@@ -92,6 +93,7 @@ export const SEE_THE_UNIT = {
   imageAlt: "Illustrative mock: an example brand card drawn beside the recovery path on the live DR-HO'S hub dashboard",
   caption: "Example of the mock Birch sends: an illustrative card drawn on a live hub page (DR-HO'S recovery path). Not a live ad and not a Birch result. Your IO names the hub and surface.",
 } as const;
+export const SEE_THE_UNIT = scaleVoiceDeep(SEE_THE_UNIT_BASE);
 
 /** 3. Questions buyers ask. Answers match /terms. B2 (Nov 17 8:56 PM ET) added the three dual-motion questions. */
 export const BUYER_FAQ_TITLE = "Questions buyers ask.";
@@ -135,7 +137,7 @@ export const BUYER_FAQ: Array<{ q: string; a: string; link?: BuyerLink; tail?: s
 ];
 
 /** 4. Sample report layout. Placeholders only, never numbers that could read as a result. */
-export const SAMPLE_REPORT = {
+const SAMPLE_REPORT_BASE = {
   kicker: "Measurement",
   title: "What your report looks like.",
   body: "Aggregate totals per hub and per surface, week by week. No names, no user-level rows, no health data.",
@@ -148,6 +150,7 @@ export const SAMPLE_REPORT = {
   total: ["Total", "", "", "x,xxx", "xx", "xx", "x"],
   caption: "Sample layout with placeholder values. Illustrative only: not a Birch result and not a forecast. Campaign figures come from your UTMs and promo codes.",
 } as const;
+export const SAMPLE_REPORT = scaleVoiceDeep(SAMPLE_REPORT_BASE);
 
 /** 5. Sample IO links on the buy path. */
 export const SAMPLE_IO_LINKS = {
