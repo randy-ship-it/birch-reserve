@@ -6,10 +6,10 @@
  *   clicks           offers shown x CTR band     (PERFORMANCE_RANGES, #350)
  *   orders           clicks x conversion band    (PERFORMANCE_RANGES, #350)
  *   sales driven     orders x average cart       (value created for the brands; NOT hub income)
- *   hub earnings     offers shown / 1000 x published starter CPM x 70% share (PAYOUT.basePct) (media revenue; independent of sales)
+ *   hub earnings     offers shown / 1000 x published starter CPM x hub share (70% under 1MM views a month, 75% at 1MM+, 80% at 3MM+, 85% at 5MM+; shareForViews) (media revenue; independent of sales)
  * Model is USD; CAD visitors see x CAD_PER_USD. All outputs are per month; yearly = monthly x 12.
  */
-import { PUBLISHER_SURFACES, PAYOUT, EMAIL_OPEN_PCT_MID } from "./brandIntake";
+import { PUBLISHER_SURFACES, shareForViews, EMAIL_OPEN_PCT_MID } from "./brandIntake";
 import { SELL_ASSUMPTION_PCT } from "./agencyShowcase";
 import { PERFORMANCE_RANGES } from "./proofContent";
 
@@ -70,7 +70,6 @@ export function estimateHub(inp: HubInputs): HubOut {
   const visitors = clamp(inp.visitors ?? defaultVisitors(orders), 0, 50_000_000);
   const list = inp.newsletter ? clamp(inp.list, 0, 50_000_000) : 0;
   const cart = clamp(inp.cart, 0, 100_000);
-  const share = PAYOUT.basePct / 100;
   const viewsOf: Record<string, number> = {
     post_purchase: orders,
     member_dashboard: (orders * surf("member_dashboard").monthlyViews!) / BASE_ORDERS,
@@ -79,6 +78,9 @@ export function estimateHub(inp: HubInputs): HubOut {
     services: (visitors * surf("services").monthlyViews!) / BASE_VISITORS,
     newsletter: (list * SENDS_PER_MONTH * emailOpen) / 100, // opens, not sends
   };
+  const totalViews = Object.values(viewsOf).reduce((a, b) => a + b, 0);
+  const sharePct = shareForViews(totalViews);
+  const share = sharePct / 100;
   const earn = { low: 0, likely: 0, high: 0 };
   const surfaces: SurfaceOut[] = Object.keys(viewsOf).map((key) => {
     const s = surf(key);
@@ -101,7 +103,7 @@ export function estimateHub(inp: HubInputs): HubOut {
   const shown = sum((s) => s.shown), clicks = sum((s) => s.clicks), ord = sum((s) => s.orders);
   return {
     views: sum((s) => s.views), shown, clicks, orders: ord, sales: sum((s) => s.sales), earn, year: earn.likely * 12, surfaces,
-    ctrPct: shown ? (clicks / shown) * 100 : 0, convPct: clicks ? (ord / clicks) * 100 : 0, sellPct: SELL_BAND[1], sharePct: PAYOUT.basePct,
+    ctrPct: shown ? (clicks / shown) * 100 : 0, convPct: clicks ? (ord / clicks) * 100 : 0, sellPct: SELL_BAND[1], sharePct,
     grossMedia: share ? earn.likely / share : 0,
   };
 }

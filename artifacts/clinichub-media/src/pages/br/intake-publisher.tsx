@@ -9,6 +9,7 @@ import { ActivationRange, DEFAULT_MARKET, MarketPicker, pickActivation } from "@
 import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { publisherActivation } from "../../../../api-server/src/lib/kitCalc/activation";
 import { useCurrency } from "@/lib/currency";
+import { HubDifferentiators } from "@/components/br/hub-differentiators";
 import { CAD_PER_USD } from "../../../../api-server/src/lib/overhaul/model";
 import { trackIntake } from "@/lib/intakeTrack";
 import { CountUp, EstimateTag, InfoPop, MockBanner, RoleTabs, SaveChip, Segmented, Toggle, basePayload, useAutosave, ChannelTiles, ContactSubmit } from "@/components/br/intake-kit";
@@ -52,13 +53,14 @@ export default function BrIntakePublisher() {
       <header className="container mx-auto px-4 pb-4 pt-8 md:pt-12">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For hubs · Max exposure</p>
         <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Max exposure for your hub, plus a share.</h1>
-        <p className="mt-3 max-w-xl text-base text-muted-foreground">Switch surfaces on. Watch the estimate move. You keep {PAYOUT.basePct}% of media revenue, rising by tier.</p>
+        <p className="mt-3 max-w-xl text-base text-muted-foreground">Switch surfaces on. Watch the estimate move. You keep {PAYOUT.basePct}% of media revenue, rising to {PAYOUT.tiers[3].pct}% as your views grow.</p>
         <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <KitCta placement="hero_role_publisher" size="md" sub="One form for hub + supplier. Website + email to start." />
           <ShareBar testId="share-bar-role" />
         </div>
       </header>
 
+      <section className="container mx-auto px-4 pb-5"><HubDifferentiators /></section>
       <section className="container mx-auto grid gap-5 px-4 pb-8 lg:grid-cols-[1.1fr_1fr]">
         {/* Hero number */}
         <div data-testid="publisher-hero" data-currency-fixed className="relative overflow-hidden rounded-3xl bg-[#0b1f3a] p-6 text-white shadow-xl md:p-8">
@@ -202,16 +204,16 @@ export default function BrIntakePublisher() {
           <div className="flex items-center gap-2">
             <h2 className="font-semibold">Payout share</h2>
             <span className="rounded-full bg-foreground/[0.06] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">{PAYOUT.tiersLabel}</span>
-            <span className="ml-auto"><InfoPop title="Payout tiers" testId="tiers-pop"><p>{PAYOUT.line}</p><p>Tier breakpoints and step-ups are not set yet. These tiers are placeholders and will be confirmed in the hub agreement.</p></InfoPop></span>
+            <span className="ml-auto"><InfoPop title="Payout tiers" testId="tiers-pop"><p>{PAYOUT.line}</p><p>Tiers are on your total monthly views and paid as a flat rate at the tier you reach, the way ad networks tier their shares (Mediavine: 75% to 90%). Your estimate above uses the tier for the views it models. Modelled; the hub agreement governs.</p></InfoPop></span>
           </div>
           <ol className="mt-4 flex items-end gap-2">
             {PAYOUT.tiers.map((t, i) => (
               <li key={t.key} className="flex-1">
-                <div className={`flex items-end justify-center rounded-t-xl pb-2 font-display text-xl ${i === 0 ? "bg-lime-300 text-[#0b1f3a]" : "border-2 border-dashed border-foreground/25 text-foreground/50"}`} style={{ height: 56 + i * 28 }}>
-                  {t.pct != null ? `${t.pct}%` : "↑"}
+                <div className={`flex items-end justify-center rounded-t-xl pb-2 font-display text-xl ${t.pct === p.payoutPct ? "bg-lime-300 text-[#0b1f3a]" : "border-2 border-dashed border-foreground/25 text-foreground/50"}`} style={{ height: 56 + i * 28 }}>
+                  {t.pct}%
                 </div>
                 <p className="mt-1 text-center text-xs font-semibold">{t.label}</p>
-                <p className="text-center text-[10px] text-muted-foreground">{t.placeholder ? "Placeholder" : "Starting share"}</p>
+                <p className="text-center text-[10px] text-muted-foreground">{t.pct === p.payoutPct ? "Your estimate" : t.breakpoint}</p>
               </li>
             ))}
           </ol>
