@@ -509,6 +509,7 @@ test("no-JS shell carries origin story, track record, GTM and the example report
     assert.match(html, /hand over the keys/i);
     assert.match(html, /Example report · illustrative numbers, not results/);
     assert.match(html, /unaudited/);
+    assert.match(html, /First measured flight reports coming soon/);
   }
   assert.equal(withProofShell(shell, "/rates"), shell);
   const txt = llmsProofSection();
@@ -518,6 +519,7 @@ test("no-JS shell carries origin story, track record, GTM and the example report
   const full = await (await fetch(`${origin}/llms-full.txt`)).text();
   assert.match(full, /How we got here/);
   assert.match(full, /What your flight report shows/);
+  assert.match(full, /First measured flight reports coming soon/);
   const short = await (await fetch(`${origin}/llms.txt`)).text();
   assert.match(short, /Track record/);
 });

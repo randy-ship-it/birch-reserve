@@ -16,7 +16,8 @@ export function FlightReportExample({ where }: { where: "home" | "media_kit" }) 
         </div>
         <span className="max-w-full rounded-full bg-amber-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-amber-900" data-testid={`flight-report-watermark-${where}`}>{R.watermark}</span>
       </div>
-      <p className="mt-2 max-w-2xl text-sm text-foreground/70">{R.lede}</p>
+      <p className="mt-2 max-w-2xl text-sm font-semibold text-[#0b1f3a]" data-testid={`flight-report-soon-${where}`}>{R.soon}</p>
+      <p className="mt-1 max-w-2xl text-sm text-foreground/70">{R.lede}</p>
       <div className="relative mt-4 overflow-hidden rounded-2xl border border-dashed border-[#0b1f3a]/25 bg-[#f7faf0] p-3 md:p-4">
         <div aria-hidden className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden"><span className="-rotate-12 select-none whitespace-nowrap text-3xl font-black uppercase tracking-widest text-[#0b1f3a]/[0.06] md:text-5xl">Example</span></div>
         <dl className="relative grid grid-cols-2 gap-2 md:grid-cols-4">
