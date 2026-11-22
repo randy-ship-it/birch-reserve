@@ -33,6 +33,7 @@ export const FLIGHT_REPORT_EXAMPLE = {
   eyebrow: "What your flight report shows",
   watermark: "Example report · illustrative numbers, not results",
   title: "One aggregate card per flight.",
+  soon: "First measured flight reports coming soon. Here's exactly what yours will show.",
   lede: "After a flight you see totals, pacing and where views came from. Aggregate only. No names, no user-level rows, no health data.",
   stats: [
     { k: "Impressions", v: "10,000" },
@@ -64,7 +65,7 @@ function gtmHtml(): string {
 }
 function reportHtml(): string {
   const r = FLIGHT_REPORT_EXAMPLE;
-  return `<section data-ssr="flight-report"><h2>${esc(r.eyebrow)}</h2><p><strong>${esc(r.watermark)}</strong></p><p>${esc(r.lede)}</p><ul>${r.stats.map((s) => `<li>${esc(s.k)}: ${esc(s.v)}</li>`).join("")}<li>${esc(r.pacing.label)}: ${r.pacing.pct}%. ${esc(r.pacing.note)}</li>${r.surfaces.map((s) => `<li>${esc(s.k)}: ${s.pct}% of views</li>`).join("")}</ul><p>${esc(r.note)} <a href="${FLIGHT_REPORT_HREF}">${esc(r.cta)}</a></p></section>`;
+  return `<section data-ssr="flight-report"><h2>${esc(r.eyebrow)}</h2><p><strong>${esc(r.watermark)}</strong></p><p>${esc(r.soon)}</p><p>${esc(r.lede)}</p><ul>${r.stats.map((s) => `<li>${esc(s.k)}: ${esc(s.v)}</li>`).join("")}<li>${esc(r.pacing.label)}: ${r.pacing.pct}%. ${esc(r.pacing.note)}</li>${r.surfaces.map((s) => `<li>${esc(s.k)}: ${s.pct}% of views</li>`).join("")}</ul><p>${esc(r.note)} <a href="${FLIGHT_REPORT_HREF}">${esc(r.cta)}</a></p></section>`;
 }
 
 /** Text-only blocks injected inside #root for "/" and "/media-kit". React replaces them on mount. */
@@ -103,6 +104,7 @@ export function llmsProofSection(): string {
     "",
     "## What your flight report shows (example, illustrative numbers, not results)",
     `- ${r.watermark}`,
+    `- ${r.soon}`,
     `- ${r.lede}`,
     `- ${r.stats.map((s) => `${s.k}: ${s.v}`).join(" · ")}`,
     `- ${r.pacing.label}: ${r.pacing.pct}%. ${r.pacing.note}`,
