@@ -125,10 +125,10 @@ export default function BrIntakePublisher() {
       <section className="container mx-auto px-4 pb-8">
         <div className="mb-3 flex flex-wrap items-center gap-3">
           <h2 className="font-display text-2xl md:text-3xl">Your surfaces</h2>
-          <label className="ml-auto flex items-center gap-3 text-sm">
+          <label className="ml-auto flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 text-sm">
             <span className="text-xs font-semibold uppercase tracking-wider text-foreground/60">Hub size</span>
-            <input data-testid="size-slider" type="range" min={0.25} max={20} step={0.25} value={sizeX} onChange={(e) => touch(setSizeX)(Number(e.target.value))} className="w-48 accent-[#0b1f3a]" />
-            <span className="w-24 text-xs tabular-nums">{sizeX}× median hub</span>
+            <input data-testid="size-slider" type="range" min={0.25} max={20} step={0.25} value={sizeX} onChange={(e) => touch(setSizeX)(Number(e.target.value))} className="w-36 accent-[#0b1f3a] sm:w-48" />
+            <span className="w-28 text-xs tabular-nums">{sizeX}× median hub</span>
           </label>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
