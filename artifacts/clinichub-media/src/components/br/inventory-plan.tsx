@@ -3,6 +3,7 @@
  * (Randy, voice, Nov 21 2026 9:59 AM ET). Numbers come from api-server/src/lib/inventoryPlan.ts only.
  * Short on the page, math in expanders. Every figure labelled modelled; no impression guarantee, no CTR/ROAS.
  */
+import { siteUrl } from "@/lib/siteSkin";
 import { ArrowRight } from "lucide-react";
 import { Details } from "@/components/br/details";
 import { PACING_ROWS, SPEND_DOWN_LINE, TAM_2027, EXPECTED_2027, VIEWS_PER_HUB_MONTHLY, BLENDED_STARTER_CPM, tam2027Headline, tam2027Views } from "../../../../api-server/src/lib/inventoryPlan";
@@ -77,7 +78,7 @@ export function Tam2027({ compact = false, dark = false, testId = "tam-2027" }: 
 export function ExclusiveReserveCard({ where, dark = true }: { where: string; dark?: boolean }) {
   const { currency } = useCurrency();
   const X = exclusiveReserveFor(currency);
-  const href = `https://birchreserve.net/exclusive?currency=${currency}&utm_source=birchreserve&utm_medium=next-step&utm_campaign=${encodeURIComponent(`${where}-exclusive-1900`)}`;
+  const href = `${siteUrl("/exclusive")}?currency=${currency}&utm_source=birchreserve&utm_medium=next-step&utm_campaign=${encodeURIComponent(`${where}-exclusive-1900`)}`;
   return (
     <article className={`flex flex-col gap-3 rounded-2xl p-4 md:flex-row md:items-center md:justify-between md:gap-4 ${dark ? "bg-white/[0.06] ring-1 ring-lime-300/60" : "border border-[#0b1f3a]/15 bg-white shadow-sm"}`} data-testid="exclusive-reserve-card">
       <div>
