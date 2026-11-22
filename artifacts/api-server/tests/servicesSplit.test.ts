@@ -1,22 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { servicesSplit } from "../src/lib/overhaul/servicesNet";
 import { SERVICES_SPLIT, PUBLISHER_ASSUMPTIONS } from "../src/lib/overhaul/brandIntake";
 
-test("services split worked example: $150 one-hour session", () => {
-  const a = servicesSplit({ revenueUsd: 150, hours: 1 });
-  assert.deepEqual([a.labor, a.management, a.net, a.hubNew, a.hubOld], [70, 15, 65, 32.5, 40]);
-  const b = servicesSplit({ revenueUsd: 150, hours: 1, managementOn: "grossProfit" });
-  assert.deepEqual([b.management, b.net, b.hubNew], [8, 72, 36]);
+test("clinic services: hub keeps half of what Scale Health charges ($49 assessment, $29 session)", () => {
+  assert.equal(SERVICES_SPLIT.hubPct, 50);
+  assert.equal(SERVICES_SPLIT.hubAssessment, (SERVICES_SPLIT.assessmentPrice * SERVICES_SPLIT.hubPct) / 100);
+  assert.equal(SERVICES_SPLIT.hubSession, (SERVICES_SPLIT.sessionPrice * SERVICES_SPLIT.hubPct) / 100);
+  for (const l of [SERVICES_SPLIT.line, SERVICES_SPLIT.birchLine]) {
+    assert.match(l, /half of what Scale Health charges, \$24\.50 per \$49 assessment and \$14\.50 per \$29 session\./);
+    assert.doesNotMatch(l, /guarantee|net|labou?r|gross|profit/i);
+  }
+  assert.match(SERVICES_SPLIT.birchLine, /^Scale Health clinic services booked through your hub/);
+  assert.match(SERVICES_SPLIT.line, /^Clinic services booked through your hub/);
+  assert.ok(PUBLISHER_ASSUMPTIONS.some((a) => a.includes(SERVICES_SPLIT.line)));
 });
 
-test("public copy says only '50% of net': no labor rate, management cost or net formula in public sources", () => {
-  assert.equal(SERVICES_SPLIT.hubPct, 50);
-  assert.match(SERVICES_SPLIT.line, /50% of net/);
-  const pub = [readFileSync("src/lib/overhaul/brandIntake.ts", "utf8"), readFileSync("../clinichub-media/src/pages/br/intake-publisher.tsx", "utf8")].join("\n");
-  assert.doesNotMatch(pub, /labou?r|\$70\b|management (cost|fee)|servicesNet/i);
-  assert.doesNotMatch(PUBLISHER_ASSUMPTIONS.join(" "), /labou?r|\$70\b|management|gross profit|revenue minus/i);
-  const walk = (d: string): string[] => []; void walk;
-  for (const f of ["../clinichub-media/src/pages/br/intake-publisher.tsx", "../clinichub-media/src/components/br/report-views.tsx"]) assert.doesNotMatch(readFileSync(f, "utf8"), /overhaul\/servicesNet/);
+test("no labor rate, management cost or net formula in public sources", () => {
+  for (const f of ["src/lib/overhaul/brandIntake.ts", "../clinichub-media/src/pages/br/intake-publisher.tsx"]) assert.doesNotMatch(readFileSync(f, "utf8"), /labou?r|\$70\b|management (cost|fee)|servicesNet|50% of net/i);
 });

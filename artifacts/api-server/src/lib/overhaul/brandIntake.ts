@@ -35,9 +35,20 @@ export const SHARE_TIERS = [
 /** Hub share (%) at a monthly view count. */
 export const shareForViews = (views: number): number => [...SHARE_TIERS].reverse().find((t) => views >= t.fromViews)!.pct;
 
-/** Clinic services booked through a hub (BR-39, Randy Nov 22 2026 10:04 AM ET): the hub or partner keeps 50% of NET. PUBLIC copy states only this
- * line. The calculation is internal and is kept out of this file and every client bundle. Provider terms are unchanged. */
-export const SERVICES_SPLIT = { hubPct: 50, line: "Clinic services booked through your hub: you keep 50% of net." } as const;
+/** Clinic services booked through a hub (BR-39, Randy Nov 22 2026 10:48 AM ET): the hub keeps half of what Scale Health charges. Plain copy only, no formula.
+ * Provider terms are unchanged. Scale voice on Scale; Birch names Scale Health clinic services. */
+export const SERVICES_SPLIT = {
+  hubPct: 50,
+  assessmentPrice: 49,
+  sessionPrice: 29,
+  /** Hub side, per booking. */
+  hubAssessment: 24.5,
+  hubSession: 14.5,
+  /** Scale-voice sentence (also the neutral one used in popovers). */
+  line: "Clinic services booked through your hub: you keep half of what Scale Health charges, $24.50 per $49 assessment and $14.50 per $29 session.",
+  /** Birch-voice sentence. */
+  birchLine: "Scale Health clinic services booked through your hub: you keep half of what Scale Health charges, $24.50 per $49 assessment and $14.50 per $29 session.",
+} as const;
 
 export const PAYOUT = {
   basePct: 70,

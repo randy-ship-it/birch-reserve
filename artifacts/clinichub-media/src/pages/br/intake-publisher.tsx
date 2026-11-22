@@ -217,7 +217,7 @@ export default function BrIntakePublisher() {
               </li>
             ))}
           </ol>
-          <p data-testid="services-split" className="mt-4 rounded-xl bg-lime-100/70 px-3 py-2 text-sm font-semibold text-[#0b1f3a]">{SERVICES_SPLIT.line}</p>
+          <p data-testid="services-split" data-currency-fixed className="mt-4 rounded-xl bg-lime-100/70 px-3 py-2 text-sm font-semibold text-[#0b1f3a]">{isScaleSkin() ? SERVICES_SPLIT.line : SERVICES_SPLIT.birchLine}</p>
         </div>
       </section>
       <section className="container mx-auto grid gap-4 px-4 pb-6 lg:grid-cols-[minmax(0,22rem)_1fr]">
