@@ -35,6 +35,10 @@ export const SHARE_TIERS = [
 /** Hub share (%) at a monthly view count. */
 export const shareForViews = (views: number): number => [...SHARE_TIERS].reverse().find((t) => views >= t.fromViews)!.pct;
 
+/** Clinic services booked through a hub (BR-39, Randy Nov 22 2026 10:04 AM ET): the hub or partner keeps 50% of NET. PUBLIC copy states only this
+ * line. The calculation is internal and is kept out of this file and every client bundle. Provider terms are unchanged. */
+export const SERVICES_SPLIT = { hubPct: 50, line: "Clinic services booked through your hub: you keep 50% of net." } as const;
+
 export const PAYOUT = {
   basePct: 70,
   line: "Hubs earn 70% of media revenue, rising to 75% at 1MM views a month, 80% at 3MM and 85% at 5MM.",
@@ -176,6 +180,7 @@ export const PUBLISHER_ASSUMPTIONS = [
   `CPC mode uses the midpoint of each placement's modelled engagement range. Ranges, not promises.`,
   `Your payout: ${PAYOUT.basePct}% of media revenue under 1MM views a month, ${SHARE_TIERS[1].pct}% at 1MM+, ${SHARE_TIERS[2].pct}% at 3MM+, ${SHARE_TIERS[3].pct}% at 5MM+, paid at the tier you reach (flat rate, like ad networks). Modelled; the hub agreement governs.`,
   `Transactions (bookings, products) use only the numbers you enter. Leave them at 0 to skip.`,
+  `${SERVICES_SPLIT.line} Modelled; the hub agreement governs.`,
   `Estimates only. Not a guarantee of views, clicks, sales or payouts. Payouts follow the hub agreement.`,
 ];
 
