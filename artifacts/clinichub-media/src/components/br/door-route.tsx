@@ -6,7 +6,7 @@ import { SALES_PHONE_DISPLAY, SALES_PHONE_HREF } from "../../../../api-server/sr
 export function DoorRoute({ requestHref = "#request", testId = "door-route", large = false }: { requestHref?: string; testId?: string; large?: boolean }) {
   const d = DOOR_ROUTE;
   return (
-    <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start lg:gap-12" data-testid={testId}>
+    <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:gap-12" data-testid={testId}>
       <div className="min-w-0">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#C8F55A]">{d.kicker}</p>
         <h2 className={`mt-3 font-display leading-tight tracking-tight ${large ? "text-3xl md:text-5xl" : "text-[1.75rem] md:text-4xl"}`}>{d.title}</h2>

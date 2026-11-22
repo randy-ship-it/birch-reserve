@@ -321,7 +321,6 @@ export default function BrMediaKit() {
           <article id="premium" className="flex flex-col border-2 border-foreground bg-foreground p-5 text-background md:p-6" data-testid="mk-card-premium">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-background/60">Premium slots · the main event</p>
-              <Tag tone="lime">Inquire only</Tag>
             </div>
             <h3 className="mt-1 font-display text-2xl">From $25K, $25K–$50K</h3>
             <p className="mt-3 text-sm text-background/80">Exclusivity, a larger display share and priority placement. No card purchase — we reply with an insertion order. Term is set on the IO.</p>

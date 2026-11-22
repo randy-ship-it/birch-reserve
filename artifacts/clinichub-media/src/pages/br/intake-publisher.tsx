@@ -125,25 +125,26 @@ export default function BrIntakePublisher() {
       <section className="container mx-auto px-4 pb-8">
         <div className="mb-3 flex flex-wrap items-center gap-3">
           <h2 className="font-display text-2xl md:text-3xl">Your surfaces</h2>
-          <label className="ml-auto flex items-center gap-3 text-sm">
+          <label className="ml-auto flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 text-sm">
             <span className="text-xs font-semibold uppercase tracking-wider text-foreground/60">Hub size</span>
-            <input data-testid="size-slider" type="range" min={0.25} max={5} step={0.25} value={sizeX} onChange={(e) => touch(setSizeX)(Number(e.target.value))} className="w-36 accent-[#0b1f3a]" />
-            <span className="w-24 text-xs tabular-nums">{sizeX}× median hub</span>
+            <input data-testid="size-slider" type="range" min={0.25} max={20} step={0.25} value={sizeX} onChange={(e) => touch(setSizeX)(Number(e.target.value))} className="w-36 accent-[#0b1f3a] sm:w-48" />
+            <span className="w-28 text-xs tabular-nums">{sizeX}× median hub</span>
           </label>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {PUBLISHER_SURFACES.map((s) => {
+          {PUBLISHER_SURFACES.map((s, idx) => {
+            const orphan = idx === PUBLISHER_SURFACES.length - 1 && PUBLISHER_SURFACES.length % 2 === 1;
             const row = p.rows.find((r) => r.key === s.key)!;
             return (
-              <article key={s.key} data-testid={`surface-${s.key}`} className={`rounded-2xl border p-4 transition ${row.on ? "border-foreground/80 bg-white shadow-md" : "border-foreground/10 bg-white/60"}`}>
+              <article key={s.key} data-testid={`surface-${s.key}`} className={`flex flex-col rounded-2xl border p-4 transition ${orphan ? "sm:col-span-2 lg:col-span-3 md:flex-row md:items-center md:gap-6" : ""} ${row.on ? "border-foreground/80 bg-white shadow-md" : "border-foreground/10 bg-white/60"}`}>
                 <div className="flex items-start gap-3">
                   <div className="min-w-0 flex-1">
                     <h3 className="font-semibold">{s.label}</h3>
-                    <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{skinText(s.where)}</p>
+                    <p className="mt-0.5 line-clamp-2 min-h-[2rem] text-xs text-muted-foreground">{skinText(s.where)}</p>
                   </div>
                   <Toggle on={row.on} onChange={(v) => touch(setOn)({ ...on, [s.key]: v })} label={`Turn ${s.label} on or off`} testId={`toggle-${s.key}`} />
                 </div>
-                <dl className="mt-3 grid grid-cols-2 gap-2 text-center">
+                <dl className={`mt-3 grid grid-cols-2 gap-2 text-center ${orphan ? "md:mt-0 md:w-80 md:shrink-0" : ""}`}>
                   <div className="rounded-lg bg-foreground/[0.04] p-2">
                     <dt className="text-[10px] font-bold uppercase tracking-wider text-foreground/55">CPM</dt>
                     <dd className="text-sm font-semibold tabular-nums">{s.cpm ? (s.cpm[0] === s.cpm[1] ? usdFmt(s.cpm[0]) : `${usdFmt(s.cpm[0])}–${s.cpm[1]}`) : "Not set"}</dd>
@@ -153,7 +154,7 @@ export default function BrIntakePublisher() {
                     <dd className="text-sm font-semibold tabular-nums">{s.cpc ? `${usdFmt(s.cpc[0], 2)}–${s.cpc[1].toFixed(2)}` : "Not set"}</dd>
                   </div>
                 </dl>
-                <div className="mt-3 flex items-center justify-between gap-2">
+                <div className={`mt-auto flex items-center justify-between gap-2 pt-3 ${orphan ? "md:mt-0 md:w-56 md:shrink-0 md:pt-0" : ""}`}>
                   <p className="text-sm">
                     {row.on && row.priced ? (
                       <>
@@ -179,7 +180,8 @@ export default function BrIntakePublisher() {
       </section>
 
       {/* Transactions + tiers */}
-      <section className="container mx-auto grid gap-5 px-4 pb-10 lg:grid-cols-2">
+      <section className="container mx-auto grid items-start gap-5 px-4 pb-6 lg:grid-cols-2">
+        <div className="grid gap-5">
         <div className="rounded-3xl border border-foreground/10 bg-white p-5 md:p-6">
           <div className="flex items-center gap-2">
             <Sparkles className="size-4" aria-hidden />
@@ -200,6 +202,8 @@ export default function BrIntakePublisher() {
           <p className="mt-3 text-sm">
             {p.conversions.toLocaleString("en-US")} transactions/mo · <span data-currency-fixed className="font-semibold">{usd(p.transactionsUsd)}</span> <span className="text-xs text-muted-foreground">(your inputs)</span>
           </p>
+        </div>
+        <MarketPicker value={market} onChange={touch(setMarket)} side="publisher" />
         </div>
         <div className="rounded-3xl border border-foreground/10 bg-white p-5 md:p-6" data-testid="payout-tiers">
           <div className="flex items-center gap-2">
@@ -222,8 +226,7 @@ export default function BrIntakePublisher() {
           <HubOnboardingNote views={p.totalViews} />
         </div>
       </section>
-      <section className="container mx-auto grid gap-4 px-4 pb-6 lg:grid-cols-[minmax(0,22rem)_1fr]">
-        <MarketPicker value={market} onChange={touch(setMarket)} side="publisher" />
+      <section className="container mx-auto px-4 pb-6">
         <ActivationRange kind="publisher" {...pickActivation(undefined, publisherActivation({ on, mode, sizeX, conversionPct: conv, valuePerConversionUsd: valueUsd }))} />
       </section>
       <section className="container mx-auto px-4 pb-8"><ContactSubmit role="publisher" payload={payload} draft={ref} setRef={setRef} label={isScaleSkin() ? "Send to Scale Health" : "Send to Birch"} /></section>

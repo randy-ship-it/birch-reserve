@@ -134,7 +134,7 @@ export function PrimeHero() {
 
 export function FaceBeforeFlight({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={`grid gap-6 ${compact ? "" : "lg:grid-cols-[minmax(0,24rem)_1fr] lg:items-start lg:gap-8"}`} data-testid="face-before-flight">
+    <div className={`grid gap-6 ${compact ? "" : "lg:grid-cols-[minmax(0,24rem)_1fr] lg:items-center lg:gap-8"}`} data-testid="face-before-flight">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Proof</p>
         <h2 className="mt-1 font-display text-[1.75rem] leading-tight tracking-tight md:text-3xl">See the face before the flight.</h2>

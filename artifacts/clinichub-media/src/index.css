@@ -379,3 +379,6 @@ html[data-skin="scale"] [fill="#d9f99d"] { fill: oklch(0.905 0.093 164.15); }
 html[data-skin="scale"] [stroke="#d9f99d"] { stroke: oklch(0.905 0.093 164.15); }
 html[data-skin="scale"] [stop-color="#d9f99d"] { stop-color: oklch(0.905 0.093 164.15); }
 html[data-skin="scale"] [fill="#a3e635"] { fill: #1d875c; }
+/* Layout-fix 1122: Scale palette for the two spots that hard-code Birch lime (hub "Claim my kit" button, step cards). */
+html[data-skin="scale"] [data-testid="hub-claim"] { background: oklch(0.765 0.177 163.223) !important; }
+html[data-skin="scale"] [class*="bg-[#ecfccb]"] { background-color: oklch(0.979 0.021 166.113 / 0.7) !important; }

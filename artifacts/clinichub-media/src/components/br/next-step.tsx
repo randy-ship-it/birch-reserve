@@ -224,7 +224,7 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
   };
   return (
     <section className="rounded-3xl p-5 text-white md:p-6" style={{ background: NAVY }} data-testid="mid-tier" data-where={where}>
-      <div className={showMock ? "flex flex-col gap-4 md:flex-row md:items-start md:justify-between" : ""}>
+      <div className={showMock ? "flex flex-col gap-4 md:flex-row md:items-center md:justify-between" : ""}>
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Next step after your kit or $190 look</p>
           <h3 className="mt-1 font-display text-2xl leading-tight md:text-3xl" data-testid="mid-tier-line">Bigger test? Prepay a sponsorship pack.</h3>
@@ -301,9 +301,9 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
   return (
     <section id={anchor ? "next-step" : undefined} className="scroll-mt-20" data-testid="next-step" data-where={where}>
       <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">{showMock ? "See it on a live hub first." : "Start with a $190 look."}</h2>
-      <div className={`mt-4 grid grid-cols-[minmax(0,1fr)] items-center gap-5 ${showMock ? "md:grid-cols-[1.2fr_1fr]" : ""}`}>
+      <div className={`mt-4 grid grid-cols-[minmax(0,1fr)] items-center gap-5 ${showMock ? "md:grid-cols-[1fr_1fr] md:items-stretch" : ""}`}>
         {showMock ? <AnnotatedHubMock brand={brand} initial="effortless" /> : null}
-        <div>
+        <div className={showMock ? "md:flex md:flex-col md:justify-center md:rounded-3xl md:border md:border-foreground/10 md:bg-white md:p-6 md:shadow-sm" : undefined} data-testid="next-step-pay">
           <p className="font-display text-5xl leading-none text-[#0b1f3a]">{lookPrice.split(" ")[0]} <span className="text-lg">{lookPrice.split(" ")[1]}</span></p>
           <p className="mt-2 text-[15px] text-foreground/75">Your ad, live for 7 days.</p>
           <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={() => trackCta("cta_hold_190", { offer: "hold-190" })} className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 hover:bg-[#0b1f3a] hover:text-white sm:w-auto" data-testid="next-step-look">
