@@ -877,7 +877,7 @@ router.post("/ads/admin/hubs", json, (req, res) =>
 );
 
 /* Hub ad serving switch (Randy Nov 21 2026 3:43 PM t397u): default OFF; only Randy or Jon may turn a hub on, with a note. Audited. */
-const HUB_APPROVERS: Record<string, "Randy" | "Jon"> = { "randy@silverbirchgrowth.com": "Randy", "randy@scalehealth.ca": "Randy", "john@scalehealth.ca": "Jon" };
+const HUB_APPROVERS: Record<string, "Randy" | "Jon"> = { "randy@silverbirchgrowth.com": "Randy", "randy@scalehealth.ca": "Randy", "jon@scalehealth.ca": "Jon" };
 router.post("/ads/admin/hubs/:key/serving", json, (req, res) =>
   safe(res, async () => {
     const who = guard(req, res);

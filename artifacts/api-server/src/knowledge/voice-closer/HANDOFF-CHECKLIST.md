@@ -11,7 +11,7 @@ Capture every call: **name · email · brand/clinic legal name · what they want
 | Ready to pay (checkout LIVE, Randy 2026-09-24 6:22pm ET) | Capture lead; send to https://birchreserve.net/inventory to claim a slot, or https://birchreserve.net for the $490 early placement. Invoice + IO only if they prefer it | Say card was charged unless buyer confirms they paid |
 | Clinician wants bookings / “send patients” | Scale https://scalehealth.ca/providers — rails-not-leads | Lead fee / bounty language |
 | Studio / audience / free store | Scale https://scalehealth.ca/clinichubs | Promise per-door brand deals |
-| Franchise / multi-loc commercial complexity | **Jon** john@scalehealth.ca; Randy stays owner | Invent Jon’s cell |
+| Franchise / multi-loc commercial complexity | **Jon** jon@scalehealth.ca; Randy stays owner | Invent Jon’s cell |
 | MSP / put whole book on Align / partner door | **Chris** chris@alignwellness.ca or Book a call | Quote CIM $ / payouts |
 | Scale Connect / intake ops | Escalate via randy@ / Jon → **Barb** path | Invent Barb’s email if UNKNOWN |
 | US clinic asking to join rails now | Capture interest; **US outbound STOP** | Promise launch / insurance states |
@@ -21,7 +21,7 @@ Capture every call: **name · email · brand/clinic legal name · what they want
 ## Team emails (safe to use)
 
 - Randy — randy@scalehealth.ca  
-- Jon — john@scalehealth.ca  
+- Jon — jon@scalehealth.ca  
 - Chris — chris@alignwellness.ca  
 - Simar — SBG + Scale admin (email via Randy/Jon if not on the call)  
 - Barb — Scale Connect → intake (escalate; do not invent personal cell)

@@ -148,7 +148,7 @@ Never tell a Birch buyer their seat equals any view count. Partner range to name
 | Impressions / CTR / guarantees | Refuse invented numbers. Platform scale story only (50MM+ uniques in 4 months, on track for 100MM+ by year end). Pivot to the checkout and booking moments the seat sits in. |
 | Premium / enterprise / big annual | Premium slots $25K to $50K, inquire only; larger annual programs, inquire. Intake + team call-back. No invented CPM. |
 | Person / calendar | Qualify first. Callback default. Cal https://cal.com/randy-gilling/30min only post-qualify if they insist on a set time. |
-| Franchise / complex / multi-location | Jon at john@scalehealth.ca. Capture details. |
+| Franchise / complex / multi-location | Jon at jon@scalehealth.ca. Capture details. |
 
 Self-serve close targets: `reserve-490` ($490 seat) and `hold-190` ($190 look) at https://birchreserve.net/buycalc. Never hero $899. Never say $300.
 

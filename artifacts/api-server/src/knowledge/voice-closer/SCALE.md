@@ -101,7 +101,7 @@ If a US clinic asks to join rails: do not promise commercial launch timing. Capt
 
 ## Handoff from Birch voice
 
-If caller is a clinician wanting bookings: stop the Birch pitch, give https://scalehealth.ca/providers. Studio / audience wanting a free store: https://scalehealth.ca/clinichubs. One URL, then offer to text or email it. Franchise / multi-loc complexity → Jon (john@scalehealth.ca).
+If caller is a clinician wanting bookings: stop the Birch pitch, give https://scalehealth.ca/providers. Studio / audience wanting a free store: https://scalehealth.ca/clinichubs. One URL, then offer to text or email it. Franchise / multi-loc complexity → Jon (jon@scalehealth.ca).
 
 ## UNKNOWN
 
