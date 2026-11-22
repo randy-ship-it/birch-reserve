@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 import { OVERHAUL_OG_IMAGE, OVERHAUL_ROUTES } from "./overhaul/seo";
 import { PUBLIC_RESERVE_OFFERS, offerAmountCents } from "./reserveOffers";
 import type { ReserveCurrency } from "./reserveOffers";
+import { mdAlternateLink } from "./aiMarkdown";
 
 export const PUBLIC_SITE_ORIGIN = "https://birchreserve.net";
 
@@ -258,6 +259,8 @@ export function withRouteSeo(html: string, pathname: string): string {
     next = replaceTag(next, /<meta\s+name="twitter:image"[^>]*>/i, `<meta name="twitter:image" content="${routeImage}" />`);
     if (meta.jsonld) next = next.replace("</head>", `<script type="application/ld+json">${JSON.stringify(meta.jsonld).replace(/</g, "\\u003c")}</script>\n</head>`);
   }
+  const mdLink = mdAlternateLink(normalizedPath(pathname));
+  if (mdLink && !next.includes('type="text/markdown"')) next = next.replace("</head>", `${mdLink}\n</head>`);
   if (isNoIndexPath(pathname)) {
     next = replaceTag(next, /<meta\s+name="robots"[^>]*>/i, `<meta name="robots" content="noindex" />`);
   }
