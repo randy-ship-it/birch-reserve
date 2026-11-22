@@ -40,6 +40,9 @@ export type AdminView = {
   promoHtml?: string;
   /** "Today and this week" strip (adminGlance.ts). */
   glanceHtml?: string;
+  /** Site filter chips + Reserves & deposits, Commissions owed, Leads (adminBusiness.ts). */
+  siteHtml?: string;
+  businessHtml?: string;
   /** Referral orders + per-referrer commission (referralAdmin.ts). */
   referralHtml?: string;
   partnersHtml?: string;
@@ -222,12 +225,12 @@ ${x.kind === "video" && !poster ? `<form class="f" data-post="/ads/admin/creativ
   const catCount = new Map<string, number>();
   for (const a of v.alerts) for (const c of a.categories) catCount.set(c, (catCount.get(c) ?? 0) + 1);
   const body = `<div class="ck-head"><h1>Ad system</h1><p class="fine">${esc(v.who)} · real, bot-filtered events only · store <code>${esc(v.schema)}</code> · updated ${fmtDateTime(new Date())}</p></div>
-<section id="overview" class="ck-kpis"><div class="grid k"><div class="card kpi"><span>Live campaigns</span><b>${live.length}</b><small>${drafts.length} paid draft${drafts.length === 1 ? "" : "s"} waiting</small></div>
+${v.siteHtml ?? ""}<section id="overview" class="ck-kpis"><div class="grid k"><div class="card kpi"><span>Live campaigns</span><b>${live.length}</b><small>${drafts.length} paid draft${drafts.length === 1 ? "" : "s"} waiting</small></div>
 <div class="card kpi"><span>Creatives to review</span><b>${v.pending.length}</b><small><a href="#creatives">Review queue</a></small></div>
 <div class="card kpi"><span>Viewable · 24h</span><b>${fmtInt(v.day.views)}</b><small>${fmtInt(v.day.serves)} served</small></div>
 <div class="card kpi"><span>Clicks · 24h</span><b>${fmtInt(v.day.clicks)}</b><small>CTR ${fmtPct(v.day.clicks, v.day.views)}</small></div>
 <div class="card kpi"><span>Conversions · 24h</span><b>${fmtInt(v.day.convs)}</b><small>pixel + postback</small></div></div></section>
-${v.glanceHtml ?? ""}
+${v.glanceHtml ?? ""}${v.businessHtml ?? ""}
 <section id="campaigns"><h2>Campaigns</h2><p class="fine">Paid checkouts open a draft automatically. To go live: approve a creative, set the flight (after the IO is signed), set the landing URL, then set status Active. Pacing is even across the flight, charged at each slot's card rate, and never past budget.</p>
 <div class="tw"><table><thead><tr><th>Campaign</th><th>Status</th><th>Placement</th><th class="n">Budget</th><th>Flight</th><th class="n">Delivery</th><th>Creatives</th><th></th></tr></thead><tbody>${rows.join("") || `<tr><td colspan="8" class="muted">No campaigns yet.</td></tr>`}</tbody></table></div>
 <details class="ed"><summary>Customer dashboard link</summary><form data-post="/ads/admin/account-link" class="f"><div class="row"><label>Customer dashboard link by email (promo-only buyers)<input name="email" type="email" required></label></div><button class="ghost sm" type="submit">Copy dashboard link</button><pre data-out style="display:none;white-space:pre-wrap;word-break:break-all"></pre></form></details>
@@ -259,7 +262,7 @@ ${v.promoHtml ?? ""}
 <section id="exports"><h2>Exports</h2><p><a class="btn ghost sm" href="/ads/admin/export/campaigns.csv">Campaigns</a> <a class="btn ghost sm" href="/ads/admin/export/delivery.csv">Daily delivery</a> <a class="btn ghost sm" href="/ads/admin/export/ledger.csv">Ledger</a> <a class="btn ghost sm" href="/ads/admin/export/royalties.csv">Royalties</a> <a class="btn ghost sm" href="/ads/admin/export/payouts.csv">Payouts (manual)</a>
 ${v.friday ? `<form data-post="/ads/admin/friday-sync" style="display:inline"><button class="ghost sm" type="submit">Push all summaries to Friday</button></form>` : `<span class="fine">Friday push is not configured on this deployment.</span>`}</p></section>
 <section id="audit"><h2>Audit log</h2><div class="tw" style="max-height:560px"><table><thead><tr><th>When</th><th>Who</th><th>Action</th><th>Target</th><th>Detail</th></tr></thead><tbody>${v.audit.map((a) => `<tr><td class="fine">${fmtDateTime(a.at)}</td><td>${esc(a.actor ?? "")}</td><td>${esc(a.action)}</td><td class="fine">${esc(a.target ?? "")}</td><td class="fine">${esc((a.detail ?? "").slice(0, 160))}</td></tr>`).join("")}</tbody></table></div></section>`;
-  const tabs: Array<[string, string]> = [["campaigns", "Campaigns"], ["creatives", `Creatives${v.pending.length ? ` <i>${v.pending.length}</i>` : ""}`], ["inventory", "Inventory"], ["hubs", "Hubs"], ["money", "Money"], ["promo", "Promo"], ["audit", "Audit"]];
+  const tabs: Array<[string, string]> = [["business", "Business"], ["campaigns", "Campaigns"], ["creatives", `Creatives${v.pending.length ? ` <i>${v.pending.length}</i>` : ""}`], ["inventory", "Inventory"], ["hubs", "Hubs"], ["money", "Money"], ["promo", "Promo"], ["audit", "Audit"]];
   return shell({
     title: "Ads admin · Birch Reserve",
     nav: "Ads admin",
@@ -279,10 +282,10 @@ const COCKPIT_CSS = `main.wrap{max-width:1360px}.cockpit{display:grid;grid-templ
 @media(max-width:900px){.cockpit{grid-template-columns:1fr;gap:8px}.ck-rail{position:static}.ck-rail nav{display:flex;flex-wrap:wrap;gap:4px}.ck-rail a{flex:1 1 auto;justify-content:center;gap:6px;border:1px solid var(--br-line);background:var(--br-surface)}.ck-kpis{position:static}}
 @media(max-width:640px){.ck-kpis .k{grid-template-columns:repeat(2,minmax(0,1fr))}}`;
 
-const COCKPIT_JS = `(function(){var G={overview:"*",glance:"*",campaigns:"campaigns",creatives:"creatives",inventory:"inventory",onboard:"hubs",hubproof:"hubs",activation:"hubs","payout-settings":"money",royalties:"money",referrals:"money",ledger:"money",orders:"money",exports:"money",promo:"promo",street:"promo",alerts:"promo",audit:"audit"};
+const COCKPIT_JS = `(function(){var G={overview:"*",glance:"business",reserves:"business",commissions:"business",leads:"business",campaigns:"campaigns",creatives:"creatives",inventory:"inventory",onboard:"hubs",hubproof:"hubs",activation:"hubs","payout-settings":"money",royalties:"money",referrals:"money",ledger:"money",orders:"money",exports:"money",promo:"promo",street:"promo",alerts:"promo",audit:"audit"};
 var secs=[].slice.call(document.querySelectorAll(".ck-pane>section[id]"));var tabs={};secs.forEach(function(s){var g=G[s.id]||"campaigns";s.setAttribute("data-g",g);tabs[g]=1});
 var links=[].slice.call(document.querySelectorAll(".ck-rail a[data-tab]"));
-function show(h){var id=(h||"").replace(/^#/,"");var g=tabs[id]?id:(G[id]&&G[id]!=="*"?G[id]:"campaigns");
+function show(h){var id=(h||"").replace(/^#/,"")||"business";var g=tabs[id]?id:(G[id]&&G[id]!=="*"?G[id]:"campaigns");
 secs.forEach(function(s){s.classList.toggle("ck-show",s.getAttribute("data-g")==="*"||s.getAttribute("data-g")===g)});
 links.forEach(function(a){a.setAttribute("aria-current",a.getAttribute("data-tab")===g?"true":"false")});
 var t=document.getElementById(id);if(t&&!tabs[id]&&G[id]!=="*")setTimeout(function(){t.scrollIntoView({block:"start"})},0);else window.scrollTo(0,0)}

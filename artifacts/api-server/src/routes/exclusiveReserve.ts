@@ -7,7 +7,7 @@
  */
 import { BUYER_HEADER_CSS, TOKENS_CSS, buyerHeaderHtml } from "../lib/brandTokens";
 import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
-import { withPromoMetadata, withScaleReturn } from "../lib/adserver/promoContext";
+import { siteOf, withPromoMetadata, withScaleReturn } from "../lib/adserver/promoContext";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { getStripeClient } from "../lib/stripeClient";
 import { logger } from "../lib/logger";
@@ -107,7 +107,7 @@ router.post("/v1/exclusive/reserve", express.json({ limit: "8kb" }), async (req:
     res.json({ held: true, message: "Got it. We'll send your insertion order and payment link within 1 business day. No charge today.", stored: friday.status });
     return;
   }
-  const built = buildExclusiveReserveSession(b, `https://${req.headers.host ?? "birchreserve.net"}`);
+  const built = buildExclusiveReserveSession(b, `https://${req.headers.host ?? "birchreserve.net"}`, siteOf(req));
   if (!built.ok) {
     res.status(400).json({ error: built.error });
     return;

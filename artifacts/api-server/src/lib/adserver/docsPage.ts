@@ -2,7 +2,21 @@
 import { AD_DEFAULTS, AD_SLOTS, VIEWABILITY, placementLabel } from "./config";
 import { esc, shell } from "./ui";
 
-export function docsPage(origin: string): string {
+/** Scale skin: rename Birch Reserve in visible prose and slot names only. Code, pre, script, style, attributes and the footer's ad-partner disclosure are left alone (the embed host stays birchreserve.net). */
+export function scaleText(html: string): string {
+  let skip = 0;
+  return html.replace(/(<[^>]*>)|([^<]+)/g, (_m, tag: string | undefined, text: string | undefined) => {
+    if (tag) {
+      const t = /^<(\/?)(script|style|pre|code|footer)\b/i.exec(tag);
+      if (t) skip += t[1] ? -1 : 1;
+      return tag;
+    }
+    if (skip > 0 || !text) return text ?? "";
+    return text.replace(/Birch Reserve(?!, a Silver Birch)/g, "Scale Health");
+  });
+}
+
+export function docsPage(origin: string, skin: "birch" | "scale" = "birch"): string {
   const live = AD_SLOTS.filter((s) => s.live && !s.test);
   const embed = `<!-- Once per page, anywhere -->
 <script async src="${origin}/ads/embed.js"></script>
@@ -19,8 +33,9 @@ export function docsPage(origin: string): string {
 </script>`;
   const pb = `GET ${origin}/v1/ads/postback?key=pb_YOUR_KEY&click_id=BR_CLICK&value=49.99&currency=USD&order_id=ORDER-123
 → {"ok":true,"attributed":true,"via":"click"}`;
-  return shell({
-    title: "Ad embed and conversion pixel · Birch Reserve",
+  const html = shell({
+    title: skin === "scale" ? "Ad embed and conversion pixel · Scale Health" : "Ad embed and conversion pixel · Birch Reserve",
+    ...(skin === "scale" ? { brand: "SCALE HEALTH", home: "https://www.scalehealth.ca/" } : {}),
     nav: "Developer docs",
     robots: "index,follow",
     right: `<nav class="tabs"><a href="#embed">Hub embed</a><a href="#pixel">CPA pixel</a><a href="#postback">Postback</a><a href="#privacy">Privacy</a><a href="/ads/specs">Creative specs</a><a href="/ads/hub-kit">Hub kit</a><a href="/account">Your ads</a></nav>`,
@@ -46,4 +61,5 @@ ${live.map((s) => `<tr><td><code>${esc(s.key)}</code></td><td>${esc(s.hubName)}<
 <li>The visitor id used for frequency caps is a random value in the hub site's own storage, hashed on our side with a salt that changes every day.</li>
 <li>Brands get aggregate reports only. See the <a href="/privacy#ads">privacy policy</a>.</li></ul></section>`,
   });
+  return skin === "scale" ? scaleText(html) : html;
 }
