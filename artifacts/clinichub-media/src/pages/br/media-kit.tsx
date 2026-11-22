@@ -386,7 +386,7 @@ export default function BrMediaKit() {
       {/* Agency + rules */}
       <Block id="agencies" eyebrow="For agencies" title={`Place a client, earn ${AGENCY_CASH_PCT}% in cash`}>
         <div className="grid gap-6 md:grid-cols-2">
-          <div className="border border-foreground/20 bg-white p-5" data-testid="mk-agency">
+          <div className="self-start border border-foreground/20 bg-white p-5" data-testid="mk-agency">
             <p className="text-sm text-foreground/80">Bring a brand into the network. The agency of record earns {AGENCY_CASH_PCT}% of media spend, paid in cash per the IO.</p>
             <p className="mt-3 text-sm" data-currency-fixed>
               <span className="text-muted-foreground">Example, in USD:</span> a ${MEDIA_KIT_OFFERS.seat.spendUsd} USD reserve pays you <strong>{usd(agencySeat)} USD</strong>; a {usdK(prem.spendLo)} USD premium slot pays you <strong>{usd(agencyPrem)} USD</strong> in cash.
