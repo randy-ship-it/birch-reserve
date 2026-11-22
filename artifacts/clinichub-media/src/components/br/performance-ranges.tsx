@@ -1,4 +1,5 @@
 /** Estimated performance ranges (Randy pt453u, Nov 21 2026). Data in api-server/src/lib/overhaul/proofContent.ts. */
+import { skinChat } from "@/lib/siteSkin";
 import { PERFORMANCE_RANGES as P, RANGES_LABEL, RANGE_METRICS, RANGE_SCALE_MAX, RANGE_SOURCES, fmtRange } from "../../../../api-server/src/lib/overhaul/proofContent";
 import { Details } from "@/components/br/details";
 
@@ -40,7 +41,7 @@ export function PerformanceRanges({ where }: { where: "home" | "media_kit" }) {
         ))}
       </ul>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-[11px] text-foreground/50" aria-hidden><span>0%</span><span>Scale 0% to {RANGE_SCALE_MAX}%</span><span>{RANGE_SCALE_MAX}%</span></div>
-      <p className="mt-2 rounded-xl bg-amber-100 px-3 py-2 text-[12px] font-semibold leading-snug text-amber-900" data-testid={`perf-ranges-label-${where}`}>{RANGES_LABEL}.</p>
+      <p className="mt-2 rounded-xl bg-amber-100 px-3 py-2 text-[12px] font-semibold leading-snug text-amber-900" data-testid={`perf-ranges-label-${where}`}>{skinChat(RANGES_LABEL)}.</p>
       <p className="mt-2 text-[12px] text-foreground/60">{P.note}</p>
       <Details label="Sources" testId={`perf-ranges-sources-${where}`}>
         <ul className="list-disc space-y-1 pl-5">{RANGE_SOURCES.map((s) => <li key={s.url}><a href={s.url} target="_blank" rel="noopener nofollow" className="underline underline-offset-2">{s.label}</a></li>)}</ul>

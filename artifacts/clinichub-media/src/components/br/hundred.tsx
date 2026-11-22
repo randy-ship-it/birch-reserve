@@ -2,6 +2,7 @@
  * Street 100 additions (Randy, Nov 21 2026): "What $100 gets you today", the measured sample report, and the premium spend-down example.
  * All numbers come from the live rate card / ad-event store / pricing modules. Modelled where labelled. No guarantees.
  */
+import { skinChat } from "@/lib/siteSkin";
 import { useEffect, useState } from "react";
 import { Check, Mail, Phone } from "lucide-react";
 import { HUNDRED_NOTE, HUNDRED_ROWS, HUNDRED_TITLE } from "../../../../api-server/src/lib/overhaul/hundred";
@@ -56,7 +57,7 @@ export function MeasuredReport() {
           </div>
         ))}
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">Anonymized aggregate. Counted by the Birch ad server on live hubs; test and QA traffic excluded. Clicks land on the brand's site tagged by surface (utm_content). A sample of what your report looks like, not a forecast or a guarantee.</p>
+      <p className="mt-3 text-xs text-muted-foreground">{skinChat("Anonymized aggregate. Counted by the Birch ad server on live hubs;")} test and QA traffic excluded. Clicks land on the brand's site tagged by surface (utm_content). A sample of what your report looks like, not a forecast or a guarantee.</p>
     </div>
   );
 }
