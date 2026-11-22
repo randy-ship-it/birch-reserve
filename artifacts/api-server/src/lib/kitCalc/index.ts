@@ -13,6 +13,7 @@
  * Every output is an Estimate.
  */
 import CONFIG from "./config.json";
+import { scaleVoiceDeep } from "../scaleVoice";
 
 export const KIT_CALC_CONFIG = CONFIG;
 export type MarginBandKey = (typeof CONFIG.marginBands)[number]["key"];
@@ -78,18 +79,20 @@ export function repeatRange(key: string): Range {
   return [b.lo, b.hi];
 }
 
-export const KIT_CALC_FORMULA = [
+const KIT_CALC_FORMULA_BASE = [
   "GP LTV per customer = average cart × margin band × purchases per year × 1–3 years (low with low, high with high).",
   "Scale visits = spend ÷ blended hub CPM × 1,000 × the modelled engagement range for ‘Browsing the hub’ (Birch modelled figures).",
   "New customers = Scale visits × your conversion scenario.",
   "Revenue opportunity = new customers × average cart × purchases per year × 1–3 years.",
   "Gross-profit opportunity = new customers × GP LTV. Break-even = spend ÷ GP LTV.",
 ];
+export const KIT_CALC_FORMULA = scaleVoiceDeep(KIT_CALC_FORMULA_BASE);
 
-export const KIT_CALC_ASSUMPTIONS = [
+const KIT_CALC_ASSUMPTIONS_BASE = [
   CONFIG.ltvHorizonYears.label,
   `Blended hub CPM $${CONFIG.demand.blendedHubCpmUsd} USD: ${CONFIG.demand.blendedHubCpmSource}.`,
   `Modelled engagement ${(CONFIG.demand.ctrBand.lo * 100).toFixed(2)}–${(CONFIG.demand.ctrBand.hi * 100).toFixed(1)}%: ${CONFIG.demand.ctrBand.source}.`,
   CONFIG.conversionLabel,
   "Spend levels are existing Birch prices. Views and engagement are modelled estimates, not promises of any specific result.",
 ];
+export const KIT_CALC_ASSUMPTIONS = scaleVoiceDeep(KIT_CALC_ASSUMPTIONS_BASE);

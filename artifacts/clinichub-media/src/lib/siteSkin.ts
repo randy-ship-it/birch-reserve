@@ -21,7 +21,7 @@ export const isScaleSkin = () => siteSkin() === "scale";
 export const siteName = () => (isScaleSkin() ? "Scale Health" : "Birch Reserve");
 
 /** Swap the Birch brand name for the host's brand name in visible copy (titles, eyebrows, review lines). */
-export const skinText = (s: string) => (isScaleSkin() ? s.replace(/Birch Reserve/g, "Scale Health") : s);
+export const skinText = (s: string) => (isScaleSkin() ? s.replace(/Birch Reserve/g, "Scale Health").replace(/(?<!Silver )\bBirch\b/g, "Scale Health") : s);
 
 /** Chat/visitor copy written in Birch voice -> Scale voice on the Scale skin (name, squirrel, links). Birch is untouched. */
 export const skinChat = (s: string) =>

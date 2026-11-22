@@ -1,3 +1,4 @@
+import { scaleVoice } from "../scaleVoice";
 /**
  * Hero path picks (Randy, Nov 18 2026 10:13 PM ET: "pick out of this what you think helps").
  * Pure copy + config, no Node imports. Reuses existing terms word for word (buyerComfort.ts, reserveOffers.ts).
@@ -48,7 +49,7 @@ export const HUB_SURFACE_SHOTS = [
     ],
   },
 ] as const;
-export const HUB_SHOTS_FINE = "Real hub pages with example placements drawn on top. Illustrative, not live ads and not Birch results. Your IO names the hub and surface.";
+export const HUB_SHOTS_FINE = scaleVoice("Real hub pages with example placements drawn on top. Illustrative, not live ads and not Birch results. Your IO names the hub and surface.");
 
 export const EARLY_RATE_BADGE = "Starter rate";
 /** Audit #5 (Randy, Nov 20 2026): footer under every block with a "Modelled" chip. */

@@ -14,7 +14,7 @@ import { PerformanceRanges } from "@/components/br/performance-ranges";
 import { FlightReportExample } from "@/components/br/flight-report";
 import { GtmBotTeaser } from "@/components/br/gtm-bot-teaser";
 import { GtmSetup } from "@/components/br/gtm-setup";
-import { siteName } from "@/lib/siteSkin";
+import { isScaleSkin, siteName, skinText } from "@/lib/siteSkin";
 import { PerformanceOnly } from "@/components/br/performance-only";
 import { STREET_TEAM_ONE_LINE } from "../../../../api-server/src/lib/overhaul/streetTeam";
 import { KitCta } from "@/components/br/kit-cta";
@@ -402,7 +402,7 @@ export default function BrMediaKit() {
             </ul>
             <SampleIoLink className="mt-3" />
             <p className="mt-3 text-sm" data-testid="mk-media-buyers-link">
-              Already running display or paid social? <a className="underline underline-offset-2" href="/media-buyers">How Birch fits your mix</a>.
+              Already running display or paid social? <a className="underline underline-offset-2" href="/media-buyers">{skinText("How Birch fits your mix")}</a>.
             </p>
           </div>
         </div>
@@ -414,7 +414,7 @@ export default function BrMediaKit() {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-background/60">Talk to the founder</p>
           <h2 className="mt-2 font-display text-[1.75rem] leading-tight md:text-4xl">Randy Gilling, Founder</h2>
           <div className="mt-4 flex flex-col gap-2 text-base">
-            <a className="inline-flex min-h-11 items-center gap-2 underline-offset-4 hover:underline" href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20media%20kit" data-testid="mk-email">
+            <a className="inline-flex min-h-11 items-center gap-2 underline-offset-4 hover:underline" href={`mailto:randy@scalehealth.ca?subject=${isScaleSkin() ? "Scale%20Health" : "Birch%20Reserve"}%20media%20kit`} data-testid="mk-email">
               <Mail className="size-4" aria-hidden /> randy@scalehealth.ca
             </a>
             <p className="text-sm text-background/75">{SALES_REPLY_LINE}</p>

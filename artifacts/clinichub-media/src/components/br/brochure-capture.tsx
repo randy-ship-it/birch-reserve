@@ -6,6 +6,7 @@
  * and the street-team `st` tag when present. No visitor auto-email: a person follows up.
  * Shared "seen" key with the linger card: shown once per visitor (30 days), never after a submit or dismiss.
  */
+import { skinText } from "@/lib/siteSkin";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, Check, Download, Loader2, X } from "lucide-react";
 import { HoneypotField, withFormGuards } from "@/lib/form-guards";
@@ -102,7 +103,7 @@ const btnCls = "inline-flex h-11 items-center justify-center gap-2 rounded-full 
 function Consent({ className = "" }: { className?: string }) {
   return (
     <p className={`text-[12px] leading-snug text-slate-500 ${className}`} data-testid="brochure-consent">
-      By submitting, you agree we may email you about Birch Reserve. No spam.{" "}
+      {skinText("By submitting, you agree we may email you about Birch Reserve. No spam.")}{" "}
       <a href="/privacy" className="underline underline-offset-2 hover:text-slate-900">Privacy</a>
     </p>
   );

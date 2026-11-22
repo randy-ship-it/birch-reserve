@@ -1,3 +1,4 @@
+import { isScaleSkin } from "@/lib/siteSkin";
 import { currentCurrency, priceLabel, useCurrency } from "@/lib/currency";
 import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
 import { KitCta } from "@/components/br/kit-cta";
@@ -160,7 +161,7 @@ export function FounderNote() {
     <div className="border border-foreground/15 bg-white p-5 md:p-6" data-testid="founder-note">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/55">Who's behind it</p>
       <p className="mt-2 text-sm leading-relaxed text-foreground/85">
-        Birch Reserve is run by Silver Birch Growth Inc. in Toronto. You deal with the founder, Randy Gilling, directly: no reseller and no ad network in between.
+        {isScaleSkin() ? "Birch Reserve is Scale Health’s exclusive ad unit, run by Silver Birch Growth Inc. in Toronto." : "Birch Reserve is run by Silver Birch Growth Inc. in Toronto."} You deal with the founder, Randy Gilling, directly: no reseller and no ad network in between.
       </p>
       <p className="mt-3 text-sm">
         <a href="https://silverbirchgrowth.com" target="_blank" rel="noopener" className="font-semibold underline underline-offset-4">silverbirchgrowth.com</a>
