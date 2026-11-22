@@ -27,6 +27,7 @@ import { errorDetail, fieldStart, trackIntake, type IntakeSide } from "@/lib/int
 import { reviewGates, type LeadGates } from "@/lib/fridayBrandIntake";
 import { savePrefill } from "@/lib/intakePrefill";
 import { birchHref } from "@/lib/shareTrack";
+import { hubEstimateNote } from "@/lib/hubEstimateNote";
 import { FastReport, type QuickResult } from "@/components/br/fast-report";
 import { numOrU, type SharedAnswers } from "@/components/br/intake-details";
 import { Details } from "@/components/br/details";
@@ -202,7 +203,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
     ...(shared.brand.trim() ? { company_name: shared.brand.trim() } : {}),
     shared: { categories: shared.categories, skus: numOrU(shared.skus), audience_customers: numOrU(shared.audience), ...(physOf(phys) ? { physical: physOf(phys) } : {}) },
     // Supplier preset + own hub: the hub is created as pending_approval (Randy or Jon approve; never auto-publish).
-    ...(sup ? {} : { notes: [perfOnly ? PERF_ONLY_PROGRAM_NOTE : CLINIC_PROGRAM_NOTE] }),
+    ...(sup ? (hubEstimateNote() ? { notes: [hubEstimateNote()!] } : {}) : { notes: [perfOnly ? PERF_ONLY_PROGRAM_NOTE : CLINIC_PROGRAM_NOTE, ...(hubEstimateNote() ? [hubEstimateNote()!] : [])] }),
     ...(sup && r.hub ? { hub_request: { role: "supplier" as const, status: "pending_approval" as const, ...(shared.brand.trim() ? { hub_name: shared.brand.trim().slice(0, 120) } : {}), ...(hubSlugOf(shared.brand.trim() || hostOf(website).split(".")[0]!) ? { hub_slug: hubSlugOf(shared.brand.trim() || hostOf(website).split(".")[0]!) } : {}) }, notes: [`Supplier intake (/intake/supplier), exposure level ${levelOf(r)}: ${r.accelerate ? "own hub + CPM/CPC display" : "own hub"}, pending Birch Reserve approval.`] } : sup ? { notes: ["Supplier intake (/intake/supplier), exposure level 1: performance only."] } : {}),
   });
   // Partial lead (Randy via Emma, Nov 19 2026 10:21 AM ET): once the email is valid, save what's filled in
