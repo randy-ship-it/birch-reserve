@@ -51,7 +51,7 @@ export function FlightReportExample({ where }: { where: "home" | "media_kit" }) 
         <a href={FLIGHT_REPORT_HREF} data-testid={`flight-report-dashboard-${where}`} className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white transition hover:bg-lime-300 hover:text-[#0b1f3a]">
           {R.cta} <ArrowRight className="size-4" aria-hidden />
         </a>
-        <p className="min-w-0 flex-1 text-[12px] text-foreground/60">{R.note}</p>
+        <p className="w-full min-w-0 text-[12px] text-foreground/60 md:w-auto md:flex-1">{R.note}</p>
       </div>
     </div>
   );
