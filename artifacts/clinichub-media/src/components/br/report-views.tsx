@@ -11,16 +11,19 @@
  * Accelerate = upper half (mid → max share). Low / likely / high = the ends and middle of each half.
  * Labelled Estimate / Modelled everywhere. USD. No CTR/ROAS, no guarantees.
  */
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Check, Rocket, Store, Package } from "lucide-react";
 import { RT, RT_SERIF, RT_SANS, RT_SHADOW } from "@/lib/reportTokens";
 import type { FridayExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 import { MOCK_SHARES } from "../../../../api-server/src/lib/kitCalc/activation";
-import { PAYOUT, PUBLISHER_SURFACES, RETAIL_COPY, RETAIL_TAG, STREET_REACH_LINE } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { PUBLISHER_SURFACES, RETAIL_COPY, RETAIL_TAG, STREET_REACH_LINE } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import type { ReportModel } from "@/components/br/report-v2";
 import { Details } from "@/components/br/details";
 import { useCurrency } from "@/lib/currency";
-import { SELL_ASSUMPTION_PCT } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
+import { CART_PRESETS, DEFAULT_INPUTS, SELL_BAND, SENDS_PER_MONTH, defaultVisitors, estimateHub, type Level } from "../../../../api-server/src/lib/overhaul/hubEstimate";
+import { PAYOUT } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { PERFORMANCE_RANGES } from "../../../../api-server/src/lib/overhaul/proofContent";
+import { saveHubEstimate } from "@/lib/hubEstimateNote";
 import { CAD_PER_USD } from "../../../../api-server/src/lib/overhaul/model";
 import { IN_LOCATION, inLocationReach, type PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
 
@@ -232,117 +235,131 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
   );
 }
 
-/* ------------------------------------------------------------------ (b) hub max-exposure + earnings view */
-/**
- * Hub earnings calculator (Randy, Nov 21 2026 9:37 PM ET: "these #s are low and I don't know what they're from"):
- * one big number, one "based on X views a month" line, two controls (hub size, surfaces on). Same model as the
- * hub intake (PUBLISHER_SURFACES x rate-card starter CPMs x 20% planning sell-through x 35% base share), computed here
- * so the number moves live. Low / likely / high flex the two things that are genuinely uncertain: how much of the
- * space is sold (10% / 20% / 30%, around the 20% planning assumption) and the CPM inside the published starter range.
- * The model runs in USD; a Canadian visitor sees it converted at the site's 1.4 CAD per USD (not just relabelled).
- */
-const HUB_SIZES = [0.25, 0.5, 1, 2, 3, 5, 7.5, 10] as const;
-export const HUB_DEFAULT_SIZE_IDX = 2; // 1x = the network median hub
-const SELL_BAND = [SELL_ASSUMPTION_PCT / 2, SELL_ASSUMPTION_PCT, SELL_ASSUMPTION_PCT * 1.5] as const;
-const hubMid = (r: readonly [number, number]) => (r[0] + r[1]) / 2;
-const PRICED = PUBLISHER_SURFACES.filter((s) => s.monthlyViews && s.cpm);
-/** Pure model: monthly payout (USD) for a hub of `sizeX` x the median hub with the given surfaces on. */
-export function hubEarnings(sizeX: number, on: Record<string, boolean>): { low: number; likely: number; high: number; views: number; rows: Array<{ key: string; label: string; on: boolean; likely: number; views: number }> } {
-  const share = PAYOUT.basePct / 100;
-  const pay = (views: number, pct: number, cpm: number) => (views * pct / 100 / 1000) * cpm * share;
-  const rows = PRICED.map((s) => {
-    const views = Math.round((s.monthlyViews ?? 0) * sizeX);
-    const isOn = on[s.key] ?? false;
-    return { s, views, isOn };
-  });
-  let low = 0, likely = 0, high = 0, views = 0;
-  for (const r of rows) {
-    if (!r.isOn) continue;
-    low += pay(r.views, SELL_BAND[0], r.s.cpm![0]);
-    likely += pay(r.views, SELL_BAND[1], hubMid(r.s.cpm!));
-    high += pay(r.views, SELL_BAND[2], r.s.cpm![1]);
-    views += r.views;
-  }
-  return { low, likely, high, views, rows: rows.map((r) => ({ key: r.s.key, label: r.s.label, on: r.isOn, views: r.views, likely: pay(r.views, SELL_BAND[1], hubMid(r.s.cpm!)) })) };
+/* ------------------------------------------------------------------ (b) hub earnings: simple form in, big numbers out */
+const num = (v: string) => { const n = Number(v.replace(/[^0-9.]/g, "")); return Number.isFinite(n) ? n : 0; };
+const grp = (n: number) => Math.round(n).toLocaleString("en-US");
+const compact = (n: number) => (n >= 1e6 ? `${+(n / 1e6).toFixed(1)}MM` : n >= 1e4 ? `${Math.round(n / 1e3)}K` : n >= 1e3 ? `${+(n / 1e3).toFixed(1)}K` : String(Math.round(n)));
+const mny = (n: number, cad: boolean) => { const v = cad ? n * CAD_PER_USD : n; return `$${(v >= 1e4 ? Math.round(v / 10) * 10 : Math.round(v)).toLocaleString("en-US")}`; };
+/** Count-up that eases to the target, skipping motion when the visitor prefers reduced motion. */
+function useCountUp(target: number): number {
+  const [v, setV] = useState(target);
+  const from = useRef(target);
+  useEffect(() => {
+    const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { from.current = target; setV(target); return; }
+    const start = performance.now(), a = from.current, dur = 700;
+    let raf = 0;
+    const tick = (t: number) => { const k = Math.min(1, (t - start) / dur); const e = 1 - Math.pow(1 - k, 3); const cur = a + (target - a) * e; from.current = cur; setV(cur); if (k < 1) raf = requestAnimationFrame(tick); };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target]);
+  return v;
 }
-const money = (n: number, cad: boolean) => {
-  const v = cad ? n * CAD_PER_USD : n;
-  return `$${(v >= 1e4 ? Math.round(v / 10) * 10 : Math.round(v)).toLocaleString("en-US")}`;
-};
-const compact = (n: number) => (n >= 1e6 ? `${+(n / 1e6).toFixed(1)}MM` : n >= 1e3 ? `${Math.round(n / 1e3)}K` : String(Math.round(n)));
+const GREEN = "#4ADE80";
+const field = "mt-1 h-12 w-full rounded-xl border bg-white px-3 text-[17px] font-semibold tabular-nums";
+const seg = (on: boolean) => ({ background: on ? "#0b1f3a" : "#fff", color: on ? "#fff" : RT.ink, border: `1.5px solid ${on ? "#0b1f3a" : RT.line}` });
 
-export function HubView({ cta, exposure, m, physical }: { m: ReportModel; exposure: FridayExposure; cta?: ReactNode; physical?: PhysicalAnswer | null }) {
+export function HubView({ cta }: { m?: ReportModel; exposure?: FridayExposure; cta?: ReactNode; physical?: PhysicalAnswer | null }) {
   const { currency } = useCurrency();
   const cad = currency === "cad";
-  const cur = cad ? "CAD" : "USD";
-  const [sizeIdx, setSizeIdx] = useState<number>(HUB_DEFAULT_SIZE_IDX);
-  const [on, setOn] = useState<Record<string, boolean>>(() => Object.fromEntries(PRICED.map((s) => [s.key, true])));
-  const sizeX = HUB_SIZES[sizeIdx]!;
-  const e = hubEarnings(sizeX, on);
-  const rows = channelRows(exposure, m.isAccelerate ? "accelerate" : "performance_only");
-  const orders = Math.round((PUBLISHER_SURFACES.find((s) => s.key === "post_purchase")?.monthlyViews ?? 0) * sizeX);
-  const anyOn = e.views > 0;
-  const top = Math.max(1, ...e.rows.map((r) => r.likely));
-  const axis = Math.max(1, e.high * 1.08);
-  const perSurface = [...e.rows].sort((a, b) => b.views * 1 - a.views * 1);
+  const [orders, setOrders] = useState("25,000");
+  const [visitors, setVisitors] = useState("");
+  const [news, setNews] = useState(true);
+  const [list, setList] = useState("120,000");
+  const [locations, setLocations] = useState("");
+  const [cart, setCart] = useState<number>(DEFAULT_INPUTS.cart);
+  const [custom, setCustom] = useState("");
+  const [level, setLevel] = useState<Level>("typical");
+  const cartVal = custom.trim() ? num(custom) : cart;
+  const cartUsd = cad ? cartVal / CAD_PER_USD : cartVal; // the cart is entered in the visitor's currency; the model runs in USD
+  const inp = { orders: num(orders), visitors: visitors.trim() ? num(visitors) : null, newsletter: news, list: num(list), cart: cartUsd, level };
+  const o = estimateHub(inp);
+  const has = o.views > 0;
+  useEffect(() => { saveHubEstimate({ orders: inp.orders, visitors: inp.visitors ?? defaultVisitors(inp.orders), newsletterList: news ? inp.list : 0, locations: locations.trim() ? num(locations) : null, cart: cartVal, level, likelyMonthlyUsd: o.earn.likely, lowUsd: o.earn.low, highUsd: o.earn.high, currency }); });
+  const month = useCountUp(has ? o.earn.likely : 0);
+  const year = useCountUp(has ? o.year : 0);
+  const claim = () => { const el = document.querySelector<HTMLElement>('[data-testid="intake-email"]') ?? document.querySelector<HTMLElement>('[data-testid="intake-website"]'); el?.scrollIntoView({ behavior: "smooth", block: "center" }); window.setTimeout(() => el?.focus({ preventScroll: true }), 450); };
+  const levels: Array<[Level, string]> = [["low", "Low"], ["typical", "Typical"], ["high", "High"]];
+  const ctrB = PERFORMANCE_RANGES.rows[0]!.ctr, cvB = PERFORMANCE_RANGES.rows[0]!.conversion;
+  const chain: Array<[string, string, string]> = [
+    ["Views", compact(o.views), "a month on your hub"],
+    ["Clicks", compact(o.clicks), `${+o.ctrPct.toFixed(1)}% of offers shown`],
+    ["Orders", compact(o.orders), `${+o.convPct.toFixed(1)}% of clicks`],
+    ["Sales for brands", mny(o.sales, cad), `at a $${grp(cartVal)} order`],
+  ];
   return (
     <section data-testid="view-hub" data-currency-fixed className="overflow-hidden" style={{ ...card, fontFamily: RT_SANS, color: RT.body }}>
-      <div className="p-5 md:p-6" style={{ background: "#0B1F3A", color: "#fff" }}>
+      <div className="p-5 md:p-6">
         <div className="flex flex-wrap items-center gap-2">
-          <Store className="size-4 text-lime-300" aria-hidden />
-          <span className={eyebrow} style={{ color: "#BEF264" }}>Your hub</span>
-          <span className="ml-auto"><Pill tone="mint">Estimate · {cur}</Pill></span>
+          <Store className="size-4" style={{ color: RT.mintInk }} aria-hidden />
+          <span className={eyebrow} style={{ color: RT.mintInk }}>Your hub</span>
         </div>
-        <h3 className="mt-3 text-[26px] leading-tight md:text-[32px]" style={{ fontFamily: RT_SERIF }}>What your hub could earn</h3>
-        <div className="mt-4" data-testid="hub-headline-month" aria-live="polite">
-          <p className="text-[56px] leading-none tabular-nums md:text-[72px]" style={{ fontFamily: RT_SERIF }}>{anyOn ? money(e.likely, cad) : "—"}</p>
-          <p className="mt-1 text-[14px] font-semibold" style={{ color: RT.mint }}>{anyOn ? "a month, likely" : "Turn on a surface to see an estimate"}</p>
-          {anyOn ? (
-            <>
-              <p className="mt-2 text-[13px] text-white/85" data-testid="hub-basis">Based on {compact(e.views)} views a month at a hub with about {compact(orders)} orders a month. Range {money(e.low, cad)}–{money(e.high, cad)}.</p>
-              <div className="relative mt-3 h-2.5 rounded-full" style={{ background: "rgba(255,255,255,.14)" }} data-testid="hub-range-bar" role="img" aria-label={`Range ${money(e.low, cad)} to ${money(e.high, cad)} a month, likely ${money(e.likely, cad)}`}>
-                <span className="absolute inset-y-0 rounded-full" style={{ left: `${(e.low / axis) * 100}%`, width: `${((e.high - e.low) / axis) * 100}%`, background: RT.mint, opacity: 0.55 }} />
-                <span className="absolute -top-1 w-1.5 rounded-full bg-white" style={{ left: `calc(${(e.likely / axis) * 100}% - 3px)`, height: 18 }} />
-              </div>
-              <p className="mt-3 text-[13px] text-white/75" data-testid="hub-headline-year">About {money(e.likely * 12, cad)} over 12 months at that run-rate.</p>
-            </>
-          ) : null}
+        <h3 className="mt-2 text-[26px] leading-tight md:text-[32px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>See what your hub could earn</h3>
+        <p className="mt-1 text-[14px]">Four quick answers. The number updates as you type.</p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2" data-testid="hub-form">
+          <label className="block text-[13px] font-bold" style={{ color: RT.ink }}>Orders or bookings a month
+            <input data-testid="hub-orders" inputMode="numeric" className={field} style={{ borderColor: RT.line }} value={orders} onChange={(e) => setOrders(e.target.value)} onBlur={() => setOrders(grp(num(orders)))} />
+          </label>
+          <label className="block text-[13px] font-bold" style={{ color: RT.ink }}>Website visitors a month <span className="font-normal" style={{ color: RT.mute }}>(optional)</span>
+            <input data-testid="hub-visitors" inputMode="numeric" className={field} style={{ borderColor: RT.line }} placeholder={grp(defaultVisitors(num(orders)))} value={visitors} onChange={(e) => setVisitors(e.target.value)} onBlur={() => visitors.trim() && setVisitors(grp(num(visitors)))} />
+          </label>
+          <div className="text-[13px] font-bold" style={{ color: RT.ink }}>Do you send a newsletter?
+            <div className="mt-1 grid grid-cols-2 gap-2" role="group" aria-label="Newsletter">
+              {([[true, "Yes"], [false, "No"]] as const).map(([v, l]) => <button key={l} type="button" aria-pressed={news === v} onClick={() => setNews(v)} data-testid={`hub-news-${l.toLowerCase()}`} className="h-12 rounded-xl text-[15px] font-bold" style={seg(news === v)}>{l}</button>)}
+            </div>
+            {news ? <input data-testid="hub-list" aria-label="Email list size" inputMode="numeric" className={field} style={{ borderColor: RT.line }} value={list} onChange={(e) => setList(e.target.value)} onBlur={() => setList(grp(num(list)))} placeholder="List size" /> : null}
+            {news ? <span className="mt-1 block text-[11px] font-normal" style={{ color: RT.mute }}>Email list size. We assume {SENDS_PER_MONTH} sends a month.</span> : null}
+          </div>
+          <label className="block text-[13px] font-bold" style={{ color: RT.ink }}>Locations <span className="font-normal" style={{ color: RT.mute }}>(optional)</span>
+            <input data-testid="hub-locations" inputMode="numeric" className={field} style={{ borderColor: RT.line }} placeholder="e.g. 3" value={locations} onChange={(e) => setLocations(e.target.value)} />
+            <span className="mt-1 block text-[11px] font-normal" style={{ color: RT.mute }}>In-location screens are priced separately, so they are not in this number.</span>
+          </label>
+        </div>
+        <div className="mt-4" data-testid="hub-cart">
+          <p className="text-[13px] font-bold" style={{ color: RT.ink }}>Average order value</p>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            {CART_PRESETS.map((c) => <button key={c} type="button" aria-pressed={!custom.trim() && cart === c} onClick={() => { setCart(c); setCustom(""); }} data-testid={`hub-cart-${c}`} className="h-12 min-w-[4.25rem] rounded-xl px-3 text-[15px] font-bold" style={seg(!custom.trim() && cart === c)}>${c}</button>)}
+            <input data-testid="hub-cart-custom" aria-label="Custom average order value" inputMode="numeric" placeholder="Custom" className="h-12 w-28 rounded-xl border bg-white px-3 text-[15px] font-semibold" style={{ borderColor: custom.trim() ? "#0b1f3a" : RT.line }} value={custom} onChange={(e) => setCustom(e.target.value)} />
+          </div>
+          <p className="mt-3 text-[13px] font-bold" style={{ color: RT.ink }}>How well do offers perform?</p>
+          <div className="mt-1 grid grid-cols-3 gap-2 sm:max-w-sm" role="group" aria-label="Performance level">
+            {levels.map(([k, l]) => <button key={k} type="button" aria-pressed={level === k} onClick={() => setLevel(k)} data-testid={`hub-level-${k}`} className="h-12 rounded-xl text-[15px] font-bold" style={seg(level === k)}>{l}</button>)}
+          </div>
         </div>
       </div>
-      <div className="p-5 md:p-6">
-        <div data-testid="hub-controls">
-          <label htmlFor="hub-size" className="flex items-baseline justify-between gap-3 text-[13px] font-bold" style={{ color: RT.ink }}>
-            <span>How big is your hub?</span>
-            <span className="tabular-nums font-semibold" style={{ color: RT.mintInk }} data-testid="hub-size-label">about {compact(orders)} orders a month{sizeX === 1 ? " (typical)" : ""}</span>
-          </label>
-          <input id="hub-size" data-testid="hub-size-slider" type="range" min={0} max={HUB_SIZES.length - 1} step={1} value={sizeIdx} onChange={(ev) => setSizeIdx(Number(ev.target.value))} aria-valuetext={`${compact(orders)} orders a month`} className="mt-2 h-8 w-full" style={{ accentColor: "#0b1f3a" }} />
-          <div className="flex justify-between text-[11px]" style={{ color: RT.mute }}><span>Smaller</span><span>Larger</span></div>
-          <p className="mt-4 text-[13px] font-bold" style={{ color: RT.ink }}>Where we show offers</p>
-          <ul className="mt-2 space-y-1.5" data-testid="hub-surfaces">
-            {perSurface.map((r) => (
-              <li key={r.key}>
-                <button type="button" role="switch" aria-checked={r.on} onClick={() => setOn((o) => ({ ...o, [r.key]: !r.on }))} data-testid={`hub-surface-${r.key}`} className="grid min-h-11 w-full grid-cols-[auto_1fr_auto] items-center gap-3 rounded-xl px-3 py-2 text-left" style={{ background: r.on ? "#F3FBF6" : RT.paper, border: `1px solid ${r.on ? RT.mint : RT.line}` }}>
-                  <span className="grid size-5 place-items-center rounded-md" style={{ background: r.on ? "#0b1f3a" : "#fff", border: `1.5px solid ${r.on ? "#0b1f3a" : RT.line}` }} aria-hidden>{r.on ? <Check className="size-3.5 text-white" /> : null}</span>
-                  <span className="min-w-0">
-                    <span className="block text-[13px] font-semibold" style={{ color: RT.ink }}>{r.label}</span>
-                    <span className="mt-1 block h-1.5 rounded-full" style={{ background: RT.track }}><span className="block h-full rounded-full" style={{ width: `${r.on ? Math.max(3, (r.likely / top) * 100) : 0}%`, background: RT.mintInk }} /></span>
-                  </span>
-                  <span className="text-right text-[13px] tabular-nums" style={{ color: r.on ? RT.ink : RT.mute }}>{r.on ? `${money(r.likely, cad)}/mo` : "off"}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
+      <div className="p-5 md:p-6" style={{ background: "#0B1F3A", color: "#fff" }} data-testid="hub-result" aria-live="polite">
+        <div className="flex items-center gap-2"><span className={eyebrow} style={{ color: GREEN }}>You could earn</span><span className="ml-auto"><Pill tone="mint">Estimate · {cad ? "CAD" : "USD"}</Pill></span></div>
+        <div data-testid="hub-headline-month">
+          <p className="mt-2 text-[64px] font-bold leading-none tabular-nums md:text-[88px]" style={{ fontFamily: RT_SERIF, color: GREEN, textShadow: "0 0 32px rgba(74,222,128,.45)" }}>{has ? mny(month, cad) : "—"}</p>
+          <p className="mt-1 text-[16px] font-semibold">a month</p>
         </div>
-        <Details label="How we estimate this" testId="hub-details">
-          <p><strong>Your share:</strong> {PAYOUT.basePct}% of the media revenue from offers shown on your hub. Higher tiers aren't set yet.</p>
-          <p><strong>Views:</strong> a typical hub (the network median, modelled) scaled by the size slider. Your real numbers replace these once you share them.</p>
-          <p><strong>Revenue:</strong> views × the share of space sold ({SELL_BAND[0]}–{SELL_BAND[2]}%, around a {SELL_BAND[1]}% planning assumption) × the published starter price per 1,000 views for that surface, then your {PAYOUT.basePct}%. Low uses the low end of both, high the top end, likely the middle.</p>
-          <p>The newsletter carries a single published price, so it moves with how much is sold, not with price.</p>
-          <p>{cad ? "Shown in CAD, converted from our USD model at 1.4 CAD per USD." : "Shown in USD."} A planning estimate, not a quote, a forecast or a guaranteed payout.</p>
-        </Details>
-        <Details label="Your products across the network" testId="hub-network">
-          <p>{RETAIL_COPY} · {RETAIL_TAG}. Estimates, not guarantees.</p>
-          <ChannelTable rows={rows} testId="hub-channels" extra={<InLocationRow physical={physical} testId="hub-channels-in-location" />} />
+        {has ? (
+          <>
+            <p className="mt-3 text-[28px] leading-none tabular-nums md:text-[36px]" style={{ fontFamily: RT_SERIF, color: GREEN }} data-testid="hub-headline-year">{mny(year, cad)} <span className="text-[16px] font-semibold text-white">a year</span></p>
+            <ul className="mt-4 space-y-1.5 text-[15px] font-semibold" data-testid="hub-lines">
+              <li>That's {mny(o.year, cad)} a year from space you already have.</li>
+              <li>Your hub could help drive about {mny(o.sales, cad)} a month in sales for brands.</li>
+              <li>Brands pay for the space. You keep {o.sharePct}% of that media revenue.</li>
+            </ul>
+            <div className="mt-5 grid grid-cols-2 gap-2 md:grid-cols-4" data-testid="hub-chain">
+              {chain.map(([t, v, sub], n) => (
+                <div key={t} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,.08)" }} data-testid={`hub-chain-${n}`}>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-white/70">{t}</p>
+                  <p className="mt-1 text-[28px] leading-none tabular-nums" style={{ fontFamily: RT_SERIF }}>{v}</p>
+                  <p className="mt-1 text-[11px] text-white/70">{sub}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 text-[12px] text-white/70">Views, then clicks, then orders, then sales. Your earnings come from the space brands pay for, not from their sales.</p>
+            <button type="button" onClick={claim} data-testid="hub-claim" className="mt-5 inline-flex h-14 w-full items-center justify-center rounded-full px-6 text-[17px] font-bold md:w-auto" style={{ background: "#BEF264", color: "#0b1f3a" }}>Claim my kit</button>
+            <p className="mt-3 text-[12px] text-white/70" data-testid="hub-range">Range {mny(o.earn.low, cad)}–{mny(o.earn.high, cad)} a month.</p>
+          </>
+        ) : <p className="mt-3 text-[15px] text-white/85">Add your orders or visitors to see an estimate.</p>}
+        <Details dark label="How we estimate this" testId="hub-details">
+          <p><strong className="text-white">Views</strong> come from your answers: orders = thank-you and confirmation views; visitors drive hub home, product and services pages; returning members follow orders; email = list size × {SENDS_PER_MONTH} sends.</p>
+          <p><strong className="text-white">Earnings</strong> = views × the share of space sold ({SELL_BAND[0]}–{SELL_BAND[2]}%, planning assumption {SELL_BAND[1]}%) × the published starter price per 1,000 views × your {PAYOUT.basePct}% share. The range uses the low and high ends of both. Brand sales are value for brands and are not added to your earnings.</p>
+          <p><strong className="text-white">Clicks and orders</strong> use the estimated ranges on this site (post-purchase {ctrB.lo}–{ctrB.hi}% clicks and {cvB.lo}–{cvB.hi}% conversion; hub and email placements {PERFORMANCE_RANGES.rows[2]!.ctr.lo}–{PERFORMANCE_RANGES.rows[2]!.ctr.hi}% and {PERFORMANCE_RANGES.rows[2]!.conversion.lo}–{PERFORMANCE_RANGES.rows[2]!.conversion.hi}%), at the low, middle or high end, on the offers actually shown. Sales = orders × your average order value.</p>
+          <p>Every figure is monthly; a year is 12 months at that run-rate. {cad ? "Shown in CAD, converted from our USD model at 1.4 CAD per USD." : "Shown in USD."} A planning estimate, not a quote, forecast or guarantee.</p>
         </Details>
         {cta ? <div className="mt-4">{cta}</div> : null}
       </div>
