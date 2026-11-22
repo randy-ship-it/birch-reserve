@@ -16,6 +16,7 @@ import { FounderNote, priceLabels, useAvailability } from "@/components/br/prime
 import { MediaKitPdfLink, ProofStrip, SalesContact, TRUST_FAQ, TrustBand, TrustFaq } from "@/components/br/trust";
 import { HowWeGotHere } from "@/components/br/how-we-got-here";
 import { TrackRecord } from "@/components/br/track-record";
+import { PerformanceRanges } from "@/components/br/performance-ranges";
 import { FlightReportExample } from "@/components/br/flight-report";
 import { GtmSetup } from "@/components/br/gtm-setup";
 import { GtmBotTeaser } from "@/components/br/gtm-bot-teaser";
@@ -177,7 +178,7 @@ export default function BrHome() {
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-offer-stairs">
         <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Start small. Scale when it works.</h2>
         <div className="mt-4"><OfferStairs look={price.look} seat={price.seat} /></div>
-        <div className="mt-4"><FlightReportExample where="home" /></div>
+        <div className="mt-4"><FlightReportExample where="home" /></div><div className="mt-4"><PerformanceRanges where="home" /></div>
       </section>
 
       {/* 2c. Categories + Questions brands ask moved up: strip under the hero, compact questions by the kit CTA (Nov 21). */}

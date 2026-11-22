@@ -510,16 +510,21 @@ test("no-JS shell carries origin story, track record, GTM and the example report
     assert.match(html, /Example report · illustrative numbers, not results/);
     assert.match(html, /unaudited/);
     assert.match(html, /First measured flight reports coming soon/);
+    assert.match(html, /Estimated range, based on comparable installations and industry research, not a guarantee or Birch results/);
+    assert.match(html, /Post-purchase: CTR 2% to 5%/);
+    assert.doesNotMatch(html, /ankita|pier39|persona3/i);
   }
   assert.equal(withProofShell(shell, "/rates"), shell);
   const txt = llmsProofSection();
-  for (const bad of [/Align|Clairvoyant|Alset|MedVibe|Friday|pier39|STREET100/i, /guarantee(?!d)/i, /\b80 locations\b/i]) assert.doesNotMatch(txt, bad);
+  for (const bad of [/Align|Clairvoyant|Alset|MedVibe|Friday|pier39|STREET100/i, /(?<!not a )(?<!no )guarantee(?!d)(?! s)/i, /\b80 locations\b/i]) assert.doesNotMatch(txt, bad);
   assert.match(txt, /How we got here/);
   assert.match(txt, /Track record/);
   const full = await (await fetch(`${origin}/llms-full.txt`)).text();
   assert.match(full, /How we got here/);
   assert.match(full, /What your flight report shows/);
   assert.match(full, /First measured flight reports coming soon/);
+  assert.match(full, /Estimated performance ranges/);
+  assert.doesNotMatch(full, /ankita|pier39|persona3/i);
   const short = await (await fetch(`${origin}/llms.txt`)).text();
   assert.match(short, /Track record/);
 });
