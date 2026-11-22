@@ -43,11 +43,11 @@ export function ShareBar({ title = "Get your free Monetization Kit", text = "See
   const enc = encodeURIComponent;
   return (
     <div data-testid={testId} className="flex flex-wrap items-center gap-2">
-      <span className={`mr-1 text-[11px] font-bold uppercase tracking-wider ${tone === "dark" ? "text-white/60" : "text-foreground/55"}`}>Share</span>
+      <span className={`mr-1 hidden text-[11px] font-bold uppercase sm:inline tracking-wider ${tone === "dark" ? "text-white/60" : "text-foreground/55"}`}>Share</span>
       {canNative ? (
         <button type="button" onClick={native} data-testid={`${testId}-native`} className={`${cls} md:hidden`}><Share2 className="size-4" />Share…</button>
       ) : null}
-      <button type="button" onClick={copy} data-testid={`${testId}-copy`} className={cls} aria-live="polite">{copied ? <Check className="size-4" /> : <Link2 className="size-4" />}{copied ? "Copied" : "Copy link"}</button>
+      <button type="button" onClick={copy} data-testid={`${testId}-copy`} className={cls} aria-live="polite" aria-label="Copy link">{copied ? <Check className="size-4" /> : <Link2 className="size-4" />}{copied ? "Copied" : <span className="hidden sm:inline">Copy link</span>}</button>
       <button type="button" onClick={open("email", `mailto:?subject=${enc(title)}&body=${enc(`${text}\n\n${url("email")}`)}`)} data-testid={`${testId}-email`} className={cls} aria-label="Share by email"><Mail className="size-4" /><span className="hidden sm:inline">Email</span></button>
       <button type="button" onClick={open("sms", `sms:?&body=${enc(`${title}: ${url("sms")}`)}`)} data-testid={`${testId}-sms`} className={cls} aria-label="Share by text message"><MessageSquare className="size-4" /><span className="hidden sm:inline">Text</span></button>
       <button type="button" onClick={open("linkedin", `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url("linkedin"))}`)} data-testid={`${testId}-linkedin`} className={cls} aria-label="Share on LinkedIn"><LinkedInIcon /><span className="hidden sm:inline">LinkedIn</span></button>

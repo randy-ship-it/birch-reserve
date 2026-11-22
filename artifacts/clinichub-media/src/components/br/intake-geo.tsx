@@ -32,7 +32,7 @@ export function MarketPicker({ value, onChange, side = "advertiser", compact = f
     </div>
   );
   return (
-    <div data-testid="market-picker" className={compact ? "" : "rounded-2xl border border-foreground/10 bg-white/70 p-3"}>
+    <div data-testid="market-picker" className={compact ? "" : "flex h-full flex-col justify-center rounded-2xl border border-foreground/10 bg-white/70 p-3"}>
       <span className="block text-[11px] font-bold uppercase tracking-wider text-foreground/60">{side === "publisher" ? "Where is your hub's audience?" : "Where do you sell and ship?"}</span>
       <div className="mt-1">{chips(value.sells_in, (c) => onChange({ ...value, sells_in: c, ships_to: shipsSame ? c : value.ships_to }), "market-sells")}</div>
       {side === "advertiser" ? (
