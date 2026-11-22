@@ -71,15 +71,15 @@ export default function BrIntakePublisher() {
           <div className="mt-5 grid grid-cols-3 gap-3">
             <div>
               <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-white/60">Low</p>
-              <CountUp value={p.monthlyTotalUsd[0]} className="block pt-1 font-display text-2xl sm:text-4xl md:text-5xl" />
+              <CountUp value={p.monthlyTotalUsd[0] * k} className="block pt-1 font-display text-2xl sm:text-4xl md:text-5xl" />
             </div>
             <div data-testid="publisher-typical">
               <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-white/60">Typical</p>
-              <CountUp value={p.monthlyLikelyUsd} className="block pt-1 font-display text-2xl text-white sm:text-4xl md:text-5xl" />
+              <CountUp value={p.monthlyLikelyUsd * k} className="block pt-1 font-display text-2xl text-white sm:text-4xl md:text-5xl" />
             </div>
             <div>
               <p className="mb-1 flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-lime-200"><TrendingUp className="size-3.5" /> High</p>
-              <CountUp value={p.monthlyTotalUsd[1]} className="block pt-1 font-display text-2xl text-lime-200 sm:text-4xl md:text-5xl" />
+              <CountUp value={p.monthlyTotalUsd[1] * k} className="block pt-1 font-display text-2xl text-lime-200 sm:text-4xl md:text-5xl" />
             </div>
           </div>
           <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10" aria-hidden>
