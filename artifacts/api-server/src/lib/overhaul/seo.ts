@@ -2,6 +2,7 @@ import { GTM_SETUP_FACT, GTM_SETUP_URL } from "./gtmSetup";
 import { GTM_BOT_FACT } from "./gtmBot";
 import { STREET_TEAM_LLMS } from "./streetTeam";
 import { POSITIONING, POSITIONING_FOLLOW, llmsFasterSection } from "../aiDiscovery";
+import { llmsProofSection } from "./proofContent";
 import { PACING_ROWS, SPEND_DOWN_LINE, tam2027Text } from "../inventoryPlan";
 /** Per-route head + llms.txt for the overhaul routes (crawlable without JS). */
 import { slotOffers, areaLockOffer } from "./agent";
@@ -219,5 +220,6 @@ export function llmsTxt(): string {
     "Rules: aggregate reporting only, no patient data, no clinical pixels. Modelled figures are labelled. No impression guarantees.",
     "Seller: Silver Birch Growth Inc. · Toronto, Ontario · randy@scalehealth.ca",
     llmsFasterSection(),
+    llmsProofSection(),
   ].join("\n");
 }

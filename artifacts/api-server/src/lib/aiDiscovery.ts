@@ -3,6 +3,8 @@
  * Standalone: no DB imports. Copy rules: USD only, "retail hubs", no impression guarantees, no CTR/ROAS claims,
  * no claim that an ad is live in minutes, Google figures only as Google publishes them (cited).
  */
+import { llmsProofSection } from "./overhaul/proofContent";
+
 export const POSITIONING = "Buy Scale Health ads through Birch Reserve.";
 export const POSITIONING_FOLLOW = "The faster way to buy ads.";
 export const AI_SITE = "https://birchreserve.net";
@@ -110,6 +112,8 @@ export function llmsFullTxt(): string {
     "",
     "## What Birch does not do",
     "No impression guarantees. No click-through or return-on-ad-spend promises. Aggregate reporting only. No patient data. No clinical pixels. Modelled figures are labelled as estimates.",
+    "",
+    llmsProofSection().trimStart(),
     "",
     "## Key URLs",
     urls,

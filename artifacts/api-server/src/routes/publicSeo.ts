@@ -23,6 +23,7 @@ import {
 } from "../lib/publicSeo";
 import { payoutRegionForCountry } from "../lib/payoutCurrency";
 import { currencyCookieHeader, decideCurrency } from "../lib/currency";
+import { withProofShell } from "../lib/overhaul/proofContent";
 import { getBrandFit } from "../lib/overhaul/brandFits";
 
 const router: IRouter = Router();
@@ -84,14 +85,14 @@ router.get("/", (req, res) => {
   res.setHeader("Vary", "Cookie, x-vercel-ip-country");
   res.set("Cache-Control", "private, max-age=0, must-revalidate");
   if (decision.source === "query") res.append("Set-Cookie", currencyCookieHeader(decision.currency));
-  res.type("html").send(withPayoutRegion(withLocalizedOffer(html, decision.currency), payoutRegionForCountry(req.headers["x-vercel-ip-country"])));
+  res.type("html").send(withPayoutRegion(withProofShell(withLocalizedOffer(html, decision.currency), "/"), payoutRegionForCountry(req.headers["x-vercel-ip-country"])));
 });
 
 for (const path of SPA_SHELL_PATHS) {
   router.get(path, (req, res) => {
     let html: string;
     try {
-      html = withPayoutRegion(withRouteSeo(readSpaIndexHtml(), path), payoutRegionForCountry(req.headers["x-vercel-ip-country"]));
+      html = withPayoutRegion(withProofShell(withRouteSeo(readSpaIndexHtml(), path), path), payoutRegionForCountry(req.headers["x-vercel-ip-country"]));
     } catch (error) {
       logger.error({ err: error, path }, "SPA shell for public SEO is missing");
       res.status(500).type("text/plain").send("Page unavailable.");
