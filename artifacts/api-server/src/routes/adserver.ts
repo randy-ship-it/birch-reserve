@@ -11,6 +11,7 @@ import * as promoLib from "../lib/adserver/promo";
 import { hubProofAdminHtml, listProofs } from "../lib/adserver/hubProof";
 import { promoAdminHtml } from "../lib/adserver/promoAdmin";
 import { attachPendingForAccount } from "../lib/adserver/promo";
+import type Stripe from "stripe";
 import express, { Router, type IRouter, type Request, type Response } from "express";
 import { logger } from "../lib/logger";
 import { getStripeClient } from "../lib/stripeClient";
@@ -38,6 +39,7 @@ import { draftCampaignFromCheckoutSafe, recordClick, recordConversion, recordVie
 import { EMBED_JS, PIXEL_JS } from "../lib/adserver/embed";
 import { dashboardPage, loginPage } from "../lib/adserver/accountPage";
 import { adminGlanceHtml } from "../lib/adserver/adminGlance";
+import { commissionRates, commissionsHtml, leadSiteOf, leadsHtml, loadReserveRows, reservesHtml, siteFilterHtml, siteFilterOf, type ReserveRow } from "../lib/adserver/adminBusiness";
 import { adminLoginPage, adminPage } from "../lib/adserver/adminPage";
 import { docsPage } from "../lib/adserver/docsPage";
 import { checkUpload, checkVariant, findFormat, matchFormat, templateSvg, MAX_VIDEO_BYTES, VARIANT_ROLES, MAX_VARIANTS, type VariantRole } from "../lib/adserver/creativeSpec";
@@ -124,7 +126,7 @@ router.get("/ads/px.js", (_req, res) => {
 });
 router.get(["/ads/docs", "/ads/docs/"], async (req, res) => {
   await store.db().catch(() => undefined); // include hubs onboarded on contract
-  res.set("Cache-Control", "public, max-age=300").type("html").send(docsPage(origin(req)));
+  res.set("Cache-Control", "public, max-age=300").type("html").send(docsPage(origin(req), skinOf(req)));
 });
 router.get(["/ads", "/ads/"], (_req, res) => res.redirect(302, "/ads/docs"));
 // Creative specs (public) and the hub drop-in kit (unlisted handoff for hub builders). ?br_mirror=scale = Scale skin.
@@ -508,7 +510,8 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
       res.type("html").send(adminLoginPage());
       return;
     }
-    const campaigns = await store.listCampaigns();
+    const siteSel = siteFilterOf(req.query["site"]);
+    const campaigns = (await store.listCampaigns()).filter((c) => siteSel === "all" || (c.seller ?? "birch") === siteSel);
     const ids = campaigns.map((c) => c.id);
     const [totals, creatives, slotTotals, led, roy, shares, alerts, audit, day, orders] = await Promise.all([
       store.totalsByCampaign("all"), store.listCreatives({}), store.bySlotFor("all", 30), store.ledger({ limit: 300 }), store.royalties(6), store.partnerShares(),
@@ -524,10 +527,26 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
     const leadStore = getLeadStore();
     const glanceSources = ["brand_intake", "advertiser_intake", "partners", "activation", "inventory_signup", "checkout"] as const;
     const glanceLeads = Object.fromEntries(await Promise.all(glanceSources.map(async (s) => [s, await leadStore.listBySource(s, 500).catch(() => [])] as const)));
-    const glanceHtml = adminGlanceHtml({ leads: glanceLeads, orders: orders.map((o) => ({ at: o.createdAt })), campaigns: campaigns.map((c) => ({ c, t: totals.get(c.id) ?? { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 } })), week: await store.totalsByCampaign("all", 7), royalties: roy });
+    const glanceFiltered = Object.fromEntries(Object.entries(glanceLeads).map(([k, v]) => [k, v.filter((l) => siteSel === "all" || leadSiteOf(l) === siteSel)]));
+    const glanceHtml = adminGlanceHtml({ leads: glanceFiltered, orders: orders.map((o) => ({ at: o.createdAt })), campaigns: campaigns.map((c) => ({ c, t: totals.get(c.id) ?? { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 } })), week: await store.totalsByCampaign("all", 7), royalties: roy });
+    let reserveRows: ReserveRow[] | null = null;
+    try {
+      reserveRows = await loadReserveRows(async (since) => {
+        const out: Stripe.Checkout.Session[] = [];
+        for await (const sess of getStripeClient().checkout.sessions.list({ limit: 100, created: { gte: since }, expand: ["data.payment_intent.latest_charge"] })) {
+          out.push(sess);
+          if (out.length >= 600) break;
+        }
+        return out;
+      });
+    } catch (err) {
+      logger.warn({ err: err instanceof Error ? err.message : String(err) }, "admin reserves: Stripe read failed");
+    }
+    const businessHtml = reservesHtml(reserveRows, siteSel) + commissionsHtml(reserveRows, commissionRates(rates, channelRates), siteSel) + leadsHtml(glanceLeads, siteSel);
+    const siteHtml = siteFilterHtml(siteSel);
     res.type("html").send(
       adminPage({
-        who, glanceHtml, campaigns: campaigns.map((c) => ({ c, t: totals.get(c.id) ?? { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 } })),
+        who, glanceHtml, businessHtml, siteHtml, campaigns: campaigns.map((c) => ({ c, t: totals.get(c.id) ?? { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 } })),
         pending: await (async () => {
           const pend = creatives.filter((x) => x.status === "pending" && ids.includes(x.campaignId));
           const vs = await store.listVariants(pend.map((x) => x.id));

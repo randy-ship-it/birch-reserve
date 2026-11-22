@@ -18,7 +18,7 @@ import { EXCLUSIVE_RESERVE, EXCLUSIVE_RESERVE_DESCRIPTION, exclusiveReserveFor }
 export type ReserveRequest = { brand?: unknown; email?: unknown; category?: unknown; agree?: unknown; currency?: unknown };
 
 /** Pure: validate and build Stripe Checkout params. body.currency "usd" charges USD; anything else CAD (the original offer). */
-export function buildExclusiveReserveSession(body: ReserveRequest, origin: string):
+export function buildExclusiveReserveSession(body: ReserveRequest, origin: string, site: "birch" | "scale" = "birch"):
   | { ok: false; error: string }
   | { ok: true; params: Record<string, unknown> } {
   const brand = String(body.brand ?? "").replace(/[\u0000-\u001f<>]/g, " ").trim().slice(0, 160);
@@ -27,7 +27,8 @@ export function buildExclusiveReserveSession(body: ReserveRequest, origin: strin
   if (!brand || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok: false, error: "Add your brand and a work email." };
   if (body.agree !== true) return { ok: false, error: "Please agree to the reserve terms." };
   const offer = exclusiveReserveFor(String(body.currency ?? "").toLowerCase() === "usd" ? "usd" : "cad");
-  const envPrice = offer.currency === "cad" ? process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD?.trim() : process.env.STRIPE_PRICE_EXCLUSIVE_1900_USD?.trim();
+  // Scale mirror checkouts name the product "Scale Health — …" (same amount and currency), so they use inline price_data instead of the Birch-named Stripe Price.
+  const envPrice = site === "scale" ? undefined : offer.currency === "cad" ? process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD?.trim() : process.env.STRIPE_PRICE_EXCLUSIVE_1900_USD?.trim();
   const metadata = {
     kind: EXCLUSIVE_RESERVE.kind,
     sku: offer.sku,
@@ -50,7 +51,7 @@ export function buildExclusiveReserveSession(body: ReserveRequest, origin: strin
         price_data: {
           currency: offer.currency,
           unit_amount: offer.amountCents,
-          product_data: { name: offer.name, description: EXCLUSIVE_RESERVE_DESCRIPTION, metadata: { sku: offer.sku } },
+          product_data: { name: site === "scale" ? `Scale Health — Exclusive display reserve ($1,900 ${offer.currency.toUpperCase()})` : offer.name, description: EXCLUSIVE_RESERVE_DESCRIPTION, metadata: { sku: offer.sku } },
         },
       }],
       metadata,
