@@ -50,6 +50,19 @@ export const SERVICES_SPLIT = {
   birchLine: "Scale Health clinic services booked through your hub: you keep half of what Scale Health charges, $24.50 per $49 assessment and $14.50 per $29 session.",
 } as const;
 
+/** Hub onboarding fee framing (BR-39 follow-up, Randy Nov 22 2026 11:23 AM ET). Same $5,000 USD figure as the supplier "Stand-up fee" (SUPPLIER_FEES).
+ * Larger hubs (the 1MM+ views tier) have it waived as a favour: still free to launch. Smaller hubs: it may apply. Never a guarantee. */
+export const HUB_ONBOARDING = {
+  feeUsd: 5000,
+  waiverFromViews: 1_000_000,
+  target: "Our target hubs are in the 50%+ payout range.",
+  smaller: "Smaller hubs are welcome. A $5,000 USD onboarding fee may apply, and it can be harder to waive.",
+  larger: "For larger hubs it's on us: the $5,000 USD onboarding fee is waived as a thank-you, so it's free to launch. The waiver is reserved for hubs at 1MM+ views a month.",
+  chipLarge: "onboarding fee waived: free to launch, our gift to larger hubs.",
+  chipSmall: "A $5,000 USD onboarding fee may apply to smaller hubs.",
+} as const;
+export const onboardingWaived = (views: number) => views >= HUB_ONBOARDING.waiverFromViews;
+
 export const PAYOUT = {
   basePct: 70,
   line: "Hubs earn 70% of media revenue, rising to 75% at 1MM views a month, 80% at 3MM and 85% at 5MM.",

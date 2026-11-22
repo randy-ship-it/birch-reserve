@@ -9,6 +9,7 @@ import { ActivationRange, DEFAULT_MARKET, MarketPicker, pickActivation } from "@
 import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { publisherActivation } from "../../../../api-server/src/lib/kitCalc/activation";
 import { useCurrency } from "@/lib/currency";
+import { HubOnboardingNote } from "@/components/br/hub-onboarding";
 import { HubDifferentiators } from "@/components/br/hub-differentiators";
 import { CAD_PER_USD } from "../../../../api-server/src/lib/overhaul/model";
 import { trackIntake } from "@/lib/intakeTrack";
@@ -218,6 +219,7 @@ export default function BrIntakePublisher() {
             ))}
           </ol>
           <p data-testid="services-split" data-currency-fixed className="mt-4 rounded-xl bg-lime-100/70 px-3 py-2 text-sm font-semibold text-[#0b1f3a]">{isScaleSkin() ? SERVICES_SPLIT.line : SERVICES_SPLIT.birchLine}</p>
+          <HubOnboardingNote views={p.totalViews} />
         </div>
       </section>
       <section className="container mx-auto grid gap-4 px-4 pb-6 lg:grid-cols-[minmax(0,22rem)_1fr]">

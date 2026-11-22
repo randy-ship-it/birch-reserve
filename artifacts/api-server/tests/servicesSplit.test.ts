@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { SERVICES_SPLIT, PUBLISHER_ASSUMPTIONS } from "../src/lib/overhaul/brandIntake";
+import { SERVICES_SPLIT, PUBLISHER_ASSUMPTIONS, HUB_ONBOARDING, onboardingWaived } from "../src/lib/overhaul/brandIntake";
 
 test("clinic services: hub keeps half of what Scale Health charges ($49 assessment, $29 session)", () => {
   assert.equal(SERVICES_SPLIT.hubPct, 50);
@@ -18,4 +18,12 @@ test("clinic services: hub keeps half of what Scale Health charges ($49 assessme
 
 test("no labor rate, management cost or net formula in public sources", () => {
   for (const f of ["src/lib/overhaul/brandIntake.ts", "../clinichub-media/src/pages/br/intake-publisher.tsx"]) assert.doesNotMatch(readFileSync(f, "utf8"), /labou?r|\$70\b|management (cost|fee)|servicesNet|50% of net/i);
+});
+
+test("hub onboarding fee: $5,000 USD (same as the supplier stand-up fee), waived from 1MM+ views, never a guarantee or a penalty", () => {
+  assert.equal(HUB_ONBOARDING.feeUsd, 5000);
+  assert.deepEqual([0, 999_999, 1_000_000, 5_000_000].map(onboardingWaived), [false, false, true, true]);
+  for (const s of [HUB_ONBOARDING.target, HUB_ONBOARDING.smaller, HUB_ONBOARDING.larger, HUB_ONBOARDING.chipLarge, HUB_ONBOARDING.chipSmall]) assert.doesNotMatch(s, /guarantee|penalt|must pay|Align|Clairvoyant/i);
+  assert.match(HUB_ONBOARDING.larger, /free to launch/);
+  assert.match(HUB_ONBOARDING.smaller, /may apply/);
 });
