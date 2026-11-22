@@ -15,7 +15,7 @@ import { isScaleSkin } from "@/lib/siteSkin";
 
 const R = "/reel";
 /** The Scale skin plays its own render: same reel, but the last slide is Scale's three exclusive private channels (Randy, Nov 21 2026 5:38 PM). */
-const SCALE_END = "Three exclusive private channels: branded hubs, our digital and brick-and-mortar provider network across Canada and the USA, and Calm Joints, our recovery store, with Street Team ambassadors going home by home and into retail.";
+const SCALE_END = "Three exclusive private channels: branded hubs, our digital and brick-and-mortar provider network across Canada and the USA, and Calm Joints, our recovery store, with Street Team ambassadors. Download your monetization kit for a free customized assessment for your business.";
 const REEL_FILES = (scale: boolean) => scale
   ? { v: `${R}/scale-ad-system-9x16.mp4`, h: `${R}/scale-ad-system-16x9.mp4`, vtt: `${R}/captions-scale-en.vtt`, len: "One-minute walkthrough" }
   : { v: `${R}/birch-scale-ad-system-9x16.mp4`, h: `${R}/birch-scale-ad-system-16x9.mp4`, vtt: `${R}/captions-en.vtt`, len: "50-second walkthrough" };
