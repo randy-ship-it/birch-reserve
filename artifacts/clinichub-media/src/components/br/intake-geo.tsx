@@ -8,6 +8,8 @@ import { CHANNEL_GEO, COUNTRY_LABEL, channelEligibility, parseRegions, type Coun
 import { readActivation, readExposure, mockExposure, type ActivationBlock, type FridayExposure, type ExposureChannel } from "../../../../api-server/src/lib/kitCalc/activation";
 import { EstimateTag } from "@/components/br/intake-kit";
 import { trackIntake, type IntakeSide } from "@/lib/intakeTrack";
+import { useCurrency } from "@/lib/currency";
+import { CAD_PER_USD } from "../../../../api-server/src/lib/overhaul/model";
 
 export const DEFAULT_MARKET: Market = { sells_in: [], ships_to: [] };
 const CHOICES: Array<{ key: "CA" | "US" | "both"; label: string; c: Country[] }> = [
@@ -66,6 +68,7 @@ export function EligChip({ e, geo }: { e: Eligibility; geo: string }) {
 }
 
 const $ = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
+const module$ = $;
 
 /** Illustration for each end of the range: a few lit screens (now) vs the full network lit (later). */
 export function EndArt({ end }: { end: "now" | "later" }) {
@@ -85,6 +88,9 @@ export function EndArt({ end }: { end: "now" | "later" }) {
 export type ActivationSource = "friday" | "mock" | "sample";
 /** Now / minimum ← range bar → later / maximum. */
 export function ActivationRange({ kind, block, source, testId }: { kind: "advertiser" | "publisher"; block: ActivationBlock; source: ActivationSource; testId?: string }) {
+  // Figures are modelled in USD. A CAD visitor sees them converted at CAD_PER_USD and labelled CAD (data-currency-fixed keeps the page-wide relabeller off).
+  const cad = useCurrency().currency === "cad";
+  const $ = (n: number) => module$(cad ? n * CAD_PER_USD : n);
   const lo = block.now.min;
   const hi = Math.max(block.later.max, lo + 1);
   const pct = (n: number) => `${Math.min(100, Math.max(0, ((n - lo) / (hi - lo)) * 100))}%`;
@@ -92,7 +98,7 @@ export function ActivationRange({ kind, block, source, testId }: { kind: "advert
   const title = kind === "publisher" ? "Hub earnings" : "Supplier exposure value";
   const srcLabel = source === "friday" ? "From your report" : source === "sample" ? "Sample · example values" : "Preview · modelled estimate";
   return (
-    <section data-testid={testId ?? `activation-${kind}`} data-source={source === "friday" ? "report" : source} className="rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm">
+    <section data-currency-fixed data-testid={testId ?? `activation-${kind}`} data-source={source === "friday" ? "report" : source} className="rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm">
       <div className="flex flex-wrap items-center gap-2">
         <h3 className="font-display text-xl">{title}</h3>
         <EstimateTag />
@@ -116,7 +122,7 @@ export function ActivationRange({ kind, block, source, testId }: { kind: "advert
         </figure>
       </div>
       <p className="mt-2 text-[11px] text-muted-foreground">
-        Now {$(block.now.min)}–{$(block.now.max)}, later {$(block.later.min)}–{$(block.later.max)}{per} USD. {kind === "publisher" ? "Now = the surfaces you switched on; later = every surface live." : "Now = channels live in your markets today; later = channels as they open (e.g. Street Team: Ontario now, Canada later)."} Estimates, not guarantees.
+        Now {$(block.now.min)}–{$(block.now.max)}, later {$(block.later.min)}–{$(block.later.max)}{per} {cad ? "CAD" : "USD"}. {kind === "publisher" ? "Now = the surfaces you switched on; later = every surface live." : "Now = channels live in your markets today; later = channels as they open (e.g. Street Team: Ontario now, Canada later)."} Estimates, not guarantees.
       </p>
     </section>
   );
