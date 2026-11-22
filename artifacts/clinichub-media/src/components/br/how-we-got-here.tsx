@@ -3,25 +3,8 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { LOOK_HREF } from "@/components/br/pricing";
 
-export const HOW_WE_GOT_HERE = {
-  eyebrow: "How we got here",
-  steps: [
-    "We tested post-checkout and retail-adjacent surfaces and saw strong engagement across categories.",
-    "Seeing how well captive audiences convert after purchase, we started talking with a lot of recovery brands.",
-    "We asked: what if an organic, service co-branded layer made the post-purchase moment free and valuable, and helped brands sell more of their own products through a trusted clinic layer?",
-    "From there, it rapidly opened up lots of captive cross-promotional audiences who wanted to work together.",
-    "Brands will share audiences with each other when there's a mutual reason to. Co-branded hubs became that reason.",
-    "We rolled that into something bigger: one combined private audience.",
-    "Then we added more ways to activate, like our Street Team, on-site and door to door.",
-    "We started in recovery, built on our team's experience opening and scaling digital-first clinics, with vertical integration to curate providers quickly.",
-    "That clinic layer became the foundation. Hubs are now turning into inventory that can be monetized immediately, at low or zero incremental cost to the brand.",
-    "The same systems and GTM expertise we use to sign and onboard partners now power our ad product and the $3,500+ USD partnership bot setup.",
-  ],
-  note: "Internal testing that informed the product, not campaign results or current sold performance.",
-  cta: "Start with the $190 USD 7-day look",
-  more: "See the full story",
-  less: "Show less",
-} as const;
+import { HOW_WE_GOT_HERE } from "../../../../api-server/src/lib/overhaul/proofContent";
+export { HOW_WE_GOT_HERE };
 
 const VISIBLE_MOBILE = 4;
 

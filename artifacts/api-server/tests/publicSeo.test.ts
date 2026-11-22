@@ -496,3 +496,28 @@ test("no seat counts: /terms copy and insight rewrite", async () => {
   assert.match(src, /reserve-490 is a shared self-serve category reserve; it does not lock the category\./);
   assert.equal(rewriteExclusiveInsightCopy("x Eight category seats sit inside listed Scale Health hubs. y"), "x Shared category reserves sit inside listed Scale Health hubs. y");
 });
+
+// Nov 21 2026 (t450u): proof modules are in the no-JS HTML and llms files, with visitor rules intact.
+test("no-JS shell carries origin story, track record, GTM and the example report on / and /media-kit", async () => {
+  const { withProofShell, llmsProofSection } = await import("../src/lib/overhaul/proofContent");
+  const shell = `<body><div id="root"><main><h1>Birch Reserve</h1><p>stub</p></main></div></body>`;
+  for (const path of ["/", "/media-kit"]) {
+    const html = withProofShell(shell, path);
+    assert.match(html, /How we got here/);
+    assert.match(html, /Track record/);
+    assert.match(html, /19 days/);
+    assert.match(html, /hand over the keys/i);
+    assert.match(html, /Example report · illustrative numbers, not results/);
+    assert.match(html, /unaudited/);
+  }
+  assert.equal(withProofShell(shell, "/rates"), shell);
+  const txt = llmsProofSection();
+  for (const bad of [/Align|Clairvoyant|Alset|MedVibe|Friday|pier39|STREET100/i, /guarantee(?!d)/i, /\b80 locations\b/i]) assert.doesNotMatch(txt, bad);
+  assert.match(txt, /How we got here/);
+  assert.match(txt, /Track record/);
+  const full = await (await fetch(`${origin}/llms-full.txt`)).text();
+  assert.match(full, /How we got here/);
+  assert.match(full, /What your flight report shows/);
+  const short = await (await fetch(`${origin}/llms.txt`)).text();
+  assert.match(short, /Track record/);
+});
