@@ -101,3 +101,10 @@ test("eval set: 25+ questions, unique ids, and the checker catches real failures
   assert.ok(checkAnswer(start, good.replace("scalehealth.ca", "birchreserve.net"), "scale").some((f: string) => /scale-links|off-domain/.test(f)));
   assert.deepEqual(extractLinks("[A](https://x.com/a) and https://y.com/b."), ["https://x.com/a", "https://y.com/b"]);
 });
+
+test("QA marker: the BirchQA/1 user-agent token (or the secret header) marks a chat as QA", async () => {
+  const { isQaMarked } = await import("../src/lib/testTraffic");
+  const req = (ua: string) => ({ get: (h: string) => (h.toLowerCase() === "user-agent" ? ua : undefined) });
+  assert.equal(isQaMarked(req("Mozilla/5.0 Chrome/124 BirchQA/1")), true);
+  assert.equal(isQaMarked(req("Mozilla/5.0 Chrome/124")), false);
+});

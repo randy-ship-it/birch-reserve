@@ -46,6 +46,15 @@ export function hasQaUaToken(req: Pick<Request, "get">): boolean {
   return /\bBirchQA\/\d/.test(req.get("user-agent") ?? "");
 }
 
+/**
+ * QA-marked chat traffic (Randy, Nov 21 2026 7:03 PM ET: eval runs must never touch the pulse, transcripts or leads):
+ * the secret X-Birch-QA header or the BirchQA/1 user-agent token. The token only marks the sender's own traffic as test,
+ * so honouring it can only suppress writes, never create them.
+ */
+export function isQaMarked(req: Pick<Request, "get">): boolean {
+  return hasValidQaHeader(req) || hasQaUaToken(req);
+}
+
 export type TestIdentity = {
   email?: string | null;
   name?: string | null;

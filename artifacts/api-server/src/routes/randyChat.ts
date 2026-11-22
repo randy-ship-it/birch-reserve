@@ -24,7 +24,7 @@ import {
   type QualifyAnswers,
 } from "../lib/randyChatTranscripts";
 import { captureChatLead } from "../lib/leadCapture";
-import { hasValidQaHeader } from "../lib/testTraffic";
+import { hasValidQaHeader, isQaMarked } from "../lib/testTraffic";
 import { FRIENDLY_429, LIMITS, limiter } from "../lib/rateLimit";
 import { attributionFrom } from "../lib/publicGuards";
 import { MIRROR_ORIGIN_HOSTS } from "../middlewares/mirrorHost";
@@ -625,6 +625,8 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
   const body = parsed.body;
   // X-Birch-QA → the session is stored as is_test (never emailed / pushed).
   const qa = hasValidQaHeader(req);
+  // QA-marked (secret header or BirchQA/1 UA): never writes the pulse, transcripts, leads or alerts. Rate limits still apply to the UA token.
+  const qaMarked = isQaMarked(req);
   const testFlag = qa ? { isTest: true } : {};
 
   if (!qa) {
@@ -642,11 +644,11 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
   // Activity pulse: one event per chat, on the visitor's first message. Topic key only; the text is never stored.
   {
     const users = body.messages.filter((m) => m.role === "user");
-    if (!qa && users.length === 1 && typeof users[0]!.content === "string") void recordPulse(chatTopic(users[0]!.content), null, { region: coarseRegion((h) => req.get(h)) });
+    if (!qaMarked && users.length === 1 && typeof users[0]!.content === "string") void recordPulse(chatTopic(users[0]!.content), null, { region: coarseRegion((h) => req.get(h)) });
   }
 
   if (isAiDisabled()) {
-    if (body.sessionId) {
+    if (body.sessionId && !qaMarked) {
       void recordTranscript({ id: body.sessionId, messages: body.messages, ...testFlag, ...(body.pagePath ? { pagePath: body.pagePath } : {}) });
     }
     res.status(503).json(disabledPayload("disabled", "Randy chat AI disabled (RANDY_CHAT_AI_DISABLED)."));
@@ -655,7 +657,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
 
   const apiKey = getXaiApiKey();
   if (!apiKey) {
-    if (body.sessionId) {
+    if (body.sessionId && !qaMarked) {
       void recordTranscript({ id: body.sessionId, messages: body.messages, ...testFlag, ...(body.pagePath ? { pagePath: body.pagePath } : {}) });
     }
     res.status(503).json(disabledPayload("missing_key", "Randy chat AI unavailable (missing XAI_API_KEY)."));
@@ -675,7 +677,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
       text = swapForBrand(birchFaqAnswer(body.messages).text, brand);
     }
     if (callback) {
-      const alert = await sendChatCallbackAlert(callback, body, qa);
+      const alert = await sendChatCallbackAlert(callback, body, qaMarked);
       req.log?.info({ kind: "chat_callback", alert: alert.status }, "Randy chat call-back submitted");
       if (alert.status !== "sent") text = `${text}\n\nIf the request didn't go through, call ${BIRCH_SALES_PHONE}.`;
     }
@@ -686,7 +688,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
       ...(offerHandoff ? { offerHandoff: true } : {}),
     };
 
-    if (body.sessionId) {
+    if (body.sessionId && !qaMarked) {
       // recordTranscript never throws; bound it so a slow DB can't push the reply
       // past the widget's 25s timeout.
       await settleWithin(
@@ -728,11 +730,11 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
     const faq = birchFaqAnswer(body.messages);
     let text = swapForBrand(faq.text, brand);
     if (faq.callback) {
-      const alert = await sendChatCallbackAlert(faq.callback, body, qa);
+      const alert = await sendChatCallbackAlert(faq.callback, body, qaMarked);
       req.log?.info({ kind: "chat_callback", alert: alert.status, source: "faq" }, "Randy chat call-back submitted");
       if (alert.status !== "sent") text = `Sorry, that didn't go through. Please call ${BIRCH_SALES_PHONE} or email randy@scalehealth.ca.`;
     }
-    if (body.sessionId) {
+    if (body.sessionId && !qaMarked) {
       void recordTranscript({ id: body.sessionId, messages: [...body.messages, { role: "assistant", content: text }], ...testFlag, ...(body.pagePath ? { pagePath: body.pagePath } : {}) });
     }
     res.status(200).json({ text, source: "faq" } satisfies RandyChatSuccess);
@@ -758,6 +760,11 @@ router.post("/launch/randy-chat/event", async (req, res): Promise<void> => {
     return;
   }
   const b = parsed.body;
+  if (isQaMarked(req)) {
+    // QA-marked: acknowledged, never stored, emailed or pushed (no transcript, lead or alert).
+    res.status(200).json({ ok: true, qa: true });
+    return;
+  }
   ensureTranscriptSweepTimer();
   await recordTranscript({
     id: b.sessionId,
