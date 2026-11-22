@@ -40,7 +40,7 @@ export function StreetTeamProgram({ where }: { where: "home" | "page" }) {
                 </span>
                 <p className="mt-2 font-display text-xl text-[#0b1f3a]">{t.name}</p>
                 <p className="mt-1 text-sm text-foreground/70">{t.short}</p>
-                <details className="mt-2 text-[12px] text-foreground/70">
+                <details className="mt-auto pt-2 text-[12px] text-foreground/70">
                   <summary className="cursor-pointer font-semibold text-[#0b1f3a]">Details</summary>
                   <p className="mt-1.5 leading-snug">{t.detail}</p>
                 </details>

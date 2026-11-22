@@ -29,10 +29,18 @@ export function LiveHubGrid({ light = true, dense = false }: { light?: boolean; 
     <div className={`grid sm:grid-cols-2 ${dense ? "grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4" : "gap-3"}`} data-testid="live-hub-grid">
       {LIVE_HUB_TILES.map((h) => (
         <a key={h.tid} href={h.href} target="_blank" rel="noopener" data-testid={h.tid} className={`group block overflow-hidden rounded-2xl border shadow-sm transition hover:shadow-lg ${light ? "border-[#0b1f3a]/10 bg-white" : "border-foreground/15 bg-white"}`} aria-label={`Visit the ${h.name} hub`}>
-          <HubThumb h={h} />
+          {/* Dense: the Live label sits on the thumbnail so every card keeps one tidy name row (no stacked badge). */}
+          <span className="relative block">
+            <HubThumb h={h} />
+            {dense ? <span className="absolute left-2 top-2 whitespace-nowrap rounded-full bg-lime-200 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#0b1f3a] shadow-sm" data-testid={`${h.tid}-live`}>Live</span> : null}
+          </span>
           <span className={`flex items-center justify-between ${dense ? "gap-1.5 px-2.5 py-2 sm:gap-3 sm:px-3" : "gap-3 px-4 py-3"}`}>
             <span className="min-w-0">
-              <span className={`flex flex-wrap items-center gap-x-2 gap-y-0.5 font-bold text-[#0b1f3a] ${dense ? "text-sm" : ""}`}>{h.name} <span className="whitespace-nowrap rounded-full bg-lime-200 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#0b1f3a]">{dense ? "Live" : "Live · activating"}</span></span>
+              {dense ? (
+                <span className="block text-sm font-bold leading-tight text-[#0b1f3a] sm:truncate">{h.name}</span>
+              ) : (
+                <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 font-bold text-[#0b1f3a]">{h.name} <span className="whitespace-nowrap rounded-full bg-lime-200 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#0b1f3a]">Live · activating</span></span>
+              )}
               <span className="block truncate text-xs text-foreground/55">{h.host}</span>
             </span>
             <span className="shrink-0 text-sm font-semibold text-[#0b1f3a] group-hover:underline">Visit ↗</span>
