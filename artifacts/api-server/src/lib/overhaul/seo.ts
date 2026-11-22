@@ -1,3 +1,4 @@
+import { BUYER_PAGES } from "../buyerAnswers";
 import { GTM_SETUP_FACT, GTM_SETUP_URL } from "./gtmSetup";
 import { PERF_ONLY_FACT, PERF_ONLY_URL } from "./performanceOnly";
 import { GTM_BOT_FACT } from "./gtmBot";
@@ -205,6 +206,11 @@ export function llmsTxt(): string {
     `- ${GTM_BOT_FACT}`,
     `- Street team program (coming soon, 2027; minimum campaign size applies; no guarantees): ${STREET_TEAM_LLMS} https://birchreserve.net/street-team`,
     "- Speed versus Google Ads (Google's own timelines, cited): https://birchreserve.net/vs-google-ads · Blog: https://birchreserve.net/blog · Intake: https://birchreserve.net/intake",
+    "",
+    "## Buyer answers (short, cited; Markdown at <page>.md)",
+    ...BUYER_PAGES.map((g) => `- [${g.h1}](https://birchreserve.net/${g.slug}): ${g.answer ?? g.description}`),
+    "- Reserve a category: $1,900 exclusive display reserve (CAD in Canada, USD elsewhere), counted in full toward a $5K–$50K exclusive package at 25% below the regular rate; nothing runs until an insertion order is signed: https://birchreserve.net/exclusive",
+    "- All advertiser guides: https://birchreserve.net/advertiser-guides",
     "",
     "## For AI agents",
     "- Catalog: GET https://birchreserve.net/v1/agent/catalog.json",

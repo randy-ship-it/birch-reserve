@@ -58,6 +58,16 @@ export const PUBLIC_SITEMAP_PATHS = [
   "/recovery-device-advertising",
   "/post-purchase-ads-health-brands",
   "/health-wellness-retail-media-canada",
+  // Buyer answers + Scale Health category pages (Nov 22 2026; lib/buyerAnswers.ts).
+  "/advertise-to-recovery-patients-canada",
+  "/clinic-waiting-room-advertising",
+  "/meta-ads-alternatives-health-brands",
+  "/advertise-recovery-brands",
+  "/advertise-longevity-brands",
+  "/advertise-sleep-brands",
+  "/advertise-food-nutrition-brands",
+  "/advertise-medi-spa-brands",
+  "/advertise-pet-wellness-brands",
   // Blog (server-rendered, Nov 19 2026; lib/blogPosts.ts).
   "/blog",
   "/blog/paid-ads-are-fuel-not-a-fix",

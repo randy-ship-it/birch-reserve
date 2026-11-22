@@ -24,6 +24,7 @@
  * Without the query tag nothing changes: birchreserve.net serves byte-identical HTML.
  */
 import type { NextFunction, Request, Response } from "express";
+import { SCALE_AD_PARTNER_LINE, scaleText } from "../lib/scaleText";
 
 export const MIRROR_PREFIX = "/intake/_m";
 /** Scale Health's own site: the only place a mirror visitor leaves /intake for (Randy, Nov 22 2026 2:51 PM ET: everything stays on Scale). */
@@ -90,7 +91,7 @@ export function mirrorHtml(html: string, src: string): string {
   out = out.replace(/<a\b[^>]*>/gi, (tag) =>
     tag.replace(/\shref="(\/(?!\/)[^"]*)"/i, (m, v: string) => (/^\/intake(?:[/?#]|$)/.test(v) ? m : v === "/" ? ` href="${SCALE_SITE_ORIGIN}/"` : ` href="${MIRROR_PREFIX}${v}"`)),
   );
-  if (MIRROR_SKINS[src] === "scale") out = scaleHead(out);
+  if (MIRROR_SKINS[src] === "scale") out = scaleBody(scaleHead(out));
   const boot = mirrorBootScript(src);
   return /<head[^>]*>/i.test(out) ? out.replace(/<head[^>]*>/i, (h) => `${h}\n${boot}`) : `${boot}${out}`;
 }
@@ -106,6 +107,29 @@ export function scaleHead(html: string): string {
   out = out.replace(/<link\b[^>]*rel="icon"[^>]*>/gi, `<link rel="icon" type="image/svg+xml" href="${MIRROR_PREFIX}${SCALE_FAVICON}" />`);
   out = out.replace(/<\/head>/i, `<link href="${SCALE_FONT_HREF}" rel="stylesheet">\n</head>`);
   return out;
+}
+
+/** Scale logo for server-rendered pages (byte copy of attached_assets/brand/scalehealth-logo-srgb-v2.png). */
+export const SCALE_LOGO = "/brand/scale/scalehealth-logo.png";
+const SCALE_SERVER_CSS = `html[data-skin="scale"] body,html[data-skin="scale"] h1,html[data-skin="scale"] h2,html[data-skin="scale"] h3,html[data-skin="scale"] .step b,html[data-skin="scale"] .tile b{font-family:"Plus Jakarta Sans",system-ui,sans-serif!important}html[data-skin="scale"] .pill{background:#BFF3D6;color:#0B6B43}html[data-skin="scale"] .tile b{color:#7EE2B1}html[data-skin="scale"] .cmp tr.us td{background:#ECFBF3}.br-ad-partner{display:block;margin-top:8px;font-size:12px;opacity:.8}`;
+
+/**
+ * Scale voice on every server-rendered page opened through the mirror (Randy, Nov 22 2026 5:31 PM ET: "ditto on
+ * ScaleHealth.ca"): visible prose says Scale Health, the BIRCH RESERVE wordmark becomes the Scale logo, and the
+ * footer gets the ad-partner disclosure line (the only place Birch Reserve is named). SPA shells are re-rendered by
+ * the client skin anyway; this covers /exclusive, /buycalc, /sponsor, /buy, guides, blog and friends.
+ */
+export function scaleBody(html: string): string {
+  const i = html.search(/<body\b/i);
+  if (i < 0) return html;
+  const head = html.slice(0, i);
+  let body = scaleText(html.slice(i));
+  body = body.replace(/(<a\b[^>]*>)\s*BIRCH RESERVE\s*(<\/a>)/g, (_m, a: string, end: string) => `${a}<img src="${MIRROR_PREFIX}${SCALE_LOGO}" alt="Scale Health" height="26" style="height:26px;width:auto;display:block">${end}`);
+  if (!/ad partner/i.test(body)) {
+    const line = `<span class="br-ad-partner">${SCALE_AD_PARTNER_LINE}</span>`;
+    body = /<\/div>\s*<\/footer>/i.test(body) ? body.replace(/<\/div>(\s*)<\/footer>/i, `${line}</div>$1</footer>`) : body.replace(/<\/footer>/i, `${line}</footer>`);
+  }
+  return `${head.replace(/<\/head>/i, `<style>${SCALE_SERVER_CSS}</style></head>`)}${body}`;
 }
 
 export function mirrorTagOf(req: Request): string | null {

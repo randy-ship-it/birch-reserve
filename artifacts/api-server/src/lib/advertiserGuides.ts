@@ -8,6 +8,8 @@
  * prescription-drug promotion.
  */
 
+import { BUYER_PAGES } from "./buyerAnswers";
+
 export type GuideSource = { label: string; url: string };
 export type GuideSection = { h2: string; paras?: string[]; bullets?: string[] };
 export type AdvertiserGuide = {
@@ -18,6 +20,19 @@ export type AdvertiserGuide = {
   lede: string;
   sections: GuideSection[];
   sources: GuideSource[];
+  /** Buyer-answer / category pages (lib/buyerAnswers.ts, Nov 22 2026). Optional; classic guides leave them out. */
+  group?: "answer" | "category";
+  /** Answer-first box under the H1 (the sentence an AI assistant should quote). */
+  answer?: string;
+  tiles?: { k: string; v: string }[];
+  compare?: { caption: string; head: string[]; rows: string[][] };
+  faq?: { q: string; a: string }[];
+  /** Small illustrative placement mock (no brand creative). */
+  mock?: boolean;
+  status?: string;
+  /** /exclusive category option to preselect (TWO_LANE_CATEGORIES label). */
+  exclusiveCategory?: string;
+  related?: { label: string; href: string }[];
 };
 
 export const GUIDES_INDEX_PATH = "/advertiser-guides";
@@ -238,5 +253,8 @@ export const ADVERTISER_GUIDES: AdvertiserGuide[] = [
     sources: [SRC.loblaw, SRC.hcNhp, SRC.hcRx],
   },
 ];
+
+export const CLASSIC_GUIDES: readonly AdvertiserGuide[] = [...ADVERTISER_GUIDES];
+ADVERTISER_GUIDES.push(...BUYER_PAGES);
 
 export const GUIDE_PATHS = ADVERTISER_GUIDES.map((g) => `/${g.slug}`);
