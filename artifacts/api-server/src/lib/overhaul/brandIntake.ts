@@ -35,6 +35,34 @@ export const SHARE_TIERS = [
 /** Hub share (%) at a monthly view count. */
 export const shareForViews = (views: number): number => [...SHARE_TIERS].reverse().find((t) => views >= t.fromViews)!.pct;
 
+/** Clinic services booked through a hub (BR-39, Randy Nov 22 2026 10:48 AM ET): the hub keeps half of what Scale Health charges. Plain copy only, no formula.
+ * Provider terms are unchanged. Scale voice on Scale; Birch names Scale Health clinic services. */
+export const SERVICES_SPLIT = {
+  hubPct: 50,
+  assessmentPrice: 49,
+  sessionPrice: 29,
+  /** Hub side, per booking. */
+  hubAssessment: 24.5,
+  hubSession: 14.5,
+  /** Scale-voice sentence (also the neutral one used in popovers). */
+  line: "Clinic services booked through your hub: you keep half of what Scale Health charges, $24.50 per $49 assessment and $14.50 per $29 session.",
+  /** Birch-voice sentence. */
+  birchLine: "Scale Health clinic services booked through your hub: you keep half of what Scale Health charges, $24.50 per $49 assessment and $14.50 per $29 session.",
+} as const;
+
+/** Hub onboarding fee framing (BR-39 follow-up, Randy Nov 22 2026 11:23 AM ET). Same $5,000 USD figure as the supplier "Stand-up fee" (SUPPLIER_FEES).
+ * Larger hubs (the 1MM+ views tier) have it waived as a favour: still free to launch. Smaller hubs: it may apply. Never a guarantee. */
+export const HUB_ONBOARDING = {
+  feeUsd: 5000,
+  waiverFromViews: 1_000_000,
+  target: "Our target hubs are in the 50%+ payout range.",
+  smaller: "Smaller hubs are welcome. A $5,000 USD onboarding fee may apply, and it can be harder to waive.",
+  larger: "For larger hubs it's on us: the $5,000 USD onboarding fee is waived as a thank-you, so it's free to launch. The waiver is reserved for hubs at 1MM+ views a month.",
+  chipLarge: "onboarding fee waived: free to launch, our gift to larger hubs.",
+  chipSmall: "A $5,000 USD onboarding fee may apply to smaller hubs.",
+} as const;
+export const onboardingWaived = (views: number) => views >= HUB_ONBOARDING.waiverFromViews;
+
 export const PAYOUT = {
   basePct: 70,
   line: "Hubs earn 70% of media revenue, rising to 75% at 1MM views a month, 80% at 3MM and 85% at 5MM.",
@@ -176,6 +204,7 @@ export const PUBLISHER_ASSUMPTIONS = [
   `CPC mode uses the midpoint of each placement's modelled engagement range. Ranges, not promises.`,
   `Your payout: ${PAYOUT.basePct}% of media revenue under 1MM views a month, ${SHARE_TIERS[1].pct}% at 1MM+, ${SHARE_TIERS[2].pct}% at 3MM+, ${SHARE_TIERS[3].pct}% at 5MM+, paid at the tier you reach (flat rate, like ad networks). Modelled; the hub agreement governs.`,
   `Transactions (bookings, products) use only the numbers you enter. Leave them at 0 to skip.`,
+  `${SERVICES_SPLIT.line} Modelled; the hub agreement governs.`,
   `Estimates only. Not a guarantee of views, clicks, sales or payouts. Payouts follow the hub agreement.`,
 ];
 

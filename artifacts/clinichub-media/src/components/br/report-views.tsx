@@ -22,6 +22,7 @@ import { Details } from "@/components/br/details";
 import { useCurrency } from "@/lib/currency";
 import { CART_PRESETS, COMPARE_SOURCES, DEFAULT_INPUTS, EMAIL, SELL_BAND, SENDS_PER_MONTH, defaultVisitors, estimateHub, type Level } from "../../../../api-server/src/lib/overhaul/hubEstimate";
 import { HubDifferentiators } from "@/components/br/hub-differentiators";
+import { HubOnboardingNote } from "@/components/br/hub-onboarding";
 import { PERFORMANCE_RANGES } from "../../../../api-server/src/lib/overhaul/proofContent";
 import { saveHubEstimate } from "@/lib/hubEstimateNote";
 import { CAD_PER_USD } from "../../../../api-server/src/lib/overhaul/model";
@@ -355,7 +356,8 @@ export function HubView({ cta }: { m?: ReportModel; exposure?: FridayExposure; c
             <p className="mt-3 text-[12px] text-white/70" data-testid="hub-range">Range {mny(o.earn.low, cad)}–{mny(o.earn.high, cad)} a month.</p>
           </>
         ) : <p className="mt-3 text-[15px] text-white/85">Add your orders or visitors to see an estimate.</p>}
-        {has ? <div className="mt-5"><HubDifferentiators dark /></div> : null}
+        {has ? <HubOnboardingNote views={o.views} compact dark /> : null}
+        {has ? <div className="mt-4"><HubDifferentiators dark /></div> : null}
         <Details dark label="How we estimate this" testId="hub-details">
           <p><strong className="text-white">Views</strong> come from your answers: orders = thank-you and confirmation page views; visitors drive hub home, product and services pages; returning members follow orders; email views are opens = list × {SENDS_PER_MONTH} sends × a {Math.round((EMAIL.openRate.lo + EMAIL.openRate.hi) / 2)}% open rate (midpoint of public health and fitness benchmarks).</p>
           <p><strong className="text-white">Earnings</strong> = views × the share of space sold ({SELL_BAND[0]}–{SELL_BAND[2]}%, midpoint {SELL_BAND[1]}%: from our {SELL_BAND[0]}% ramp assumption up to the bottom of the 60–80% direct sell-through target Google News Initiative cites) × the published starter price per 1,000 views × your {o.sharePct}% share (70% under 1MM views a month, 75% at 1MM+, 80% at 3MM+, 85% at 5MM+, a flat rate at the tier you reach). The range uses the low and high ends of both. Brand sales are value for brands and are not added to your earnings.</p>
