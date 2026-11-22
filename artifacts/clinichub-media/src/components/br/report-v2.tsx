@@ -359,8 +359,8 @@ export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposur
     const sides = [m.isSupplier ? "supplier" : null, m.isPublisher ? "hub" : null].filter(Boolean) as string[];
     return (
       <section data-testid="report-two-sides" data-first={sides[0]} data-sides={sides.join(",")} data-accelerate={m.isAccelerate ? "true" : "false"} style={{ fontFamily: RT_SANS }}>
-        <h2 className="text-[26px] md:text-[34px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{m.isSupplier && m.isPublisher ? "Both answers from one form: your exposure + your hub earnings" : m.isSupplier ? "Your supplier exposure" : "Your hub: max exposure + earnings"}</h2>
-        <p className="text-[13px]" style={{ color: RT.mute }} data-testid="two-sides-plan">Estimates in USD. {MODELLED_PLAN_LABEL}.</p>
+        <h2 className="text-[26px] md:text-[34px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{m.isSupplier && m.isPublisher ? "Your exposure and your hub earnings" : m.isSupplier ? "Your supplier exposure" : "Your hub earnings"}</h2>
+        <p className="text-[13px]" style={{ color: RT.mute }} data-testid="two-sides-plan">Estimates, not guarantees. {MODELLED_PLAN_LABEL}.</p>
         <div className={`mt-4 grid items-start gap-4 ${sides.length > 1 ? "lg:grid-cols-2" : ""}`}>
           {m.isSupplier ? <SupplierExposureView key="sup" m={m} exposure={ex} source={src} cta={supplierCta} onAccelerate={onAccelerate} physical={physical} /> : null}
           {m.isPublisher ? <HubView key="hub" m={m} exposure={ex} cta={earnCta} physical={physical} /> : null}
@@ -384,7 +384,7 @@ export function ReportV2({ report, sample, map, costExtra, earnCta, supplierCta,
     <div data-testid={sample ? "report-v2-sample" : "report-v2"} className="space-y-8 p-3 md:p-6" style={{ background: RT.paper, borderRadius: 24 }}>
       <ReportHero m={m} sample={sample} />
       {afterHero}
-      <ChannelTilesV2 m={m} map={map} />
+      {compact ? <Details label="Where it fits: network reach" testId="report-reach-details" className="!mt-0 text-[13px]"><ChannelTilesV2 m={m} map={map} /></Details> : <ChannelTilesV2 m={m} map={map} />}
       {compact ? null : <HubCards m={m} />}
       <TwoSides m={m} costExtra={costExtra} earnCta={earnCta} supplierCta={supplierCta} exposure={exposure} exposureSource={exposureSource} onAccelerate={onAccelerate} physical={physical} />
     </div>

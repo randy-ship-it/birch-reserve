@@ -96,14 +96,18 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
       <div className="container mx-auto px-4 pb-12 pt-6" style={{ fontFamily: RT_SANS }} data-testid="sample-kit">
         <span className="rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider" style={{ background: RT.mint, color: RT.forest }} data-testid="sample-label">Sample · example values only</span>
         <h2 className="mt-3 text-3xl md:text-5xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you get.</h2>
-        <Details testId="sample-details"><p>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range in USD, not a result or a guarantee.</p></Details>
+        <Details testId="sample-details"><p>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range, not a result or a guarantee.</p></Details>
         <div className="mt-4"><ReportV2 report={sample} sample compact exposure={SAMPLE_EXPOSURE} exposureSource="sample" /></div>
         {sup ? null : <div className="mt-10" data-testid="intake-next-step"><NextStep where="intake" yieldToPostKit /></div>}
         {sup ? null : (
           <div className="mt-10 space-y-8" style={{ fontFamily: "inherit" }} data-testid="intake-market-signals">
             <div className="hidden min-h-[6.5rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div>
-            <CategoriesWeServe />
-            <QuestionsBrandsAskCompact testId="intake-questions-compact" />
+            <Details label="Categories we serve and questions brands ask" testId="intake-more-details" className="text-[14px]">
+              <div className="space-y-8 pt-3">
+                <CategoriesWeServe />
+                <QuestionsBrandsAskCompact testId="intake-questions-compact" />
+              </div>
+            </Details>
           </div>
         )}
         {/* GTM setup packages (Randy Nov 21 2026): same shared block as home + media kit, below the main intake options. */}
