@@ -20,7 +20,7 @@ import { PUBLISHER_SURFACES, RETAIL_COPY, RETAIL_TAG, STREET_REACH_LINE } from "
 import type { ReportModel } from "@/components/br/report-v2";
 import { Details } from "@/components/br/details";
 import { useCurrency } from "@/lib/currency";
-import { CART_PRESETS, DEFAULT_INPUTS, SELL_BAND, SENDS_PER_MONTH, defaultVisitors, estimateHub, type Level } from "../../../../api-server/src/lib/overhaul/hubEstimate";
+import { CART_PRESETS, DEFAULT_INPUTS, EMAIL, SELL_BAND, SENDS_PER_MONTH, defaultVisitors, estimateHub, type Level } from "../../../../api-server/src/lib/overhaul/hubEstimate";
 import { PAYOUT } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { PERFORMANCE_RANGES } from "../../../../api-server/src/lib/overhaul/proofContent";
 import { saveHubEstimate } from "@/lib/hubEstimateNote";
@@ -282,8 +282,8 @@ export function HubView({ cta }: { m?: ReportModel; exposure?: FridayExposure; c
   const levels: Array<[Level, string]> = [["low", "Low"], ["typical", "Typical"], ["high", "High"]];
   const ctrB = PERFORMANCE_RANGES.rows[0]!.ctr, cvB = PERFORMANCE_RANGES.rows[0]!.conversion;
   const chain: Array<[string, string, string]> = [
-    ["Views", compact(o.views), "a month on your hub"],
-    ["Clicks", compact(o.clicks), `${+o.ctrPct.toFixed(1)}% of offers shown`],
+    ["Views", compact(o.views), "page views and email opens a month"],
+    ["Clicks", compact(o.clicks), `about ${+o.ctrPct.toFixed(1)}% click on offers shown`],
     ["Orders", compact(o.orders), `${+o.convPct.toFixed(1)}% of clicks`],
     ["Sales for brands", mny(o.sales, cad), `at a $${grp(cartVal)} order`],
   ];
@@ -308,7 +308,7 @@ export function HubView({ cta }: { m?: ReportModel; exposure?: FridayExposure; c
               {([[true, "Yes"], [false, "No"]] as const).map(([v, l]) => <button key={l} type="button" aria-pressed={news === v} onClick={() => setNews(v)} data-testid={`hub-news-${l.toLowerCase()}`} className="h-12 rounded-xl text-[15px] font-bold" style={seg(news === v)}>{l}</button>)}
             </div>
             {news ? <input data-testid="hub-list" aria-label="Email list size" inputMode="numeric" className={field} style={{ borderColor: RT.line }} value={list} onChange={(e) => setList(e.target.value)} onBlur={() => setList(grp(num(list)))} placeholder="List size" /> : null}
-            {news ? <span className="mt-1 block text-[11px] font-normal" style={{ color: RT.mute }}>Email list size. We assume {SENDS_PER_MONTH} sends a month.</span> : null}
+            {news ? <span className="mt-1 block text-[11px] font-normal" style={{ color: RT.mute }}>Email list size. We assume {SENDS_PER_MONTH} sends a month and about a third opened.</span> : null}
           </div>
           <label className="block text-[13px] font-bold" style={{ color: RT.ink }}>Locations <span className="font-normal" style={{ color: RT.mute }}>(optional)</span>
             <input data-testid="hub-locations" inputMode="numeric" className={field} style={{ borderColor: RT.line }} placeholder="e.g. 3" value={locations} onChange={(e) => setLocations(e.target.value)} />
@@ -356,9 +356,10 @@ export function HubView({ cta }: { m?: ReportModel; exposure?: FridayExposure; c
           </>
         ) : <p className="mt-3 text-[15px] text-white/85">Add your orders or visitors to see an estimate.</p>}
         <Details dark label="How we estimate this" testId="hub-details">
-          <p><strong className="text-white">Views</strong> come from your answers: orders = thank-you and confirmation views; visitors drive hub home, product and services pages; returning members follow orders; email = list size × {SENDS_PER_MONTH} sends.</p>
+          <p><strong className="text-white">Views</strong> come from your answers: orders = thank-you and confirmation page views; visitors drive hub home, product and services pages; returning members follow orders; email views are opens = list × {SENDS_PER_MONTH} sends × a {Math.round((EMAIL.openRate.lo + EMAIL.openRate.hi) / 2)}% open rate (midpoint of public health and fitness benchmarks).</p>
           <p><strong className="text-white">Earnings</strong> = views × the share of space sold ({SELL_BAND[0]}–{SELL_BAND[2]}%, planning assumption {SELL_BAND[1]}%) × the published starter price per 1,000 views × your {PAYOUT.basePct}% share. The range uses the low and high ends of both. Brand sales are value for brands and are not added to your earnings.</p>
-          <p><strong className="text-white">Clicks and orders</strong> use the estimated ranges on this site (post-purchase {ctrB.lo}–{ctrB.hi}% clicks and {cvB.lo}–{cvB.hi}% conversion; hub and email placements {PERFORMANCE_RANGES.rows[2]!.ctr.lo}–{PERFORMANCE_RANGES.rows[2]!.ctr.hi}% and {PERFORMANCE_RANGES.rows[2]!.conversion.lo}–{PERFORMANCE_RANGES.rows[2]!.conversion.hi}%), at the low, middle or high end, on the offers actually shown. Sales = orders × your average order value.</p>
+          <p><strong className="text-white">Clicks and orders</strong> apply only to the offers actually shown, so the click rate is on that share of views, not on all of them. Thank-you and confirmation pages average our post-purchase and thank-you ranges ({ctrB.lo}–{ctrB.hi}% and {PERFORMANCE_RANGES.rows[1]!.ctr.lo}–{PERFORMANCE_RANGES.rows[1]!.ctr.hi}% clicks, {cvB.lo}–{cvB.hi}% and {PERFORMANCE_RANGES.rows[1]!.conversion.lo}–{PERFORMANCE_RANGES.rows[1]!.conversion.hi}% conversion). Hub home, dashboard, product and services pages use the activation range ({PERFORMANCE_RANGES.rows[2]!.ctr.lo}–{PERFORMANCE_RANGES.rows[2]!.ctr.hi}% clicks, {PERFORMANCE_RANGES.rows[2]!.conversion.lo}–{PERFORMANCE_RANGES.rows[2]!.conversion.hi}% conversion). Email uses health and fitness benchmarks of {EMAIL.clickPerSend.lo}–{EMAIL.clickPerSend.hi}% clicks per send and {EMAIL.openRate.lo}–{EMAIL.openRate.hi}% opens, and assumes one sponsored slot gets {EMAIL.slotShare.lo}–{EMAIL.slotShare.hi}% of an email's clicks (our assumption). Sales = orders × your average order value.</p>
+          <p className="text-[11px]">Sources: {EMAIL.sources.map((x, i) => <span key={x.url}>{i ? "; " : ""}<a href={x.url} target="_blank" rel="noopener noreferrer" className="underline">{x.label}</a></span>)}.</p>
           <p>Every figure is monthly; a year is 12 months at that run-rate. {cad ? "Shown in CAD, converted from our USD model at 1.4 CAD per USD." : "Shown in USD."} A planning estimate, not a quote, forecast or guarantee.</p>
         </Details>
         {cta ? <div className="mt-4">{cta}</div> : null}
