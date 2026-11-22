@@ -15,7 +15,9 @@ import { PERFORMANCE_RANGES } from "./proofContent";
 
 export type Level = "low" | "typical" | "high";
 export const SENDS_PER_MONTH = 4; // visible planning assumption for newsletter views = list size x sends
-export const SELL_BAND = [SELL_ASSUMPTION_PCT / 2, SELL_ASSUMPTION_PCT, SELL_ASSUMPTION_PCT * 1.5] as const;
+/** Share of views that carry a paid brand offer. Low = our 20% planning assumption (ramp); High = 60%, the bottom of the 60-80% direct
+ * sell-through Google News Initiative gives as a target for a well-run direct-sold business; Likely = the midpoint, 40%. */
+export const SELL_BAND = [SELL_ASSUMPTION_PCT, SELL_ASSUMPTION_PCT * 2, SELL_ASSUMPTION_PCT * 3] as const;
 export const CART_PRESETS = [50, 80, 120, 200] as const;
 
 const surf = (k: string) => PUBLISHER_SURFACES.find((s) => s.key === k)!;
@@ -103,3 +105,13 @@ export function estimateHub(inp: HubInputs): HubOut {
     grossMedia: share ? earn.likely / share : 0,
   };
 }
+
+/** Benchmarks behind the "Compared with typical publisher earnings" line. */
+export const COMPARE_SOURCES = [
+  { label: "EarnifyHub 2026: health and wellness RPM $25-38 Mediavine, $30-45 Raptive, $14-25 Ezoic", url: "https://earnifyhub.com/blog/blogging/mediavine-vs-raptive-vs-ezoic-rpm" },
+  { label: "Revenue By AdApp: health and wellness page RPM about $5-9 (conservative)", url: "https://www.revenuebyadapp.com/estimates/mediavine/health" },
+  { label: "Google News Initiative: direct-sold CPMs $10-20 at 60-80% sell-through", url: "https://newsinitiative.withgoogle.com/resources/trainings/estimate-ad-revenue/" },
+  { label: "Aftersell docs: Rokt Thanks earns merchants about $0.20-0.50 per order", url: "https://docs.aftersell.com/aftersell/earn-save" },
+  { label: "SenderCircle: wellness newsletter sponsorship about $15 per 1,000 opens", url: "https://sendercircle.com/guides/wellness-newsletter-advertising-rates" },
+  { label: "RMIQ citing BCG: onsite retail media retains 70-90% margin", url: "https://www.rmiq.net/glossary/retail-media-monetization/" },
+] as const;

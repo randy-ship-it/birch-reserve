@@ -30,11 +30,11 @@ function camp(p: Partial<Campaign> = {}): Campaign {
 test("rate card: CPM bills viewable impressions at the slot's own rate; exclusive is 25% off; CAD uses the 1.4 ladder", () => {
   const pp = findSlot("sole.post_purchase")!;
   const land = findSlot("sole.landing")!;
-  assert.equal(eventCostMicros(camp(), pp, "view"), 18_000); // $18 CPM → $0.018
+  assert.equal(eventCostMicros(camp(), pp, "view"), 30_000); // $30 CPM → $0.030
   assert.equal(eventCostMicros(camp(), land, "view"), 4_000); // substitute slot billed at its own $4 CPM
   assert.equal(eventCostMicros(camp(), pp, "click"), 0);
-  assert.equal(eventCostMicros(camp({ rateMultiplierBps: 7500 }), pp, "view"), 13_500);
-  assert.equal(eventCostMicros(camp({ currency: "cad" }), pp, "view"), 25_200);
+  assert.equal(eventCostMicros(camp({ rateMultiplierBps: 7500 }), pp, "view"), 22_500);
+  assert.equal(eventCostMicros(camp({ currency: "cad" }), pp, "view"), 42_000);
   assert.equal(eventCostMicros(camp({ pricing: "cpc" }), pp, "click"), 1_200_000);
 });
 
@@ -99,7 +99,7 @@ test("full flow on Postgres: serve → viewable → click → conversion, ledger
   store.setAdPoolForTests(db as unknown as store.Queryable, "ads_test");
   resetServeCacheForTests();
   const now = Date.now();
-  const { campaign, created } = await store.createCampaign({ accountEmail: "Buyer@Brand.com", brand: "Brand Co", orderRef: "cs_test_1", orderKind: "sponsor pack", budgetMicros: 50_000, currency: "usd", primaryPlacement: "post_purchase", actor: "test" });
+  const { campaign, created } = await store.createCampaign({ accountEmail: "Buyer@Brand.com", brand: "Brand Co", orderRef: "cs_test_1", orderKind: "sponsor pack", budgetMicros: 80_000, currency: "usd", primaryPlacement: "post_purchase", actor: "test" });
   assert.equal(created, true);
   assert.equal((await store.createCampaign({ accountEmail: "x@y.z", brand: "dup", orderRef: "cs_test_1", budgetMicros: 1 })).created, false); // idempotent per order
   // Draft: nothing serves.
@@ -142,9 +142,9 @@ test("full flow on Postgres: serve → viewable → click → conversion, ledger
   assert.equal((await recordConversion({ source: "pixel", pixel: pixelId("buyer@brand.com"), viewIds: [s.id], orderId: "o2", now: now + 7000 })).via, "view");
   const t = (await store.totalsByCampaign([campaign.id])).get(campaign.id)!;
   assert.deepEqual([t.serves, t.views, t.clicks, t.convs], [1, 1, 1, 2]);
-  assert.equal(t.spendMicros, 18_000);
+  assert.equal(t.spendMicros, 30_000);
   assert.equal(t.convValueMicros, 49_990_000);
-  // No overspend: budget 50,000 micros = 2 more views at $18 CPM, then it stops and completes.
+  // No overspend: budget 80,000 micros = 1 more view at $30 CPM, then it stops and completes.
   let billed = 0;
   for (let i = 0; i < 6; i += 1) {
     resetServeCacheForTests();
@@ -155,15 +155,15 @@ test("full flow on Postgres: serve → viewable → click → conversion, ledger
   assert.equal(billed, 1);
   const after = (await store.getCampaign(campaign.id))!;
   assert.ok(after.spentMicros <= after.budgetMicros);
-  assert.equal(after.spentMicros, 36_000);
+  assert.equal(after.spentMicros, 60_000);
   // Ledger: one credit, hourly charge lines that net to spend.
   const led = await store.ledger({ campaignId: campaign.id });
   assert.equal(led.filter((l) => l.kind === "credit").length, 1);
   assert.equal(-led.filter((l) => l.kind === "charge").reduce((a, l) => a + l.amountMicros, 0), after.spentMicros);
   // Royalties: seeded default (20% override, hub 35% of net); held until the hub's payout gate passes; approve records only.
   let roy = (await store.royalties()).find((r) => r.partner === "SOLE")!;
-  assert.equal(roy.grossMicros, 36_000);
-  assert.equal(roy.payableMicros, 10_080);
+  assert.equal(roy.grossMicros, 60_000);
+  assert.equal(roy.payableMicros, 16_800);
   assert.equal(roy.status, "held");
   assert.equal(await store.approvePayout("SOLE", roy.month, "usd", "randy"), null);
   await store.setGate("SOLE", { live: true, hasTransactions: false, audienceActivated: false, override: true, note: "test release" }, "randy");
@@ -177,7 +177,7 @@ test("full flow on Postgres: serve → viewable → click → conversion, ledger
   const tcr = await store.addCreative({ campaignId: tc.id, mime: "image/png", width: 500, height: 500, data: png, alt: "", uploadedBy: "t", status: "approved" });
   assert.ok(tcr);
   await store.updateCampaign(tc.id, { status: "active", flightStart: new Date(now - DAY), flightEnd: new Date(now + DAY), clickUrl: "https://example.com" }, "t");
-  // The real campaign still has $0.014 left: too little for an $18 CPM view, enough for a $4 CPM substitute slot.
+  // The real campaign still has $0.020 left: too little for a $30 CPM view, enough for a $4 CPM substitute slot.
   resetServeCacheForTests();
   const sub = await serve({ slot: "sole.landing", ua: UA, origin: "https://birchreserve.net", now });
   assert.equal(sub.fill && sub.brand, "Brand Co");
@@ -232,7 +232,7 @@ test("hub on contract: becomes sellable at card rates, QA hub carries test campa
   if (!s.fill) return;
   const v = await recordView(new URL(s.view).searchParams.get("t"), UA, now + 1500);
   assert.equal(v.billed, true);
-  assert.equal((await store.getCampaign(campaign.id))!.spentMicros, 18_000);
+  assert.equal((await store.getCampaign(campaign.id))!.spentMicros, 30_000);
   const tr = await store.royalties(1, { testOnly: true });
   assert.equal(tr[0]!.partner, "QA Partner");
   assert.equal(tr[0]!.shareBps, 3500); // default hub share of net
@@ -303,7 +303,7 @@ test("statements: promo delivery earns nothing, gate holds until live+transactio
   const promo = (await store.createCampaign({ accountEmail: "p@brand.com", brand: "Promo", orderRef: "promo:1", orderKind: "promo STREET100", budgetMicros: 100_000_000, currency: "usd", primaryPlacement: "post_purchase", actor: "test" })).campaign;
   for (const c of [campaign, promo]) {
     const id = await store.insertEvent({ kind: "view", campaignId: c.id, slotKey: "sole.post_purchase", dedupeKey: `v:${c.id}`, isTest: false, at: new Date(now) });
-    assert.ok(await store.chargeEvent(id!, c, "sole.post_purchase", 18_000, new Date(now)));
+    assert.ok(await store.chargeEvent(id!, c, "sole.post_purchase", 30_000, new Date(now)));
   }
   let rows = await store.royalties(1);
   assert.equal(rows.length, 1); // promo delivery excluded
@@ -312,7 +312,7 @@ test("statements: promo delivery earns nothing, gate holds until live+transactio
   await store.setGate("SOLE", { live: true, hasTransactions: true, audienceActivated: true, override: false, note: null }, "test");
   rows = await store.royalties(1);
   assert.equal(rows[0]!.status, "calculated");
-  assert.equal(rows[0]!.payableMicros, Math.floor(18_000 * 0.8 * 0.35));
+  assert.equal(rows[0]!.payableMicros, Math.floor(30_000 * 0.8 * 0.35));
   assert.ok(await store.approvePayout(rows[0]!.partner, rows[0]!.month, "usd", "test"));
   const b = await store.createPayoutBatch("test");
   assert.equal(b.rows.length, 1);

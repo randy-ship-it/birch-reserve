@@ -79,9 +79,9 @@ export const SLOTS: Slot[] = [
     label: "Partner email module",
     where: "Native module in the hub brand's own customer email",
     size: "600×200 native",
-    cpmUsd: 30,
+    cpmUsd: 12,
     core: false,
-    comp: "Health and wellness newsletter sponsorships run $40–$100 per 1,000 sends.",
+    comp: "Priced per 1,000 opens. Newsletter sponsorships are commonly quoted per 1,000 opens or sends; see the cited benchmarks on the rate card.",
   },
   {
     key: "partner_site",
