@@ -1,5 +1,6 @@
 /** "Performance only" card (Randy voice, Nov 21 2026): short and visual, detail collapsed. Copy: api-server/src/lib/overhaul/performanceOnly.ts. */
 import { ArrowRight, Code2, ShoppingBag, Receipt, UserRound, Zap } from "lucide-react";
+import { skinChat } from "@/lib/siteSkin";
 import { Details } from "@/components/br/details";
 import { PERFORMANCE_ONLY as P, PERF_ONLY_HREF } from "../../../../api-server/src/lib/overhaul/performanceOnly";
 
@@ -33,12 +34,12 @@ export function PerformanceOnly({ where }: { where: "home" | "media_kit" }) {
           <p key={c.k} className={`rounded-2xl border p-4 text-sm ${i === 1 ? "border-lime-400 bg-lime-50" : "border-[#0b1f3a]/10 bg-[#0b1f3a]/[0.03]"}`}><span className="block font-bold text-[#0b1f3a]">{c.k}</span><span className="text-foreground/70">{c.v}</span></p>
         ))}
       </div>
-      <p className="mt-3 text-[12px] text-foreground/60">{P.ranges}</p>
+      <p className="mt-3 text-[12px] text-foreground/60">{skinChat(P.ranges)}</p>
       <div className="mt-4">
         <a href={PERF_ONLY_HREF} data-testid={`perf-only-cta-${where}`} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-6 text-sm font-bold text-white transition hover:bg-lime-300 hover:text-[#0b1f3a]">{P.cta} <ArrowRight className="size-4" aria-hidden /></a>
       </div>
       <Details label={P.detailsLabel} testId={`perf-only-details-${where}`}>
-        <ul className="list-disc space-y-1 pl-5">{P.details.map((d) => <li key={d}>{d}</li>)}</ul>
+        <ul className="list-disc space-y-1 pl-5">{P.details.map((d) => <li key={d}>{skinChat(d)}</li>)}</ul>
       </Details>
     </div>
   );

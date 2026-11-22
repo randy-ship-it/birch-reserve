@@ -26,7 +26,7 @@ import {
 import { fitWireBudget, withQuietRetry } from "@/lib/randy-wire";
 import { clearHumanToken, ensureHuman, humanHeaders } from "@/lib/human-gate";
 import { getAttribution } from "@/lib/attribution";
-import { siteSkin } from "@/lib/siteSkin";
+import { siteSkin, skinChat } from "@/lib/siteSkin";
 
 export type RandyModelMessage = {
   role: "user" | "assistant";
@@ -284,7 +284,7 @@ export async function requestRandyReply(
     if (live.ok === "human") return { ok: false, kind: "rejected", status: 401, detail: "human_required" };
   }
   if (live.ok === true) return { ok: true, ...live.value };
-  if (live.ok === "stub") return { ok: true, ...(await stubRandyReply(req)) };
+  if (live.ok === "stub") { const st = await stubRandyReply(req); return { ok: true, ...st, text: skinChat(st.text) }; }
   return live;
 }
 

@@ -9,6 +9,8 @@
 /** Mailto kept as secondary / fallback only. */
 export const BOOK_CALL_MAILTO_HREF =
   "mailto:randy@scalehealth.ca?subject=Birch%20Reserve" as const;
+/** Scale skin: same inbox, Scale subject line. */
+export const BOOK_CALL_MAILTO_HREF_SCALE = "mailto:randy@scalehealth.ca?subject=Scale%20Health" as const;
 
 export const BOOK_CALL_LABEL = "Book a call" as const;
 
