@@ -108,7 +108,7 @@ function AccelerateToggle({ on, onClick }: { on: boolean; onClick: () => void })
         <span className="flex flex-wrap items-center gap-2 text-sm font-bold">Accelerate<span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${on ? "bg-[#0b1f3a] text-lime-300" : "bg-white/15 text-white/80"}`}>Optional</span></span>
         <span className={`mt-0.5 block text-[12px] leading-snug ${on ? "text-[#0b1f3a]/80" : "text-white/75"}`}>Add premium display placements to speed up exposure.</span>
       </span>
-      <span aria-hidden className={`relative h-6 w-11 shrink-0 rounded-full transition ${on ? "bg-[#0b1f3a]" : "bg-white/25"}`}><span className={`absolute top-0.5 size-5 rounded-full bg-white transition-all ${on ? "left-[22px]" : "left-0.5"}`} /></span>
+      <span aria-hidden data-static-toggle className={`inline-flex h-6 shrink-0 items-center rounded-full px-2.5 text-[10px] font-bold uppercase tracking-wider ${on ? "bg-[#0b1f3a] text-lime-300" : "bg-white/25 text-white/80"}`}>{on ? "On" : "Off"}</span>
     </button>
   );
 }
@@ -379,7 +379,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
             <div className="mt-1 flex flex-wrap gap-1.5" data-testid="shared-categories">
               {FRIDAY_CATEGORIES.map((c) => {
                 const on = shared.categories.includes(c.key);
-                return <button key={c.key} type="button" aria-pressed={on} onClick={() => toggleCat(c.key)} data-testid={`shared-cat-${c.key}`} className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${on ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/75 ring-1 ring-foreground/15 hover:ring-foreground/40"}`}>{c.label}</button>;
+                return <button key={c.key} type="button" onClick={() => toggleCat(c.key)} data-testid={`shared-cat-${c.key}`} className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${on ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/75 ring-1 ring-foreground/15 hover:ring-foreground/40"}`}>{c.label}</button>;
               })}
             </div>
           </div>

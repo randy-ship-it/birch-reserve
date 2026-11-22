@@ -18,6 +18,11 @@ export function siteSkin(): SiteSkin {
 export const isScaleSkin = () => siteSkin() === "scale";
 
 /** The brand name a visitor should see on this host. */
+/** Absolute URL of a Birch page. On the Scale skin it stays on scalehealth.ca (the same page served at /intake/_m/<path>, Scale skin);
+ *  on birchreserve.net it is the Birch URL, unchanged. */
+export const siteUrl = (path: string) =>
+  isScaleSkin() && typeof window !== "undefined" ? `${window.location.origin}/intake/_m${path}` : `https://birchreserve.net${path}`;
+
 export const siteName = () => (isScaleSkin() ? "Scale Health" : "Birch Reserve");
 
 /** Swap the Birch brand name for the host's brand name in visible copy (titles, eyebrows, review lines). */

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  ELEVENLABS_RANDY_AVATAR_URL,
+  randyAvatarUrl,
   resolveElevenLabsRandyAgentId,
 } from "@/lib/elevenlabs-randy-agent";
 
@@ -246,7 +246,7 @@ export function HearRandyElevenLabs() {
         action-text="Hear Randy"
         start-call-text="Start talking"
         end-call-text="End"
-        avatar-image-url={ELEVENLABS_RANDY_AVATAR_URL}
+        avatar-image-url={randyAvatarUrl()}
         dismissible="true"
       />
     </>

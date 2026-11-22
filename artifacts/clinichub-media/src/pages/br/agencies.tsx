@@ -1,4 +1,5 @@
 import { StartSmall } from "@/components/br/start-small";
+import { isScaleSkin, skinText } from "@/lib/siteSkin";
 import { KitEntry } from "@/components/br/pilot-path";
 import { CheckCircle2 } from "lucide-react";
 import { LeadForm } from "@/components/br/lead-form";
@@ -78,8 +79,8 @@ export default function BrAgencies() {
             <Eyebrow>In plain terms</Eyebrow>
             <H2>Explain it to a client in five answers.</H2>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              What Birch Reserve is, the moment it reaches, where the figures come from, what gets reported and how a test starts. Forward this section as is:{" "}
-              <a href="/agencies#plain-terms" className="break-all underline underline-offset-2" data-testid="plain-terms-link">birchreserve.net/agencies#plain-terms</a>
+              {skinText("What Birch Reserve is, the moment it reaches, where the figures come from, what gets reported and how a test starts. Forward this section as is:")}{" "}
+              <a href="/agencies#plain-terms" className="break-all underline underline-offset-2" data-testid="plain-terms-link">{isScaleSkin() ? "scalehealth.ca/intake/_m/agencies#plain-terms" : "birchreserve.net/agencies#plain-terms"}</a>
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Cta href="#talk" testId="plain-cta-io">Request a draft IO</Cta>

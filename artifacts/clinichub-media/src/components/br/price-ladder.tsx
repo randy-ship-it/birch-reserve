@@ -3,6 +3,7 @@
  * Same steps and copy as the server pages (api-server/src/lib/priceLadder.ts), in the visitor's currency:
  * $190 look → $490 reserve → $1,900 exclusive reserve that locks a $5K–$50K package; $25K–$50K premium is inquire-only.
  */
+import { siteUrl } from "@/lib/siteSkin";
 import { ArrowRight } from "lucide-react";
 import { CurrencyToggle } from "@/components/currency-toggle";
 import { useCurrency } from "@/lib/currency";
@@ -11,7 +12,7 @@ import { PREMIUM_RANGE, priceLadder } from "../../../../api-server/src/lib/price
 export function PriceLadder({ title = "Every step, in your currency", premiumHref = "#premium", dark = false }: { title?: string; premiumHref?: string; dark?: boolean }) {
   const { currency } = useCurrency();
   const steps = priceLadder(currency);
-  const abs = (href: string) => (href.startsWith("/") ? `https://birchreserve.net${href}${href.includes("?") ? "&" : "?"}currency=${currency}` : href);
+  const abs = (href: string) => (href.startsWith("/") ? `${siteUrl(href)}${href.includes("?") ? "&" : "?"}currency=${currency}` : href);
   return (
     <section data-testid="price-ladder" data-currency={currency} aria-label="Prices" className="my-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
