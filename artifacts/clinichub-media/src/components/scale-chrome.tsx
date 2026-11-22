@@ -60,7 +60,7 @@ export function ScaleHeader() {
 
 export function ScaleFooter() {
   return (
-    <footer className="mt-auto border-t border-border bg-secondary/20 py-4 sm:py-5 print:hidden" data-testid="scale-footer">
+    <footer className="mt-auto border-t border-border bg-secondary/20 py-4 sm:py-5 md:pb-16 print:hidden" data-testid="scale-footer">
       <div className="mx-auto max-w-7xl px-5 sm:px-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <a href={SCALE_HOME} data-mirror-keep="" className="inline-flex min-h-11 items-center">

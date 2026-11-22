@@ -260,7 +260,7 @@ const GREEN = "#4ADE80";
 const field = "mt-1 h-12 w-full rounded-xl border bg-white px-3 text-[17px] font-semibold tabular-nums";
 const seg = (on: boolean) => ({ background: on ? "#0b1f3a" : "#fff", color: on ? "#fff" : RT.ink, border: `1.5px solid ${on ? "#0b1f3a" : RT.line}` });
 
-export function HubView({ cta }: { m?: ReportModel; exposure?: FridayExposure; cta?: ReactNode; physical?: PhysicalAnswer | null }) {
+export function HubView({ cta, split = false }: { m?: ReportModel; exposure?: FridayExposure; cta?: ReactNode; physical?: PhysicalAnswer | null; split?: boolean }) {
   const { currency } = useCurrency();
   const cad = currency === "cad";
   const [orders, setOrders] = useState("25,000");
@@ -289,8 +289,8 @@ export function HubView({ cta }: { m?: ReportModel; exposure?: FridayExposure; c
     ["Sales for brands", mny(o.sales, cad), `at a $${grp(cartVal)} order`],
   ];
   return (
-    <section data-testid="view-hub" data-currency-fixed className="overflow-hidden" style={{ ...card, fontFamily: RT_SANS, color: RT.body }}>
-      <div className="p-5 md:p-6">
+    <section data-testid="view-hub" data-currency-fixed className={split ? "overflow-hidden lg:contents" : "overflow-hidden"} style={{ ...card, fontFamily: RT_SANS, color: RT.body }}>
+      <div className={`p-5 md:p-6 ${split ? "lg:rounded-3xl lg:border lg:bg-white lg:shadow-md" : ""}`} style={split ? { borderColor: RT.line, fontFamily: RT_SANS, color: RT.body } : undefined}>
         <div className="flex flex-wrap items-center gap-2">
           <Store className="size-4" style={{ color: RT.mintInk }} aria-hidden />
           <span className={eyebrow} style={{ color: RT.mintInk }}>Your hub</span>
@@ -328,7 +328,9 @@ export function HubView({ cta }: { m?: ReportModel; exposure?: FridayExposure; c
           </div>
         </div>
       </div>
-      <div className="p-5 md:p-6" style={{ background: "#0B1F3A", color: "#fff" }} data-testid="hub-result" aria-live="polite">
+      <div className={`p-5 md:p-6 ${split ? "lg:col-span-2 lg:rounded-3xl lg:p-8" : ""}`} style={{ background: "#0B1F3A", color: "#fff", ...(split ? { fontFamily: RT_SANS } : {}) }} data-testid="hub-result" aria-live="polite">
+      <div className={split ? "lg:grid lg:grid-cols-2 lg:gap-x-12" : undefined}>
+      <div>
         <div className="flex items-center gap-2"><span className={eyebrow} style={{ color: GREEN }}>You could earn</span><span className="ml-auto"><Pill tone="mint">Estimate · {cad ? "CAD" : "USD"}</Pill></span></div>
         <div data-testid="hub-headline-month">
           <p className="mt-2 text-[64px] font-bold leading-none tabular-nums md:text-[88px]" style={{ fontFamily: RT_SERIF, color: GREEN, textShadow: "0 0 32px rgba(74,222,128,.45)" }}>{has ? mny(month, cad) : "—"}</p>
@@ -352,10 +354,16 @@ export function HubView({ cta }: { m?: ReportModel; exposure?: FridayExposure; c
               ))}
             </div>
             <p className="mt-2 text-[12px] text-white/70">Views, then clicks, then orders, then sales. Your earnings come from the space brands pay for, not from their sales.</p>
+          </>
+        ) : <p className="mt-3 text-[15px] text-white/85">Add your orders or visitors to see an estimate.</p>}
+      </div>
+      <div>
+        {has ? (
+          <>
             <button type="button" onClick={claim} data-testid="hub-claim" className="mt-5 inline-flex h-14 w-full items-center justify-center rounded-full px-6 text-[17px] font-bold md:w-auto" style={{ background: "#BEF264", color: "#0b1f3a" }}>Claim my kit</button>
             <p className="mt-3 text-[12px] text-white/70" data-testid="hub-range">Range {mny(o.earn.low, cad)}–{mny(o.earn.high, cad)} a month.</p>
           </>
-        ) : <p className="mt-3 text-[15px] text-white/85">Add your orders or visitors to see an estimate.</p>}
+        ) : null}
         {has ? <HubOnboardingNote views={o.views} compact dark /> : null}
         {has ? <div className="mt-4"><HubDifferentiators dark /></div> : null}
         <Details dark label="How we estimate this" testId="hub-details">
@@ -367,6 +375,8 @@ export function HubView({ cta }: { m?: ReportModel; exposure?: FridayExposure; c
           <p>Every figure is monthly; a year is 12 months at that run-rate. {cad ? "Shown in CAD, converted from our USD model at 1.4 CAD per USD." : "Shown in USD."} A planning estimate, not a quote, forecast or guarantee.</p>
         </Details>
         {cta ? <div className="mt-4">{cta}</div> : null}
+      </div>
+      </div>
       </div>
     </section>
   );

@@ -158,7 +158,7 @@ export function ReportHero({ m, sample }: { m: ReportModel; sample?: boolean }) 
   const more = Math.max(0, m.hubs.length - 1);
   return (
     <section data-testid="report-hero" className="overflow-hidden px-5 py-8 md:px-8 md:py-10" style={{ background: RT.forest, color: "#fff", borderRadius: 24, fontFamily: RT_SANS }}>
-      <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
+      <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
         <div>
           <div className="flex items-center gap-3">
             <span className="flex size-10 items-center justify-center rounded-lg text-lg" style={{ background: monogramBg(m.domain || m.name), fontFamily: RT_SERIF }}>{m.name.slice(0, 1).toUpperCase()}</span>
@@ -361,9 +361,9 @@ export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposur
       <section data-testid="report-two-sides" data-first={sides[0]} data-sides={sides.join(",")} data-accelerate={m.isAccelerate ? "true" : "false"} style={{ fontFamily: RT_SANS }}>
         <h2 className="text-[26px] md:text-[34px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{m.isSupplier && m.isPublisher ? "Your exposure and your hub earnings" : m.isSupplier ? "Your supplier exposure" : "Your hub earnings"}</h2>
         <p className="text-[13px]" style={{ color: RT.mute }} data-testid="two-sides-plan">Estimates, not guarantees. {MODELLED_PLAN_LABEL}.</p>
-        <div className={`mt-4 grid items-start gap-4 ${sides.length > 1 ? "lg:grid-cols-2" : ""}`}>
-          {m.isSupplier ? <div key="sup" className={sides.length > 1 ? "lg:sticky lg:top-24" : undefined}><SupplierExposureView m={m} exposure={ex} source={src} cta={supplierCta} onAccelerate={onAccelerate} physical={physical} /></div> : null}
-          {m.isPublisher ? <HubView key="hub" m={m} exposure={ex} cta={earnCta} physical={physical} /> : null}
+        <div className={`mt-4 grid items-stretch gap-4 ${sides.length > 1 ? "lg:grid-cols-2" : ""}`}>
+          {m.isSupplier ? <div key="sup" className="min-w-0"><SupplierExposureView m={m} exposure={ex} source={src} cta={supplierCta} onAccelerate={onAccelerate} physical={physical} /></div> : null}
+          {m.isPublisher ? <HubView key="hub" m={m} exposure={ex} cta={earnCta} physical={physical} split={sides.length > 1} /> : null}
         </div>
       </section>
     );

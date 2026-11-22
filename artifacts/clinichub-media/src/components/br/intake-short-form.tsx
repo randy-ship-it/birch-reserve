@@ -86,7 +86,7 @@ const EMPTY_SHARED: SharedAnswers = { brand: "", categories: [], skus: "", audie
 
 function RoleCard({ on, onClick, icon: Icon, title, sub, tag, testId, children }: { on: boolean; onClick: () => void; icon: typeof Store; title: string; sub: string; tag?: string; testId: string; children?: ReactNode }) {
   return (
-    <div data-testid={`${testId}-card`} className={`rounded-2xl border-2 p-4 transition ${on ? "border-[#0b1f3a] bg-[#0b1f3a] text-white shadow-lg" : "border-foreground/15 bg-white hover:border-foreground/40"}`}>
+    <div data-testid={`${testId}-card`} className={`rounded-2xl border-2 p-4 transition md:flex md:flex-col md:justify-center ${on ? "border-[#0b1f3a] bg-[#0b1f3a] text-white shadow-lg" : "border-foreground/15 bg-white hover:border-foreground/40"}`}>
       <button type="button" role="checkbox" aria-checked={on} onClick={onClick} data-testid={testId} className="flex w-full items-start gap-3 text-left">
         <span className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md border-2 ${on ? "border-lime-300 bg-lime-300 text-[#0b1f3a]" : "border-foreground/30"}`}>{on ? <Check className="size-4" /> : null}</span>
         <span className="min-w-0">

@@ -268,7 +268,7 @@ export default function BrHome() {
                 </div>
               </div>
               <div className="rounded-xl p-4 text-white" style={{ background: NAVY }}>
-                <p className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Premium slots · the main event <span className="rounded-full bg-lime-300 px-2 py-0.5 text-[10px] tracking-wider text-[#0b1f3a]">Inquire only</span></p>
+                <p className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Premium slots · the main event</p>
                 <p className="mt-1 font-display text-2xl">From $25K, $25K–$50K USD</p>
                 <p className="mt-2 text-sm text-white/75">Exclusivity, a larger display share and priority placement. No card purchase: we write the insertion order.</p>
                 <a href="/media-kit#premium" data-testid="home-cta-premium" className="mt-4 inline-flex h-11 items-center gap-1.5 rounded-full bg-lime-300 px-5 text-sm font-bold text-[#0b1f3a] hover:bg-white">Inquire about premium <ArrowRight className="size-4" aria-hidden /></a>
