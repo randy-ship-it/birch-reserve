@@ -12,14 +12,16 @@
  * Labelled Estimate / Modelled everywhere. USD. No CTR/ROAS, no guarantees.
  */
 import { useState, type ReactNode } from "react";
-import { Check, Rocket, Store, Package, TrendingUp } from "lucide-react";
+import { Check, Rocket, Store, Package } from "lucide-react";
 import { RT, RT_SERIF, RT_SANS, RT_SHADOW } from "@/lib/reportTokens";
 import type { FridayExposure } from "../../../../api-server/src/lib/kitCalc/activation";
 import { MOCK_SHARES } from "../../../../api-server/src/lib/kitCalc/activation";
-import { PUBLISHER_SURFACES, RETAIL_COPY, RETAIL_TAG, STREET_REACH_LINE } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { PAYOUT, PUBLISHER_SURFACES, RETAIL_COPY, RETAIL_TAG, STREET_REACH_LINE } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import type { ReportModel } from "@/components/br/report-v2";
-import { EstimatePop } from "@/components/br/report-v2";
 import { Details } from "@/components/br/details";
+import { useCurrency } from "@/lib/currency";
+import { SELL_ASSUMPTION_PCT } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
+import { CAD_PER_USD } from "../../../../api-server/src/lib/overhaul/model";
 import { IN_LOCATION, inLocationReach, type PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
 
 /** In-location display (Randy, Nov 19 2026 10:54 AM ET): the brand's own locations × monthly visitors. Estimate; no rate
@@ -123,15 +125,6 @@ function LowLikelyHigh({ r, fmt, dark }: { r: LLH; fmt: (n: number) => string; d
     </dl>
   );
 }
-function Stat({ label, value, sub, testId, wide }: { label: string; value: string; sub?: string; testId?: string; wide?: boolean }) {
-  return (
-    <div className={`p-3 ${wide ? "col-span-2 sm:col-span-1" : ""}`} style={{ background: RT.paper, borderRadius: 12 }} data-testid={testId}>
-      <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: RT.mute }}>{label}</p>
-      <p className="mt-1 text-[26px] leading-none tabular-nums" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{value}</p>
-      {sub ? <p className="mt-1 text-[12px]" style={{ color: RT.mute }}>{sub}</p> : null}
-    </div>
-  );
-}
 function ChannelTable({ rows, extra, testId }: { rows: ChannelRow[]; extra?: ReactNode; testId: string }) {
   return (
     <div className="mt-4 overflow-hidden" style={{ border: `1px solid ${RT.line}`, borderRadius: 14 }} data-testid={testId}>
@@ -170,29 +163,18 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
   const acc = channelRows(exposure, "accelerate");
   const rows = tier === "accelerate" ? acc : perf;
   const hubs = rows.find((r) => r.key === "hubs")?.range ?? null;
-  const perfHubs = perf.find((r) => r.key === "hubs")?.range ?? null;
-  const accHubs = acc.find((r) => r.key === "hubs")?.range ?? null;
   const reach = rows.filter((r) => !r.monthly && r.range).reduce((a, r) => ({ low: a.low + r.range!.low, likely: a.likely + r.range!.likely, high: a.high + r.range!.high }), { low: 0, likely: 0, high: 0 });
   const disp = tier === "accelerate" ? displayPer1k(m.cpm) : null;
   const own = ownHubViews();
   const s = sharesOf(exposure);
   const pct = (n: number) => `${+(n * 100).toFixed(1)}%`;
-  const src = source === "report" ? "From your report" : source === "sample" ? "Sample values" : "Modelled";
   return (
     <section data-testid="view-supplier" data-tier={tier} className="overflow-hidden" style={{ ...card, fontFamily: RT_SANS, color: RT.body }}>
       <div className="p-5 md:p-6" style={{ background: RT.forest, color: "#fff" }}>
         <div className="flex flex-wrap items-center gap-2">
           <Package className="size-4" style={{ color: RT.mint }} aria-hidden />
           <span className={eyebrow} style={{ color: RT.mint }}>Supplier · exposure view</span>
-          <span className="ml-auto flex items-center gap-2"><Pill tone="mint">{src}</Pill>
-            <EstimatePop title="How the supplier exposure is modelled" testId="estimate-supplier">
-              <p>Exposure = network figures and targets × an activation share, scoped to where you sell and ship. Activation shares are placeholders ({pct(s.min)}–{pct(s.max)}) until real placements confirm them.</p>
-              <p><strong>Performance-only</strong> (pay on results, no CPC/CPM) uses the lower half of that range ({pct(s.min)}–{pct(s.mid)}). You pay on results, not for ad space.</p>
-              {tier === "accelerate" ? <p><strong>Accelerate</strong> adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}), plus the display views a $1,000 test buys at rate-card CPM (budget ÷ CPM × 1,000).</p> : <p><strong>Accelerate</strong> (optional) adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}). Switch to With Accelerate to see how it is sized.</p>}
-              <p>12 months = the monthly figure × 12 for page views. Customers and doors are an audience in reach, so they are not multiplied.</p>
-              <p style={{ color: RT.mute }}>Network figures as reported by Scale Health; targets are goals. Estimates in USD where money is shown. Not a forecast or a promise of any result.</p>
-            </EstimatePop>
-          </span>
+          <span className="ml-auto"><Pill tone="mint">Estimate</Pill></span>
         </div>
         <h3 className="mt-3 text-[26px] leading-tight md:text-[32px]" style={{ fontFamily: RT_SERIF }}>Where your products get seen</h3>
         <div className="mt-4 grid w-full grid-cols-2 rounded-full p-1 sm:inline-grid sm:w-auto" style={{ background: "rgba(255,255,255,.1)" }} role="tablist" aria-label="Supplier tier">
@@ -203,26 +185,15 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
           ))}
         </div>
         {hubs ? (
-          <div className="mt-5 grid gap-5 md:grid-cols-2">
+          <div className="mt-5" data-testid="supplier-headline-wrap">
             <Headline value={hubs.likely} unit="page-view exposures a month, likely" range={hubs} fmt={big} dark testId="supplier-headline-month" />
-            <Headline value={hubs.likely * 12} unit="page-view exposures over 12 months, likely" range={scale(hubs, 12)} fmt={big} dark testId="supplier-headline-year" />
+            <p className="mt-2 text-[13px] text-white/75" data-testid="supplier-headline-year">About {big(hubs.likely * 12)} over 12 months at that run-rate.</p>
           </div>
         ) : null}
         {reach.likely > 0 ? <p className="mt-4 text-[14px] text-white/85" data-testid="supplier-reach">Plus about <strong className="text-white">{big(reach.likely)}</strong> captive recovery consumers across our private retail network (200+ locations, 500+ soon), plus Calm Joints and the Street Team, {STREET_REACH_LINE}.</p> : null}
       </div>
       <div className="p-5 md:p-6">
-        <div className="grid gap-3 sm:grid-cols-2" data-testid="supplier-compare">
-          <div className="p-3" style={{ background: tier === "performance_only" ? RT.mint : RT.paper, borderRadius: 12 }}>
-            <p className="text-[11px] font-bold uppercase tracking-wider" style={{ color: RT.mintInk }}>Performance-only · pay on results, no CPC/CPM</p>
-            <p className="mt-1 text-[24px] leading-none tabular-nums" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{perfHubs ? `${big(perfHubs.likely)} / mo` : "—"}</p>
-            <p className="mt-1 text-[12px]" style={{ color: RT.mute }}>Curated placement on hubs that fit your category.</p>
-          </div>
-          <div className="p-3" style={{ background: tier === "accelerate" ? RT.mint : RT.paper, borderRadius: 12 }}>
-            <p className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider" style={{ color: RT.mintInk }}><Rocket className="size-3" aria-hidden />With Accelerate · optional</p>
-            <p className="mt-1 text-[24px] leading-none tabular-nums" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{accHubs ? `${big(accHubs.likely)} / mo` : "—"}</p>
-            <p className="mt-1 text-[12px]" style={{ color: RT.mute }}>Premium display placements to speed up exposure.</p>
-          </div>
-        </div>
+        <Details label="By channel" testId="supplier-channels-details">
         <ChannelTable
           rows={rows}
           testId="supplier-channels"
@@ -244,7 +215,16 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
             </>
           }
         />
-        <Details testId="supplier-details"><p>{RETAIL_COPY} · {RETAIL_TAG}. Estimates, not guarantees.</p></Details>
+        </Details>
+        <Details label="How we estimate this" testId="supplier-details">
+              <p>Exposure = network figures and targets × an activation share, scoped to where you sell and ship. Activation shares are placeholders ({pct(s.min)}–{pct(s.max)}) until real placements confirm them.</p>
+              <p><strong>Performance-only</strong> (pay on results, no CPC/CPM) uses the lower half of that range ({pct(s.min)}–{pct(s.mid)}). You pay on results, not for ad space.</p>
+              {tier === "accelerate" ? <p><strong>Accelerate</strong> adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}), plus the display views a $1,000 test buys at rate-card CPM (budget ÷ CPM × 1,000).</p> : <p><strong>Accelerate</strong> (optional) adds premium display placements, modelled as the upper half ({pct(s.mid)}–{pct(s.max)}). Switch to With Accelerate to see how it is sized.</p>}
+              <p>12 months = the monthly figure × 12 for page views. Customers and doors are an audience in reach, so they are not multiplied.</p>
+              <p style={{ color: RT.mute }}>Network figures as reported by Scale Health; targets are goals. Estimates in USD where money is shown. Not a forecast or a promise of any result.</p>
+            
+          <p>{RETAIL_COPY} · {RETAIL_TAG}. Estimates, not guarantees.</p>
+        </Details>
         {onAccelerate && !m.isAccelerate ? <div className="mt-4">{onAccelerate}</div> : null}
         {cta ? <div className="mt-4">{cta}</div> : null}
       </div>
@@ -253,66 +233,117 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
 }
 
 /* ------------------------------------------------------------------ (b) hub max-exposure + earnings view */
-export function HubView({ m, exposure, cta, physical }: { m: ReportModel; exposure: FridayExposure; cta?: ReactNode; physical?: PhysicalAnswer | null }) {
-  const now = m.total;
-  const later = m.later && now && m.later.high > now.high ? m.later : null;
-  const earn: LLH | null = now ? { low: now.low, likely: (now.low + now.high) / 2, high: later?.high ?? now.high } : null;
-  const own = ownHubViews();
+/**
+ * Hub earnings calculator (Randy, Nov 21 2026 9:37 PM ET: "these #s are low and I don't know what they're from"):
+ * one big number, one "based on X views a month" line, two controls (hub size, surfaces on). Same model as the
+ * hub intake (PUBLISHER_SURFACES x rate-card starter CPMs x 20% planning sell-through x 35% base share), computed here
+ * so the number moves live. Low / likely / high flex the two things that are genuinely uncertain: how much of the
+ * space is sold (10% / 20% / 30%, around the 20% planning assumption) and the CPM inside the published starter range.
+ * The model runs in USD; a Canadian visitor sees it converted at the site's 1.4 CAD per USD (not just relabelled).
+ */
+const HUB_SIZES = [0.25, 0.5, 1, 2, 3, 5, 7.5, 10] as const;
+export const HUB_DEFAULT_SIZE_IDX = 2; // 1x = the network median hub
+const SELL_BAND = [SELL_ASSUMPTION_PCT / 2, SELL_ASSUMPTION_PCT, SELL_ASSUMPTION_PCT * 1.5] as const;
+const hubMid = (r: readonly [number, number]) => (r[0] + r[1]) / 2;
+const PRICED = PUBLISHER_SURFACES.filter((s) => s.monthlyViews && s.cpm);
+/** Pure model: monthly payout (USD) for a hub of `sizeX` x the median hub with the given surfaces on. */
+export function hubEarnings(sizeX: number, on: Record<string, boolean>): { low: number; likely: number; high: number; views: number; rows: Array<{ key: string; label: string; on: boolean; likely: number; views: number }> } {
+  const share = PAYOUT.basePct / 100;
+  const pay = (views: number, pct: number, cpm: number) => (views * pct / 100 / 1000) * cpm * share;
+  const rows = PRICED.map((s) => {
+    const views = Math.round((s.monthlyViews ?? 0) * sizeX);
+    const isOn = on[s.key] ?? false;
+    return { s, views, isOn };
+  });
+  let low = 0, likely = 0, high = 0, views = 0;
+  for (const r of rows) {
+    if (!r.isOn) continue;
+    low += pay(r.views, SELL_BAND[0], r.s.cpm![0]);
+    likely += pay(r.views, SELL_BAND[1], hubMid(r.s.cpm!));
+    high += pay(r.views, SELL_BAND[2], r.s.cpm![1]);
+    views += r.views;
+  }
+  return { low, likely, high, views, rows: rows.map((r) => ({ key: r.s.key, label: r.s.label, on: r.isOn, views: r.views, likely: pay(r.views, SELL_BAND[1], hubMid(r.s.cpm!)) })) };
+}
+const money = (n: number, cad: boolean) => {
+  const v = cad ? n * CAD_PER_USD : n;
+  return `$${(v >= 1e4 ? Math.round(v / 10) * 10 : Math.round(v)).toLocaleString("en-US")}`;
+};
+const compact = (n: number) => (n >= 1e6 ? `${+(n / 1e6).toFixed(1)}MM` : n >= 1e3 ? `${Math.round(n / 1e3)}K` : String(Math.round(n)));
+
+export function HubView({ cta, exposure, m, physical }: { m: ReportModel; exposure: FridayExposure; cta?: ReactNode; physical?: PhysicalAnswer | null }) {
+  const { currency } = useCurrency();
+  const cad = currency === "cad";
+  const cur = cad ? "CAD" : "USD";
+  const [sizeIdx, setSizeIdx] = useState<number>(HUB_DEFAULT_SIZE_IDX);
+  const [on, setOn] = useState<Record<string, boolean>>(() => Object.fromEntries(PRICED.map((s) => [s.key, true])));
+  const sizeX = HUB_SIZES[sizeIdx]!;
+  const e = hubEarnings(sizeX, on);
   const rows = channelRows(exposure, m.isAccelerate ? "accelerate" : "performance_only");
-  const surfaces = m.earnings.filter((e) => e.pay).sort((a, b) => b.pay!.high - a.pay!.high);
-  const needs = m.earnings.filter((e) => !e.pay);
+  const orders = Math.round((PUBLISHER_SURFACES.find((s) => s.key === "post_purchase")?.monthlyViews ?? 0) * sizeX);
+  const anyOn = e.views > 0;
+  const top = Math.max(1, ...e.rows.map((r) => r.likely));
+  const axis = Math.max(1, e.high * 1.08);
+  const perSurface = [...e.rows].sort((a, b) => b.views * 1 - a.views * 1);
   return (
-    <section data-testid="view-hub" className="overflow-hidden" style={{ ...card, fontFamily: RT_SANS, color: RT.body }}>
+    <section data-testid="view-hub" data-currency-fixed className="overflow-hidden" style={{ ...card, fontFamily: RT_SANS, color: RT.body }}>
       <div className="p-5 md:p-6" style={{ background: "#0B1F3A", color: "#fff" }}>
         <div className="flex flex-wrap items-center gap-2">
           <Store className="size-4 text-lime-300" aria-hidden />
-          <span className={eyebrow} style={{ color: "#BEF264" }}>Hub · max exposure + earnings</span>
-          <span className="ml-auto flex items-center gap-2"><Pill tone="mint">Estimate · USD</Pill>
-            <EstimatePop title="How the hub view is modelled" testId="estimate-earn">
-              <p>Your share starts at {Math.round(m.share * 100)}% of media revenue (base). Tiers above base are placeholders until confirmed.</p>
-              <p>Earnings per surface = monthly views × rate-card CPM ÷ 1,000 × your share. Low = at ramp, high = once pricing normalizes{later ? ", with every surface that has views on" : ""}; likely = the middle.</p>
-              <p>12 months = the monthly run-rate × 12. Your own views use a typical (network median) hub until you tell us your numbers.</p>
-              <p style={{ color: RT.mute }}>Planning ranges in USD, not quotes or guaranteed payouts.</p>
-            </EstimatePop>
-          </span>
+          <span className={eyebrow} style={{ color: "#BEF264" }}>Your hub</span>
+          <span className="ml-auto"><Pill tone="mint">Estimate · {cur}</Pill></span>
         </div>
-        <h3 className="mt-3 text-[26px] leading-tight md:text-[32px]" style={{ fontFamily: RT_SERIF }}>What your hub earns, and the exposure it unlocks</h3>
-        {earn ? (
-          <div className="mt-5 grid gap-5 md:grid-cols-2">
-            <Headline value={earn.likely} unit="a month, likely (USD)" range={earn} fmt={usd} dark testId="hub-headline-month" />
-            <Headline value={earn.likely * 12} unit="over 12 months at that run-rate, likely (USD)" range={scale(earn, 12)} fmt={usd} dark testId="hub-headline-year" />
-          </div>
-        ) : (
-          <p className="mt-4 text-[15px] text-white/85" data-testid="earnings-empty">Add your hub to unlock max exposure. Hubs keep a share of media revenue from their own shelf space, screens and pages, and your products get the most eyeballs. Supplier-only works too.</p>
-        )}
+        <h3 className="mt-3 text-[26px] leading-tight md:text-[32px]" style={{ fontFamily: RT_SERIF }}>What your hub could earn</h3>
+        <div className="mt-4" data-testid="hub-headline-month" aria-live="polite">
+          <p className="text-[56px] leading-none tabular-nums md:text-[72px]" style={{ fontFamily: RT_SERIF }}>{anyOn ? money(e.likely, cad) : "—"}</p>
+          <p className="mt-1 text-[14px] font-semibold" style={{ color: RT.mint }}>{anyOn ? "a month, likely" : "Turn on a surface to see an estimate"}</p>
+          {anyOn ? (
+            <>
+              <p className="mt-2 text-[13px] text-white/85" data-testid="hub-basis">Based on {compact(e.views)} views a month at a hub with about {compact(orders)} orders a month. Range {money(e.low, cad)}–{money(e.high, cad)}.</p>
+              <div className="relative mt-3 h-2.5 rounded-full" style={{ background: "rgba(255,255,255,.14)" }} data-testid="hub-range-bar" role="img" aria-label={`Range ${money(e.low, cad)} to ${money(e.high, cad)} a month, likely ${money(e.likely, cad)}`}>
+                <span className="absolute inset-y-0 rounded-full" style={{ left: `${(e.low / axis) * 100}%`, width: `${((e.high - e.low) / axis) * 100}%`, background: RT.mint, opacity: 0.55 }} />
+                <span className="absolute -top-1 w-1.5 rounded-full bg-white" style={{ left: `calc(${(e.likely / axis) * 100}% - 3px)`, height: 18 }} />
+              </div>
+              <p className="mt-3 text-[13px] text-white/75" data-testid="hub-headline-year">About {money(e.likely * 12, cad)} over 12 months at that run-rate.</p>
+            </>
+          ) : null}
+        </div>
       </div>
       <div className="p-5 md:p-6">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3" data-testid="hub-stats">
-          <Stat label="Your share" value={`${Math.round(m.share * 100)}%`} sub="of media revenue (base)" />
-          <Stat label="Your own views" value={big(own.on)} sub={`a month on your surfaces; up to ${big(own.all)} with every surface on · modelled`} testId="hub-own-views" />
-          <Stat wide label="Network reach" value={rows[0]?.range ? big(rows[0].range.likely) : "—"} sub="Branded ScaleHealth.ca hubs page views a month for your products, likely" />
+        <div data-testid="hub-controls">
+          <label htmlFor="hub-size" className="flex items-baseline justify-between gap-3 text-[13px] font-bold" style={{ color: RT.ink }}>
+            <span>How big is your hub?</span>
+            <span className="tabular-nums font-semibold" style={{ color: RT.mintInk }} data-testid="hub-size-label">about {compact(orders)} orders a month{sizeX === 1 ? " (typical)" : ""}</span>
+          </label>
+          <input id="hub-size" data-testid="hub-size-slider" type="range" min={0} max={HUB_SIZES.length - 1} step={1} value={sizeIdx} onChange={(ev) => setSizeIdx(Number(ev.target.value))} aria-valuetext={`${compact(orders)} orders a month`} className="mt-2 h-8 w-full" style={{ accentColor: "#0b1f3a" }} />
+          <div className="flex justify-between text-[11px]" style={{ color: RT.mute }}><span>Smaller</span><span>Larger</span></div>
+          <p className="mt-4 text-[13px] font-bold" style={{ color: RT.ink }}>Where we show offers</p>
+          <ul className="mt-2 space-y-1.5" data-testid="hub-surfaces">
+            {perSurface.map((r) => (
+              <li key={r.key}>
+                <button type="button" role="switch" aria-checked={r.on} onClick={() => setOn((o) => ({ ...o, [r.key]: !r.on }))} data-testid={`hub-surface-${r.key}`} className="grid min-h-11 w-full grid-cols-[auto_1fr_auto] items-center gap-3 rounded-xl px-3 py-2 text-left" style={{ background: r.on ? "#F3FBF6" : RT.paper, border: `1px solid ${r.on ? RT.mint : RT.line}` }}>
+                  <span className="grid size-5 place-items-center rounded-md" style={{ background: r.on ? "#0b1f3a" : "#fff", border: `1.5px solid ${r.on ? "#0b1f3a" : RT.line}` }} aria-hidden>{r.on ? <Check className="size-3.5 text-white" /> : null}</span>
+                  <span className="min-w-0">
+                    <span className="block text-[13px] font-semibold" style={{ color: RT.ink }}>{r.label}</span>
+                    <span className="mt-1 block h-1.5 rounded-full" style={{ background: RT.track }}><span className="block h-full rounded-full" style={{ width: `${r.on ? Math.max(3, (r.likely / top) * 100) : 0}%`, background: RT.mintInk }} /></span>
+                  </span>
+                  <span className="text-right text-[13px] tabular-nums" style={{ color: r.on ? RT.ink : RT.mute }}>{r.on ? `${money(r.likely, cad)}/mo` : "off"}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
-        {surfaces.length ? (
-          <div className="mt-4 overflow-hidden" style={{ border: `1px solid ${RT.line}`, borderRadius: 14 }} data-testid="hub-surfaces">
-            <div className="grid grid-cols-[1fr_auto] gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-wider md:grid-cols-[1.3fr_1fr_1fr]" style={{ background: RT.paper, color: RT.mute }}>
-              <span>Earnings by surface</span><span className="text-right">Monthly · USD</span><span className="hidden text-right md:block">12 months · likely</span>
-            </div>
-            {surfaces.map((e) => {
-              const mid = (e.pay!.low + e.pay!.high) / 2;
-              return (
-                <div key={e.surface} className="grid grid-cols-[1fr_auto] items-baseline gap-2 px-3 py-2.5 text-[13px] md:grid-cols-[1.3fr_1fr_1fr]" style={{ borderTop: `1px solid ${RT.line}` }}>
-                  <span className="font-semibold" style={{ color: RT.ink }}>{e.surface}</span>
-                  <span className="text-right tabular-nums text-[15px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{Math.round(e.pay!.low) === Math.round(e.pay!.high) ? usd(e.pay!.low) : `${usd(e.pay!.low)}–${usd(e.pay!.high)}`}</span>
-                  <span className="col-span-2 text-[11px] md:col-span-1 md:text-right md:text-[13px]" style={{ color: RT.mute }}><span className="md:hidden">12 months: </span><span className="font-semibold tabular-nums" style={{ color: RT.ink }}>{usd(mid * 12)}</span></span>
-                </div>
-              );
-            })}
-            {needs.map((e) => <div key={e.surface} className="flex justify-between px-3 py-2.5 text-[13px]" style={{ borderTop: `1px solid ${RT.line}` }}><span className="font-semibold" style={{ color: RT.ink }}>{e.surface}</span><span style={{ color: RT.mute }}>needs a rate or monthly views</span></div>)}
-          </div>
-        ) : null}
-        <p className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-bold" style={{ color: RT.ink }}><TrendingUp className="size-4" style={{ color: RT.mintInk }} aria-hidden />Max exposure: your products on your own hub plus across the network</p>
-        <ChannelTable rows={rows} testId="hub-channels" extra={<InLocationRow physical={physical} testId="hub-channels-in-location" />} />
-        <Details testId="hub-details"><p>{RETAIL_COPY} · {RETAIL_TAG}. Estimates, not guarantees.</p></Details>
+        <Details label="How we estimate this" testId="hub-details">
+          <p><strong>Your share:</strong> {PAYOUT.basePct}% of the media revenue from offers shown on your hub. Higher tiers aren't set yet.</p>
+          <p><strong>Views:</strong> a typical hub (the network median, modelled) scaled by the size slider. Your real numbers replace these once you share them.</p>
+          <p><strong>Revenue:</strong> views × the share of space sold ({SELL_BAND[0]}–{SELL_BAND[2]}%, around a {SELL_BAND[1]}% planning assumption) × the published starter price per 1,000 views for that surface, then your {PAYOUT.basePct}%. Low uses the low end of both, high the top end, likely the middle.</p>
+          <p>The newsletter carries a single published price, so it moves with how much is sold, not with price.</p>
+          <p>{cad ? "Shown in CAD, converted from our USD model at 1.4 CAD per USD." : "Shown in USD."} A planning estimate, not a quote, a forecast or a guaranteed payout.</p>
+        </Details>
+        <Details label="Your products across the network" testId="hub-network">
+          <p>{RETAIL_COPY} · {RETAIL_TAG}. Estimates, not guarantees.</p>
+          <ChannelTable rows={rows} testId="hub-channels" extra={<InLocationRow physical={physical} testId="hub-channels-in-location" />} />
+        </Details>
         {cta ? <div className="mt-4">{cta}</div> : null}
       </div>
     </section>
