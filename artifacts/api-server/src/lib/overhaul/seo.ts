@@ -221,5 +221,16 @@ export function llmsTxt(): string {
     "Seller: Silver Birch Growth Inc. · Toronto, Ontario · randy@scalehealth.ca",
     llmsFasterSection(),
     llmsProofSection(),
+    "",
+    "## Markdown versions of the main pages",
+    "- [Home](https://birchreserve.net/index.md)",
+    "- [Media kit](https://birchreserve.net/media-kit.md)",
+    "- [Rates](https://birchreserve.net/rates.md)",
+    "- [See prices and pay](https://birchreserve.net/buycalc.md)",
+    "- [For media buyers and agencies](https://birchreserve.net/buyers.md)",
+    "- [Agencies](https://birchreserve.net/agencies.md)",
+    "- [Hubs](https://birchreserve.net/hubs.md)",
+    "- [Birch Reserve vs a typical Google Ads start](https://birchreserve.net/vs-google-ads.md)",
+    "- [Full description](https://birchreserve.net/llms-full.txt)",
   ].join("\n");
 }

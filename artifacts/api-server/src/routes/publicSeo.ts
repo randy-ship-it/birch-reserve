@@ -6,6 +6,7 @@
  * the API function (ahead of the SPA rewrite) and the head is rewritten here.
  * Server-rendered pages set the same tags in their own HTML.
  */
+import { MD_PAGES, mdPathFor } from "../lib/aiMarkdown";
 import { PUBLIC_INSIGHT_ARTICLES, db, editorialArticlesTable, isRetractedPublicInsight } from "@workspace/db";
 import { and, asc, eq, lte } from "drizzle-orm";
 import { Router, type IRouter, type NextFunction, type Request, type Response } from "express";
@@ -62,7 +63,7 @@ async function insightPaths(): Promise<{ paths: string[]; lastmod: Map<string, s
 router.get("/sitemap.xml", async (_req, res) => {
   const insights = await insightPaths();
   const pages = [...PUBLIC_SITEMAP_PATHS, ...insights.paths].filter((path) => isSelfCanonical(path));
-  const xml = sitemapXml(pages, insights.lastmod);
+  const xml = sitemapXml([...pages, ...MD_PAGES.map((p) => mdPathFor(p.path))], insights.lastmod);
   res.set({
     "Cache-Control": "public, max-age=300",
     "Content-Type": "application/xml; charset=utf-8",

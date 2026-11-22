@@ -14,6 +14,8 @@ import publicPagesRouter from "./routes/publicPages";
 import advertiserGuidesRouter from "./routes/advertiserGuides";
 import blogRouter from "./routes/blog";
 import aiDiscoveryRouter from "./routes/aiDiscovery";
+import aiMarkdownRouter from "./routes/aiMarkdown";
+import { aiBotLog } from "./middlewares/aiBotLog";
 import buyRouter, { buyStaffRouter } from "./routes/buy";
 import exclusiveReserveRouter from "./routes/exclusiveReserve";
 import adserverRouter from "./routes/adserver";
@@ -54,11 +56,15 @@ app.set("trust proxy", (_address: string, hop: number) => hop === 0);
 // Security headers on every function response (HSTS, nosniff, frame-ancestors, CSP + report-only, etc.).
 // frame-ancestors already includes the Scale hosts and MIRROR_FRAME_HOSTS, so it replaces the old mirrorFrame().
 app.use(securityHeaders());
+// AI crawler visit log (bot family + path only, no PII). CrowdReply playbook, Nov 21 2026.
+app.use(aiBotLog());
 app.use(CSP_REPORT_PATH, cspReportRouter);
 
 // Scale mirror (scalehealth.ca/intake): strip /intake/_m and shape the mirror shell. No-op on birchreserve.net.
 app.use(mirrorHost());
 app.use(promoContext());
+// Markdown mirrors (/index.md, /media-kit.md, ...) + Accept: text/markdown + Link header. Public, no cloaking.
+app.use(aiMarkdownRouter);
 
 // ── Standard middleware ───────────────────────────────────────────────────────
 app.use(
