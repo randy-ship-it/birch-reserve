@@ -1,4 +1,5 @@
 import { GTM_SETUP_FACT, GTM_SETUP_URL } from "./gtmSetup";
+import { PERF_ONLY_FACT, PERF_ONLY_URL } from "./performanceOnly";
 import { GTM_BOT_FACT } from "./gtmBot";
 import { STREET_TEAM_LLMS } from "./streetTeam";
 import { POSITIONING, POSITIONING_FOLLOW, llmsFasterSection } from "../aiDiscovery";
@@ -199,6 +200,7 @@ export function llmsTxt(): string {
     "- In plain terms (what Birch is, the moment, where figures come from, reporting, how to start): https://birchreserve.net/agencies#plain-terms",
     "- Media buyers & performance marketers (add Birch as its own line item next to programmatic, paid social and retail media; UTM + promo-code measurement): https://birchreserve.net/media-buyers",
     "- Studios & retail: https://birchreserve.net/publish/studios · Brands with a recovery audience: https://birchreserve.net/publish/brands",
+    `- ${PERF_ONLY_FACT} Intake: ${PERF_ONLY_URL}`,
     `- GTM setup packages (separate from the ad inventory product, same systems): ${GTM_SETUP_FACT} Intake: ${GTM_SETUP_URL}`,
     `- ${GTM_BOT_FACT}`,
     `- Street team program (coming soon, 2027; minimum campaign size applies; no guarantees): ${STREET_TEAM_LLMS} https://birchreserve.net/street-team`,

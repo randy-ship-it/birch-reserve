@@ -34,6 +34,7 @@ import { cleanPhysical, inLocationReach, type PhysicalAnswer } from "../../../..
 import { FieldError, SavedNote, StepHeader } from "@/components/br/form-steps";
 import { clearSaved, fieldError, loadSaved, saveForm } from "@/lib/form-save";
 import { AdActivation } from "@/components/br/ad-activation";
+import { CLINIC_PROGRAM_NOTE, PERF_ONLY_PROGRAM_NOTE } from "../../../../api-server/src/lib/overhaul/performanceOnly";
 import { ExposureLadder, SupplierDone, SupplierFees, brandFromUrl, hubSlugOf, levelOf, rolesForLevel, type IntakePreset } from "@/components/br/supplier-mode";
 
 /** "Do you have physical locations?" (Randy, Nov 19 2026 10:54 AM ET): yes/no; if yes, how many + monthly visitors. */
@@ -115,6 +116,11 @@ function AccelerateToggle({ on, onClick }: { on: boolean; onClick: () => void })
 export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: IntakeSide) => void; preset?: IntakePreset }) {
   const sup = preset === "supplier";
   const [r, setR] = useState<OneFormRoles>({ supplier: true, hub: true, accelerate: false });
+  // Program choice (Randy voice, Nov 21 2026): "Clinic hub program" (the default, unchanged) vs "Performance only (your own site)".
+  // Performance only sends the supplier role alone and tags the lead through a notes line (lands in the lead blurb).
+  const [perfOnly, setPerfOnly] = useState<boolean>(() => !sup && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("program") === "performance-only");
+  const pickProgram = (po: boolean) => { setPerfOnly(po); setR(po ? { supplier: true, hub: false, accelerate: false } : { supplier: true, hub: true, accelerate: false }); trackIntake("advertiser", "field_start", "role", { dedupe: true }); };
+  useEffect(() => { if (perfOnly) setR({ supplier: true, hub: false, accelerate: false }); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const roles = rolesOf(r);
   const side = sideFor(r);
   const [market, setMarketRaw] = useState<Market>(DEFAULT_MARKET);
@@ -196,6 +202,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
     ...(shared.brand.trim() ? { company_name: shared.brand.trim() } : {}),
     shared: { categories: shared.categories, skus: numOrU(shared.skus), audience_customers: numOrU(shared.audience), ...(physOf(phys) ? { physical: physOf(phys) } : {}) },
     // Supplier preset + own hub: the hub is created as pending_approval (Randy or Jon approve; never auto-publish).
+    ...(sup ? {} : { notes: [perfOnly ? PERF_ONLY_PROGRAM_NOTE : CLINIC_PROGRAM_NOTE] }),
     ...(sup && r.hub ? { hub_request: { role: "supplier" as const, status: "pending_approval" as const, ...(shared.brand.trim() ? { hub_name: shared.brand.trim().slice(0, 120) } : {}), ...(hubSlugOf(shared.brand.trim() || hostOf(website).split(".")[0]!) ? { hub_slug: hubSlugOf(shared.brand.trim() || hostOf(website).split(".")[0]!) } : {}) }, notes: [`Supplier intake (/intake/supplier), exposure level ${levelOf(r)}: ${r.accelerate ? "own hub + CPM/CPC display" : "own hub"}, pending Birch Reserve approval.`] } : sup ? { notes: ["Supplier intake (/intake/supplier), exposure level 1: performance only."] } : {}),
   });
   // Partial lead (Randy via Emma, Nov 19 2026 10:21 AM ET): once the email is valid, save what's filled in
@@ -300,10 +307,23 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   const supplierOnly = r.supplier && !r.hub;
   return (
     <form onSubmit={submit} noValidate data-testid="intake-short-form" data-roles={roles.join(",")} className="rounded-3xl border border-foreground/10 bg-white p-5 shadow-xl md:p-6">
-      <StepHeader step={1} total={2} title="Your free kit" hint={sup ? "Pick your level, add your website and work email, then press the green button." : "Both boxes are on (most brands are both). Add your website and work email, then press Get my free Monetization Kit."} testId="intake-steps" />
+      <StepHeader step={1} total={2} title="Your free kit" hint={sup ? "Pick your level, add your website and work email, then press the green button." : perfOnly ? "Add your website and work email, then press Get my free Monetization Kit." : "Both boxes are on (most brands are both). Add your website and work email, then press Get my free Monetization Kit."} testId="intake-steps" />
       <SavedNote show={localRestored && !resumed} onClear={startOver} />
       {sup ? <ExposureLadder level={levelOf(r)} onPick={(l) => { setR(rolesForLevel(l)); trackIntake("advertiser", "field_start", l === 3 ? "accelerate" : l === 2 ? "add_hub" : "supplier", { dedupe: true }); }} /> : null}
-      {sup ? null : <fieldset>
+      {sup ? null : (
+        <fieldset className="mb-4" data-testid="intake-program">
+          <legend className="text-[11px] font-bold uppercase tracking-wider text-foreground/60">How do you want to work with us?</legend>
+          <div className="mt-2 grid gap-2 md:grid-cols-2" role="radiogroup">
+            {([[false, "Clinic hub program", "Your offers inside clinic hubs.", "intake-program-clinic"], [true, "Performance only (your own site)", "Our code on your own site. Not every brand is a fit for the clinic hub program.", "intake-program-perf"]] as const).map(([po, t, sub, id]) => (
+              <button key={id} type="button" role="radio" aria-checked={perfOnly === po} onClick={() => pickProgram(po)} data-testid={id} className={`rounded-2xl border-2 p-4 text-left transition ${perfOnly === po ? "border-[#0b1f3a] bg-[#0b1f3a] text-white shadow-lg" : "border-foreground/15 bg-white hover:border-foreground/40"}`}>
+                <span className="block text-base font-bold">{t}</span>
+                <span className={`mt-1 block text-[13px] leading-snug ${perfOnly === po ? "text-white/80" : "text-foreground/65"}`}>{sub}</span>
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      )}
+      {sup || perfOnly ? null : <fieldset>
         <legend className="text-[11px] font-bold uppercase tracking-wider text-foreground/60">You are… <span className="font-semibold normal-case tracking-normal text-foreground/50">(most brands are both)</span></legend>
         <div className="mt-2 grid gap-2 md:grid-cols-2" data-testid="intake-roles">
           <RoleCard on={r.supplier} onClick={() => flip("supplier")} icon={Package} title="Supplier" tag="Performance-only" sub="Get into curated hubs. Pay on results." testId="intake-role-supplier">
@@ -321,6 +341,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
           </div>
         ) : null}
       </fieldset>}
+      {perfOnly ? <p className="rounded-2xl border border-lime-300 bg-lime-50 p-3 text-sm font-semibold text-[#0b1f3a]" data-testid="perf-only-note">Performance only: we place our drop-in code on key spots in your own customer experience. Performance-based terms are set at onboarding.</p> : null}
       {resumed ? <p className="mt-3 rounded-xl bg-lime-50 p-3 text-sm font-semibold text-[#0b1f3a]" data-testid="intake-resumed">Welcome back. We saved your answers: check them and get your kit.</p> : null}
       <LocationsQuestion value={phys} onChange={setPhys} side={side} />
 

@@ -178,3 +178,11 @@ test("network explainer: what the private display network is, spend-down, packs,
   assert.doesNotMatch(p, /\bsigned partners\b|unclaimed|\bAlign\b/i);
   assert.match(p, /\$1,900/);
 });
+
+test("prompt explains the performance-only path without rejecting anyone or quoting rates", () => {
+  const p = buildBirchChatSystemPrompt({ checkout: live });
+  assert.match(p, /not every brand is a fit for the clinic hub program/i);
+  assert.match(p, /performance-based and set at onboarding/);
+  assert.match(p, /intake\?program=performance-only/);
+  assert.match(p, /never that anyone was rejected/);
+});

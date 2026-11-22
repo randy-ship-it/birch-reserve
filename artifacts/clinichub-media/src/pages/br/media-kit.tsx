@@ -14,6 +14,7 @@ import { PerformanceRanges } from "@/components/br/performance-ranges";
 import { FlightReportExample } from "@/components/br/flight-report";
 import { GtmBotTeaser } from "@/components/br/gtm-bot-teaser";
 import { GtmSetup } from "@/components/br/gtm-setup";
+import { PerformanceOnly } from "@/components/br/performance-only";
 import { STREET_TEAM_ONE_LINE } from "../../../../api-server/src/lib/overhaul/streetTeam";
 import { KitCta } from "@/components/br/kit-cta";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
@@ -213,7 +214,7 @@ export default function BrMediaKit() {
 
       {/* GTM setup packages (Randy t332u, Nov 21 2026) */}
       <section className="border-b border-border/70 bg-background" data-testid="mk-gtm-setup">
-        <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14"><div className="mb-4"><HowWeGotHere where="media_kit" /></div><div className="mb-4"><TrackRecord where="media_kit" /></div><div className="mb-4"><FlightReportExample where="media_kit" /></div><div className="mb-4"><PerformanceRanges where="media_kit" /></div><GtmSetup where="media_kit" />
+        <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14"><div className="mb-4"><HowWeGotHere where="media_kit" /></div><div className="mb-4"><TrackRecord where="media_kit" /></div><div className="mb-4"><FlightReportExample where="media_kit" /></div><div className="mb-4"><PerformanceRanges where="media_kit" /></div><div className="mb-4"><PerformanceOnly where="media_kit" /></div><GtmSetup where="media_kit" />
           <div className="mt-4"><GtmBotTeaser /></div>
           <p className="mt-4 text-sm text-foreground/75" data-testid="mk-street-team-line"><strong className="text-[#0b1f3a]">Street team.</strong> {STREET_TEAM_ONE_LINE} <a href="/street-team" className="font-semibold underline underline-offset-2">See the program</a></p>
         </div>
