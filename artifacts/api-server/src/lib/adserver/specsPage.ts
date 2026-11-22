@@ -43,14 +43,14 @@ function fmtCard(f: CreativeFormat, base: string): string {
 <h3>${esc(f.label)}</h3><p class="fine" style="margin:0">${esc(f.where)}</p>
 <dl><dt>Export</dt><dd>${f.upload[0]}×${f.upload[1]} px</dd><dt>Smallest</dt><dd>${f.min[0]}×${f.min[1]} px</dd><dt>Shows at</dt><dd>${f.size[0]}×${f.size[1]} px</dd><dt>Safe zone</dt><dd>${f.safe * (f.upload[0] / f.size[0])} px from each edge</dd><dt>Aim for</dt><dd>${f.kind === "video" ? `≤ ${kb(f.targetBytes)}, ${VIDEO_SECONDS.ideal[0]}–${VIDEO_SECONDS.ideal[1]} s` : `≤ ${kb(f.targetBytes)}`}</dd><dt>Format id</dt><dd><code>${f.key}</code></dd></dl>
 <p class="fine" style="margin:0">Runs on: ${esc(where)}</p>
-<div class="dl"><a class="btn ghost sm" href="${base}/ads/specs/templates/${f.key}.svg?download" download>SVG template</a><a class="btn ghost sm" href="${PUBLIC_ORIGIN}/ads-specs/templates/${f.key}.png" download>PNG template</a></div></article>`;
+<div class="dl"><a class="btn ghost sm" href="${base}/ads/specs/templates/${f.key}.svg?download" download>SVG template</a><a class="btn ghost sm" href="${base}/ads-specs/templates/${f.key}.png" download>PNG template</a></div></article>`;
 }
 
 export function specsPage(o: { skin?: Skin } = {}): string {
   const skin = o.skin ?? "birch";
   const b = brandOf(skin);
-  const base = ""; // templates resolve on both hosts (scalehealth.ca forwards /ads/specs/*)
-  const abs = skin === "scale" ? PUBLIC_ORIGIN : "";
+  const base = skin === "scale" ? "/intake/_m" : ""; // templates resolve on both hosts through the mirror prefix
+  const abs = skin === "scale" ? "/intake/_m" : ""; // Scale pages stay on scalehealth.ca (the mirror prefix serves every Birch path)
   const stills = FORMATS.filter((f) => f.kind === "image");
   const videos = FORMATS.filter((f) => f.kind === "video");
   const snippet = `<script async src="${PUBLIC_ORIGIN}/ads/embed.js"></script>
@@ -124,7 +124,7 @@ ${PLACEMENTS.map((p) => `<tr><td>${esc(placementLabel(p))}</td><td>${formatsForP
     robots: skin === "scale" ? "noindex,follow" : "index,follow",
     head: `<link rel="canonical" href="${PUBLIC_ORIGIN}/ads/specs"><meta name="description" content="Ad creative specs: still image and short video sizes, file types, weights, safe zones, alt text and landing link rules, with downloadable templates.">`,
     right: `<nav class="tabs"><a href="#sizes">Sizes</a><a href="#rules">Rules</a><a href="#words">Words</a><a href="#embed">Embed</a><a href="${abs}/account">Upload</a></nav>`,
-    footer: skin === "scale" ? `Scale Health ad system · <a href="${PUBLIC_ORIGIN}/ads/specs">birchreserve.net/ads/specs</a> · Aggregate reporting only. No impression guarantees.` : undefined,
+    footer: skin === "scale" ? `Scale Health ad system · Aggregate reporting only. No impression guarantees.` : undefined,
     body,
   });
 }
@@ -141,7 +141,7 @@ const SLOT_MAP: Array<{ placement: Placement; where: string; width: string }> = 
 export function hubKitPage(o: { skin?: Skin } = {}): string {
   const skin = o.skin ?? "birch";
   const b = brandOf(skin);
-  const abs = skin === "scale" ? PUBLIC_ORIGIN : "";
+  const abs = skin === "scale" ? "/intake/_m" : ""; // Scale pages stay on scalehealth.ca (the mirror prefix serves every Birch path)
   const snippet = `<!-- 1. Once per page (or once in your app shell) -->
 <script async src="${PUBLIC_ORIGIN}/ads/embed.js"></script>
 

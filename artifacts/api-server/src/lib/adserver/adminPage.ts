@@ -38,6 +38,8 @@ export type AdminView = {
   friday: boolean;
   schema: string;
   promoHtml?: string;
+  /** "Today and this week" strip (adminGlance.ts). */
+  glanceHtml?: string;
   /** Referral orders + per-referrer commission (referralAdmin.ts). */
   referralHtml?: string;
   partnersHtml?: string;
@@ -225,6 +227,7 @@ ${x.kind === "video" && !poster ? `<form class="f" data-post="/ads/admin/creativ
 <div class="card kpi"><span>Viewable · 24h</span><b>${fmtInt(v.day.views)}</b><small>${fmtInt(v.day.serves)} served</small></div>
 <div class="card kpi"><span>Clicks · 24h</span><b>${fmtInt(v.day.clicks)}</b><small>CTR ${fmtPct(v.day.clicks, v.day.views)}</small></div>
 <div class="card kpi"><span>Conversions · 24h</span><b>${fmtInt(v.day.convs)}</b><small>pixel + postback</small></div></div></section>
+${v.glanceHtml ?? ""}
 <section id="campaigns"><h2>Campaigns</h2><p class="fine">Paid checkouts open a draft automatically. To go live: approve a creative, set the flight (after the IO is signed), set the landing URL, then set status Active. Pacing is even across the flight, charged at each slot's card rate, and never past budget.</p>
 <div class="tw"><table><thead><tr><th>Campaign</th><th>Status</th><th>Placement</th><th class="n">Budget</th><th>Flight</th><th class="n">Delivery</th><th>Creatives</th><th></th></tr></thead><tbody>${rows.join("") || `<tr><td colspan="8" class="muted">No campaigns yet.</td></tr>`}</tbody></table></div>
 <details class="ed"><summary>Customer dashboard link</summary><form data-post="/ads/admin/account-link" class="f"><div class="row"><label>Customer dashboard link by email (promo-only buyers)<input name="email" type="email" required></label></div><button class="ghost sm" type="submit">Copy dashboard link</button><pre data-out style="display:none;white-space:pre-wrap;word-break:break-all"></pre></form></details>
@@ -276,7 +279,7 @@ const COCKPIT_CSS = `main.wrap{max-width:1360px}.cockpit{display:grid;grid-templ
 @media(max-width:900px){.cockpit{grid-template-columns:1fr;gap:8px}.ck-rail{position:static}.ck-rail nav{display:flex;flex-wrap:wrap;gap:4px}.ck-rail a{flex:1 1 auto;justify-content:center;gap:6px;border:1px solid var(--br-line);background:var(--br-surface)}.ck-kpis{position:static}}
 @media(max-width:640px){.ck-kpis .k{grid-template-columns:repeat(2,minmax(0,1fr))}}`;
 
-const COCKPIT_JS = `(function(){var G={overview:"*",campaigns:"campaigns",creatives:"creatives",inventory:"inventory",onboard:"hubs",hubproof:"hubs",activation:"hubs","payout-settings":"money",royalties:"money",referrals:"money",ledger:"money",orders:"money",exports:"money",promo:"promo",street:"promo",alerts:"promo",audit:"audit"};
+const COCKPIT_JS = `(function(){var G={overview:"*",glance:"*",campaigns:"campaigns",creatives:"creatives",inventory:"inventory",onboard:"hubs",hubproof:"hubs",activation:"hubs","payout-settings":"money",royalties:"money",referrals:"money",ledger:"money",orders:"money",exports:"money",promo:"promo",street:"promo",alerts:"promo",audit:"audit"};
 var secs=[].slice.call(document.querySelectorAll(".ck-pane>section[id]"));var tabs={};secs.forEach(function(s){var g=G[s.id]||"campaigns";s.setAttribute("data-g",g);tabs[g]=1});
 var links=[].slice.call(document.querySelectorAll(".ck-rail a[data-tab]"));
 function show(h){var id=(h||"").replace(/^#/,"");var g=tabs[id]?id:(G[id]&&G[id]!=="*"?G[id]:"campaigns");
