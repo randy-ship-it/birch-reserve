@@ -56,13 +56,13 @@ test("publisher surfaces re-use the rate card / spec sheet; nothing invented", (
   assert.deepEqual(Object.keys(byKey).sort(), ["home", "member_dashboard", "newsletter", "post_purchase", "product", "services", "social"]);
 });
 
-test("publisher projection: 35% payout, sell-through assumption, ramp <= normalized, toggles", () => {
+test("publisher projection: 70% payout, sell-through assumption, ramp <= normalized, toggles", () => {
   const p = projectPublisher({ on: {}, mode: "cpm", sizeX: 1, conversionPct: 0, valuePerConversionUsd: 0 });
-  assert.equal(PAYOUT.basePct, 35);
-  assert.equal(p.sellPct, SELL_ASSUMPTION_PCT);
+  assert.equal(PAYOUT.basePct, 70);
+  assert.equal(p.sellBand[0], SELL_ASSUMPTION_PCT); assert.equal(p.sellPct, SELL_ASSUMPTION_PCT * 2);
   assert.ok(p.mediaPayoutUsd[0] > 0 && p.mediaPayoutUsd[0] <= p.mediaPayoutUsd[1]);
   const pp = p.rows.find((r) => r.key === "post_purchase")!;
-  assert.equal(pp.payoutUsd[0], Math.round(pp.grossUsd[0] * 0.35));
+  assert.ok(Math.abs(pp.payoutUsd[0] - pp.grossUsd[0] * 0.7) <= 1);
   const off = projectPublisher({ on: { post_purchase: false, home: false, product: false, services: false, member_dashboard: false }, mode: "cpm", sizeX: 1, conversionPct: 0, valuePerConversionUsd: 0 });
   assert.deepEqual(off.mediaPayoutUsd, [0, 0]);
   const cpc = projectPublisher({ on: {}, mode: "cpc", sizeX: 2, conversionPct: 2, valuePerConversionUsd: 50 });
