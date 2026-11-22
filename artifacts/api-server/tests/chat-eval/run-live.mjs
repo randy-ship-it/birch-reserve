@@ -17,7 +17,8 @@ const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > 0 ?
 const out = arg("out", `/workspace/onboard-eval/run-${Date.now()}`);
 const only = arg("only", "");
 const ids = arg("ids", "") ? arg("ids", "").split(",") : null;
-const UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
+// BirchQA/1 marks every eval request as QA: the chat never writes the pulse, transcripts, leads or alerts for it.
+const UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 BirchQA/1";
 const SITES = {
   birch: { url: "https://birchreserve.net/api/launch/randy-chat", origin: "https://birchreserve.net", body: {} },
   scale: { url: "https://www.scalehealth.ca/intake/_m/api/launch/randy-chat", origin: "https://www.scalehealth.ca", body: { skin: "scale" } },
