@@ -16,16 +16,18 @@
  *    Root-relative src/href in the shell are prefixed on the server. Canonical stays https://birchreserve.net/…
  *
  * 3. Links (Randy, Nov 20 2026 8:51 AM ET: the mirror must behave the same): root-relative <a href> that leave /intake
- *    are rewritten in the DOM to https://birchreserve.net/<path>, so middle-click, open-in-new-tab, long-press and
- *    copy-link land on the same page as a normal click. Absolute links (e.g. https://www.scalehealth.ca/clinichubs)
+ *    are rewritten in the DOM to /intake/_m/<path> (the same Birch page, served under the Scale skin on scalehealth.ca;
+ *    "/" goes to https://www.scalehealth.ca/), so middle-click, open-in-new-tab, long-press and copy-link land on the
+ *    same page as a normal click and the visitor never leaves scalehealth.ca (Randy, Nov 22 2026 2:51 PM ET). Absolute links (e.g. https://www.scalehealth.ca/clinichubs)
  *    and data-mirror-keep links are left alone.
  *
  * Without the query tag nothing changes: birchreserve.net serves byte-identical HTML.
  */
 import type { NextFunction, Request, Response } from "express";
-import { PUBLIC_SITE_ORIGIN } from "../lib/publicSeo";
 
 export const MIRROR_PREFIX = "/intake/_m";
+/** Scale Health's own site: the only place a mirror visitor leaves /intake for (Randy, Nov 22 2026 2:51 PM ET: everything stays on Scale). */
+export const SCALE_SITE_ORIGIN = "https://www.scalehealth.ca";
 /** br_mirror tag -> source tag recorded on share events and intake records. */
 export const MIRROR_TAGS: Readonly<Record<string, string>> = { scale: "scale_mirror" };
 /**
@@ -55,22 +57,23 @@ export function stripMirrorPrefix(url: string): string | null {
 /** The boot script. Kept tiny and dependency-free; runs before the freshness check and the bundle. */
 export function mirrorBootScript(src: string): string {
   const skin = MIRROR_SKINS[src];
-  const cfg = JSON.stringify({ base: MIRROR_PREFIX, src, home: PUBLIC_SITE_ORIGIN, ...(skin ? { skin } : {}) });
+  const cfg = JSON.stringify({ base: MIRROR_PREFIX, src, home: MIRROR_PREFIX, site: SCALE_SITE_ORIGIN, ...(skin ? { skin } : {}) });
   return `<script>(function(){var M=window.__BR_MIRROR=${cfg};var B=M.base,O=location.origin;if(M.skin)document.documentElement.setAttribute("data-skin",M.skin);
 function rel(u){if(typeof u!=="string")return null;if(u.indexOf(O+"/")===0)u=u.slice(O.length);return u.charAt(0)==="/"&&u.charAt(1)!=="/"?u:null}
 function own(p){return p==="/intake"||p.indexOf("/intake/")===0||p.indexOf("/intake?")===0||p.indexOf("/intake#")===0}
 function fix(u){var p=rel(u);return p===null||own(p)?u:B+p}
 function raw(v){return typeof v==="string"&&v.charAt(0)==="/"&&v.charAt(1)!=="/"?v:null}
-M.fix=fix;M.href=function(u){var p=rel(u);return p===null||own(p)?u:M.home+p};
+function to(p){return p==="/"?M.site+"/":M.home+p}
+M.fix=fix;M.href=function(u){var p=rel(u);return p===null||own(p)?u:to(p)};
 var f=window.fetch;if(f)window.fetch=function(i,o){try{if(typeof i==="string")i=fix(i);else if(i instanceof URL)i=fix(i.href);else if(i&&i.url&&rel(i.url)!==null&&!own(rel(i.url)))i=new Request(fix(i.url),i)}catch(e){}return f.call(this,i,o)};
 var sb=navigator.sendBeacon;if(sb)navigator.sendBeacon=function(u,d){return sb.call(navigator,fix(String(u)),d)};
 var xo=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u){arguments[1]=fix(String(u));return xo.apply(this,arguments)};
 var sa=Element.prototype.setAttribute,A={src:1,srcset:1,poster:1,"data-src":1};
 Element.prototype.setAttribute=function(n,v){var t=this.tagName;if(typeof v==="string"){var k=String(n).toLowerCase();if(A[k])v=k==="srcset"?v.replace(/(^|,\\s*)(\\/[^\\/\\s][^\\s,]*)/g,function(_,a,p){return a+fix(p)}):fix(v);else if(k==="href"&&(t==="LINK"||t==="IMAGE"||t==="USE"))v=fix(v)}return sa.call(this,n,v)};
 ["src"].forEach(function(p){[HTMLImageElement,HTMLScriptElement,HTMLSourceElement,HTMLVideoElement,HTMLAudioElement,HTMLIFrameElement].forEach(function(C){var d=C&&Object.getOwnPropertyDescriptor(C.prototype,p);if(d&&d.set)Object.defineProperty(C.prototype,p,{configurable:true,enumerable:d.enumerable,get:d.get,set:function(v){d.set.call(this,typeof v==="string"?fix(v):v)}})})});
-var ps=history.pushState,rs=history.replaceState;function nav(o){return function(s,t,u){if(u!=null){var p=rel(String(u));if(p!==null&&!own(p)){location.href=M.home+p;return}}return o.apply(history,arguments)}}history.pushState=nav(ps);history.replaceState=nav(rs);
-document.addEventListener("click",function(e){if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;var a=e.target&&e.target.closest&&e.target.closest("a[href]");if(!a||a.hasAttribute("download")||a.hasAttribute("data-mirror-keep"))return;var p=raw(a.getAttribute("href"));if(p===null||own(p))return;e.preventDefault();e.stopPropagation();if(a.target==="_blank")window.open(M.home+p,"_blank","noopener");else location.href=M.home+p},true);
-function fa(a){if(!a.getAttribute||a.hasAttribute("data-mirror-keep")||a.hasAttribute("download"))return;var p=raw(a.getAttribute("href"));if(p!==null&&!own(p))sa.call(a,"href",M.home+p)}
+var ps=history.pushState,rs=history.replaceState;function nav(o){return function(s,t,u){if(u!=null){var p=rel(String(u));if(p!==null&&!own(p)){location.href=to(p);return}}return o.apply(history,arguments)}}history.pushState=nav(ps);history.replaceState=nav(rs);
+document.addEventListener("click",function(e){if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;var a=e.target&&e.target.closest&&e.target.closest("a[href]");if(!a||a.hasAttribute("download")||a.hasAttribute("data-mirror-keep"))return;var p=raw(a.getAttribute("href"));if(p===null||own(p))return;e.preventDefault();e.stopPropagation();if(a.target==="_blank")window.open(to(p),"_blank","noopener");else location.href=to(p)},true);
+function fa(a){if(!a.getAttribute||a.hasAttribute("data-mirror-keep")||a.hasAttribute("download"))return;var p=raw(a.getAttribute("href"));if(p!==null&&!own(p))sa.call(a,"href",to(p))}
 function sweep(n){if(!n||n.nodeType!==1)return;if(n.tagName==="A")fa(n);if(n.querySelectorAll){var l=n.querySelectorAll("a[href]");for(var i=0;i<l.length;i++)fa(l[i])}}
 if(window.MutationObserver)new MutationObserver(function(ms){for(var i=0;i<ms.length;i++){var m=ms[i];if(m.type==="attributes")fa(m.target);else for(var j=0;j<m.addedNodes.length;j++)sweep(m.addedNodes[j])}}).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:["href"]});
 document.addEventListener("DOMContentLoaded",function(){sweep(document.documentElement)});
@@ -85,7 +88,7 @@ export function mirrorHtml(html: string, src: string): string {
     tag.replace(/\s(src|href|poster)="([^"]*)"/gi, (_m, k: string, v: string) => ` ${k}="${pre(v)}"`),
   );
   out = out.replace(/<a\b[^>]*>/gi, (tag) =>
-    tag.replace(/\shref="(\/(?!\/)[^"]*)"/i, (m, v: string) => (/^\/intake(?:[/?#]|$)/.test(v) ? m : ` href="${PUBLIC_SITE_ORIGIN}${v}"`)),
+    tag.replace(/\shref="(\/(?!\/)[^"]*)"/i, (m, v: string) => (/^\/intake(?:[/?#]|$)/.test(v) ? m : v === "/" ? ` href="${SCALE_SITE_ORIGIN}/"` : ` href="${MIRROR_PREFIX}${v}"`)),
   );
   if (MIRROR_SKINS[src] === "scale") out = scaleHead(out);
   const boot = mirrorBootScript(src);

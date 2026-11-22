@@ -4,6 +4,7 @@
  * "from your site" tag; gaps (needs_input) become prompts in "Add detail to sharpen your numbers". Defaults are
  * labelled. Friday's full report is reviewed by a person first. Birch never fetches the brand's site itself.
  */
+import { siteUrl } from "@/lib/siteSkin";
 import { LaneCtas } from "@/components/br/two-lane";
 import { PostKitNext } from "@/components/br/next-step";
 import { ArrowRight, Download, Loader2, Mail, Plus, Rocket, Sparkles } from "lucide-react";
@@ -85,7 +86,7 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
   const supplierOnly = q.roles.includes("supplier") && !q.roles.includes("publisher");
   // Downloadable PDF (cover with the report's key numbers + Side A + Side B) and the kit email (flag-gated server side).
   const token = q.ref?.reportToken && !q.ref.legacy && !q.held ? q.ref.reportToken : null;
-  const reportUrl = token ? `https://birchreserve.net${reportPath(token)}` : undefined;
+  const reportUrl = token ? siteUrl(reportPath(token)) : undefined;
   const summary = useMemo(() => kitSummary(report, exposure, q.physical, q.autofill?.mock || adapterMode() === "mock" ? "mock" : "preview", reportUrl), [report, exposure, q.physical, q.autofill, reportUrl]);
   const buildPdf = async () => {
     const calc = kitCalc({ aovUsd: aov ?? QUICK_DEFAULTS.aov_usd, monthlyOrders: QUICK_DEFAULTS.orders_per_month, purchasesPerYear: QUICK_DEFAULTS.purchases_per_year, marginBand: QUICK_DEFAULTS.margin_band });

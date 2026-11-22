@@ -12,6 +12,7 @@
  * Refund wording is the live /terms line for the $490 reserve; everything else says the IO sets the terms.
  * Copy rules: no counts, never "open/available/unclaimed", no impression/CTR/ROAS guarantees, modelled figures labelled.
  */
+import { siteUrl } from "@/lib/siteSkin";
 import { URGENCY_LINE } from "../../../../api-server/src/lib/overhaul/pilotPath";
 import { useEffect, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
@@ -269,7 +270,7 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
         <p data-testid="mid-tier-agency-terms">{MID_TIER_LINE} One IO per client. {AGENCY_REPORTING_LINE}.</p>
         <p data-testid="mid-tier-refund">{MID_TIER_REFUND}</p>
         <p>View block: from {fmtUsd(STARTER_BLOCK.startingUsd)} {C} for 100K modelled views. <a href={withUtm("/?inquire=pack&block=100000&surfaces=landing#quick-buy", where, "block")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-block-cta">Request a block</a></p>
-        <p>Premium, one brand per category: lock a {X.packageLabel} package with the <a href={withUtm("https://birchreserve.net/exclusive", where, "exclusive-1900")} className="font-semibold text-lime-300 underline underline-offset-2">{X.label} reserve</a>, or ask about a $25K–$50K premium slot by invoice. <a href={withUtm("/buy?plan=exclusive", where, "exclusive")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-exclusive">Reserve on /buy</a></p>
+        <p>Premium, one brand per category: lock a {X.packageLabel} package with the <a href={withUtm(siteUrl("/exclusive"), where, "exclusive-1900")} className="font-semibold text-lime-300 underline underline-offset-2">{X.label} reserve</a>, or ask about a $25K–$50K premium slot by invoice. <a href={withUtm("/buy?plan=exclusive", where, "exclusive")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-exclusive">Reserve on /buy</a></p>
         <TwoSurfaceExample dark />
       </Details>
     </section>

@@ -25,7 +25,9 @@ test("mirror shell: boot script first, assets through the prefix, links to Birch
   assert.match(out, new RegExp(`src="${MIRROR_PREFIX}/br-t\\.js"`));
   assert.ok(out.includes(`href="${MIRROR_PREFIX}${SCALE_FAVICON}"`), "scale mirror swaps in Scale's favicon");
   assert.match(out, /<link rel="canonical" href="https:\/\/birchreserve\.net\/intake" \/>/);
-  assert.match(out, /<a href="https:\/\/birchreserve\.net\/media-kit">/);
+  assert.match(out, /<a href="\/intake\/_m\/media-kit">/); // stays on scalehealth.ca (Randy, Nov 22 2026 2:51 PM ET)
+  assert.doesNotMatch(out.replace(/<link rel="canonical"[^>]*>/, ""), /<a href="https:\/\/birchreserve\.net/);
+  assert.match(out, /function to\(p\)\{return p==="\/"\?M\.site\+"\/":M\.home\+p\}/); // "\/" -> scalehealth.ca home, the rest -> \/intake\/_m
   assert.match(out, /<a href="\/intake\?ref=nav">/);
   assert.match(out, /<a href="https:\/\/scalehealth\.ca">/);
   assert.match(out, /src="\/\/cdn\.example\.com\/x\.png"/);

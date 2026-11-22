@@ -58,18 +58,23 @@ export function CountUp({ value, prefix = "$", className = "" }: { value: number
   return <span ref={ref} className={`tabular-nums ${className}`}>{`${prefix}${Math.round(value).toLocaleString("en-US")}`}</span>;
 }
 
+/** Static two-state pill (Off | On): the fill and colour change instantly, nothing slides. Palette follows the skin
+ *  (bg-accent = Birch lime on birchreserve.net, Scale green on scalehealth.ca). Keyboard: Tab to focus, Space or Enter flips it. */
 export function Toggle({ on, onChange, label, testId }: { on: boolean; onChange: (v: boolean) => void; label: string; testId?: string }) {
   return (
     <button
       type="button"
       role="switch"
       aria-checked={on}
+     
       aria-label={label}
       data-testid={testId}
+      data-static-toggle
       onClick={() => onChange(!on)}
-      className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${on ? "bg-accent ring-2 ring-foreground" : "bg-foreground/15"}`}
+      className="inline-flex h-8 shrink-0 select-none items-stretch rounded-full bg-foreground/[0.08] p-0.5 text-[11px] font-bold uppercase tracking-wider ring-1 ring-foreground/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
     >
-      <span className={`inline-block size-5 rounded-full bg-white shadow transition-transform ${on ? "translate-x-6" : "translate-x-1"}`} />
+      <span className={`inline-flex min-w-9 items-center justify-center rounded-full px-2.5 ${on ? "text-foreground/45" : "bg-foreground text-background"}`}>Off</span>
+      <span className={`inline-flex min-w-9 items-center justify-center rounded-full px-2.5 ${on ? "bg-accent text-accent-foreground" : "text-foreground/45"}`}>On</span>
     </button>
   );
 }
