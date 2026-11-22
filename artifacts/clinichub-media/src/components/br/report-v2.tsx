@@ -362,7 +362,7 @@ export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposur
         <h2 className="text-[26px] md:text-[34px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{m.isSupplier && m.isPublisher ? "Your exposure and your hub earnings" : m.isSupplier ? "Your supplier exposure" : "Your hub earnings"}</h2>
         <p className="text-[13px]" style={{ color: RT.mute }} data-testid="two-sides-plan">Estimates, not guarantees. {MODELLED_PLAN_LABEL}.</p>
         <div className={`mt-4 grid items-start gap-4 ${sides.length > 1 ? "lg:grid-cols-2" : ""}`}>
-          {m.isSupplier ? <SupplierExposureView key="sup" m={m} exposure={ex} source={src} cta={supplierCta} onAccelerate={onAccelerate} physical={physical} /> : null}
+          {m.isSupplier ? <div key="sup" className={sides.length > 1 ? "lg:sticky lg:top-24" : undefined}><SupplierExposureView m={m} exposure={ex} source={src} cta={supplierCta} onAccelerate={onAccelerate} physical={physical} /></div> : null}
           {m.isPublisher ? <HubView key="hub" m={m} exposure={ex} cta={earnCta} physical={physical} /> : null}
         </div>
       </section>
