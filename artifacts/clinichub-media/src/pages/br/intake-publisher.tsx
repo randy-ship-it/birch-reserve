@@ -10,7 +10,7 @@ import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { publisherActivation } from "../../../../api-server/src/lib/kitCalc/activation";
 import { trackIntake } from "@/lib/intakeTrack";
 import { CountUp, EstimateTag, InfoPop, MockBanner, RoleTabs, SaveChip, Segmented, Toggle, basePayload, useAutosave, ChannelTiles, ContactSubmit } from "@/components/br/intake-kit";
-import { PAYOUT, PUBLISHER_ASSUMPTIONS, PUBLISHER_SURFACES, projectPublisher, type PricingMode, type PubSurfaceKey } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { PAYOUT, EMAIL_OPEN_PCT_MID, PUBLISHER_ASSUMPTIONS, PUBLISHER_SURFACES, projectPublisher, type PricingMode, type PubSurfaceKey } from "../../../../api-server/src/lib/overhaul/brandIntake";
 
 const usd = (n: number, d = 0) => `$${n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d })}`;
 
@@ -56,24 +56,28 @@ export default function BrIntakePublisher() {
           <div className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-lime-300/30 blur-3xl" />
           <div className="flex flex-wrap items-center gap-2">
             <EstimateTag />
-            <span className="text-xs text-white/70">Monthly payout to you</span>
+            <span className="text-xs text-white/70">Monthly payout to you · estimate</span>
             <span className="ml-auto"><InfoPop dark title="Assumptions" label="Assumptions" testId="publisher-assumptions">{PUBLISHER_ASSUMPTIONS.map((a) => <p key={a}>• {a}</p>)}</InfoPop></span>
           </div>
-          <div className="mt-5 grid grid-cols-2 gap-4">
+          <div className="mt-5 grid grid-cols-3 gap-3">
             <div>
-              <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-white/60">At ramp</p>
-              <CountUp value={p.monthlyTotalUsd[0]} className="block pt-1 font-display text-4xl md:text-6xl" />
+              <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-white/60">Low</p>
+              <CountUp value={p.monthlyTotalUsd[0]} className="block pt-1 font-display text-2xl sm:text-4xl md:text-5xl" />
+            </div>
+            <div data-testid="publisher-typical">
+              <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-white/60">Typical</p>
+              <CountUp value={p.monthlyLikelyUsd} className="block pt-1 font-display text-2xl text-white sm:text-4xl md:text-5xl" />
             </div>
             <div>
-              <p className="mb-1 flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-lime-200"><TrendingUp className="size-3.5" /> Pricing normalized</p>
-              <CountUp value={p.monthlyTotalUsd[1]} className="block pt-1 font-display text-4xl text-lime-200 md:text-6xl" />
+              <p className="mb-1 flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-lime-200"><TrendingUp className="size-3.5" /> High</p>
+              <CountUp value={p.monthlyTotalUsd[1]} className="block pt-1 font-display text-2xl text-lime-200 sm:text-4xl md:text-5xl" />
             </div>
           </div>
           <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10" aria-hidden>
             <div className="h-full rounded-full bg-gradient-to-r from-lime-200 to-lime-400 transition-all duration-500" style={{ width: `${p.monthlyTotalUsd[1] ? Math.max(6, (p.monthlyTotalUsd[0] / p.monthlyTotalUsd[1]) * 100) : 0}%` }} />
           </div>
           <p className="mt-3 text-xs text-white/70">
-            Per year: {usd(p.yearTotalUsd[0])}–{usd(p.yearTotalUsd[1])} · {p.sellPct}% sell-through · {p.payoutPct}% payout · USD
+            Per year: {usd(p.yearTotalUsd[0])} to {usd(p.yearTotalUsd[1])}, typical {usd(p.yearLikelyUsd)} · {p.sellBand[0]}/{p.sellBand[1]}/{p.sellBand[2]}% sold (low/typical/high) · {p.payoutPct}% payout · USD
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             <Segmented<PricingMode> value={mode} onChange={touch<PricingMode>(setMode)} testId="pricing-mode" options={[{ v: "cpm", l: "CPM", tone: "bg-lime-200 text-[#0b1f3a]" }, { v: "cpc", l: "CPC", tone: "bg-lime-200 text-[#0b1f3a]" }]} />
@@ -93,7 +97,7 @@ export default function BrIntakePublisher() {
               <BarChart data={chart} layout="vertical" margin={{ left: 8, right: 16, top: 4, bottom: 4 }}>
                 <XAxis type="number" tickFormatter={(v) => `$${v}`} tick={{ fontSize: 11 }} />
                 <YAxis type="category" dataKey="name" width={112} tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: number, k: string) => [usd(v), k === "ramp" ? "At ramp" : "Added once normalized"]} />
+                <Tooltip formatter={(v: number, k: string) => [usd(v), k === "ramp" ? "Low case" : "Added up to the high case"]} />
                 <Bar dataKey="ramp" stackId="a" fill="#0b1f3a" radius={[4, 0, 0, 4]} isAnimationActive />
                 <Bar dataKey="normalized" stackId="a" radius={[0, 4, 4, 0]} isAnimationActive>
                   {chart.map((c) => <Cell key={c.name} fill="#a3e635" />)}
@@ -101,7 +105,7 @@ export default function BrIntakePublisher() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-[11px] text-muted-foreground">Navy = at ramp. Lime = added once pricing normalizes (top of the published starter range).</p>
+          <p className="text-[11px] text-muted-foreground">Navy = low case ({p.sellBand[0]}% sold, low end of the starter price). Lime = added up to the high case ({p.sellBand[2]}% sold, top of the range).</p>
         </div>
       </section>
 
@@ -152,7 +156,7 @@ export default function BrIntakePublisher() {
                   </p>
                   <InfoPop title={s.label} testId={`surface-pop-${s.key}`}>
                     <p>{s.source}</p>
-                    <p>Modelled views at a median hub: {s.monthlyViews == null ? "none on file" : `${s.monthlyViews.toLocaleString("en-US")}/mo`}.</p>
+                    <p>Modelled {s.key === "newsletter" ? "sends" : "views"} at a median hub: {s.monthlyViews == null ? "none on file" : `${s.monthlyViews.toLocaleString("en-US")}/mo`}.{s.key === "newsletter" && s.monthlyViews != null ? ` Priced per 1,000 opens: about ${Math.round((s.monthlyViews * EMAIL_OPEN_PCT_MID) / 100).toLocaleString("en-US")} opens at a typical open rate.` : ""}</p>
                     <p>Starter rates are illustrative 2026 planning estimates, not sold rates.</p>
                   </InfoPop>
                 </div>

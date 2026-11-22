@@ -8,8 +8,8 @@
  *   - CTR bands: INTENT_LADDER (./audiences), benchmark ranges, not promises.
  *   - Newsletter: the partner_email slot (../sponsorKit), $12 CPM per 1,000 opens, views per network median partner.
  *   - Monthly views: the network median partner row (../sponsorKit HUBS, modelled).
- *   - Sell-through: SELL_ASSUMPTION_PCT (./agencyShowcase), Randy's 20% planning assumption.
- *   - Payout share 35% (Randy, Nov 18 2026). Tier breakpoints are NOT set: placeholders only.
+ *   - Sell-through: SELL_ASSUMPTION_PCT (./agencyShowcase), Randy's 20% planning assumption; bands 20/40/60% (low/typical/high), same as hubEstimate.
+ *   - Payout share 70% base (Randy, Nov 22 2026: "don't be under market"; was 35%). Market set: Rokt Thanks 50%, AdSense 68%, Journey 70%, Mediavine/Raptive 75%, Ezoic 82% (median ~72%). Tier breakpoints are NOT set: placeholders only.
  *   - Sponsor SKUs: $190 look, $490 reserve (./agent publicOffers), $3,500 area lock launch price (./model AREA_LOCK).
  *   - Channel tiles: Randy's network figures / targets (Nov 18 2026). They differ from /inventory, which is unchanged.
  * Every projection is an Estimate. Nothing here is a guarantee, a booking or a checkout.
@@ -25,11 +25,11 @@ export const INTAKE_TERMS_VERSION = "birch-intake-preview-2026-11-18";
 /* ------------------------------------------------------------------ publisher */
 
 export const PAYOUT = {
-  basePct: 35,
-  line: "Hubs earn 35% of media revenue, escalating by tier.",
+  basePct: 70,
+  line: "Hubs earn 70% of media revenue, escalating by tier.",
   /** Breakpoints and step-ups are not set yet (Randy to decide). Labels only, no numbers. */
   tiers: [
-    { key: "t1", label: "Tier 1", pct: 35 as number | null, breakpoint: null as string | null, placeholder: false },
+    { key: "t1", label: "Tier 1", pct: 70 as number | null, breakpoint: null as string | null, placeholder: false },
     { key: "t2", label: "Tier 2", pct: null, breakpoint: null, placeholder: true },
     { key: "t3", label: "Tier 3", pct: null, breakpoint: null, placeholder: true },
   ],
@@ -85,42 +85,57 @@ export type SurfaceProjection = {
   label: string;
   on: boolean;
   priced: boolean;
+  /** Offers shown at the typical (40%) sell-through. */
   soldViews: number;
   clicks: [number, number];
-  /** Gross media revenue: at ramp (starter low) and once pricing normalizes (top of the published starter range). */
+  /** Gross media revenue: [low, high] = 20% sold at the low price end, 60% sold at the high price end. */
   grossUsd: [number, number];
+  /** Hub payout [low, high] and typical (40% sold at the price midpoint). Same method as the hub calculator (hubEstimate). */
   payoutUsd: [number, number];
+  likelyUsd: number;
 };
+
+/** Typical newsletter open rate (%): midpoint of the public health and fitness benchmarks used by hubEstimate (EMAIL.openRate 19.2-47.81). */
+export const EMAIL_OPEN_PCT_MID = (19.2 + 47.81) / 2;
+/** Sell-through bands, % of views carrying a paid offer: low = planning assumption, typical = 2x, high = 3x (60%, bottom of Google's 60-80% direct-sold target). */
+export const PUBLISHER_SELL_BAND = [SELL_ASSUMPTION_PCT, SELL_ASSUMPTION_PCT * 2, SELL_ASSUMPTION_PCT * 3] as const;
 
 const mid = (r: Range) => (r[0] + r[1]) / 2;
 
 export function projectPublisher(input: PublisherInput) {
   const sizeX = Math.min(20, Math.max(0.1, input.sizeX || 1));
   const share = PAYOUT.basePct / 100;
+  const [sLo, sMid, sHi] = PUBLISHER_SELL_BAND;
   const rows: SurfaceProjection[] = PUBLISHER_SURFACES.map((s) => {
     const on = input.on[s.key] ?? s.defaultOn;
-    const views = s.monthlyViews == null ? 0 : Math.round(s.monthlyViews * sizeX);
-    const sold = Math.round((views * SELL_ASSUMPTION_PCT) / 100);
+    // Newsletter views on file are sends; the $12 price is per 1,000 OPENS, so convert at the typical open rate.
+    const base = s.monthlyViews == null ? 0 : s.key === "newsletter" ? (s.monthlyViews * EMAIL_OPEN_PCT_MID) / 100 : s.monthlyViews;
+    const views = Math.round(base * sizeX);
+    const soldAt = (pct: number) => (views * pct) / 100;
     const useCpc = input.mode === "cpc" && s.cpc && s.ctr;
-    const clicksMid = s.ctr ? Math.round(sold * mid(s.ctr)) : 0;
-    let gross: [number, number] = [0, 0];
-    if (useCpc) gross = [clicksMid * s.cpc![0], clicksMid * s.cpc![1]];
-    else if (s.cpm) gross = [(sold / 1000) * s.cpm[0], (sold / 1000) * s.cpm[1]];
+    const clicksAt = (pct: number) => (s.ctr ? soldAt(pct) * mid(s.ctr) : 0);
+    // [low, likely, high] gross. CPM: sold/1000 x price. CPC: clicks x per-click price.
+    let g: [number, number, number] = [0, 0, 0];
+    if (useCpc) g = [clicksAt(sLo) * s.cpc![0], clicksAt(sMid) * mid(s.cpc!), clicksAt(sHi) * s.cpc![1]];
+    else if (s.cpm) g = [(soldAt(sLo) / 1000) * s.cpm[0], (soldAt(sMid) / 1000) * mid(s.cpm), (soldAt(sHi) / 1000) * s.cpm[1]];
     const priced = !!(s.cpm || (useCpc && s.cpc));
-    if (!on) gross = [0, 0];
+    if (!on) g = [0, 0, 0];
+    const sold = Math.round(soldAt(sMid));
     return {
       key: s.key,
       label: s.label,
       on,
       priced: priced && s.monthlyViews != null,
       soldViews: on ? sold : 0,
-      clicks: on && s.ctr ? [Math.round(sold * s.ctr[0]), Math.round(sold * s.ctr[1])] : [0, 0],
-      grossUsd: [Math.round(gross[0]), Math.round(gross[1])],
-      payoutUsd: [Math.round(gross[0] * share), Math.round(gross[1] * share)],
+      clicks: on && s.ctr ? [Math.round(soldAt(sMid) * s.ctr[0]), Math.round(soldAt(sMid) * s.ctr[1])] : [0, 0],
+      grossUsd: [Math.round(g[0]), Math.round(g[2])],
+      payoutUsd: [Math.round(g[0] * share), Math.round(g[2] * share)],
+      likelyUsd: Math.round(g[1] * share),
     };
   });
   const sum = (f: (r: SurfaceProjection) => number) => rows.reduce((a, r) => a + f(r), 0);
   const mediaPayout: [number, number] = [sum((r) => r.payoutUsd[0]), sum((r) => r.payoutUsd[1])];
+  const mediaLikely = sum((r) => r.likelyUsd);
   const clicksMid = rows.reduce((a, r) => a + (r.clicks[0] + r.clicks[1]) / 2, 0);
   const conv = Math.max(0, Math.min(100, input.conversionPct || 0));
   const value = Math.max(0, input.valuePerConversionUsd || 0);
@@ -128,20 +143,24 @@ export function projectPublisher(input: PublisherInput) {
   const transactionsUsd = Math.round(conversions * value);
   return {
     rows,
-    sellPct: SELL_ASSUMPTION_PCT,
+    sellPct: sMid,
+    sellBand: PUBLISHER_SELL_BAND,
     payoutPct: PAYOUT.basePct,
     mediaPayoutUsd: mediaPayout,
+    mediaLikelyUsd: mediaLikely,
     conversions,
     transactionsUsd,
     monthlyTotalUsd: [mediaPayout[0] + transactionsUsd, mediaPayout[1] + transactionsUsd] as [number, number],
+    monthlyLikelyUsd: mediaLikely + transactionsUsd,
     yearTotalUsd: [(mediaPayout[0] + transactionsUsd) * 12, (mediaPayout[1] + transactionsUsd) * 12] as [number, number],
+    yearLikelyUsd: (mediaLikely + transactionsUsd) * 12,
   };
 }
 
 export const PUBLISHER_ASSUMPTIONS = [
   `Views: the network median partner hub (modelled), scaled by your hub-size slider.`,
-  `Sell-through: ${SELL_ASSUMPTION_PCT}% of available space is sold (a planning assumption, not a delivery commitment).`,
-  `At ramp = the low end of each published starter range. Normalized = the top of the same published range. No later-rate numbers are published.`,
+  `Sell-through: ${PUBLISHER_SELL_BAND[0]}% of views carry a paid offer in the low case, ${PUBLISHER_SELL_BAND[1]}% typical, ${PUBLISHER_SELL_BAND[2]}% high (the bottom of the 60-80% direct-sold target Google News Initiative cites). A planning assumption, not a delivery commitment.`,
+  `Low = ${PUBLISHER_SELL_BAND[0]}% sold at the low end of each published starter price. Typical = ${PUBLISHER_SELL_BAND[1]}% sold at the midpoint. High = ${PUBLISHER_SELL_BAND[2]}% sold at the top. The newsletter is priced per 1,000 opens ($12), at a typical open rate. No later-rate numbers are published.`,
   `CPC mode uses the midpoint of each placement's modelled engagement range. Ranges, not promises.`,
   `Your payout: ${PAYOUT.basePct}% of media revenue. Tier breakpoints are not set yet (placeholder tiers).`,
   `Transactions (bookings, products) use only the numbers you enter. Leave them at 0 to skip.`,
