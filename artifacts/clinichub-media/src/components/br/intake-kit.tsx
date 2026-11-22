@@ -230,7 +230,7 @@ export function ChannelTiles({ market, fridayGeo }: { market?: Market | null; fr
         <div className="flex items-center gap-3">
           <span className="rounded-full bg-sky-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-sky-900 ring-1 ring-sky-300" data-testid="network-figures-label">{CHANNEL_TILES_LABEL}</span>
           <InfoPop title={CHANNEL_TILES_LABEL} testId="tiles-fine">
-            <p>{CHANNEL_TILES_FINE}</p>
+            <p>{skinText(CHANNEL_TILES_FINE)}</p>
           </InfoPop>
         </div>
       </div>

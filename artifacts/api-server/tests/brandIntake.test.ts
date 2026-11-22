@@ -222,3 +222,13 @@ test("hero path picks: existing terms word for word, no turnaround promise, no r
   for (const f of ["pages/br/home.tsx", "pages/br/media-buyers.tsx", "pages/br/agencies.tsx"]) assert.match(web(f), /PilotHero|KitEntry|KitCta/, f);
   assert.match(web("pages/br/media-kit.tsx"), /KitBuilder/);
 });
+
+test("Scale voice: publisher band copy and popovers go through skinText; publisher page converts CAD", async () => {
+  const { readFileSync } = await import("node:fs");
+  const sell = readFileSync("../clinichub-media/src/components/br/intake-sell.tsx", "utf8");
+  assert.match(sell, /skinText\("Your hub's screens and pages[^"]*A person at Birch Reserve reviews every hub\./);
+  const pub = readFileSync("../clinichub-media/src/pages/br/intake-publisher.tsx", "utf8");
+  assert.match(pub, /skinText\(s\.source\)/);
+  assert.match(pub, /CAD_PER_USD/);
+  assert.doesNotMatch(pub, /Value each \(USD\)/);
+});
