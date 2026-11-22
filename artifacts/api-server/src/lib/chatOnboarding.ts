@@ -63,6 +63,7 @@ export function swapForBrand(text: string, brand: ChatBrand): string {
   return swapLinks(text, "scale")
     .replace(/Birch Q&A Squirrel/g, BRAND_NAMES.scale.squirrel)
     .replace(/\bBirch team\b/g, `${BRAND_NAMES.scale.site} team`)
+    .replace(/\bRandy(?:'s|\u2019s) team\b/g, `${BRAND_NAMES.scale.site}'s team`)
     .replace(/BIRCH RESERVE/g, "SCALE HEALTH")
     .replace(/\bBirch client\b/g, "client")
     .replace(/Birch Reserve/g, BRAND_NAMES.scale.site)
