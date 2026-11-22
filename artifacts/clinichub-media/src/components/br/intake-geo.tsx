@@ -113,9 +113,16 @@ export function ActivationRange({ kind, block, source, testId }: { kind: "advert
           <figcaption className="mt-1 text-[10px] font-bold uppercase tracking-wider text-foreground/60">Now · minimum</figcaption>
           <p className="font-display text-lg tabular-nums" data-testid="activation-now-min">{$(block.now.min)}</p>
         </figure>
-        <div className="relative h-3 rounded-full bg-foreground/[0.08]" data-testid="activation-bar" aria-label={`${title}: ${$(block.now.min)} now to ${$(block.later.max)} later${per}, estimate`}>
-          <div className="absolute inset-y-0 rounded-full bg-lime-300" style={{ left: pct(block.now.min), width: `calc(${pct(block.now.max)} - ${pct(block.now.min)})`, minWidth: 6 }} title="Now" />
-          <div className="absolute inset-y-0 rounded-full bg-[#0b1f3a]/70" style={{ left: pct(block.later.min), width: `calc(${pct(block.later.max)} - ${pct(block.later.min)})`, minWidth: 6, top: 3, bottom: 3 }} title="Later" />
+        <div className="min-w-0">
+          {/* Later range sits behind as a soft band; the Now range is the solid segment on top (no stacked half-height bar). */}
+          <div className="relative h-3 rounded-full bg-foreground/[0.06]" data-testid="activation-bar" aria-label={`${title}: ${$(block.now.min)} now to ${$(block.later.max)} later${per}, estimate`}>
+            <div className="absolute inset-y-0 rounded-full bg-[#0b1f3a]/20" style={{ left: pct(block.later.min), width: `calc(${pct(block.later.max)} - ${pct(block.later.min)})`, minWidth: 6 }} title="Later" />
+            <div className="absolute inset-y-0 rounded-full bg-lime-300 ring-1 ring-[#0b1f3a]/10" style={{ left: pct(block.now.min), width: `calc(${pct(block.now.max)} - ${pct(block.now.min)})`, minWidth: 6 }} title="Now" />
+          </div>
+          <div className="mt-1.5 flex justify-center gap-3 text-[10px] font-semibold text-foreground/60" aria-hidden>
+            <span className="inline-flex items-center gap-1"><span className="size-2 rounded-full bg-lime-300" />Now</span>
+            <span className="inline-flex items-center gap-1"><span className="size-2 rounded-full bg-[#0b1f3a]/20" />Later</span>
+          </div>
         </div>
         <figure className="m-0 text-center">
           <EndArt end="later" />
