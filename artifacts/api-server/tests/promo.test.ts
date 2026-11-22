@@ -101,8 +101,8 @@ test("promo credit charges the regular rate; same buyer's promo credit is spent 
   const slot = findSlot("sole.post_purchase")!;
   const paidEx = camp({ rateMultiplierBps: 7500 });
   const promoC = camp({ id: "00000000-0000-4000-8000-000000000002", orderKind: "promo STREET100", rateMultiplierBps: PROMO_RATE_BPS });
-  assert.equal(eventCostMicros(paidEx, slot, "view"), 13_500);
-  assert.equal(eventCostMicros(promoC, slot, "view"), 18_000);
+  assert.equal(eventCostMicros(paidEx, slot, "view"), 22_500);
+  assert.equal(eventCostMicros(promoC, slot, "view"), 30_000);
   const pick = pickAd(slot, [{ campaign: paidEx, creativeIds: ["c1"] }, { campaign: promoC, creativeIds: ["c2"] }], T0, { rand: () => 0 });
   assert.equal(pick?.campaign.id, promoC.id);
   const other = camp({ id: "00000000-0000-4000-8000-000000000003", accountEmail: "z@other.com" });
@@ -110,7 +110,7 @@ test("promo credit charges the regular rate; same buyer's promo credit is spent 
   assert.ok(p2); // promo never forced ahead of another brand
   const r = regularRateSummary();
   assert.equal(r.cpmLow, 4);
-  assert.equal(r.cpmHigh, 18);
+  assert.equal(r.cpmHigh, 30);
   assert.match(r.compare, /25% below regular/);
 });
 

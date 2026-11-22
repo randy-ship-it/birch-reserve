@@ -6,7 +6,7 @@
  * NO NEW NUMBERS. Every rate, CTR band and view figure is re-used from an existing source:
  *   - CPM / CPC starter ranges: RATE_SURFACES (./pricing), illustrative 2026 planning estimates.
  *   - CTR bands: INTENT_LADDER (./audiences), benchmark ranges, not promises.
- *   - Newsletter: the partner_email slot (../sponsorKit), $30 CPM, views per network median partner.
+ *   - Newsletter: the partner_email slot (../sponsorKit), $12 CPM per 1,000 opens, views per network median partner.
  *   - Monthly views: the network median partner row (../sponsorKit HUBS, modelled).
  *   - Sell-through: SELL_ASSUMPTION_PCT (./agencyShowcase), Randy's 20% planning assumption.
  *   - Payout share 35% (Randy, Nov 18 2026). Tier breakpoints are NOT set: placeholders only.
@@ -65,7 +65,7 @@ export const PUBLISHER_SURFACES: PubSurface[] = [
   { key: "product", label: "Product pages", where: rate("products").where, monthlyViews: Math.round(MEDIAN.product_services / 2), cpm: rate("products").cpmStarter, cpc: rate("products").cpcStarter, ctr: ctr("Browsing the hub"), source: "Rate card: product pages. Views: half of product / services (modelled split).", defaultOn: true },
   { key: "services", label: "Services & booking", where: rate("services").where, monthlyViews: MEDIAN.product_services - Math.round(MEDIAN.product_services / 2), cpm: rate("services").cpmStarter, cpc: rate("services").cpcStarter, ctr: ctr("Browsing the hub"), source: "Rate card: services & booking pages. Views: half of product / services (modelled split).", defaultOn: true },
   { key: "member_dashboard", label: "Member dashboard", where: rate("dashboard").where, monthlyViews: MEDIAN.member_dashboard, cpm: rate("dashboard").cpmStarter, cpc: rate("dashboard").cpcStarter, ctr: ctr("Coming back"), source: "Rate card: member dashboard. CTR band: Coming back.", defaultOn: true },
-  { key: "newsletter", label: "Newsletter", where: EMAIL_SLOT.where, monthlyViews: MEDIAN.partner_email, cpm: [EMAIL_SLOT.cpmUsd, EMAIL_SLOT.cpmUsd], cpc: null, ctr: null, source: "Spec sheet: partner email module, $30 CPM. No CPC or CTR on file.", defaultOn: false },
+  { key: "newsletter", label: "Newsletter", where: EMAIL_SLOT.where, monthlyViews: MEDIAN.partner_email, cpm: [EMAIL_SLOT.cpmUsd, EMAIL_SLOT.cpmUsd], cpc: null, ctr: null, source: "Rate card: partner email module, $12 per 1,000 opens. No CPC or CTR on file.", defaultOn: false },
   { key: "social", label: "Social", where: "Paid posts on the hub's own social accounts.", monthlyViews: null, cpm: null, cpc: null, ctr: null, source: "No Birch rate on file yet. Priced by IO.", defaultOn: false },
 ];
 

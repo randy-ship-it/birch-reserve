@@ -29,7 +29,7 @@ export const RATE_SURFACES: readonly RateSurface[] = [
   { key: "dashboard", label: "Member dashboard (post-login)", short: "Dashboard", where: "Logged-in members tracking orders, plans and bookings.", cpmStarter: [10, 18], cpcStarter: [0.8, 1.4] },
   { key: "products", label: "Product pages", short: "Products", where: "Inside product pages while members shop recovery gear.", cpmStarter: [12, 22], cpcStarter: [0.7, 1.4] },
   { key: "services", label: "Services & booking pages", short: "Services", where: "On service and booking pages, right before an appointment is made.", cpmStarter: [15, 25], cpcStarter: [0.9, 1.8] },
-  { key: "post_purchase", label: "Post-purchase", short: "Post-purchase", where: "Thank-you and booking-confirmation pages, right after a paid order.", cpmStarter: [18, 30], cpcStarter: [1.2, 2.5] },
+  { key: "post_purchase", label: "Post-purchase", short: "Post-purchase", where: "Thank-you and booking-confirmation pages, right after a paid order.", cpmStarter: [30, 45], cpcStarter: [1.2, 2.5] },
 ] as const;
 
 const starterLow = (k: RateSurface["key"]) => RATE_SURFACES.find((s) => s.key === k)!.cpmStarter[0];

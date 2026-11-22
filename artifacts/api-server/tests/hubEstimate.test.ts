@@ -2,9 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { estimateHub, DEFAULT_INPUTS, SELL_BAND } from "../src/lib/overhaul/hubEstimate";
 
-test("typical hub earnings: email priced on opens (~$412 likely)", () => {
+test("typical hub earnings: email $12 per 1,000 opens, post-purchase $30-45, sold 20/40/60% (~$472 likely)", () => {
   const r = estimateHub(DEFAULT_INPUTS);
-  assert.ok(Math.abs(r.earn.likely - 412) < 15);
+  assert.ok(Math.abs(r.earn.likely - 472) < 15);
   assert.ok(r.earn.low < r.earn.likely && r.earn.likely < r.earn.high);
   assert.equal(Math.round(r.year), Math.round(r.earn.likely * 12));
 });
@@ -34,4 +34,10 @@ test("email views are opens, email has its own click band, and every surface ble
   const pp = r.surfaces.find((s) => s.key === "post_purchase")!;
   assert.ok(pp.clicks / pp.shown >= 0.015 && pp.clicks / pp.shown <= 0.04);
   assert.ok(r.ctrPct > 0.5 && r.ctrPct < 3);
+});
+test("effective RPM is flat with scale and post-purchase brand return holds at 2.5x", () => {
+  const a = estimateHub(DEFAULT_INPUTS), b = estimateHub({ ...DEFAULT_INPUTS, orders: 250000, list: 1200000 });
+  assert.ok(Math.abs(a.earn.likely / a.views - b.earn.likely / b.views) < 1e-6);
+  const pp = a.surfaces.find((s) => s.key === "post_purchase")!;
+  assert.ok(pp.sales / (pp.earn / 0.35 / 0.4 * 0.4) >= 2.5);
 });

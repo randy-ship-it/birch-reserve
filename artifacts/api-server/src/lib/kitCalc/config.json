@@ -58,7 +58,7 @@
     }
   ],
   "demand": {
-    "blendedHubCpmUsd": 12.78,
+    "blendedHubCpmUsd": 17.83,
     "blendedHubCpmSource": "Birch blendedHubCpmUsd(): rate-card CPM blended across the four hub placements by modelled views (Modelled)",
     "ctrBand": {
       "lo": 0.0025,

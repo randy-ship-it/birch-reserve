@@ -141,7 +141,7 @@ test("Side B anchor hubs: proposed, pending Randy, public-OK names only", () => 
   for (const h of PROPOSED_ANCHOR_HUBS) assert.ok(publicNames.has(h.name), h.name);
   assert.deepEqual(PROPOSED_ANCHOR_HUBS.map((h) => h.key), ["dr-ho", "roll-recovery", "jill-health", "jack-health", "nutriprocan", "sole", "effortless-admin", "kalaya"]);
   assert.deepEqual(EXPOSURE_CHANNELS[0]!.cpm, HUB_RATE_RANGE.cpm);
-  assert.deepEqual(HUB_RATE_RANGE.cpm, [4, 30]);
+  assert.deepEqual(HUB_RATE_RANGE.cpm, [4, 45]);
   assert.ok(EXPOSURE_CHANNELS.slice(1).every((c) => c.cpm === null), "no rate card for other channels: priced by IO");
 });
 
