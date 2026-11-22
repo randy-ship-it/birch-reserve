@@ -39,7 +39,7 @@ export function FlightReportExample({ where }: { where: "home" | "media_kit" }) 
             <ul className="mt-2 space-y-1.5">
               {R.surfaces.map((s) => (
                 <li key={s.k} className="flex items-center gap-2 text-[12px] text-foreground/80">
-                  <span className="w-28 shrink-0 truncate md:w-40" title={s.k}>{s.k}</span>
+                  <span className="w-28 shrink-0 leading-tight md:w-40">{s.k}</span>
                   <span className="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-[#0b1f3a]/10"><span className="block h-full rounded-full bg-[#0b1f3a]" style={{ width: `${s.pct}%` }} /></span>
                   <span className="w-9 shrink-0 text-right font-semibold">{s.pct}%</span>
                 </li>
