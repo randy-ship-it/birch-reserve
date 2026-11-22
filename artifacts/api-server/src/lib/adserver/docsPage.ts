@@ -12,7 +12,7 @@ export function scaleText(html: string): string {
       return tag;
     }
     if (skip > 0 || !text) return text ?? "";
-    return text.replace(/Birch Reserve(?!, a Silver Birch)/g, "Scale Health");
+    return text.replace(/Birch Reserve(?!, a Silver Birch)/g, "Scale Health").replace(/(?<!Silver )\bBirch\b(?! Growth)/g, "Scale Health");
   });
 }
 
