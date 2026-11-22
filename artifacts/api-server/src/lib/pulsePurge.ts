@@ -20,7 +20,9 @@ export function pulsePurgeOnce(): void {
       if (PURGE_PHASE === "dump") {
         const res = await db.execute(sql`SELECT id::text AS id, action, category, who, region, src, src_id, created_at FROM activity_pulse_events WHERE created_at >= ${PURGE_SINCE}::timestamptz AND action LIKE 'chat\\_%' ORDER BY created_at`);
         const rows = ((res as unknown as { rows?: unknown[] }).rows ?? (res as unknown as unknown[])) as Array<Record<string, unknown>>;
-        for (let i = 0; i < rows.length; i += 25) console.log("PULSE_PURGE_DUMP " + JSON.stringify({ total: rows.length, offset: i, rows: rows.slice(i, i + 25) }));
+        // Compact [id, action, region, src|src_id flag, ISO time] so a log line stays under the log viewer's line cap.
+        const c = rows.map((r) => [r.id, String(r.action), r.region ?? "", r.src || r.src_id ? 1 : 0, new Date(String(r.created_at).replace(" ", "T").replace(/\+00$/, "Z")).toISOString()]);
+        for (let i = 0; i < c.length; i += 16) console.log("PULSE_PURGE_DUMP2 " + JSON.stringify({ total: c.length, offset: i, rows: c.slice(i, i + 16) }));
         if (!rows.length) console.log("PULSE_PURGE_DUMP " + JSON.stringify({ total: 0 }));
       } else if (PURGE_IDS.length) {
         const ids = PURGE_IDS.map((x) => `'${x.replace(/[^0-9a-f-]/gi, "")}'`).join(",");
