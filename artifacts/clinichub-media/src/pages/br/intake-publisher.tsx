@@ -88,7 +88,7 @@ export default function BrIntakePublisher() {
           <p className="mt-3 text-xs text-white/70">
             Per year: {usd(p.yearTotalUsd[0])} to {usd(p.yearTotalUsd[1])}, typical {usd(p.yearLikelyUsd)} · {p.sellBand[0]}/{p.sellBand[1]}/{p.sellBand[2]}% sold (low/typical/high) · {p.payoutPct}% payout · {cur}
           </p>
-          <div className="mt-5 flex flex-wrap items-center gap-3">
+          <div className="mt-5 flex flex-wrap items-center gap-3 [&_[data-testid=save-chip]]:bg-white/10 [&_[data-testid=save-chip]]:text-white/75 [&_[role=radio][aria-checked=false]]:text-white/70 [&_[role=radiogroup]]:bg-white/10">
             <Segmented<PricingMode> value={mode} onChange={touch<PricingMode>(setMode)} testId="pricing-mode" options={[{ v: "cpm", l: "CPM", tone: "bg-lime-200 text-[#0b1f3a]" }, { v: "cpc", l: "CPC", tone: "bg-lime-200 text-[#0b1f3a]" }]} />
             <SaveChip state={state} version={ref?.version} />
           </div>

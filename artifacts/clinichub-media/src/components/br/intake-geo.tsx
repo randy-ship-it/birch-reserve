@@ -101,9 +101,11 @@ export function ActivationRange({ kind, block, source, testId }: { kind: "advert
     <section data-currency-fixed data-testid={testId ?? `activation-${kind}`} data-source={source === "friday" ? "report" : source} className="rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm">
       <div className="flex flex-wrap items-center gap-2">
         <h3 className="font-display text-xl">{title}</h3>
-        <EstimateTag />
-        <span className="rounded-full bg-foreground/[0.06] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">Modelled</span>
-        <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${source === "friday" ? "bg-lime-300 text-[#0b1f3a]" : "bg-violet-100 text-violet-900"}`} data-testid="activation-source">{srcLabel}</span>
+        {/* One honest label: the amber estimate tag carries the source for the modelled preview; report/sample keep their own chip. */}
+        {source === "mock" ? <span data-testid="activation-source"><EstimateTag>{srcLabel}</EstimateTag></span> : <>
+          <EstimateTag />
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${source === "friday" ? "bg-lime-300 text-[#0b1f3a]" : "bg-violet-100 text-violet-900"}`} data-testid="activation-source">{srcLabel}</span>
+        </>}
       </div>
       <div className="mt-3 grid grid-cols-[auto_1fr_auto] items-center gap-3">
         <figure className="m-0 text-center">
