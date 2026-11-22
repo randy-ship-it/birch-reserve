@@ -200,16 +200,21 @@ const TILE_ART: Record<string, ReactNode> = {
   ),
   "calm-joints": (
     <svg viewBox="0 0 200 120" className="absolute inset-0 h-full w-full" aria-hidden preserveAspectRatio="xMidYMid slice">
-      <defs><linearGradient id="g-cj" x1="0" x2="1"><stop offset="0" stopColor="#99f6e4" /><stop offset="1" stopColor="#0b1f3a" stopOpacity="0" /></linearGradient></defs>
-      {[0, 1, 2, 3, 4].map((i) => (
-        <path key={i} d={`M0 ${70 + i * 8} C 50 ${40 + i * 8}, 120 ${100 + i * 6}, 200 ${55 + i * 9}`} stroke="url(#g-cj)" strokeWidth="2" fill="none" opacity={0.8 - i * 0.12} />
+      <defs>
+        <linearGradient id="g-cj" x1="0" x2="1"><stop offset="0" stopColor="#99f6e4" /><stop offset="1" stopColor="#99f6e4" stopOpacity=".15" /></linearGradient>
+        <radialGradient id="g-cj-glow" cx="75%" cy="20%" r="70%"><stop offset="0" stopColor="#99f6e4" stopOpacity=".45" /><stop offset="1" stopColor="#0b1f3a" stopOpacity="0" /></radialGradient>
+      </defs>
+      {/* Art sits in the top half: this tile has no stats row, so its text block is short and the top would read as empty. */}
+      <rect width="200" height="120" fill="url(#g-cj-glow)" />
+      {[0, 1, 2, 3, 4, 5].map((i) => (
+        <path key={i} d={`M0 ${22 + i * 7} C 50 ${4 + i * 7}, 120 ${48 + i * 6}, 200 ${16 + i * 8}`} stroke="url(#g-cj)" strokeWidth="2" fill="none" opacity={0.85 - i * 0.11} />
       ))}
     </svg>
   ),
   "retail-network": (
     <svg viewBox="0 0 200 120" className="absolute inset-0 h-full w-full" aria-hidden preserveAspectRatio="xMidYMid slice">
       {[...Array(40)].map((_, i) => (
-        <rect key={i} x={10 + (i % 10) * 19} y={20 + Math.floor(i / 10) * 22} width="12" height="12" rx="2" fill="#fde68a" opacity={((i * 7) % 10) / 12 + 0.12} />
+        <rect key={i} x={10 + (i % 10) * 19} y={20 + Math.floor(i / 10) * 22} width="12" height="12" rx="2" fill="#fde68a" opacity={((i * 7) % 10) / 40 + 0.06} />
       ))}
     </svg>
   ),
