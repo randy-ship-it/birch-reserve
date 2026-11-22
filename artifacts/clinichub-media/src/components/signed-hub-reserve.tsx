@@ -1,3 +1,4 @@
+import { skinChat } from "@/lib/siteSkin";
 import { useEffect, useMemo, useState } from "react";
 import { usePriceText } from "@/lib/currency";
 
@@ -46,7 +47,7 @@ export function SignedHubHero({ reserveHref, lookHref, cardsLive = true, eyebrow
         <p className="mt-6 text-sm text-white/85">
           Live hub: <a href={LIVE_HUB_URL} target="_blank" rel="noopener" className="font-semibold underline underline-offset-4" style={{ textDecorationColor: PURPLE }}>physio.drhonow.com</a>. A listed physio hub. Your module sits at the booking and the plan, in the category.
         </p>
-        <p className="mt-3 text-xs text-white/65" data-testid="meta-benchmark">Public benchmark, not a Birch result: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p>
+        <p className="mt-3 text-xs text-white/65" data-testid="meta-benchmark">{skinChat("Public benchmark, not a Birch result")}: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p>
         <p className="mt-3 text-xs text-white/65" data-testid="exclusions">One brand per category · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only · Canada only</p>
       </div>
     </section>

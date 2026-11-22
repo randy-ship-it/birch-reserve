@@ -30,7 +30,7 @@ export const skinChat = (s: string) =>
         .replace(/https:\/\/(?:www\.)?birchreserve\.net(\/intake(?:[/?#][^\s)\]"'<>]*)?)?/g, (_m, p?: string) => `https://www.scalehealth.ca${p ?? "/intake"}`)
         .replace(/https:\/\/(?:www\.)?birchreserve\.net(\/[^\s)\]"'<>]*)/g, "https://www.scalehealth.ca/intake/_m$1")
         .replace(/Birch Q&A Squirrel/g, SCALE_SQUIRREL_NAME)
-        .replace(/\bBirch results\b/g, "Scale Health results")
+        .replace(/\bBirch (results?|ad server)\b/g, "Scale Health $1")
         .replace(/Birch Reserve/g, "Scale Health")
         .replace(/\bBirch team\b/g, "Scale Health team")
     : s;
