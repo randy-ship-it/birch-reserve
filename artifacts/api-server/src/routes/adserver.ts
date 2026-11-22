@@ -37,6 +37,7 @@ import { getLeadStore } from "../lib/leads";
 import { draftCampaignFromCheckoutSafe, recordClick, recordConversion, recordView, serve } from "../lib/adserver/service";
 import { EMBED_JS, PIXEL_JS } from "../lib/adserver/embed";
 import { dashboardPage, loginPage } from "../lib/adserver/accountPage";
+import { adminGlanceHtml } from "../lib/adserver/adminGlance";
 import { adminLoginPage, adminPage } from "../lib/adserver/adminPage";
 import { docsPage } from "../lib/adserver/docsPage";
 import { checkUpload, checkVariant, findFormat, matchFormat, templateSvg, MAX_VIDEO_BYTES, VARIANT_ROLES, MAX_VARIANTS, type VariantRole } from "../lib/adserver/creativeSpec";
@@ -520,9 +521,13 @@ router.get(["/ads/admin", "/ads/admin/"], (req, res) =>
     const brand = new Map(campaigns.map((c) => [c.id, c.brand]));
     const dayT = { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 };
     for (const [id, t] of day) if (!campaigns.find((c) => c.id === id)?.isTest) for (const k of Object.keys(dayT) as Array<keyof typeof dayT>) dayT[k] += t[k];
+    const leadStore = getLeadStore();
+    const glanceSources = ["brand_intake", "advertiser_intake", "partners", "activation", "inventory_signup", "checkout"] as const;
+    const glanceLeads = Object.fromEntries(await Promise.all(glanceSources.map(async (s) => [s, await leadStore.listBySource(s, 500).catch(() => [])] as const)));
+    const glanceHtml = adminGlanceHtml({ leads: glanceLeads, orders: orders.map((o) => ({ at: o.createdAt })), campaigns: campaigns.map((c) => ({ c, t: totals.get(c.id) ?? { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 } })), week: await store.totalsByCampaign("all", 7), royalties: roy });
     res.type("html").send(
       adminPage({
-        who, campaigns: campaigns.map((c) => ({ c, t: totals.get(c.id) ?? { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 } })),
+        who, glanceHtml, campaigns: campaigns.map((c) => ({ c, t: totals.get(c.id) ?? { serves: 0, views: 0, clicks: 0, convs: 0, convValueMicros: 0, spendMicros: 0 } })),
         pending: await (async () => {
           const pend = creatives.filter((x) => x.status === "pending" && ids.includes(x.campaignId));
           const vs = await store.listVariants(pend.map((x) => x.id));
