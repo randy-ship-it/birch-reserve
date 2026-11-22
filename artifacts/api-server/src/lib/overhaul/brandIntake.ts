@@ -9,7 +9,7 @@
  *   - Newsletter: the partner_email slot (../sponsorKit), $12 CPM per 1,000 opens, views per network median partner.
  *   - Monthly views: the network median partner row (../sponsorKit HUBS, modelled).
  *   - Sell-through: SELL_ASSUMPTION_PCT (./agencyShowcase), Randy's 20% planning assumption; bands 20/40/60% (low/typical/high), same as hubEstimate.
- *   - Payout share 70% base (Randy, Nov 22 2026: "don't be under market"; was 35%). Market set: Rokt Thanks 50%, AdSense 68%, Journey 70%, Mediavine/Raptive 75%, Ezoic 82% (median ~72%). Tier breakpoints are NOT set: placeholders only.
+ *   - Payout share 70% base, tiered 75/80/85% at 1MM/3MM/5MM views a month (SHARE_TIERS) (Randy, Nov 22 2026: "don't be under market"; was 35%). Market set: Rokt Thanks 50%, AdSense 68%, Journey 70%, Mediavine/Raptive 75%, Ezoic 82% (median ~72%). Tier breakpoints are NOT set: placeholders only.
  *   - Sponsor SKUs: $190 look, $490 reserve (./agent publicOffers), $3,500 area lock launch price (./model AREA_LOCK).
  *   - Channel tiles: Randy's network figures / targets (Nov 18 2026). They differ from /inventory, which is unchanged.
  * Every projection is an Estimate. Nothing here is a guarantee, a booking or a checkout.
@@ -24,16 +24,22 @@ export const INTAKE_TERMS_VERSION = "birch-intake-preview-2026-11-18";
 
 /* ------------------------------------------------------------------ publisher */
 
+/** Volume tiers on the hub's total monthly views (Randy, Nov 22 2026 9:48 AM ET: "we can match this"). Flat rate by tier, Mediavine-style
+ * (their tiers are 75/80/85/90% by annual earnings): the whole month's media revenue is paid at the tier reached. */
+export const SHARE_TIERS = [
+  { key: "t1", label: "Under 1MM", pct: 70, fromViews: 0, breakpoint: "under 1MM views a month" },
+  { key: "t2", label: "1MM+", pct: 75, fromViews: 1_000_000, breakpoint: "1MM+ views a month" },
+  { key: "t3", label: "3MM+", pct: 80, fromViews: 3_000_000, breakpoint: "3MM+ views a month" },
+  { key: "t4", label: "5MM+", pct: 85, fromViews: 5_000_000, breakpoint: "5MM+ views a month" },
+] as const;
+/** Hub share (%) at a monthly view count. */
+export const shareForViews = (views: number): number => [...SHARE_TIERS].reverse().find((t) => views >= t.fromViews)!.pct;
+
 export const PAYOUT = {
   basePct: 70,
-  line: "Hubs earn 70% of media revenue, escalating by tier.",
-  /** Breakpoints and step-ups are not set yet (Randy to decide). Labels only, no numbers. */
-  tiers: [
-    { key: "t1", label: "Tier 1", pct: 70 as number | null, breakpoint: null as string | null, placeholder: false },
-    { key: "t2", label: "Tier 2", pct: null, breakpoint: null, placeholder: true },
-    { key: "t3", label: "Tier 3", pct: null, breakpoint: null, placeholder: true },
-  ],
-  tiersLabel: "Placeholder tiers",
+  line: "Hubs earn 70% of media revenue, rising to 75% at 1MM views a month, 80% at 3MM and 85% at 5MM.",
+  tiers: SHARE_TIERS,
+  tiersLabel: "Volume tiers",
 } as const;
 
 const MEDIAN = HUBS.find((h) => h.key === "jack-health")!.views; // network median partner (modelled)
@@ -104,13 +110,18 @@ const mid = (r: Range) => (r[0] + r[1]) / 2;
 
 export function projectPublisher(input: PublisherInput) {
   const sizeX = Math.min(20, Math.max(0.1, input.sizeX || 1));
-  const share = PAYOUT.basePct / 100;
   const [sLo, sMid, sHi] = PUBLISHER_SELL_BAND;
-  const rows: SurfaceProjection[] = PUBLISHER_SURFACES.map((s) => {
-    const on = input.on[s.key] ?? s.defaultOn;
+  const viewsOf = (s: PubSurface) => {
     // Newsletter views on file are sends; the $12 price is per 1,000 OPENS, so convert at the typical open rate.
     const base = s.monthlyViews == null ? 0 : s.key === "newsletter" ? (s.monthlyViews * EMAIL_OPEN_PCT_MID) / 100 : s.monthlyViews;
-    const views = Math.round(base * sizeX);
+    return Math.round(base * sizeX);
+  };
+  const totalViews = PUBLISHER_SURFACES.reduce((a, s) => a + ((input.on[s.key] ?? s.defaultOn) ? viewsOf(s) : 0), 0);
+  const sharePct = shareForViews(totalViews);
+  const share = sharePct / 100;
+  const rows: SurfaceProjection[] = PUBLISHER_SURFACES.map((s) => {
+    const on = input.on[s.key] ?? s.defaultOn;
+    const views = viewsOf(s);
     const soldAt = (pct: number) => (views * pct) / 100;
     const useCpc = input.mode === "cpc" && s.cpc && s.ctr;
     const clicksAt = (pct: number) => (s.ctr ? soldAt(pct) * mid(s.ctr) : 0);
@@ -145,7 +156,8 @@ export function projectPublisher(input: PublisherInput) {
     rows,
     sellPct: sMid,
     sellBand: PUBLISHER_SELL_BAND,
-    payoutPct: PAYOUT.basePct,
+    payoutPct: sharePct,
+    totalViews,
     mediaPayoutUsd: mediaPayout,
     mediaLikelyUsd: mediaLikely,
     conversions,
@@ -162,7 +174,7 @@ export const PUBLISHER_ASSUMPTIONS = [
   `Sell-through: ${PUBLISHER_SELL_BAND[0]}% of views carry a paid offer in the low case, ${PUBLISHER_SELL_BAND[1]}% typical, ${PUBLISHER_SELL_BAND[2]}% high (the bottom of the 60-80% direct-sold target Google News Initiative cites). A planning assumption, not a delivery commitment.`,
   `Low = ${PUBLISHER_SELL_BAND[0]}% sold at the low end of each published starter price. Typical = ${PUBLISHER_SELL_BAND[1]}% sold at the midpoint. High = ${PUBLISHER_SELL_BAND[2]}% sold at the top. The newsletter is priced per 1,000 opens ($12), at a typical open rate. No later-rate numbers are published.`,
   `CPC mode uses the midpoint of each placement's modelled engagement range. Ranges, not promises.`,
-  `Your payout: ${PAYOUT.basePct}% of media revenue. Tier breakpoints are not set yet (placeholder tiers).`,
+  `Your payout: ${PAYOUT.basePct}% of media revenue under 1MM views a month, ${SHARE_TIERS[1].pct}% at 1MM+, ${SHARE_TIERS[2].pct}% at 3MM+, ${SHARE_TIERS[3].pct}% at 5MM+, paid at the tier you reach (flat rate, like ad networks). Modelled; the hub agreement governs.`,
   `Transactions (bookings, products) use only the numbers you enter. Leave them at 0 to skip.`,
   `Estimates only. Not a guarantee of views, clicks, sales or payouts. Payouts follow the hub agreement.`,
 ];

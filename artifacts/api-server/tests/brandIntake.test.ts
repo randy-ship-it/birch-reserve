@@ -10,7 +10,7 @@ import {
   EXPOSURE_CHANNELS,
   FIRST_LOOK,
   HUB_RATE_RANGE,
-  PAYOUT,
+  PAYOUT, shareForViews,
   PROPOSED_ANCHOR_HUBS,
   PUBLISHER_SURFACES,
   SPONSOR_OFFERS,
@@ -67,8 +67,9 @@ test("publisher projection: 70% payout, sell-through assumption, ramp <= normali
   assert.deepEqual(off.mediaPayoutUsd, [0, 0]);
   const cpc = projectPublisher({ on: {}, mode: "cpc", sizeX: 2, conversionPct: 2, valuePerConversionUsd: 50 });
   assert.ok(cpc.transactionsUsd > 0, "transactions only from user inputs");
-  assert.equal(PAYOUT.tiersLabel, "Placeholder tiers");
-  assert.ok(PAYOUT.tiers.slice(1).every((t) => t.placeholder && t.pct == null && t.breakpoint == null), "breakpoints not set");
+  assert.equal(PAYOUT.tiersLabel, "Volume tiers");
+  assert.deepEqual(PAYOUT.tiers.map((t) => [t.pct, t.fromViews]), [[70, 0], [75, 1_000_000], [80, 3_000_000], [85, 5_000_000]]);
+  assert.deepEqual([0, 999_999, 1_000_000, 2_999_999, 3_000_000, 4_999_999, 5_000_000, 20_000_000].map(shareForViews), [70, 70, 75, 75, 80, 80, 85, 85]);
 });
 
 test("supplier: categories from CATEGORY_DEMAND, first look on the top 3 at published starter rates", () => {

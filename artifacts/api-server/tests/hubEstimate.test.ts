@@ -36,10 +36,10 @@ test("email views are opens, email has its own click band, and every surface ble
   assert.ok(r.ctrPct > 0.5 && r.ctrPct < 3);
 });
 test("effective RPM is flat with scale and post-purchase brand return holds at 2.5x", () => {
-  const a = estimateHub(DEFAULT_INPUTS), b = estimateHub({ ...DEFAULT_INPUTS, orders: 250000, list: 1200000 });
+  const a = estimateHub(DEFAULT_INPUTS), b = estimateHub({ ...DEFAULT_INPUTS, orders: 50000, list: 240000 });
   assert.ok(Math.abs(a.earn.likely / a.views - b.earn.likely / b.views) < 1e-6);
   const pp = a.surfaces.find((s) => s.key === "post_purchase")!;
-  assert.ok(pp.sales / (pp.earn / 0.7) >= 2.5);
+  assert.ok(pp.sales / (pp.earn / (a.sharePct / 100)) >= 2.5);
 });
 
 test("publisher page and hub calculator agree: 20/40/60 sold, 70% share, same typical hub", async () => {
@@ -51,5 +51,15 @@ test("publisher page and hub calculator agree: 20/40/60 sold, 70% share, same ty
   assert.ok(Math.abs(p.mediaPayoutUsd[0] - h.earn.low) <= 4);
   assert.ok(Math.abs(p.mediaPayoutUsd[1] - h.earn.high) <= 4);
   assert.equal(h.sharePct, 70);
+  assert.equal(p.payoutPct, 70);
   assert.deepEqual([...p.sellBand], [20, 40, 60]);
+});
+
+test("hub share tiers: 70% under 1MM views, 75% at 1MM+, 80% at 3MM+, 85% at 5MM+; brand sales unchanged by the share", () => {
+  const at = (views: number) => { const k = views / estimateHub(DEFAULT_INPUTS).views; return estimateHub({ ...DEFAULT_INPUTS, orders: 25000 * k, list: 120000 * k }); };
+  assert.deepEqual([500_000, 1_000_000, 3_000_000, 5_000_000].map((v) => at(v).sharePct), [70, 75, 80, 85]);
+  const a = at(1_000_000), b = at(1_200_000);
+  assert.ok(Math.abs(a.earn.likely / a.views - b.earn.likely / b.views) < 1e-6, "same tier, same RPM");
+  assert.ok(at(5_000_000).earn.likely / 5_000_000 > at(500_000).earn.likely / 500_000);
+  assert.ok(Math.abs(at(5_000_000).sales / 5_000_000 - at(500_000).sales / 500_000) < 1e-6, "sales per view do not depend on the share");
 });
