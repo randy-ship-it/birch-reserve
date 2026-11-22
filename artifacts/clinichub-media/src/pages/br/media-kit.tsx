@@ -14,6 +14,7 @@ import { PerformanceRanges } from "@/components/br/performance-ranges";
 import { FlightReportExample } from "@/components/br/flight-report";
 import { GtmBotTeaser } from "@/components/br/gtm-bot-teaser";
 import { GtmSetup } from "@/components/br/gtm-setup";
+import { siteName } from "@/lib/siteSkin";
 import { PerformanceOnly } from "@/components/br/performance-only";
 import { STREET_TEAM_ONE_LINE } from "../../../../api-server/src/lib/overhaul/streetTeam";
 import { KitCta } from "@/components/br/kit-cta";
@@ -163,7 +164,7 @@ export default function BrMediaKit() {
           <div data-testid="mk-what">
             <p className="mt-4 max-w-xl text-base leading-relaxed text-foreground/80 md:text-lg">Display space on the pages members use right after they buy or book, and when they log back in.</p>
             <Details label="How buying works" testId="mk-what-more" className="max-w-xl !text-sm">
-              <p>Birch Reserve sells a share of display space across our growing network of private, members-only hubs (live today: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, with more launching). Placements are curated as each hub launches. Your payment is media credit until the insertion order. Start self-serve by reserving for {price.seat} or with a {price.look} 7-day look; premium slots are inquire-only.</p>
+              <p>{siteName()} sells a share of display space across our growing network of private, members-only hubs (live today: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, with more launching). Placements are curated as each hub launches. Your payment is media credit until the insertion order. Start self-serve by reserving for {price.seat} or with a {price.look} 7-day look; premium slots are inquire-only.</p>
             </Details>
           </div>
           </div>

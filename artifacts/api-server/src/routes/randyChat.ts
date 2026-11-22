@@ -669,7 +669,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
   try {
     const raw = await callGrok(body, apiKey, brand);
     const { text: withoutMarker, callback } = extractCallbackMarker(raw);
-    let text = softenReply(polishReply(withoutMarker, body.messages, brand));
+    let text = swapForBrand(softenReply(polishReply(withoutMarker, body.messages, brand)), brand);
     const banned = findBannedContent(text);
     if (banned) {
       // Hard content rule tripped: send the deterministic answer instead (never the slip).

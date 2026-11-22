@@ -25,6 +25,7 @@ import { HoneypotField } from "@/lib/form-guards";
 import { isLingerOpen, LINGER_STATE_EVENT, setChatOpen } from "@/lib/overlay-bus";
 import {
   BOOK_CALL_MAILTO_HREF,
+  BOOK_CALL_MAILTO_HREF_SCALE,
   OPEN_RANDY_CHAT_EVENT,
   type OpenRandyChatDetail,
 } from "@/lib/book-call";
@@ -55,7 +56,7 @@ import { startDockYield } from "@/lib/dock-yield";
 import { RichText } from "@/components/randy-rich-text";
 import { SQUIRREL_STYLES, SquirrelBadge } from "@/components/birch-squirrel";
 import { BIRCH_SQUIRREL } from "@/lib/birch-squirrel-config";
-import { SCALE_SQUIRREL_NAME, isScaleSkin, siteName } from "@/lib/siteSkin";
+import { SCALE_SQUIRREL_NAME, isScaleSkin, siteName, skinChat } from "@/lib/siteSkin";
 
 const PANEL_SHADOW =
   "shadow-[0_32px_80px_-24px_rgba(7,26,57,0.45),0_10px_28px_-10px_rgba(7,26,57,0.22)]";
@@ -271,7 +272,7 @@ export function RandyChat() {
         pushMessages({
           id: newId(),
           role: "randy",
-          text: `Checkout is live on birchreserve.net for the ${localizeNow(sku === "hold-190" ? "$190 7-day look" : "$490 category prepay")}. You can pay there, or leave your details here and I'll walk you through it.`,
+          text: skinChat(`Checkout is live on birchreserve.net for the ${localizeNow(sku === "hold-190" ? "$190 7-day look" : "$490 category prepay")}. You can pay there, or leave your details here and I'll walk you through it.`),
         });
         setHandoffReady(true);
         setCallbackOpen(true);
@@ -471,7 +472,7 @@ export function RandyChat() {
       return;
     }
     // Bubble shows the chip label; the model gets the fuller message.
-    pushMessages({ id: newId(), role: "user", text: message });
+    pushMessages({ id: newId(), role: "user", text: skinChat(message) });
     track("chat_message", { chip: chipId });
     await fetchReply(chipId);
   };
@@ -1010,8 +1011,8 @@ export function RandyChat() {
                   </button>
                 </form>
                 <p className="mt-2 text-center text-[11px] text-slate-400">
-                  Chats are saved so Randy&apos;s team can follow up. Prefer email?{" "}
-                  <a href={BOOK_CALL_MAILTO_HREF} className="underline hover:text-slate-600">
+                  Chats are saved so {isScaleSkin() ? "Scale Health\u2019s" : "Randy\u2019s"} team can follow up. Prefer email?{" "}
+                  <a href={isScaleSkin() ? BOOK_CALL_MAILTO_HREF_SCALE : BOOK_CALL_MAILTO_HREF} className="underline hover:text-slate-600">
                     Email sales
                   </a>
                 </p>

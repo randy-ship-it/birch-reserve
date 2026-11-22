@@ -23,6 +23,18 @@ export const siteName = () => (isScaleSkin() ? "Scale Health" : "Birch Reserve")
 /** Swap the Birch brand name for the host's brand name in visible copy (titles, eyebrows, review lines). */
 export const skinText = (s: string) => (isScaleSkin() ? s.replace(/Birch Reserve/g, "Scale Health") : s);
 
+/** Chat/visitor copy written in Birch voice -> Scale voice on the Scale skin (name, squirrel, links). Birch is untouched. */
+export const skinChat = (s: string) =>
+  isScaleSkin()
+    ? s
+        .replace(/https:\/\/(?:www\.)?birchreserve\.net(\/intake(?:[/?#][^\s)\]"'<>]*)?)?/g, (_m, p?: string) => `https://www.scalehealth.ca${p ?? "/intake"}`)
+        .replace(/https:\/\/(?:www\.)?birchreserve\.net(\/[^\s)\]"'<>]*)/g, "https://www.scalehealth.ca/intake/_m$1")
+        .replace(/Birch Q&A Squirrel/g, SCALE_SQUIRREL_NAME)
+        .replace(/\bBirch results\b/g, "Scale Health results")
+        .replace(/Birch Reserve/g, "Scale Health")
+        .replace(/\bBirch team\b/g, "Scale Health team")
+    : s;
+
 /** Scale Health's public site (header/footer links on the Scale skin). Links carry data-mirror-keep so the mirror
  *  boot script leaves them on scalehealth.ca instead of sending them to birchreserve.net. */
 export const SCALE_HOME = "https://www.scalehealth.ca";

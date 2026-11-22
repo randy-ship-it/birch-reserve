@@ -9,6 +9,7 @@ import { Details } from "@/components/br/details";
 import { ArrowRight, Clock, FlaskConical, Store, Megaphone } from "lucide-react";
 import type { IntakeRole } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
+import { skinText } from "@/lib/siteSkin";
 import { trackCta } from "@/lib/track-cta";
 import { trackIntake, type IntakeDetail, type IntakeSide } from "@/lib/intakeTrack";
 import type { LeadGates } from "@/lib/fridayBrandIntake";
@@ -57,7 +58,7 @@ export function PrimaryCta({ side, where, tone = "light", secondary = true }: { 
         </>
       ) : (
         <a href={where === "done" ? "/intake/publisher" : "/intake/publisher#publisher-contact-submit"} data-testid="primary-cta-publisher" onClick={() => trackIntake(side, "cta_click", where === "done" ? "publisher_payout" : "send_for_review")} className={`${big} bg-lime-300 text-[#0b1f3a] shadow-lime-500/30 hover:bg-[#0b1f3a] hover:text-white`}>
-          {where === "done" ? "See my full hub payout estimate" : "List my hub with Birch Reserve"} <ArrowRight className="size-5" />
+          {where === "done" ? "See my full hub payout estimate" : skinText("List my hub with Birch Reserve")} <ArrowRight className="size-5" />
         </a>
       )}
     </div>
@@ -86,7 +87,7 @@ export function LeadGatesStatus({ gates, testId = "lead-gates" }: { gates: LeadG
     <div data-testid={testId} className="mt-3 flex flex-wrap items-center gap-2">
       {gates.mock ? <span data-testid={`${testId}-mock`} className="inline-flex items-center gap-1 rounded-full bg-violet-700 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"><FlaskConical className="size-3" />Mock · preview state</span> : null}
       <span data-testid={`${testId}-pending`} className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900"><Clock className="size-3.5" />In review, pending BR approval</span>
-      <Details className="basis-full !mt-0" testId={`${testId}-details`}><p>A person at Birch Reserve approves before anything changes on a hub screen or page. Nothing is booked or charged until then.</p></Details>
+      <Details className="basis-full !mt-0" testId={`${testId}-details`}><p>{skinText("A person at Birch Reserve approves before anything changes on a hub screen or page. Nothing is booked or charged until then.")}</p></Details>
     </div>
   );
 }
@@ -97,7 +98,7 @@ export function SampleLeadStatus() {
     <div data-testid="sample-lead-status" className="rounded-2xl border border-dashed border-foreground/25 bg-white p-4">
       <p className="text-[11px] font-bold uppercase tracking-wider text-foreground/60"><span className="mr-2 rounded-full bg-foreground px-2 py-0.5 text-[10px] text-background">Sample</span>After you send · example status</p>
       <div className="-mt-1"><LeadGatesStatus testId="sample-lead-gates" gates={{ review: "pending_review" }} /></div>
-      <p className="mt-2 text-[11px] text-muted-foreground">Example only. Every request is reviewed by a person at Birch Reserve.</p>
+      <p className="mt-2 text-[11px] text-muted-foreground">{skinText("Example only. Every request is reviewed by a person at Birch Reserve.")}</p>
     </div>
   );
 }
