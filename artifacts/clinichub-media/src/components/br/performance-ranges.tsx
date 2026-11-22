@@ -18,8 +18,11 @@ export function PerformanceRanges({ where }: { where: "home" | "media_kit" }) {
       <ul className="mt-4 grid gap-3 md:grid-cols-3">
         {P.rows.map((r) => (
           <li key={r.placement} className="min-w-0 rounded-2xl bg-[#f7faf0] p-4" data-testid={`perf-row-${r.placement.split(" ")[0].toLowerCase()}`}>
-            <p className="font-display text-lg leading-tight text-[#0b1f3a]">{r.placement}</p>
-            <div className="mt-3 space-y-3">
+            {(() => { const [name, sub] = r.placement.split(/ \((.*)\)$/); return (<>
+              <p className="font-display text-lg leading-tight text-[#0b1f3a]">{name}</p>
+              <p className="text-[11px] leading-4 text-foreground/55 md:min-h-4">{sub ?? ""}</p>
+            </>); })()}
+            <div className="mt-2 space-y-3">
               {RANGE_METRICS.map((m) => {
                 const b = r[m.key];
                 return (
