@@ -6,6 +6,9 @@ import { memoryStore, setSiteAnalyticsStore } from "../src/lib/siteAnalyticsStor
 import { handleUiEvent, parseUiEvent, uiEventsJsonParser, resetUiEventRateLimitForTests } from "../src/lib/uiEvents";
 import router, { setStripeListerForTests } from "../src/routes/siteAnalytics";
 import { sign } from "../src/lib/adserver/auth";
+import { securityHeaders } from "../src/middlewares/securityHeaders";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 test("site events: fixed names only, extras never carry free text", () => {
   assert.equal(isSiteEvent("a.pv"), true);
@@ -51,6 +54,7 @@ test("routes: ui-events stores dims; dashboard needs admin or a signed link; emb
   resetUiEventRateLimitForTests();
   const app = express();
   app.set("trust proxy", true);
+  app.use(securityHeaders({} as NodeJS.ProcessEnv)); // as in app.ts: the site-wide set runs first, the embed overrides it
   app.use("/v1/ui-events", uiEventsJsonParser());
   app.post("/v1/ui-events", (req, res) => void handleUiEvent(req, res));
   app.use(router);
@@ -67,16 +71,37 @@ test("routes: ui-events stores dims; dashboard needs admin or a signed link; emb
     assert.equal(mem.rows[0]!.device, "desktop");
     assert.match(mem.rows[0]!.vh ?? "", /^[A-Za-z0-9_-]{16}$/);
     assert.equal((await fetch(`${base}/ads/admin/analytics.json`)).status, 401);
-    assert.equal((await fetch(`${base}/analytics/live?k=nope`)).status, 403);
+    const bad = await fetch(`${base}/analytics/live?k=nope`);
+    assert.equal(bad.status, 403);
+    assert.equal(bad.headers.get("x-frame-options"), null, "the 403 message must render inside Friday's frame too");
     const k = sign("ana", { v: "1", by: "t" }, 60_000);
     const j = await (await fetch(`${base}/ads/admin/analytics.json?range=today&k=${encodeURIComponent(k)}`)).json() as { totals: { views: number }; stripe: { created: number; paid: number } };
     assert.equal(j.totals.views, 1);
     assert.deepEqual([j.stripe.created, j.stripe.paid], [1, 1]); // QA card excluded
     const page = await fetch(`${base}/analytics/live?k=${encodeURIComponent(k)}`);
     assert.equal(page.status, 200);
-    assert.match(page.headers.get("content-security-policy") ?? "", /frame-ancestors 'self' https:\/\/fridayapp\.org/);
+    const csp = page.headers.get("content-security-policy") ?? "";
+    assert.match(csp, /frame-ancestors 'self' https:\/\/fridayapp\.org https:\/\/www\.fridayapp\.org/);
+    assert.doesNotMatch(csp, /scalehealth/);
+    assert.equal(page.headers.get("x-frame-options"), null);
+    assert.equal(page.headers.get("content-security-policy-report-only"), null);
+    assert.equal(page.headers.get("referrer-policy"), "no-referrer");
+    const html = await page.text();
+    assert.doesNotMatch(html, /<form|window\.open|target="_blank"|top\.location|document\.referrer/, "works under sandbox=allow-scripts allow-same-origin");
+    assert.match(html, /try\{return localStorage/);
+    // Admin page keeps the site-wide (non-Friday) framing policy.
+    const adm = await fetch(`${base}/ads/admin/analytics`, { redirect: "manual" });
+    assert.equal(adm.headers.get("x-frame-options"), "SAMEORIGIN");
   } finally {
     srv.close();
     setSiteAnalyticsStore(null);
   }
+});
+
+test("edge: the Vercel security-header route skips only the Friday embed path", () => {
+  const src = readFileSync(resolve(process.cwd(), "../../scripts/vercel-build.mjs"), "utf8").match(/src: "(\^\/\(\?![^"]+)", headers: SECURITY_HEADERS/)?.[1];
+  assert.ok(src, "edge route found");
+  const re = new RegExp(src!);
+  for (const p of ["/analytics/live", "/analytics/live/", "/intake/_m/analytics/live"]) assert.equal(re.test(p), false, p);
+  for (const p of ["/", "/ads/admin/analytics", "/analytics/livex", "/analytics/live/x", "/intake/_m/", "/buy"]) assert.equal(re.test(p), true, p);
 });

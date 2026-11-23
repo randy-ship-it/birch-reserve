@@ -31,6 +31,7 @@ import { coarseRegion, recordPulse } from "../lib/activityPulse";
 import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
 import { FRIENDLY_429, limiter } from "../lib/rateLimit";
 import { isIP } from "node:net";
+import { visitorDayHash } from "../lib/siteAnalytics";
 import { FRIDAY_CATEGORIES, toV1Body } from "../lib/kitCalc/fridayV12";
 import { NEVER_HUB_NAME } from "../lib/overhaul/hubNameFilter";
 
@@ -54,6 +55,24 @@ export function clientIp(req: Request): string | null {
   const c = first(req.get("x-vercel-forwarded-for")) || first(req.get("x-real-ip")) || first(req.get("x-forwarded-for")) || req.ip || "";
   const ip = c.replace(/^::ffff:/i, "");
   return isIP(ip) ? ip : null;
+}
+
+/** Headers for forwarding one /br-t.js beacon to Friday's /api/track (contract: friday-crm docs/contracts/track-forwarding.md). */
+export function trackForwardHeaders(req: Request, env: Env = process.env): Record<string, string> {
+  let host = "";
+  try { host = new URL(req.get("origin") ?? "").hostname; } catch { /* none */ }
+  const ua = (req.get("user-agent") ?? "").slice(0, 400);
+  const ip = clientIp(req);
+  const key = (env.INTAKE_WEBHOOK_SECRET || env.FRIDAY_API_KEY)?.trim();
+  const h: Record<string, string> = {
+    "content-type": "text/plain",
+    origin: MIRROR_ORIGIN_HOSTS.has(host) ? "https://www.scalehealth.ca" : "https://birchreserve.net",
+    "user-agent": ua,
+  };
+  if (key) h["x-intake-secret"] = key;
+  if (ip) h["x-client-ip"] = ip;
+  if (ua) h["x-visitor-id"] = visitorDayHash(ip ?? "", ua);
+  return h;
 }
 
 /**
@@ -391,26 +410,29 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
   });
   /**
    * The same-origin analytics snippet (/br-t.js) posts page / section / CTA / form events to /api/track on THIS host.
-   * Until Nov 23 2026 they were dropped here (204), so the portfolio traffic + funnel view in the CRM never saw Birch.
-   * Now they are forwarded server-side, unchanged (the snippet's own cookieless payload, no PII), with the page's
-   * site as Origin and the visitor's user agent so bot filtering works. Do Not Track / GPC: dropped, nothing sent.
+   * They are forwarded server-side to Friday's traffic endpoint, body unchanged (the snippet's own cookieless payload, no
+   * PII), per Friday's docs/contracts/track-forwarding.md (friday-crm PR #233):
+   *   X-Intake-Secret  the existing Friday intake secret (INTAKE_WEBHOOK_SECRET, else FRIDAY_API_KEY); omitted if unset
+   *   X-Client-IP      the visitor's IP from the trusted Vercel headers (clientIp), only when it is a valid IPv4/IPv6
+   *   X-Visitor-Id     our daily-rotating visitor hash (the same one site analytics stores), replaces IP+UA in Friday's hash
+   *   User-Agent       the visitor's real user agent; Origin = the page's site (birchreserve.net or the Scale mirror)
+   * No geo is forwarded. Do Not Track / GPC: dropped, nothing sent. TRACK_FORWARD_DISABLED=true turns forwarding off.
    * Server-to-server, so the backend name never appears in the page. Always 204 to the browser.
    */
+  let forwardLogged = false;
   router.post("/api/track", text({ type: "*/*", limit: "4kb" }), async (req, res) => {
     const done = () => void res.status(204).end();
     if (env.TRACK_FORWARD_DISABLED === "true" || req.get("dnt") === "1" || req.get("sec-gpc") === "1") return done();
     const raw = typeof req.body === "string" ? req.body : "";
     if (!raw || raw.length > 4096) return done();
-    let host = "";
-    try { host = new URL(req.get("origin") ?? "").hostname; } catch { /* none */ }
-    const origin = MIRROR_ORIGIN_HOSTS.has(host) ? "https://www.scalehealth.ca" : "https://birchreserve.net";
+    const headers = trackForwardHeaders(req, env);
+    if (!forwardLogged) {
+      forwardLogged = true;
+      log("track forward ready", { intake_secret: Boolean(headers["x-intake-secret"]), client_ip: Boolean(headers["x-client-ip"]) });
+    }
     // Awaited (3 s cap) so the serverless function is not frozen mid-request; the browser's beacon never waits on it.
-    await f("https://fridayapp.org/api/track", {
-      method: "POST",
-      headers: { "content-type": "text/plain", origin, "user-agent": (req.get("user-agent") ?? "").slice(0, 400) },
-      body: raw,
-      signal: AbortSignal.timeout(3000),
-    }).then((r) => r.arrayBuffer()).catch(() => undefined);
+    await f("https://fridayapp.org/api/track", { method: "POST", headers, body: raw, signal: AbortSignal.timeout(3000) })
+      .then((r) => r.arrayBuffer()).catch(() => undefined);
     done();
   });
   /** v1.2 §6 shared category keys (Friday's list when it serves one, else the static copy of the contract table). */

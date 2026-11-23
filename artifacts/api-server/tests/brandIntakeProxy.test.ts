@@ -396,3 +396,49 @@ test("prepareStage: a bad src tag is dropped; plain drafts are untouched", () =>
   const d = prepareStage({ roles: ["brand"], blurb: "x" });
   assert.deepEqual([d.stage, d.body.blurb, d.error], [null, "x", undefined]);
 });
+
+test("/api/track forwards to Friday per track-forwarding contract: secret, client IP, visitor id, real UA; body unchanged", async () => {
+  const calls: Array<{ url: string; init: RequestInit }> = [];
+  const f = (async (url: string, init: RequestInit) => { calls.push({ url, init }); return new Response(null, { status: 204 }); }) as unknown as typeof fetch;
+  const s = await serve(ENV, f);
+  const UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1";
+  const body = JSON.stringify({ e: "pageview", p: "/", s: "birchreserve.net" });
+  const post = (h: Record<string, string>) => realFetch(`${s.base}/api/track`, { method: "POST", headers: { "content-type": "text/plain", "user-agent": UA, origin: "https://birchreserve.net", ...h }, body });
+  const r1 = await post({ "x-real-ip": "203.0.113.7", "x-forwarded-for": "198.51.100.1, 10.0.0.1" });
+  const r2 = await post({ "x-forwarded-for": "2001:db8::42, 10.0.0.1", origin: "https://www.scalehealth.ca" });
+  const r3 = await post({ "x-real-ip": "not-an-ip" });
+  const r4 = await post({ dnt: "1", "x-real-ip": "203.0.113.7" });
+  s.close();
+  for (const r of [r1, r2, r3, r4]) assert.equal(r.status, 204);
+  assert.equal(calls.length, 3, "DNT hit is not forwarded");
+  const h = calls.map((c) => c.init.headers as Record<string, string>);
+  assert.equal(calls[0].url, "https://fridayapp.org/api/track");
+  assert.equal(calls[0].init.body, body);
+  assert.equal(h[0]["content-type"], "text/plain");
+  assert.equal(h[0]["x-intake-secret"], SECRET);
+  assert.equal(h[0]["x-client-ip"], "203.0.113.7");
+  assert.equal(h[0]["user-agent"], UA);
+  assert.equal(h[0].origin, "https://birchreserve.net");
+  assert.match(h[0]["x-visitor-id"], /^[A-Za-z0-9_-]{16,128}$/);
+  assert.equal(h[1]["x-client-ip"], "2001:db8::42");
+  assert.equal(h[1].origin, "https://www.scalehealth.ca");
+  assert.notEqual(h[1]["x-visitor-id"], h[0]["x-visitor-id"]);
+  assert.equal(h[2]["x-client-ip"], undefined, "invalid IP is not forwarded");
+  for (const x of h) for (const k of Object.keys(x)) assert.ok(!/geo|country|region|city|lat|lon/i.test(k), `no geo header (${k})`);
+  if (process.env.SHOW_TRACK_HEADERS) for (const x of h) console.log("forwarded headers:", JSON.stringify({ ...x, "x-intake-secret": x["x-intake-secret"] ? "<redacted>" : undefined }));
+});
+
+test("/api/track: TRACK_FORWARD_DISABLED stops forwarding; no secret configured → no X-Intake-Secret", async () => {
+  const calls: RequestInit[] = [];
+  const f = (async (_u: string, init: RequestInit) => { calls.push(init); return new Response(null, { status: 204 }); }) as unknown as typeof fetch;
+  const off = await serve({ ...ENV, TRACK_FORWARD_DISABLED: "true" }, f);
+  assert.equal((await realFetch(`${off.base}/api/track`, { method: "POST", body: "{}", headers: { "user-agent": "x" } })).status, 204);
+  off.close();
+  assert.equal(calls.length, 0);
+  const bare = await serve({} as NodeJS.ProcessEnv, f);
+  await realFetch(`${bare.base}/api/track`, { method: "POST", body: "{}", headers: { "user-agent": "x", "x-real-ip": "203.0.113.9" } });
+  bare.close();
+  assert.equal(calls.length, 1);
+  assert.equal((calls[0].headers as Record<string, string>)["x-intake-secret"], undefined);
+  assert.equal((calls[0].headers as Record<string, string>)["x-client-ip"], "203.0.113.9");
+});

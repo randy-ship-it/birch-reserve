@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import express from "express";
+import { isIP } from "node:net";
 import { logger } from "./logger";
 import { isIntakeEvent } from "./intakeEvents";
 import { isAttentionEvent } from "./attentionEvents";
@@ -62,6 +63,13 @@ async function defaultRecordUiEvent(event: ParsedUiEvent, ctx?: UiEventContext):
   });
 }
 
+/** Same IP source as the Friday track forward (routes/brandIntakeProxy.ts clientIp), so both carry one visitor hash. */
+function visitorIp(req: Pick<Request, "get" | "ip">): string | null {
+  const first = (v: string | undefined) => v?.split(",")[0]?.trim();
+  const ip = (first(req.get("x-vercel-forwarded-for")) || first(req.get("x-real-ip")) || first(req.get("x-forwarded-for")) || req.ip || "").replace(/^::ffff:/i, "");
+  return isIP(ip) ? ip : null;
+}
+
 /** Skin from the page's Origin (the Scale mirror posts with scalehealth.ca), else the client's hint. */
 export function uiEventContext(req: Pick<Request, "get" | "ip">, extras?: SiteExtras): UiEventContext {
   const ua = req.get("user-agent") ?? "";
@@ -71,7 +79,7 @@ export function uiEventContext(req: Pick<Request, "get" | "ip">, extras?: SiteEx
   return {
     skin: MIRROR_ORIGIN_HOSTS.has(host) ? "scale" : extras?.skin ?? "birch",
     device: info.device, browser: info.browser, os: info.os,
-    vh: ua ? visitorDayHash(req.ip ?? "", ua) : null,
+    vh: ua ? visitorDayHash(visitorIp(req) ?? "", ua) : null,
     isTest: info.bot || isQaMarked(req),
   };
 }

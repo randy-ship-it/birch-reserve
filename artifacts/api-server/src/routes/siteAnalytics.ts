@@ -91,12 +91,18 @@ export async function analyticsSummary(range: Range): Promise<AnalyticsSummary> 
 }
 
 const router: IRouter = Router();
+/** Friday iframes /analytics/live (sandbox="allow-scripts allow-same-origin", referrerpolicy=no-referrer). */
+export const EMBED_CSP = "base-uri 'self'; object-src 'none'; form-action 'none'; frame-ancestors 'self' https://fridayapp.org https://www.fridayapp.org https://*.fridayapp.org";
+const embedHeaders = (res: Response) => {
+  // X-Frame-Options has no allow-list form; frame-ancestors (which supersedes it) is the one gate. The site-wide
+  // report-only policy names the Scale frame hosts, so it is dropped here to keep one unambiguous policy.
+  res.removeHeader("X-Frame-Options");
+  res.removeHeader("Content-Security-Policy-Report-Only");
+  res.set("Content-Security-Policy", EMBED_CSP);
+};
 const page = (res: Response, html: string, embed: boolean) => {
   res.set({ "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer" });
-  if (embed) {
-    res.removeHeader("X-Frame-Options");
-    res.set("Content-Security-Policy", "base-uri 'self'; object-src 'none'; frame-ancestors 'self' https://fridayapp.org https://*.fridayapp.org");
-  }
+  if (embed) embedHeaders(res);
   res.type("html").send(html);
 };
 
@@ -107,6 +113,7 @@ router.get(["/ads/admin/analytics", "/ads/admin/analytics/"], (req, res) => {
 });
 
 router.get(["/analytics/live", "/analytics/live/"], (req, res) => {
+  embedHeaders(res); // the "not valid" message must also render inside Friday's frame
   if (!linkOk(req.query.k)) { res.status(403).type("text/plain").set("Cache-Control", "no-store").send("This analytics link is not valid or has been revoked."); return; }
   page(res, analyticsPage({ who: null, embed: true }), true);
 });
