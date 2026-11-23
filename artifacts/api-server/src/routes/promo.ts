@@ -16,6 +16,7 @@ import { publicSampleReport } from "../lib/adserver/publicReport";
 import * as promo from "../lib/adserver/promo";
 import { promoCtxOf, siteOf } from "../lib/adserver/promoContext";
 import { qrPng, qrSvg } from "../lib/adserver/qr";
+import { markEftPaid, recordEftOrder } from "../lib/adserver/referrals";
 import { draftCampaignFromCheckoutSafe } from "../lib/adserver/service";
 import * as store from "../lib/adserver/store";
 import { toCsv } from "../lib/adserver/ui";
@@ -234,6 +235,30 @@ router.post("/ads/admin/street/member", json, (req, res) =>
     const url = promo.shareUrl(id, site, str(b.code, 60) || null, label.toLowerCase().replace(/[^a-z0-9_-]/g, "-").slice(0, 40));
     await promo.registerQr(id, label, site, url, who);
     res.json({ message: `${r.message} Link copied; reload to see it in the table.`, copy: `${url}\nQR PNG: ${`${origin(req)}/ads/admin/street/qr.png?member=${encodeURIComponent(id)}&label=${encodeURIComponent(label)}`}`, url, png: `/ads/admin/street/qr.png?member=${encodeURIComponent(id)}&label=${encodeURIComponent(label)}` });
+  }),
+);
+/** EFT / invoice order for a referred buyer: recorded pending (stamped with the IO's referrer, else the buyer's first touch). Never charges a card. */
+router.post("/ads/admin/referral/eft", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    const amount = Math.round(Number(b.amount) * 100);
+    const email = promo.cleanEmail(b.email);
+    if (!str(b.ref, 60) || !str(b.brand, 160) || !promo.validEmail(email)) return void res.status(400).json({ message: "Add the IO / invoice reference, the brand and the buyer's email." });
+    const r = await recordEftOrder({ ref: str(b.ref, 60), brand: str(b.brand, 160), email, website: str(b.website, 160) || null, amountCents: amount, currency: b.currency === "cad" ? "cad" : "usd", member: str(b.member, 40) || null, site: b.site === "scale" ? "scale" : "birch", campaignId: /^[0-9a-f-]{36}$/i.test(str(b.campaignId, 40)) ? str(b.campaignId, 40) : null, isTest: isTestIdentity({ email }) }, who);
+    if (!r.ok) return void res.status(400).json({ message: r.message });
+    res.json({ message: `${r.created ? "Recorded" : "Already recorded"}: credited to ${r.member} (${r.via === "first_touch" ? "first touch" : "named on the IO"}). Commission is pending until you mark it paid.` });
+  }),
+);
+router.post("/ads/admin/referral/eft/paid", json, (req, res) =>
+  safe(res, async () => {
+    const who = guard(req, res);
+    if (!who) return;
+    const b = (req.body ?? {}) as Record<string, unknown>;
+    if (!str(b.ref, 80) || !str(b.paidRef, 120)) return void res.status(400).json({ message: "Add the order reference and the e-transfer / wire reference." });
+    const r = await markEftPaid(str(b.ref, 80), str(b.paidRef, 120), who);
+    res.status(r.ok ? 200 : 400).json({ message: r.message });
   }),
 );
 router.get(["/ads/admin/street/qr.png", "/ads/admin/street/qr.svg"], (req, res) =>

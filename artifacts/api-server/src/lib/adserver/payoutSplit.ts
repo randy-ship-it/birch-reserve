@@ -17,6 +17,8 @@ export type RecipientRow = {
   rkey: string; name: string; kind: "brokerage" | "commission"; pctBps: number; scopePartner: string | null; scopeCampaign: string | null;
   /** Street-team / partner member id: this recipient earns its share on orders that member referred (sale-time), never on delivery. */
   scopeReferrer?: string | null;
+  /** Referrer shares only. "pool" (default) = pct of the order's Birch override pool; "gross" = pct of the amount the buyer paid (Simar: 10% of the sale). */
+  basis?: "pool" | "gross";
   active: boolean; payoutRef: string | null; effectiveAt: Date;
 };
 export type Channel = "brokerage" | "scale_direct" | "internal";
@@ -178,7 +180,7 @@ export function dueDate(month: string, cadence: "monthly" | "quarterly", netDays
 /* ------------------------------------------------------------------------------------- referral commissions (Randy, Nov 21 2026 4:07 PM) */
 /** One paid order a street-team / partner link or QR brought in (ad_referral_orders + the order's current channel). */
 export type ReferralOrderLine = { sessionId: string; campaignId: string | null; member: string; at: Date; currency: string; amountMicros: number; channel: Channel };
-export type ReferralDetail = ReferralOrderLine & { overrideBps: number | null; poolMicros: number | null; commissions: Array<{ rkey: string; name: string; pctBps: number; micros: number }> };
+export type ReferralDetail = ReferralOrderLine & { overrideBps: number | null; poolMicros: number | null; commissions: Array<{ rkey: string; name: string; pctBps: number; micros: number; basis?: "pool" | "gross" }> };
 
 /** Largest share of a referral pool any one member's recipients could take. Must be ≤ 10000. */
 export function maxReferrerAllocationBps(active: RecipientRow[]): number {
@@ -209,17 +211,21 @@ export function splitReferralOrders(orders: ReferralOrderLine[], rates: RateRow[
     const month = o.at.toISOString().slice(0, 7);
     const commissions: ReferralDetail["commissions"] = [];
     for (const rc of recipientsAt(recipients, t).filter((x) => x.active && x.scopeReferrer === o.member)) {
-      const amt = (pool * rc.pctBps) / 10_000;
-      commissions.push({ rkey: rc.rkey, name: rc.name, pctBps: rc.pctBps, micros: Math.floor(amt) });
+      const gross = rc.basis === "gross";
+      const base = gross ? o.amountMicros : pool;
+      const amt = (base * rc.pctBps) / 10_000;
+      commissions.push({ rkey: rc.rkey, name: rc.name, pctBps: rc.pctBps, micros: Math.floor(amt), basis: gross ? "gross" : "pool" });
       const key = `ref:${rc.rkey}`;
       const k = `${key}|${month}|${o.currency}`;
-      const a = payees.get(k) ?? { key, kind: rc.kind, label: `${rc.name} (referrals by ${o.member})`, partner: "", source: "referral" as const, month, currency: o.currency, basis: 0, payable: 0, pending: false, units: 0, bpsSeen: new Set<number>(), payoutRef: rc.payoutRef, overrides: new Map<string, number>() };
-      a.basis += pool;
+      const a = payees.get(k) ?? { key, kind: rc.kind, label: `${rc.name} (referrals by ${o.member}${gross ? ", % of sale" : ""})`, partner: "", source: "referral" as const, month, currency: o.currency, basis: 0, payable: 0, pending: false, units: 0, bpsSeen: new Set<number>(), payoutRef: rc.payoutRef, overrides: new Map<string, number>() };
+      a.basis += base;
       a.payable += amt;
       a.units += 1;
       a.bpsSeen.add(rc.pctBps);
-      const ov = `${o.channel}:${ovBps}`;
-      a.overrides.set(ov, (a.overrides.get(ov) ?? 0) + pool);
+      if (!gross) {
+        const ov = `${o.channel}:${ovBps}`;
+        a.overrides.set(ov, (a.overrides.get(ov) ?? 0) + pool);
+      }
       payees.set(k, a);
     }
     detail.push({ ...o, overrideBps: ovBps, poolMicros: Math.round(pool), commissions });

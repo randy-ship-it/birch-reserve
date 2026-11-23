@@ -150,6 +150,20 @@ const DDL = (s: string) => [
     amount_cents bigint NOT NULL, currency text NOT NULL, order_kind text, brand text, is_test boolean NOT NULL DEFAULT false, paid_at timestamptz NOT NULL DEFAULT now(), created_at timestamptz NOT NULL DEFAULT now())`,
   `CREATE INDEX IF NOT EXISTS ad_referral_orders_member ON ${s}.ad_referral_orders (member, paid_at)`,
   `ALTER TABLE ${s}.ad_override_recipients ADD COLUMN IF NOT EXISTS scope_referrer text`,
+  // Simar (Randy, Nov 23 2026 12:23 PM): ad sales credited to him through the street-team QR / link system. Rate is stored per referrer
+  // (this recipient row, scope_referrer = 'simar'), so other ambassadors keep their own. 10% of the sale = 50% of Birch's 20% brokerage.
+  `ALTER TABLE ${s}.ad_override_recipients ADD COLUMN IF NOT EXISTS basis text NOT NULL DEFAULT 'pool'`,
+  `ALTER TABLE ${s}.ad_referral_orders ADD COLUMN IF NOT EXISTS status text NOT NULL DEFAULT 'paid'`,
+  `ALTER TABLE ${s}.ad_referral_orders ADD COLUMN IF NOT EXISTS method text NOT NULL DEFAULT 'card'`,
+  `ALTER TABLE ${s}.ad_referral_orders ADD COLUMN IF NOT EXISTS paid_ref text`,
+  `ALTER TABLE ${s}.ad_referral_orders ADD COLUMN IF NOT EXISTS buyer_email text`,
+  `ALTER TABLE ${s}.ad_referral_orders ADD COLUMN IF NOT EXISTS via text`,
+  `CREATE TABLE IF NOT EXISTS ${s}.ad_referral_touch (
+    touch_key text PRIMARY KEY, kind text NOT NULL, member text NOT NULL, qr text, site text NOT NULL DEFAULT 'birch', first_at timestamptz NOT NULL DEFAULT now(), is_test boolean NOT NULL DEFAULT false)`,
+  `INSERT INTO ${s}.ad_street_members (id, label, created_by) VALUES ('simar','Simar','seed') ON CONFLICT DO NOTHING`,
+  `INSERT INTO ${s}.ad_street_qrs (member, label, site, url, created_by) VALUES ('simar','scale-intake','scale','https://scalehealth.ca/intake?st=simar&qr=scale-intake','seed'),('simar','birch-intake','birch','https://birchreserve.net/intake?st=simar&qr=birch-intake','seed') ON CONFLICT DO NOTHING`,
+  `INSERT INTO ${s}.ad_override_recipients (rkey, name, kind, pct_bps, scope_referrer, basis, active, effective_at, actor)
+    SELECT 'ref-simar', 'Simar', 'commission', 1000, 'simar', 'gross', true, date_trunc('hour', now()), 'seed: Randy Nov 23 2026 12:23 PM, 10% of ad sales (50% of the 20% brokerage)' WHERE NOT EXISTS (SELECT 1 FROM ${s}.ad_override_recipients WHERE rkey = 'ref-simar')`,
   // One-shot QA hygiene (Nov 21 2026): the live referral e2e (4:25:34–4:28:31 PM ET, before it marked itself as test) logged
   // visit / scan rows for bridget (birch, birch-intake) and mona (scale, scale-intake-digital). Flag them is_test (never deleted;
   // reversible from the ids in the audit row) so street-team stats stay real-only. Runs once, guarded by its audit row.
@@ -654,7 +668,7 @@ const toRate = (r: Record<string, unknown>): RateRow => ({
 });
 const toRecipient = (r: Record<string, unknown>): RecipientRow => ({
   rkey: String(r.rkey), name: String(r.name), kind: r.kind === "commission" ? "commission" : "brokerage", pctBps: num(r.pct_bps), scopePartner: (r.scope_partner as string) || null,
-  scopeCampaign: (r.scope_campaign as string) || null, scopeReferrer: (r.scope_referrer as string) || null, active: Boolean(r.active), payoutRef: (r.payout_ref as string) ?? null, effectiveAt: new Date(String(r.effective_at)),
+  scopeCampaign: (r.scope_campaign as string) || null, scopeReferrer: (r.scope_referrer as string) || null, basis: r.basis === "gross" ? "gross" : "pool", active: Boolean(r.active), payoutRef: (r.payout_ref as string) ?? null, effectiveAt: new Date(String(r.effective_at)),
 });
 export async function rateHistory(): Promise<Array<RateRow & { actor: string | null; note: string | null; id: number }>> {
   const p = await db();
@@ -686,9 +700,9 @@ export async function addRate(r: { partner: string | null; overrideBps: number |
 }
 export async function addRecipientVersion(r: RecipientRow, actor: string): Promise<void> {
   const p = await db();
-  await p.query(`INSERT INTO ${S()}.ad_override_recipients (rkey, name, kind, pct_bps, scope_partner, scope_campaign, scope_referrer, active, payout_ref, effective_at, actor) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
-    [r.rkey, r.name, r.kind, r.pctBps, r.scopePartner, r.scopeCampaign, r.scopeReferrer ?? null, r.active, r.payoutRef, r.effectiveAt.toISOString(), actor]);
-  await audit(actor, "recipient.set", r.rkey, `${r.name} ${r.kind} ${r.pctBps / 100}% of pool scope=${r.scopeReferrer ? `referrals by ${r.scopeReferrer}` : `${r.scopePartner ?? "all hubs"}/${r.scopeCampaign ?? "all campaigns"}`} active=${r.active} effective=${r.effectiveAt.toISOString()}`);
+  await p.query(`INSERT INTO ${S()}.ad_override_recipients (rkey, name, kind, pct_bps, scope_partner, scope_campaign, scope_referrer, basis, active, payout_ref, effective_at, actor) VALUES ($1,$2,$3,$4,$5,$6,$7,$12,$8,$9,$10,$11)`,
+    [r.rkey, r.name, r.kind, r.pctBps, r.scopePartner, r.scopeCampaign, r.scopeReferrer ?? null, r.active, r.payoutRef, r.effectiveAt.toISOString(), actor, r.basis === "gross" ? "gross" : "pool"]);
+  await audit(actor, "recipient.set", r.rkey, `${r.name} ${r.kind} ${r.pctBps / 100}% of ${r.basis === "gross" ? "sale" : "pool"} scope=${r.scopeReferrer ? `referrals by ${r.scopeReferrer}` : `${r.scopePartner ?? "all hubs"}/${r.scopeCampaign ?? "all campaigns"}`} active=${r.active} effective=${r.effectiveAt.toISOString()}`);
 }
 export async function purgeTestRecipient(rkey: string, actor: string): Promise<boolean> {
   const p = await db();

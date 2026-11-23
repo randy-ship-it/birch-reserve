@@ -12,7 +12,7 @@ import { MEMBER_RE } from "./promoContext";
 import * as store from "./store";
 import { db, S, audit } from "./store";
 import { isTestIdentity } from "../testTraffic";
-import { recordReferralOrder } from "./referrals";
+import { firstTouchFor, recordFirstTouch, recordReferralOrder } from "./referrals";
 
 export const normKey = (s: string): string => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 /** Spoken forms: "street team hundred" and "street team 100" normalise to the same key. */
@@ -265,12 +265,21 @@ export async function afterOrderCampaign(session: Stripe.Checkout.Session, campa
   const md = session.metadata ?? {};
   const email = (session.customer_details?.email || session.customer_email || "").trim().toLowerCase();
   const site = md.site === "scale" ? "scale" : "birch";
-  const st = await resolveMember(md.st);
+  let st = await resolveMember(md.st);
+  let touch: { touchQr: string | null; touchSite: "birch" | "scale"; email: string } | undefined;
+  if (!st && email) {
+    // No referral on this checkout (different device, link lost): credit the referrer who first brought this buyer's email / company in.
+    const t = await firstTouchFor(email, md.website ?? null).catch(() => null);
+    if (t) {
+      st = t.member;
+      touch = { touchQr: t.qr, touchSite: t.site, email };
+    }
+  }
   if (st) {
     await streetEvent({ member: st, kind: "order", site, ref: session.id, amountCents: session.amount_total ?? 0, currency: session.currency ?? "usd", isTest, dedupeKey: `order:${session.id}` });
     // Commission basis: stamp the order with its referrer and write the referral row (referrals.ts). Never blocks the promo step.
     try {
-      await recordReferralOrder(session, campaign, st, isTest);
+      await recordReferralOrder(session, campaign, st, isTest, touch);
     } catch (err) {
       await audit("stripe-webhook", "referral.error", session.id, err instanceof Error ? err.message : String(err));
     }
@@ -351,13 +360,15 @@ export async function purgeTestPromo(actor: string): Promise<number> {
 }
 
 /** A brand submitted an intake with a street team link / code in play. Counts the intake and stores a pending credit tied to the email. Never throws. */
-export async function onIntakeSubmitted(ctx: { st: string | null; code: string | null; site: "birch" | "scale" }, email: string, website?: string | null): Promise<void> {
+export async function onIntakeSubmitted(ctx: { st: string | null; code: string | null; site: "birch" | "scale"; qr?: string | null }, email: string, website?: string | null): Promise<void> {
   try {
     const e = cleanEmail(email);
     if (!validEmail(e)) return;
     const test = isTestIdentity({ email: e });
     const st = await resolveMember(ctx.st);
     if (st) await streetEvent({ member: st, kind: "intake", site: ctx.site, isTest: test, dedupeKey: `intake:${e}:${st}` });
+    // First touch: remember who referred this buyer (email + company domain) so a later card or EFT order from them, on either site, is credited.
+    if (st) await recordFirstTouch(st, ctx.qr ?? null, ctx.site, e, website ?? null, test);
     if (ctx.code) {
       const host = website ? website.replace(/^https?:\/\//i, "").replace(/^www\./i, "").split(/[/?#]/)[0]!.slice(0, 120) : null;
       await claimCode({ code: ctx.code, email: e, company: host, site: ctx.site, st, src: "intake" });
