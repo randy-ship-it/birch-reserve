@@ -108,7 +108,7 @@ export default function BrAiBuyers() {
             <H2>Place a client, earn 10% in cash.</H2>
             <ul className="mt-4 space-y-2 text-sm">
               {["The agency of record earns 10% of media spend, paid in cash per the IO.", "Aggregate UTM reporting only. No personal data is shared.", "Modelled volumes, labelled as estimates. No impression guarantees."].map((r) => (
-                <li key={r} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />{r}</li>
+                <li key={r} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden /><span>{r}</span></li>
               ))}
             </ul>
             <div className="mt-6"><Cta href="/agencies" variant="line" testId="buyers-agencies" className="w-full sm:w-auto">Agency details</Cta></div>
