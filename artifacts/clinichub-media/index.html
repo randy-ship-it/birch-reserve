@@ -89,7 +89,11 @@
       })();
     </script>
     <script defer src="/br-t.js"></script>
-</head>
+    <style>
+      /* The crawlable text shell inside #root is unstyled markup. Keep it in the DOM for crawlers/AI readers but never paint it: it showed as raw serif text until the JS bundle mounted React. */
+      #root > main:first-child { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
+    </style>
+  </head>
   <body>
     <div id="root"><main><h1>Birch Reserve</h1><p>Display and CPC ad space inside co-branded Recovery Brand hubs and health &amp; wellness business hubs, on four placements: post-purchase, hub home, product and services pages, and the member dashboard behind login. Priced in USD: a $190 USD 7-day category look or a $490 USD category reserve. <a href="/media-kit">See the media kit</a>.</p></main></div>
     <script type="module" src="/src/main.tsx"></script>
