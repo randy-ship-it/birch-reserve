@@ -51,7 +51,7 @@ export function BrandBanners({ title = "Co-branded brand hubs listed with Scale"
     <div data-testid="brand-banners">
       <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.25em] text-foreground/55">{title}</p>
       {/* logo strip */}
-      <ul className="mb-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-5" data-testid="brand-logo-strip">
+      <ul className={`mb-10 items-center gap-x-10 gap-y-5 ${hubs.length % 5 === 0 ? "grid grid-cols-2 justify-items-center md:grid-cols-5" : "flex flex-wrap justify-center"}`} data-testid="brand-logo-strip">
         {hubs.map((h) => (
           <li key={h.key} className="flex h-10 items-center opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0">
             <img src={h.logo} alt={h.name} className="max-h-9 w-auto max-w-[130px] object-contain" />
