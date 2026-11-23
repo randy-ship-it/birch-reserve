@@ -17,7 +17,7 @@ s.textContent=".io-term{white-space:normal}.io-q{display:inline-flex;align-items
 (document.head||document.documentElement).appendChild(s)}
 function blockOf(n){var e=n.parentElement;while(e&&e!==document.body){var d=getComputedStyle(e).display;if(d==="block"||d==="list-item"||d==="flow-root")return e;e=e.parentElement}return document.body}
 function find(){
- if(document.querySelector(".io-term"))return null;
+ if(document.querySelector(".io-q"))return null;
  var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:function(t){
   if(!t.nodeValue||t.nodeValue.indexOf("IO")<0)return NodeFilter.FILTER_REJECT;
   var p=t.parentElement;if(!p||p.closest(SKIP))return NodeFilter.FILTER_REJECT;
@@ -26,7 +26,7 @@ function find(){
   var re=/\bIO\b/g,m;
   while((m=re.exec(t.nodeValue))){
    var before=t.nodeValue.slice(0,m.index);
-   if(/insertion order\s*\(?\s*$/i.test(before))return {skip:true};
+   if(/insertion order\s*\(\s*$/i.test(before)&&t.nodeValue.charAt(m.index+2)===")")return {t:t,i:m.index,spelled:true};
    if(t.nodeValue.charAt(m.index+2)==="-"||before.slice(-1)==="-")continue;
    return {t:t,i:m.index}}
  }
@@ -34,15 +34,16 @@ function find(){
 function apply(){
  if(!document.body)return;var f=find();if(!f||f.skip)return;css();
  var t=f.t,s=t.nodeValue,i=f.i,before=s.slice(0,i),after=s.slice(i+2);
- var cap=/^\s*$/.test(before)||/[.!?:]\s*$/.test(before);
+ var spelled=f.spelled;var cap=/^\s*$/.test(before)||/[.!?:]\s*$/.test(before);
  var span=document.createElement("span");span.className="io-term";
- span.appendChild(document.createTextNode((cap?"Insertion order (IO)":"insertion order (IO)")));
+ if(!spelled)span.appendChild(document.createTextNode((cap?"Insertion order (IO)":"insertion order (IO)")));
  var b=document.createElement("button");b.type="button";b.className="io-q";b.textContent="?";b.setAttribute("aria-expanded","false");b.setAttribute("aria-label","What is an insertion order?");b.setAttribute("data-testid","io-explainer-toggle");
  var box=document.createElement("span");box.className="io-exp";box.hidden=true;box.setAttribute("role","note");box.setAttribute("data-testid","io-explainer");box.textContent=TXT;
  b.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();var o=box.hidden;box.hidden=!o;b.setAttribute("aria-expanded",o?"true":"false")});
  span.appendChild(b);
  var par=t.parentNode,blk=blockOf(t);
- t.nodeValue=before;par.insertBefore(span,t.nextSibling);par.insertBefore(document.createTextNode(after),span.nextSibling);
+ if(spelled){t.nodeValue=s.slice(0,i+3);par.insertBefore(span,t.nextSibling);par.insertBefore(document.createTextNode(s.slice(i+3)),span.nextSibling)}
+ else{t.nodeValue=before;par.insertBefore(span,t.nextSibling);par.insertBefore(document.createTextNode(after),span.nextSibling)}
  blk.appendChild(box)}
 var tm=0;function later(){clearTimeout(tm);tm=setTimeout(apply,250)}
 function start(){apply();try{new MutationObserver(later).observe(document.body,{childList:true,subtree:true,characterData:false})}catch(e){}}
