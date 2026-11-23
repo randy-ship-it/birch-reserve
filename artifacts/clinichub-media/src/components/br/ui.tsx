@@ -48,7 +48,7 @@ export function Cta({ href, children, variant = "lime", className = "", onClick,
           ? "border border-background/45 text-background hover:border-background hover:bg-background hover:text-foreground"
           : "border border-foreground/25 text-foreground hover:border-foreground hover:bg-foreground hover:text-background";
   return (
-    <a href={href} onClick={onClick} data-testid={testId} className={`inline-flex h-12 items-center justify-center gap-2 px-6 text-sm font-semibold transition-colors ${v} ${className}`}>
+    <a href={href} onClick={onClick} data-testid={testId} className={`inline-flex h-12 items-center justify-center gap-2 px-4 text-sm sm:px-6 font-semibold transition-colors ${v} ${className}`}>
       {children} <ArrowRight className="size-4" aria-hidden />
     </a>
   );
