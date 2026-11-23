@@ -100,7 +100,7 @@ export function TamStrip({ tone = "light", compact = false }: { tone?: "light" |
         { v: "IO", l: "media credit until the insertion order" },
       ].map((x) => (
         <div key={x.l}>
-          <div className={`font-display ${compact ? "text-4xl" : "text-4xl md:text-5xl"}`}>{x.v}</div>
+          <div className={`font-display ${x.v === "IO" ? "text-2xl leading-tight md:text-3xl" : compact ? "text-4xl" : "text-4xl md:text-5xl"}`}>{x.v}</div>
           <div className={`mt-1 text-sm ${muted}`}>{x.l}</div>
         </div>
       ))}
