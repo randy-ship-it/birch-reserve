@@ -139,6 +139,8 @@ function BookCall({ variant = "ink", testId }: { variant?: "ink" | "lime" | "lin
   );
 }
 
+const HERO_BTN = "w-full sm:w-auto rounded-full whitespace-nowrap h-11! px-5!";
+
 export default function BrMediaKit() {
   usePageMeta(
     "Media kit | Birch Reserve",
@@ -179,12 +181,13 @@ export default function BrMediaKit() {
           <div className="mt-6" data-testid="mk-kit-cta">
             <KitCta placement="hero_media_kit" size="lg" sub="Free · website + email · hub earnings and supplier exposure, estimated" />
           </div>
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row" id="download">
-            <Cta href="#my-kit" variant="lime" testId="mk-download-kit-hero" className="w-full sm:w-auto">Download my kit</Cta>
-            <Cta href={RESERVE_HREF} variant="lime" testId="mk-reserve-hero" className="w-full sm:w-auto">Reserve your space — {price.seat}</Cta>
-            <Cta href={LOOK_HREF} variant="ink" testId="mk-look-hero" className="w-full sm:w-auto">Take a 7-day look — {price.look}</Cta>
-            <Cta href="#request" variant="line" testId="mk-request-hero" className="w-full sm:w-auto">Ask about a placement</Cta>
-            <MediaKitPdfLink variant="line" testId="mk-pdf-hero" className="w-full sm:w-auto" />
+          {/* One button shape with the kit CTA above: rounded, single-line, wraps as a row (design cal, Nov 23 2026). */}
+          <div className="mt-4 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap" id="download">
+            <Cta href="#my-kit" variant="lime" testId="mk-download-kit-hero" className={HERO_BTN}>Download my kit</Cta>
+            <Cta href={RESERVE_HREF} variant="lime" testId="mk-reserve-hero" className={HERO_BTN}>Reserve your space — {price.seat}</Cta>
+            <Cta href={LOOK_HREF} variant="ink" testId="mk-look-hero" className={HERO_BTN}>Take a 7-day look — {price.look}</Cta>
+            <Cta href="#request" variant="line" testId="mk-request-hero" className={HERO_BTN}>Ask about a placement</Cta>
+            <MediaKitPdfLink variant="line" testId="mk-pdf-hero" className={HERO_BTN}>One-page media kit (PDF)</MediaKitPdfLink>
           </div>
           <div className="mt-4" data-testid="mk-reel-link"><WatchHowItWorks placement="hero_media_kit" testId="mk-watch-reel" /></div>
 
