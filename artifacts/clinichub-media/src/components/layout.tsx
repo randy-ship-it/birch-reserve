@@ -234,7 +234,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <div key={c.label} className="flex min-w-0 flex-col gap-3 text-sm">
                 <span className="text-xs font-medium uppercase tracking-widest text-foreground/50 mb-1">{c.label}</span>
                 {c.items.map((it) => (
-                  <a key={it.href} href={it.href} className="break-words hover:text-foreground/70 transition-colors">{it.label}</a>
+                  <a key={it.href} href={it.href} className="break-words hover:text-foreground/70 transition-colors">{/* URL-style labels break after the slash, not mid-word (design cal, Nov 23 2026). */}{it.label.includes("/") ? <>{it.label.slice(0, it.label.indexOf("/") + 1)}<wbr />{it.label.slice(it.label.indexOf("/") + 1)}</> : it.label}</a>
                 ))}
               </div>
             ))}
