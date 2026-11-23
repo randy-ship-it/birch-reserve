@@ -7,12 +7,12 @@ import { IO_EXPLAIN_JS, IO_EXPLAINER } from "../src/lib/ioExplain";
 import { BRAND_HUBS, INVENTORY } from "../src/lib/overhaul/model";
 import { llmsTxt } from "../src/lib/overhaul/seo";
 
-const BANNED = /align|clairvoyant|alset|80 locations|medvibe|friday|pier39|ankita|integrity/i;
+const BANNED = /align|clairvoyant|alset|80 locations|medvibe|friday|pier39|ankita/i;
 
 test("one ladder: Live now, Activating, and more launching", () => {
-  assert.deepEqual(liveHubs().map((h) => h.name), ["DR-HO'S physio", "SOLE", "Calm Joints"]);
+  assert.deepEqual(liveHubs().map((h) => h.name), ["DR-HO'S physio", "SOLE", "Integrity Fitness", "Calm Joints"]);
   assert.deepEqual(activatingHubs().map((h) => h.name), ["Effortless Admin", "NutriProCan", "Jack Health", "Jill Health", "Roll Recovery", "Bird & Be"]);
-  assert.match(ladderLine(), /Live now: DR-HO'S physio, SOLE and Calm Joints\. Activating: .*Bird & Be, and more launching\./);
+  assert.match(ladderLine(), /Live now: DR-HO'S physio, SOLE, Integrity Fitness and Calm Joints\. Activating: .*Bird & Be, and more launching\./);
   assert.ok(publicHubs().every((h) => h.audience.length > 10));
   assert.doesNotMatch(ladderLine(), BANNED);
 });
@@ -26,10 +26,10 @@ test("a hub with no real page is not linked; Scale links stay on scalehealth.ca"
 });
 
 test("every surface reads the ladder: model, llms.txt, server html", () => {
-  assert.match(INVENTORY.line, /Live now: DR-HO'S physio, SOLE and Calm Joints/);
+  assert.match(INVENTORY.line, /Live now: DR-HO'S physio, SOLE, Integrity Fitness and Calm Joints/);
   for (const h of BRAND_HUBS) assert.notEqual(h.bannerStatus, "In queue", h.key);
   const txt = llmsTxt();
-  assert.match(txt, /- Live now: DR-HO'S physio; SOLE; Calm Joints/);
+  assert.match(txt, /- Live now: DR-HO'S physio; SOLE; Integrity Fitness; Calm Joints/);
   assert.match(txt, /- Coming: and more launching/);
   assert.match(txt, /Insertion order \(IO\): the short document/);
   assert.doesNotMatch(txt, /DR-HO'S physio and SOLE\./);

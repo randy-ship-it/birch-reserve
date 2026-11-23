@@ -20,7 +20,7 @@ test("prompt carries the site offer in USD with CAD for Canadian visitors", () =
   assert.match(p, /USD base prices; Canadian visitors pay CAD/);
   assert.match(p, /\$270 CAD/);
   assert.match(p, /\$690 CAD/);
-  assert.doesNotMatch(p, /Integrity/i);
+  assert.match(p, /Integrity Fitness/); // Live now on the hub ladder (Randy, Nov 23 2026)
   assert.match(p, /DR-HO'S physio/);
   assert.match(p, /Activating/);
   assert.ok(p.includes(BIRCH_LINKS.reserve490) && p.includes(BIRCH_LINKS.look190) && p.includes(BIRCH_LINKS.request));
