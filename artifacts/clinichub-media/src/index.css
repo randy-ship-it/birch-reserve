@@ -382,3 +382,10 @@ html[data-skin="scale"] [fill="#a3e635"] { fill: #1d875c; }
 /* Layout-fix 1122: Scale palette for the two spots that hard-code Birch lime (hub "Claim my kit" button, step cards). */
 html[data-skin="scale"] [data-testid="hub-claim"] { background: oklch(0.765 0.177 163.223) !important; }
 html[data-skin="scale"] [class*="bg-[#ecfccb]"] { background-color: oklch(0.979 0.021 166.113 / 0.7) !important; }
+
+/* Phones: every disclosure row is at least a 40px tap target (mobile QA, Nov 23 2026). Flex summaries grow to 40px and
+   stay centred; plain summaries get vertical padding so their marker and text keep their layout. */
+@media (max-width: 767px) {
+  summary[class*="flex"] { min-height: 40px; }
+  summary:not([class*="flex"]) { padding-top: 11px; padding-bottom: 11px; }
+}
