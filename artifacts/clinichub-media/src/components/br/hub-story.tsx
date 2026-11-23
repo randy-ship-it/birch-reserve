@@ -12,7 +12,8 @@ import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { siteUrl } from "@/lib/siteSkin";
 import { REGION_MIX, AUDIENCE_SNAPSHOT } from "../../../../api-server/src/lib/overhaul/audiences";
 import { IO_EXPLAINER } from "../../../../api-server/src/lib/ioExplain";
-import { HUB_MOCKS } from "@/lib/hub-mocks";
+import { HUB_MOCKS, HUB_KEYS } from "@/lib/hub-mocks";
+import { MORE_LAUNCHING, RETAIL_MICRO_HUBS } from "../../../../api-server/src/lib/hubLadder";
 
 const NAVY = "#0b1f3a";
 
@@ -21,18 +22,20 @@ export function OwnTheMoment({ testId = "own-the-moment" }: { testId?: string })
     <div data-testid={testId}>
       <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Own the moment</p>
       <h2 className="mt-1 max-w-3xl font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">The card sits on the page already open, right after the booking or purchase.</h2>
-      <div className="mt-4 grid gap-4 md:grid-cols-2">
-        {(["drho", "sole"] as const).map((k) => (
-          <figure key={k} className="min-w-0" data-testid={`${testId}-${k}`}>
+      <div className="-mx-1 mt-4 flex snap-x gap-4 overflow-x-auto px-1 pb-3" data-testid={`${testId}-strip`}>
+        {HUB_KEYS.map((k) => (
+          <figure key={k} className="w-[86%] shrink-0 snap-start sm:w-[48%] lg:w-[32%]" data-testid={`${testId}-${k}`}>
             <HubMock brand="" logo={null} hub={k} category="Your category" badge="Example mockup" />
             <figcaption className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-foreground/70">
               <span className="rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A5A00]">Example mockup</span>
+              <span className="rounded-full bg-[#0b1f3a]/8 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]/70">{HUB_MOCKS[k].status === "Live" ? "Live now" : "Activating"}</span>
               <span className="font-semibold text-[#0b1f3a]">{HUB_MOCKS[k].name}</span>
               <span>· {HUB_MOCKS[k].surface}</span>
             </figcaption>
           </figure>
         ))}
       </div>
+      <p className="mt-1 text-[13px] font-semibold"><a href={siteUrl("/hubs")} data-mirror-keep className="text-[#0b1f3a] underline underline-offset-2" data-testid="see-all-hubs">See all {HUB_KEYS.length + RETAIL_MICRO_HUBS.length} hubs</a> <span className="font-normal text-foreground/60">· {MORE_LAUNCHING}</span></p>
       <p className="mt-2 text-[12px] text-foreground/60">Illustrative mockups, not live ads. Your insertion order names the hub and surface before anything runs.</p>
     </div>
   );
@@ -41,7 +44,7 @@ export function OwnTheMoment({ testId = "own-the-moment" }: { testId?: string })
 export function FourSteps({ look, seat, testId = "four-steps" }: { look: string; seat: string; testId?: string }) {
   const steps = [
     { n: "1", title: `${look} look or ${seat} reserve`, line: "Media credit, not a fee. The look converts to a reserve or is refunded.", href: LOOK_HREF },
-    { n: "2", title: "See the mock on a live hub", line: "Your card on DR-HO'S or SOLE, shown as an example mockup.", href: RESERVE_HREF },
+    { n: "2", title: "See the mock on a live hub", line: "Your card on any hub, shown as an example mockup.", href: RESERVE_HREF },
     { n: "3", title: "Sign the insertion order (IO)", line: "It names the hub, surface, category and dates. Nothing runs until the IO is signed and approved.", href: undefined },
     { n: "4", title: "The flight runs, you get the report", line: "Aggregate report only. First measured reports coming soon.", href: undefined },
   ];

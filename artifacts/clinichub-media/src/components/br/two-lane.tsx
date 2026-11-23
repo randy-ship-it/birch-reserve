@@ -119,7 +119,7 @@ export function HubMock({ brand, logo, hub, category, pins = false, badge }: { b
       {/* 16:10 frame = the 1440x900 captures, nothing cropped. The ad card scales with the frame (container units) so it
           sits in the same place at every width; its spot is chosen per hub so it never cuts hub text (see hub-mocks.ts). */}
       <div className="relative aspect-[16/10] w-full">
-        <img src={H.img} alt={`${hubName} live hub`} width={1440} height={900} decoding="async" className="absolute inset-0 size-full object-cover object-center" />
+        <img src={H.img} alt={`${hubName} hub`} width={1440} height={900} loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
         <div className={`absolute ${H.card.pos} ${example ? "w-[36cqw] p-[1.4cqw] max-md:w-[40cqw]" : "w-[42cqw] p-[2.2cqw] max-md:w-[60cqw]"} rounded-[1.6cqw] bg-white shadow-2xl ring-2 ring-lime-300`} style={H.card.scale ? { transform: `scale(${H.card.scale})`, transformOrigin: H.card.origin === "br" ? "bottom right" : "bottom left" } : undefined} data-testid="hub-mock-card">
           {pins ? <><span className={`${pinCls} -left-3 -top-3`} aria-hidden>1</span><span className={`${pinCls} -bottom-3 ${H.card.pin3 === "bl" ? "-left-3" : "-right-3"}`} aria-hidden>3</span></> : null}
@@ -146,7 +146,7 @@ export function HubMock({ brand, logo, hub, category, pins = false, badge }: { b
             </>
           )}
         </div>
-        {badge ? null : <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]">Mock · live hub</span>}
+        {badge ? null : <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]">{H.status === "Live" ? "Mock · live hub" : "Example mockup"}</span>}
         {pins ? <span className={pinCls} style={{ left: H.pin2.left, top: H.pin2.top }} aria-hidden>2</span> : null}
       </div>
     </figure>
