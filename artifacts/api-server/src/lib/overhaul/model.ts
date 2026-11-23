@@ -96,7 +96,7 @@ function ladderStatus(key: string, fallback: BrandHub["bannerStatus"]): { banner
 }
 
 /** The brand hubs Randy named (Nov 12). DR-HO'S and SOLE are live today (SOLE added Nov 19 2026, Randy 11:10 AM ET); the rest are in queue. */
-export const BRAND_HUBS: BrandHub[] = [
+const BASE_BRAND_HUBS: BrandHub[] = [
   ...KIT_HUBS.filter((h) => h.kind === "brand").map((h) => ({ ...h, ...EXTRA[h.key]!, ...ladderStatus(h.key, EXTRA[h.key]!.bannerStatus) })),
   {
     key: "effortless-admin",
@@ -116,22 +116,25 @@ export const BRAND_HUBS: BrandHub[] = [
 ];
 
 /**
- * Every hub on the ladder, in ladder order, for the /hubs detail cards (Randy, Nov 23 2026: the locked cards omitted
- * Integrity Fitness and Calm Joints). The two with no hub feed row use the network-median basis, the same as SOLE. Display only.
+ * Every hub on the ladder, in ladder order (Live now first), for every hub list on the site (carousel, media kit tiles,
+ * /hubs detail cards, rate card, trust strip). Integrity Fitness and Calm Joints have no hub feed row, so they use the
+ * network-median basis like SOLE and a wordmark logo. Display only; ad serving still reads sponsorKit status.
  */
-export const LADDER_BRAND_HUBS: BrandHub[] = (() => {
-  const med = BRAND_HUBS.find((h) => h.key === "jack-health")!;
+export const BRAND_HUBS: BrandHub[] = (() => {
+  const med = BASE_BRAND_HUBS.find((h) => h.key === "jack-health")!;
   const extra: Record<string, Partial<BrandHub>> = {
-    "integrity-fitness": { name: "Integrity Fitness", url: "https://www.scalehealth.ca/integrity", category: "Gym and recovery membership", logo: "", banner: "/hub-gallery/integrity.webp", recovery: "Recovery" },
-    "calm-joints": { name: "Calm Joints", url: "https://www.scalehealth.ca/calmjoints", category: "Digital physio clinic", logo: "", banner: "/hub-gallery/calmjoints.webp", recovery: "Recovery" },
+    "integrity-fitness": { name: "Integrity Fitness", url: "https://www.scalehealth.ca/integrity", category: "Gym and recovery membership", logo: "/partner-logos/integrity-fitness.svg", banner: "/hub-gallery/integrity.webp", recovery: "Recovery" },
+    "calm-joints": { name: "Calm Joints", url: "https://www.scalehealth.ca/calmjoints", category: "Digital physio clinic", logo: "/partner-logos/calm-joints.svg", banner: "/hub-gallery/calmjoints.webp", recovery: "Recovery" },
   };
-  return publicHubs()
-    .map((l) => {
-      const have = BRAND_HUBS.find((b) => b.key === l.key || (l.key === "dr-ho" && b.key === "dr-ho"));
-      const b = have ?? ({ ...med, key: l.key, basis: "Network median partner (no hub feed yet)", ...extra[l.key] } as BrandHub);
-      return { ...b, audience: have ? b.audience : l.audience, ...ladderStatus(l.key, b.bannerStatus) };
-    });
+  return publicHubs().flatMap((l) => {
+    const have = BASE_BRAND_HUBS.find((b) => b.key === l.key);
+    if (have) return [have];
+    if (!extra[l.key]) return [];
+    return [{ ...med, key: l.key, basis: "Network median partner (no hub feed yet)", audience: l.audience, ...extra[l.key], ...ladderStatus(l.key, "Live") } as BrandHub];
+  });
 })();
+/** Kept for the /hubs page import. */
+export const LADDER_BRAND_HUBS = BRAND_HUBS;
 
 /** Inventory framing (Randy, Nov 12 1:10 PM): named hubs are live inventory now; more in queue by year end. */
 export const INVENTORY = {

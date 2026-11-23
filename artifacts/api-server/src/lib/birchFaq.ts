@@ -106,7 +106,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return { intent: "categories", callback: null, text: `You get a share of display space across our growing network of private, members-only health and wellness hubs, with more launching. Placements are curated by hand as each hub launches. Reserve at ${BUY}.` };
   }
   if (/proof|see|example|hub|where|show|who sees/.test(t)) {
-    return { intent: "proof", callback: null, text: `See the face before the flight: live hubs anyone can open now are https://physio.drhonow.com (DR-HO'S) and https://www.scalehealth.ca/sole (SOLE). Ads sit on the thank-you page, the hub home page, product and services pages, and the member dashboard. The media kit is ${KIT}.` };
+    return { intent: "proof", callback: null, text: `See the face before the flight: live hubs anyone can open now are https://physio.drhonow.com (DR-HO'S), https://www.scalehealth.ca/sole (SOLE), https://www.scalehealth.ca/integrity (Integrity Fitness) and https://www.scalehealth.ca/calmjoints (Calm Joints). Ads sit on the thank-you page, the hub home page, product and services pages, and the member dashboard. The media kit is ${KIT}.` };
   }
   if (/price|cost|how much|rate|pricing|budget|package/.test(t)) {
     return { intent: "price", callback: null, text: `Three ways in. The 7-day look is $190 USD, and it converts to the reserve within 7 days or is refunded. Reserving is $490 USD, 100% media credit until the IO. Premium slots run $25,000 to $50,000 and are inquire only. Start at ${BUY}.` };
