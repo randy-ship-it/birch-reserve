@@ -11,7 +11,7 @@ export const AI_SITE = "https://birchreserve.net";
 export const VS_GOOGLE_PATH = "/vs-google-ads";
 export const HOW_FAST_PATH = "/how-fast";
 export const AI_MEASURED = "2026-11-19";
-export const AI_NETWORK_LINE = "Based on signed partnership contracts: 700MM+ captive page views activating (branded ScaleHealth.ca hubs) · 200+ retail locations, 500+ soon, 1MM+ captive recovery consumers · 2MM+ homes reached by 2027 (Calm Joints + Street Team Ambassadors)";
+export const AI_NETWORK_LINE = "Based on signed partnership contracts: 700MM+ captive page views activating (branded ScaleHealth.ca hubs) · 200+ retail locations, 500+ soon, 1MM+ captive recovery consumers · 1MM+ consumers now through our provider network and Street Team Ambassadors, expanding to an estimated 3MM+ in 2027";
 
 export type GoogleSource = { id: string; label: string; claim: string; url: string };
 

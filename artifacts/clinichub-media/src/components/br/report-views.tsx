@@ -70,7 +70,7 @@ export function sharesOf(ex: FridayExposure) {
 }
 /** Channel rows for one tier: base figure (= channel now.min ÷ min share) × the tier's share band. */
 /** Street Team row note: text reach, never a homes figure (Randy, Nov 19 2026 2:27 PM ET). */
-export const STREET_ROW_NOTE = "2MM+ homes by 2027, based on signed partnership contracts";
+export const STREET_ROW_NOTE = "1MM+ consumers now, 3MM+ est. in 2027, based on signed partnership contracts";
 
 export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
   const s = sharesOf(ex);
@@ -79,7 +79,7 @@ export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
     const c = ex.channels.find((x) => x.key === key);
     const n = NAMES[key]!;
     if (key === "street_team") {
-      // Street Team: text reach only ("2MM+ homes reached by 2027"), never a homes figure.
+      // Street Team: text reach only ("1MM+ consumers now, 3MM+ est. in 2027"), never a homes figure.
       // Shown as text, never as a homes figure (Randy, Nov 19 2026 2:27 PM ET).
       const range = null;
       const later = null;
@@ -90,7 +90,7 @@ export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
     const baseLater = c?.later ? c.later.min / s.min : null;
     const range = base && base > 0 ? llh(base * lo, base * hi) : null;
     const later = baseLater && base && baseLater > base ? llh(baseLater * lo, baseLater * hi) : null;
-    const note = c?.needs_figure ? "2MM+ homes by 2027, based on signed partnership contracts" : !c?.eligible_now ? (c?.reason ?? "Not in your markets yet") : null;
+    const note = c?.needs_figure ? "1MM+ consumers now, 3MM+ est. in 2027, based on signed partnership contracts" : !c?.eligible_now ? (c?.reason ?? "Not in your markets yet") : null;
     return { key, name: n.name, unit: n.unit, monthly: n.monthly, geo: c?.geo_label ?? "", range, later, note };
   });
 }
@@ -139,7 +139,7 @@ function ChannelTable({ rows, extra, testId }: { rows: ChannelRow[]; extra?: Rea
         <div key={r.key} className="grid grid-cols-[1fr_auto] items-baseline gap-2 px-3 py-2.5 text-[13px] md:grid-cols-[1.3fr_1fr_1fr]" style={{ borderTop: `1px solid ${RT.line}` }} data-testid={`${testId}-${r.key}`}>
           <span className="min-w-0">
             <span className="font-semibold" style={{ color: RT.ink }}>{r.name}</span>
-            <span className="block text-[11px]" style={{ color: RT.mute }}>{r.key === "street_team" ? "homes · " : r.unit ? `${r.unit}${r.monthly ? " / month" : " in reach"} · ` : ""}{r.geo}</span>
+            <span className="block text-[11px]" style={{ color: RT.mute }}>{r.key === "street_team" ? "consumers · " : r.unit ? `${r.unit}${r.monthly ? " / month" : " in reach"} · ` : ""}{r.geo}</span>
           </span>
           {r.range ? (
             <>

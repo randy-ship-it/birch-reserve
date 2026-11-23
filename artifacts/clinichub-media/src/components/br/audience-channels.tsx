@@ -9,7 +9,7 @@ const ICONS = { "scale-hubs": Globe2, "retail-network": Store, "calm-street": Ho
 const MORE: Record<string, string> = {
   "scale-hubs": "Branded ScaleHealth.ca hubs are private, members-only pages where recovery and wellness customers already shop and book care. 700MM+ captive page views are activating as brand hubs go live.",
   "retail-network": "Our private network of digital and brick-and-mortar fitness & recovery retailers in Canada and the USA: 200+ locations today and 500+ soon, with 1MM+ captive recovery consumers.",
-  "calm-street": "Calm Joints is our owned digital clinic. Together with our Street Team Ambassadors, who do on-site product sampling and door-to-door, the plan is to reach 2MM+ homes by 2027.",
+  "calm-street": "Calm Joints is our owned digital clinic. Together with our Street Team Ambassadors, who do on-site product sampling and door-to-door, we reach 1MM+ consumers now with our provider network activating, expanding to an estimated 3MM+ in 2027.",
 };
 
 export function AudienceChannels({ testId = "audience-channels", dark = false }: { testId?: string; dark?: boolean }) {

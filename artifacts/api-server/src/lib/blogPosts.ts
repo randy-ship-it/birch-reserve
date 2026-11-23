@@ -33,7 +33,7 @@ export type BlogPost = {
 export const BLOG_INDEX_PATH = "/blog";
 export const BLOG_PUBLISHED = "2026-11-19";
 export const NETWORK_LINE = "700MM+ captive page views activating · 200+ retail locations (500+ soon) · 1MM+ captive recovery consumers";
-export const STREET_TEAM_LINE = "Calm Joints and our Street Team Ambassadors are planned to reach 2MM+ homes by 2027.";
+export const STREET_TEAM_LINE = "Our provider network is activating and, with our Street Team Ambassadors, reaches 1MM+ consumers now, expanding to an estimated 3MM+ in 2027.";
 
 export const BLOG_POSTS: readonly BlogPost[] = [
   {
