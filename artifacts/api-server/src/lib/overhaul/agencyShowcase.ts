@@ -55,8 +55,8 @@ export function agencyPayoutRows(seatPrice: number, cur: "USD" | "CAD") {
     { key: "seat", label: `${m(seatPrice)} ${cur} reserve (card)`, spend: m(seatPrice), cash: m(agencyCash(seatPrice)) },
     {
       key: "client_test",
-      label: `Client test, ${m(AGENCY_CLIENT_TEST.lo / 1000)}K–${m(AGENCY_CLIENT_TEST.hi / 1000)}K (IO)`,
-      spend: `${m(AGENCY_CLIENT_TEST.lo)}–${m(AGENCY_CLIENT_TEST.hi)}`,
+      label: "Client test (IO)",
+      spend: `${m(AGENCY_CLIENT_TEST.lo / 1000)}K–${m(AGENCY_CLIENT_TEST.hi / 1000)}K`,
       cash: `${m(agencyCash(AGENCY_CLIENT_TEST.lo))}–${m(agencyCash(AGENCY_CLIENT_TEST.hi))}`,
     },
     {

@@ -360,8 +360,8 @@ export function AgencyPayouts() {
             {rows.map((e) => (
               <tr key={e.key} data-testid={`agency-payout-${e.key}`}>
                 <td className="px-4 py-3 md:px-5">{e.label}</td>
-                <td className="px-4 py-3 text-right md:px-5">{e.spend}</td>
-                <td className="px-4 py-3 text-right font-semibold md:px-5">{e.cash}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-right md:px-5">{e.spend}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-right font-semibold md:px-5">{e.cash}</td>
               </tr>
             ))}
           </tbody>
