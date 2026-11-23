@@ -277,6 +277,22 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
   );
 }
 
+/** Refund, checkout and agency terms shared by both NextStep layouts (copy unchanged). */
+function NextStepTerms({ open = false }: { open?: boolean }) {
+  const body = (
+    <>
+      <p>$190: 100% credit if you reserve within 7 days, otherwise a cash refund. $490: fully refundable until 14 days before the launch date in your IO.</p>
+      <p>Card checkout by Stripe. Upload your ad on the same page. A person approves every order before it runs.</p>
+      <p data-testid="next-step-agency-line">Agencies: {AGENCY_TEST.cashPct}% of media spend paid in cash · {AGENCY_REPORTING_LINE}.</p>
+    </>
+  );
+  if (open) return <div className="mt-2 space-y-2 text-[14px] leading-relaxed text-foreground/80" data-testid="next-step-details">{body}</div>;
+  return (
+    <Details label="Refunds, checkout and agencies" testId="next-step-details">{body}</Details>
+  );
+}
+
+
 /**
  * Next step after the kit: live-hub mock beside ONE primary button ($190 look) and a text link ($490), then the
  * mid-tier band. `yieldToPostKit`: the page-level copy on /intake hides once the post-kit copy mounts (never two on a page).
@@ -300,24 +316,26 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
   if (hidden) return null;
   return (
     <section id={anchor ? "next-step" : undefined} className="scroll-mt-20" data-testid="next-step" data-where={where}>
-      <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">{showMock ? "See it on a live hub first." : "Start with a $190 look."}</h2>
-      <div className={`mt-4 grid grid-cols-[minmax(0,1fr)] items-center gap-5 ${showMock ? "md:grid-cols-[1fr_1fr] md:items-stretch" : ""}`}>
+      <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">{showMock ? "See it on a live hub first." : "Start with a 7-day look."}</h2>
+      <div className={`mt-4 grid grid-cols-[minmax(0,1fr)] items-center gap-5 ${showMock ? "md:grid-cols-[1fr_1fr] md:items-stretch" : "md:grid-cols-2 md:items-stretch md:gap-8"}`}>
         {showMock ? <AnnotatedHubMock brand={brand} initial="drho" /> : null}
-        <div className={showMock ? "md:flex md:flex-col md:justify-center md:rounded-3xl md:border md:border-foreground/10 md:bg-white md:p-6 md:shadow-sm" : undefined} data-testid="next-step-pay">
+        <div className={showMock ? "md:flex md:flex-col md:justify-center md:rounded-3xl md:border md:border-foreground/10 md:bg-white md:p-6 md:shadow-sm" : "md:flex md:flex-col md:justify-center"} data-testid="next-step-pay">
           <p className="font-display text-5xl leading-none text-[#0b1f3a]">{lookPrice.split(" ")[0]} <span className="text-lg">{lookPrice.split(" ")[1]}</span></p>
           <p className="mt-2 text-[15px] text-foreground/75">Your ad, live for 7 days.</p>
-          <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={() => trackCta("cta_hold_190", { offer: "hold-190" })} className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 hover:bg-[#0b1f3a] hover:text-white sm:w-auto" data-testid="next-step-look">
+          <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={() => trackCta("cta_hold_190", { offer: "hold-190" })} className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 hover:bg-[#0b1f3a] hover:text-white sm:w-auto sm:self-start" data-testid="next-step-look">
             Start the $190 look <ArrowRight className="size-5" />
           </a>
           <p className="mt-3 text-sm">
             <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="next-step-reserve">or reserve $490 as media credit</a>
           </p>
-          <Details label="Refunds, checkout and agencies" testId="next-step-details">
-            <p>$190: 100% credit if you reserve within 7 days, otherwise a cash refund. $490: fully refundable until 14 days before the launch date in your IO.</p>
-            <p>Card checkout by Stripe. Upload your ad on the same page. A person approves every order before it runs.</p>
-            <p data-testid="next-step-agency-line">Agencies: {AGENCY_TEST.cashPct}% of media spend paid in cash · {AGENCY_REPORTING_LINE}.</p>
-          </Details>
+          {showMock ? <NextStepTerms /> : null}
         </div>
+        {showMock ? null : (
+          <aside className="rounded-3xl border border-foreground/10 bg-white p-5 shadow-sm md:p-6" data-testid="next-step-card">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-foreground/60">Refunds, checkout and agencies</p>
+            <NextStepTerms open />
+          </aside>
+        )}
       </div>
       <div className="mt-6"><MidTier where={where} showMock={!showMock} /></div>
     </section>
