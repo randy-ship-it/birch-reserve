@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { activatingHubs, hubHref, liveHubs, LABEL_ACTIVATING, LABEL_LIVE, MORE_LAUNCHING, type LadderHub } from "../../../../api-server/src/lib/hubLadder";
+import { activatingHubs, hubHref, liveHubs, retailSceneSrc, LABEL_ACTIVATING, LABEL_LIVE, MORE_LAUNCHING, MOCK_LABEL, RETAIL_MICRO_HUBS, RETAIL_MICRO_LABEL, type LadderHub } from "../../../../api-server/src/lib/hubLadder";
 import { isScaleSkin } from "@/lib/siteSkin";
 
 /**
@@ -70,21 +70,59 @@ export function LiveHubGrid({ light = true }: { light?: boolean; dense?: boolean
   );
 }
 
-/** Activating list + "and more launching". Compact: names and one line each, no thumbnails. */
+/** Example ad card drawn over a hub page or a retail scene. Placeholder lines only: never a real brand or a real placement. */
+function AdCardMock({ surface }: { surface: string }) {
+  return (
+    <span className="absolute bottom-2 left-2 w-[52%] rounded-lg bg-white p-2 shadow-lg ring-1 ring-black/10" aria-hidden="true">
+      <span className="block text-[8px] font-bold uppercase tracking-wider text-[#0b1f3a]/55">Your brand · {surface}</span>
+      <span className="mt-1 block h-1.5 w-4/5 rounded bg-[#0b1f3a]/25" />
+      <span className="mt-1 block h-1.5 w-3/5 rounded bg-[#0b1f3a]/12" />
+      <span className="mt-1.5 block h-3 w-1/2 rounded bg-[#1f8a4c]" />
+    </span>
+  );
+}
+
+function ExampleCard({ tid, img, imgClass = "object-top", style, name, chip, audience, surface, sub }: { tid: string; img: string; imgClass?: string; style?: React.CSSProperties; name: string; chip: string; audience: string; surface: string; sub?: string }) {
+  return (
+    <li data-testid={tid} className="w-[240px] shrink-0 snap-start overflow-hidden rounded-2xl border border-dashed border-[#0b1f3a]/30 bg-white shadow-sm sm:w-auto sm:shrink">
+      <span className="relative block aspect-[16/10] w-full overflow-hidden bg-[#e9e3d6]">
+        <img src={img} alt={`${MOCK_LABEL}: ${name}`} width={960} height={600} loading="lazy" decoding="async" style={style} className={`absolute inset-0 size-full object-cover ${imgClass}`} />
+        <span className="absolute left-2 top-2 whitespace-nowrap rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-900 shadow-sm">{chip}</span>
+        <span className="absolute right-2 top-2 whitespace-nowrap rounded-full bg-[#0b1f3a]/80 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">{MOCK_LABEL}</span>
+        <AdCardMock surface={surface} />
+      </span>
+      <span className="block px-3 py-2.5">
+        <span className="block font-bold leading-tight text-[#0b1f3a]">{name}</span>
+        {sub ? <span className="block text-[11px] font-semibold text-[#0b1f3a]/55">{sub}</span> : null}
+        <span className="mt-0.5 block text-[13px] leading-snug text-foreground/70">{audience}</span>
+      </span>
+    </li>
+  );
+}
+
+/** Activating hubs with an example ad-card mockup on each hub's page, then 5 generic retail micro-hub examples, then "and more launching". */
 export function HubFunnel({ compact = false }: { compact?: boolean }) {
   const list = activatingHubs();
+  const strip = "-mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2 sm:mx-0 sm:grid sm:overflow-visible sm:px-0 sm:pb-0";
   return (
     <div className={compact ? "mt-4" : "mt-6"} data-testid="hub-funnel" data-hub-tier="activating" aria-label={`${LABEL_ACTIVATING} hubs, ${MORE_LAUNCHING}`}>
-      <p className="mb-2 text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#0b1f3a]/65">{LABEL_ACTIVATING}</p>
-      <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3" data-testid="hub-funnel-soon">
+      <p className="mb-2 flex flex-wrap items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#0b1f3a]/65">{LABEL_ACTIVATING}<span className="font-semibold normal-case tracking-normal text-foreground/55">Example mockups of the ad card on each hub's page. Not live placements.</span></p>
+      <ul className={`${strip} sm:grid-cols-2 lg:grid-cols-3`} data-testid="hub-funnel-soon">
         {list.map((h) => (
-          <li key={h.key} className="min-w-0 rounded-xl border border-dashed border-[#0b1f3a]/25 bg-white/70 px-3 py-2" data-testid={`activating-${h.key}`}>
-            <span className="flex items-center gap-2 text-sm font-bold text-[#0b1f3a]">{h.name}<span className="rounded-full bg-amber-100 px-1.5 py-px text-[9px] font-extrabold uppercase tracking-wider text-amber-900">{LABEL_ACTIVATING}</span></span>
-            <span className="block text-[12px] leading-snug text-foreground/65">{h.audience}</span>
-          </li>
+          <ExampleCard key={h.key} tid={`activating-${h.key}`} img={h.banner ?? ""} name={h.name} chip={LABEL_ACTIVATING} audience={h.audience} surface={h.surface ?? "Hub card"} />
         ))}
-        <li className="grid min-w-0 place-items-center rounded-xl border border-dashed border-[#0b1f3a]/20 px-3 py-2 text-sm font-semibold text-[#0b1f3a]/70" data-testid="hub-funnel-count">{MORE_LAUNCHING}</li>
       </ul>
+      {compact ? null : (
+        <div className="mt-5" data-testid="retail-micro-hubs">
+          <p className="mb-2 flex flex-wrap items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#0b1f3a]/65">{RETAIL_MICRO_LABEL}s · {LABEL_ACTIVATING}<span className="font-semibold normal-case tracking-normal text-foreground/55">Signed clinic partners, shown as generic examples. Illustrations, not photos.</span></p>
+          <ul className={`${strip} sm:grid-cols-3 lg:grid-cols-5`}>
+            {RETAIL_MICRO_HUBS.map((h) => (
+              <ExampleCard key={h.key} tid={`retail-${h.key}`} img={retailSceneSrc(h)} imgClass="object-cover" style={{ filter: `hue-rotate(${h.hue}deg)` }} name={h.name} sub={h.label} chip={LABEL_ACTIVATING} audience={h.audience} surface={h.surface} />
+            ))}
+          </ul>
+        </div>
+      )}
+      <p className="mt-3 text-sm font-semibold text-[#0b1f3a]/70" data-testid="hub-funnel-count">{MORE_LAUNCHING}</p>
     </div>
   );
 }
