@@ -84,10 +84,13 @@ export function AvailabilityStrip({ dark = false }: { a?: Availability | null; d
         {NETWORK_HUBS.map((h) => (
           <li key={h} className={`border px-3 py-2 text-[13px] font-semibold leading-tight ${dark ? "border-background/25" : "border-foreground/20 bg-white"}`}>{h}</li>
         ))}
-        {activatingHubs().map((h) => (
-          <li key={h.key} className={`border border-dashed px-3 py-2 text-[13px] font-semibold leading-tight ${dark ? "border-background/30 text-background/70" : "border-foreground/25 text-foreground/60"}`}>{h.name} · {LABEL_ACTIVATING}</li>
-        ))}
-        <li className={`border border-dashed px-3 py-2 text-[13px] font-semibold leading-tight ${dark ? "border-background/30 text-background/70" : "border-foreground/25 text-foreground/60"}`}>{MORE_LAUNCHING}</li>
+        {/* Design cal 11/23: one dashed chip for the Activating hubs (names in the expander), not a wall of 7 chips. */}
+        <li className={`max-w-full border border-dashed px-3 py-2 text-[13px] font-semibold leading-tight ${dark ? "border-background/30 text-background/70" : "border-foreground/25 text-foreground/60"}`} data-testid="network-hubs-activating">
+          <details>
+            <summary className="cursor-pointer select-none">+{activatingHubs().length} {LABEL_ACTIVATING.toLowerCase()} · {MORE_LAUNCHING}</summary>
+            <p className="mt-1.5 font-normal">{activatingHubs().map((h) => h.name).join(", ")}</p>
+          </details>
+        </li>
       </ul>
     </div>
   );
