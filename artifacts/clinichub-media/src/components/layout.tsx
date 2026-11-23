@@ -211,8 +211,8 @@ export function Layout({ children }: { children: ReactNode }) {
               Display space across private health and wellness hubs. Your payment is media credit until an insertion order.
             </p>
             <p className="mb-4 text-sm">
-              <a href="tel:+16479316278" className="font-medium text-accent hover:underline" data-testid="footer-call-birch">Call Birch: (647) 931-6278</a>
-              <span className="block text-[11px] text-muted-foreground">Call our sales line.</span>
+              <a href="tel:+16479316278" className="font-semibold text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:decoration-foreground" data-testid="footer-call-birch">Call Birch: (647) 931-6278</a>
+              <span className="mt-1 block text-[11px] text-muted-foreground">Call our sales line.</span>
             </p>
             <div className="mb-4">
               <SalesContact />
