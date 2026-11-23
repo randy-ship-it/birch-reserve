@@ -88,7 +88,7 @@ export default function BrAdvertiseLocal() {
               ))}
             </ul>
           </div>
-          <div className="border border-foreground/15 bg-white p-6 md:p-8" id="quote">
+          <div className="border border-foreground/15 bg-white p-6 md:p-8 lg:self-start" id="quote">
             <form onSubmit={onCheck} className="flex flex-col gap-3 sm:flex-row sm:items-end" data-testid="area-form">
               <div className="flex-1">
                 <Field label="Postal code or ZIP">
