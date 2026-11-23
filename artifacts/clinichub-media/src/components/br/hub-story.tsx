@@ -26,11 +26,12 @@ export function OwnTheMoment({ testId = "own-the-moment" }: { testId?: string })
         {HUB_KEYS.map((k) => (
           <figure key={k} className="w-[86%] shrink-0 snap-start sm:w-[48%] lg:w-[32%]" data-testid={`${testId}-${k}`}>
             <HubMock brand="" logo={null} hub={k} category="Your category" badge="Example mockup" />
-            <figcaption className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-foreground/70">
-              <span className="rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A5A00]">Example mockup</span>
-              <span className="rounded-full bg-[#0b1f3a]/8 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]/70">{HUB_MOCKS[k].status === "Live" ? "Live now" : "Activating"}</span>
-              <span className="font-semibold text-[#0b1f3a]">{HUB_MOCKS[k].name}</span>
-              <span>· {HUB_MOCKS[k].surface}</span>
+            <figcaption className="mt-2 text-[13px] text-foreground/70">
+              <span className="flex flex-wrap items-center gap-1.5">
+                <span className="rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A5A00]">Example mockup</span>
+                <span className="rounded-full bg-[#0b1f3a]/8 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]/70">{HUB_MOCKS[k].status === "Live" ? "Live now" : "Activating"}</span>
+              </span>
+              <span className="mt-1 block truncate"><span className="font-semibold text-[#0b1f3a]">{HUB_MOCKS[k].name}</span> · {HUB_MOCKS[k].surface}</span>
             </figcaption>
           </figure>
         ))}
