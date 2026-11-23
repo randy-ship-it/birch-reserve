@@ -98,7 +98,7 @@ test("channel tiles: Randy's figures labelled network figures / targets; Calm Jo
   const t = Object.fromEntries(CHANNEL_TILES.map((x) => [x.key, x]));
   assert.deepEqual(t["scale-hubs"]!.stats.map((s) => s.v), ["700MM+"]);
   assert.equal(t["calm-joints"]!.stats.length, 0);
-  assert.deepEqual(t["street-team"]!.stats.map((s) => s.v), ["2MM+"]);
+  assert.deepEqual(t["street-team"]!.stats.map((s) => s.v), ["1MM+"]);
   assert.deepEqual(t["retail-network"]!.stats.map((s) => s.v), ["200+", "1MM+", "CA + US"]);
 });
 

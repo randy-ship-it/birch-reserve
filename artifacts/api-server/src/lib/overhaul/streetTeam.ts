@@ -3,7 +3,7 @@
  * the /street-team page, the /intake/street-team form, the site chat and llms.txt.
  * Rules: the high-touch version runs today only for Calm Joints (our in-house consumer brand), powered by the Scale
  * Health street team. Outside brands start in 2027. No minimum dollar amount is published (qualified on the inquiry).
- * No guarantees. No client names. No open-slot claims, no counts. The 2MM+ homes figure is STREET_REACH_FIG (brandIntake).
+ * No guarantees. No client names. No open-slot claims, no counts. The Street Team reach figure is STREET_REACH_FIG (brandIntake).
  */
 export const STREET_TEAM_HREF = "/street-team";
 export const STREET_TEAM_INTAKE_HREF = "/intake/street-team";
@@ -52,7 +52,7 @@ export const STREET_TEAM_TIMING = ["Early 2027 (Q1)", "Q2 2027", "Q3 2027", "Q4 
 export const STREET_TEAM_BUDGET = ["Under $10K", "$10K to $25K", "$25K to $50K", "$50K to $100K", "$100K+", "Not sure yet"] as const;
 
 export const STREET_TEAM_FACT =
-  "Street team program, coming soon in 2027: an activatable door-to-door program with a minimum campaign size (qualified on the inquiry; no public dollar minimum). Three tiers: 1) join a campaign already running, with display and performance-based placement; 2) your own focused campaign on specific routes; 3) door drop, straight door-to-door expansion with no talking (the more commoditized tier). The high-touch version (QR-powered offers, sample bags, GPS-tracked reps who log in on their phones and knock on doors) runs today only for our in-house consumer brand Calm Joints, powered by the Scale Health street team, whose ambassadors also do on-site product sampling. Birch Reserve will take on outside brands in 2027. Calm Joints and the Street Team Ambassadors are planned to reach 2MM+ homes by 2027 (a plan, not a guarantee). Inquire at https://birchreserve.net/intake/street-team. No outcomes are guaranteed.";
+  "Street team program, coming soon in 2027: an activatable door-to-door program with a minimum campaign size (qualified on the inquiry; no public dollar minimum). Three tiers: 1) join a campaign already running, with display and performance-based placement; 2) your own focused campaign on specific routes; 3) door drop, straight door-to-door expansion with no talking (the more commoditized tier). The high-touch version (QR-powered offers, sample bags, GPS-tracked reps who log in on their phones and knock on doors) runs today only for our in-house consumer brand Calm Joints, powered by the Scale Health street team, whose ambassadors also do on-site product sampling. Birch Reserve will take on outside brands in 2027. Our provider network is activating and, with the Street Team Ambassadors, reaches 1MM+ consumers now, expanding to an estimated 3MM+ in 2027 (an estimate, not a guarantee; Street Team is Canada for now). Inquire at https://birchreserve.net/intake/street-team. No outcomes are guaranteed.";
 
 /** One line for llms.txt. */
 export const STREET_TEAM_LLMS =

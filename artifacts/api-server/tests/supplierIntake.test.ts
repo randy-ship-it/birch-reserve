@@ -106,12 +106,12 @@ test("network figures (2:27 PM): shared constants site-wide, no homes figure, no
   const act = await import("../src/lib/kitCalc/activation");
   assert.equal(bi.RETAIL_COPY, "200+ locations, 500+ soon · 1MM+ captive recovery consumers · Canada + USA");
   assert.equal(bi.RETAIL_TAG, "private network of digital and brick-and-mortar fitness & recovery retailers");
-  assert.equal(bi.AUDIENCE_LINE, "700MM+ captive page views activating · 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers · 2MM+ homes reached by 2027");
-  assert.equal(bi.STREET_REACH_LINE, "planned to reach 2MM+ homes by 2027 with Calm Joints");
+  assert.equal(bi.AUDIENCE_LINE, "700MM+ captive page views activating · 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers · 1MM+ consumers now through our provider network and Street Team, expanding to an estimated 3MM+ in 2027");
+  assert.equal(bi.STREET_REACH_LINE, "reaching 1MM+ consumers now, expanding to an estimated 3MM+ in 2027");
   const s = JSON.stringify([bi.CHANNEL_TILES, bi.EXPOSURE_CHANNELS, act]);
   assert.ok(!/500K|homes in reach/.test(s));
   assert.match(s, /500\+ soon/);
-  assert.match(s, /2MM\+ homes by 2027/);
+  assert.match(s, /1MM\+ consumers now, 3MM\+ est\. in 2027/);
   assert.ok(!/\bAlign\b/i.test(s));
   const fs = await import("node:fs");
   assert.ok(!fs.existsSync(`${process.cwd()}/../clinichub-media/src/lib/networkCopy.tsx`), "supplier-only override removed");

@@ -89,7 +89,7 @@ function Expand({ title, sub, children, testId, open = false }: { title: string;
 
 export default function BrHome() {
   useAttention({ audience: "[data-testid=home-stats]", hubs: "#proof-live", ladder: "[data-testid=home-offer-stairs]", street: "[data-testid=home-street-team]", details: "#more", end: "[data-testid=home-close]" });
-  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand inside private, members-only health and wellness hubs: 700MM+ captive page views activating, 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 2MM+ homes reached by 2027. Get a free Monetization Kit. Prices in USD; figures are based on signed partnership contracts: reach and audience, not delivered impressions.");
+  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand inside private, members-only health and wellness hubs: 700MM+ captive page views activating, 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 1MM+ consumers now through our provider network and Street Team, expanding to an estimated 3MM+ in 2027. Get a free Monetization Kit. Prices in USD; figures are based on signed partnership contracts: reach and audience, not delivered impressions.");
   const price = priceLabels(useAvailability());
   // Phones: the floating chat + voice buttons stay out of the hero preview until the visitor scrolls past it.
   useEffect(() => {
@@ -159,9 +159,9 @@ export default function BrHome() {
             <div className="absolute inset-0 bg-gradient-to-t from-[#0E3B2A] via-[#0E3B2A]/60 to-transparent" />
             <div className="relative flex h-full flex-col justify-end p-5 md:p-6">
               <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#BFF3D6]">Calm Joints + Street Team Ambassadors</span>
-              <p className="mt-2 font-display text-[2.6rem] leading-none md:text-5xl" data-testid="home-street-figure">2MM+</p>
-              <p className="mt-1.5 text-sm text-white/80">homes reached by 2027 <ArrowRight className="ml-1 inline size-3.5 transition group-hover:translate-x-0.5" aria-hidden /></p>
-              <p className="mt-1 text-[11px] text-white/60">Our owned digital clinic plus ambassadors doing on-site sampling and door-to-door. Based on signed partnership contracts.</p>
+              <p className="mt-2 font-display text-[2.6rem] leading-none md:text-5xl" data-testid="home-street-figure">1MM+</p>
+              <p className="mt-1.5 text-sm text-white/80">consumers now · 3MM+ est. in 2027 <ArrowRight className="ml-1 inline size-3.5 transition group-hover:translate-x-0.5" aria-hidden /></p>
+              <p className="mt-1 text-[11px] text-white/60">Provider network activating, plus ambassadors doing on-site sampling and door-to-door. 2027 figure is an estimate. Based on signed partnership contracts. Canada for now.</p>
             </div>
           </a>
         </div>

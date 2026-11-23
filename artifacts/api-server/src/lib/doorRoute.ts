@@ -5,7 +5,7 @@
  * Rules: area-level only (no homes, addresses or house numbers), no ambassador name,
  * no door-hit counts, no "exclusive", inquire-only (no SKU, no door prices).
  * Census incomes are 2020 household income in 2020 CAD, labelled as such and never
- * converted. 2MM+ homes reached by 2027 (with Calm Joints) is a plan, not a guarantee.
+ * converted. 1MM+ consumers now, 3MM+ estimated in 2027, is an estimate, not a guarantee.
  */
 import { DOOR_ROUTE_DATA as D } from "./doorRouteData";
 
@@ -34,7 +34,7 @@ export const DOOR_ROUTE = {
   title: "Day 1: lead ambassador testing areas around our private network.",
   body:
     "Ambassador street routes give brands sought-after door-to-door display and performance-based placements, targeted by neighbourhood. Placements are limited by route.",
-  goal: "The plan: Calm Joints and Street Team Ambassadors reach 2MM+ homes by 2027, with multiple offers.",
+  goal: "The plan: Our provider network and Street Team Ambassadors reach 1MM+ consumers now, expanding to an estimated 3MM+ in 2027, with multiple offers.",
   goalNote: "A target, modelled, not a guarantee. Reach and audience, not delivered impressions.",
   mapAlt:
     "Day-1 street-team route areas near Yonge and Lawrence in Toronto, shown as a heat map of route zones. No homes or addresses are shown.",
