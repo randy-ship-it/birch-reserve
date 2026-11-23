@@ -20,7 +20,7 @@ import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { Details } from "@/components/br/details";
 import { ExclusiveReserveCard, SpendDown } from "@/components/br/inventory-plan";
 import { HubMock, twoLaneMock } from "@/components/br/two-lane";
-import { HUB_MOCKS, HUB_KEYS, type HubKey } from "@/lib/hub-mocks";
+import { HUB_MOCKS, HUB_KEYS, mockBadgeFor, type HubKey } from "@/lib/hub-mocks";
 import { STARTER_BLOCK } from "@/components/br/start-small";
 import { trackCta } from "@/lib/track-cta";
 import { usePriceText } from "@/lib/currency";
@@ -68,7 +68,7 @@ export function twoSurfaceExample(creditUsd: number) {
 /** Audit #3 (Randy, Nov 20 2026): always-visible badge + pin legend + DR-HO'S/SOLE toggle. */
 export const MOCK_PINS = ["Your ad card, approved by a person", "Live members-only hub", "Clicks to your site, UTM-tagged"] as const;
 export function mockBadge(hub: HubKey): string {
-  return `Illustrative mock · your ad on the live ${HUB_MOCKS[hub].name} hub`;
+  return mockBadgeFor(hub);
 }
 export function AnnotatedHubMock({ brand = "", testId = "annotated-hub-mock", initial = "drho" }: { brand?: string; testId?: string; initial?: HubKey }) {
   const [hub, setHub] = useState<HubKey>(initial);

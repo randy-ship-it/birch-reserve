@@ -66,10 +66,10 @@ function Shot({ src, alt, children }: { src: string; alt: string; children: Reac
 }
 
 /** Landing example on any of the 4 live hubs (16:10 captures, nothing cropped). Banner sits in the header gap; tile in a blank corner. */
-const LANDING_BANNER: Record<HubKey, string> = { drho: "top-[18.6%]", sole: "top-[12.6%]", effortless: "top-[12.4%]", calmjoints: "top-[13.2%]" };
-const LANDING_TILE: Record<HubKey, string> = { drho: "right-[4%] top-[27%] w-[44%]", sole: "left-[4%] top-[24%] w-[44%]", effortless: "right-[2%] top-[29%] w-[44%]", calmjoints: "left-[4%] top-[22%] w-[40%]" };
+const LANDING_BANNER: Partial<Record<HubKey, string>> = { drho: "top-[18.6%]", sole: "top-[12.6%]", effortless: "top-[12.4%]", calmjoints: "top-[13.2%]" };
+const LANDING_TILE: Partial<Record<HubKey, string>> = { drho: "right-[4%] top-[27%] w-[44%]", sole: "left-[4%] top-[24%] w-[44%]", effortless: "right-[2%] top-[29%] w-[44%]", calmjoints: "left-[4%] top-[22%] w-[40%]" };
 /** Same corners as LANDING_TILE, narrower so the creative tile stays in the blank area. */
-const LANDING_TILE_EX: Record<HubKey, string> = { drho: "right-[4%] top-[27%] w-[30%]", sole: "left-[4%] top-[24%] w-[30%]", effortless: "right-[2%] top-[29%] w-[30%]", calmjoints: "left-[4%] top-[22%] w-[30%]" };
+const LANDING_TILE_EX: Partial<Record<HubKey, string>> = { drho: "right-[4%] top-[27%] w-[30%]", sole: "left-[4%] top-[24%] w-[30%]", effortless: "right-[2%] top-[29%] w-[30%]", calmjoints: "left-[4%] top-[22%] w-[30%]" };
 function LandingShot() {
   const [hub, setHub] = useState<HubKey>("drho");
   const H = HUB_MOCKS[hub];
@@ -81,14 +81,14 @@ function LandingShot() {
         ))}
       </div>
       <Shot src={H.img} alt={`${H.name} hub home page, with an example banner and tile drawn on top`}>
-        <Unit className={`absolute left-[4%] right-[4%] ${LANDING_BANNER[hub]} py-1`} label={showCalmExample(hub) ? `${EX} · hub banner` : "Your brand · hub banner"} />
+        <Unit className={`absolute left-[4%] right-[4%] ${LANDING_BANNER[hub] ?? "top-[12%]"} py-1`} label={showCalmExample(hub) ? `${EX} · hub banner` : "Your brand · hub banner"} />
         {showCalmExample(hub) ? (
-          <div className={`absolute ${LANDING_TILE_EX[hub]} rounded-md border-2 border-dashed border-emerald-600 bg-white/95 p-1 text-emerald-900 shadow`} data-testid="placement-example-tile">
+          <div className={`absolute ${LANDING_TILE_EX[hub] ?? "right-[4%] top-[27%] w-[30%]"} rounded-md border-2 border-dashed border-emerald-600 bg-white/95 p-1 text-emerald-900 shadow`} data-testid="placement-example-tile">
             <Creative />
             <div className="mt-1 flex items-center justify-between gap-1"><span className="truncate text-[9px] font-semibold">{EX}</span><span className="shrink-0 rounded-sm bg-emerald-700 px-1 text-[7px] font-semibold uppercase tracking-wider text-white">Sponsored</span></div>
           </div>
         ) : (
-          <Unit className={`absolute ${LANDING_TILE[hub]}`} label="Your brand" />
+          <Unit className={`absolute ${LANDING_TILE[hub] ?? "right-[4%] top-[27%] w-[44%]"}`} label="Your brand" />
         )}
       </Shot>
     </div>
