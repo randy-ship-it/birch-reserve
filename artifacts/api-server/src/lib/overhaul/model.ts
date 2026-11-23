@@ -11,6 +11,7 @@
  * signed. Do-not-pitch brands never appear.
  */
 import { HUB_PLACEMENT_STARTER_CPM as STARTER } from "./pricing";
+import { hubTier, ladderLine } from "../hubLadder";
 import { HUBS as KIT_HUBS, SLOTS, DEPOSIT_TIERS, CUSTOM_MIN, CUSTOM_MAX, SMB_LADDER, toCad, type Hub, type Slot } from "../sponsorKit";
 
 export { SLOTS, DEPOSIT_TIERS, CUSTOM_MIN, CUSTOM_MAX, SMB_LADDER, toCad };
@@ -73,7 +74,7 @@ export type BrandHub = Hub & {
   banner: string;
   recovery: "Recovery" | "Longevity" | "Food" | "Wellness services";
   audience: string;
-  bannerStatus: "Live" | "In queue";
+  bannerStatus: "Live" | "Activating" | "In queue";
 };
 
 const EXTRA: Record<string, Pick<BrandHub, "logo" | "banner" | "recovery" | "audience" | "bannerStatus">> = {
@@ -86,14 +87,22 @@ const EXTRA: Record<string, Pick<BrandHub, "logo" | "banner" | "recovery" | "aud
   sole: { logo: "/partner-logos/sole.png", banner: "/hub-banners/sole.webp", recovery: "Recovery", audience: "Foot pain, insoles and active footwear buyers", bannerStatus: "Live" },
 };
 
+/** Status words come from the one hub ladder (lib/hubLadder.ts): Live / Activating, never "In queue" for a hub that is on it. */
+function ladderStatus(key: string, fallback: BrandHub["bannerStatus"]): { bannerStatus: BrandHub["bannerStatus"]; status?: string } {
+  const t = hubTier(key);
+  if (t === "live") return { bannerStatus: "Live" };
+  if (t === "activating") return { bannerStatus: "Activating", status: "Activating" };
+  return { bannerStatus: fallback };
+}
+
 /** The brand hubs Randy named (Nov 12). DR-HO'S and SOLE are live today (SOLE added Nov 19 2026, Randy 11:10 AM ET); the rest are in queue. */
 export const BRAND_HUBS: BrandHub[] = [
-  ...KIT_HUBS.filter((h) => h.kind === "brand").map((h) => ({ ...h, ...EXTRA[h.key]! })),
+  ...KIT_HUBS.filter((h) => h.kind === "brand").map((h) => ({ ...h, ...EXTRA[h.key]!, ...ladderStatus(h.key, EXTRA[h.key]!.bannerStatus) })),
   {
     key: "effortless-admin",
     name: "Effortless Admin",
     kind: "brand",
-    status: "In queue",
+    status: "Activating",
     url: "",
     category: "Workplace benefits and admin",
     basis: "Network median partner (no hub feed yet)",
@@ -102,7 +111,7 @@ export const BRAND_HUBS: BrandHub[] = [
     banner: "/hub-banners/effortless-admin.webp",
     recovery: "Wellness services",
     audience: "Employees reaching care through their benefits",
-    bannerStatus: "In queue",
+    bannerStatus: "Activating",
   },
 ];
 
@@ -111,8 +120,8 @@ export const INVENTORY = {
   liveSpendDownMonths: 6,
   queueMultiple: 3,
   queueBy: "year end 2026",
-  line: "Live today: DR-HO'S physio and SOLE. Placements are curated as each hub launches.",
-  queueLine: "The other listed brand hubs are in queue, not live yet; more hubs launch over time.",
+  line: `${ladderLine()} Placements are curated as each hub launches.`,
+  queueLine: "Activating hubs are going live now; more hubs launch over time.",
 } as const;
 
 export const CLINIC_NETWORK = KIT_HUBS.find((h) => h.kind === "clinic")!;

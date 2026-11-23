@@ -302,7 +302,7 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
     <section id={anchor ? "next-step" : undefined} className="scroll-mt-20" data-testid="next-step" data-where={where}>
       <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">{showMock ? "See it on a live hub first." : "Start with a $190 look."}</h2>
       <div className={`mt-4 grid grid-cols-[minmax(0,1fr)] items-center gap-5 ${showMock ? "md:grid-cols-[1fr_1fr] md:items-stretch" : ""}`}>
-        {showMock ? <AnnotatedHubMock brand={brand} initial="effortless" /> : null}
+        {showMock ? <AnnotatedHubMock brand={brand} initial="drho" /> : null}
         <div className={showMock ? "md:flex md:flex-col md:justify-center md:rounded-3xl md:border md:border-foreground/10 md:bg-white md:p-6 md:shadow-sm" : undefined} data-testid="next-step-pay">
           <p className="font-display text-5xl leading-none text-[#0b1f3a]">{lookPrice.split(" ")[0]} <span className="text-lg">{lookPrice.split(" ")[1]}</span></p>
           <p className="mt-2 text-[15px] text-foreground/75">Your ad, live for 7 days.</p>

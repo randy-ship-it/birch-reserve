@@ -23,6 +23,7 @@ import { BIRCH_SALES_EMAIL, BIRCH_SALES_PHONE, SELF_SERVE_LIMIT_USD } from "./bi
 import { SPEND_DOWN_LINE, TAM_2027, tam2027Headline } from "./inventoryPlan";
 import type { SiteCheckoutState } from "./checkoutState";
 import { buildOnboardingModule, identityBlock, ONBOARDING_HARD_RULES, offTableCadAmounts, swapForBrand, type ChatBrand } from "./chatOnboarding";
+import { ladderLine, liveLine, activatingLine, ladderMarkdown, MORE_LAUNCHING } from "./hubLadder";
 
 export const BIRCH_CHAT_PROMPT_VERSION = "2026-11-21-onboarding-sot" as const;
 
@@ -160,7 +161,7 @@ function buildBirchPromptText(opts: BirchChatPromptOptions, brand: ChatBrand): s
     "- Not a social feed and not an open auction. No bidding. Placements are curated hub by hub as each hub launches. Don't describe how ads are selected or matched beyond that.",
     "- Four placements in every hub: 1) Post-purchase, the thank-you page right after an order or booking (highest intent); 2) Member dashboard, the logged-in home where members track orders and plans; 3) Hub home, banner and tiles on the co-branded hub home page; 4) Product and services pages, inside product, service and booking pages. Exact position and creative are set in the insertion order (IO).",
     "- Hub verticals: Recovery, Longevity and Food.",
-    `- Live today: DR-HO'S physio (${BIRCH_LINKS.drhoHub}) and SOLE (${BIRCH_LINKS.soleHub}). Those are the ONLY live hubs. Other listed brand hubs on ${BIRCH_LINKS.hubs} are "In queue", not live; never describe a queued hub as live and don't list them. Detailed hub audiences are shown on the hubs page after the visitor registers their email.`,
+    `- Hub status ladder (one list): ${ladderLine()} Open now: DR-HO'S ${BIRCH_LINKS.drhoHub}, SOLE ${BIRCH_LINKS.soleHub}. Never describe an Activating hub as live. Detailed hub audiences are shown on the hubs page after the visitor registers their email.`,
     "- Who they reach: members of these hubs, people actively buying or booking recovery, physio, fitness and wellness products and services. Do not give audience sizes, order counts, view counts or demographics beyond that and the homepage network line (see THE PRIVATE DISPLAY NETWORK).",
     "- Run by Silver Birch Growth Inc., Toronto, Ontario. Founder: Randy Gilling.",
     "",

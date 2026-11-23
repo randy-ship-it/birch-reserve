@@ -11,6 +11,7 @@ import { slotOffers, areaLockOffer } from "./agent";
 import { AGENCY_FAQ, PLAIN_TERMS, faqPageJsonLd } from "./agencyShowcase";
 import { MEDIA_BUYER_FAQ } from "./mediaBuyers";
 import { AGENCY, AREA_LOCK, BRAND_HUBS, INVENTORY, PLACEMENT_LABELS, PUBLISHER_INCENTIVE, SLOT_LADDER, TAM, areaLockGuaranteedViews } from "./model";
+import { ladderLine, liveLine, activatingLine, ladderMarkdown, MORE_LAUNCHING } from "../hubLadder";
 
 export const OVERHAUL_OG_IMAGE = "https://birchreserve.net/og-birch-reserve-hubs.png";
 
@@ -38,7 +39,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/intake/sponsor": { title: "Supplier + Accelerate · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
   "/advertise/brands": {
     title: "Advertise to brands | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. Live today: DR-HO'S physio and SOLE.",
+    description: "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. " + liveLine(),
     jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/advertise/local": {
@@ -49,7 +50,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/publish/brands": { title: "Publish · Brands | Birch Reserve", description: "Brands with a recovery audience can apply for a co-branded hub. Otherwise, inquire about display or CPC-only opportunities outside hubs." },
   "/publish/studios": { title: "Publish · Studios & retail | Birch Reserve", description: `Activate your hub with pre-built monetizations and our marketplace. Earn $${PUBLISHER_INCENTIVE.cashCad} CAD cash or $${PUBLISHER_INCENTIVE.creditCad}+ CAD in ad credit.` },
   "/match": { title: "Match your audience | Birch Reserve", description: "Enter your website and a short note. See how well your audience matches the Scale Activity launch audience profile, as a clean % with three reasons." },
-  "/hubs": { title: "Hubs | Birch Reserve", description: "Live today: DR-HO'S physio and SOLE. More brand hubs are in queue. Register your email to see audience, placements and modelled views." },
+  "/hubs": { title: "Hubs | Birch Reserve", description: liveLine() + " More hubs are activating. Register your email to see audience, placements and modelled views." },
   "/media-kit": {
     title: "Media kit | Birch Reserve",
     image: MEDIA_KIT_OG_IMAGE,
@@ -65,12 +66,12 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   },
   "/buyers": {
     title: "For media buyers & agencies | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. Live today: DR-HO'S physio and SOLE.",
+    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. " + liveLine(),
     jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/ai-buyers": {
     title: "For media buyers & agencies | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. Live today: DR-HO'S physio and SOLE.",
+    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. " + liveLine(),
     jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/rates": {
@@ -189,8 +190,10 @@ export function llmsTxt(): string {
     "## 2027 ad inventory: expected $50MM+ (estimate), available to spend now below",
     ...tam2027Text().split("\n").map((l, i) => (i === 0 ? `- ${l}` : `  ${l}`)),
     "",
-    "## Live hubs",
-    "- DR-HO'S physio and SOLE. More hubs launch over time; placements are curated as each goes live.",
+    "## Hubs (one status ladder)",
+    ladderMarkdown(),
+    "- Insertion order (IO): the short document that names your hub, the surface (post-purchase, dashboard tile, hub home), your category and your dates before anything runs. What you pay is media credit until the IO is signed and approved. Nothing runs without it.",
+    "- Proof: example flight-report layout (illustrative, aggregate only), estimated performance ranges (based on comparables, not Birch results), early measured hub session geography, and the GTM partnership bot example (internal testing, not ad results): https://birchreserve.net/media-kit#proof",
     "",
     "## Pages",
     "- Media kit: https://birchreserve.net/media-kit · PDF: https://birchreserve.net/birch-reserve-one-pager.pdf",

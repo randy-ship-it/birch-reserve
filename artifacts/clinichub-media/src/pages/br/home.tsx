@@ -28,6 +28,7 @@ import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BuyCta } from "@/components/br/buy-cta";
 import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
+import { OwnTheMoment, FourSteps, SeeTheProof } from "@/components/br/hub-story";
 import { MidTier } from "@/components/br/next-step";
 import { SeeYourAd } from "@/components/br/see-your-ad";
 import { OfferStairs } from "@/components/br/offer-stairs";
@@ -124,7 +125,7 @@ export default function BrHome() {
           <div className="md:col-start-1 md:row-start-1 md:self-end">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · Private wellness hubs</p>
           <h1 className="mt-2 font-display text-[2.6rem] leading-[1.02] text-[#0b1f3a] md:text-6xl">See your brand inside a live wellness hub.</h1>
-          <p className="mt-3 max-w-xl text-base text-muted-foreground md:text-lg">Type your name. Your ad card lands on a real hub, right here.</p>
+          <p className="mt-3 max-w-xl text-base text-muted-foreground md:text-lg">The card sits on the page already open, right after the booking or purchase. Type your name and see it land on a real hub.</p>
           </div>
           <div className="order-3 md:order-none md:col-start-1 md:row-start-2 md:self-start">
           <BuyCta placement="hero_home" className="mt-0" onClick={() => trackAttn("hero_cta.buy")} />
@@ -170,10 +171,15 @@ export default function BrHome() {
 
       {/* 4. Live hubs as visual cards. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" id="proof-live" data-testid="live-hub-thumbs">
-        <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Live and activating hubs</h2>
+        <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Live now and activating hubs</h2>
         <div className="mt-4"><LiveHubGrid /></div>
         <HubFunnel />
       </section>
+
+      {/* 4b. Own the moment + how buying works + proof (Randy, Nov 23 2026). */}
+      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-own-moment"><OwnTheMoment /></section>
+      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-four-steps"><FourSteps look={price.look} seat={price.seat} /></section>
+      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-see-proof"><SeeTheProof /></section>
 
       {/* 2b. Offer ladder, rising order. The longer mid-tier detail lives in "The details" below. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-offer-stairs">

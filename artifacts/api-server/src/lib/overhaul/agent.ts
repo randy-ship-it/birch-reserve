@@ -3,6 +3,7 @@
  * Pure builders for the agent catalog, quote, OpenAPI spec and agent card.
  * Every audience number here is modelled from the TAM feed and labelled as such.
  */
+import { liveHubs } from "../hubLadder";
 import { AGENCY, AREA_LOCK, BRAND_HUBS, INVENTORY, PLACEMENT_LABELS, PUBLISHER_INCENTIVE, CPC_FLOOR_USD, SLOT_LADDER, SURFACES, TAM, areaLockGuaranteedViews, blendedHubCpmUsd, quoteAreaLock, type Currency } from "./model";
 
 export const AGENT_CATALOG_VERSION = "2026-11-17";
@@ -12,10 +13,7 @@ export const HANDOFF_EMAIL = "randy@scalehealth.ca";
 export type AgentOfferKey = "hold-190" | "reserve-490";
 
 /** Live hubs anyone can open today (media kit, Nov 17 2026). */
-export const AGENT_LIVE_HUBS = [
-  { name: "DR-HO'S physio", type: "brand hub", status: "live" },
-  { name: "SOLE", type: "brand hub", status: "live" },
-] as const;
+export const AGENT_LIVE_HUBS = liveHubs().map((h) => ({ name: h.name, type: h.key === "calm-joints" ? "digital physio layer" : "brand hub", status: "live" as const }));
 
 /** The two public offers, same as the media kit. USD only. Humans pay on the Stripe-hosted /buycalc page. */
 export function publicOffers() {

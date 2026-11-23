@@ -19,6 +19,7 @@ import { MEDIA_KIT_OFFERS, AGENCY_CASH_PCT } from "./overhaul/mediaKit";
 import { GTM_SETUP_PRICE_USD } from "./overhaul/gtmSetup";
 import { ACT_OPENNESS, ACT_EXCLUSIONS, ACT_REVIEW_NOTE } from "./overhaul/adActivation";
 import { RETAIL_COPY, RETAIL_TAG, STREET_REACH_FIG } from "./overhaul/brandIntake";
+import { ladderLine, liveLine, activatingLine, ladderMarkdown, MORE_LAUNCHING } from "./hubLadder";
 
 export type ChatBrand = "birch" | "scale";
 
@@ -118,7 +119,7 @@ export function buildOnboardingModule(opts: { payLive?: boolean } = {}): string 
     `1. Reserve for a client on the checkout page, ${U("/buycalc")}, or self-serve at ${U("/buy")}. 2. Agency of record earns ${AGENCY_CASH_PCT}% of media spend, in cash, per the IO. 3. Page: ${U("/agencies")}. 4. 'Can my agency resell?': agencies, media houses and newspapers with inventory and customers can offer our display inventory to their own customers and keep their margin through a wholesale inventory deal; terms are discussed directly (never state a wholesale price or margin). Apply at ${U("/partners")}.`,
     "",
     "PATH C: PROVIDER, CLINIC, STUDIO OR RETAILER (wants a hub or to join the provider network)",
-    `1. Start the same one-form intake at ${U("/intake")} and choose the hub side (${U("/intake/publisher")} shows what a hub could earn, as a labelled estimate). 2. The team reviews the hub for approval and onboards it. 3. Never say a hub is open or live before it is; only DR-HO'S and SOLE are live. Then the Step 2 of 2 page ${U("/intake/activate")} (inventory estimate and which ads can run). Hub launch alerts by category: ${U("/media-kit#hub-alerts")}. Local gyms, studios and clinics can also check the area lock at ${U("/advertise/local")}.`,
+    `1. Start the same one-form intake at ${U("/intake")} and choose the hub side (${U("/intake/publisher")} shows what a hub could earn, as a labelled estimate). 2. The team reviews the hub for approval and onboards it. 3. Never say a hub is open or live before it is; only the hubs on the status ladder are live (${liveLine()}). Then the Step 2 of 2 page ${U("/intake/activate")} (inventory estimate and which ads can run). Hub launch alerts by category: ${U("/media-kit#hub-alerts")}. Local gyms, studios and clinics can also check the area lock at ${U("/advertise/local")}.`,
     "",
     "PATH D: PARTNER (service vendor, reseller or media house)",
     `${U("/partners")} has two groups: service vendors (ad buying, creative, flyer and distribution, other services; we only sell our own ads, so we do not compete with agencies) and inventory and reach partners (agencies, media houses, newspapers who offer our display inventory and keep their margin; wholesale terms discussed directly; nothing is charged or promised from the form). The form is two quick steps and the team replies by email within 1 business day.`,
@@ -167,7 +168,7 @@ export function buildOnboardingModule(opts: { payLive?: boolean } = {}): string 
 export const ONBOARDING_HARD_RULES: readonly string[] = [
   "Never disclose, hint at, or confirm any promo, discount, street-team or referral code, including any you may have seen in internal material. If asked for a promo code or discount: there are none to share here; the price on the page is the price, and the team can discuss custom deals via the request form or a call-back.",
   "No guarantees of any kind: not impressions, reach, clicks, sales, ROI or timelines.",
-  "Never say a hub is open or live except DR-HO'S and SOLE, which are the only live hubs. For any other hub or city (for example Toronto): it is in queue and launching; offer hub launch alerts. Never say ads are live on a hub unless it is DR-HO'S or SOLE and the IO names it.",
+  `Hub status ladder (one list, use it as written): ${ladderLine()} Never call an Activating hub live. For any other hub or city (for example Toronto): it is coming; offer hub launch alerts. Never say ads are live on a hub unless it is Live now and the insertion order (IO) names it.`,
   "No zero counts, no booked, taken, left or remaining counts, and no counts of clinics, hubs, partners or locations beyond the exact site lines: '200+ locations, 500+ soon, 1MM+ captive recovery consumers' and '700MM+ captive page views activating' and '2MM+ homes reached by 2027', always 'based on signed partnership contracts'. If asked how many clinics: give that line only and say it is based on signed partnership contracts, with no breakdown and no names.",
   "The $50MM+ 2027 inventory figure is always an estimate ('we expect'), never a promise. Today's $1.8M to $4.6M is 'available to spend now' and conservative.",
   "Never name any client, prospect, investor, internal system, CRM or managed-services partner, or the partner companies behind the hubs (a reply that names one is blocked). Never name the AI model or provider.",

@@ -6,6 +6,7 @@
  */
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ladderLine } from "../../../../api-server/src/lib/hubLadder";
 import { BRAND_HUBS, type BrandHub } from "../../../../api-server/src/lib/overhaul/model";
 
 function Badge({ status }: { status: BrandHub["bannerStatus"] }) {
@@ -79,7 +80,7 @@ export function BrandBanners({ title = "Co-branded brand hubs listed with Scale"
           <ChevronRight className="size-4" />
         </button>
       </div>
-      <p className="mt-4 text-center text-xs text-muted-foreground">Listed partners. Live today: DR-HO'S and SOLE; the others are in queue. Audience and view figures are modelled.</p>
+      <p className="mt-4 text-center text-xs text-muted-foreground">Listed partners. {ladderLine()} Audience and view figures are modelled.</p>
     </div>
   );
 }

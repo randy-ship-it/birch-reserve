@@ -10,6 +10,7 @@
  * No impression guarantee, no CTR or ROAS. Modelled, not a commitment.
  */
 import { SURFACES, TAM, blendedHubCpmUsd } from "./overhaul/model";
+import { ladderLine, liveLine, activatingLine, ladderMarkdown, MORE_LAUNCHING } from "./hubLadder";
 
 /** Flexible spend-down window: up to 6 months once the IO starts, or faster. */
 export const SPEND_DOWN_MAX_MONTHS = 6;
@@ -94,7 +95,7 @@ export const TAM_2027 = {
     `~${(HUB_VIEWS_MONTHLY / 1_000_000).toFixed(2)}MM hub-placement views a month across ${TAM.listedPartners} listed partners (TAM feed, part of ~128MM total modelled views). This pricing inventory is separate from the audience channels (700MM+ captive page views activating).`,
     `≈ ${VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} modelled views per hub a month.`,
     `× 12 months × hubs × $${BLENDED_STARTER_CPM.toFixed(2)} blended starter CPM (rate card).`,
-    "Hubs live today: DR-HO'S physio (June) and SOLE (October). Queued categories: Longevity, Sleep, Food & Nutrition, Medi/Spa, Pets.",
+    `${ladderLine()} Queued categories: Longevity, Sleep, Food & Nutrition, Medi/Spa, Pets.`,
     "Partner websites and email (the rest of the ~128MM) are not counted. Starter rates only; no impression guarantee.",
   ],
 } as const;

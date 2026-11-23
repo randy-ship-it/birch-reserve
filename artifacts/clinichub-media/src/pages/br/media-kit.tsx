@@ -11,6 +11,7 @@ import { BrochureInline, BrochureSlideIn } from "@/components/br/brochure-captur
 import { HowWeGotHere } from "@/components/br/how-we-got-here";
 import { TrackRecord } from "@/components/br/track-record";
 import { PerformanceRanges } from "@/components/br/performance-ranges";
+import { OwnTheMoment, FourSteps, SeeTheProof } from "@/components/br/hub-story";
 import { FlightReportExample } from "@/components/br/flight-report";
 import { GtmBotTeaser } from "@/components/br/gtm-bot-teaser";
 import { GtmSetup } from "@/components/br/gtm-setup";
@@ -168,7 +169,7 @@ export default function BrMediaKit() {
             </Details>
           </div>
           </div>
-          <AnnotatedHubMock testId="mk-hero-mock" initial="effortless" />
+          <AnnotatedHubMock testId="mk-hero-mock" initial="drho" />
           </div>
           <p className="mt-3 text-sm font-semibold" data-testid="mk-upgrade">{UPGRADE_PATH_LINE}</p>
           <div className="mt-5">
@@ -230,6 +231,9 @@ export default function BrMediaKit() {
       <section id="proof" className="scroll-mt-20 border-b border-border/70 bg-background">
         <div className="container mx-auto px-5 py-8 md:px-6 md:py-10">
           <FaceBeforeFlight />
+          <div className="mt-8"><OwnTheMoment testId="mk-own-moment" /></div>
+          <div className="mt-8"><FourSteps look={price.look} seat={price.seat} testId="mk-four-steps" /></div>
+          <div className="mt-8"><SeeTheProof testId="mk-see-proof" /></div>
         </div>
       </section>
 

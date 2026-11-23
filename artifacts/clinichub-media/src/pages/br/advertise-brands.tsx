@@ -59,7 +59,7 @@ export default function BrAdvertiseBrands() {
       </Section>
 
       <Section>
-        <BrandBanners title="Brand hubs listed with Scale (in queue)" />
+        <BrandBanners title="Brand hubs listed with Scale (live and activating)" />
       </Section>
 
       <Section tone="soft">
