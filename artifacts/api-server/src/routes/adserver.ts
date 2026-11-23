@@ -96,10 +96,13 @@ const promoPanels = async () => {
 };
 /** Referral orders (QR / street team / partner links) with their commission detail, for the payouts view. */
 const referralPanel = async (recips: Awaited<ReturnType<typeof store.recipientHistory>>) => {
-  const [orders, rates, chRates, members] = await Promise.all([listReferralOrders({ includeTest: true, limit: 2000 }), store.rateHistory(), store.channelRateHistory(), promoLib.members()]);
+  const [all, rates, chRates, members] = await Promise.all([listReferralOrders({ includeTest: true, includePending: true, limit: 2000 }), store.rateHistory(), store.channelRateHistory(), promoLib.members()]);
+  const orders = all.filter((o) => o.status === "paid");
+  const pending = all.filter((o) => o.status === "pending");
   const { detail } = splitReferralOrders(orders.map(toReferralLine), rates, recips, chRates);
+  const pendingDetail = splitReferralOrders(pending.map(toReferralLine), rates, recips, chRates).detail;
   const refMembers = members.map((m) => ({ id: m.id, label: m.label }));
-  return { referralHtml: referralAdminHtml({ orders, detail, members: refMembers, recipients: recips }), referrers: refMembers };
+  return { referralHtml: referralAdminHtml({ orders, detail, members: refMembers, recipients: recips, pending, pendingDetail }), referrers: refMembers };
 };
 const promoAttach = (email: string) => attachPendingForAccount(email).catch(() => 0);
 const noStore = (res: Response) => res.set("Cache-Control", "no-store");
