@@ -76,6 +76,9 @@ const TAG_CLS: Record<Tag, string> = {
   "Internal testing, not ad results": "bg-[#0b1f3a]/10 text-[#0b1f3a]",
 };
 
+// Five cards: three across, then two wider ones, so the second row is not left with an empty slot (2 + 2 + full-width on tablets).
+const PROOF_SPAN = ["lg:col-span-2", "lg:col-span-2", "lg:col-span-2", "lg:col-span-3", "sm:col-span-2 lg:col-span-3"];
+
 export function SeeTheProof({ testId = "see-the-proof", id = "see-the-proof" }: { testId?: string; id?: string }) {
   const geo = REGION_MIX.slice(0, 2).map((r) => `${r.label} ${r.pct}%`).join(" · ");
   const cards: { tag: Tag; title: string; line: string; href: string; cta: string }[] = [
@@ -88,9 +91,9 @@ export function SeeTheProof({ testId = "see-the-proof", id = "see-the-proof" }: 
   return (
     <div data-testid={testId} id={id}>
       <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">See the proof</p>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {cards.map((c) => (
-          <a key={c.title} href={siteUrl(c.href)} data-mirror-keep className="group flex min-w-0 flex-col rounded-2xl border border-[#0b1f3a]/10 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" data-testid={`${testId}-${c.tag === "Measured" ? "measured" : "other"}`}>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+        {cards.map((c, i) => (
+          <a key={c.title} href={siteUrl(c.href)} data-mirror-keep className={`${PROOF_SPAN[i] ?? "lg:col-span-2"} group flex min-w-0 flex-col rounded-2xl border border-[#0b1f3a]/10 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md`} data-testid={`${testId}-${c.tag === "Measured" ? "measured" : "other"}`}>
             <span className={`self-start rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${TAG_CLS[c.tag]}`}>{c.tag}</span>
             <span className="mt-2 block text-base font-bold leading-snug text-[#0b1f3a]">{c.title}</span>
             <span className="mt-1 block flex-1 text-[13px] leading-snug text-foreground/70">{c.line}</span>
