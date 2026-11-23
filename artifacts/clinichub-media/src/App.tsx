@@ -219,9 +219,6 @@ if (import.meta.env.VITE_BROWSER_TEST_AUTH === 'true') {
   });
 }
 
-// How long the signed-out home waits for Clerk before rendering anyway.
-const CLERK_HOME_GRACE_MS = 2500;
-
 function HomeRedirect() {
   // Browser tests have no Clerk frontend. The public home is what they exercise.
   if (import.meta.env.VITE_BROWSER_TEST_AUTH === "true") {
@@ -231,29 +228,15 @@ function HomeRedirect() {
 }
 
 function ClerkHomeRedirect() {
-  const { isLoaded } = useAuth();
-  const [graceOver, setGraceOver] = useState(false);
-  useEffect(() => {
-    const timer = window.setTimeout(() => setGraceOver(true), CLERK_HOME_GRACE_MS);
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  // Clerk never finishes loading when its Frontend API rejects the host (for
-  // example a *.vercel.app preview of the birchreserve.net production
-  // instance) or the proxy is down. The public home must not stay blank.
-  if (!isLoaded && graceOver) {
-    return <Home />;
+  const { isLoaded, isSignedIn } = useAuth();
+  // Paint the public home right away. Waiting for Clerk left the page as
+  // header + footer only for 1-2.5s on every visit (most visitors are signed
+  // out). Signed-in team members still land on their dashboard once Clerk
+  // loads. Home stays at the same tree position so it never remounts.
+  if (isLoaded && isSignedIn) {
+    return <Redirect to="/sales/advertiser-requests" />;
   }
-  return (
-    <>
-      <Show when="signed-in">
-        <Redirect to="/sales/advertiser-requests" />
-      </Show>
-      <Show when="signed-out">
-        <Home />
-      </Show>
-    </>
-  );
+  return <Home />;
 }
 
 function Router() {
