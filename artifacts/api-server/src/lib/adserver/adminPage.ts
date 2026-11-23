@@ -267,7 +267,7 @@ ${v.friday ? `<form data-post="/ads/admin/friday-sync" style="display:inline"><b
     title: "Ads admin · Birch Reserve",
     nav: "Ads admin",
     head: `<style>${COCKPIT_CSS}</style>`,
-    right: `<nav class="tabs"><a href="/ads/docs">Docs</a><a href="/ads/specs">Specs</a><form data-post="/ads/admin/logout" style="display:inline"><button class="ghost sm" type="submit">Sign out</button></form></nav>`,
+    right: `<nav class="tabs"><a href="/ads/admin/analytics">Site analytics</a><a href="/ads/docs">Docs</a><a href="/ads/specs">Specs</a><form data-post="/ads/admin/logout" style="display:inline"><button class="ghost sm" type="submit">Sign out</button></form></nav>`,
     body: `<div class="cockpit"><aside class="ck-rail"><nav aria-label="Ad system">${tabs.map(([k, l]) => `<a href="#${k}" data-tab="${k}">${l}</a>`).join("")}</nav></aside><div class="ck-pane">${body}</div></div><script>${COCKPIT_JS}</script><script>${CREATIVE_UPLOAD_JS}</script>`,
   });
 }
