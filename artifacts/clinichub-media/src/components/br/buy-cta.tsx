@@ -1,6 +1,7 @@
 /** Primary self-serve buy CTA → /buy (Randy, Nov 19 2026 10:10 PM ET). One line, no jargon. */
 import { ArrowRight } from "lucide-react";
 import { CHECKOUT_TAGLINE } from "../../../../api-server/src/lib/checkoutCopy";
+import { isScaleSkin } from "@/lib/siteSkin";
 
 export const BUY_HREF = "/buy";
 
@@ -15,7 +16,7 @@ export function BuyCta({ placement, className = "", onClick }: { placement: stri
       >
         Buy ads now <ArrowRight className="size-4" aria-hidden />
       </a>
-      <span className="text-sm font-semibold text-[#0b1f3a]">{CHECKOUT_TAGLINE}</span>
+      <span className="text-sm font-semibold text-[#0b1f3a]">{/* Scale skin speaks as Scale Health (same rename as the server-side scaleText). */}{isScaleSkin() ? CHECKOUT_TAGLINE.replace(/Buy Scale Health ads through Birch Reserve\./g, "Buy Scale Health ads.") : CHECKOUT_TAGLINE}</span>
     </div>
   );
 }

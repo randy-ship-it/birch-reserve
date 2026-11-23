@@ -9,6 +9,7 @@ import { STREET_REACH_FIG } from "../../../../api-server/src/lib/overhaul/brandI
 import { STREET_TEAM, STREET_TEAM_INTAKE_HREF, STREET_TEAM_TIERS, STREET_TEAM_TODAY } from "../../../../api-server/src/lib/overhaul/streetTeam";
 import { DOOR_ROUTE } from "../../../../api-server/src/lib/doorRoute";
 import { logCtaClick } from "@/lib/shareTrack";
+import { skinText } from "@/lib/siteSkin";
 
 const TIER_ICON = { join: Users, own: Route, "door-drop": Footprints } as const;
 const FEATURE_ICON = { qr: QrCode, bags: PackageOpen, gps: MapPin } as const;
@@ -26,7 +27,7 @@ export function StreetTeamProgram({ where }: { where: "home" | "page" }) {
           <span className="text-xs font-bold uppercase tracking-[0.18em] text-foreground/60">{STREET_TEAM.eyebrow}</span>
         </div>
         {where === "page" ? <h1 className="mt-2 font-display text-4xl leading-[1.05] text-[#0b1f3a] md:text-5xl">{STREET_TEAM.title}</h1> : <h2 className="mt-2 font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">{STREET_TEAM.title}</h2>}
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground md:text-base">{STREET_TEAM.sub}</p>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground md:text-base">{skinText(STREET_TEAM.sub)}</p>
 
         <p className="mt-6 text-xs font-bold uppercase tracking-[0.18em] text-foreground/60">{STREET_TEAM.tiersTitle}</p>
         <ol className="mt-2 grid gap-3 md:grid-cols-3" data-testid={`street-team-tiers-${where}`}>
@@ -81,7 +82,7 @@ export function StreetTeamProgram({ where }: { where: "home" | "page" }) {
           </div>
         </div>
 
-        <p className="mt-5 text-sm font-semibold text-[#0b1f3a]" data-testid={`street-team-outside-${where}`}>{STREET_TEAM.outside}</p>
+        <p className="mt-5 text-sm font-semibold text-[#0b1f3a]" data-testid={`street-team-outside-${where}`}>{skinText(STREET_TEAM.outside)}</p>
         <p className="mt-1 text-[13px] text-foreground/70" data-testid={`street-team-minimum-${where}`}>{STREET_TEAM.minimum}</p>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <a href={streetTeamHref()} onClick={() => logCtaClick(`street_team_${where}`)} data-testid={`street-team-cta-${where}`} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-6 text-sm font-bold text-white transition hover:bg-lime-300 hover:text-[#0b1f3a]">
