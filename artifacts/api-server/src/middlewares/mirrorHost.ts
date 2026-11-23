@@ -91,9 +91,21 @@ export function mirrorHtml(html: string, src: string): string {
   out = out.replace(/<a\b[^>]*>/gi, (tag) =>
     tag.replace(/\shref="(\/(?!\/)[^"]*)"/i, (m, v: string) => (/^\/intake(?:[/?#]|$)/.test(v) ? m : v === "/" ? ` href="${SCALE_SITE_ORIGIN}/"` : ` href="${MIRROR_PREFIX}${v}"`)),
   );
-  if (MIRROR_SKINS[src] === "scale") out = scaleBody(scaleHead(out));
+  if (MIRROR_SKINS[src] === "scale") out = scaleMeta(scaleBody(scaleHead(out)));
   const boot = mirrorBootScript(src);
   return /<head[^>]*>/i.test(out) ? out.replace(/<head[^>]*>/i, (h) => `${h}\n${boot}`) : `${boot}${out}`;
+}
+
+/**
+ * Scale voice in non-visible text: description/og/twitter metas, link titles and JSON-LD names say Scale Health
+ * ("Birch Reserve" stays only in the visible ad-partner disclosure). URLs (birchreserve.net) are untouched.
+ */
+export function scaleMeta(html: string): string {
+  const rename = (v: string) => v.replace(/Buy Scale Health ads through Birch Reserve\./g, "Buy Scale Health ads.").replace(/Birch Reserve/g, "Scale Health");
+  let out = html.replace(/<meta\b[^>]*(?:property|name)="(?:description|og:description|twitter:description)"[^>]*>/gi, rename);
+  out = out.replace(/<link\b[^>]*\btitle="[^"]*Birch Reserve[^"]*"[^>]*>/gi, rename);
+  out = out.replace(/(<script\b[^>]*application\/ld\+json[^>]*>)([\s\S]*?)(<\/script>)/gi, (_m, a: string, j: string, z: string) => `${a}${rename(j)}${z}`);
+  return out;
 }
 
 /** Re-brand the shell head for the Scale skin: titles, favicon, theme colour, Scale's typeface. Canonical/og:url stay Birch's. */
