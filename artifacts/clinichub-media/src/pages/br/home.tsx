@@ -30,33 +30,27 @@ import { BuyCta } from "@/components/br/buy-cta";
 import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
 import { OwnTheMoment, FourSteps, SeeTheProof } from "@/components/br/hub-story";
 import { MidTier } from "@/components/br/next-step";
+import { WhatYoureBuying, hubDefinition, hubHostLine } from "@/components/br/what-youre-buying";
+import { siteName } from "@/lib/siteSkin";
 import { SeeYourAd } from "@/components/br/see-your-ad";
 import { OfferStairs } from "@/components/br/offer-stairs";
 import { trackAttn, useAttention } from "@/lib/attention";
 import { ActivityPulse, CategoryStrip, QuestionsBrandsAskCompact } from "@/components/br/market-pulse";
 import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { INVENTORY, PUBLISHER_INCENTIVE } from "../../../../api-server/src/lib/overhaul/model";
-import { DOOR_ROUTE } from "../../../../api-server/src/lib/doorRoute";
 import { UPGRADE_PATH_LINE } from "../../../../api-server/src/lib/overhaul/mediaKit";
 
 const NAVY = "#0b1f3a";
 
 const FAQ = [
-  { q: "Where exactly do the ads run?", a: "Only inside co-branded hubs from Recovery Brands (recovery, longevity and food today; pets in queue) and inside health and wellness business hubs such as physio, gym, studio and clinic hubs. Each hub has four placements: post-purchase, the hub home page, product and services pages, and the member dashboard behind login." },
+  { q: "Where exactly do the ads run?", a: "Only inside private, members-only hubs: pages inside a brand, clinic or retailer where its own customers land right after they buy or book. Categories start with recovery, then longevity, sleep, nutrition and more. Private clinic network display, retail micro hubs and the Street Team are separate add-ons. Each hub has four placements: post-purchase, the hub home page, product and services pages, and the member dashboard behind login." },
   { q: "Which hubs are live?", a: `${INVENTORY.line} More hubs launch over time.` },
   { q: "Is this display or cost-per-click?", a: "Both. Every placement can be bought as display (priced per thousand views) or CPC (priced per click). Deposits and area locks draw down against either." },
   { q: "Are the audience numbers measured?", a: "Not yet. Audience and view figures on this site are based on signed partnership contracts, not measured delivery. We don't publish a measured network views figure (the 2027 inventory figure is based on signed partnership contracts); your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
   { q: "Can a local business or studio buy?", a: "Yes. Start with the same $190 USD 7-day look or $490 USD reserve. Locking your area (a share of hub display near your postal code) is a premium option, by inquiry." },
-  { q: "How does my business become a hub?", a: `Studios and retailers activate a hub at scalehealth.ca/clinichubs and earn cash or ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded hub.` },
+  { q: "How does my business become a hub?", a: `Studios and retailers activate a hub on ScaleHealth.ca, the platform that hosts the hubs (scalehealth.ca/clinichubs), and earn cash or ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded hub.` },
   { q: "Do agencies get anything?", a: `Yes. ${AGENCY_SHARE.line} Agencies can also prepay a client test budget and get UTM and promo-code reporting per hub and surface.` },
 ];
-
-/** One audience framing, three channels (Randy Nov 21 1:00 PM). Reach and audience, not delivered impressions. */
-const STATS = [
-  { v: "700MM+", l: "captive page views activating", name: "Branded ScaleHealth.ca hubs", tid: "stat-hub-views", more: "Private, members-only hubs on ScaleHealth.ca where recovery and wellness customers already shop and book care. Page views are activating as brand hubs go live." },
-  { v: "200+", l: "locations, 500+ soon", name: "Private retail network", tid: "stat-retail-locations", more: "Our private network of digital and brick-and-mortar fitness & recovery retailers in Canada and the USA: 200+ locations today, 500+ soon, with 1MM+ captive recovery consumers." },
-];
-
 
 const TILES = [
   { href: "/intake?ref=home_tile", icon: Sparkles, title: "Monetization Kit", line: "Exposure + hub earnings. Free.", tid: "tile-intake", hot: true },
@@ -121,11 +115,11 @@ export default function BrHome() {
       <section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]" data-testid="home-hero">
         {/* Mobile first screen (Randy, Nov 21 2:26 PM): one slim line of real recent activity above the headline. In flow, never over the preview card. */}
         <div className="container mx-auto min-h-[5.25rem] max-w-6xl px-4 pt-3 md:hidden" data-testid="home-pulse-slim"><ActivityPulse mode="inline" slim /></div>
-        <div className="container mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-x-8 gap-y-5 px-4 pb-8 pt-4 md:grid-cols-[1fr_1.05fr] md:grid-rows-[auto_auto] md:content-center md:pb-12 md:pt-14">
+        <div className="container mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-x-8 gap-y-5 px-4 pb-8 pt-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:grid-rows-[auto_auto] md:content-center md:pb-12 md:pt-14">
           <div className="md:col-start-1 md:row-start-1 md:self-end">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Birch Reserve · Private wellness hubs</p>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55" data-testid="home-eyebrow">{siteName()} · Private hub display network</p>
           <h1 className="mt-2 font-display text-[2.6rem] leading-[1.02] text-[#0b1f3a] md:text-6xl">See your brand inside a live wellness hub.</h1>
-          <p className="mt-3 max-w-xl text-base text-muted-foreground md:text-lg">The card sits on the page already open, right after the booking or purchase. Type your name and see it land on a real hub.</p>
+          <p className="mt-3 max-w-xl text-base text-muted-foreground md:text-lg" data-testid="home-hub-definition">{hubDefinition()}</p>
           </div>
           <div className="order-3 md:order-none md:col-start-1 md:row-start-2 md:self-start">
           <BuyCta placement="hero_home" className="mt-0" onClick={() => trackAttn("hero_cta.buy")} />
@@ -137,34 +131,15 @@ export default function BrHome() {
           </p>
           <div className="mt-4"><WatchHowItWorks placement="hero_home" testId="home-watch-reel" /></div>
           </div>
-          <div className="order-2 md:order-none md:col-start-2 md:row-span-2 md:row-start-1 md:self-center"><SeeYourAd testId="home-hero-mock" /></div>
+          <div className="order-2 md:order-none md:col-start-2 md:row-span-2 md:row-start-1 md:self-center"><SeeYourAd testId="home-hero-mock" /><p className="mt-1 text-[12px] leading-snug text-foreground/60" data-testid="home-hub-host">{hubHostLine()}</p></div>
         </div>
       </section>
       {/* Light continuous category strip under the hero (Randy Nov 21 10:20 AM). */}
       <div className="container mx-auto max-w-6xl px-4 pb-5"><div className="hidden mb-3 min-h-[6.5rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div><CategoryStrip testId="home-category-strip" /></div>
 
-      {/* 2. Big numbers. */}
-      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-stats">
-        <div className="grid gap-3 md:grid-cols-3" data-testid="home-retail-tile">
-          {STATS.map((s) => (
-            <div key={s.tid} className="rounded-2xl p-5 text-white shadow-lg md:p-6" style={{ background: NAVY }} data-testid={s.tid}>
-              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">{s.name}</span>
-              <p className="mt-3 whitespace-nowrap font-display text-[2.6rem] leading-none tabular-nums md:text-5xl">{s.v}</p>
-              <p className="mt-1.5 text-sm leading-tight text-white/75">{s.l}</p>
-              <details className="mt-3 text-[12px] text-white/70"><summary className="cursor-pointer font-semibold text-lime-200">Details</summary><p className="mt-1.5 leading-snug">{s.more}</p></details>
-            </div>
-          ))}
-          <a href="/media-kit#doors" className="group relative block min-h-[200px] overflow-hidden rounded-2xl text-white shadow-lg" style={{ background: "#0E3B2A" }} data-testid="home-street-tile">
-            <img src={DOOR_ROUTE.mapWebp} alt="" aria-hidden width={DOOR_ROUTE.mapWidth} height={DOOR_ROUTE.mapHeight} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover opacity-45 transition group-hover:opacity-60" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0E3B2A] via-[#0E3B2A]/60 to-transparent" />
-            <div className="relative flex h-full flex-col justify-end p-5 md:p-6">
-              <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#BFF3D6]">Calm Joints + Street Team Ambassadors</span>
-              <p className="mt-2 font-display text-[2.6rem] leading-none md:text-5xl" data-testid="home-street-figure">1MM+</p>
-              <p className="mt-1.5 text-sm text-white/80">consumers now · 3MM+ est. in 2027 <ArrowRight className="ml-1 inline size-3.5 transition group-hover:translate-x-0.5" aria-hidden /></p>
-              <p className="mt-1 text-[11px] text-white/60">Provider network activating, plus ambassadors doing on-site sampling and door-to-door. 2027 figure is an estimate. Based on signed partnership contracts. Canada for now.</p>
-            </div>
-          </a>
-        </div>
+      {/* 2. What you're buying (Randy, voice, Nov 23 2026 2:37 PM ET): the inventory, plain and visual, for a cold advertiser. */}
+      <section className="container mx-auto max-w-5xl px-4 pb-10 pt-2" data-testid="home-stats">
+        <WhatYoureBuying testId="home-what-youre-buying" />
         <div className="mt-3 rounded-2xl border border-[#0b1f3a]/10 bg-white p-5 shadow-sm md:p-6"><Tam2027 compact testId="home-tam-2027" /><div className="mt-3"><HubAlerts compact where="home" pagePath="/" /></div></div>
         <p className="mt-2 text-[12px] text-foreground/60" data-testid="home-stats-label">{MODELLED_FOOTER}</p>
       </section>
@@ -267,7 +242,7 @@ export default function BrHome() {
               <div className="rounded-xl border border-[#0b1f3a]/10 p-4">
                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Small business package</p>
                 <p className="mt-1 font-display text-2xl text-[#0b1f3a]">{price.look} look · {price.seat} reserve</p>
-                <p className="mt-2 text-sm text-foreground/75">Card checkout. 100% media credit until the IO, usable 12 months; fully refundable until 14 days before launch. The {price.look} look converts in full to the reserve within 7 days, or is refunded.</p>
+                <p className="mt-2 text-sm text-foreground/75">Card checkout. 100% media credit until the insertion order (IO), usable 12 months; fully refundable until 14 days before launch. The {price.look} look converts in full to the reserve within 7 days, or is refunded.</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a href={RESERVE_HREF} data-testid="home-cta-seat" className="inline-flex h-11 items-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-lime-300 hover:text-[#0b1f3a]">Reserve · {price.seat} <ArrowRight className="size-4" aria-hidden /></a>
                   <a href={LOOK_HREF} className="inline-flex h-11 items-center gap-1.5 rounded-full border border-[#0b1f3a]/25 px-5 text-sm font-bold text-[#0b1f3a] hover:border-[#0b1f3a]">7-day look · {price.look}</a>

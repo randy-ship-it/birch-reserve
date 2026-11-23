@@ -175,6 +175,9 @@ export function BrochureInline() {
 
 export function BrochureSlideIn() {
   const [open, setOpen] = useState(false);
+  /** Phones (Nov 23 2026 mobile QA: the full card covered the media kit's "Two tiers" heading): open as a one-line
+   *  strip; the email form only expands when the visitor taps it. Desktop is unchanged. */
+  const [expanded, setExpanded] = useState(() => typeof window === "undefined" || !window.matchMedia("(max-width: 767px)").matches);
   const shownRef = useRef(false);
   const f = useBrochureForm("brochure_slidein");
 
@@ -242,14 +245,18 @@ export function BrochureSlideIn() {
   return (
     <aside
       aria-label="Get the brochure"
-      className="fixed bottom-3 left-3 right-[84px] z-[56] rounded-2xl border border-black/5 bg-white p-4 text-slate-900 shadow-[0_18px_50px_-16px_rgba(7,26,57,0.45)] md:bottom-6 md:left-auto md:right-6 md:w-[340px]"
+      className={`fixed bottom-[calc(var(--birch-dock-bottom,14px)_-_2px)] left-3 right-[84px] z-[56] rounded-2xl border border-black/5 bg-white ${expanded ? "p-4" : "px-3 py-1.5"} text-slate-900 shadow-[0_18px_50px_-16px_rgba(7,26,57,0.45)] md:bottom-6 md:left-auto md:right-6 md:w-[340px]`}
       style={{ marginBottom: "env(safe-area-inset-bottom)" }}
       data-testid="brochure-slidein"
     >
-      <button type="button" onClick={dismiss} aria-label="Close" className="absolute right-2 top-2 z-10 flex size-8 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900" data-testid="brochure-slidein-close">
+      <button type="button" onClick={dismiss} aria-label="Close" className={`absolute z-10 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 ${expanded ? "right-2 top-2 size-8" : "right-1 top-1/2 size-10 -translate-y-1/2"}`} data-testid="brochure-slidein-close">
         <X className="size-4" aria-hidden />
       </button>
-      {f.state === "done" ? (
+      {!expanded && f.state !== "done" ? (
+        <button type="button" onClick={() => setExpanded(true)} className="flex min-h-10 w-full items-center gap-2 pr-8 text-left font-display text-base leading-tight" data-testid="brochure-slidein-expand">
+          <Download className="size-4 shrink-0" aria-hidden /> Get the brochure + rate card
+        </button>
+      ) : f.state === "done" ? (
         <div role="status" data-testid="brochure-slidein-done">
           <p className="pr-6 font-display text-lg leading-tight">Thanks, here it is.</p>
           <p className="mt-1 text-[13px] text-slate-600">We&apos;ll keep you posted.</p>

@@ -90,7 +90,7 @@ export function HubAlerts({ compact = false, where = "media_kit", pagePath = "/m
           {HUB_ALERT_CATEGORIES.map((c) => {
             const on = cats.includes(c);
             return (
-              <button key={c} type="button" aria-pressed={on} onClick={() => toggle(c)} className={`min-h-8 rounded-full border px-3 text-[13px] font-semibold transition-colors ${on ? "border-[#0b1f3a] bg-[#0b1f3a] text-white" : dark ? "border-white/30 text-white/85 hover:bg-white/10" : "border-slate-300 bg-white text-slate-700 hover:border-slate-500"}`}>
+              <button key={c} type="button" aria-pressed={on} onClick={() => toggle(c)} className={`min-h-10 rounded-full border px-3 text-[13px] font-semibold transition-colors ${on ? "border-[#0b1f3a] bg-[#0b1f3a] text-white" : dark ? "border-white/30 text-white/85 hover:bg-white/10" : "border-slate-300 bg-white text-slate-700 hover:border-slate-500"}`}>
                 {on ? "✓ " : ""}{c}
               </button>
             );
