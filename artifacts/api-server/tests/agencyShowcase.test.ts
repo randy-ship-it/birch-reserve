@@ -168,3 +168,20 @@ test("start small (Nov 19 2026): $190 / $490 / starter block / $1K–$5K agency 
   }
   assert.doesNotMatch(read("../clinichub-media/src/pages/br/audiences.tsx"), /<Eyebrow>Start now<\/Eyebrow>/);
 });
+
+test("Nov 23: /agencies payout table pays 10% of the seat price actually shown (CAD $690 -> $69, not $49)", async () => {
+  const { agencyPayoutRows } = await import("../src/lib/overhaul/agencyShowcase");
+  const cad = agencyPayoutRows(690, "CAD");
+  assert.deepEqual(cad.map((r) => r.key), ["seat", "client_test", "premium"]);
+  assert.equal(cad[0]!.label, "$690 CAD reserve (card)");
+  assert.equal(cad[0]!.cash, "$69");
+  assert.equal(cad[1]!.spend, "$1K–$5K");
+  assert.equal(cad[1]!.cash, "$100–$500");
+  assert.equal(cad[2]!.cash, "$2,500");
+  const usd = agencyPayoutRows(490, "USD");
+  assert.equal(usd[0]!.label, "$490 USD reserve (card)");
+  assert.equal(usd[0]!.cash, "$49");
+  const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
+  assert.match(ui, /agencyPayoutRows\(priceFor\("reserve-490"/);
+  assert.match(ui, /data-currency-fixed data-testid="agency-payout-table"/);
+});

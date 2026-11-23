@@ -141,7 +141,7 @@ export const SEGMENTS: Segment[] = [
     profileBasis: "modelled",
     intent: "Very high",
     fits: "Braces, TENS, heat, mobility tools, recovery footwear",
-    marketKey: "chronic-pain",
+    marketKey: "osteoarthritis-ca",
   },
   {
     key: "racquet",
@@ -322,6 +322,16 @@ export const MARKET_CONTEXT: Array<{ key: string; pillar: string; stat: string; 
     source: "Public Health Agency of Canada, Postpartum Health in Canada infographic (Family-Centred Maternity and Newborn Care guidelines)",
     url: "https://www.canada.ca/en/public-health/services/publications/healthy-living/infographic-postpartum-health-canada.html",
     year: "2024",
+  },
+  // Nov 23 2026 daily scan: Physio card gets its own cited line (was sharing chronic pain with Recovery).
+  {
+    key: "osteoarthritis-ca",
+    pillar: "Physio & mobility",
+    stat: "3.9 million",
+    line: "Canadians aged 20 and older live with diagnosed osteoarthritis (13.6%), with 219,000 newly diagnosed in a year; it is more common in women (16.1% vs 11.1% of men).",
+    source: "Public Health Agency of Canada, Osteoarthritis in Canada (Canadian Chronic Disease Surveillance System, 2016 to 2017)",
+    url: "https://www.canada.ca/en/public-health/services/publications/diseases-conditions/osteoarthritis.html",
+    year: "2020",
   },
 ];
 

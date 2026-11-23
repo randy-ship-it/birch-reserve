@@ -39,6 +39,35 @@ export const AGENCY_EXAMPLES = [
   { label: `Premium slot from $${MEDIA_KIT_OFFERS.premium.spendLo / 1000}K (inquire)`, spend: MEDIA_KIT_OFFERS.premium.spendLo },
 ].map((e) => ({ ...e, cash: agencyCash(e.spend) }));
 
+/** Agency client test band ($1K–$5K, one IO per client). Same figures as AGENCY_TEST in ../twoLane. */
+export const AGENCY_CLIENT_TEST = { lo: 1_000, hi: 5_000 } as const;
+
+/**
+ * The /agencies payout table in the visitor's currency (daily scan Nov 23 2026).
+ * Bug fixed: CAD visitors saw "$690 CAD reserve -> $49 agency cash" because the page relabelled USD
+ * text but kept the USD cash figure. Cash is now 10% of the seat price actually shown ($690 CAD -> $69 CAD).
+ * Other rows keep the same number in both currencies (the site rule when no CAD table exists).
+ * No new prices: seat price comes from /api/currency (priceFor), bands are the ones already on /agencies.
+ */
+export function agencyPayoutRows(seatPrice: number, cur: "USD" | "CAD") {
+  const m = (n: number) => `$${n.toLocaleString("en-US")}`;
+  return [
+    { key: "seat", label: `${m(seatPrice)} ${cur} reserve (card)`, spend: m(seatPrice), cash: m(agencyCash(seatPrice)) },
+    {
+      key: "client_test",
+      label: "Client test (IO)",
+      spend: `${m(AGENCY_CLIENT_TEST.lo / 1000)}K–${m(AGENCY_CLIENT_TEST.hi / 1000)}K`,
+      cash: `${m(agencyCash(AGENCY_CLIENT_TEST.lo))}–${m(agencyCash(AGENCY_CLIENT_TEST.hi))}`,
+    },
+    {
+      key: "premium",
+      label: `Premium slot from ${m(MEDIA_KIT_OFFERS.premium.spendLo / 1000)}K (inquire)`,
+      spend: m(MEDIA_KIT_OFFERS.premium.spendLo),
+      cash: m(agencyCash(MEDIA_KIT_OFFERS.premium.spendLo)),
+    },
+  ];
+}
+
 const CPC_BY_SURFACE: Record<(typeof SURFACES)[number]["key"], number> = {
   post_purchase: RATE_SURFACES.find((s) => s.key === "post_purchase")!.cpcStarter[0],
   hub_home: RATE_SURFACES.find((s) => s.key === "landing")!.cpcStarter[0],

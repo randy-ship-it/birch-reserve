@@ -6,6 +6,7 @@
 import type { ReactNode } from "react";
 import { Cta } from "./ui";
 import { InquireBadge } from "./quick-buy";
+import { priceFor, useCurrency } from "@/lib/currency";
 import {
   AGENCY_EXAMPLES,
   AGENCY_SHARE,
@@ -17,6 +18,7 @@ import {
   SELL_ASSUMPTION_PCT,
   SPEC_ROWS,
   SPEND_DOWN_MONTHS,
+  agencyPayoutRows,
 } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { POSITIONING, TAM } from "../../../../api-server/src/lib/overhaul/model";
 
@@ -333,6 +335,9 @@ export function IoProcess() {
 
 /** How agency payouts work: the stated share, worked examples, and marked placeholders. */
 export function AgencyPayouts() {
+  const { currency, prices } = useCurrency();
+  const cur = currency === "cad" ? "CAD" : "USD";
+  const rows = agencyPayoutRows(priceFor("reserve-490", currency, prices), cur);
   return (
     <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]" data-testid="agency-payouts">
       <div>
@@ -342,23 +347,21 @@ export function AgencyPayouts() {
         <p className="mt-4 max-w-md text-base leading-relaxed text-foreground/80">{AGENCY_SHARE.line}</p>
         <p className="mt-3 max-w-md text-sm text-muted-foreground">{BRAND_BONUS_LINE}</p>
       </div>
-      <div className="border border-foreground/15 bg-white">
+      <div className="border border-foreground/15 bg-white" data-currency-fixed data-testid="agency-payout-table">
         <table className="w-full border-collapse text-left text-sm tabular-nums">
           <thead>
             <tr className="border-b border-foreground/80 text-[11px] uppercase tracking-wider text-foreground/60">
               <th className="px-4 py-3 font-semibold md:px-5">Client buy</th>
-              <th className="px-4 py-3 text-right font-semibold md:px-5">Prepaid (USD)</th>
-              <th className="px-4 py-3 text-right font-semibold md:px-5">Agency cash (USD)</th>
+              <th className="px-4 py-3 text-right font-semibold md:px-5">Prepaid ({cur})</th>
+              <th className="px-4 py-3 text-right font-semibold md:px-5">Agency cash ({cur})</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {AGENCY_EXAMPLES.map((e) => (
-              <tr key={e.label}>
+            {rows.map((e) => (
+              <tr key={e.key} data-testid={`agency-payout-${e.key}`}>
                 <td className="px-4 py-3 md:px-5">{e.label}</td>
-                <td className="px-4 py-3 text-right md:px-5">{usd(e.spend)}</td>
-                <td className="px-4 py-3 text-right font-semibold md:px-5">
-                  {usd(e.cash)}
-                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-right md:px-5">{e.spend}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-right font-semibold md:px-5">{e.cash}</td>
               </tr>
             ))}
           </tbody>
