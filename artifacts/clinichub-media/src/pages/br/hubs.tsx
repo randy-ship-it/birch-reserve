@@ -143,6 +143,7 @@ export default function BrHubs() {
       <Section>
         <LiveHubGrid />
         <HubFunnel />
+        <p className="mt-4 text-[13px] text-foreground/65">Your hub and surface are named on an insertion order (IO) before anything runs. Audiences are described, not guaranteed; view figures are modelled.</p>
       </Section>
       <Section tone="soft">
         <BrandBanners title="Brand hubs: live and activating" />

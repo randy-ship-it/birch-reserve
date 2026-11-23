@@ -20,6 +20,9 @@ import { RT, RT_SANS, RT_SERIF } from "@/lib/reportTokens";
 import { TwoLane } from "@/components/br/two-lane";
 import { NextStep } from "@/components/br/next-step";
 import { GtmSetup } from "@/components/br/gtm-setup";
+import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
+import { OwnTheMoment, FourSteps, SeeTheProof } from "@/components/br/hub-story";
+import { priceLabels, useAvailability } from "@/components/br/prime-hero";
 import { useAttention } from "@/lib/attention";
 import { ActivityPulse, CategoriesWeServe, QuestionsBrandsAskCompact } from "@/components/br/market-pulse";
 import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation";
@@ -35,6 +38,7 @@ type Mode = "fast" | "expanded";
  * supplier hero, exposure ladder, quiet fees; the agency lanes stay on the default page. No preset = unchanged.
  */
 export default function BrIntake({ preset: forced }: { preset?: IntakePreset } = {}) {
+  const price = priceLabels(useAvailability());
   const preset = forced ?? (typeof window === "undefined" ? undefined : presetOf(window.location.search));
   const sup = preset === "supplier";
   const brand = useMemo(() => (sup ? brandFromUrl() : ""), [sup]);
@@ -99,6 +103,14 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
         <Details testId="sample-details"><p>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range, not a result or a guarantee.</p></Details>
         <div className="mt-4"><ReportV2 report={sample} sample compact exposure={SAMPLE_EXPOSURE} exposureSource="sample" /></div>
         {sup ? null : <div className="mt-10" data-testid="intake-next-step"><NextStep where="intake" yieldToPostKit /></div>}
+        {sup ? null : (
+          <div className="mt-10 space-y-10" data-testid="intake-hub-story">
+            <div><LiveHubGrid /><HubFunnel /></div>
+            <OwnTheMoment testId="intake-own-moment" />
+            <FourSteps look={price.look} seat={price.seat} testId="intake-four-steps" />
+            <SeeTheProof testId="intake-see-proof" />
+          </div>
+        )}
         {sup ? null : (
           <div className="mt-10 space-y-8" style={{ fontFamily: "inherit" }} data-testid="intake-market-signals">
             <div className="hidden min-h-[6.5rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div>
