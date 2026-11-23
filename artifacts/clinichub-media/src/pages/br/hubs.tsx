@@ -6,7 +6,7 @@ import { Eyebrow, Field, H1, Lede, Modelled, Section, inputClass, postJson, useP
 import { useCurrency } from "@/lib/currency";
 import { ladderLine } from "../../../../api-server/src/lib/hubLadder";
 import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
-import { BRAND_HUBS, SLOTS, type BrandHub } from "../../../../api-server/src/lib/overhaul/model";
+import { LADDER_BRAND_HUBS, SLOTS, type BrandHub } from "../../../../api-server/src/lib/overhaul/model";
 
 const KEY = "br_hub_access_v1";
 
@@ -17,7 +17,7 @@ function HubDetail({ hub, unlocked }: { hub: BrandHub; unlocked: boolean }) {
     <article className="relative border border-foreground/15 bg-white" data-testid={`hub-card-${hub.key}`}>
       <div className="flex items-center gap-4 border-b border-border p-5">
         <div className="flex h-12 w-32 items-center justify-center">
-          <img src={hub.logo} alt={`${hub.name} logo`} className="max-h-10 w-auto object-contain" />
+          {hub.logo ? <img src={hub.logo} alt={`${hub.name} logo`} className="max-h-10 w-auto object-contain" /> : <span className="font-display text-lg font-bold leading-tight">{hub.name}</span>}
         </div>
         <div>
           <h3 className="font-display text-2xl">{hub.name}</h3>
@@ -150,7 +150,7 @@ export default function BrHubs() {
       </Section>
       <Section>
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {BRAND_HUBS.map((h) => (
+          {LADDER_BRAND_HUBS.map((h) => (
             <HubDetail key={h.key} hub={h} unlocked={unlocked} />
           ))}
         </div>

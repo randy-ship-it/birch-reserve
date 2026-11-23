@@ -11,7 +11,7 @@
  * signed. Do-not-pitch brands never appear.
  */
 import { HUB_PLACEMENT_STARTER_CPM as STARTER } from "./pricing";
-import { hubTier, ladderLine } from "../hubLadder";
+import { hubTier, ladderLine, publicHubs } from "../hubLadder";
 import { HUBS as KIT_HUBS, SLOTS, DEPOSIT_TIERS, CUSTOM_MIN, CUSTOM_MAX, SMB_LADDER, toCad, type Hub, type Slot } from "../sponsorKit";
 
 export { SLOTS, DEPOSIT_TIERS, CUSTOM_MIN, CUSTOM_MAX, SMB_LADDER, toCad };
@@ -114,6 +114,24 @@ export const BRAND_HUBS: BrandHub[] = [
     bannerStatus: "Activating",
   },
 ];
+
+/**
+ * Every hub on the ladder, in ladder order, for the /hubs detail cards (Randy, Nov 23 2026: the locked cards omitted
+ * Integrity Fitness and Calm Joints). The two with no hub feed row use the network-median basis, the same as SOLE. Display only.
+ */
+export const LADDER_BRAND_HUBS: BrandHub[] = (() => {
+  const med = BRAND_HUBS.find((h) => h.key === "jack-health")!;
+  const extra: Record<string, Partial<BrandHub>> = {
+    "integrity-fitness": { name: "Integrity Fitness", url: "https://www.scalehealth.ca/integrity", category: "Gym and recovery membership", logo: "", banner: "/hub-gallery/integrity.webp", recovery: "Recovery" },
+    "calm-joints": { name: "Calm Joints", url: "https://www.scalehealth.ca/calmjoints", category: "Digital physio clinic", logo: "", banner: "/hub-gallery/calmjoints.webp", recovery: "Recovery" },
+  };
+  return publicHubs()
+    .map((l) => {
+      const have = BRAND_HUBS.find((b) => b.key === l.key || (l.key === "dr-ho" && b.key === "dr-ho"));
+      const b = have ?? ({ ...med, key: l.key, basis: "Network median partner (no hub feed yet)", ...extra[l.key] } as BrandHub);
+      return { ...b, audience: have ? b.audience : l.audience, ...ladderStatus(l.key, b.bannerStatus) };
+    });
+})();
 
 /** Inventory framing (Randy, Nov 12 1:10 PM): named hubs are live inventory now; more in queue by year end. */
 export const INVENTORY = {
