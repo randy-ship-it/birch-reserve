@@ -20,6 +20,7 @@ import { aiBotLog } from "./middlewares/aiBotLog";
 import buyRouter, { buyStaffRouter } from "./routes/buy";
 import exclusiveReserveRouter from "./routes/exclusiveReserve";
 import adserverRouter from "./routes/adserver";
+import siteAnalyticsRouter from "./routes/siteAnalytics";
 import promoRouter from "./routes/promo";
 import hubProofRouter from "./routes/hubProof";
 import { promoContext, withPromoMetadata } from "./lib/adserver/promoContext";
@@ -136,6 +137,8 @@ app.use(exclusiveReserveRouter);
 // Ad system (Nov 21 2026): embed + pixel + serving, /account customer dashboard, /ads/admin. Own body parsers.
 app.use(promoRouter);
 app.use(hubProofRouter);
+// Live site analytics dashboard + Friday read-only link (Nov 23 2026).
+app.use(siteAnalyticsRouter);
 app.use(adserverRouter);
 app.use(publicPagesRouter);
 app.use(advertiserGuidesRouter);

@@ -24,7 +24,8 @@
  */
 import { onIntakeSubmitted } from "../lib/adserver/promo";
 import { promoCtxOf } from "../lib/adserver/promoContext";
-import { Router, json, type Request, type Response } from "express";
+import { Router, json, text, type Request, type Response } from "express";
+import { MIRROR_ORIGIN_HOSTS } from "../middlewares/mirrorHost";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
 import { coarseRegion, recordPulse } from "../lib/activityPulse";
 import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
@@ -389,11 +390,28 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     }
   });
   /**
-   * The same-origin analytics snippet (/br-t.js) posts page/form events to /api/track on THIS host, which had no
-   * route: a 404 in the console on every page (Nov 21 2026 forms audit). Accept and drop: 204, nothing stored or sent.
+   * The same-origin analytics snippet (/br-t.js) posts page / section / CTA / form events to /api/track on THIS host.
+   * Until Nov 23 2026 they were dropped here (204), so the portfolio traffic + funnel view in the CRM never saw Birch.
+   * Now they are forwarded server-side, unchanged (the snippet's own cookieless payload, no PII), with the page's
+   * site as Origin and the visitor's user agent so bot filtering works. Do Not Track / GPC: dropped, nothing sent.
+   * Server-to-server, so the backend name never appears in the page. Always 204 to the browser.
    */
-  router.post("/api/track", (_req, res) => {
-    res.status(204).end();
+  router.post("/api/track", text({ type: "*/*", limit: "4kb" }), async (req, res) => {
+    const done = () => void res.status(204).end();
+    if (env.TRACK_FORWARD_DISABLED === "true" || req.get("dnt") === "1" || req.get("sec-gpc") === "1") return done();
+    const raw = typeof req.body === "string" ? req.body : "";
+    if (!raw || raw.length > 4096) return done();
+    let host = "";
+    try { host = new URL(req.get("origin") ?? "").hostname; } catch { /* none */ }
+    const origin = MIRROR_ORIGIN_HOSTS.has(host) ? "https://www.scalehealth.ca" : "https://birchreserve.net";
+    // Awaited (3 s cap) so the serverless function is not frozen mid-request; the browser's beacon never waits on it.
+    await f("https://fridayapp.org/api/track", {
+      method: "POST",
+      headers: { "content-type": "text/plain", origin, "user-agent": (req.get("user-agent") ?? "").slice(0, 400) },
+      body: raw,
+      signal: AbortSignal.timeout(3000),
+    }).then((r) => r.arrayBuffer()).catch(() => undefined);
+    done();
   });
   /** v1.2 §6 shared category keys (Friday's list when it serves one, else the static copy of the contract table). */
   router.get("/v1/brand-categories", async (_req, res) => {
