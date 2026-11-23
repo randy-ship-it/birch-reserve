@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { MIRROR_PAGE_RE, MIRROR_PREFIX, SCALE_FAVICON, mirrorHtml, stripMirrorPrefix } from "../src/middlewares/mirrorHost";
+import { MIRROR_PAGE_RE, MIRROR_PREFIX, SCALE_FAVICON, mirrorHtml, scaleMeta, stripMirrorPrefix } from "../src/middlewares/mirrorHost";
 
 test("mirror prefix: /intake/_m/<path> strips to /<path>, other URLs untouched", () => {
   assert.equal(stripMirrorPrefix("/intake/_m/assets/index-abc.js"), "/assets/index-abc.js");
@@ -133,4 +133,13 @@ test("account sign-in fallbacks on the Scale mirror stay on scalehealth.ca/intak
 test("mirror pages: /intake/activate is served in Scale mode like the other intake pages", () => {
   for (const p of ["/intake", "/intake/supplier", "/intake/street-team", "/intake/activate", "/intake/activate/"]) assert.ok(MIRROR_PAGE_RE.test(p), p);
   assert.ok(!MIRROR_PAGE_RE.test("/intake/activates"));
+});
+
+test("scaleMeta: metas, link titles and JSON-LD names speak as Scale Health; URLs and the visible disclosure stay", () => {
+  const html = `<head><meta name="description" content="Buy Scale Health ads through Birch Reserve. Hubs."><meta property="og:description" content="Birch Reserve x"><link title="Birch Reserve machine catalog" href="/c.json"><script type="application/ld+json">{"name":"Birch Reserve starter slot","url":"https://birchreserve.net/"}</script></head><body><span>ad partner Birch Reserve</span></body>`;
+  const out = scaleMeta(html);
+  assert.ok(!/<head>[\s\S]*<\/head>/.exec(out)![0].includes("Birch Reserve"));
+  assert.match(out, /content="Buy Scale Health ads\. Hubs\."/);
+  assert.match(out, /"name":"Scale Health starter slot","url":"https:\/\/birchreserve\.net\/"/);
+  assert.match(out, /<span>ad partner Birch Reserve<\/span>/);
 });
