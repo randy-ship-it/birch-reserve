@@ -117,3 +117,12 @@ test("Nov 20: racquet and MD-referral cards carry cited, population-level contex
     assert.doesNotMatch(m.line, /\b(our|Birch|reach|guarantee)\b/i);
   }
 });
+
+test("Nov 23: Physio card carries its own cited PHAC osteoarthritis line; population-level, no Birch-reach words", () => {
+  const seg = A.SEGMENTS.find((s) => s.key === "physio")!;
+  const m = A.segmentContext(seg)!;
+  assert.equal(m.key, "osteoarthritis-ca");
+  assert.match(m.url, /^https:\/\/www\.canada\.ca\//);
+  assert.doesNotMatch(m.line, /\b(our|Birch|reach|guarantee)\b/i);
+  assert.equal(new Set(A.MARKET_CONTEXT.map((x) => x.key)).size, A.MARKET_CONTEXT.length);
+});
