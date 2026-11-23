@@ -28,6 +28,9 @@ export const HUB_PROFILES: Record<string, HubProfile> = {
   "jill-health": { kind: "service", skus: [], leads: ["hormonal", "menopause", "glp1", "womens_health"], cats: ["digital_health_telehealth", "health_testing_longevity"] },
   "jack-health": { kind: "service", skus: [], leads: ["hormonal", "trt", "glp1", "mens_health"], cats: ["digital_health_telehealth", "health_testing_longevity"] },
   nutriprocan: { kind: "service", skus: [], leads: ["dietitian", "nutrition_coaching", "glp1"], cats: ["sports_nutrition"] },
+  "integrity-fitness": { kind: "service", skus: [], leads: ["gym_membership", "physio"], cats: [] },
+  "calm-joints": { kind: "service", skus: [], leads: ["physio", "digital_physio"], cats: [] },
+  "bird-and-be": { kind: "service", skus: [], leads: ["womens_health", "postpartum"], cats: [] },
   "effortless-admin": { kind: "service", skus: [], leads: ["benefits_admin"], cats: [] },
 };
 

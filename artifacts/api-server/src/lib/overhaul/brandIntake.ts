@@ -329,12 +329,15 @@ export const ANCHOR_HUBS_STATUS = "Proposed, pending Randy's confirmation" as co
  */
 export const PROPOSED_ANCHOR_HUBS = [
   { key: "dr-ho", name: "DR-HO’S", what: "Pain relief and physio", fits: ["recovery", "physio", "sleep"], live: true },
+  { key: "integrity-fitness", name: "Integrity Fitness", what: "Gym members, with recovery and physio built into the membership", fits: ["recovery", "fitness", "physio", "sports-nutrition"], live: true },
+  { key: "calm-joints", name: "Calm Joints", what: "Members of our own digital physio clinic", fits: ["recovery", "physio", "sleep"], live: true },
   { key: "roll-recovery", name: "Roll Recovery", what: "Recovery tools and a member marketplace", fits: ["recovery", "fitness", "physio", "sports-nutrition"], live: false },
   { key: "jill-health", name: "Jill Health", what: "Women's health, midlife and menopause", fits: ["longevity", "sleep", "supplements"], live: false },
   { key: "jack-health", name: "Jack Health", what: "Men's health and longevity", fits: ["longevity", "supplements", "fitness"], live: false },
   { key: "nutriprocan", name: "NutriProCan", what: "Nutrition and dietitian-guided eating", fits: ["supplements", "sports-nutrition", "longevity"], live: false },
   { key: "sole", name: "SOLE", what: "Foot pain, insoles and active footwear", fits: ["recovery", "fitness"], live: true },
   { key: "effortless-admin", name: "Effortless Admin", what: "Benefits and wellness admin hub", fits: ["longevity", "supplements", "sleep"], live: false },
+  { key: "bird-and-be", name: "Bird & Be", what: "Postpartum recovery and pelvic-floor care", fits: ["recovery", "physio", "longevity"], live: false },
   { key: "kalaya", name: "Kalaya", what: "Topical pain relief", fits: ["recovery", "physio", "sleep"], live: false },
 ] as const;
 

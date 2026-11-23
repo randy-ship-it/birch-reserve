@@ -133,8 +133,8 @@ test("Friday payload: org birchreserve, tags, and skipped without env", async ()
   assert.equal(r.status, "skipped");
 });
 
-test("copy rules: the eight queued brand hubs, no do-not-pitch brands", () => {
-  assert.deepEqual(BRAND_HUBS.map((h) => h.key).sort(), ["bird-and-be", "dr-ho", "effortless-admin", "jack-health", "jill-health", "nutriprocan", "roll-recovery", "sole"]);
+test("copy rules: every ladder brand hub (4 Live, 6 Activating), no do-not-pitch brands", () => {
+  assert.deepEqual(BRAND_HUBS.map((h) => h.key).sort(), ["bird-and-be", "calm-joints", "dr-ho", "effortless-admin", "integrity-fitness", "jack-health", "jill-health", "nutriprocan", "roll-recovery", "sole"]);
   const all = JSON.stringify(BRAND_HUBS);
   assert.doesNotMatch(all, /kalaya|align|clairvoyant|80 locations|pier39|ankita/i);
 });

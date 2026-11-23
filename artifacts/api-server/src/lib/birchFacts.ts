@@ -57,7 +57,7 @@ export function birchCanonicalFacts(): string {
     "- Never name the managed-services partner, its legal company or its team members. Never give a home or street address.",
     "",
     "PROOF",
-    "- See the face before the flight: live hubs anyone can open now, https://physio.drhonow.com (DR-HO'S) and https://www.scalehealth.ca/sole (SOLE).",
+    "- See the face before the flight: live hubs anyone can open now, https://physio.drhonow.com (DR-HO'S), https://www.scalehealth.ca/sole (SOLE); also Integrity Fitness and Calm Joints (scalehealth.ca/integrity, /calmjoints).",
     "- Media kit, one link: https://birchreserve.net/media-kit",
     "",
     "ROUTING",

@@ -1,3 +1,4 @@
+import { ladderLine, liveLine } from "../../../../api-server/src/lib/hubLadder";
 import { MetaComparison, SurfacesGrid, TamStrip } from "@/components/br/blocks";
 import { BrandBanners } from "@/components/br/brand-banners";
 import { RateCard } from "@/components/br/rate-card";
@@ -6,13 +7,13 @@ import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@
 
 const FAQ = [
   { q: "What do I buy?", a: "Start with a $190 USD 7-day category look or a $490 USD category reserve. Your payment is media credit. We send an insertion order naming the hub and placements, and nothing runs until you approve it." },
-  { q: "Which hubs are live?", a: "DR-HO'S physio and SOLE are live today. More hubs launch over time, and placements are curated as each one goes live." },
+  { q: "Which hubs are live?", a: `${ladderLine()} Placements are curated as each one goes live.` },
   { q: "Can I own a category?", a: "Premium slots add exclusivity and priority placement, by inquiry only. See the media kit or ask us and we'll quote it against the hubs you want." },
   { q: "How is it reported?", a: "Aggregate only: views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. No patient data and no clinical pixels." },
 ];
 
 export default function BrAdvertiseBrands() {
-  usePageMeta("Advertise to brands | Birch Reserve", "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. Live today: DR-HO'S physio and SOLE.");
+  usePageMeta("Advertise to brands | Birch Reserve", "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. " + liveLine());
   return (
     <div data-testid="br-advertise-brands">
       <JsonLd data={{ "@context": "https://schema.org", "@type": "OfferCatalog", name: "Birch Reserve self-serve offers", itemListElement: [{ "@type": "Offer", name: "7-day category look", sku: "hold-190", price: 190, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=hold-190" }, { "@type": "Offer", name: "Category reserve", sku: "reserve-490", price: 490, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=reserve-490" }] }} />
@@ -21,7 +22,7 @@ export default function BrAdvertiseBrands() {
           <div>
             <Eyebrow>Advertise · Brands</Eyebrow>
             <H1>Put your brand inside private health and wellness hubs.</H1>
-            <Lede>Your ad runs on the pages members use right after they buy or book, and when they log back in. Live today: DR-HO'S physio and SOLE, with more hubs launching. Start for $190 USD or $490 USD.</Lede>
+            <Lede>Your ad runs on the pages members use right after they buy or book, and when they log back in. {liveLine()} More hubs are launching. Start for $190 USD or $490 USD.</Lede>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta href="#slots">See the two offers</Cta>
               <Cta href="/match" variant="line">Match my audience</Cta>
