@@ -4,6 +4,8 @@ import { BrandBanners } from "@/components/br/brand-banners";
 import { sponsorImps, slotPrice } from "@/components/br/rate-card";
 import { Eyebrow, Field, H1, Lede, Modelled, Section, inputClass, postJson, usePageMeta } from "@/components/br/ui";
 import { useCurrency } from "@/lib/currency";
+import { ladderLine } from "../../../../api-server/src/lib/hubLadder";
+import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
 import { BRAND_HUBS, SLOTS, type BrandHub } from "../../../../api-server/src/lib/overhaul/model";
 
 const KEY = "br_hub_access_v1";
@@ -70,7 +72,7 @@ function HubDetail({ hub, unlocked }: { hub: BrandHub; unlocked: boolean }) {
 }
 
 export default function BrHubs() {
-  usePageMeta("Hubs | Birch Reserve", "Live and activating: DR-HO'S physio, SOLE, Effortless Admin and Calm Joints. More brand hubs are in queue. Register your email to see audience, placements and modelled views.");
+  usePageMeta("Hubs | Birch Reserve", `${ladderLine()} Register your email to see audience, placements and modelled views.`);
   const [unlocked, setUnlocked] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -106,7 +108,7 @@ export default function BrHubs() {
           <div>
             <Eyebrow>Hubs</Eyebrow>
             <H1>See inside the hubs.</H1>
-            <Lede>Live and activating: DR-HO'S physio, SOLE, Effortless Admin and Calm Joints. The other listed brand hubs below are coming and activate over time; placements are curated as each one launches. Register your email to see each hub's audience, placements and modelled views. To start, take a <a className="underline underline-offset-2" href="/media-kit">$190 USD 7-day look or a $490 USD reserve</a>.</Lede>
+            <Lede>{ladderLine()} Placements are curated as each hub launches. Register your email to see each hub's audience, placements and modelled views.</Lede>
           </div>
           {unlocked ? (
             <p className="inline-flex items-center gap-2 bg-accent px-4 py-3 text-sm font-semibold" data-testid="hubs-unlocked">
@@ -138,8 +140,12 @@ export default function BrHubs() {
           )}
         </div>
       </Section>
+      <Section>
+        <LiveHubGrid />
+        <HubFunnel />
+      </Section>
       <Section tone="soft">
-        <BrandBanners title="Brand hubs: live and in queue" />
+        <BrandBanners title="Brand hubs: live and activating" />
       </Section>
       <Section>
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">

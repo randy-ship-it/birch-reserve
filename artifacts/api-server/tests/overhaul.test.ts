@@ -150,7 +150,7 @@ test("agent catalog: the two media-kit offers in USD, only live hubs, agent chec
   assert.deepEqual(c.offers.map((o) => [o.offer_key, o.price_usd]), [["hold-190", 190], ["reserve-490", 490]]);
   assert.deepEqual(c.currencies, ["USD"]);
   assert.equal(c.inventory.surfaces.length, 4);
-  assert.deepEqual(c.inventory.live_hubs.map((h) => h.name), ["DR-HO'S physio", "SOLE"]);
+  assert.deepEqual(c.inventory.live_hubs.map((h) => h.name), ["DR-HO'S physio", "SOLE", "Calm Joints"]);
   assert.equal(c.agency.commission_pct_of_media_spend, 10);
   assert.equal(c.checkout_status.agent_checkout, "held");
   assert.doesNotMatch(JSON.stringify(c), /CAD|sponsor-|area-lock|live inventory/);

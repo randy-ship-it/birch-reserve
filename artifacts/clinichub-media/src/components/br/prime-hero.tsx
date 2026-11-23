@@ -1,3 +1,4 @@
+import { activatingHubs, liveHubs, LABEL_ACTIVATING, MORE_LAUNCHING } from "../../../../api-server/src/lib/hubLadder";
 import { isScaleSkin } from "@/lib/siteSkin";
 import { currentCurrency, priceLabel, useCurrency } from "@/lib/currency";
 import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
@@ -37,7 +38,7 @@ export type Availability = {
 
 /** Hub brands in the network today; more launch over time. */
 /** Live hubs anyone can open today (shown on the same pages); more launch over time. Scale Health is the business, not a hub. */
-export const NETWORK_HUBS = ["DR-HO'S physio", "SOLE"] as const;
+export const NETWORK_HUBS = liveHubs().map((h) => h.name);
 
 export function useAvailability(): Availability | null {
   useCurrency(); // re-render price labels when the visitor flips USD / CAD
@@ -83,7 +84,10 @@ export function AvailabilityStrip({ dark = false }: { a?: Availability | null; d
         {NETWORK_HUBS.map((h) => (
           <li key={h} className={`border px-3 py-2 text-[13px] font-semibold leading-tight ${dark ? "border-background/25" : "border-foreground/20 bg-white"}`}>{h}</li>
         ))}
-        <li className={`border border-dashed px-3 py-2 text-[13px] font-semibold leading-tight ${dark ? "border-background/30 text-background/70" : "border-foreground/25 text-foreground/60"}`}>+ more hubs launching</li>
+        {activatingHubs().map((h) => (
+          <li key={h.key} className={`border border-dashed px-3 py-2 text-[13px] font-semibold leading-tight ${dark ? "border-background/30 text-background/70" : "border-foreground/25 text-foreground/60"}`}>{h.name} · {LABEL_ACTIVATING}</li>
+        ))}
+        <li className={`border border-dashed px-3 py-2 text-[13px] font-semibold leading-tight ${dark ? "border-background/30 text-background/70" : "border-foreground/25 text-foreground/60"}`}>{MORE_LAUNCHING}</li>
       </ul>
     </div>
   );
@@ -102,7 +106,7 @@ export function PrimeHero() {
         <p className="mt-3 font-display text-xl text-accent md:text-3xl" data-testid="prime-positioning">Buy Scale Health ads through Birch Reserve. The faster way to buy ads.</p>
         <p className="mt-3 font-display text-xl text-background/80 md:text-3xl" data-testid="prime-scarcity">A growing network. Curated placements. No bidding.</p>
         <p className="mt-4 max-w-3xl text-base leading-relaxed text-background/80" data-testid="prime-what">
-          Reserve a share of display space across our growing network of private, members-only hubs: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, with more on the way. Placements are curated as each hub launches.
+          Reserve a share of display space across our growing network of private, members-only hubs: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, and more launching. Placements are curated as each hub launches.
         </p>
         <div className="mt-6" data-testid="prime-kit-cta">
           <KitCta placement="hero_home_network" size="lg" sub="Free · website + email · hub earnings and supplier exposure, estimated" />
@@ -142,10 +146,10 @@ export function FaceBeforeFlight({ compact = false }: { compact?: boolean }) {
           Open a hub that is live and activating right now. This is the private, members-only experience your brand sits inside: placements curated hub by hub, next to the brand members already trust. No feed, no auction.
         </p>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-          <a href={LIVE_HUB_URL} target="_blank" rel="noopener" data-testid="face-live-hub" className="inline-flex h-11 items-center justify-center gap-2 bg-foreground px-4 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground">
+          <a href={isScaleSkin() ? "https://www.scalehealth.ca/dr-ho" : LIVE_HUB_URL} data-mirror-keep target="_blank" rel="noopener" data-testid="face-live-hub" className="inline-flex h-11 items-center justify-center gap-2 bg-foreground px-4 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground">
             Open the DR-HO'S physio hub <ArrowRight className="size-4" aria-hidden />
           </a>
-          <a href={SOLE_HUB_URL} target="_blank" rel="noopener" data-testid="face-live-hub-sole" className="inline-flex h-11 items-center justify-center gap-2 border border-foreground px-4 text-sm font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background">
+          <a href={SOLE_HUB_URL} data-mirror-keep target="_blank" rel="noopener" data-testid="face-live-hub-sole" className="inline-flex h-11 items-center justify-center gap-2 border border-foreground px-4 text-sm font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background">
             Open the SOLE hub <ArrowRight className="size-4" aria-hidden />
           </a>
         </div>

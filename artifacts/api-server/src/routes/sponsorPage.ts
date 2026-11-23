@@ -9,6 +9,8 @@
  * is refused unless SPONSOR_DEPOSITS_LIVE=true, so a preview can only ever
  * create test-mode sessions. All impression figures are modelled.
  */
+import { hubTier, tierLabel } from "../lib/hubLadder";
+import { hubLadderHtml } from "../lib/hubLadderHtml";
 import { BUYER_HEADER_CSS, TOKENS_CSS, buyerHeaderHtml } from "../lib/brandTokens";
 import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
 import { withPromoMetadata, withScaleReturn } from "../lib/adserver/promoContext";
@@ -103,11 +105,18 @@ ${PROMO_SCRIPT_TAG}
 </body></html>`;
 }
 
+/** Status word on this page follows the one hub ladder (Live now / Activating). Ad serving still reads hub.status, untouched. */
+function shownStatus(hub: { key: string; status: string }): string {
+  const t = hubTier(hub.key);
+  return t ? tierLabel(t) : hub.status;
+}
+
 function statsStrip(): string {
   return `<div class="stats">
 <div class="stat"><b>Private hubs</b>members-only health and wellness hubs, with more launching</div>
-<div class="stat"><b>Media credit</b>until an insertion order names the hub and surface</div>
+<div class="stat"><b>Media credit</b>until an insertion order (IO) names the hub and surface</div>
 </div>
+${hubLadderHtml("sponsor-hub-ladder")}
 <p class="fine">Aggregate reporting only. No impression guarantees. Any view figure is a modelled estimate, not a delivery promise. Nothing runs until an insertion order names the hub.</p>`;
 }
 
@@ -115,7 +124,7 @@ function hubPackageTable(currency: Currency): string {
   const rows = HUBS.map((hub) => {
     const core = SLOTS.filter((s) => s.core);
     const imps = core.reduce((acc, s) => acc + sponsorImpressions(hub, s), 0);
-    return `<tr><td><a href="${esc(hub.url)}">${esc(hub.name)}</a><div class="fine">${esc(hub.category)}</div></td><td>${esc(hub.status)}</td><td class="n"><span class="mc">Modelled</span>${fmt(imps)}</td><td class="n">${price(corePackageUsd(hub), currency)}</td></tr>`;
+    return `<tr><td><a href="${esc(hub.url)}">${esc(hub.name)}</a><div class="fine">${esc(hub.category)}</div></td><td>${esc(shownStatus(hub))}</td><td class="n"><span class="mc">Modelled</span>${fmt(imps)}</td><td class="n">${price(corePackageUsd(hub), currency)}</td></tr>`;
   }).join("");
   return `<div class="tw"><table><thead><tr><th>Hub</th><th>Status</th><th class="n">Modelled impressions / mo</th><th class="n">Core package / mo</th></tr></thead><tbody>${rows}</tbody></table></div>
 <p class="fine">Core package = thank-you after buy or book, member dashboard tile and hub hero banner, as one of five rotating sponsors (20% share of voice) at 75% availability. Impressions are modelled. Full slot-by-slot pricing is in the <a href="/kit?currency=${currency}">marketing kit</a>.</p>
@@ -225,7 +234,7 @@ if(location.hash==='#prepay'){f.scrollIntoView({block:'start'})}
 function kitHtml(currency: Currency): string {
   const rows = HUBS.map((hub) => {
     const slotRows = SLOTS.map((s) => `<tr><td>${esc(s.label)}${s.core ? "" : ' <span class="fine">(partner approval per send)</span>'}</td><td class="n"><span class="mc">Modelled</span>${fmt(sponsorImpressions(hub, s))}</td><td class="n">${price(s.cpmUsd, currency)}</td><td class="n">${price(slotPriceUsd(hub, s), currency)}</td></tr>`).join("");
-    return `<tr class="hub"><td colspan="4"><a href="${esc(hub.url)}">${esc(hub.name)}</a> · ${esc(hub.status)} · ${esc(hub.category)} <span class="fine">· basis: ${esc(hub.basis)} · core package ${price(corePackageUsd(hub), currency)}/mo</span></td></tr>${slotRows}`;
+    return `<tr class="hub"><td colspan="4"><a href="${esc(hub.url)}">${esc(hub.name)}</a> · ${esc(shownStatus(hub))} · ${esc(hub.category)} <span class="fine">· basis: ${esc(hub.basis)} · core package ${price(corePackageUsd(hub), currency)}/mo</span></td></tr>${slotRows}`;
   }).join("");
   const slotDefs = SLOTS.map((s) => `<tr><td>${esc(s.label)}</td><td>${esc(s.where)}</td><td>${esc(s.size)}</td><td class="n">${price(s.cpmUsd, currency)}</td><td class="fine">${esc(s.comp)}</td></tr>`).join("");
   return `<p class="draft">Every impression figure on this page is modelled, not measured.</p>

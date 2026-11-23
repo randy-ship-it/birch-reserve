@@ -1,6 +1,7 @@
 import { securityHeaders, CSP_REPORT_PATH } from "./middlewares/securityHeaders";
 import { cspReportRouter } from "./routes/cspReport";
 import { mirrorHost } from "./middlewares/mirrorHost";
+import { ioExplain } from "./middlewares/ioExplain";
 import express, { type Express } from "express";
 import { clerkMiddleware } from "@clerk/express";
 import { shareEventsRouter } from "./routes/shareEvents";
@@ -62,6 +63,7 @@ app.use(CSP_REPORT_PATH, cspReportRouter);
 
 // Scale mirror (scalehealth.ca/intake): strip /intake/_m and shape the mirror shell. No-op on birchreserve.net.
 app.use(mirrorHost());
+app.use(ioExplain());
 app.use(promoContext());
 // Markdown mirrors (/index.md, /media-kit.md, ...) + Accept: text/markdown + Link header. Public, no cloaking.
 app.use(aiMarkdownRouter);

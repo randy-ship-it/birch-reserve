@@ -3,6 +3,7 @@
  * Shape follows the contract; values come from Birch's shared modules so the preview is honest about its source.
  * Every object carries mock: true and the UI labels it. Never used on birchreserve.net.
  */
+import { kitStatus } from "../../../api-server/src/lib/hubLadder";
 import type { FridayReport, ReportView } from "./fridayBrandIntake";
 import type { IntakePayload } from "../../../api-server/src/lib/overhaul/brandIntake";
 import { CHANNEL_TILES, PROPOSED_ANCHOR_HUBS, RATE_PLACEMENTS, hubFit, projectPublisher } from "../../../api-server/src/lib/overhaul/brandIntake";
@@ -47,7 +48,7 @@ export function mockReport(payload: IntakePayload, body: Record<string, unknown>
       anchor_hubs: matchHubs(PROPOSED_ANCHOR_HUBS.map((h) => h.key), { category: k?.category ?? "recovery", ...brandCtx }).map((d) => {
         const h = PROPOSED_ANCHOR_HUBS.find((x) => x.key === d.key)!;
         const f = fits.find((x) => x.key === h.key)!;
-        return { key: h.key, name: h.name, status: h.live ? "Live" : "In queue", confirmed_anchor: false, fit: f.fit === "Likely fit" ? 80 : 40, fit_label: `${f.fit === "Likely fit" ? "Good fit" : "Possible fit"} (mock)`, reason: h.what, subject_to_human_confirmation: true , ...(d.hidden ? { hidden: true, flag: d.reason ?? "conflict" } : {})};
+        return { key: h.key, name: h.name, status: kitStatus(h.key, h.live), confirmed_anchor: false, fit: f.fit === "Likely fit" ? 80 : 40, fit_label: `${f.fit === "Likely fit" ? "Good fit" : "Possible fit"} (mock)`, reason: h.what, subject_to_human_confirmation: true , ...(d.hidden ? { hidden: true, flag: d.reason ?? "conflict" } : {})};
       }),
     },
     channels: CHANNEL_TILES.map((t) => ({ key: FK[t.key]!, name: t.name, figures: t.key === "retail-network" ? ["200+ locations (500+ soon)", "1MM+ captive recovery consumers", "Canada + USA"] : t.stats.map((s) => `${s.v} ${s.l}`), figures_label: t.key === "retail-network" ? "retail-network estimate" : "network figures / targets", fit: 0, fit_label: "", line: t.line, image: "image" in t ? t.image : null })),

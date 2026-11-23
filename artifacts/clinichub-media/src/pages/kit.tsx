@@ -1,6 +1,8 @@
 import { SELLER_EMAIL_HREF, SELLER_IDENTITY } from "@/lib/seller-identity";
 import { useEffect } from "react";
 import { Download, Mail } from "lucide-react";
+import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
+import { SeeTheProof } from "@/components/br/hub-story";
 
 /** Optional static print of this page (headless Chromium print-to-PDF). */
 const MEDIA_KIT_PDF_HREF = "/birch-reserve-one-pager.pdf" as const;
@@ -87,6 +89,19 @@ export default function Kit() {
             </a>
           </div>
         </div>
+      </section>
+
+      <section className="border-b border-border" data-testid="kit-hubs">
+        <div className="container mx-auto max-w-3xl px-6 py-12">
+          <h2 className="font-display text-2xl tracking-tight">Where your card can run</h2>
+          <div className="mt-4"><LiveHubGrid /></div>
+          <HubFunnel />
+          <p className="mt-3 text-xs text-muted-foreground">Audience and view figures anywhere on this site are modelled estimates, not delivered impressions and not a guarantee.</p>
+        </div>
+      </section>
+
+      <section className="border-b border-border" data-testid="kit-proof">
+        <div className="container mx-auto max-w-3xl px-6 py-12"><SeeTheProof testId="kit-see-proof" /></div>
       </section>
 
       <section className="border-b border-border">

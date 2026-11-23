@@ -124,6 +124,8 @@ export function scaleBody(html: string): string {
   if (i < 0) return html;
   const head = html.slice(0, i);
   let body = scaleText(html.slice(i));
+  // Hub links stay on scalehealth.ca on Scale pages: the DR-HO'S hub has its own scalehealth.ca page.
+  body = body.replace(/href="https:\/\/physio\.drhonow\.com\/?"/g, 'href="https://www.scalehealth.ca/dr-ho"');
   body = body.replace(/(<a\b[^>]*>)\s*BIRCH RESERVE\s*(<\/a>)/g, (_m, a: string, end: string) => `${a}<img src="${MIRROR_PREFIX}${SCALE_LOGO}" alt="Scale Health" height="26" style="height:26px;width:auto;display:block">${end}`);
   if (!/ad partner/i.test(body)) {
     const line = `<span class="br-ad-partner">${SCALE_AD_PARTNER_LINE}</span>`;

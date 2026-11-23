@@ -283,7 +283,7 @@ export default function BrAudiences() {
       </Section>
 
       {/* Region + arrival (measured) */}
-      <Section>
+      <Section id="signals">
         <Eyebrow>Network signals</Eyebrow>
         <H2>What the hubs are already telling us.</H2>
         <p className="mt-4 max-w-2xl text-muted-foreground">

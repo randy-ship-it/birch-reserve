@@ -7,7 +7,8 @@ export const HUB_MOCKS: Record<HubKey, HubInfo> = {
   effortless: { key: "effortless", tab: "Effortless", name: "Effortless Admin", host: "scalehealth.ca/effortlessadmin", img: "/hub-gallery/effortless.webp", surface: "Hub home", url: "https://www.scalehealth.ca/effortlessadmin", card: { pos: "right-[1.2%] top-[27%]", pin3: "bl" }, pin2: { left: "1.5%", top: "74%" } },
   calmjoints: { key: "calmjoints", tab: "Calm Joints", name: "Calm Joints", host: "scalehealth.ca/calmjoints", img: "/hub-gallery/calmjoints.webp", surface: "Hub home", url: "https://www.scalehealth.ca/calmjoints", card: { pos: "left-[5%] bottom-[4%]", pin3: "br", scale: 0.64, origin: "bl" }, pin2: { left: "3%", top: "22%" } },
 };
-export const HUB_KEYS: HubKey[] = ["drho", "sole", "effortless", "calmjoints"];
+/** Mock switchers show Live now hubs only (lib/hubLadder.ts). Effortless Admin is Activating, so it has no "live hub" mock. */
+export const HUB_KEYS: HubKey[] = ["drho", "sole", "calmjoints"];
 /** Rotate the default hub per placement so pages do not all show the same one. */
 export function pickHub(seed: string): HubKey {
   let h = 0;

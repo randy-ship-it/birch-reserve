@@ -8,6 +8,7 @@ import { captureAttribution } from '@/lib/attribution';
 import { initAnalytics } from '@/lib/analytics';
 import { ensurePromo } from '@/lib/promo';
 import { trackAiReferral } from '@/lib/aiRef';
+import { ensureIoExplain } from '@/lib/ioExplain';
 
 // First-touch UTM / referrer / landing page, then analytics (both no-op safely).
 captureAttribution();
@@ -16,6 +17,8 @@ initAnalytics();
 ensurePromo();
 // AI-search referral (ChatGPT, Perplexity, Grok, Gemini, Copilot...): one aggregate event per visit.
 trackAiReferral();
+// First plain "IO" on each page reads "insertion order (IO)" with a short expandable explainer.
+ensureIoExplain();
 
 createRoot(document.getElementById('root')!, {
   // Keeps caught errors off reportError(), which would raise the dev overlay.

@@ -30,12 +30,12 @@ type MdPage = { path: string; title: string; summary?: string; short: readonly s
 /** md path -> HTML page it mirrors. Order = order in llms.txt. */
 export const MD_PAGES: readonly MdPage[] = [
   { path: "/", title: "Birch Reserve", short: [], full: [] },
-  { path: "/media-kit", title: "Media kit", short: ["Offers", "Live hubs"], full: ["What you can buy", "How to buy", "What Birch does not do"] },
+  { path: "/media-kit", title: "Media kit", short: ["Offers", "Hubs (one status ladder)"], full: ["What you can buy", "How to buy", "What Birch does not do"] },
   { path: "/rates", title: "Rates", short: ["Offers"], full: ["What you can buy", "How to buy"] },
   { path: "/buycalc", title: "See prices and pay", short: ["Offers"], full: ["How to buy", "What Birch does not do"] },
   { path: "/buyers", title: "For media buyers and agencies", short: ["For media buyers"], full: ["How to buy", "FAQ"] },
   { path: "/agencies", title: "Agencies", short: ["For media buyers"], full: ["How to buy", "FAQ"] },
-  { path: "/hubs", title: "Hubs", short: ["Live hubs"], full: ["How to buy"] },
+  { path: "/hubs", title: "Hubs", short: ["Hubs (one status ladder)"], full: ["How to buy"] },
   { path: "/vs-google-ads", title: "Birch Reserve vs a typical Google Ads start", short: [], full: ["Speed versus Google Ads", "What Birch does not do"] },
 ];
 

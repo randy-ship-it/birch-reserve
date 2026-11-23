@@ -4,6 +4,7 @@
  * birchCanonicalFacts(); no model call, no invented numbers.
  */
 import { BIRCH_SALES_EMAIL, BIRCH_SALES_PHONE } from "./birchFacts";
+import { ladderLine, liveLine, activatingLine, ladderMarkdown, MORE_LAUNCHING } from "./hubLadder";
 
 type Msg = { role: "user" | "assistant"; content: string };
 export type FaqResult = { text: string; callback: Record<string, string> | null; intent: string };
@@ -59,7 +60,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return { intent: "positioning", callback: null, text: `No. Scale Health is a distribution platform that started in Recovery, where it is vertically integrated, and it is growing into more health and wellness categories. It is never gig, Uber-type or on-demand. Want the free kit or the request form? [Start the kit](${INTAKE})` };
   }
   if (/which clients|your clients|client list|who do you work with|case stud|testimonial|\balign\b|\balset\b|clairvoyant|medvibe|pier\s?39|investor/.test(t)) {
-    return { intent: "confidential", callback: null, text: `We keep client and partner details confidential, so I can't share or confirm names. What I can share: only DR-HO'S and SOLE are live hubs today. Want the request form, or a person to call you? [Request form](${REQ})` };
+    return { intent: "confidential", callback: null, text: `We keep client and partner details confidential, so I can't share or confirm names. What I can share: ${liveLine()} Want the request form, or a person to call you? [Request form](${REQ})` };
   }
   if (/\bcad\b|canadian|canada|currency|us dollars|\busd\b|exchange rate/.test(t)) {
     return { intent: "currency", callback: null, text: `Visitors in Canada see and pay CAD ($270 CAD for the 7-day look, $690 CAD to reserve); everyone else pays USD ($190 and $490). The currency shown at checkout is the currency you're charged, and there's a toggle on the page. Start at ${BUY}, or ask us anything first at ${REQ}.` };
@@ -74,7 +75,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return { intent: "how", callback: null, text: `Three steps: reserve your space for $490 USD (or take a $190 USD 7-day look first), pay by card on the Stripe checkout with no login, then approve the insertion order that names the hub and placement. After you pay you get a receipt, send your ad (specs at https://birchreserve.net/ads/specs), and a person reviews it. Nothing runs before you approve the IO, and the full amount is media credit. Start at ${BUY}` };
   }
   if (/audience|who (will |would )?(see|sees)|who are (the )?members|demographic|who do (you|i) reach|who('s| is) the (audience|customer)/.test(t)) {
-    return { intent: "audience", callback: null, text: `Members of private, members-only health and wellness hubs, reached right after they book or buy and when they log back in. Live today: DR-HO'S physio and SOLE, with more hubs launching. You can open a live hub now at https://physio.drhonow.com (DR-HO'S) or https://www.scalehealth.ca/sole (SOLE), or reserve at ${BUY}.` };
+    return { intent: "audience", callback: null, text: `Members of private, members-only health and wellness hubs, reached right after they book or buy and when they log back in. ${ladderLine()} You can open a live hub now at https://physio.drhonow.com (DR-HO'S) or https://www.scalehealth.ca/sole (SOLE), or reserve at ${BUY}.` };
   }
   if (/exclusiv|one brand/.test(t) && /490|seat/.test(t) && !/premium|\d{2,3}\s?k\b/.test(t)) {
     return { intent: "exclusive", callback: null, text: `The $490 reserve isn't exclusive. It reserves a share of display space across the hub network, curated as hubs launch. Exclusivity is a premium slot, $25,000 to $50,000, inquire only. Want the team to call you about premium?` };

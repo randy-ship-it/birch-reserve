@@ -7,6 +7,7 @@
 import { AGENCY_CASH_PCT, MEDIA_KIT_CPM, MEDIA_KIT_OFFERS, agencyCash, kitExample, millions } from "./overhaul/mediaKit";
 import { AREA_LOCK } from "./overhaul/model";
 import { PREPAY_REFUND_CUTOFF_DAYS } from "./reserveOffers";
+import { ladderLine, liveLine, activatingLine, ladderMarkdown, MORE_LAUNCHING } from "./hubLadder";
 
 export const BIRCH_FACTS_VERSION = "2026-11-17-usd-only" as const;
 export const BIRCH_SALES_PHONE = "(647) 931-6278" as const;
@@ -21,7 +22,7 @@ export function birchCanonicalFacts(): string {
     `BIRCH RESERVE CANONICAL OFFER FACTS (version ${BIRCH_FACTS_VERSION}, Randy Nov 14 2026). These override anything else in your instructions that conflicts.`,
     "",
     "WHAT IT IS",
-    "- Birch Reserve sells a share of display space across a growing network of private, members-only health and wellness hubs (live today: DR-HO'S physio and SOLE), with more launching. Scale Health is the business name, not a hub. Placements are curated as each hub launches.",
+    "- Birch Reserve sells a share of display space across a growing network of private, members-only health and wellness hubs (${ladderLine()}) Scale Health is the business name, not a hub. Placements are curated as each hub launches.",
     "- Four placements in every hub: the post-purchase thank-you page, the hub home page, product and services pages, and the logged-in member dashboard.",
     "- Placements are curated hub by hub inside a private experience members chose. Not a social feed, not an auction. Do not describe how ads are selected or matched beyond that.",
     "- Run by Silver Birch Growth Inc., Toronto. Founder: Randy Gilling.",

@@ -239,10 +239,11 @@ const radRoller: BrandFit = {
     {
       status: "live",
       title: "Live recovery hubs",
-      line: "Two hubs anyone can open today: the DR-HO'S physio hub and the SOLE hub. They are the hubs we call live.",
+      line: "Hubs anyone can open today: the DR-HO'S physio hub, the SOLE hub and Calm Joints. They are the hubs we call live.",
       links: [
         { title: "DR-HO'S physio hub", href: "https://physio.drhonow.com" },
         { title: "SOLE hub", href: "https://www.scalehealth.ca/sole" },
+        { title: "Calm Joints", href: "https://www.scalehealth.ca/calmjoints" },
       ],
       strength: "strong",
     },
@@ -347,7 +348,7 @@ const radRoller: BrandFit = {
     },
     {
       label: "Birch snapshot",
-      text: "Live hubs named in the Birch media kit (DR-HO'S physio and SOLE). Cataloged launching brands and Calm Joints racquet pages from the audience snapshot fed by the TAM inventory read on Nov 13, 2026. Street team footprint follows the retail hubs in the GTHA.",
+      text: "Live hubs named in the Birch media kit (DR-HO'S physio, SOLE and Calm Joints). Cataloged launching brands and Calm Joints racquet pages from the audience snapshot fed by the TAM inventory read on Nov 13, 2026. Street team footprint follows the retail hubs in the GTHA.",
     },
   ],
 };
