@@ -31,7 +31,7 @@ const CSS = `
 #ticker{font:12px/1.5 var(--br-mono);max-height:300px;overflow:auto;color:var(--d-mute)}#ticker>div{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid #12294a;padding:3px 0}
 #ticker>div>*{margin-right:8px}#ticker b{color:var(--d-lime);font-weight:500}#ticker em{color:var(--d-cyan);font-style:normal}
 .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--d-mute);margin-top:6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
-.donut{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.empty{color:var(--d-mute);font-size:13px;padding:8px 0}
+.donut{display:flex;gap:14px;align-items:center;flex-wrap:wrap}.empty{color:var(--d-mute);font-size:13px;padding:8px 0;background:none;border:0;border-radius:0}
 .split{height:30px;border-radius:6px;overflow:hidden;display:flex;margin:6px 0}.split i{display:block;height:100%}
 .note{color:var(--d-mute);font-size:12px;margin-top:8px}
 svg text{fill:var(--d-mute);font:11px var(--br-sans)}
@@ -39,7 +39,7 @@ svg text{fill:var(--d-mute);font:11px var(--br-sans)}
 
 const JS = `
 (function(){
-var K=new URLSearchParams(location.search).get("k")||"",R=localStorage.getItem("br_ana_range")||"today",T=null,busy=false;
+var K=new URLSearchParams(location.search).get("k")||"",R=(function(){try{return localStorage.getItem("br_ana_range")}catch(e){return null}})()||"today",T=null,busy=false;
 var C=["#C8F55A","#5ad1f5","#f58bd1","#f5c45a","#9b8cf5","#5af5b5","#f5845a","#8fa3bf"];
 function $(id){return document.getElementById(id)}
 function e(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -77,7 +77,7 @@ function render(d){var t=d.totals;
  $("stamp").textContent="Updated "+new Date(d.generated_at).toLocaleTimeString("en-CA",{timeZone:"America/Toronto"})+" ET · "+n(t.excluded_test_or_bot)+" QA/bot events excluded"+(d.stripe.available?"":" · Stripe counts unavailable");}
 function load(){if(busy||document.hidden)return;busy=true;
  fetch("/ads/admin/analytics.json?range="+R+(K?"&k="+encodeURIComponent(K):""),{credentials:"same-origin",cache:"no-store"}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(render).catch(function(err){$("stamp").textContent="Could not refresh ("+err.message+"). Retrying…"}).finally(function(){busy=false})}
-document.querySelectorAll("[data-range]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.range===R));b.addEventListener("click",function(){R=b.dataset.range;localStorage.setItem("br_ana_range",R);document.querySelectorAll("[data-range]").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});load()})});
+document.querySelectorAll("[data-range]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.range===R));b.addEventListener("click",function(){R=b.dataset.range;try{localStorage.setItem("br_ana_range",R)}catch(e){}document.querySelectorAll("[data-range]").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});load()})});
 var lk=$("mklink");if(lk)lk.addEventListener("click",function(){fetch("/ads/admin/analytics/link",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:"{}"}).then(function(r){return r.json()}).then(function(j){$("linkout").value=j.url||j.message||"";$("linkout").select()})});
 load();T=setInterval(load,5000);document.addEventListener("visibilitychange",load);
 })();`;

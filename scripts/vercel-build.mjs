@@ -229,7 +229,10 @@ const { securityHeaderSet } = await import(
 const SECURITY_HEADERS = securityHeaderSet(process.env);
 
 const routes = [
-  { src: "/(.*)", headers: SECURITY_HEADERS, continue: true },
+  // Every path gets the security headers at the edge EXCEPT the Friday analytics embed (/analytics/live, also under the
+  // Scale mirror prefix): its X-Frame-Options / frame-ancestors would stack on the function's and block fridayapp.org.
+  // The function (middlewares/securityHeaders.ts + routes/siteAnalytics.ts) sets that page's headers itself.
+  { src: "^/(?!(?:intake/_m/)?analytics/live/?$).*$", headers: SECURITY_HEADERS, continue: true },
   // Scale mirror (artifacts/api-server/src/middlewares/mirrorHost.ts): every path is also served at /intake/_m/<path>,
   // so scalehealth.ca can forward only its /intake namespace. Static files resolve through the filesystem check;
   // everything else falls through to the function, which strips the same prefix.
