@@ -12,6 +12,7 @@ const TINT: Record<string, string> = {
   "dr-ho": "from-[#2b2d8f] to-[#4a4cc0]",
   sole: "from-[#e5532a] to-[#f08a5d]",
   "calm-joints": "from-[#2f3e5c] to-[#5b6f94]",
+  "integrity-fitness": "from-[#7a1f3d] to-[#c0507a]",
 };
 const hostOf = (u?: string) => (u ? u.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "") : "");
 
@@ -32,13 +33,13 @@ export function HubThumb({ h, className = "" }: { h: LadderHub; className?: stri
   );
 }
 
-/** Live now cards: 1 column on phones, 3 across from 640px. */
+/** Live now cards: 1 column on phones, 2 from 640px, 4 from 1024px. */
 export function LiveHubGrid({ light = true }: { light?: boolean; dense?: boolean }) {
   const scale = isScaleSkin();
   return (
     <div data-testid="live-hub-grid" data-hub-tier="live">
       <p className="mb-2 text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#0b1f3a]/65">{LABEL_LIVE}</p>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className={`grid gap-3 ${LIVE_HUB_TILES.length === 4 ? "sm:grid-cols-2 lg:grid-cols-4" : "sm:grid-cols-3"}`}>
         {LIVE_HUB_TILES.map((h) => {
           const href = hubHref(h, scale);
           const body = (
