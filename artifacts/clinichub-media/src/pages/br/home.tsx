@@ -23,7 +23,8 @@ import { PerformanceOnly } from "@/components/br/performance-only";
 import { GtmBotTeaser } from "@/components/br/gtm-bot-teaser";
 import { StreetTeamProgram } from "@/components/br/street-team";
 import { PartnersTeaser } from "@/components/br/partners";
-import { KitCta } from "@/components/br/kit-cta";
+import { KitCta, intakeHref } from "@/components/br/kit-cta";
+import { logCtaClick } from "@/lib/shareTrack";
 import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BuyCta } from "@/components/br/buy-cta";
@@ -137,11 +138,11 @@ export default function BrHome() {
           </div>
           <div className="order-3 md:order-none md:col-start-1 md:row-start-2 md:self-start">
           <BuyCta placement="hero_home" className="mt-0" onClick={() => trackAttn("hero_cta.buy")} />
-          <div className="mt-4" data-testid="home-kit-cta">
-            <KitCta placement="hero_home" size="md" testId="home-cta-kit" sub={null} onClick={() => trackAttn("hero_cta.kit")} />
-          </div>
           <p className="mt-3 text-[13px] text-foreground/60">
-            or <a href={LOOK_HREF} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-look" onClick={() => trackAttn("hero_cta.look")}>start with a {price.look} 7-day look</a>
+            or <a href="/buy?plan=hold-190&ref=hero_home" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-look" onClick={() => trackAttn("hero_cta.look")}>start with a {price.look} 7-day look</a>
+          </p>
+          <p className="mt-2 text-[13px] text-foreground/60" data-testid="home-kit-cta">
+            Not ready? <a href={intakeHref("hero_home")} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-kit" onClick={() => { logCtaClick("hero_home"); trackAttn("hero_cta.kit"); }}>Get my free Monetization Kit</a>
           </p>
           <div className="mt-4"><WatchHowItWorks placement="hero_home" testId="home-watch-reel" /></div>
           </div>
