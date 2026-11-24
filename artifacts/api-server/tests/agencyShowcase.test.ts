@@ -233,3 +233,17 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.match(home, /data-testid="home-cta-agencies"/);
   assert.match(home, /<BuyCta placement="hero_home"/);
 });
+
+test("Nov 24 1:53 PM (Randy): home partner section says 'Exclusive inventory partners' and 10–25% off list, same as /agencies; no blended effective figure", () => {
+  const tap = read("../clinichub-media/src/components/br/trusted-agency-partners.tsx");
+  const home = read("../clinichub-media/src/pages/br/home.tsx");
+  // Name and numbers come from the /agencies tier data, not a second copy.
+  assert.match(tap, /AGENCY_TIERS\.find\(\(t\) => t\.key === "exclusive"\)/);
+  assert.match(tap, /EXCLUSIVE\.pay/);
+  assert.match(tap, /EXCLUSIVE\.keep/);
+  assert.match(tap, /Exclusive inventory partner/);
+  assert.match(tap, /within 10–25% off list price/);
+  assert.doesNotMatch(tap + home, /Trusted Agency Partner|10–20%|20–30%|Effective/);
+  assert.doesNotMatch(tap, /trusted-agency-partner-badge\.svg/); // the old badge image said "Birch Reserve" on the Scale skin too
+  assert.match(home, /Exclusive inventory partners get 10–25% off list price\./);
+});
