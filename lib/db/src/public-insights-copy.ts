@@ -579,6 +579,60 @@ The $190 look does not burn a seat. It lets you start the card before you lock t
 `,
 } as const;
 
+export const THE_AD_ON_THE_PAGE_ALREADY_OPEN_ARTICLE = {
+  slug: "the-ad-on-the-page-that-is-already-open",
+  title: "The ad on the page that is already open",
+  authorName: "Birch Reserve Editorial",
+  topic: "Closed-hub advertising",
+  summary:
+    "Most advertising asks for attention. A private hub card sits on a page the customer already opened after they booked or bought. What the unit is, and how to look before you reserve.",
+  publishedAt: new Date("2026-11-23T22:00:00.000Z"),
+  body: `# The ad on the page that is already open
+
+Most advertising starts by asking for attention. A banner interrupts something, a feed ad has to beat the next post, and a search ad out-bids every other brand for the same click.
+
+There is another kind of page. It is the one a person is already looking at because they just did something that mattered: they booked a physio visit, bought a recovery product, or opened the plan they follow at home. Nobody had to be pulled there. The page is already open, the person is already paying attention to it, and there is a quiet space below the confirmation. That space is what we sell.
+
+## What the unit is
+
+A private hub is a members-only page that a brand, clinic or retailer gives its own customers. Our hubs run on ScaleHealth.ca, and they are the places a customer lands right after they buy or book. DR-HO'S physio and SOLE are live today.
+
+Your ad is a card on that page. It sits in one of four spots: after a purchase, on the hub home, next to a product or service, or on the member dashboard. A person at Scale Health approves the card before it appears. The click goes to your site, tagged so you can see it in your own analytics.
+
+That is the whole unit. It is a card on a page that was already open, not a stack of websites and not an auction.
+
+## Why a category, not a keyword
+
+Search and social sell you a keyword or an audience, and you compete with everyone else who wants it. On a closed hub the thing you choose is a category: pain relief and topicals, recovery hardware, nutrition, sleep, meal prep, women's health, men's health, or diagnostics and services.
+
+Choosing a category does two useful things. It tells us which pages fit you, because a sleep brand and a recovery-hardware brand belong next to different moments. And it keeps the page calm, because the hub carries a small number of cards chosen by hand, not whatever bids highest that second.
+
+Self-serve reserves are shared. More than one brand can hold a reserve in a category while the network is curated hub by hub. If you want one brand per category, there is a separate exclusive reserve, and the terms for it are written out on its own page. Premium slots are inquire-only.
+
+## Look first, then reserve
+
+You do not have to commit to a reserve to see the unit. The 7-day look is $190 USD ($270 CAD). During those seven days we send you a custom mock of your card on a hub surface, built from your own square still. It is a preview, labelled as an illustration. Nothing runs on a live hub during the look, and the look does not take a category.
+
+If you then move to the reserve within the seven days, the whole $190 carries over. If you do not, it is refunded.
+
+The reserve is $490 USD ($690 CAD). All of it is media credit, and credit stays usable for twelve months. It is fully refundable until 14 days before the launch date on your insertion order. The insertion order is a short document that names the hub, the surface, the format, the category and the dates. Nothing runs until you approve it, and if no approved surface is named within 60 days of payment you get a cash refund.
+
+## What we do not promise
+
+We do not guarantee impressions, clicks or results. Reach and audience figures on our site describe audiences, not delivered views, and any view figure on a planning page is a modelled estimate that we label as one. Reporting is aggregate only, with no health information and no clinical pixels. Where we cite a public benchmark, we name the source and say it is not a Scale Health result.
+
+We would rather you pay a small amount to see the unit, and decide on evidence, than buy a large number we cannot stand behind.
+
+## What to do next
+
+If your category is on the list, the quickest way to judge this is to look at the unit on a live hub, then start the $190 USD look. If you would rather reserve space right away, the reserve is $490 USD and the insertion order will name the hub before anything runs.
+
+We are also building more: a Street Team for on-site sampling, new hub categories, and a private clinic network. Nothing in this post is a promise of results.
+
+Examples on this page are illustrative. Prices are shown in USD with CAD in brackets. Reach figures, where shown on the site, are based on signed partnership contracts and are not a guarantee of views, clicks or results.
+`,
+} as const;
+
 /**
  * Published insights. Randy, Nov 12 2026: the short near-duplicate posts ("The $490 is the
  * stamp", "the square ... already opened") read as filler. They are folded into
@@ -589,6 +643,7 @@ export const PUBLIC_INSIGHT_ARTICLES = [
   SCALE_HUBS_ARTICLE,
   SHELF_AFTER_RECEIPT_ARTICLE,
   WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE,
+  THE_AD_ON_THE_PAGE_ALREADY_OPEN_ARTICLE,
 ] as const;
 
 /** Where a folded insight slug now points. */
