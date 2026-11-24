@@ -110,7 +110,7 @@ export default function BrHome() {
         }}
       />
 
-      <style>{`@media (max-width: 767px){html.br-hero-in-view .birch-dock-squirrel,html.br-hero-in-view elevenlabs-convai{visibility:hidden!important;pointer-events:none!important}html.br-hero-in-view [data-testid=sticky-kit-cta]{display:none!important}}`}</style>
+      <style>{`@media (max-width: 767px){html.br-hero-in-view .birch-dock-squirrel{visibility:hidden!important;pointer-events:none!important}html.br-hero-in-view [data-testid=sticky-kit-cta]{display:none!important}}`}</style>
       {/* 1. Hero: one line + the kit CTA. */}
       <section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]" data-testid="home-hero">
         {/* Mobile first screen (Randy, Nov 21 2:26 PM): one slim line of real recent activity above the headline. In flow, never over the preview card. */}

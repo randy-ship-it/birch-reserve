@@ -36,7 +36,7 @@ export function birchCanonicalFacts(): string {
     `- Reserve: $${seat.spendUsd} USD. Reserves a share of display space across the network. 100% media credit until the insertion order (IO). Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before the launch date on the IO; after that not refundable but usable for 12 months. Cash refund also if no approved surface is named within 60 days.`,
     `- Modelled estimate only: at about $${MEDIA_KIT_CPM.lo} to $${MEDIA_KIT_CPM.hi} CPM, $${seat.spendUsd} of credit is roughly ${millions(seatEx.imprLo)} to ${millions(seatEx.imprHi)} impressions. Always say it is a modelled estimate, never a guarantee.`,
     "- How to buy (walk them through it): open https://birchreserve.net/buycalc, pick the $490 reserve or the $190 look, add brand name and work email, tick the terms box, then pay on the secure Stripe checkout. Prices are in USD.",
-    "- Not ready, want something custom, or want to talk first: the Ask about a placement form at https://birchreserve.net/buycalc#request (brand, email, what they sell). No card needed. The team gets it instantly.",
+    "- Not ready, or want something custom: the Ask about a placement form at https://birchreserve.net/buycalc#request (brand, email, what they sell). No card needed. The team gets it instantly.",
     "",
     `PREMIUM ($${SELF_SERVE_LIMIT_USD.toLocaleString("en-US")} and up)`,
     `- Premium slots: $${premium.spendLo.toLocaleString("en-US")} to $${premium.spendHi.toLocaleString("en-US")} USD. Inquire only, never a card purchase. Exclusivity, a larger display share and priority placement. Term and scope are set on the IO. Price is set on the IO.`,

@@ -37,7 +37,6 @@ export function analyticsConfigured(): boolean {
 export function initAnalytics(): void {
   if (initialized || typeof window === "undefined" || typeof document === "undefined") return;
   initialized = true;
-  if (analyticsConfigured()) listenForCallClicks();
   const w = window as AnalyticsWindow;
   if (PLAUSIBLE_DOMAIN) {
     w.plausible =
@@ -66,20 +65,6 @@ export function initAnalytics(): void {
     s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(GA4_ID)}`;
     document.head.appendChild(s);
   }
-}
-
-/** call_click for every tel: link on the site (chat, hero, kit, concierge), one listener. */
-function listenForCallClicks(): void {
-  document.addEventListener(
-    "click",
-    (e) => {
-      const a = (e.target as Element | null)?.closest?.('a[href^="tel:"]');
-      if (!a) return;
-      const where = a.closest("[data-testid]")?.getAttribute("data-testid") ?? "page";
-      track("call_click", { where: where.slice(0, 60), path: window.location.pathname.slice(0, 100) });
-    },
-    { capture: true },
-  );
 }
 
 /** Fire-and-forget event. Silent no-op without config; never throws. */

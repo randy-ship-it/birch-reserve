@@ -2435,9 +2435,9 @@ ${sampleIoCheckoutHtml()}
 <p class="fine" id="checkout-note">${checkoutLive ? "Secure card checkout by Stripe. Payment counts once Stripe confirms it." : "Card checkout is not open yet. Submitting saves your seat request and alerts our sales team. No card is charged."}</p>
 <p class="fine" id="inquire-note" hidden>${PREMIUM_INQUIRY_MESSAGE}</p>
 <p id="message" role="status" aria-live="polite"></p>
-<noscript><p class="fine">This form needs JavaScript. To reserve without it, <a href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20seat">email randy@scalehealth.ca</a> or call <a href="tel:+16479316278">(647) 931-6278</a>.</p></noscript>
+<noscript><p class="fine">This form needs JavaScript. To reserve without it, <a href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20seat">email randy@scalehealth.ca</a>.</p></noscript>
 </form>
-<aside class="talk"><h3>Rather talk first?</h3><p>We'll walk you through the hubs, placements and the brief.</p><a class="btn" href="tel:+16479316278">Call (647) 931-6278</a><a class="btn line" href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20seat">randy@scalehealth.ca</a><a class="btn line" href="/media-kit">See the media kit</a></aside>
+<aside class="talk"><h3>Rather read first?</h3><p>See the hubs, placements and the brief in the media kit.</p><a class="btn line" href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20seat">randy@scalehealth.ca</a><a class="btn line" href="/media-kit">See the media kit</a></aside>
 </div></div></section>
 ${buyerFaqHtml(price(look), price(seat))}
 
@@ -2452,10 +2452,10 @@ ${buyerFaqHtml(price(look), price(seat))}
 <button id="r-submit" class="btn" type="submit">Send request</button>
 <p id="r-message" role="status" aria-live="polite"></p>
 </form>
-<aside class="talk"><h3>Talk to us</h3><p>We reply within 1 business day.</p><a class="btn" href="tel:+16479316278">Call (647) 931-6278</a><a class="btn line" href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20placement%20request">randy@scalehealth.ca</a></aside>
+<aside class="talk"><h3>Questions?</h3><p>We reply by email within 1 business day.</p><a class="btn line" href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20placement%20request">randy@scalehealth.ca</a></aside>
 </div></div></section>
 </main>
-<footer><div class="wrap"><p>Media credit until IO · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only</p><p>Silver Birch Growth Inc. · Toronto, Ontario · <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a> · <a href="tel:+16479316278">(647) 931-6278</a></p><p>Machine-readable catalog: <a href="/v1/catalog.json">/v1/catalog.json</a> · <a href="/v1/quote?sku=reserve-490&amp;format=post_checkout&amp;days=30">/v1/quote</a> · <a href="/llms.txt">/llms.txt</a></p></div></footer>
+<footer><div class="wrap"><p>Media credit until IO · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only</p><p>Silver Birch Growth Inc. · Toronto, Ontario · <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a> </p><p>Machine-readable catalog: <a href="/v1/catalog.json">/v1/catalog.json</a> · <a href="/v1/quote?sku=reserve-490&amp;format=post_checkout&amp;days=30">/v1/quote</a> · <a href="/llms.txt">/llms.txt</a></p></div></footer>
 <script>
 (function(){var form=document.getElementById("reserve"),message=document.getElementById("message"),submit=document.getElementById("submit"),idempotencyKey=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2),currency=${JSON.stringify(currency)},live=${checkoutLive ? "true" : "false"},labels=${JSON.stringify(Object.fromEntries(PUBLIC_RESERVE_OFFERS.map((offer) => [offer.sku, price(offer)])))},premiumFormats=${JSON.stringify(PREMIUM_INQUIRE_ONLY.formats)},inquiryKind=${JSON.stringify(PREMIUM_INQUIRY_KIND)};
 function premium(){return premiumFormats.indexOf(form.elements.format_pref.value)>=0}

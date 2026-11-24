@@ -55,8 +55,6 @@ export function trackSite(event: string, extra: Extra = {}): void {
 /** Named buttons Randy asked to see; anything else is "other" with its test id as the label. */
 export function clickName(el: Element, label: string, href: string, text: string): string {
   const t = `${label} ${text}`.toLowerCase();
-  if (el.closest("elevenlabs-convai") || /hear randy|start a call|start talking|randy_handoff_ai_call/.test(t)) return "call_voice";
-  if (href.startsWith("tel:") || /tap_to_call|panel_call|header_call|call_back|call randy/.test(t)) return "call_phone";
   if (/squirrel_launcher|button_open_randy_chat|randy_teaser|randy_figure_launcher|open the |ask about .* seats/.test(t)) return "chat_open";
   if (/\.pdf(\?|#|$)/i.test(href) || /_pdf|download/.test(t)) return "pdf_download";
   if (/get my (free )?kit|kit_cta|sticky_kit/.test(t)) return "get_my_kit";
@@ -80,15 +78,9 @@ function area(el: Element): string {
 
 function onClick(e: MouseEvent): void {
   const cp = e.composedPath?.() ?? [];
-  // The voice widget renders in a shadow root: count any click inside it as the call button.
-  if (cp.some((n) => (n as Element).localName === "elevenlabs-convai")) {
-    const inner = cp[0] as Element | undefined;
-    if (inner?.closest?.("button,[role=button],a")) trackSite("click.call_voice", { label: slug(inner.closest("button,[role=button],a")?.getAttribute("aria-label") || "elevenlabs"), area: "widget" });
-    return;
-  }
   const path0 = (cp[0] ?? e.target) as Element | null;
   const target = e.target as Element | null;
-  const el = (path0?.closest?.("a,button,[role=button],summary,[data-testid]") ?? target?.closest?.("a,button,[role=button],summary,elevenlabs-convai")) as Element | null;
+  const el = (path0?.closest?.("a,button,[role=button],summary,[data-testid]") ?? target?.closest?.("a,button,[role=button],summary")) as Element | null;
   if (!el) return;
   const tid = el.closest("[data-testid]")?.getAttribute("data-testid") ?? "";
   const aria = el.getAttribute("aria-label") ?? "";
@@ -96,7 +88,7 @@ function onClick(e: MouseEvent): void {
   const text = el.querySelector("input,textarea,select") ? "" : (el.textContent || "").trim().slice(0, 48);
   const href = el.getAttribute("href") ?? "";
   const name = clickName(el, `${tid} ${aria}`.replace(/-/g, "_"), href, text);
-  const label = slug(tid || aria.slice(0, 40) || (el.tagName === "ELEVENLABS-CONVAI" ? "elevenlabs" : text) || el.tagName);
+  const label = slug(tid || aria.slice(0, 40) || text || el.tagName);
   trackSite(`click.${name}`, { label, area: area(el) });
 }
 

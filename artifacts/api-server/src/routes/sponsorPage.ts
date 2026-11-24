@@ -252,7 +252,7 @@ ${statsStrip()}
 <ul>
 <li>Sponsorship credit: ${DEPOSIT_TIERS.map((t) => `${money(currency === "cad" ? t.cad : t.usd, currency)} (+${t.bonusPct}% credit)`).join(" · ")} or your own amount. <a href="/sponsor">Sponsor</a></li>
 <li>${priceLadder(currency).map((s) => `${s.name}: ${s.price}`).join(" · ")} (the exclusive reserve locks a $5K–$50K ${currency.toUpperCase()} package; the shared reserve does not lock the category). <a href="/buycalc">Calculator</a> · <a href="/exclusive">Exclusive</a></li>
-<li>Multi-hub or annual programs: book a call at <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a></li>
+<li>Multi-hub or annual programs: reserve or ask at <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a></li>
 </ul>
 <h2>What to send</h2>
 <ul><li>Square still (primary creative) and optional 15-second silent motion</li><li>Destination URL and one brand category</li><li>Contact email for creative and insertion-order follow-up</li></ul>

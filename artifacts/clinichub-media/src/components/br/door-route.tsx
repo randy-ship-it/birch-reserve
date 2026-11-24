@@ -1,7 +1,6 @@
 /** Street-team door section. Copy and census figures: api-server/src/lib/doorRoute.ts. */
 import { ArrowRight } from "lucide-react";
 import { DOOR_DETAIL_ROWS, DOOR_HEADLINE, DOOR_ROUTE } from "../../../../api-server/src/lib/doorRoute";
-import { SALES_PHONE_DISPLAY, SALES_PHONE_HREF } from "../../../../api-server/src/lib/buyerComfort";
 
 export function DoorRoute({ requestHref = "#request", testId = "door-route", large = false }: { requestHref?: string; testId?: string; large?: boolean }) {
   const d = DOOR_ROUTE;
@@ -21,9 +20,6 @@ export function DoorRoute({ requestHref = "#request", testId = "door-route", lar
         <div className="mt-7 flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-start">
           <a href={requestHref} className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap bg-[#C8F55A] px-6 text-sm font-semibold text-[#071A39] transition-colors hover:bg-background" data-testid="door-inquire">
             {d.inquire} <ArrowRight className="size-4" aria-hidden />
-          </a>
-          <a href={SALES_PHONE_HREF} className="inline-flex h-12 items-center justify-center whitespace-nowrap border border-background/40 px-6 text-sm font-semibold transition-colors hover:border-background" data-testid="door-call">
-            Request a call back · {SALES_PHONE_DISPLAY}
           </a>
         </div>
         <p className="mt-3 text-xs text-background/60">{d.inquireNote}</p>

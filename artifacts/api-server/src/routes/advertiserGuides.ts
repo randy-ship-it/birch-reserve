@@ -61,7 +61,7 @@ ${path === GUIDES_INDEX_PATH ? "" : `<link rel="alternate" type="text/markdown" 
 </head><body>
 <header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav class="tn" aria-label="Advertiser guides"><a href="${GUIDES_INDEX_PATH}">Guides</a><a href="/blog">Blog</a><a href="/media-kit">Media kit</a><a href="/exclusive">Reserve</a></nav></div></header>
 <main class="wrap">${body}</main>
-<footer><div class="wrap">Silver Birch Growth Inc. · Toronto, Ontario · <a href="tel:+16479316278">(647) 931-6278</a> · <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a><br><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="${GUIDES_INDEX_PATH}">All advertiser guides</a></div></footer>
+<footer><div class="wrap">Silver Birch Growth Inc. · Toronto, Ontario · <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a><br><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="${GUIDES_INDEX_PATH}">All advertiser guides</a></div></footer>
 ${sticky}${CTA_TRACK}${aiRefBeaconScript()}
 </body></html>`;
 }

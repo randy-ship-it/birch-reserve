@@ -5,7 +5,6 @@ import birchReserveMark from '@assets/brand/birch-reserve-mark-v2.svg';
 import { MEDIA_KIT_ONE_PAGER_HREF, SELLER_EMAIL_HREF, SELLER_IDENTITY } from '@/lib/seller-identity';
 import { OperatorLine, PrivacyNote, SalesContact } from '@/components/br/trust';
 import { RandyChat } from '@/components/randy-chat';
-import { HearRandyElevenLabs } from '@/components/hear-randy-elevenlabs';
 import { LingerCapture } from '@/components/linger-capture';
 import { CurrencyToggle } from '@/components/currency-toggle';
 import { CurrencyText } from '@/components/currency-text';
@@ -98,7 +97,6 @@ export function Layout({ children }: { children: ReactNode }) {
         <ScaleFooter />
         <div className="print:hidden">
           <RandyChat />
-          <HearRandyElevenLabs />
           <LingerCapture />
         </div>
         <StickyKitCta path={location} />
@@ -142,7 +140,6 @@ export function Layout({ children }: { children: ReactNode }) {
               <a key={l.href} href={l.href} className="hover:text-foreground/70 transition-colors">{l.label}</a>
             ))}
             <span className="hidden xl:inline-flex"><CurrencyToggle className="[&_button]:min-h-8 [&_button]:min-w-9" /></span>
-            <a href="tel:+16479316278" className="hidden xl:inline font-medium whitespace-nowrap underline-offset-2 hover:underline" data-testid="header-call-birch">(647) 931-6278</a>
             <KitCta placement="nav" size="sm" sub={null} testId="nav-kit-cta" />
           </nav>
 
@@ -185,7 +182,6 @@ export function Layout({ children }: { children: ReactNode }) {
               {NAV_LINKS.map((l) => (
                 <a key={l.href} href={l.href} onClick={() => setMobileMenuOpen(false)} className="border-b border-border/60 py-3 font-medium">{l.label}</a>
               ))}
-              <a href="tel:+16479316278" className="py-3 font-medium">Call Birch: (647) 931-6278</a>
             </div>
           </div>
         )}
@@ -209,10 +205,6 @@ export function Layout({ children }: { children: ReactNode }) {
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
               Display space across private health and wellness hubs. Your payment is media credit until an insertion order.
-            </p>
-            <p className="mb-4 text-sm">
-              <a href="tel:+16479316278" className="font-semibold text-foreground underline decoration-accent decoration-2 underline-offset-4 hover:decoration-foreground" data-testid="footer-call-birch">Call Birch: (647) 931-6278</a>
-              <span className="mt-1 block text-[11px] text-muted-foreground">Call our sales line.</span>
             </p>
             <div className="mb-4">
               <SalesContact />
@@ -247,10 +239,9 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
       </footer>
 
-      {/* Chat Randy (bottom-right); Hear Randy ElevenLabs ConvAI (bottom-left) */}
+      {/* Chat (bottom-right). No call widget (Randy, Nov 23 2026). */}
       <div className="print:hidden">
         <RandyChat />
-        <HearRandyElevenLabs />
         <LingerCapture />
       </div>
       <StickyKitCta path={location} />

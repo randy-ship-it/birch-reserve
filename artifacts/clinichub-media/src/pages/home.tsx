@@ -1,4 +1,3 @@
-import { RANDY_TEL_DISPLAY, RANDY_TEL_HREF, TAP_TO_CALL_HREF, TAP_TO_CALL_LABEL } from "@/lib/randy-chat-knowledge";
 import { useCurrency, usePriceText, priceLabel } from "@/lib/currency";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,6 @@ import {
   MonitorUp,
   Lock,
   MapPin,
-  Phone,
   ReceiptText,
   ShieldCheck,
   Zap,
@@ -26,7 +24,7 @@ import {
   type ReserveOfferKey,
 } from "@/lib/reserve-offers";
 import { trackCta, trackReserveDialogOpen, type CtaEvent } from "@/lib/track-cta";
-import { BOOK_CALL_LABEL, BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
+import { BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
 import { fetchCheckoutEnabled } from "@/lib/checkout-status";
 import { HubWalkthroughVideo } from "@/components/hub-walkthrough-video";
 import { ExampleHubsGallery } from "@/components/example-hubs-gallery";
@@ -198,14 +196,6 @@ export default function Home() {
     void fetchCheckoutEnabled();
   }, []);
 
-  const VOICE_TEL_HREF = RANDY_TEL_HREF;
-  const VOICE_TEL_DISPLAY = RANDY_TEL_DISPLAY;
-
-  const callBack = () => {
-    trackCta("cta_book_call");
-    window.location.href = VOICE_TEL_HREF;
-  };
-
 
   const handleDialogChange = (open: boolean) => {
     setSplashDialogOpen(open);
@@ -238,15 +228,6 @@ export default function Home() {
           className="fixed inset-x-0 bottom-0 z-40 border-t border-foreground/10 bg-background/95 p-3 backdrop-blur-md md:hidden"
           data-testid="mobile-sticky-reserve-cta"
         >
-          <a
-            href={TAP_TO_CALL_HREF}
-            className="mb-2 flex h-11 w-full items-center justify-center border border-foreground/15 font-medium text-foreground"
-            data-testid="link-mobile-tap-to-call"
-            onClick={() => trackCta("cta_book_call")}
-          >
-            <Phone className="mr-2 size-4" aria-hidden />
-            {TAP_TO_CALL_LABEL}
-          </a>
           <a
             href={RESERVE_LIST_HREF}
             className="flex h-12 w-full items-center justify-center bg-accent font-semibold text-accent-foreground transition-colors hover:bg-foreground hover:text-background"
@@ -314,31 +295,6 @@ export default function Home() {
                 data-testid="button-hero-reserve"
               >
                 Reserve a placement — {reservePriceLabel}
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background h-14 px-8 font-medium hover:bg-background/10 transition-colors"
-                onClick={callBack}
-                data-testid="button-hero-call-back"
-              >
-                <Phone className="mr-2 size-4" aria-hidden />
-                Get a call back
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background h-14 px-8 font-medium hover:bg-background/10 transition-colors"
-              >
-                <a
-                  href={TAP_TO_CALL_HREF}
-                  data-testid="link-hero-tap-to-call"
-                  onClick={() => trackCta("cta_book_call")}
-                >
-                  <Phone className="mr-2 size-4" aria-hidden />
-                  {TAP_TO_CALL_LABEL}
-                </a>
               </Button>
             </motion.div>
             <p className="mt-3 text-sm text-background/80">
@@ -530,23 +486,10 @@ export default function Home() {
               <Button
                 type="button"
                 className="h-11 rounded-none bg-accent text-accent-foreground hover:bg-foreground hover:text-background"
-                onClick={() => {
-                  trackCta("cta_book_call");
-                  openRandyChat({ reason: "book-a-call" });
-                }}
-                data-testid="button-enterprise-book-call"
+                onClick={() => { window.location.assign("/buycalc#request"); }}
+                data-testid="button-enterprise-buy-ads"
               >
-                {BOOK_CALL_LABEL}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="h-11 rounded-none"
-                onClick={callBack}
-                data-testid="button-enterprise-call-back"
-              >
-                <Phone className="mr-2 size-4" aria-hidden />
-                Call {VOICE_TEL_DISPLAY}
+                Buy ads now
               </Button>
               <a
                 href={BOOK_CALL_MAILTO_HREF}
@@ -642,13 +585,11 @@ export default function Home() {
               </p>
               <div className="flex flex-wrap gap-2">
                 <a
-                  href={VOICE_TEL_HREF}
-                  onClick={() => trackCta("cta_book_call")}
+                  href="/buycalc#request"
                   className="inline-flex items-center gap-1.5 border border-accent/40 px-3 py-1 text-[10px] uppercase tracking-widest text-accent bg-background/5"
-                  data-testid="link-onprem-call"
+                  data-testid="link-onprem-request"
                 >
-                  <Phone className="size-3" aria-hidden />
-                  Call {VOICE_TEL_DISPLAY}
+                  Request on-prem placement
                 </a>
               </div>
             </article>
@@ -1083,27 +1024,6 @@ export default function Home() {
                 data-testid="button-final-splash-access"
               >
                 Reserve a placement — {reservePriceLabel}
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background h-14 px-8 font-medium hover:bg-background/10 transition-colors"
-                onClick={callBack}
-                data-testid="button-final-call-back"
-              >
-                <Phone className="mr-2 size-4" aria-hidden />
-                Get a call back
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="w-full sm:w-auto rounded-none border-background/20 bg-transparent text-background h-14 px-8 font-medium hover:bg-background/10 transition-colors"
-              >
-                <a href={TAP_TO_CALL_HREF} data-testid="link-final-tap-to-call" onClick={() => trackCta("cta_book_call")}>
-                  <Phone className="mr-2 size-4" aria-hidden />
-                  {TAP_TO_CALL_LABEL}
-                </a>
               </Button>
             </div>
           </div>
