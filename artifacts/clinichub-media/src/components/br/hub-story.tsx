@@ -3,6 +3,7 @@
  * one hub ladder (api-server/src/lib/hubLadder.ts) and the existing proof content; no new figures, no new claims.
  *   OwnTheMoment  the card sits on the page already open, right after the booking or purchase (example mocks on two Live hubs)
  *   FourSteps     look or reserve -> mock on a live hub -> sign the insertion order -> flight runs, aggregate report
+ *                 Step 4 says clicks arrive UTM-tagged (engine.ts sets utm_source/medium/campaign/content on the click redirect), so buyers can check them in their own analytics.
  *   SeeTheProof   Measured / Estimate / Illustrative / Internal testing, each linked to what already exists
  * Words are skin-neutral, so the Scale mirror speaks as Scale Health with the same blocks.
  */
@@ -47,7 +48,7 @@ export function FourSteps({ look, seat, testId = "four-steps" }: { look: string;
     { n: "1", title: `${look} look or ${seat} reserve`, line: "Media credit, not a fee. The look converts to a reserve or is refunded.", href: LOOK_HREF },
     { n: "2", title: "See the mock on a live hub", line: "Your card on any hub, shown as an example mockup.", href: RESERVE_HREF },
     { n: "3", title: "Sign the insertion order (IO)", line: "It names the hub, surface, category and dates. Nothing runs until the IO is signed and approved.", href: undefined },
-    { n: "4", title: "The flight runs, you get the report", line: "Aggregate report only. First measured reports coming soon.", href: undefined },
+    { n: "4", title: "The flight runs, you get the report", line: "Aggregate report only. Clicks arrive UTM-tagged, so you can check them in your own analytics. First measured reports coming soon.", href: undefined },
   ];
   return (
     <div data-testid={testId}>
