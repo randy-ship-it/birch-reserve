@@ -142,6 +142,9 @@ export default function BrHome() {
           <p className="mt-3 text-[13px] text-foreground/60">
             or <a href="/buy?plan=hold-190&ref=hero_home" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-look" onClick={() => trackAttn("hero_cta.look")}>start with a {price.look} 7-day look</a>
           </p>
+          <p className="mt-2 text-[13px] text-foreground/60" data-testid="home-hero-agencies">
+            Buying for clients? <a href="/agencies?ref=hero_home" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-agencies" onClick={() => trackAttn("hero_cta.agencies")}>For agencies: keep 10% of spend</a>
+          </p>
           <p className="mt-2 text-[13px] text-foreground/60" data-testid="home-kit-cta">
             Not ready? <a href={intakeHref("hero_home")} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-kit" onClick={() => { logCtaClick("hero_home"); trackAttn("hero_cta.kit"); }}>Get my free Monetization Kit</a>
           </p>
@@ -166,6 +169,14 @@ export default function BrHome() {
             <a href="/buy?plan=reserve-490&ref=home_strip" data-testid="home-strip-reserve-cta" onClick={() => trackAttn("strip.reserve")} className="mt-3 inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-white hover:text-[#0b1f3a]">Reserve · {price.seat} <ArrowRight className="size-4" aria-hidden /></a>
           </div>
         </div>
+        {/* Agencies get their own door (Randy, Nov 24 2026 12:57 PM ET, t543u): a clear secondary next to the two prices. */}
+        <a href="/agencies?ref=home_strip" data-testid="home-strip-agencies" onClick={() => trackAttn("strip.agencies")} className="group mt-3 flex flex-col gap-2 rounded-2xl border-2 border-[#0b1f3a] bg-white p-4 shadow-sm transition-colors hover:bg-[#0b1f3a] sm:flex-row sm:items-center sm:justify-between">
+          <span className="min-w-0">
+            <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55 group-hover:text-lime-300">For agencies &amp; brokers</span>
+            <span className="mt-0.5 block font-display text-xl leading-tight text-[#0b1f3a] group-hover:text-white md:text-2xl">Pay list price, keep 10% of spend. Exclusive partners buy below list.</span>
+          </span>
+          <span className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 self-start rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white group-hover:bg-lime-300 group-hover:text-[#0b1f3a] sm:self-auto">See agency tiers <ArrowRight className="size-4" aria-hidden /></span>
+        </a>
         <p className="mt-2 text-[12px] text-foreground/60">Prices in USD unless shown. Want a category to yourself? <a href="/exclusive?ref=home_strip" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-strip-exclusive">See the exclusive reserve</a>.</p>
       </section>
       {/* Light continuous category strip under the hero (Randy Nov 21 10:20 AM). */}

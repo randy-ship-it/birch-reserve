@@ -7,9 +7,17 @@ import type { ReactNode } from "react";
 import { Cta } from "./ui";
 import { InquireBadge } from "./quick-buy";
 import { priceFor, useCurrency } from "@/lib/currency";
+import { ChevronDown } from "lucide-react";
+import { skinText } from "@/lib/siteSkin";
+import { priceLadder } from "../../../../api-server/src/lib/priceLadder";
+import { TRACK_RECORD } from "../../../../api-server/src/lib/overhaul/trackRecord";
 import {
+  AGENCY_CLIENT_TEST,
   AGENCY_EXAMPLES,
   AGENCY_SHARE,
+  AGENCY_TIERS,
+  EXCLUSIVE_PARTNER_PERKS,
+  type AgencyTierKey,
   BRAND_BONUS_LINE,
   BUY_PATHS,
   GOAL_PLAN,
@@ -417,5 +425,139 @@ export function BuyPaths({ reserveHref, lookHref, ioHref = "#talk" }: { reserveH
         );
       })}
     </div>
+  );
+}
+
+/**
+ * Inventory canister (Randy, Nov 24 2026 12:57 PM ET, t543u): one tank of hub inventory, three outlets for the three
+ * buyer types. Pure CSS grid (no image), so each band lines up with its outlet at any width. List price = the live ladder.
+ */
+const TIER_STYLE: Record<AgencyTierKey, { band: string; card: string; dot: string }> = {
+  direct: { band: "bg-[#e7ecf3]", card: "border-[#0b1f3a]/20 bg-white", dot: "bg-[#0b1f3a]/40" },
+  agency: { band: "bg-[#0b1f3a]", card: "border-[#0b1f3a] bg-white", dot: "bg-[#0b1f3a]" },
+  exclusive: { band: "bg-lime-300", card: "border-[#0b1f3a] bg-lime-100", dot: "bg-lime-500" },
+};
+
+export const LIST_PRICE_HREF = "/media-kit#start-small";
+
+export function ListPriceLine({ className = "" }: { className?: string }) {
+  const steps = priceLadder("usd");
+  const short: Record<string, string> = { "hold-190": "7-day look", "reserve-490": "reserve", exclusive: "exclusive reserve" };
+  return (
+    <div className={`flex flex-wrap items-center justify-center gap-1.5 text-[13px] text-foreground/70 ${className}`} data-testid="agency-list-price">
+      <b className="mr-1 text-[#0b1f3a]">List price =</b>
+      {steps.map((s) => (
+        <span key={s.key} className="rounded-full border border-[#0b1f3a]/20 bg-white px-2.5 py-1"><b className="text-[#0b1f3a]">{s.price}</b> {short[s.key] ?? s.name}</span>
+      ))}
+      <a href={LIST_PRICE_HREF} className="ml-1 font-semibold text-[#0b1f3a] underline underline-offset-2">See the ladder</a>
+    </div>
+  );
+}
+
+export function InventoryCanister() {
+  const n = AGENCY_TIERS.length;
+  return (
+    <figure className="mx-auto w-full max-w-3xl" data-testid="agency-canister" aria-label="One tank of hub inventory with three outlets: direct brands, agencies and exclusive inventory partners">
+      <div className="grid grid-cols-[4.25rem_1.25rem_minmax(0,1fr)] md:grid-cols-[8.5rem_3.5rem_minmax(0,1fr)]">
+        {/* Lid + label */}
+        <div className="col-start-1 flex flex-col items-center">
+          <span className="mb-1 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.14em] text-[#0b1f3a]/70 md:text-[11px]">Hub inventory</span>
+          <span className="block h-4 w-full rounded-[50%] border-2 border-[#0b1f3a] bg-white md:h-6" aria-hidden />
+        </div>
+        <span className="col-span-2" aria-hidden />
+        {AGENCY_TIERS.map((t, i) => {
+          const st = TIER_STYLE[t.key];
+          const last = i === n - 1;
+          return (
+            <div key={t.key} className="contents" data-testid={`canister-${t.key}`}>
+              <div className={`col-start-1 -mt-2 flex items-center justify-center border-x-2 border-[#0b1f3a] pt-2 md:-mt-3 md:pt-3 ${st.band} ${last ? "rounded-b-[1.75rem] border-b-2 md:rounded-b-[3rem]" : "border-b border-b-[#0b1f3a]/25"}`}>
+                <span className={`font-display text-2xl md:text-4xl ${t.key === "agency" ? "text-white" : "text-[#0b1f3a]"}`}>{i + 1}</span>
+              </div>
+              <div className="relative flex items-center" aria-hidden>
+                <span className="block h-[3px] w-full bg-[#0b1f3a]" />
+                <span className={`absolute right-0 size-2.5 rounded-full md:size-3 ${st.dot} ring-2 ring-white`} />
+              </div>
+              <div className={`my-1.5 rounded-xl border-2 p-3 md:my-2 md:p-4 ${st.card}`}>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <p className="font-display text-lg leading-tight text-[#0b1f3a] md:text-2xl">{t.name}</p>
+                  {t.badge ? <span className="rounded-full bg-[#0b1f3a] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-lime-300">{t.badge}</span> : null}
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1.5 text-[12px] md:text-[13px]">
+                  <span className="rounded-full border border-[#0b1f3a]/25 bg-white px-2.5 py-1 font-semibold text-[#0b1f3a]">Pay: {t.pay.charAt(0).toLowerCase() + t.pay.slice(1)}{t.key === "exclusive" ? "*" : ""}</span>
+                  {t.key === "direct" ? null : <span className="rounded-full bg-[#0b1f3a] px-2.5 py-1 font-semibold text-white">Keep: {t.keep}</span>}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <figcaption className="mt-3"><ListPriceLine /></figcaption>
+    </figure>
+  );
+}
+
+/** Three tier cards under the canister. Brands + agencies go to the existing checkout; exclusive partners send a bid. */
+export function AgencyTierCards({ reserveHref, buyHref, bidHref = "#talk", ioHref = "#talk" }: { reserveHref: string; buyHref: string; bidHref?: string; ioHref?: string }) {
+  const io = `$${AGENCY_CLIENT_TEST.lo / 1000}K–$${AGENCY_CLIENT_TEST.hi / 1000}K USD`;
+  return (
+    <div className="grid gap-4 md:grid-cols-3" data-testid="agency-tier-cards">
+      {AGENCY_TIERS.map((t, i) => {
+        const st = TIER_STYLE[t.key];
+        return (
+          <article key={t.key} data-testid={`tier-${t.key}`} className={`flex flex-col rounded-2xl border-2 p-5 ${st.card}`}>
+            <div className="flex items-center justify-between gap-2">
+              <Kicker>{`Tier ${i + 1}`}</Kicker>
+              {t.badge ? <span className="rounded-full bg-[#0b1f3a] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-lime-300">{t.badge}</span> : null}
+            </div>
+            <h3 className="mt-1 font-display text-2xl leading-tight text-[#0b1f3a]">{t.name}</h3>
+            <p className="mt-1 text-sm text-foreground/70">{t.who}</p>
+            <dl className="mt-4 divide-y divide-[#0b1f3a]/10 border-y border-[#0b1f3a]/10 text-sm">
+              <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2 py-2"><dt className="text-foreground/60">You pay</dt><dd className="font-semibold text-[#0b1f3a]">{t.pay}</dd></div>
+              <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2 py-2"><dt className="text-foreground/60">You keep</dt><dd className="font-semibold text-[#0b1f3a]">{t.keep}</dd></div>
+            </dl>
+            <div className="mt-5 flex flex-col gap-2 md:mt-auto md:pt-5">
+              {t.key === "direct" ? (
+                <Cta href={buyHref} variant="line" testId="tier-direct-cta" className="w-full">Buy ads now</Cta>
+              ) : t.key === "agency" ? (
+                <>
+                  <Cta href={reserveHref} variant="ink" testId="tier-agency-cta" className="w-full">Reserve for a client · $490 USD</Cta>
+                  <a href={ioHref} data-testid="tier-agency-io" className="text-center text-[13px] font-semibold text-[#0b1f3a] underline underline-offset-2">or a {io} client test on an insertion order (IO)</a>
+                </>
+              ) : (
+                <Cta href={bidHref} variant="ink" testId="tier-exclusive-cta" className="w-full">Send a bid or interest</Cta>
+              )}
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  );
+}
+
+/** "What exclusive partners get" (Randy's footnote), with the nameless partner-launch example from the track record. */
+export function ExclusivePerks() {
+  const ex = TRACK_RECORD.cards.find((c) => c.key === "partner-launch")!;
+  const how = ex.detail.split(", with the prospect")[0] + ".";
+  return (
+    <details className="group rounded-2xl border-2 border-[#0b1f3a] bg-white" data-testid="exclusive-perks" id="exclusive-partners">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-semibold text-[#0b1f3a] md:px-5 [&::-webkit-details-marker]:hidden">
+        <span>* What exclusive partners get</span>
+        <ChevronDown className="size-5 shrink-0 transition group-open:rotate-180" aria-hidden />
+      </summary>
+      <div className="grid gap-5 border-t border-[#0b1f3a]/15 p-4 md:grid-cols-[1.1fr_0.9fr] md:p-5">
+        <ul className="space-y-2.5 text-sm text-foreground/80">
+          {EXCLUSIVE_PARTNER_PERKS.map((p) => (
+            <li key={p} className="flex gap-2"><span className="mt-1.5 size-2 shrink-0 rounded-full bg-lime-500" aria-hidden />{skinText(p)}</li>
+          ))}
+          <li className="pt-1 text-[12px] text-foreground/60">The exact discount, within 10–25% off list price, is agreed per partner.</li>
+        </ul>
+        <div className="rounded-xl bg-[#0b1f3a] p-4 text-white" data-testid="exclusive-example">
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-lime-300">Example · names withheld</p>
+          <p className="mt-2 font-display text-xl leading-snug">{ex.outcome}</p>
+          <p className="mt-2 text-[13px] text-white/80">{how} The same GTM bot runs field sales motions for exclusive partners.</p>
+          <p className="mt-3 text-[11px] text-white/55">{skinText(TRACK_RECORD.note)}</p>
+        </div>
+      </div>
+    </details>
   );
 }

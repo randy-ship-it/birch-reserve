@@ -158,6 +158,7 @@ export const AGENCY_FAQ: Array<{ q: string; a: string }> = [
   { q: "Is there a commission?", a: "Yes: 10% of media spend, paid in cash to the agency of record. Small tests can start self-serve on the $190 USD look or the $490 USD reserve." },
   { q: "Which placement fits which goal?", a: "Awareness: the hub home page. Consideration: product, services and booking pages. Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Retention and loyalty: the member dashboard behind login. One IO can mix them." },
   { q: "How is performance tracked?", a: "Every placement carries your UTM parameters and, if you want, a promo code. We report views and clicks per hub and surface. Aggregate only." },
+  { q: "What is an exclusive inventory partner?", a: "An agency that buys at 10–25% off list price and still keeps 10% of spend. Partners get first chance at new inventory as the network grows, inventory blocked for them, a named mention on our site and in sales materials, and our go-to-market sales motions in the field. Send a bid or note your interest on the agency form." },
   { q: "Do brokers and media resellers qualify?", a: "Yes. When you are the agency of record on the insertion order, you earn 10% of media spend, paid in cash, the same as an agency. List every brand you represent in one inquiry; each gets its own IO and reporting." },
   { q: "Why lock a test now?", a: "New placements open at starter rates, and a placement's rate can step up only once reporting shows it performs. Prepaid credit keeps its rate for its term, and the $490 USD reserve stays fully refundable until 14 days before the launch date on the IO." },
   { q: "Can our bots read this site?", a: "Yes: see /llms.txt, /sitemap.xml and the structured data on each page." },
@@ -198,3 +199,43 @@ export const BUY_PATHS = {
     { k: "Agency cash", card: `${AGENCY_CASH_PCT}% of media spend`, io: `${AGENCY_CASH_PCT}% of media spend` },
   ],
 } as const;
+
+/**
+ * Three ways to buy the same hub inventory (Randy, Nov 24 2026 12:57 PM ET, t543u):
+ *   "Direct brands pay X. Agencies pay X, keep 10%. Exclusive inventory agency partners pay 10%-25% off X,
+ *    plus keep 10% of spend."
+ * X = the live list-price ladder (priceLadder: look, reserve and the 1,900 top step), never a new price.
+ * The 10–25% discount and the 10% are Randy's numbers, shown exactly. Exclusive partners ask for a bid on the
+ * existing agency form; no call, no new checkout. Perks restate Randy's footnote; the example reuses the nameless
+ * "partner launch" track-record card (./trackRecord), already public on home + media kit.
+ */
+export const EXCLUSIVE_PARTNER_DISCOUNT = { lo: 10, hi: 25 } as const;
+
+export type AgencyTierKey = "direct" | "agency" | "exclusive";
+export const AGENCY_TIERS: ReadonlyArray<{
+  key: AgencyTierKey;
+  name: string;
+  who: string;
+  pay: string;
+  keep: string;
+  badge?: string;
+}> = [
+  { key: "direct", name: "Direct brands", who: "A brand buying space for itself.", pay: "List price", keep: "Your own placement and reporting" },
+  { key: "agency", name: "Agencies", who: "Agencies, brokers and media resellers buying for clients as agency of record.", pay: "List price", keep: `${AGENCY_CASH_PCT}% of media spend, paid in cash` },
+  {
+    key: "exclusive",
+    name: "Exclusive inventory partners",
+    who: "Agencies that want first pick of the network as it grows.",
+    pay: `${EXCLUSIVE_PARTNER_DISCOUNT.lo}–${EXCLUSIVE_PARTNER_DISCOUNT.hi}% off list price`,
+    keep: `${AGENCY_CASH_PCT}% of spend`,
+    badge: "First pick",
+  },
+];
+
+/** "What exclusive partners get" (Randy's footnote, t543u). Commitments about our own effort only; no reach or results. */
+export const EXCLUSIVE_PARTNER_PERKS = [
+  "First chance to buy new inventory before anyone else, as the network grows.",
+  "Inventory blocked for you as new hubs come on.",
+  "A named mention on the Birch Reserve site and in our sales materials.",
+  "Birch-run go-to-market sales motions in the field, alongside yours.",
+] as const;
