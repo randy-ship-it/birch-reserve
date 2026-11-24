@@ -297,7 +297,7 @@ export default function BrHome() {
             </div>
           </Expand>
 
-          <Expand title="Talk to the founder" sub="Silver Birch Growth Inc. · Toronto" testId="home-contact">
+          <Expand title="Ask about a bid" sub="Email the desk · Silver Birch Growth Inc. · Toronto" testId="home-contact">
             <div className="grid gap-4 p-5 md:grid-cols-2 md:p-6">
               <SalesContact />
               <FounderNote />
