@@ -155,7 +155,7 @@ export default function BrHome() {
           <div className="flex flex-col rounded-2xl border border-[#0b1f3a]/15 bg-white p-4 shadow-sm" data-testid="home-strip-look">
             <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">7-day look</p>
             <p className="mt-0.5 font-display text-3xl leading-none text-[#0b1f3a]">{price.look}</p>
-            <p className="mt-2 flex-1 text-[13px] leading-snug text-foreground/75">See your ad on a live hub for 7 days. It converts in full to a reserve, or it is refunded.</p>
+            <p className="mt-2 flex-1 text-[13px] leading-snug text-foreground/75">See your placement for 7 days. It converts in full to a reserve, or it is refunded.</p>
             <a href="/buy?plan=hold-190&ref=home_strip" data-testid="home-strip-look-cta" onClick={() => trackAttn("strip.look")} className="mt-3 inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-[#0b1f3a]/30 px-5 text-sm font-bold text-[#0b1f3a] hover:border-[#0b1f3a]">Start my look · {price.look} <ArrowRight className="size-4" aria-hidden /></a>
           </div>
           <div className="flex flex-col rounded-2xl bg-lime-200 p-4 shadow-sm" data-testid="home-strip-reserve">
