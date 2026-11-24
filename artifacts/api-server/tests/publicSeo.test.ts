@@ -535,3 +535,15 @@ test("no-JS shell carries origin story, track record, GTM and the example report
   const short = await (await fetch(`${origin}/llms.txt`)).text();
   assert.match(short, /Track record/);
 });
+
+test("/v1/catalog.json lists the $1,900 CAD exclusive additively, not inside offers", async () => {
+  const res = await fetch(`${origin}/v1/catalog.json`);
+  assert.equal(res.status, 200);
+  const body = (await res.json()) as { offers: Array<{ sku: string }>; exclusive_offers: Array<{ sku: string; amount_cents: number; currency: string; checkout: string }> };
+  assert.deepEqual(body.offers.map((o) => o.sku), ["hold-190", "reserve-490"]);
+  assert.equal(body.exclusive_offers.length, 1);
+  assert.equal(body.exclusive_offers[0]!.sku, "exclusive-reserve-1900-cad");
+  assert.equal(body.exclusive_offers[0]!.amount_cents, 190000);
+  assert.equal(body.exclusive_offers[0]!.currency, "CAD");
+  assert.equal(body.exclusive_offers[0]!.checkout, "/exclusive");
+});
