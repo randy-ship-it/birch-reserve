@@ -21,6 +21,7 @@ import { FlightReportExample } from "@/components/br/flight-report";
 import { GtmSetup } from "@/components/br/gtm-setup";
 import { PerformanceOnly } from "@/components/br/performance-only";
 import { GtmBotTeaser } from "@/components/br/gtm-bot-teaser";
+import { TrustedAgencyPartners } from "@/components/br/trusted-agency-partners";
 import { StreetTeamProgram } from "@/components/br/street-team";
 import { PartnersTeaser } from "@/components/br/partners";
 import { KitCta, intakeHref } from "@/components/br/kit-cta";
@@ -194,6 +195,9 @@ export default function BrHome() {
         <div className="mt-4"><LiveHubGrid /></div>
         <HubFunnel />
       </section>
+
+      {/* 5. Trusted Agency Partners (Randy Nov 24 2026 t8289u). */}
+      <TrustedAgencyPartners />
 
       {/* 2c. Categories + Questions brands ask moved up: strip under the hero, compact questions by the kit CTA (Nov 21). */}
 
