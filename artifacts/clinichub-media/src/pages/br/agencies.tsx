@@ -23,6 +23,15 @@ const FORWARD_KIT = [
   { href: "/media-buyers", t: "For media buyers", d: "How Birch fits next to programmatic, paid social and retail media." },
 ];
 
+/** Why an agency would use Birch. Tight, no counts, no share splits. */
+const AGENCY_BENEFITS = [
+  { t: "Win wallet share", d: "A new distribution channel your clients can shift spend to." },
+  { t: "High-margin placements", d: "Priced under market." },
+  { t: "Exclusive inventory", d: "Competitors can't tap it, so you can win new clients." },
+  { t: "Trusted Birch referral partner", d: "Customer flow both ways." },
+  { t: "High-value customers", d: "For your clients, at below-market CAC." },
+] as const;
+
 /** One expandable detail row. Native <details>, so it works without JS; opens itself when the URL hash names it. */
 function Fold({ id, title, sub, children }: { id: string; title: string; sub: string; children: ReactNode }) {
   return (
@@ -55,16 +64,26 @@ export default function BrAgencies() {
     <div data-testid="br-agencies">
       <JsonLd data={{ "@context": "https://schema.org", "@type": "Service", name: "Birch Reserve agency placements", provider: { "@type": "Organization", name: "Birch Reserve" }, areaServed: ["CA", "US"], serviceType: "Retail media / post-purchase advertising", url: "https://birchreserve.net/agencies" }} />
       <Section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]">
-        <div className="max-w-3xl">
-          <Eyebrow>For agencies, brokers &amp; media resellers</Eyebrow>
-          <H1>The rate card is public. Agencies buy 10% off.</H1>
-          <Lede>
-            Direct buyers pay the published rate card. Agencies get a standard written 10% discount, set their own resale price, and handle their own client disclosure. We do not undercut an agency&apos;s client.
-          </Lede>
-          <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-            <Cta href={RESERVE_HREF} testId="agency-cta-reserve">Reserve for a client · $490 USD</Cta>
-            <a href="#model" className="text-sm font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="agency-cta-model">See how it works</a>
+        <div className="grid items-start gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
+          <div className="max-w-3xl">
+            <Eyebrow>For agencies, brokers &amp; media resellers</Eyebrow>
+            <H1>The rate card is public. Agencies buy 10% off.</H1>
+            <Lede>
+              Direct buyers pay the published rate card. Agencies get a standard written 10% discount, set their own resale price, and handle their own client disclosure. We do not undercut an agency&apos;s client.
+            </Lede>
+            <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+              <Cta href={RESERVE_HREF} testId="agency-cta-reserve">Reserve for a client · $490 USD</Cta>
+              <a href="#model" className="text-sm font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="agency-cta-model">See how it works</a>
+            </div>
           </div>
+          <ul className="border-t border-[#0b1f3a]/15 lg:mt-2" data-testid="agency-benefits" aria-label="Why agencies use Birch">
+            {AGENCY_BENEFITS.map((b) => (
+              <li key={b.t} className="border-b border-[#0b1f3a]/15 py-4">
+                <p className="font-display text-xl leading-tight text-[#0b1f3a]">{b.t}</p>
+                <p className="mt-1 text-[13px] leading-snug text-foreground/60">{b.d}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </Section>
 
