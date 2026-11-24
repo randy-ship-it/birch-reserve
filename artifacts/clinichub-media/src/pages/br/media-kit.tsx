@@ -159,8 +159,8 @@ export default function BrMediaKit() {
       {/* Hero */}
       <section className="border-b border-border/70 bg-background">
         <div className="container mx-auto max-w-5xl px-5 pb-10 pt-10 md:px-6 md:pb-14 md:pt-16">
-          <div className="grid items-center gap-8 md:grid-cols-[1fr_1.05fr]">
-          <div>
+          <div className="grid items-center gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+          <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Media kit · Nov 2026</p>
           <h1 className="mt-3 font-display text-[2.15rem] leading-[1.05] tracking-tight md:text-6xl">Put your brand inside private health and wellness hubs.</h1>
           <p className="mt-2 font-display text-xl text-foreground/70 md:text-2xl">A growing network. Curated placements.</p>
