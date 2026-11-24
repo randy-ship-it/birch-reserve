@@ -52,7 +52,6 @@ import {
   type RandyModelMessage,
   type RandyReplyFailure,
 } from "@/lib/randy-model-client";
-import { startDockYield } from "@/lib/dock-yield";
 import { RichText } from "@/components/randy-rich-text";
 import { SQUIRREL_STYLES, SquirrelBadge } from "@/components/birch-squirrel";
 import { BIRCH_SQUIRREL } from "@/lib/birch-squirrel-config";
@@ -95,7 +94,6 @@ html:has([data-testid="mobile-sticky-reserve-cta"]) { --birch-dock-bottom: calc(
   .birch-dock-squirrel { bottom: calc(var(--birch-dock-bottom) + 4px); right: calc(12px + 56px + 8px); }
   body { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
   .birch-dock-squirrel { transform: scale(0.88); transform-origin: bottom right; }
-  html.br-dock-yield .birch-dock-squirrel, html.br-dock-yield elevenlabs-convai { visibility: hidden !important; pointer-events: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   .randy-bob, .randy-teaser, .randy-wave, .randy-chip, .randy-msg, .randy-dot, .randy-ping { animation: none !important; }
@@ -158,7 +156,7 @@ function toHistory(messages: ChatMessage[]): RandyModelMessage[] {
 }
 
 export function RandyChat() {
-  useEffect(() => startDockYield(), []);
+  // Steady dock (Randy, Nov 23 2026 9:13 PM: "keeps flashing... just stay there"): no runtime show/hide loop.
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("chat");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
