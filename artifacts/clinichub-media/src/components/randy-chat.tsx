@@ -17,7 +17,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { localizeNow } from "@/lib/currency";
 import { AnimatePresence, motion } from "framer-motion";
-import { Phone, X, PhoneIncoming, RotateCw, ArrowUp } from "lucide-react";
+import { X, RotateCw, ArrowUp } from "lucide-react";
 import { trackCta } from "@/lib/track-cta";
 import { track } from "@/lib/analytics";
 import { ensureHuman } from "@/lib/human-gate";
@@ -85,13 +85,13 @@ const FIGURE_STYLES = `
 .randy-ping { animation: randy-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
 /* Mobile dock: squirrel sits just left of the 56px voice button, both at the
    bottom edge (or above the sticky reserve bar when a page has one), so neither
-   covers hero copy. --birch-dock-bottom is shared with hear-randy-elevenlabs. */
+   covers hero copy.  */
 :root { --birch-dock-bottom: calc(14px + env(safe-area-inset-bottom)); }
 html:has([data-testid="mobile-sticky-reserve-cta"]) { --birch-dock-bottom: calc(7.75rem + env(safe-area-inset-bottom)); }
 @media (max-width: 1023px) { html:has([data-testid="sticky-kit-cta"]) { --birch-dock-bottom: calc(5.25rem + env(safe-area-inset-bottom)); } }
 @media (max-width: 767px) { html:has([data-testid="post-kit-sticky"]) { --birch-dock-bottom: calc(5rem + env(safe-area-inset-bottom)); } }
 @media (max-width: 767px) {
-  .birch-dock-squirrel { bottom: calc(var(--birch-dock-bottom) + 4px); right: calc(12px + 56px + 8px); }
+  .birch-dock-squirrel { bottom: calc(var(--birch-dock-bottom) + 4px); right: 12px; }
   body { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
   .birch-dock-squirrel { transform: scale(0.88); transform-origin: bottom right; }
 }
@@ -139,13 +139,13 @@ function getSessionId(): string {
 function failureCopy(kind: RandyReplyFailure["kind"]): string {
   switch (kind) {
     case "timeout":
-      return "Sorry, that took too long on my side. Tap Retry, or call the live line and you'll get an answer right away.";
+      return "Sorry, that took too long on my side. Tap Retry, or try again in a moment.";
     case "rate_limited":
       return "You're quicker than me. Give it a few seconds, then tap Retry. The live line is always open too.";
     case "network":
-      return "Looks like the connection dropped. Check your signal and tap Retry, or call the live line.";
+      return "Looks like the connection dropped. Check your signal and tap Retry, or try again in a moment.";
     default:
-      return "Sorry, I couldn't get a reply just now. Tap Retry, or call the live line and you'll get an answer right away.";
+      return "Sorry, I couldn't get a reply just now. Tap Retry, or try again in a moment.";
   }
 }
 
@@ -522,7 +522,7 @@ export function RandyChat() {
         pushMessages({
           id: newId(),
           role: "randy",
-          text: "Calling now. If you'd rather, leave your details here and the team will call you back.",
+          text: "Reserve at the Buy ads now link, or keep asking me here.",
         });
       }, 400);
     }
@@ -564,7 +564,7 @@ export function RandyChat() {
         id: newId(),
         role: "randy",
         kind: "error",
-        text: "Sorry, I couldn't save your details just now. Try again, or call the live line.",
+        text: "Sorry, I couldn't save your details just now. Try again, or try again in a moment.",
       });
       return;
     }
@@ -597,166 +597,19 @@ export function RandyChat() {
     </span>
   );
 
-  const callPill = (label: string, testId: string) => (
-    <a
-      href={RANDY_TEL_HREF}
-      onClick={onTelClick}
-      className="inline-flex h-9 items-center gap-1.5 rounded-full bg-foreground px-4 text-[13px] font-semibold text-background shadow-sm transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
-      aria-label={`Call Randy at ${RANDY_TEL_DISPLAY}`}
-      data-testid={testId}
-    >
-      <Phone className="size-3.5" aria-hidden />
-      {label}
-    </a>
-  );
-
   const pillBase =
     "inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2";
 
   const handoffCard = (
     <div className="mt-2 flex w-full flex-col gap-2" data-testid="randy-handoff">
       <a
-        href={RANDY_TEL_HREF}
-        onClick={onTelClick}
+        href="/buycalc"
+        onClick={() => trackCta("cta_reserve_490")}
         className={`${pillBase} h-10 justify-center bg-accent text-accent-foreground shadow-sm`}
-        data-testid="randy-handoff-ai-call"
+        data-testid="randy-handoff-reserve"
       >
-        <Phone className="size-4" aria-hidden />
-        {AI_CALL_LABEL}
+        Buy ads now: reserve for $490 USD
       </a>
-      {callbackState === "done" ? (
-        <p className="text-[12px] text-slate-500">Callback requested. Randy&apos;s team will call you shortly.</p>
-      ) : callbackOpen ? (
-        <form
-          onSubmit={submitCallback}
-          className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-3"
-          data-testid="randy-callback-form"
-        >
-          <p className="text-[12px] font-medium text-slate-600">Leave your details and the team will call you back.</p>
-          <HoneypotField inputRef={honeypotRef} idSuffix="randy-callback" />
-          <input
-            id="randy-callback-phone"
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel"
-            value={callbackPhone}
-            onChange={(e) => {
-              setCallbackPhone(e.target.value);
-              if (callbackState === "error") setCallbackState("idle");
-            }}
-            placeholder="Phone (required)"
-            aria-label="Phone number (required)"
-            maxLength={32}
-            required
-            className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
-            data-testid="randy-callback-phone"
-          />
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="text"
-              autoComplete="name"
-              value={callbackName}
-              onChange={(e) => setCallbackName(e.target.value)}
-              placeholder="Name"
-              aria-label="Your name"
-              maxLength={80}
-              className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
-              data-testid="randy-callback-name"
-            />
-            <input
-              type="email"
-              autoComplete="email"
-              value={intake.email}
-              onChange={(e) => {
-                setIntake((c) => ({ ...c, email: e.target.value }));
-                if (callbackState === "error") setCallbackState("idle");
-              }}
-              placeholder="Email"
-              aria-label="Email"
-              maxLength={254}
-              className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
-              data-testid="randy-callback-email"
-            />
-            <input
-              type="text"
-              autoComplete="organization"
-              value={intake.company}
-              onChange={(e) => setIntake((c) => ({ ...c, company: e.target.value }))}
-              placeholder="Company"
-              aria-label="Company"
-              maxLength={300}
-              className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
-              data-testid="randy-callback-company"
-            />
-            <input
-              type="text"
-              autoComplete="organization-title"
-              value={intake.role}
-              onChange={(e) => setIntake((c) => ({ ...c, role: e.target.value }))}
-              placeholder="Role"
-              aria-label="Role"
-              maxLength={80}
-              className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
-              data-testid="randy-callback-role"
-            />
-          </div>
-          <input
-            type="text"
-            value={intake.need}
-            onChange={(e) => setIntake((c) => ({ ...c, need: e.target.value }))}
-            placeholder="What do you need?"
-            aria-label="What do you need?"
-            maxLength={300}
-            className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
-            data-testid="randy-callback-need"
-          />
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="text"
-              value={intake.size}
-              onChange={(e) => setIntake((c) => ({ ...c, size: e.target.value }))}
-              placeholder="Size (locations, budget)"
-              aria-label="Size (locations, budget)"
-              maxLength={300}
-              className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
-              data-testid="randy-callback-size"
-            />
-            <input
-              type="text"
-              value={intake.timing}
-              onChange={(e) => setIntake((c) => ({ ...c, timing: e.target.value }))}
-              placeholder="Timing"
-              aria-label="Timing"
-              maxLength={300}
-              className="h-9 w-full min-w-0 rounded-xl border border-slate-200 bg-slate-50 px-3 text-[13px] text-slate-900 placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:outline-none"
-              data-testid="randy-callback-timing"
-            />
-          </div>
-          {callbackState === "error" && (
-            <p className="text-[12px] text-red-600" role="alert">
-              Please enter a full phone number with area code{intake.email.trim() ? ", and a valid email" : ""}.
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={callbackState === "sending"}
-            className={`${pillBase} h-10 justify-center bg-foreground text-background disabled:opacity-60`}
-            data-testid="randy-callback-submit"
-          >
-            {callbackState === "sending" ? "Sending…" : "Call me back"}
-          </button>
-        </form>
-      ) : (
-        <button
-          type="button"
-          onClick={openCallbackIntake}
-          className={`${pillBase} h-10 justify-center border border-slate-300 bg-white text-slate-800`}
-          data-testid="randy-handoff-callback"
-        >
-          <PhoneIncoming className="size-4" aria-hidden />
-          Request a callback
-        </button>
-      )}
     </div>
   );
 
@@ -846,7 +699,6 @@ export function RandyChat() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {callPill("Call", "randy-chip-call")}
                   <button
                     type="button"
                     onClick={closeWidget}
@@ -859,16 +711,6 @@ export function RandyChat() {
                 </div>
               </div>
               <div className="mx-5 h-px bg-slate-200/80 shrink-0" />
-              <a
-                href="tel:+16479316278"
-                onClick={onTelClick}
-                className="mx-5 mt-3 inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-slate-300 bg-white px-4 text-[13px] font-semibold text-slate-800"
-                data-testid="randy-panel-call"
-              >
-                <Phone className="size-3.5" aria-hidden />
-                Call (647) 931-6278
-              </a>
-
               {/* Messages */}
               <div className="flex-1 overflow-y-auto px-5 py-4" aria-live="polite" data-testid="randy-mode-chips">
                 <div className="flex flex-col gap-3">
@@ -899,7 +741,6 @@ export function RandyChat() {
                                       Retry
                                     </button>
                                   )}
-                                  {callPill("Call", "randy-error-call")}
                                 </div>
                               </div>
                             ) : (
@@ -960,27 +801,9 @@ export function RandyChat() {
               {/* Persistent next steps once handoff intent shows */}
               {handoffReady && (
                 <div className="flex gap-2 px-4 pt-2 shrink-0" data-testid="randy-persistent-cta">
-                  <a href={RANDY_TEL_HREF} onClick={onTelClick} className={`${pillBase} flex-1 justify-center bg-accent text-accent-foreground`}>
-                    <Phone className="size-3.5" aria-hidden />
-                    AI call now
+                  <a href="/buycalc" onClick={() => trackCta("cta_reserve_490")} className={`${pillBase} flex-1 justify-center bg-accent text-accent-foreground`}>
+                    Buy ads now
                   </a>
-                  {callbackState === "done" ? (
-                    <span className="inline-flex flex-1 items-center justify-center text-[12px] text-slate-500">Callback requested</span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        openCallbackIntake();
-                        if (lastHandoffIndex < 0) {
-                          pushMessages({ id: newId(), role: "randy", text: "Leave your details and Randy's team will call you back.", showHandoff: true });
-                        }
-                      }}
-                      className={`${pillBase} flex-1 justify-center border border-slate-300 bg-white text-slate-800`}
-                    >
-                      <PhoneIncoming className="size-3.5" aria-hidden />
-                      Callback
-                    </button>
-                  )}
                 </div>
               )}
 

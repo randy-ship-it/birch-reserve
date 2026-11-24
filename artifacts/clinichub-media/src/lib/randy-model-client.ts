@@ -123,7 +123,7 @@ async function stubRandyReply(
 
   if (req.mode === "hear") {
     return {
-      text: "Voice isn't on this page. Keep chatting here, or tap Call for the live line.",
+      text: "Keep chatting here, or buy ads now at https://birchreserve.net/buycalc.",
       source: "stub",
       offerHandoff: true,
     };
@@ -134,14 +134,14 @@ async function stubRandyReply(
 
   if (/\b(who (are|r) (you|u)|who('s| is) this|your name|are (you|u) (a |an )?(ai|bot|human|real))\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "I'm the Birch Q&A Squirrel, the AI guide on Birch Reserve. I help brands reserve display space across our private health and wellness hubs. Want a real person? Tap Call for Randy's line or ask for a callback from Randy's team. What are you working on?",
+      text: "I'm the Birch Q&A Squirrel, the AI guide on Birch Reserve. I help brands reserve display space across our private health and wellness hubs. Want to buy? Reserve at https://birchreserve.net/buycalc. What are you working on?",
       source: "stub",
     };
   }
 
   if (chip === "talk_human" || /\b(call|human|phone)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: `Happy to connect you live. Tap Call for ${RANDY_TEL_DISPLAY}. Or leave your details here and the team will call you back.`,
+      text: `Easiest is to buy ads now: reserve for $490 USD or take a $190 USD 7-day look at https://birchreserve.net/buycalc, or get the media kit.`,
       source: "stub",
       offerHandoff: true,
     };
@@ -171,7 +171,7 @@ async function stubRandyReply(
 
   if (/\b(190|490|hold|reserve|seat|price|pricing|buy|checkout)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "Reserve for $490 USD (100% media credit until the IO) or take a $190 USD 7-day look at https://birchreserve.net/buycalc. Prices are USD for every buyer. Want to pay there, call, or keep going here?",
+      text: "Reserve for $490 USD (100% media credit until the IO) or take a $190 USD 7-day look at https://birchreserve.net/buycalc. Prices are USD for every buyer. Want to pay there or keep going here?",
       source: "stub",
       offerHandoff: true,
     };
@@ -362,6 +362,6 @@ export async function startRandyVoiceSession(): Promise<RandyVoiceSession> {
     status: "eve_pending",
     reason: "In-widget Eve/Grok voice unused — Hear Randy is ElevenLabs ConvAI widget.",
     uiNote:
-      "Use Hear Randy (bottom-left) for voice, or Call for the live phone line.",
+      "Voice is off. Use the chat, or buy ads now at birchreserve.net/buycalc.",
   };
 }

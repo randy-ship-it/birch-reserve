@@ -13,7 +13,7 @@
  */
 import { hashRef } from "./adserver/auth";
 
-export const CLICK_NAMES = ["get_my_kit", "buy_ads_now", "look_7day", "reserve", "inquire_premium", "chat_open", "call_voice", "call_phone", "hub_chip", "media_kit", "pdf_download", "other"] as const;
+export const CLICK_NAMES = ["get_my_kit", "buy_ads_now", "look_7day", "reserve", "inquire_premium", "chat_open", "hub_chip", "media_kit", "pdf_download", "other"] as const;
 const CLICK_SET = new Set<string>(CLICK_NAMES);
 const PLAIN = new Set(["a.pv", "a.scroll_25", "a.scroll_50", "a.scroll_75", "a.scroll_100", "a.form_start", "a.form_submit"]);
 

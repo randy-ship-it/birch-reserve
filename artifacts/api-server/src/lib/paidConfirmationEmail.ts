@@ -119,7 +119,7 @@ export function buildPaidConfirmationEmail(i: PaidConfirmationInput): PaidConfir
     "Next steps:",
     ...steps.map((s) => `- ${s}`),
     "",
-    `Questions? Reply to this email, write to ${SUPPORT_EMAIL} or call ${SUPPORT_PHONE}.`,
+    `Questions? Reply to this email, write to ${SUPPORT_EMAIL}.`,
     "",
     site,
   ].filter((l, n) => l !== "" || n > 0).join("\n");
@@ -142,7 +142,7 @@ export function buildPaidConfirmationEmail(i: PaidConfirmationInput): PaidConfir
     emailButton(i.dashboardUrl, "Open my ad dashboard", i.brand),
     h2("Next steps"),
     list,
-    p(`Questions? Reply to this email, write to <a href="mailto:${SUPPORT_EMAIL}" style="color:${K.ink}">${SUPPORT_EMAIL}</a> or call <a href="tel:+16479316278" style="color:${K.ink};white-space:nowrap">${SUPPORT_PHONE}</a>.`, true, true),
+    p(`Questions? Reply to this email, write to <a href="mailto:${SUPPORT_EMAIL}" style="color:${K.ink}">${SUPPORT_EMAIL}</a>.`, true, true),
   ].join("");
   const footer = scale
     ? `ScaleHealth · <a href="https://www.scalehealth.ca/intake" style="color:${K.muted}">scalehealth.ca</a> · ${SUPPORT_EMAIL}`

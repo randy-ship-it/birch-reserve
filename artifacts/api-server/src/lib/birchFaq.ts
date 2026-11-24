@@ -50,17 +50,17 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return {
       intent: "callback_submit",
       callback,
-      text: `Thanks${c.name ? `, ${c.name.split(" ")[0]}` : ""}. I've sent your call-back request to the Birch team${c.best_time ? ` for ${c.best_time}` : ""}. They'll reach you at ${c.phone || c.email}. If you'd rather not wait, call ${BIRCH_SALES_PHONE}.`,
+      text: `Thanks${c.name ? `, ${c.name.split(" ")[0]}` : ""}. I've sent your call-back request to the Birch team${c.best_time ? ` for ${c.best_time}` : ""}. They'll reply by email at ${c.email || c.phone}.`,
     };
   }
   if (/get(ting)? started|onboard|how do i (start|sign up|begin|join|apply)|where do i (start|sign up)|what do i do/.test(t)) {
-    return { intent: "start", callback: null, text: `Here's the path for a brand:\n1. Get the free Monetization Kit (website and email, no card): [Start the kit](${INTAKE})\n2. Pick your channels: branded hubs, the private retail network across Canada and the USA, or Calm Joints with the Street Team\n3. Start small: the $190 USD 7-day look ($270 CAD in Canada): [See the look](${BUY}?sku=hold-190)\n4. Scale up with a sponsorship pack or the exclusive reserve\nNothing runs until you approve an insertion order. Want the request form, or a person to call you? [Request form](${REQ})` };
+    return { intent: "start", callback: null, text: `Here's the path for a brand:\n1. Get the free Monetization Kit (website and email, no card): [Start the kit](${INTAKE})\n2. Pick your channels: branded hubs, the private retail network across Canada and the USA, or Calm Joints with the Street Team\n3. Start small: the $190 USD 7-day look ($270 CAD in Canada): [See the look](${BUY}?sku=hold-190)\n4. Scale up with a sponsorship pack or the exclusive reserve\nNothing runs until you approve an insertion order. Want the request form? [Request form](${REQ})` };
   }
   if (/\buber\b|\bgig\b|on-?demand|taskrabbit|freelanc/.test(t)) {
     return { intent: "positioning", callback: null, text: `No. Scale Health is a distribution platform that started in Recovery, where it is vertically integrated, and it is growing into more health and wellness categories. It is never gig, Uber-type or on-demand. Want the free kit or the request form? [Start the kit](${INTAKE})` };
   }
   if (/which clients|your clients|client list|who do you work with|case stud|testimonial|\balign\b|\balset\b|clairvoyant|medvibe|pier\s?39|investor/.test(t)) {
-    return { intent: "confidential", callback: null, text: `We keep client and partner details confidential, so I can't share or confirm names. What I can share: ${liveLine()} Want the request form, or a person to call you? [Request form](${REQ})` };
+    return { intent: "confidential", callback: null, text: `We keep client and partner details confidential, so I can't share or confirm names. What I can share: ${liveLine()} Want the request form? [Request form](${REQ})` };
   }
   if (/\bcad\b|canadian|canada|currency|us dollars|\busd\b|exchange rate/.test(t)) {
     return { intent: "currency", callback: null, text: `Visitors in Canada see and pay CAD ($270 CAD for the 7-day look, $690 CAD to reserve); everyone else pays USD ($190 and $490). The currency shown at checkout is the currency you're charged, and there's a toggle on the page. Start at ${BUY}, or ask us anything first at ${REQ}.` };
@@ -84,7 +84,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return {
       intent: "premium",
       callback: null,
-      text: `Premium slots run $25,000 to $50,000 USD and are inquire only: exclusivity, a larger display share and priority placement, set on an insertion order. Randy's team will call you. What's your name, company, phone, email and best time to call? Or call ${BIRCH_SALES_PHONE} now.`,
+      text: `Premium slots run $25,000 to $50,000 USD and are inquire only: exclusivity, a larger display share and priority placement, set on an insertion order. Send the request form at ${BUY}#request and we reply by email.`,
     };
   }
   if (/guarantee|ctr|click|impression|reach|results|roi/.test(t)) {
@@ -112,7 +112,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return { intent: "price", callback: null, text: `Three ways in. The 7-day look is $190 USD, and it converts to the reserve within 7 days or is refunded. Reserving is $490 USD, 100% media credit until the IO. Premium slots run $25,000 to $50,000 and are inquire only. Start at ${BUY}.` };
   }
   if (/phone|call|email|contact|reach/.test(t)) {
-    return { intent: "contact", callback: null, text: `Call ${BIRCH_SALES_PHONE} or email ${BIRCH_SALES_EMAIL}. For a premium slot, send me your name, company, phone, email and best time, and the team will call you.` };
+    return { intent: "contact", callback: null, text: `Email ${BIRCH_SALES_EMAIL}, or buy ads now at ${BUY}. For a premium slot, use the request form at ${BUY}#request.` };
   }
   return {
     intent: "general",

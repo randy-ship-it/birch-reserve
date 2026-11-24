@@ -366,7 +366,7 @@ ${buyerHeaderHtml("buy", currencyToggleHtml(currency, (c) => currencyHref("/buy"
 
 <div class="card done-box" id="done" role="status"><h2 id="done-h">Got it.</h2><p id="done-p"></p><p class="sub">What happens next</p><ol id="done-next"><li>We email your insertion order within 1 business day. It names the hub, placement and dates.</li><li>A person checks your ad. No ad yet? Reply to that email with it.</li><li>You approve the insertion order. Then it runs.</li></ol><div class="actions"><a class="btn" href="/media-kit">See the media kit</a><a class="back" href="/" style="display:inline-flex;align-items:center;text-decoration:none">Back to Birch Reserve</a></div></div>
 </main>
-<footer><div class="wrap">Silver Birch Growth Inc. · Toronto · <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a> · <a href="tel:+16479316278">(647) 931-6278</a></div></footer>
+<footer><div class="wrap">Silver Birch Growth Inc. · Toronto · <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a></div></footer>
 ${PROMO_SCRIPT_TAG}
 <script>
 (function(){var acct=null,crv=null,live=${opts.checkoutLive ? "true" : "false"},cur=1,hasPf=${opts.prefill ? "true" : "false"};

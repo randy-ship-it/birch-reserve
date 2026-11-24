@@ -42,7 +42,7 @@ export const REPLY_LINE = "We reply within 1 business day.";
 
 export const DUAL_MOTION = {
   /** A1: /buycalc subhead under the H1. */
-  heroSub: "Start yourself with a $190 USD look or $490 USD reserve. Or talk to us about a larger display share, priority placement, or a program across more than one hub.",
+  heroSub: "Start yourself with a $190 USD look or $490 USD reserve. Or ask about a larger display share, priority placement, or a program across more than one hub.",
   /** A2: secondary inquire link under the self-serve buttons. */
   inquireLabel: "Ask about a premium slot or multi-hub program",
   callBack: "to request a call back",
@@ -87,7 +87,7 @@ const SEE_THE_UNIT_BASE = {
     "A custom mock of your card on the hub surface, made by Birch from your square still. Illustrative, not a live ad.",
     "The live hubs, open to anyone right now.",
     "The creative brief and the sample insertion order, so you know what the next step asks for.",
-    "A real person: (647) 931-6278 or randy@scalehealth.ca.",
+    "Questions by email: randy@scalehealth.ca.",
   ],
   decide: "Then decide: move to the $490 USD reserve within 7 days and all $190 USD carries over, otherwise it is refunded. The look does not lock a category; seats are shared, not exclusive.",
   imageAlt: "Illustrative mock: an example brand card drawn beside the recovery path on the live DR-HO'S hub dashboard",
@@ -113,7 +113,7 @@ export const BUYER_FAQ: Array<{ q: string; a: string; link?: BuyerLink; tail?: s
   },
   {
     q: "How do larger or priority placements work?",
-    a: "Premium slots are inquire only, never a card purchase. Send a request or call (647) 931-6278 to request a call back. We reply with an insertion order that sets the term, display share and placement.",
+    a: "Premium slots are inquire only, never a card purchase. Send a request and we reply by email with an insertion order that sets the term, display share and placement.",
     link: { label: "Ask about a premium slot", href: "/buycalc#request" },
   },
   {

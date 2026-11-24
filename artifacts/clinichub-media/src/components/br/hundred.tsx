@@ -9,7 +9,6 @@ import { HUNDRED_NOTE, HUNDRED_ROWS, HUNDRED_TITLE } from "../../../../api-serve
 import { SPEND_DOWN_MAX_MONTHS } from "../../../../api-server/src/lib/inventoryPlan";
 import { MEDIA_KIT_CPM, MEDIA_KIT_OFFERS, kitExample, usd } from "../../../../api-server/src/lib/overhaul/mediaKit";
 import { HUB_DEMAND_LINE, HUB_DEMAND_SUB, HUB_EARN_LINE, HUB_EARN_TITLE, HUB_PROOF_PATH, HUB_PROOF_TERMS } from "../../../../api-server/src/lib/overhaul/hubEarn";
-import { openRandyChat } from "@/lib/book-call";
 
 export function WhatHundredGets() {
   return (
@@ -96,9 +95,8 @@ export function PremiumSpendDown() {
       </ul>
       <p className="pb-3 text-xs text-background/65">An example, not a quote or a guarantee. Inquire only: no card purchase, and nothing runs until the IO names the hub. Aggregate reporting only.</p>
       <div className="flex flex-col gap-2 pb-4 sm:flex-row">
-        <a href="tel:+16479316278" className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-accent px-5 text-sm font-semibold text-accent-foreground"><Phone className="size-4" aria-hidden /> (647) 931-6278</a>
         <a href="mailto:randy@scalehealth.ca?subject=Premium%20slot%20inquiry" className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-background/45 px-5 text-sm font-semibold"><Mail className="size-4" aria-hidden /> Email sales</a>
-        <button type="button" onClick={() => openRandyChat({ reason: "book-a-call" })} className="inline-flex h-11 items-center justify-center rounded-full border border-background/45 px-5 text-sm font-semibold">Talk to Randy</button>
+        <a href="/buycalc?sku=reserve-490#reserve" className="inline-flex h-11 items-center justify-center rounded-full border border-background/45 px-5 text-sm font-semibold">Buy ads now</a>
       </div>
     </details>
   );

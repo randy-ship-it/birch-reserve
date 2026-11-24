@@ -177,7 +177,7 @@ export function BrochureSlideIn() {
   const [open, setOpen] = useState(false);
   /** Phones (Nov 23 2026 mobile QA: the full card covered the media kit's "Two tiers" heading): open as a one-line
    *  strip; the email form only expands when the visitor taps it. Desktop is unchanged. */
-  const [expanded, setExpanded] = useState(() => typeof window === "undefined" || !window.matchMedia("(max-width: 767px)").matches);
+  const [expanded, setExpanded] = useState(false); // Nov 23 2026 9 PM: desktop too. Always a one-line strip until tapped, never a card over the page.
   const shownRef = useRef(false);
   const f = useBrochureForm("brochure_slidein");
 
@@ -245,7 +245,7 @@ export function BrochureSlideIn() {
   return (
     <aside
       aria-label="Get the brochure"
-      className={`fixed bottom-[calc(var(--birch-dock-bottom,14px)_-_2px)] left-3 right-[84px] z-[56] rounded-2xl border border-black/5 bg-white ${expanded ? "p-4" : "px-3 py-1.5"} text-slate-900 shadow-[0_18px_50px_-16px_rgba(7,26,57,0.45)] md:bottom-6 md:left-auto md:right-6 md:w-[340px]`}
+      className={`fixed bottom-[calc(var(--birch-dock-bottom,14px)_-_2px)] left-3 right-[84px] z-[56] rounded-2xl border border-black/5 bg-white ${expanded ? "p-4" : "px-3 py-1.5 md:w-[290px]"} text-slate-900 shadow-[0_18px_50px_-16px_rgba(7,26,57,0.45)] md:bottom-6 md:left-6 md:right-auto ${expanded ? "md:w-[340px]" : ""}`}
       style={{ marginBottom: "env(safe-area-inset-bottom)" }}
       data-testid="brochure-slidein"
     >

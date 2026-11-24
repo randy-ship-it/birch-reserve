@@ -67,7 +67,7 @@ export default function BrIntakeReel() {
   // On the Scale skin every link stays under /intake, so the visit and any checkout stay on scalehealth.ca (Scale direct).
   const kit = `/intake?utm_source=reel&utm_medium=${scale ? "scale_reel" : "reel"}`;
   const exclusive = `${scale ? "/intake/_m" : ""}/exclusive?currency=${currency}&utm_source=reel&utm_medium=${scale ? "scale_reel" : "reel"}`;
-  const talk = `${scale ? "/intake/_m" : ""}/media-kit#request`;
+  const talk = `${scale ? "/intake/_m" : ""}/buycalc?sku=reserve-490#reserve`;
   const v = useRef<HTMLVideoElement>(null);
   const h = useRef<HTMLVideoElement>(null);
   useEffect(() => {
@@ -83,7 +83,7 @@ export default function BrIntakeReel() {
     <div className="flex flex-wrap items-center gap-2.5">
       <a href={kit} className={`${btn} bg-[#C8F55A] text-[#071A39]`} data-testid={`reel-${where}-kit`}>Get my free monetization kit →</a>
       <a href={exclusive} className={`${btn} ${dark ? "border border-white/40 text-white" : "bg-[#071A39] text-white"}`} data-testid={`reel-${where}-exclusive`}>Reserve ${"1,900"} {C} exclusive</a>
-      <a href={talk} className={`${btn} border ${dark ? "border-white/40 text-white" : "border-[#c9cfc2] bg-white text-[#071A39]"}`} data-testid={`reel-${where}-talk`}>Talk to us</a>
+      <a href={talk} className={`${btn} border ${dark ? "border-white/40 text-white" : "border-[#c9cfc2] bg-white text-[#071A39]"}`} data-testid={`reel-${where}-talk`}>Buy ads now</a>
     </div>
   );
   return (

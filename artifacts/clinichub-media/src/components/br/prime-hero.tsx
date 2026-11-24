@@ -211,9 +211,9 @@ export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path
         setState({ status: "done", msg: `We'll reply to ${v.email.trim()} within 1 business day. No card was charged.` });
         return;
       }
-      setState({ status: "error", msg: o.error ?? `We could not send that. Call ${SALES_PHONE_DISPLAY} or email ${SALES_EMAIL}.` });
+      setState({ status: "error", msg: o.error ?? `We could not send that. Email ${SALES_EMAIL}.` });
     } catch {
-      setState({ status: "error", msg: `We could not send that. Check your connection and press Send again, or call ${SALES_PHONE_DISPLAY}.` });
+      setState({ status: "error", msg: `We could not send that. Check your connection and press Send again.` });
     }
   }
   const input = "h-12 w-full border border-foreground/25 bg-white px-3 text-base text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-accent disabled:opacity-60";
@@ -258,7 +258,7 @@ export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path
       </button>
       {state.status === "error" ? <p role="alert" className="mt-3 text-sm font-semibold text-[#b42318]" data-testid="cr-message">{state.msg}</p> : null}
       <p className="mt-2 text-xs text-muted-foreground">
-        Saved in this browser until you send it. Or call <a className="underline" href={SALES_PHONE_HREF}>{SALES_PHONE_DISPLAY}</a> · <a className="underline" href={`mailto:${SALES_EMAIL}`}>{SALES_EMAIL}</a>
+        Saved in this browser until you send it. Or email <a className="underline" href={`mailto:${SALES_EMAIL}`}>{SALES_EMAIL}</a>
       </p>
     </form>
   );

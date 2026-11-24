@@ -349,17 +349,15 @@ export function SalesConcierge({
         return {
           text: "On-prem clinic and studio surfaces are a separate insertion-order line, available on request. The public product is digital hubs.",
           options: [
-            { label: "Get a call back", href: RANDY_TEL_HREF, primary: true },
-            { label: "Book a call", action: () => { trackCta("cta_book_call"); openRandyChat({ reason: "concierge", mode: "chat" }); } },
+            { label: "Buy ads now", href: "/buycalc?sku=reserve-490#reserve", primary: true },
             { label: localizeNow("Prepay your category — $490"), action: onHandoff },
           ],
         };
       case "book_a_call":
         return {
-          text: `Multi-hub and on-prem retail hubs are a call, not a public checkout SKU. Dial ${RANDY_TEL_DISPLAY} or email.`,
+          text: `Multi-hub and on-prem retail hubs are not a public checkout SKU. Send the request form or email.`,
           options: [
-            { label: "Get a call back", href: RANDY_TEL_HREF, primary: true },
-            { label: "Book a call", action: () => { trackCta("cta_book_call"); openRandyChat({ reason: "concierge", mode: "chat" }); } },
+            { label: "Buy ads now", href: "/buycalc?sku=reserve-490#reserve", primary: true },
           ],
         };
       case "audience_or_metrics":
@@ -554,9 +552,6 @@ export function SalesConcierge({
                                 href={opt.href}
                                 target="_blank"
                                 rel="noreferrer"
-                                onClick={() => {
-                                  if (opt.label === "Book a call" || opt.label === "Get a call back") trackCta("cta_book_call");
-                                }}
                                 className={`flex items-center justify-between px-4 py-3 text-left text-sm font-medium transition-colors w-full border focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent ${
                                   opt.primary
                                     ? 'bg-accent border-accent text-accent-foreground hover:bg-accent/90'

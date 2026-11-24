@@ -25,7 +25,6 @@ import { Cta, usePageMeta } from "@/components/br/ui";
 import { MediaKitPdfLink } from "@/components/br/trust";
 import { SALES_REPLY_LINE } from "@/lib/seller-identity";
 import { PlacementVisual, type PlacementKey } from "@/components/br/placement-example";
-import { BOOK_CALL_MAILTO_HREF, openRandyChat } from "@/lib/book-call";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 import { BUYER_FAQ_TITLE, BuyerFaq, EarlySlots, FlightTimeline, ProgramsCallout, SAMPLE_REPORT, FLIGHT_TIMELINE, SampleIoLink, SampleReport, SeeTheUnit } from "@/components/br/buyer-comfort";
 import { DoorRoute } from "@/components/br/door-route";
@@ -119,22 +118,15 @@ function Block({ id, eyebrow, title, children, tone = "plain" }: { id: string; e
   );
 }
 
-/** Book a call opens the Randy chat (site rule); the mailto stays as the no-JS fallback. */
-function bookCall(e: MouseEvent<HTMLAnchorElement>) {
-  e.preventDefault();
-  openRandyChat({ reason: "book-a-call" });
-}
-
 function BookCall({ variant = "ink", testId }: { variant?: "ink" | "lime" | "line"; testId: string }) {
   return (
     <Cta
-      href={BOOK_CALL_MAILTO_HREF}
+      href={RESERVE_HREF}
       variant={variant}
       testId={testId}
       className="w-full sm:w-auto"
-      onClick={bookCall}
     >
-      Book a call
+      Buy ads now
     </Cta>
   );
 }
@@ -417,16 +409,13 @@ export default function BrMediaKit() {
       {/* Contact */}
       <section id="contact" className="scroll-mt-20 bg-foreground text-background">
         <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14" data-testid="mk-contact">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-background/60">Talk to the founder</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-background/60">Questions? Email the founder</p>
           <h2 className="mt-2 font-display text-[1.75rem] leading-tight md:text-4xl">Randy Gilling, Founder</h2>
           <div className="mt-4 flex flex-col gap-2 text-base">
             <a className="inline-flex min-h-11 items-center gap-2 underline-offset-4 hover:underline" href={`mailto:randy@scalehealth.ca?subject=${isScaleSkin() ? "Scale%20Health" : "Birch%20Reserve"}%20media%20kit`} data-testid="mk-email">
               <Mail className="size-4" aria-hidden /> randy@scalehealth.ca
             </a>
             <p className="text-sm text-background/75">{SALES_REPLY_LINE}</p>
-            <a className="inline-flex min-h-11 items-center gap-2 underline-offset-4 hover:underline" href="tel:+16479316278" data-testid="mk-phone">
-              <Phone className="size-4" aria-hidden /> (647) 931-6278
-            </a>
           </div>
           <div className="mt-6 max-w-xl text-foreground">
             <FounderNote />

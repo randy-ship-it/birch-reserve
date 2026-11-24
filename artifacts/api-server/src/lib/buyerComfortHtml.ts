@@ -52,7 +52,7 @@ export function seeTheUnitHtml(lookPrice: string, seatPrice: string): string {
     esc(SEE_THE_UNIT.gets[0]),
     `${esc(SEE_THE_UNIT.gets[1])} ${hubs}.`,
     `The <a href="${CREATIVE_BRIEF_HREF}">creative brief</a> and the <a href="${SAMPLE_IO_HREF}">sample insertion order</a>, so you know what the next step asks for.`,
-    `A real person: <a href="tel:+16479316278">(647) 931-6278</a> or <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a>.`,
+    `Questions by email: <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a>.`,
   ];
   return `<section class="band" id="see-the-unit" data-testid="see-the-unit"><div class="wrap"><p class="kicker">${esc(SEE_THE_UNIT.kicker)}</p><h2>${esc(SEE_THE_UNIT.title)}</h2>
 <div class="unit"><div><p>${esc(swap(SEE_THE_UNIT.body))}</p><p><strong>${esc(SEE_THE_UNIT.getTitle)}</strong></p><ul>${gets.map((g) => `<li>${g}</li>`).join("")}</ul><p>${esc(swap(SEE_THE_UNIT.decide))}</p></div>
@@ -92,7 +92,7 @@ export function heroSubHtml(lookPrice: string, seatPrice: string): string {
 /** A2: secondary inquire link plus the contact line, under the self-serve buttons. */
 export function heroInquireHtml(): string {
   return `<p class="hero-inquire" data-testid="hero-inquire"><a href="#request">${esc(DUAL_MOTION.inquireLabel)} →</a></p>
-<p class="hero-contact">Or call <a href="${SALES_PHONE_HREF}">${SALES_PHONE_DISPLAY}</a> ${esc(DUAL_MOTION.callBack)} · <a href="mailto:${SALES_EMAIL}?subject=Birch%20Reserve%20seat">${SALES_EMAIL}</a></p>`;
+<p class="hero-contact">Questions? <a href="mailto:${SALES_EMAIL}?subject=Birch%20Reserve%20seat">${SALES_EMAIL}</a></p>`;
 }
 
 /** B1: sample IO line under the offer cards. */
@@ -107,5 +107,5 @@ export function sharedSeatsHtml(): string {
 
 /** B3: sentence added to the live hub proof line. */
 export function liveHubTalkHtml(): string {
-  return ` ${esc(DUAL_MOTION.liveHubLead)} <a href="${REQUEST_HREF.replace("/buycalc", "")}">Ask about a placement</a> or call <a href="${SALES_PHONE_HREF}">${SALES_PHONE_DISPLAY}</a>.`;
+  return ` ${esc(DUAL_MOTION.liveHubLead)} <a href="${REQUEST_HREF.replace("/buycalc", "")}">Ask about a placement</a>.`;
 }
