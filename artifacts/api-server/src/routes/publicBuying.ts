@@ -1,4 +1,5 @@
 import { BUYER_HEADER_CSS, TOKENS_CSS, buyerHeaderHtml } from "../lib/brandTokens";
+import { EXCLUSIVE_RESERVE, EXCLUSIVE_RESERVE_DESCRIPTION, exclusiveReserveFor } from "../lib/exclusiveReserveTerms";
 import { PRICE_LADDER_CSS, priceLadderHtml } from "../lib/priceLadder";
 import { hundredHtml } from "../lib/overhaul/hundred";
 import { PROMO_SCRIPT_TAG } from "../lib/adserver/promoBoxJs";
@@ -597,6 +598,7 @@ router.get("/v1/catalog.json", (_req, res) => {
       due_today: offer.dueTodayUsd,
       note: "Unpublished legacy SKU. Existing Stripe Checkout sessions still match. Not offered for new public checkout.",
     })),
+    exclusive_offers: [catalogExclusiveOffer()],
     discount_vs_published: 0.25,
     formats: FORMATS,
     category_slot: "early_slot",
@@ -606,6 +608,34 @@ router.get("/v1/catalog.json", (_req, res) => {
     human: "/buycalc",
   });
 });
+
+/** The $1,900 exclusive reserve, from the same terms module /exclusive and /terms use. Additive: not in `offers` (agents check out those via /v1/checkout; this one pays on /exclusive). */
+function catalogExclusiveOffer() {
+  const cad = exclusiveReserveFor("cad");
+  const usd = exclusiveReserveFor("usd");
+  return {
+    offer_key: "exclusive-reserve",
+    sku: cad.sku,
+    name: cad.name,
+    offer_type: "exclusive_display_reserve",
+    amount_cents: cad.amountCents,
+    due_today: cad.amountCents / 100,
+    currency: "CAD",
+    prices: {
+      CAD: { amount_cents: cad.amountCents, due_today: cad.amountCents / 100, label: cad.label },
+      USD: { amount_cents: usd.amountCents, due_today: usd.amountCents / 100, label: usd.label },
+    },
+    scope: EXCLUSIVE_RESERVE_DESCRIPTION,
+    package_range: cad.packageLabel,
+    discount_vs_regular_rate: EXCLUSIVE_RESERVE.discountPct / 100,
+    one_brand_per_category: true,
+    requires_insertion_order: true,
+    guarantees_impressions: false,
+    terms_version: EXCLUSIVE_RESERVE.termsVersion,
+    checkout: "/exclusive",
+    human: "/exclusive",
+  };
+}
 
 /** Exact due-today price in every payable currency for one public SKU. */
 function priceTable(offer: PublicReserveOffer) {
