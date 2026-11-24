@@ -173,7 +173,7 @@ export default function BrHome() {
         <a href="/agencies?ref=home_strip" data-testid="home-strip-agencies" onClick={() => trackAttn("strip.agencies")} className="group mt-3 flex flex-col gap-2 rounded-2xl border-2 border-[#0b1f3a] bg-white p-4 shadow-sm transition-colors hover:bg-[#0b1f3a] sm:flex-row sm:items-center sm:justify-between">
           <span className="min-w-0">
             <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55 group-hover:text-lime-300">For agencies &amp; brokers</span>
-            <span className="mt-0.5 block font-display text-xl leading-tight text-[#0b1f3a] group-hover:text-white md:text-2xl">Pay list price, keep 10% of spend. Exclusive partners buy below list.</span>
+            <span className="mt-0.5 block font-display text-xl leading-tight text-[#0b1f3a] group-hover:text-white md:text-2xl">Pay list price, keep 10% of spend. Exclusive inventory partners get 10–25% off list price.</span>
           </span>
           <span className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 self-start rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white group-hover:bg-lime-300 group-hover:text-[#0b1f3a] sm:self-auto">See agency tiers <ArrowRight className="size-4" aria-hidden /></span>
         </a>
@@ -196,7 +196,7 @@ export default function BrHome() {
         <HubFunnel />
       </section>
 
-      {/* 5. Trusted Agency Partners (Randy Nov 24 2026 t8289u). */}
+      {/* 5. Exclusive inventory partners (Randy Nov 24 2026 t8289u; renamed + 10–25% Nov 24 1:53 PM ET). */}
       <TrustedAgencyPartners />
 
       {/* 2c. Categories + Questions brands ask moved up: strip under the hero, compact questions by the kit CTA (Nov 21). */}
