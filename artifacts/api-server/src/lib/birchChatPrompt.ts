@@ -70,7 +70,20 @@ export type BirchChatPromptOptions = {
   checkout: SiteCheckoutState;
   /** Themes behind real recent marketplace events (lib/activityPulse.ts pulseThemes), newest-weighted. */
   pulseThemes?: string[];
+  /** Visitor's display currency from the site (/api/currency + toggle). The page shows prices in this currency. */
+  currency?: "usd" | "cad";
 };
+
+/** One currency per reply (Randy, Nov 23 2026: "$690 CAD (or $690 CAD if you're in Canada)" read wrong). Amounts come from the ONBOARDING MODULE tables only. */
+function currencyNote(currency: BirchChatPromptOptions["currency"]): string {
+  if (currency === "cad") {
+    return "The visitor's prices are shown in CAD (Canada). Quote each price once, as the CAD amount from the ONBOARDING MODULE (for example the look and the reserve in CAD), with no USD figure and no bracketed equivalent. Prices that have no CAD table (exclusive reserve, GTM setup, area lock, partnerships) keep the number written here.";
+  }
+  if (currency === "usd") {
+    return "The visitor's prices are shown in USD. Quote each price once, in USD, with no bracketed CAD equivalent unless they say they are in Canada or ask about CAD.";
+  }
+  return "";
+}
 
 /** Mirrors "Questions brands ask" on the site (components/br/market-pulse.tsx). Questions only; answers come from the facts above. */
 export const BRAND_QUESTIONS_ASKED = [
@@ -244,6 +257,7 @@ function buildBirchPromptText(opts: BirchChatPromptOptions, brand: ChatBrand): s
     `- ${surface}`,
     ...(page ? [`- ${page}`] : []),
     ...(chip ? [`- ${chip}`] : []),
+    ...(currencyNote(opts.currency) ? [`- ${currencyNote(opts.currency)}`] : []),
   ].join("\n");
 }
 

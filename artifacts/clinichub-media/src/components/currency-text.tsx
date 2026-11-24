@@ -16,9 +16,24 @@ const SKIP_PATHS = /^\/(terms|privacy|sample-io)(\/|$)/;
 const SKIP_SEL = "script,style,textarea,input,[role=group],[data-testid^=currency],[data-currency-fixed],[contenteditable]";
 const HAS_PRICE = /\$(190|490)(?![0-9,]|\.[0-9])|\bUSD\b/;
 
+const AMT = String.raw`\$[0-9][0-9,]*(?:\.[0-9]{2})?`;
+/** "$490 USD (or $690 CAD if you're in Canada)", "$190 USD ($270 CAD in Canada)", "$490 USD / $690 CAD", "$490 USD (CAD $690)":
+ * the text already names the CAD amount, so keep just that one (Randy, Nov 23 2026: the chat read "$690 CAD (or $690 CAD if
+ * you're in Canada)" after the USD half was rewritten). Only the amount the copy itself states is used; nothing is converted. */
+const DUAL_PAREN = new RegExp(String.raw`(${AMT})(?:\s*USD)?\s*\((?:or\s+)?(?:(${AMT})\s*CAD|CAD\s*(${AMT}))\b[^)]*\)`, "g");
+const DUAL_SLASH = new RegExp(String.raw`(${AMT})\s*USD\s*/\s*(?:(${AMT})\s*CAD|CAD\s*(${AMT}))\b`, "g");
+const REPEAT_CAD = new RegExp(String.raw`\s*\((?:or\s+)?(${AMT})\s*CAD(?:\s+(?:in|for|if you're in|if you are in|for visitors in)\s+Canada)?\)`, "g");
+export function preferCadAmount(text: string): string {
+  const keep = (_m: string, _usd: string, cad?: string, cad2?: string) => `${cad ?? cad2} CAD`;
+  return text.replace(DUAL_PAREN, keep).replace(DUAL_SLASH, keep);
+}
+
 /** CAD copy: CAD table for $190 / $490, every other USD label becomes CAD with the same number. */
 export function toCadText(text: string, prices?: Parameters<typeof localizePrices>[2]): string {
-  return localizePrices(text, "cad", prices).replace(/\bUSD\b/g, "CAD").replace(/\bCAD(\s*[·,]?\s*)CAD\b/g, "CAD");
+  const out = localizePrices(preferCadAmount(text), "cad", prices).replace(/\bUSD\b/g, "CAD").replace(/\bCAD(\s*[·,]?\s*)CAD\b/g, "CAD");
+  // "$690 CAD reserve ($690 CAD in Canada)": the bracket now repeats a CAD amount already stated just before it.
+  return out.replace(REPEAT_CAD, (m: string, amt: string, offset: number, all: string) =>
+    all.slice(Math.max(0, offset - 120), offset).includes(`${amt} CAD`) ? "" : m);
 }
 
 /** Text just before this node inside its block: all previous siblings ("$" + "190" + " USD"), or, for a
