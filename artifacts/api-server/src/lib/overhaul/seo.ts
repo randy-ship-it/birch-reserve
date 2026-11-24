@@ -89,7 +89,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   },
   "/agencies": {
     title: "For agencies & brokers | Birch Reserve",
-    description: "Agencies, brokers and media resellers: prepay a client test into private health & wellness hubs from $490 USD. Spec sheet, sample IO, UTM and promo-code reporting, 10% of media spend paid in cash to the agency of record.",
+    description: "Agencies, brokers and media resellers: published rate card, a standard written 10% agency discount, you set the resale price and handle client disclosure. Direct buyers pay the rate card. We do not undercut agency clients.",
     jsonld: {
       "@context": "https://schema.org",
       "@graph": [

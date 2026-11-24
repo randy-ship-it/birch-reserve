@@ -20,14 +20,49 @@ test("agency cut: 10% of media spend, paid in cash to the agency of record (Rand
   assert.equal(agencyCash(50000), 5000);
 });
 
-test("/agencies: 10% paid in cash; client tests start on the $190 / $490 USD offers", () => {
+test("/agencies: written 10% discount off the published rate card; client tests start on the $190 / $490 USD offers", () => {
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
-  assert.match(page, /10% of media spend, paid in cash to the agency of record/);
+  assert.match(page, /standard written 10% discount/);
+  assert.match(page, /published rate card/);
   assert.doesNotMatch(page, /\$1,500|\$3,000|\$6,000|SLOT_LADDER/);
   assert.match(page, /<BuyPaths /); // Nov 24: card vs IO compare, now folded under "The details"
   assert.equal(AGENCY.line, "10% of media spend, paid in cash to the agency of record.");
   assert.match(AGENCY.bonusNote, /\$190 USD/);
   assert.match(AGENCY.bonusNote, /\$490 USD/);
+});
+
+test("Nov 24 PM: /agencies is the published rate-card model (written 10% discount, agency sets resale, no undercutting)", async () => {
+  const { AGENCY_DISCOUNT_PCT, AGENCY_DISCOUNT_EXAMPLE, AGENCY_RATE_CARD, AGENCY_RATE_RULES, AGENCY_FAQ } = await import("../src/lib/overhaul/agencyShowcase");
+  assert.equal(AGENCY_DISCOUNT_PCT, 10);
+  assert.equal(AGENCY_DISCOUNT_EXAMPLE.list, 10_000);
+  assert.equal(AGENCY_DISCOUNT_EXAMPLE.agencyPays, 9_000);
+  assert.match(AGENCY_RATE_CARD.line, /standard written 10% discount off the published rate card/);
+  assert.equal(AGENCY_RATE_CARD.resale, "You set your own resale price.");
+  assert.equal(AGENCY_RATE_CARD.disclosure, "You handle your own client disclosure.");
+  assert.equal(AGENCY_RATE_CARD.direct, "Direct buyers pay the published rate card.");
+  assert.equal(AGENCY_RATE_CARD.noUndercut, "We do not undercut an agency's client.");
+  assert.deepEqual(AGENCY_RATE_RULES.map((r) => r.k), [
+    "Published rate card",
+    "Written 10% discount",
+    "You set the resale price",
+    "You disclose to your client",
+    "Direct buyers pay the card",
+    "No undercutting agency clients",
+  ]);
+  const page = read("../clinichub-media/src/pages/br/agencies.tsx");
+  const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
+  assert.match(page, /<AgencyRateCardModel \/>/);
+  assert.match(page, /<AgencyDiscountExample \/>/);
+  assert.match(page, /We do not undercut an agency/);
+  assert.match(page, /set their own resale price/);
+  assert.match(page, /handle their own client disclosure/);
+  assert.doesNotMatch(page, /10–25%|paid in cash to the agency of record|keep 10% of spend|GTM bot|go-to-market sales motions/);
+  assert.doesNotMatch(page + ui, /book a call|schedule a call|talk to (the founder|randy)|chat with randy/i);
+  assert.doesNotMatch(page, /Clairvoyant|\bAlign\b|MedVibe|Kalaya/);
+  const faq = AGENCY_FAQ.map((i) => i.q + " " + i.a).join("\n");
+  assert.match(faq, /standard written 10% discount off the published rate card/);
+  assert.match(faq, /We do not undercut an agency's client/);
+  assert.doesNotMatch(faq, /10–25%|go-to-market sales motions|GTM bot/);
 });
 
 test("brand pages lead with the $190 / $490 USD offers, not the old deposit ladder", () => {
@@ -82,7 +117,7 @@ test("/agencies (Nov 16 2026, rebuilt Nov 24): fast lock path, brokers folded in
   assert.match(page, /RESERVE_HREF/);
   assert.match(page, /lookHref\("agencies_paths_look"\)/);
   // Brokers & resellers: same agency-of-record terms (agency tier copy), no new commission number.
-  assert.match(page, /Exclusive partner bids, client tests and broker lists all come here/);
+  assert.match(page, /Partner access, client tests and broker lists all come here/);
   assert.doesNotMatch(page, /\b(5|8|12|15|20)% (broker|referral|finder)/i);
   // No invented deadlines, countdowns or seat counts.
   assert.doesNotMatch(page, /\d+ (seats?|spots?|placements?) (left|remaining|open)/i);
@@ -90,7 +125,7 @@ test("/agencies (Nov 16 2026, rebuilt Nov 24): fast lock path, brokers folded in
   // USD only until the CAD checkout is tested (Randy, Nov 16 2026).
   assert.doesNotMatch(page, /\bCAD\b|t\.cad/);
   // Reuses the shared spec sheet, IO steps and payout table (folded).
-  for (const c of ["<InventorySpec />", "<IoProcess />", "<AgencyPayouts />"]) assert.ok(page.includes(c), c);
+  for (const c of ["<InventorySpec />", "<IoProcess />", "<AgencyDiscountExample />"]) assert.ok(page.includes(c), c);
 });
 
 test("plan by goal (Nov 17 2026): four goals map to the four spec-sheet placements at the published starting rates, no claims", () => {
@@ -186,15 +221,15 @@ test("Nov 23: /agencies payout table pays 10% of the seat price actually shown (
 
 test("Nov 24: /agencies leads with two ways to buy (card vs insertion order), published terms only", async () => {
   const { BUY_PATHS } = await import("../src/lib/overhaul/agencyShowcase");
-  assert.deepEqual(BUY_PATHS.rows.map((r) => r.k), ["Best for", "Pay", "Before it runs", "Refunds", "Agency cash"]);
+  assert.deepEqual(BUY_PATHS.rows.map((r) => r.k), ["Best for", "Pay", "Before it runs", "Refunds", "Agency discount"]);
   assert.equal(BUY_PATHS.io.price, "$1K–$5K USD");
   assert.match(BUY_PATHS.io.kicker, /^Insertion order \(IO\)/);
   const text = JSON.stringify(BUY_PATHS);
-  for (const t of ["$190 USD", "$490 USD", "10% of media spend", "14 days before launch", "Deposit collected at confirmation", "Stripe-hosted"]) assert.ok(text.includes(t), t);
+  for (const t of ["$190 USD", "$490 USD", "10% off the published rate card", "14 days before launch", "Deposit collected at confirmation", "Stripe-hosted"]) assert.ok(text.includes(t), t);
   assert.doesNotMatch(text, /guarantee|CTR|ROAS|lift|\bCAD\b|signed partners?|Align\b|Clairvoyant|Kalaya|80 locations|call|minutes|hours|today only|left\b/i);
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
-  // Nov 24 PM (t543u): the compare moved into "The details", after the tiers; still one block, no duplicate offers.
-  assert.ok(page.indexOf('id="two-ways-to-buy"') > page.indexOf('id="tiers"'));
+  // The compare sits in "The details", after the rate-card model; still one block, no duplicate offers.
+  assert.ok(page.indexOf('id="two-ways-to-buy"') > page.indexOf('id="model"'));
   assert.match(page, /<BuyPaths reserveHref=\{RESERVE_HREF\} lookHref=\{lookHref\("agencies_paths_look"\)\} \/>/);
   assert.doesNotMatch(page, /Same two offers as brands/);
 });
@@ -217,9 +252,10 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.match(ui, /priceLadder\("usd"\)/);
   assert.match(ui, /TRACK_RECORD\.cards\.find\(\(c\) => c\.key === "partner-launch"\)/);
   assert.ok(TRACK_RECORD.cards.some((c) => c.key === "partner-launch"));
-  for (const c of ["<InventoryCanister />", "<AgencyTierCards ", "<ExclusivePerks />"]) assert.ok(page.includes(c), c);
-  // One primary hero CTA, before the canister.
-  const hero = page.slice(page.indexOf("<H1>"), page.indexOf('id="tiers"'));
+  for (const c of ["<AgencyRateCardModel />", "<AgencyDiscountExample />"]) assert.ok(page.includes(c), c);
+  assert.doesNotMatch(page, /<InventoryCanister \/>|<AgencyTierCards |<ExclusivePerks \/>/);
+  // One primary hero CTA, before the model.
+  const hero = page.slice(page.indexOf("<H1>"), page.indexOf('id="model"'));
   assert.equal((hero.match(/<Cta /g) ?? []).length, 1);
   // Exclusive partners ask for a bid on the existing form; never a phone call or a chat with Randy.
   assert.match(ui, /Send a bid or interest/);

@@ -155,11 +155,11 @@ export const PLAIN_TERMS: Array<{ key: string; q: string; a: string }> = [
 /** The /agencies FAQ (moved here from the page on Nov 18 2026 so the server can emit one FAQPage). */
 export const AGENCY_FAQ: Array<{ q: string; a: string }> = [
   { q: "Can we prepay for several clients?", a: "Yes. One prepay can be split across clients; each client gets its own insertion order and reporting." },
-  { q: "Is there a commission?", a: "Yes: 10% of media spend, paid in cash to the agency of record. Small tests can start self-serve on the $190 USD look or the $490 USD reserve." },
+  { q: "Is there an agency discount?", a: "Yes. Agencies, brokers and media resellers buy at a standard written 10% discount off the published rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. Small tests can start self-serve on the $190 USD look or the $490 USD reserve." },
   { q: "Which placement fits which goal?", a: "Awareness: the hub home page. Consideration: product, services and booking pages. Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Retention and loyalty: the member dashboard behind login. One IO can mix them." },
   { q: "How is performance tracked?", a: "Every placement carries your UTM parameters and, if you want, a promo code. We report views and clicks per hub and surface. Aggregate only." },
-  { q: "What is an exclusive inventory partner?", a: "An agency that buys at 10–25% off list price and still keeps 10% of spend. Partners get first chance at new inventory as the network grows, inventory blocked for them, a named mention on our site and in sales materials, and our go-to-market sales motions in the field. Send a bid or note your interest on the agency form." },
-  { q: "Do brokers and media resellers qualify?", a: "Yes. When you are the agency of record on the insertion order, you earn 10% of media spend, paid in cash, the same as an agency. List every brand you represent in one inquiry; each gets its own IO and reporting." },
+  { q: "What is reserved partner inventory?", a: "A limited set-aside of exclusive packages and newly activating hubs, for a few agencies. Partners buy at the same written 10% discount off the rate card, and get first look as new hubs activate. Send a note on the agency form if that is useful." },
+  { q: "Do brokers and media resellers qualify?", a: "Yes. When you are the agency of record on the insertion order, you buy at the same written 10% discount as an agency. You set your own resale price and handle your own client disclosure. List every brand you represent in one inquiry; each gets its own IO and reporting." },
   { q: "Why lock a test now?", a: "New placements open at starter rates, and a placement's rate can step up only once reporting shows it performs. Prepaid credit keeps its rate for its term, and the $490 USD reserve stays fully refundable until 14 days before the launch date on the IO." },
   { q: "Can our bots read this site?", a: "Yes: see /llms.txt, /sitemap.xml and the structured data on each page." },
 ];
@@ -196,8 +196,44 @@ export const BUY_PATHS = {
     { k: "Pay", card: "Card on a Stripe-hosted page, no login", io: "Deposit collected at confirmation" },
     { k: "Before it runs", card: "You approve an IO naming the hub and placement", io: "Send the brief; we reply with hub fit and a draft IO" },
     { k: "Refunds", card: "$490 refundable until 14 days before launch; $190 converts or is refunded", io: "Same terms as every deposit" },
-    { k: "Agency cash", card: `${AGENCY_CASH_PCT}% of media spend`, io: `${AGENCY_CASH_PCT}% of media spend` },
+    { k: "Agency discount", card: `${AGENCY_CASH_PCT}% off the published rate card`, io: `${AGENCY_CASH_PCT}% off the published rate card` },
   ],
+} as const;
+
+
+/**
+ * Rate-card agency model (Randy, Nov 24 2026): published rate card, standard written 10% agency
+ * discount, agencies set their own resale price, agencies handle their own client disclosure,
+ * direct buyers pay the rate card, no undercutting of agency clients.
+ * /agencies uses this. The older three-tier cash + 10–25% exclusive-partner constants below stay
+ * for the current home section until that page is aligned.
+ */
+export const AGENCY_DISCOUNT_PCT = AGENCY_CASH_PCT;
+export const AGENCY_RATE_CARD = {
+  discountPct: AGENCY_DISCOUNT_PCT,
+  line: `Agencies buy at a standard written ${AGENCY_DISCOUNT_PCT}% discount off the published rate card.`,
+  resale: "You set your own resale price.",
+  disclosure: "You handle your own client disclosure.",
+  direct: "Direct buyers pay the published rate card.",
+  noUndercut: "We do not undercut an agency's client.",
+} as const;
+
+export const AGENCY_RATE_RULES: ReadonlyArray<{ k: string; d: string }> = [
+  { k: "Published rate card", d: "The same list prices every buyer can see. The 7-day look, the reserve and the exclusive reserve are on the media kit." },
+  { k: "Written 10% discount", d: "Agencies, brokers and media resellers buy 10% off that card. The discount is standard and in writing." },
+  { k: "You set the resale price", d: "What you charge your client is yours. We do not set a resale price for you." },
+  { k: "You disclose to your client", d: "Client disclosure sits with you. We do not brief your client on what you paid." },
+  { k: "Direct buyers pay the card", d: "A brand buying for itself pays the published rate card. No agency discount." },
+  { k: "No undercutting agency clients", d: "If you are the agency of record on an insertion order, we will not sell that client the same inventory cheaper behind you." },
+];
+
+/** $10,000 USD worked example. Planning illustration only, not a quote. */
+export const AGENCY_DISCOUNT_EXAMPLE = {
+  list: 10_000,
+  discountPct: AGENCY_DISCOUNT_PCT,
+  discount: 10_000 * (AGENCY_DISCOUNT_PCT / 100),
+  agencyPays: 10_000 * (1 - AGENCY_DISCOUNT_PCT / 100),
+  note: "Illustrative example, modelled. Not a forecast or a quote. Assumes a 10% discount off the published rate card. What you charge the client is yours. Nothing runs until an insertion order names the placement.",
 } as const;
 
 /**

@@ -13,7 +13,11 @@ import { priceLadder } from "../../../../api-server/src/lib/priceLadder";
 import { TRACK_RECORD } from "../../../../api-server/src/lib/overhaul/trackRecord";
 import {
   AGENCY_CLIENT_TEST,
+  AGENCY_DISCOUNT_EXAMPLE,
+  AGENCY_DISCOUNT_PCT,
   AGENCY_EXAMPLES,
+  AGENCY_RATE_CARD,
+  AGENCY_RATE_RULES,
   AGENCY_SHARE,
   AGENCY_TIERS,
   EXCLUSIVE_PARTNER_PERKS,
@@ -559,5 +563,65 @@ export function ExclusivePerks() {
         </div>
       </div>
     </details>
+  );
+}
+
+/** Two buyer lanes + six ground rules + the published rate-card ladder (Randy, Nov 24 2026). */
+export function AgencyRateCardModel() {
+  return (
+    <div data-testid="agency-rate-card-model">
+      <div className="grid gap-px border border-foreground bg-foreground md:grid-cols-2">
+        <article className="bg-background p-6 md:p-8" data-testid="lane-direct">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Direct buyers</p>
+          <h3 className="mt-3 font-display text-3xl leading-tight text-foreground md:text-4xl">Pay the rate card.</h3>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">A brand buying space for itself pays the published list price. No agency discount.</p>
+        </article>
+        <article className="bg-foreground p-6 text-background md:p-8" data-testid="lane-agency">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-background/55">Agencies, brokers &amp; resellers</p>
+          <h3 className="mt-3 font-display text-3xl leading-tight md:text-4xl">{AGENCY_DISCOUNT_PCT}% off, in writing.</h3>
+          <p className="mt-3 text-sm leading-relaxed text-background/75">{AGENCY_RATE_CARD.line} {AGENCY_RATE_CARD.resale} {AGENCY_RATE_CARD.disclosure}</p>
+        </article>
+      </div>
+      <ol className="mt-6 grid gap-px border border-foreground/15 bg-foreground/15 sm:grid-cols-2 lg:grid-cols-3" data-testid="agency-rate-rules">
+        {AGENCY_RATE_RULES.map((r, i) => (
+          <li key={r.k} className="bg-background p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{String(i + 1).padStart(2, "0")}</p>
+            <p className="mt-2 font-display text-xl leading-tight text-foreground">{r.k}</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{r.d}</p>
+          </li>
+        ))}
+      </ol>
+      <div className="mt-5"><ListPriceLine /></div>
+    </div>
+  );
+}
+
+/** Illustrative $10,000 USD worked example of the 10% written discount. */
+export function AgencyDiscountExample() {
+  const e = AGENCY_DISCOUNT_EXAMPLE;
+  const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
+  const rows = [
+    { k: "Rate card", n: usd(e.list) },
+    { k: "Written 10% discount", n: `−${usd(e.discount)}` },
+    { k: "Agency pays", n: usd(e.agencyPays), accent: true },
+  ] as const;
+  return (
+    <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]" data-testid="agency-discount-example">
+      <div>
+        <span className="inline-block border border-foreground px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em]" data-testid="agency-illustrative">Illustrative example</span>
+        <p className="mt-5 font-display text-6xl leading-none tracking-tight text-foreground md:text-7xl">{e.discountPct}%</p>
+        <p className="mt-4 max-w-md text-base leading-relaxed text-foreground/80">{AGENCY_RATE_CARD.line}</p>
+        <p className="mt-3 max-w-md text-sm text-muted-foreground">{AGENCY_RATE_CARD.resale} {AGENCY_RATE_CARD.disclosure} {AGENCY_RATE_CARD.noUndercut}</p>
+      </div>
+      <div className="border border-foreground bg-foreground text-background">
+        {rows.map((r) => (
+          <div key={r.k} className="flex items-baseline justify-between gap-4 border-b border-background/15 px-5 py-4 last:border-b-0">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-background/60">{r.k}</span>
+            <span className={`font-display text-3xl leading-none tabular-nums md:text-4xl ${"accent" in r && r.accent ? "text-accent" : ""}`}>{r.n}</span>
+          </div>
+        ))}
+        <p className="border-t border-background/15 px-5 py-3 text-[12px] leading-snug text-background/65">{e.note}</p>
+      </div>
+    </div>
   );
 }
