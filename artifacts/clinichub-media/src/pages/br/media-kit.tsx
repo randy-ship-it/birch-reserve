@@ -20,7 +20,7 @@ import { PerformanceOnly } from "@/components/br/performance-only";
 import { STREET_TEAM_ONE_LINE } from "../../../../api-server/src/lib/overhaul/streetTeam";
 import { KitCta } from "@/components/br/kit-cta";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
-import { Check, Mail, Phone } from "lucide-react";
+import { Check, ChevronDown, Mail, Phone } from "lucide-react";
 import { Cta, usePageMeta } from "@/components/br/ui";
 import { MediaKitPdfLink } from "@/components/br/trust";
 import { SALES_REPLY_LINE } from "@/lib/seller-identity";
@@ -146,6 +146,20 @@ export default function BrMediaKit() {
   const agencyPrem = agencyCash(prem.spendLo);
   const cpm = `~$${MEDIA_KIT_CPM.lo}–${MEDIA_KIT_CPM.hi} CPM`;
 
+  // Deep links like /media-kit#flight-report open the collapsed section that holds the target.
+  useEffect(() => {
+    const openHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      const el = id ? document.getElementById(id) : null;
+      let d = el?.closest("details") ?? null;
+      if (!el || !d) return;
+      while (d) { d.open = true; d = d.parentElement?.closest("details") ?? null; }
+      requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "start" }));
+    };
+    openHash();
+    window.addEventListener("hashchange", openHash);
+    return () => window.removeEventListener("hashchange", openHash);
+  }, []);
   return (
     <div className="media-kit overflow-x-hidden" data-testid="br-media-kit">
       {/* Hero */}
@@ -211,9 +225,14 @@ export default function BrMediaKit() {
 
       {/* GTM setup packages (Randy t332u, Nov 21 2026) */}
       <section className="border-b border-border/70 bg-background" data-testid="mk-gtm-setup">
-        <div className="container mx-auto max-w-5xl px-5 py-10 md:px-6 md:py-14"><div className="mb-4"><HowWeGotHere where="media_kit" /></div><div className="mb-4"><TrackRecord where="media_kit" /></div><div className="mb-4"><FlightReportExample where="media_kit" /></div><div className="mb-4"><PerformanceRanges where="media_kit" /></div><div className="mb-4"><PerformanceOnly where="media_kit" /></div><GtmSetup where="media_kit" />
+        <div className="container mx-auto max-w-5xl px-5 py-6 md:px-6 md:py-8">
+        <details className="group rounded-2xl border border-[#0b1f3a]/10 bg-white shadow-sm" data-testid="mk-more-details">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 md:px-6 [&::-webkit-details-marker]:hidden"><span><span className="block font-display text-xl text-[#0b1f3a] md:text-2xl">Track record, example reports, outreach setup</span><span className="mt-0.5 block text-[13px] text-foreground/60">Estimates are labelled, not guarantees</span></span><ChevronDown className="size-5 shrink-0 text-[#0b1f3a]/60 transition group-open:rotate-180" aria-hidden /></summary>
+          <div className="border-t border-[#0b1f3a]/10 p-4 md:p-6"><div className="mb-4"><HowWeGotHere where="media_kit" /></div><div className="mb-4"><TrackRecord where="media_kit" /></div><div className="mb-4"><FlightReportExample where="media_kit" /></div><div className="mb-4"><PerformanceRanges where="media_kit" /></div><div className="mb-4"><PerformanceOnly where="media_kit" /></div><GtmSetup where="media_kit" />
           <div className="mt-4"><GtmBotTeaser /></div>
           <p className="mt-4 text-sm text-foreground/75" data-testid="mk-street-team-line"><strong className="text-[#0b1f3a]">Street team.</strong> {STREET_TEAM_ONE_LINE} <a href="/street-team" className="font-semibold underline underline-offset-2">See the program</a></p>
+          </div>
+        </details>
         </div>
       </section>
 
