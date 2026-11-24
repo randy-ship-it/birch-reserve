@@ -170,9 +170,11 @@ export function FounderNote() {
       <p className="mt-2 text-sm leading-relaxed text-foreground/85">
         {isScaleSkin() ? "Birch Reserve is Scale Health’s exclusive ad unit, run by Silver Birch Growth Inc. in Toronto." : "Birch Reserve is run by Silver Birch Growth Inc. in Toronto."} You deal with the founder, Randy Gilling, directly: no reseller and no ad network in between.
       </p>
-      <p className="mt-3 text-sm">
-        <a href="https://silverbirchgrowth.com" target="_blank" rel="noopener" className="font-semibold underline underline-offset-4">silverbirchgrowth.com</a>
-      </p>
+      {isScaleSkin() ? null : (
+        <p className="mt-3 text-sm">
+          <a href="https://silverbirchgrowth.com" target="_blank" rel="noopener" className="font-semibold underline underline-offset-4">silverbirchgrowth.com</a>
+        </p>
+      )}
     </div>
   );
 }
