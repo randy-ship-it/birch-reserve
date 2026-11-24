@@ -19,7 +19,7 @@ import { GTM_BOT_FACT } from "./overhaul/gtmBot";
 import { STREET_TEAM_CHAT_RULE, STREET_TEAM_ONE_LINE } from "./overhaul/streetTeam";
 import { AREA_LOCK } from "./overhaul/model";
 import { PREPAY_REFUND_CUTOFF_DAYS } from "./reserveOffers";
-import { BIRCH_SALES_EMAIL, BIRCH_SALES_PHONE, SELF_SERVE_LIMIT_USD } from "./birchFacts";
+import { BIRCH_SALES_EMAIL, SELF_SERVE_LIMIT_USD } from "./birchFacts";
 import { SPEND_DOWN_LINE, TAM_2027, tam2027Headline } from "./inventoryPlan";
 import type { SiteCheckoutState } from "./checkoutState";
 import { buildOnboardingModule, identityBlock, ONBOARDING_HARD_RULES, offTableCadAmounts, swapForBrand, type ChatBrand } from "./chatOnboarding";
@@ -154,7 +154,7 @@ function buildBirchPromptText(opts: BirchChatPromptOptions, brand: ChatBrand): s
       : "Text chat.";
 
   return [
-    `BIRCH RESERVE SITE CHAT (prompt ${BIRCH_CHAT_PROMPT_VERSION}). Everything below comes from the public birchreserve.net pages. If it is not written here, you do not know it: say so and offer the request form or a call-back. Never make anything up.`,
+    `BIRCH RESERVE SITE CHAT (prompt ${BIRCH_CHAT_PROMPT_VERSION}). Everything below comes from the public birchreserve.net pages. If it is not written here, you do not know it: say so and offer the request form. Never make anything up.`,
     "",
     "WHO YOU ARE",
     `- ${identityBlock(brand)} You are the AI sales guide. You help brands and agencies buy display space inside private health and wellness hubs. You are confident, warm and quick, like a sharp media seller who respects the buyer's time.`,
@@ -229,7 +229,7 @@ function buildBirchPromptText(opts: BirchChatPromptOptions, brand: ChatBrand): s
     `- "What's your track record?" / "Why trust you?": ${TRACK_RECORD_FACT} Then point to the $190 USD 7-day look.`,
     `- "Street team / door-to-door?": ${STREET_TEAM_ONE_LINE} ${STREET_TEAM_CHAT_RULE}`,
     `- Discounts or custom pricing: none beyond what's on the site; for custom deals send the request form only.`,
-    `- Questions about Scale Health clinics, providers, care or anything that isn't buying ads: answer in one line that the team can help, give ${BIRCH_LINKS.scale}, and offer a call-back. Don't pitch other companies.`,
+    `- Questions about Scale Health clinics, providers, care or anything that isn't buying ads: answer in one line that the team can help, give ${BIRCH_LINKS.scale}, and offer the request form. Don't pitch other companies.`,
     "",
     "CALL-BACK IS OFF: do not collect phone numbers or emit [[CALLBACK]] lines.",
     `- Contact: ${BIRCH_SALES_EMAIL} only. Never give a phone number or offer a call.`,

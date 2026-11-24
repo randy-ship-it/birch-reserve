@@ -34,8 +34,6 @@ export const EARLY_SLOTS = {
  * The 647 line is a phone assistant that books a call back, so copy says "request a call back",
  * never "the sales team walks you through" on the call.
  */
-export const SALES_PHONE_DISPLAY = "(647) 931-6278";
-export const SALES_PHONE_HREF = "tel:+16479316278";
 export const SALES_EMAIL = "randy@scalehealth.ca";
 export const REQUEST_HREF = "/buycalc#request";
 export const REPLY_LINE = "We reply within 1 business day.";
@@ -57,7 +55,7 @@ export const DUAL_MOTION = {
   sharedBuycalc: "Self-serve seats stay shared, open to more than one brand, while the network is curated hub by hub. Only a premium slot locks a category.",
   sharedKit: "Self-serve seats stay shared, not exclusive, while the network is curated hub by hub. Exclusivity is a premium slot only.",
   /** B3: added to the live hub proof line on /buycalc. */
-  liveHubLead: "Want to talk through current options?",
+  liveHubLead: "Ready to bid, or have a question?",
 } as const;
 
 /** 1. How a test dollar becomes a flight. */

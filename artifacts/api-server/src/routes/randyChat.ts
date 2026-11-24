@@ -30,7 +30,6 @@ import { attributionFrom } from "../lib/publicGuards";
 import { MIRROR_ORIGIN_HOSTS } from "../middlewares/mirrorHost";
 import { birchFaqAnswer } from "../lib/birchFaq";
 import { BRAND_NAMES, chatBrandFor, swapForBrand, type ChatBrand } from "../lib/chatOnboarding";
-import { BIRCH_SALES_PHONE } from "../lib/birchFacts";
 import { sendSalesAlert } from "../lib/salesAlert";
 import { isTestIdentity } from "../lib/testTraffic";
 import { chatTopic, coarseRegion, currentPulseThemes, recordPulse } from "../lib/activityPulse";

@@ -4,7 +4,7 @@ import { currentCurrency, priceLabel, useCurrency } from "@/lib/currency";
 import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
 import { KitCta } from "@/components/br/kit-cta";
 import { useEffect, useState, type FormEvent } from "react";
-import { ArrowRight, Mail, Phone } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
 import { FieldError, SavedNote, SuccessPanel } from "@/components/br/form-steps";
 import { fieldError, useSavedState } from "@/lib/form-save";
 import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
@@ -21,8 +21,6 @@ import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
 /** Count-free urgency line (Randy, Nov 20 2026). Never pair with open/held/paid numbers. */
 export const EARLY_RATE_LINE = "Prepaid credit keeps today's rate for its term. Rates step up only after reporting shows a placement performs.";
 
-export const SALES_PHONE_DISPLAY = "(647) 931-6278";
-export const SALES_PHONE_HREF = "tel:+16479316278";
 export const SALES_EMAIL = "randy@scalehealth.ca";
 export const LIVE_HUB_URL = "https://physio.drhonow.com";
 /** Second live hub (Randy, Nov 19 2026 11:10 AM ET). */
@@ -128,7 +126,6 @@ export function PrimeHero() {
         <p className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-background/80">
           <a href="/media-kit" className="font-semibold text-accent underline underline-offset-4" data-testid="prime-see-seats">See the media kit</a>
           <a href="#request" className="underline underline-offset-4" data-testid="prime-request-link">Ask about a placement</a>
-          <a href={SALES_PHONE_HREF} className="inline-flex items-center gap-1.5 underline-offset-4 hover:underline" data-testid="prime-phone"><Phone className="size-3.5" aria-hidden />{SALES_PHONE_DISPLAY}</a>
           <a href={`mailto:${SALES_EMAIL}?subject=Birch%20Reserve%20seat`} className="inline-flex items-center gap-1.5 underline-offset-4 hover:underline" data-testid="prime-email"><Mail className="size-3.5" aria-hidden />{SALES_EMAIL}</a>
         </p>
         <p className="mt-4 max-w-3xl text-xs leading-relaxed text-background/60">

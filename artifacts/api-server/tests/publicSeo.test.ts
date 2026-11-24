@@ -477,7 +477,7 @@ test("buycalc dual sales motion (Randy, Nov 17 2026 8:56 PM ET): additive copy, 
   // B3 + Live hub tag.
   assert.match(html, /<span class="tag">Live hub<\/span>/);
   assert.doesNotMatch(html, /Live placement/);
-  assert.match(html, /Illustrative until your insertion order names the hub\. Want to talk through current options\? <a href="#request">Ask about a placement<\/a>/);
+  assert.match(html, /Illustrative until your insertion order names the hub\. Ready to bid, or have a question\? <a href="#request">Ask about a placement<\/a>/);
   // A4 merged with the early-slots strap, once.
   assert.equal((html.match(/Self-serve seats stay shared, open to more than one brand/g) ?? []).length, 1);
   // Reply time standardized; no same-day promise.

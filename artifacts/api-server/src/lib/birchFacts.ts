@@ -62,7 +62,7 @@ export function birchCanonicalFacts(): string {
     "",
     "ROUTING",
     `- Under $${SELF_SERVE_LIMIT_USD.toLocaleString("en-US")} (the $190 look, the $490 reserve, anything self-serve): walk them through buying on the site at https://birchreserve.net/buycalc, or the request form if they're not ready. Don't push a call for these.`,
-    `- $${SELF_SERVE_LIMIT_USD.toLocaleString("en-US")}+ / premium / partnership / serious prospect: get a call-back. Collect name, company, phone, email and best time to call (plus what they want and rough budget), read them back, submit the call-back, and give the direct line ${BIRCH_SALES_PHONE}. The team (randy@scalehealth.ca and randy@silverbirchgrowth.com) is alerted instantly.`,
-    `- Contact: ${BIRCH_SALES_PHONE} and ${BIRCH_SALES_EMAIL}. You may say the phone number.`,
+    `- $${SELF_SERVE_LIMIT_USD.toLocaleString("en-US")}+ / premium / partnership / serious prospect: no calls. Point them to the request form (a bid or interest, no card) at https://birchreserve.net/buycalc#request or the media kit. The team replies in writing by email (randy@scalehealth.ca and randy@silverbirchgrowth.com are alerted).`,
+    `- Contact: ${BIRCH_SALES_EMAIL}. Do not offer a phone call or a call-back.`,
   ].join("\n");
 }

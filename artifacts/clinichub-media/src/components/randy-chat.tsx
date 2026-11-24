@@ -278,15 +278,18 @@ export function RandyChat() {
       }
       const isBookCall =
         detail?.reason === "book-a-call" || detail?.reason === "voice-demo" || detail?.reason === "concierge";
-      if (isBookCall && !qualified && qualifyStep === null) {
-        // Book a call: qualifying questions first, never a cold calendar link.
-        if (messagesRef.current.length === 0) setThread([]);
-        startQualify();
+      if (isBookCall && messagesRef.current.length === 0) {
+        // No calls (Randy, Nov 23 2026): point to Buy ads now / the bid or interest form instead.
+        setThread([
+          { id: "opener", role: "randy", text: OPENER },
+          { id: "no-call", role: "randy", text: TALK_HUMAN_REPLY, showHandoff: true },
+        ]);
+        setHandoffReady(true);
       } else {
         ensureThread();
       }
     },
-    [ensureThread, pushMessages, qualified, qualifyStep, setThread, startQualify],
+    [ensureThread, pushMessages, setThread],
   );
 
   useEffect(() => {
@@ -541,7 +544,7 @@ export function RandyChat() {
     pushMessages({
       id: newId(),
       role: "user",
-      text: `Please call me back at ${callbackPhone.trim()}${name ? ` (${name})` : ""}.`,
+      text: `Please reply to ${callbackPhone.trim()}${name ? ` (${name})` : ""}.`,
     });
     const clip = (v: string, n: number) => v.trim().slice(0, n);
     const contact = {
@@ -576,7 +579,7 @@ export function RandyChat() {
     pushMessages({
       id: newId(),
       role: "randy",
-      text: "Got it, thanks. Randy's team will call you back shortly. Anything else I can answer in the meantime?",
+      text: "Got it, thanks. Randy's team will reply by email shortly. Anything else I can answer in the meantime?",
     });
   };
 
