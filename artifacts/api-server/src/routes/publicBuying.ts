@@ -2336,6 +2336,8 @@ function currencyToggleHtml(
   return `<span class="currency-toggle" data-testid="currency-toggle" role="group" aria-label="Currency"><span>Prices in</span> ${link("usd")} ${link("cad")}</span>`;
 }
 
+const BUYCALC_MORE_CSS = `.more{border:1px solid #d9d6cb;border-radius:14px;background:#fff}.more>summary{cursor:pointer;list-style:none;padding:16px 20px;font-weight:600;font-size:16px}.more>summary::-webkit-details-marker{display:none}.more>summary::after{content:"+";float:right;font-weight:400;font-size:20px;line-height:1}.more[open]>summary::after{content:"\\2212"}.more[open]>summary{border-bottom:1px solid #d9d6cb}.more>.band:first-of-type{padding-top:24px}#more{padding-top:8px}`;
+
 function renderBuycalcHtmlUsd(input: {
   seatsOpen: number;
   seatsTotal: number;
@@ -2387,7 +2389,7 @@ function renderBuycalcHtmlUsd(input: {
 })}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>${TOKENS_CSS}${BUYCALC_CSS}${BUYER_COMFORT_CSS}${START_SMALL_CSS}${HERO_MOCK_CSS}${BUYER_HEADER_CSS}${PRICE_LADDER_CSS}</style></head><body>
+<style>${TOKENS_CSS}${BUYCALC_CSS}${BUYER_COMFORT_CSS}${START_SMALL_CSS}${HERO_MOCK_CSS}${BUYER_HEADER_CSS}${PRICE_LADDER_CSS}${BUYCALC_MORE_CSS}</style></head><body>
 ${buyerHeaderHtml("buycalc", `<a class="br-bh-tel" href="#request" data-testid="buycalc-ask">Ask about a placement</a>${currencyToggleHtml(currency, { sku: input.sku, format: input.format, category })}`)}
 <main>
 <section class="hero"><div class="wrap hero-grid"><div><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
@@ -2397,6 +2399,27 @@ ${heroSubHtml(price(look), price(seat))}
 <div class="ctas"><a class="btn" href="/buycalc?sku=reserve-490#reserve" data-pick-sku="reserve-490">Reserve your space · ${price(seat)}</a><a class="btn line" href="/buycalc?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · ${price(look)}</a></div>
 ${heroInquireHtml()}</div>${heroMockHtml("buycalc-hero-mock")}</div></section>
 
+<section class="band" id="buy"><div class="wrap"><div class="buy">
+<form id="reserve" novalidate><p class="kicker">Reserve without a login</p><h2 style="margin-bottom:6px">Lock it in.</h2>
+<p class="fine" style="margin:0 0 6px" data-testid="buy-tagline">${CHECKOUT_TAGLINE} Want to upload your ad too? <a href="/buy">Use the 3-step buy</a>.</p>
+<label for="f-sku">Offer</label><select id="f-sku" name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${offer.sku === selected.sku ? " selected" : ""}>${price(offer)} · ${offer.sku === "reserve-490" ? "Reserve your space" : "7-day look"}</option>`).join("")}</select>
+${category ? `<input type="hidden" name="category" value="${category}">` : ""}
+<label for="f-brand">Brand</label><input id="f-brand" name="brand" required maxlength="160" autocomplete="organization">
+<label for="f-email">Work email</label><input id="f-email" name="email" type="email" required autocomplete="email">
+<div class="row2"><div><label for="f-web">Website <span class="fine">(optional)</span></label><input id="f-web" name="website_url" type="text" inputmode="url" autocomplete="url" autocapitalize="none" spellcheck="false" placeholder="yourbrand.com"></div><div><label for="f-format">Where it shows</label><select id="f-format" name="format_pref">${FORMATS.map((f) => `<option value="${f}"${(isFormat(input.format) ? input.format : DEFAULT_SELF_SERVE_FORMAT) === f ? " selected" : ""}${isPremiumFormat(f) ? ' data-inquire="1"' : ""}>${BUYCALC_FORMAT_LABELS[f]}${isPremiumFormat(f) ? " · Inquire" : ""}</option>`).join("")}</select></div></div>
+<div data-promo-box></div>
+<label class="check"><input id="terms" type="checkbox" required><span>I agree to the draft <a href="/terms">terms</a> before any charge.</span></label>
+${sampleIoCheckoutHtml()}
+<button id="submit" class="btn" type="submit">${submitLabel}</button>
+<p class="fine" id="checkout-note">${checkoutLive ? "Secure card checkout by Stripe. Payment counts once Stripe confirms it." : "Card checkout is not open yet. Submitting saves your seat request and alerts our sales team. No card is charged."}</p>
+<p class="fine" id="inquire-note" hidden>${PREMIUM_INQUIRY_MESSAGE}</p>
+<p id="message" role="status" aria-live="polite"></p>
+<noscript><p class="fine">This form needs JavaScript. To reserve without it, <a href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20seat">email randy@scalehealth.ca</a>.</p></noscript>
+</form>
+<aside class="talk"><h3>Rather read first?</h3><p>See the hubs, placements and the brief in the media kit.</p><a class="btn line" href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20seat">randy@scalehealth.ca</a><a class="btn line" href="/media-kit">See the media kit</a></aside>
+</div></div></section>
+
+<section class="band" id="more"><div class="wrap"><details class="more" id="more-details"><summary>How it works, what you get, refunds and the network</summary>
 <section class="band" id="offers"><div class="wrap"><p class="kicker">Two ways in</p><h2>Pick your start.</h2>
 <div class="offers">${offerCard(look, { eyebrow: "7-day look", name: "See it before you commit", lines: ["See your placement for 7 days while you decide.", "Converts in full to the reserve within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Reserve", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the hub network. Credit lasts 12 months.`, "Placements are curated as hubs launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Reserve your space · ${price(seat)}` })}</div>
 ${priceLadderHtml(currency, { title: "Every step, in " + currency.toUpperCase() })}
@@ -2419,26 +2442,7 @@ ${flightTimelineHtml(price(look), price(seat))}
 ${sharedSeatsHtml()}
 ${hubLadderHtml("network-hubs")}
 </div></section>
-
-<section class="band" id="buy"><div class="wrap"><div class="buy">
-<form id="reserve" novalidate><p class="kicker">Reserve without a login</p><h2 style="margin-bottom:6px">Lock it in.</h2>
-<p class="fine" style="margin:0 0 6px" data-testid="buy-tagline">${CHECKOUT_TAGLINE} Want to upload your ad too? <a href="/buy">Use the 3-step buy</a>.</p>
-<label for="f-sku">Offer</label><select id="f-sku" name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${offer.sku === selected.sku ? " selected" : ""}>${price(offer)} · ${offer.sku === "reserve-490" ? "Reserve your space" : "7-day look"}</option>`).join("")}</select>
-${category ? `<input type="hidden" name="category" value="${category}">` : ""}
-<label for="f-brand">Brand</label><input id="f-brand" name="brand" required maxlength="160" autocomplete="organization">
-<label for="f-email">Work email</label><input id="f-email" name="email" type="email" required autocomplete="email">
-<div class="row2"><div><label for="f-web">Website <span class="fine">(optional)</span></label><input id="f-web" name="website_url" type="text" inputmode="url" autocomplete="url" autocapitalize="none" spellcheck="false" placeholder="yourbrand.com"></div><div><label for="f-format">Where it shows</label><select id="f-format" name="format_pref">${FORMATS.map((f) => `<option value="${f}"${(isFormat(input.format) ? input.format : DEFAULT_SELF_SERVE_FORMAT) === f ? " selected" : ""}${isPremiumFormat(f) ? ' data-inquire="1"' : ""}>${BUYCALC_FORMAT_LABELS[f]}${isPremiumFormat(f) ? " · Inquire" : ""}</option>`).join("")}</select></div></div>
-<div data-promo-box></div>
-<label class="check"><input id="terms" type="checkbox" required><span>I agree to the draft <a href="/terms">terms</a> before any charge.</span></label>
-${sampleIoCheckoutHtml()}
-<button id="submit" class="btn" type="submit">${submitLabel}</button>
-<p class="fine" id="checkout-note">${checkoutLive ? "Secure card checkout by Stripe. Payment counts once Stripe confirms it." : "Card checkout is not open yet. Submitting saves your seat request and alerts our sales team. No card is charged."}</p>
-<p class="fine" id="inquire-note" hidden>${PREMIUM_INQUIRY_MESSAGE}</p>
-<p id="message" role="status" aria-live="polite"></p>
-<noscript><p class="fine">This form needs JavaScript. To reserve without it, <a href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20seat">email randy@scalehealth.ca</a>.</p></noscript>
-</form>
-<aside class="talk"><h3>Rather read first?</h3><p>See the hubs, placements and the brief in the media kit.</p><a class="btn line" href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20seat">randy@scalehealth.ca</a><a class="btn line" href="/media-kit">See the media kit</a></aside>
-</div></div></section>
+</details></div></section>
 ${buyerFaqHtml(price(look), price(seat))}
 
 <section class="band" id="request"><div class="wrap"><div class="buy">
@@ -2470,7 +2474,7 @@ document.querySelectorAll("[data-request-category]").forEach(function(a){a.addEv
 rq.addEventListener("submit",async function(e){e.preventDefault();if(!rq.reportValidity())return;rs.disabled=true;rm.textContent="Sending…";var d=Object.fromEntries(new FormData(rq));d.path="/buycalc";try{var q=new URLSearchParams(location.search);d.utm={utm_source:q.get("utm_source")||"",utm_medium:q.get("utm_medium")||"",utm_campaign:q.get("utm_campaign")||""}}catch(_){}try{var r=await fetch("/v1/category-request",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(d)});var o=await r.json().catch(function(){return{}});if(r.ok&&o.ok){rm.textContent="Got it. Your request is in. We'll reply to "+d.email+" shortly. No card was charged.";rq.querySelectorAll("input,select,textarea,button").forEach(function(el){el.disabled=true});return}rm.textContent=o.error||"We could not send that. Call (647) 931-6278 or email randy@scalehealth.ca.";rs.disabled=false}catch(err){rm.textContent="We could not send that. Call (647) 931-6278 or email randy@scalehealth.ca.";rs.disabled=false}});
 try{var pf=JSON.parse(sessionStorage.getItem("br_quick_reserve")||"null");if(pf&&typeof pf==="object"){if(typeof pf.brand==="string"&&!form.elements.brand.value)form.elements.brand.value=pf.brand.slice(0,160);if(typeof pf.email==="string"&&!form.elements.email.value)form.elements.email.value=pf.email.slice(0,320);sessionStorage.removeItem("br_quick_reserve")}}catch(_){}
 refresh();if(location.hash==="#reserve"&&/[?&]format=/.test(location.search)){setTimeout(function(){document.getElementById("f-brand").focus({preventScroll:true})},350)}})();
-</script>${PROMO_SCRIPT_TAG}</body></html>`;
+</script><script>(function(){var d=document.getElementById("more-details");if(!d)return;function o(){var h=location.hash&&document.getElementById(location.hash.slice(1));if(h&&d.contains(h)&&!d.open){d.open=true;h.scrollIntoView()}}o();window.addEventListener("hashchange",o);document.querySelectorAll('a[href^="#"]').forEach(function(a){a.addEventListener("click",function(){setTimeout(o,0)})})})()</script>${PROMO_SCRIPT_TAG}</body></html>`;
 }
 
 router.get("/buycalc", async (req, res): Promise<void> => {
