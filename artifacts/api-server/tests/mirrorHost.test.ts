@@ -143,3 +143,12 @@ test("scaleMeta: metas, link titles and JSON-LD names speak as Scale Health; URL
   assert.match(out, /"name":"Scale Health starter slot","url":"https:\/\/birchreserve\.net\/"/);
   assert.match(out, /<span>ad partner Birch Reserve<\/span>/);
 });
+
+test("scale mirror: the <strong>BIRCH RESERVE</strong> wordmark (Insights, Terms headers) becomes the Scale logo, links stay on scalehealth.ca", () => {
+  const html = `<!doctype html><html><head><title>Insights | Birch Reserve</title></head><body><header><a href="/"><strong>BIRCH RESERVE</strong></a><nav><a href="/insights">Insights</a></nav></header><main>x</main><footer><div>Silver Birch Growth Inc.</div></footer></body></html>`;
+  const out = mirrorHtml(html, "scale_mirror");
+  assert.ok(!out.includes("BIRCH RESERVE"));
+  assert.ok(out.includes('alt="Scale Health"'));
+  assert.ok(out.includes('href="https://www.scalehealth.ca/"'));
+  assert.ok(out.includes('href="/intake/_m/insights"'));
+});
