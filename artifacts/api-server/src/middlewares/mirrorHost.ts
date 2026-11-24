@@ -138,7 +138,7 @@ export function scaleBody(html: string): string {
   let body = scaleText(html.slice(i));
   // Hub links stay on scalehealth.ca on Scale pages: the DR-HO'S hub has its own scalehealth.ca page.
   body = body.replace(/href="https:\/\/physio\.drhonow\.com\/?"/g, 'href="https://www.scalehealth.ca/dr-ho"');
-  body = body.replace(/(<a\b[^>]*>)\s*BIRCH RESERVE\s*(<\/a>)/g, (_m, a: string, end: string) => `${a}<img src="${MIRROR_PREFIX}${SCALE_LOGO}" alt="Scale Health" height="26" style="height:26px;width:auto;display:block">${end}`);
+  body = body.replace(/(<a\b[^>]*>)\s*(?:<strong>\s*)?BIRCH RESERVE\s*(?:<\/strong>\s*)?(<\/a>)/g, (_m, a: string, end: string) => `${a}<img src="${MIRROR_PREFIX}${SCALE_LOGO}" alt="Scale Health" height="26" style="height:26px;width:auto;display:block">${end}`);
   if (!/ad partner/i.test(body)) {
     const line = `<span class="br-ad-partner">${SCALE_AD_PARTNER_LINE}</span>`;
     body = /<\/div>\s*<\/footer>/i.test(body) ? body.replace(/<\/div>(\s*)<\/footer>/i, `${line}</div>$1</footer>`) : body.replace(/<\/footer>/i, `${line}</footer>`);

@@ -276,10 +276,10 @@ async function listReadableArticles(): Promise<PublicArticle[]> {
     }
     return [...bySlug.values()]
       .filter((article) => !isRetractedPublicInsight(article.slug))
-      .sort((a, b) => (a.publishedAt?.getTime() ?? 0) - (b.publishedAt?.getTime() ?? 0));
+      .sort((a, b) => (b.publishedAt?.getTime() ?? 0) - (a.publishedAt?.getTime() ?? 0)); // newest first (Randy, Nov 23 2026)
   } catch (error) {
     logger.warn({ err: error }, "Public insights HTML fell back to seeded articles");
-    return seeded.filter((article) => !isRetractedPublicInsight(article.slug));
+    return seeded.filter((article) => !isRetractedPublicInsight(article.slug)).sort((a, b) => (b.publishedAt?.getTime() ?? 0) - (a.publishedAt?.getTime() ?? 0));
   }
 }
 
