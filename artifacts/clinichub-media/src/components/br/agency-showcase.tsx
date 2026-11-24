@@ -7,15 +7,20 @@ import type { ReactNode } from "react";
 import { Cta } from "./ui";
 import { InquireBadge } from "./quick-buy";
 import { priceFor, useCurrency } from "@/lib/currency";
-import { ChevronDown } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 import { skinText } from "@/lib/siteSkin";
 import { priceLadder } from "../../../../api-server/src/lib/priceLadder";
 import { TRACK_RECORD } from "../../../../api-server/src/lib/overhaul/trackRecord";
 import {
   AGENCY_CLIENT_TEST,
+  AGENCY_DISCOUNT_EXAMPLE,
+  AGENCY_DISCOUNT_PCT,
   AGENCY_EXAMPLES,
+  AGENCY_RATE_CARD,
+  AGENCY_RATE_RULES,
   AGENCY_SHARE,
   AGENCY_TIERS,
+  EXCLUSIVE_CASE_STUDY_URL,
   EXCLUSIVE_PARTNER_PERKS,
   type AgencyTierKey,
   BRAND_BONUS_LINE,
@@ -115,7 +120,7 @@ export function AgencyHero() {
               For agencies &amp; media buyers <span aria-hidden className="h-px w-6 bg-foreground/30" /> First-party health inventory
             </p>
             <h2 className="font-display text-[2.1rem] leading-[1.04] tracking-tight md:text-[3.5rem]">
-              Agencies: place a client inside the health hubs. <em className="not-italic text-foreground/55">Keep {AGENCY_SHARE.pct}% of the spend.</em>
+              Agencies: place a client inside the health hubs. <em className="not-italic text-foreground/55">A written {AGENCY_SHARE.pct}% off the rate card.</em>
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground" data-testid="agency-inventory-line">
               {INVENTORY_LINE} Fixed starting rates, the surface named on the IO, and UTM and promo-code reporting per hub.
@@ -156,8 +161,8 @@ export function AgencyHero() {
               <div className="mt-2 grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 text-sm tabular-nums">
                 <span className="text-background/70">Client prepays: {ex.label}</span>
                 <span className="text-right">{usd(ex.spend)}</span>
-                <span className="text-background/70">Agency of record earns, in cash</span>
-                <span className="text-right font-semibold text-accent">{usd(ex.cash)}</span>
+                <span className="text-background/70">Agency pays (10% off list)</span>
+                <span className="text-right font-semibold text-accent">{usd(ex.spend - ex.cash)}</span>
               </div>
             </div>
             <ul className="mt-6 space-y-2 border-t border-background/15 pt-5 text-sm text-background/80">
@@ -166,7 +171,7 @@ export function AgencyHero() {
               <li className="text-background/60">{BRAND_BONUS_LINE}</li>
             </ul>
             <a href="#agency-payouts" className="mt-6 inline-block text-sm text-background/70 underline underline-offset-4 hover:text-background">
-              How agency payouts work
+              How the discount works
             </a>
           </aside>
         </div>
@@ -342,7 +347,7 @@ export function IoProcess() {
   );
 }
 
-/** How agency payouts work: the stated share, worked examples, and marked placeholders. */
+/** How the discount works: the stated share, worked examples, and marked placeholders. */
 export function AgencyPayouts() {
   const { currency, prices } = useCurrency();
   const cur = currency === "cad" ? "CAD" : "USD";
@@ -362,7 +367,7 @@ export function AgencyPayouts() {
             <tr className="border-b border-foreground/80 text-[11px] uppercase tracking-wider text-foreground/60">
               <th className="px-4 py-3 font-semibold md:px-5">Client buy</th>
               <th className="px-4 py-3 text-right font-semibold md:px-5">Prepaid ({cur})</th>
-              <th className="px-4 py-3 text-right font-semibold md:px-5">Agency cash ({cur})</th>
+              <th className="px-4 py-3 text-right font-semibold md:px-5">Agency pays ({cur})</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -370,22 +375,22 @@ export function AgencyPayouts() {
               <tr key={e.key} data-testid={`agency-payout-${e.key}`}>
                 <td className="px-4 py-3 md:px-5">{e.label}</td>
                 <td className="whitespace-nowrap px-4 py-3 text-right md:px-5">{e.spend}</td>
-                <td className="whitespace-nowrap px-4 py-3 text-right font-semibold md:px-5">{e.cash}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-right font-semibold md:px-5">{e.pays}</td>
               </tr>
             ))}
           </tbody>
         </table>
         <dl className="divide-y divide-border border-t border-foreground/15 text-sm" data-testid="agency-payout-terms">
           <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
-            <dt className="text-foreground/75">Paid in</dt>
-            <dd className="font-semibold">Cash</dd>
+            <dt className="text-foreground/75">Discount</dt>
+            <dd className="font-semibold">Written 10% off list</dd>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
             <dt className="text-foreground/75">When</dt>
             <dd className="font-semibold">{AGENCY_SHARE.timing}</dd>
           </div>
         </dl>
-        <p className="border-t border-border px-4 py-3 text-[11px] text-muted-foreground md:px-5">{AGENCY_SHARE.pct}% of media spend, paid in cash to the agency of record. Examples use prices already on the site.</p>
+        <p className="border-t border-border px-4 py-3 text-[11px] text-muted-foreground md:px-5">Written {AGENCY_SHARE.pct}% discount off the published rate card. Examples use prices already on the site. What you charge the client is yours.</p>
       </div>
     </div>
   );
@@ -484,7 +489,7 @@ export function InventoryCanister() {
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1.5 text-[12px] md:text-[13px]">
                   <span className="rounded-full border border-[#0b1f3a]/25 bg-white px-2.5 py-1 font-semibold text-[#0b1f3a]">Pay: {t.pay.charAt(0).toLowerCase() + t.pay.slice(1)}{t.key === "exclusive" ? "*" : ""}</span>
-                  {t.key === "direct" ? null : <span className="rounded-full bg-[#0b1f3a] px-2.5 py-1 font-semibold text-white">Keep: {t.keep}</span>}
+                  {t.key === "direct" ? null : <span className="rounded-full bg-[#0b1f3a] px-2.5 py-1 font-semibold text-white">{t.keep}</span>}
                 </div>
               </div>
             </div>
@@ -513,7 +518,7 @@ export function AgencyTierCards({ reserveHref, buyHref, bidHref = "#talk", ioHre
             <p className="mt-1 text-sm text-foreground/70">{t.who}</p>
             <dl className="mt-4 divide-y divide-[#0b1f3a]/10 border-y border-[#0b1f3a]/10 text-sm">
               <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2 py-2"><dt className="text-foreground/60">You pay</dt><dd className="font-semibold text-[#0b1f3a]">{t.pay}</dd></div>
-              <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2 py-2"><dt className="text-foreground/60">You keep</dt><dd className="font-semibold text-[#0b1f3a]">{t.keep}</dd></div>
+              <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2 py-2"><dt className="text-foreground/60">You get</dt><dd className="font-semibold text-[#0b1f3a]">{t.keep}</dd></div>
             </dl>
             <div className="mt-5 flex flex-col gap-2 md:mt-auto md:pt-5">
               {t.key === "direct" ? (
@@ -534,12 +539,11 @@ export function AgencyTierCards({ reserveHref, buyHref, bidHref = "#talk", ioHre
   );
 }
 
-/** "What exclusive partners get" (Randy's footnote), with the nameless partner-launch example from the track record. */
+/** "What exclusive partners get" (Randy t8307u), with the nameless partner-launch example (Contract signed · Onboarding) linked to the live blurred case study. */
 export function ExclusivePerks() {
   const ex = TRACK_RECORD.cards.find((c) => c.key === "partner-launch")!;
-  const how = ex.detail.split(", with the prospect")[0] + ".";
   return (
-    <details className="group rounded-2xl border-2 border-[#0b1f3a] bg-white" data-testid="exclusive-perks" id="exclusive-partners">
+    <details open className="group rounded-2xl border-2 border-[#0b1f3a] bg-white" data-testid="exclusive-perks" id="exclusive-partners">
       <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-semibold text-[#0b1f3a] md:px-5 [&::-webkit-details-marker]:hidden">
         <span>* What exclusive partners get</span>
         <ChevronDown className="size-5 shrink-0 transition group-open:rotate-180" aria-hidden />
@@ -549,15 +553,93 @@ export function ExclusivePerks() {
           {EXCLUSIVE_PARTNER_PERKS.map((p) => (
             <li key={p} className="flex gap-2"><span className="mt-1.5 size-2 shrink-0 rounded-full bg-lime-500" aria-hidden />{skinText(p)}</li>
           ))}
-          <li className="pt-1 text-[12px] text-foreground/60">The exact discount, within 10–25% off list price, is agreed per partner.</li>
+          <li className="pt-1 text-[12px] text-foreground/60">Partners buy at the same written 10% discount off the published rate card.</li>
         </ul>
-        <div className="rounded-xl bg-[#0b1f3a] p-4 text-white" data-testid="exclusive-example">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-lime-300">Example · names withheld</p>
-          <p className="mt-2 font-display text-xl leading-snug">{ex.outcome}</p>
-          <p className="mt-2 text-[13px] text-white/80">{how} The same GTM bot runs field sales motions for exclusive partners.</p>
-          <p className="mt-3 text-[11px] text-white/55">{skinText(TRACK_RECORD.note)}</p>
+        <div className="flex flex-col justify-between rounded-xl bg-[#0b1f3a] p-4 text-white" data-testid="exclusive-example">
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-lime-300">Example · names withheld</p>
+              <span className="rounded-full bg-lime-300/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-lime-300" data-testid="exclusive-example-stage">
+                Contract signed · Onboarding
+              </span>
+            </div>
+            <p className="mt-2 font-display text-xl leading-snug">{ex.outcome}</p>
+            <p className="mt-2 text-[13px] text-white/80">{ex.detail}</p>
+          </div>
+          <div className="mt-4 space-y-3">
+            <a
+              href={EXCLUSIVE_CASE_STUDY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="exclusive-example-link"
+              className="inline-flex items-center gap-1.5 rounded-full bg-lime-300 px-4 py-2 text-xs font-bold text-[#0b1f3a] transition hover:bg-white"
+            >
+              See the live case study <ArrowUpRight className="size-3.5" aria-hidden />
+            </a>
+            <p className="text-[11px] text-white/55">{skinText(TRACK_RECORD.note)}</p>
+          </div>
         </div>
       </div>
     </details>
+  );
+}
+
+/** Two buyer lanes + six ground rules + the published rate-card ladder (Randy, Nov 24 2026). */
+export function AgencyRateCardModel() {
+  return (
+    <div data-testid="agency-rate-card-model">
+      <div className="grid gap-px border border-foreground bg-foreground md:grid-cols-2">
+        <article className="bg-background p-6 md:p-8" data-testid="lane-direct">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Direct buyers</p>
+          <h3 className="mt-3 font-display text-3xl leading-tight text-foreground md:text-4xl">Pay the rate card.</h3>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">A brand buying space for itself pays the published list price. No agency discount.</p>
+        </article>
+        <article className="bg-foreground p-6 text-background md:p-8" data-testid="lane-agency">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-background/55">Agencies, brokers &amp; resellers</p>
+          <h3 className="mt-3 font-display text-3xl leading-tight md:text-4xl">{AGENCY_DISCOUNT_PCT}% off, in writing.</h3>
+          <p className="mt-3 text-sm leading-relaxed text-background/75">{AGENCY_RATE_CARD.line} {AGENCY_RATE_CARD.resale} {AGENCY_RATE_CARD.disclosure}</p>
+        </article>
+      </div>
+      <ol className="mt-6 grid gap-px border border-foreground/15 bg-foreground/15 sm:grid-cols-2 lg:grid-cols-3" data-testid="agency-rate-rules">
+        {AGENCY_RATE_RULES.map((r, i) => (
+          <li key={r.k} className="bg-background p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{String(i + 1).padStart(2, "0")}</p>
+            <p className="mt-2 font-display text-xl leading-tight text-foreground">{r.k}</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{r.d}</p>
+          </li>
+        ))}
+      </ol>
+      <div className="mt-5"><ListPriceLine /></div>
+    </div>
+  );
+}
+
+/** Illustrative $10,000 USD worked example of the 10% written discount. */
+export function AgencyDiscountExample() {
+  const e = AGENCY_DISCOUNT_EXAMPLE;
+  const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
+  const rows = [
+    { k: "Rate card", n: usd(e.list) },
+    { k: "Written 10% discount", n: `−${usd(e.discount)}` },
+    { k: "Agency pays", n: usd(e.agencyPays), accent: true },
+  ] as const;
+  return (
+    <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]" data-testid="agency-discount-example">
+      <div>
+        <span className="inline-block border border-foreground px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em]" data-testid="agency-illustrative">Illustrative example</span>
+        <p className="mt-5 font-display text-6xl leading-none tracking-tight text-foreground md:text-7xl">{e.discountPct}%</p>
+        <p className="mt-4 max-w-md text-base leading-relaxed text-foreground/80">{AGENCY_RATE_CARD.line}</p>
+        <p className="mt-3 max-w-md text-sm text-muted-foreground">{AGENCY_RATE_CARD.resale} {AGENCY_RATE_CARD.disclosure} {AGENCY_RATE_CARD.noUndercut}</p>
+      </div>
+      <div className="border border-foreground bg-foreground text-background">
+        {rows.map((r) => (
+          <div key={r.k} className="flex items-baseline justify-between gap-4 border-b border-background/15 px-5 py-4 last:border-b-0">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-background/60">{r.k}</span>
+            <span className={`font-display text-3xl leading-none tabular-nums md:text-4xl ${"accent" in r && r.accent ? "text-accent" : ""}`}>{r.n}</span>
+          </div>
+        ))}
+        <p className="border-t border-background/15 px-5 py-3 text-[12px] leading-snug text-background/65">{e.note}</p>
+      </div>
+    </div>
   );
 }

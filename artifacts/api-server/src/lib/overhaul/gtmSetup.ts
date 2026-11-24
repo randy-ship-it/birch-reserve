@@ -1,37 +1,20 @@
 /**
- * GTM setup packages (Randy t332u, Nov 21 2026). One source of truth for the homepage block, the media-kit block,
- * the /intake/gtm form, the site chat and llms.txt. Anonymous by design: no client names, logos, cities, categories
- * that identify, or numbers. Separate from the ad inventory product; same systems. No outcome guarantees.
- * Currency: the setup is quoted in USD for every visitor (no CAD table, nothing charged online). Every element that
- * shows the $3,500 USD figure carries data-currency-fixed so the CA page-wide relabel (currency-text.tsx) skips it.
+ * B2B go-to-market aside (Silver Birch Growth Inc.). Replaces the former $3,500 GTM setup offer:
+ * SBG takes on only rare strategic projects and is pointed at portfolio value creation right now,
+ * so it isn't something you can buy. No price, no package pitch, no client names, no guarantees.
  */
-export const GTM_SETUP_PRICE_USD = 3500;
 export const GTM_SETUP_HREF = "/intake/gtm";
 export const GTM_SETUP_URL = "https://birchreserve.net/intake/gtm";
 export const GTM_SETUP_KIND = "gtm_setup_inquiry" as const;
 
 export const GTM_SETUP = {
-  eyebrow: "GTM setup packages · from $3,500 USD",
-  title: "We set up the partnership bot we use. Then you run it.",
-  sub: "For health and wellness businesses that want efficient outreach and commercial conversations.",
-  steps: [
-    { n: "1", t: "We set it up", d: "The same in-house partnership / B2B go-to-market bot and console we use." },
-    { n: "2", t: "Your motion starts running", d: "We get your outreach and partner conversations moving." },
-    { n: "3", t: "We hand over the keys", d: "You run it yourselves." },
-  ],
-  separate: "Separate from the ad inventory product (the $190 USD look, reserves and packs), and it runs on the same systems.",
-  cases: [
-    "Virtual care partner: first email to ready to sign in 19 days, run by our field sales bot.",
-    "Same thread: prospect tone rose from 55 on the first reply to 94 at ready to sign, across 12 scored emails (our read of the wording).",
-  ],
-  casesNote: "Examples are anonymous. No outcomes are guaranteed.",
-  cta: "Start with a $3,500 USD setup",
-  detailsLabel: "What's included and how it works",
-  details: [
-    "Setup of the same partnership / B2B go-to-market bot and console we use in-house.",
-    "We get your motion running, then hand over the keys so you can run it yourselves.",
-    "Priced from $3,500 USD. Nothing is charged online: the form sends us your details and we reply by email.",
-    "Ad inventory works as before: modelled inventory is labelled, reporting is aggregate only, and nothing runs before an insertion order.",
+  eyebrow: "B2B go-to-market · Silver Birch Growth Inc.",
+  title: "B2B go-to-market, powered by Silver Birch Growth Inc.",
+  sub: "Silver Birch Growth takes on only rare strategic projects and is pointed at portfolio value creation right now — so it isn't something you can buy.",
+  separate: "Separate from Birch Reserve ad placements.",
+  notes: [
+    "Built and run internally across our own portfolio.",
+    "Not sold as a package, setup tier, or rate-card service.",
   ],
 } as const;
 
@@ -39,7 +22,8 @@ export const GTM_PARTNER_TYPES = ["Clinics & studios", "Retailers", "Brands", "D
 
 /** One short paragraph for the chat prompt and llms.txt. */
 export const GTM_SETUP_FACT =
-  "GTM setup packages start at $3,500 USD: we set up the same in-house partnership / B2B go-to-market bot and console we use, get the client's motion running, then hand over the keys so they run it themselves. For health and wellness businesses. Separate from the ad inventory product but runs on the same systems. Nothing is charged online; start at https://birchreserve.net/intake/gtm and the team replies by email. Examples are anonymous (a virtual care partner went from first email to ready to sign in 19 days through our field sales bot, across 12 scored emails). No outcomes are guaranteed.";
+  "B2B go-to-market, powered by Silver Birch Growth Inc.: SBG takes on only rare strategic projects and is pointed at portfolio value creation right now, so it isn't something you can buy. Separate from Birch Reserve ad placements. Never quote a price.";
 
 /** Chat-only guardrail. */
-export const GTM_SETUP_CHAT_RULE = "If asked who the examples are, say they are anonymous and you can't share client details. Never name, describe or hint at any client, and never promise outcomes or give numbers for them.";
+export const GTM_SETUP_CHAT_RULE =
+  "Never quote a price or offer GTM setup for sale. Explain plainly that Silver Birch Growth takes on only rare strategic projects and is pointed at portfolio value creation right now, so it isn't something you can buy.";

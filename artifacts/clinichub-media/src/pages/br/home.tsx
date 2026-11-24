@@ -38,7 +38,7 @@ import { SeeYourAd } from "@/components/br/see-your-ad";
 import { OfferStairs } from "@/components/br/offer-stairs";
 import { trackAttn, useAttention } from "@/lib/attention";
 import { ActivityPulse, CategoryStrip, QuestionsBrandsAskCompact } from "@/components/br/market-pulse";
-import { AGENCY_SHARE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
+import { AGENCY_RATE_CARD } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { INVENTORY, PUBLISHER_INCENTIVE } from "../../../../api-server/src/lib/overhaul/model";
 import { UPGRADE_PATH_LINE } from "../../../../api-server/src/lib/overhaul/mediaKit";
 
@@ -51,14 +51,14 @@ const FAQ = [
   { q: "Are the audience numbers measured?", a: "Not yet. Audience and view figures on this site are based on signed partnership contracts, not measured delivery. We don't publish a measured network views figure (the 2027 inventory figure is based on signed partnership contracts); your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
   { q: "Can a local business or studio buy?", a: "Yes. Start with the same $190 USD 7-day look or $490 USD reserve. Locking your area (a share of hub display near your postal code) is a premium option, by inquiry." },
   { q: "How does my business become a hub?", a: `Studios and retailers activate a hub on ScaleHealth.ca, the platform that hosts the hubs (scalehealth.ca/clinichubs), and earn cash or ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded hub.` },
-  { q: "Do agencies get anything?", a: `Yes. ${AGENCY_SHARE.line} Agencies can also prepay a client test budget and get UTM and promo-code reporting per hub and surface.` },
+  { q: "Do agencies get anything?", a: `Yes. ${AGENCY_RATE_CARD.line} ${AGENCY_RATE_CARD.resale} ${AGENCY_RATE_CARD.disclosure} ${AGENCY_RATE_CARD.direct} ${AGENCY_RATE_CARD.noUndercut} Agencies can also prepay a client test budget and get UTM and promo-code reporting per hub and surface.` },
 ];
 
 const TILES = [
   { href: "/intake?ref=home_tile", icon: Sparkles, title: "Monetization Kit", line: "Exposure + hub earnings. Free.", tid: "tile-intake", hot: true },
   { href: "/hubs", icon: Building2, title: "Hubs", line: "Where your brand shows up.", tid: "tile-hubs" },
   { href: "/media-kit", icon: BookOpen, title: "Media kit", line: "Placements, rates, one page.", tid: "tile-media-kit" },
-  { href: "/agencies", icon: Handshake, title: "Agencies", line: "10% of media spend, in cash.", tid: "tile-agencies" },
+  { href: "/agencies", icon: Handshake, title: "Agencies", line: "A written 10% off the rate card.", tid: "tile-agencies" },
   { href: "/audiences", icon: Users, title: "Audiences", line: "Who you reach.", tid: "tile-audiences" },
   { href: "/inventory", icon: LayoutGrid, title: "Inventory", line: "The network, by category.", tid: "tile-inventory" },
 ];
@@ -143,7 +143,7 @@ export default function BrHome() {
             or <a href="/buy?plan=hold-190&ref=hero_home" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-look" onClick={() => trackAttn("hero_cta.look")}>start with a {price.look} 7-day look</a>
           </p>
           <p className="mt-2 text-[13px] text-foreground/60" data-testid="home-hero-agencies">
-            Buying for clients? <a href="/agencies?ref=hero_home" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-agencies" onClick={() => trackAttn("hero_cta.agencies")}>For agencies: keep 10% of spend</a>
+            Buying for clients? <a href="/agencies?ref=hero_home" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-agencies" onClick={() => trackAttn("hero_cta.agencies")}>For agencies: a written 10% off the rate card</a>
           </p>
           <p className="mt-2 text-[13px] text-foreground/60" data-testid="home-kit-cta">
             Not ready? <a href={intakeHref("hero_home")} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-kit" onClick={() => { logCtaClick("hero_home"); trackAttn("hero_cta.kit"); }}>Get my free Monetization Kit</a>
@@ -173,9 +173,9 @@ export default function BrHome() {
         <a href="/agencies?ref=home_strip" data-testid="home-strip-agencies" onClick={() => trackAttn("strip.agencies")} className="group mt-3 flex flex-col gap-2 rounded-2xl border-2 border-[#0b1f3a] bg-white p-4 shadow-sm transition-colors hover:bg-[#0b1f3a] sm:flex-row sm:items-center sm:justify-between">
           <span className="min-w-0">
             <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55 group-hover:text-lime-300">For agencies &amp; brokers</span>
-            <span className="mt-0.5 block font-display text-xl leading-tight text-[#0b1f3a] group-hover:text-white md:text-2xl">Pay list price, keep 10% of spend. Exclusive inventory partners get 10–25% off list price.</span>
+            <span className="mt-0.5 block font-display text-xl leading-tight text-[#0b1f3a] group-hover:text-white md:text-2xl">A written 10% off the published rate card. You set the resale price. We do not undercut your clients.</span>
           </span>
-          <span className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 self-start rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white group-hover:bg-lime-300 group-hover:text-[#0b1f3a] sm:self-auto">See agency tiers <ArrowRight className="size-4" aria-hidden /></span>
+          <span className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 self-start rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white group-hover:bg-lime-300 group-hover:text-[#0b1f3a] sm:self-auto">See agency terms <ArrowRight className="size-4" aria-hidden /></span>
         </a>
         <p className="mt-2 text-[12px] text-foreground/60">Prices in USD unless shown. Want a category to yourself? <a href="/exclusive?ref=home_strip" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-strip-exclusive">See the exclusive reserve</a>.</p>
       </section>
@@ -196,7 +196,7 @@ export default function BrHome() {
         <HubFunnel />
       </section>
 
-      {/* 5. Exclusive inventory partners (Randy Nov 24 2026 t8289u; renamed + 10–25% Nov 24 1:53 PM ET). */}
+      {/* 5. Trusted Agency Partners (Randy Nov 24 2026 t8289u; rate-card model, same as /agencies). */}
       <TrustedAgencyPartners />
 
       {/* 2c. Categories + Questions brands ask moved up: strip under the hero, compact questions by the kit CTA (Nov 21). */}

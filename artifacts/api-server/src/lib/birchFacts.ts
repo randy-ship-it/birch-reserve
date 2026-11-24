@@ -42,7 +42,7 @@ export function birchCanonicalFacts(): string {
     `- Premium slots: $${premium.spendLo.toLocaleString("en-US")} to $${premium.spendHi.toLocaleString("en-US")} USD. Inquire only, never a card purchase. Exclusivity, a larger display share and priority placement. Term and scope are set on the IO. Price is set on the IO.`,
     "",
     "AGENCIES",
-    `- The agency of record earns ${AGENCY_CASH_PCT}% of media spend, paid in cash per the IO. Example: a $${seat.spendUsd} reserve pays the agency $${agencyCash(seat.spendUsd)}; a $25,000 premium slot pays $${agencyCash(25_000).toLocaleString("en-US")}.`,
+    `- Agencies buy at a standard written ${AGENCY_CASH_PCT}% discount off the published rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. Illustrative: on a $${seat.spendUsd} USD reserve the agency pays $${seat.spendUsd - agencyCash(seat.spendUsd)}; on a $25,000 USD premium slot, $${(25_000 - agencyCash(25_000)).toLocaleString("en-US")}.`,
     "",
     "LOCAL BUSINESSES",
     `- Lock down my area: a $${AREA_LOCK.priceUsd.toLocaleString("en-US")} USD launch price (launch rate until ${AREA_LOCK.launchRateUntil}), never call it a deposit. It holds up to ${AREA_LOCK.standardSharePct}% of hub display within ${AREA_LOCK.radiusKm} km of their postal code for 1 to 6 months. Details at https://birchreserve.net/advertise/local.`,

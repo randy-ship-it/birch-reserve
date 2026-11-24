@@ -33,7 +33,7 @@ import { useCurrency } from "@/lib/currency";
 import { CARRY_OVER_CLAUSE } from "../../../../api-server/src/lib/sponsorTerms";
 import { AGENCY_TEST, agencyPrepayLeadPayload, clampAgencyBudget, draftRef } from "../../../../api-server/src/lib/twoLane";
 
-export const MID_TIER_LINE = `Prepay a client test or sponsorship credit. 100% media credit. ${AGENCY_TEST.cashPct}% cash to the agency of record.`;
+export const MID_TIER_LINE = `Prepay a client test or sponsorship credit. 100% media credit. A written ${AGENCY_TEST.cashPct}% discount off the published rate card.`;
 /** Straight cut of the live /terms reserve-490 line, plus "the IO sets the terms" for everything else. */
 export const MID_TIER_REFUND = "Nothing runs until you sign the IO, and the IO sets the refund terms. The $490 card reserve is fully refundable until 14 days before the launch date in your IO.";
 export const AGENCY_REPORTING_LINE = "UTM and promo-code reporting per hub and surface";
@@ -152,7 +152,7 @@ export function AgencyPrepayForm({ where, dark = false }: { where: string; dark?
         {state === "busy" ? <Loader2 className="size-4 animate-spin" /> : null}Get a pre-filled IO <ArrowRight className="size-4" />
       </button>
       <p className={`text-[12px] ${dark ? "text-white/65" : "text-foreground/60"}`}>
-        {fmtUsd(b)} {C} budget · agency earns <b>{fmtUsd(cash)} {C}</b> cash ({AGENCY_TEST.cashPct}%). No card today: we send a pre-filled IO to sign.
+        {fmtUsd(b)} {C} list · agency pays <b>{fmtUsd(b - cash)} {C}</b> ({AGENCY_TEST.cashPct}% off). You set the resale price. No card today: we send a pre-filled IO to sign.
       </p>
       {state === "error" ? <p className="text-[12px] font-semibold text-red-400" role="alert">Add a work email, or email randy@scalehealth.ca.</p> : null}
     </form>
@@ -256,7 +256,7 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
         <div>
           <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">Agency client test</p>
           <p className="mt-1 font-display text-2xl leading-none">$1K–$5K <span className="text-sm">{C}</span></p>
-          <p className="mt-1 text-[13px] text-white/75">{AGENCY_TEST.cashPct}% cash to the agency. Pre-filled IO, no card.</p>
+          <p className="mt-1 text-[13px] text-white/75">Written {AGENCY_TEST.cashPct}% off the rate card. Pre-filled IO, no card.</p>
         </div>
         <button type="button" onClick={() => setAgencyOpen((v) => !v)} aria-expanded={agencyOpen} className="mt-3 inline-flex h-10 items-center justify-center gap-1.5 rounded-full px-4 text-sm font-bold text-white ring-1 ring-white/40 hover:bg-white hover:text-[#0b1f3a] md:mt-0" data-testid="mid-tier-agency-cta">
           Prepay a test <ArrowRight className="size-4" />
@@ -283,7 +283,7 @@ function NextStepTerms({ open = false }: { open?: boolean }) {
     <>
       <p>$190: 100% credit if you reserve within 7 days, otherwise a cash refund. $490: fully refundable until 14 days before the launch date in your IO.</p>
       <p>Card checkout by Stripe. Upload your ad on the same page. A person approves every order before it runs.</p>
-      <p data-testid="next-step-agency-line">Agencies: {AGENCY_TEST.cashPct}% of media spend paid in cash · {AGENCY_REPORTING_LINE}.</p>
+      <p data-testid="next-step-agency-line">Agencies: a written {AGENCY_TEST.cashPct}% off the published rate card · {AGENCY_REPORTING_LINE}.</p>
     </>
   );
   if (open) return <div className="mt-2 space-y-2 text-[14px] leading-relaxed text-foreground/80" data-testid="next-step-details">{body}</div>;

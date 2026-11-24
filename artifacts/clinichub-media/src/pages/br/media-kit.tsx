@@ -403,12 +403,12 @@ export default function BrMediaKit() {
       </Block>
 
       {/* Agency + rules */}
-      <Block id="agencies" eyebrow="For agencies" title={`Place a client, earn ${AGENCY_CASH_PCT}% in cash`}>
+      <Block id="agencies" eyebrow="For agencies" title={`Place a client at ${AGENCY_CASH_PCT}% off the rate card`}>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="self-start border border-foreground/20 bg-white p-5" data-testid="mk-agency">
-            <p className="text-sm text-foreground/80">Bring a brand into the network. The agency of record earns {AGENCY_CASH_PCT}% of media spend, paid in cash per the IO.</p>
+            <p className="text-sm text-foreground/80">Bring a brand into the network. Agencies buy at a standard written {AGENCY_CASH_PCT}% discount off the published rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency&apos;s client.</p>
             <p className="mt-3 text-sm" data-currency-fixed>
-              <span className="text-muted-foreground">Example, in USD:</span> a ${MEDIA_KIT_OFFERS.seat.spendUsd} USD reserve pays you <strong>{usd(agencySeat)} USD</strong>; a {usdK(prem.spendLo)} USD premium slot pays you <strong>{usd(agencyPrem)} USD</strong> in cash.
+              <span className="text-muted-foreground">Illustrative example, in USD:</span> on a ${MEDIA_KIT_OFFERS.seat.spendUsd} USD reserve the agency pays <strong>{usd(MEDIA_KIT_OFFERS.seat.spendUsd - agencySeat)} USD</strong>; on a {usdK(prem.spendLo)} USD premium slot, <strong>{usd(prem.spendLo - agencyPrem)} USD</strong>. What you charge the client is yours.
             </p>
           </div>
           <div data-testid="mk-rules">

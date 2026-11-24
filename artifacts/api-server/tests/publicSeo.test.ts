@@ -506,8 +506,8 @@ test("no-JS shell carries origin story, track record, GTM and the example report
     const html = withProofShell(shell, path);
     assert.match(html, /How we got here/);
     assert.match(html, /Track record/);
-    assert.match(html, /19 days/);
-    assert.match(html, /hand over the keys/i);
+    assert.match(html, /21 days/);
+    assert.match(html, /rare strategic projects/i);
     assert.match(html, /Example report · illustrative numbers, not results/);
     assert.match(html, /unaudited/);
     assert.match(html, /First measured flight reports coming soon/);

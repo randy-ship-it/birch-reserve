@@ -16,7 +16,6 @@ import { CARRY_OVER_CLAUSE } from "./sponsorTerms";
 import { EXCLUSIVE_RESERVE } from "./exclusiveReserveTerms";
 import { PUBLIC_CAD_AMOUNT_CENTS, PREPAY_REFUND_CUTOFF_DAYS } from "./reserveOffers";
 import { MEDIA_KIT_OFFERS, AGENCY_CASH_PCT } from "./overhaul/mediaKit";
-import { GTM_SETUP_PRICE_USD } from "./overhaul/gtmSetup";
 import { ACT_OPENNESS, ACT_EXCLUSIONS, ACT_REVIEW_NOTE } from "./overhaul/adActivation";
 import { RETAIL_COPY, RETAIL_TAG, STREET_REACH_FIG } from "./overhaul/brandIntake";
 import { ladderLine, liveLine, activatingLine, ladderMarkdown, MORE_LAUNCHING } from "./hubLadder";
@@ -103,7 +102,7 @@ export function buildOnboardingModule(opts: { payLive?: boolean } = {}): string 
   return [
     "ONBOARDING MODULE (source of truth for 'how do I get started', 'what happens after I pay', 'where do I sign up', 'what does it cost'. Facts below match the live pages. The same module runs on birchreserve.net and the Scale mirror; only the name and links differ.)",
     "",
-    "TRACK RECORD (use when asked 'can you execute', 'proof', 'how fast'; always labelled as internal, anonymous and not Birch Reserve campaign results): a virtual care partner went from first email to ready to sign in 19 days, run by our field sales bot (12 scored emails). Never name the partner, never tie it to ad performance, never promise a timeline.",
+    "TRACK RECORD (use when asked 'can you execute', 'proof', 'how fast'; always labelled as internal, anonymous and not Birch Reserve campaign results): a virtual care partner went from first email to signed pilot in 21 days, run by our field sales bot (12 scored emails; contract signed, now onboarding). Never name the partner, never tie it to ad performance, never promise a timeline.",
     "",
     "STEP ONE, ALWAYS: work out who the visitor is, in one short question if they have not said (brand or supplier, agency, provider or retailer wanting a hub, or a partner). Then give the 3 to 5 step path for THAT type, one recommended starting offer, ONE correct link, and offer the request form or a human. Do not dump the whole module. If the visitor asks for the whole flow or a generic 'how does it work', do NOT ask first: assume a brand, answer with the Path A steps and the link, and ask who they are afterwards.",
     "",
@@ -116,7 +115,7 @@ export function buildOnboardingModule(opts: { payLive?: boolean } = {}): string 
     `6. Pay by card on Stripe, then the after-payment path below. Not ready: the request form ${U("/buycalc#request")} (no card, reply within 1 business day) or an email reply from the team.`,
     "",
     "PATH B: AGENCY (buying for a client)",
-    `1. Reserve for a client on the checkout page, ${U("/buycalc")}, or self-serve at ${U("/buy")}. 2. Agency of record earns ${AGENCY_CASH_PCT}% of media spend, in cash, per the IO. 3. Page: ${U("/agencies")}. 4. 'Can my agency resell?': agencies, media houses and newspapers with inventory and customers can offer our display inventory to their own customers and keep their margin through a wholesale inventory deal; terms are discussed directly (never state a wholesale price or margin). Apply at ${U("/partners")}.`,
+    `1. Reserve for a client on the checkout page, ${U("/buycalc")}, or self-serve at ${U("/buy")}. 2. Agencies buy at a standard written ${AGENCY_CASH_PCT}% discount off the published rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. 3. Page: ${U("/agencies")}. 4. 'Can my agency resell?': agencies, media houses and newspapers with inventory and customers can offer our display inventory to their own customers and keep their margin through a wholesale inventory deal; terms are discussed directly (never state a wholesale price or margin). Apply at ${U("/partners")}.`,
     "",
     "PATH C: PROVIDER, CLINIC, STUDIO OR RETAILER (wants a hub or to join the provider network)",
     `1. Start the same one-form intake at ${U("/intake")} and choose the hub side (${U("/intake/publisher")} shows what a hub could earn, as a labelled estimate). 2. The team reviews the hub for approval and onboards it. 3. Never say a hub is open or live before it is; only the hubs on the status ladder are live (${liveLine()}). Then the Step 2 of 2 page ${U("/intake/activate")} (inventory estimate and which ads can run). Hub launch alerts by category: ${U("/media-kit#hub-alerts")}. Local gyms, studios and clinics can also check the area lock at ${U("/advertise/local")}.`,
@@ -126,7 +125,7 @@ export function buildOnboardingModule(opts: { payLive?: boolean } = {}): string 
     "",
     "ALSO AVAILABLE",
     `- Street Team: ${U("/street-team")}. Running today for Calm Joints only; outside brands start in 2027 (join a running campaign, your own focused campaign, or door drop). Inquiry form ${U("/intake/street-team")}. No minimum published.`,
-    `- GTM setup (the partnership bot): from $${GTM_SETUP_PRICE_USD.toLocaleString("en-US")} USD setup, then monthly ranges scoped to the client's needs (never quote a monthly price). We set it up, get the motion running, hand over the keys. Nothing is charged online: ${U("/intake/gtm")}. Separate from ad buying. Examples are anonymous.`,
+    `- B2B go-to-market, powered by Silver Birch Growth Inc.: SBG takes on only rare strategic projects and is pointed at portfolio value creation right now, so it isn't something you can buy (never quote a price). Separate from ad buying. Note: ${U("/intake/gtm")}.`,
     `- /buy self-serve (3 steps, no password): ${U("/buy")}. Step 1 plan (7-day look, shared reserve, exclusive reserve), step 2 name, work email and website, step 3 where the ad shows plus upload now (PNG, JPG, WebP or GIF, up to 2 MB) or send it later, then card. A person reviews every creative before anything runs.`,
     `- Media kit: ${U("/media-kit")}. Sample IO: ${U("/sample-io")}. Creative specs and templates: ${U("/ads/specs")}.`,
     "",
@@ -138,7 +137,7 @@ export function buildOnboardingModule(opts: { payLive?: boolean } = {}): string 
     "- Premium slots $25K to $50K: inquire only (request form), never a card purchase.",
     "",
     "CURRENCY RULES",
-    "- Visitors in Canada see and pay CAD; everyone else pays USD. There is a currency toggle on the checkout page, and the currency shown at checkout is the currency charged (no conversion at the card). Look and reserve: CAD $270 and $690. Packs: CAD $2,100, $4,200 and $8,400. If you do not know where they are, quote USD and add the CAD equivalent in brackets only if they say they are Canadian or ask. Only quote CAD amounts from this module; never convert any other figure. GTM setup, area lock and partnership prices are USD.",
+    "- Visitors in Canada see and pay CAD; everyone else pays USD. There is a currency toggle on the checkout page, and the currency shown at checkout is the currency charged (no conversion at the card). Look and reserve: CAD $270 and $690. Packs: CAD $2,100, $4,200 and $8,400. If you do not know where they are, quote USD and add the CAD equivalent in brackets only if they say they are Canadian or ask. Only quote CAD amounts from this module; never convert any other figure. Area lock and partnership prices are USD.",
     "",
     "AFTER THEY PAY (what to tell them, in order)",
     "1. Stripe takes the card and the buyer gets a receipt and a confirmation email. Nothing runs yet; all of it is media credit.",

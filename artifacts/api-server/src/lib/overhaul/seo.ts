@@ -29,8 +29,8 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/intake": { title: "Get your free Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
   "/intake/publisher": { title: "Hub · max exposure + earnings · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
   "/intake/supplier": { title: "Supplier intake · Your own hub | Birch Reserve", description: "Suppliers: get your own hub on Birch Reserve. No setup fee, no monthly fee, you approve every placement. Goes live once our team approves it.", image: INTAKE_OG_IMAGE },
-  "/intake/gtm": { title: "GTM setup packages from $3,500 USD | Birch Reserve", description: "We set up the partnership / B2B go-to-market bot and console we use, get your motion running, then hand over the keys. For health and wellness businesses.", image: INTAKE_OG_IMAGE },
-  "/gtm-bot": { title: "The GTM bot | Silver Birch Growth", description: "A go-to-market system built on decades of GTM experience and trained on Silver Birch Growth's own data. Set up selectively, from $3,500 USD, then monthly ranges scoped to your needs.", image: INTAKE_OG_IMAGE },
+  "/intake/gtm": { title: "B2B go-to-market | Silver Birch Growth Inc.", description: "B2B go-to-market, powered by Silver Birch Growth Inc. Rare strategic projects only; pointed at portfolio value creation right now.", image: INTAKE_OG_IMAGE },
+  "/gtm-bot": { title: "B2B go-to-market | Silver Birch Growth Inc.", description: "B2B go-to-market, powered by Silver Birch Growth Inc. SBG takes on only rare strategic projects and is pointed at portfolio value creation right now.", image: INTAKE_OG_IMAGE },
   "/intake/activate": { title: "Get your ads turned on | Birch Reserve", description: "Share a rough inventory estimate and which ads can run on your hubs. Every ad is reviewed and nothing runs without approval.", image: INTAKE_OG_IMAGE },
   "/intake/street-team": { title: "Street team program inquiry (2027) | Birch Reserve", description: "Tell us your brand, tier and routes for the 2027 street team program. A minimum campaign size applies. Reviewed by a person; nothing is charged.", image: INTAKE_OG_IMAGE },
   "/partners": { title: "Partner with Birch Reserve | Service vendors and inventory partners", description: "Service vendors for ad buying, creative and distribution, and agencies, media houses and newspapers who want to offer our display inventory to their customers. Wholesale terms discussed directly.", image: INTAKE_OG_IMAGE },
@@ -89,7 +89,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   },
   "/agencies": {
     title: "For agencies & brokers | Birch Reserve",
-    description: "Agencies, brokers and media resellers: prepay a client test into private health & wellness hubs from $490 USD. Spec sheet, sample IO, UTM and promo-code reporting, 10% of media spend paid in cash to the agency of record.",
+    description: "Agencies, brokers and media resellers: published rate card, a standard written 10% agency discount, you set the resale price and handle client disclosure. Direct buyers pay the rate card. We do not undercut agency clients.",
     jsonld: {
       "@context": "https://schema.org",
       "@graph": [
@@ -205,7 +205,7 @@ export function llmsTxt(): string {
     "- Media buyers & performance marketers (add Birch as its own line item next to programmatic, paid social and retail media; UTM + promo-code measurement): https://birchreserve.net/media-buyers",
     "- Studios & retail: https://birchreserve.net/publish/studios · Brands with a recovery audience: https://birchreserve.net/publish/brands",
     `- ${PERF_ONLY_FACT} Intake: ${PERF_ONLY_URL}`,
-    `- GTM setup packages (separate from the ad inventory product, same systems): ${GTM_SETUP_FACT} Intake: ${GTM_SETUP_URL}`,
+    `- B2B go-to-market (separate from the ad inventory product): ${GTM_SETUP_FACT}`,
     `- ${GTM_BOT_FACT}`,
     `- Street team program (coming soon, 2027; minimum campaign size applies; no guarantees): ${STREET_TEAM_LLMS} https://birchreserve.net/street-team`,
     "- Speed versus Google Ads (Google's own timelines, cited): https://birchreserve.net/vs-google-ads · Blog: https://birchreserve.net/blog · Intake: https://birchreserve.net/intake",

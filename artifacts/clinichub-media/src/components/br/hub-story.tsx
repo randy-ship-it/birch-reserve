@@ -91,7 +91,7 @@ export function SeeTheProof({ testId = "see-the-proof", id = "see-the-proof" }: 
     { tag: "Estimate", title: "Estimated performance ranges", line: "Based on comparables, not our results. Not a guarantee.", href: "/media-kit#performance-ranges", cta: "See the ranges" },
     { tag: "Measured", title: "Hub session geography", line: `${geo} of located hub sessions, ${AUDIENCE_SNAPSHOT.measuredWindow}. Shares only.`, href: "/audiences#signals", cta: "See the shares" },
     { tag: "Measured", title: "Launch brands feeding the audience", line: "Brand launches on the hubs, shown with the audiences they bring.", href: "/audiences#signals", cta: "See the audiences" },
-    { tag: "Internal testing, not ad results", title: "Partnership bot, 19-day example", line: "Our $3,500 USD setup runs the same bot we use: a virtual care partner went from first email to ready to sign in 19 days.", href: "/gtm-bot", cta: "See the example" },
+    { tag: "Internal testing, not ad results", title: "B2B go-to-market · Silver Birch Growth Inc.", line: "Pointed at portfolio value creation (not for sale) — a virtual care partner went from first email to signed pilot in 21 days, now onboarding.", href: "/gtm-bot", cta: "Read the note" },
   ];
   return (
     <div data-testid={testId} id={id}>

@@ -227,7 +227,7 @@ function CardLane({ initialSku }: { initialSku: CardSku }) {
             <label className="flex cursor-pointer items-center gap-2 text-sm font-bold text-[#0b1f3a]">
               <input type="checkbox" checked={agency} onChange={(e) => setAgency(e.target.checked)} className="size-4 accent-[#0b1f3a]" data-testid="lane-agency-toggle" /> Placing for a client?
             </label>
-            {agency ? <AgencyTest brand={brand} email={email} /> : <p className="mt-1 text-[12px] text-foreground/60">Agencies earn {AGENCY_TEST.cashPct}% of media spend, paid in cash.</p>}
+            {agency ? <AgencyTest brand={brand} email={email} /> : <p className="mt-1 text-[12px] text-foreground/60">Agencies buy at a written {AGENCY_TEST.cashPct}% discount off the published rate card.</p>}
           </div>
         </div>
         <div className="min-w-0">
@@ -274,7 +274,7 @@ function AgencyTest({ brand, email: emailIn }: { brand: string; email: string })
   if (state === "sent") return <p className="mt-2 text-sm font-semibold text-[#0b1f3a]" data-testid="lane-agency-sent"><Check className="mr-1 inline size-4 text-lime-600" />Request in. We reply with a client IO. No card was charged.{mock ? " (Preview · mock: nothing sent.)" : ""}</p>;
   return (
     <div className="mt-2" data-testid="lane-agency-test">
-      <p className="text-sm text-foreground/75"><b className="text-[#0b1f3a]">Client test $1K–$5K USD.</b> One IO per client. {AGENCY_TEST.cashPct}% of media spend paid to the agency in cash. UTM + promo-code reporting.</p>
+      <p className="text-sm text-foreground/75"><b className="text-[#0b1f3a]">Client test $1K–$5K USD.</b> One IO per client. Written {AGENCY_TEST.cashPct}% discount off the published rate card. UTM + promo-code reporting.</p>
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
         <input aria-label="Agency" placeholder="Agency" autoComplete="organization" className={input} value={agency} onChange={(e) => setAgency(e.target.value)} data-testid="lane-agency-name" />
         <input aria-label="Your email" placeholder="you@agency.com" type="email" inputMode="email" autoComplete="email" className={input} value={email} onChange={(e) => setEmail(e.target.value)} data-testid="lane-agency-email" />
@@ -375,7 +375,7 @@ function BlockLane() {
             <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Pay by cheque, wire or EFT</p>
             <p className="mt-2 font-display text-4xl leading-none">{BLOCK_BANDS.find((b) => b.key === band)!.label}</p>
             <p className="text-sm text-white/75">{BLOCK_BANDS.find((b) => b.key === band)!.sub} · USD</p>
-            {agency.trim() ? <p className="mt-3 text-sm"><b className="text-lime-300">{AGENCY_TEST.cashPct}% agency cash</b> · est. {agencyCashLabel(band)}</p> : <p className="mt-3 text-sm text-white/75">Agencies earn {AGENCY_TEST.cashPct}% of media spend, paid in cash.</p>}
+            {agency.trim() ? <p className="mt-3 text-sm"><b className="text-lime-300">{AGENCY_TEST.cashPct}% off the rate card</b> · discount est. {agencyCashLabel(band)}</p> : <p className="mt-3 text-sm text-white/75">Agencies buy at a written {AGENCY_TEST.cashPct}% discount off the published rate card.</p>}
             <div className="mt-3"><Chips dark items={["Draft IO PDF now", "Nothing runs until the IO names the hub", "Aggregate reporting"]} /></div>
             <Details dark testId="lane-block-terms" label="Details">
               <p>{PAYMENT_METHODS_LINE} {REMIT_LINE} The IO sets the hubs, placements, flight and invoice terms.</p>

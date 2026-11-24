@@ -48,12 +48,12 @@ export const TRACK_RECORD = {
     },
     {
       key: "partner-launch",
-      tag: "Partner launch",
-      stat: "19 days",
-      outcome: "A virtual care partner went from first email to ready to sign in 19 days.",
+      tag: "Partner launch · Contract signed · Onboarding",
+      stat: "21 days",
+      outcome: "A virtual care partner went from first email to signed pilot in 21 days — now in onboarding.",
       detail:
-        "Our field sales bot ran the thread: 12 emails, each one scored, with the prospect's tone rising from 55 on the first reply to 94 at ready to sign (our read of the wording). It's the same GTM bot that brought in our partnerships and audiences fast.",
-      sources: ["https://silverbirchgrowth.com/ (Case study · names withheld, Oct 28 to Nov 16, 2026)"],
+        "Our field sales bot ran the thread: 12 emails, each one scored, with the prospect's tone rising from 55 on the first reply to 94 before signing (our read of the wording). Contract signed Nov 18; onboarding is under way across partner pages and hubs.",
+      sources: ["https://fridayapp.org/share/deal/digital-md-partner (Case study · names withheld, Oct 28 to Nov 24, 2026)"],
     },
   ] as const satisfies readonly TrackRecordCard[],
   more: "How",
@@ -64,4 +64,4 @@ export const TRACK_RECORD = {
 
 /** One line for the chat prompt / llms.txt. */
 export const TRACK_RECORD_FACT =
-  "Team and portfolio track record (anonymous, internally reported, not Birch Reserve campaign results): a service placed inside one host business grew 5.4x from its first month and the host signed a five-year term at month six; a partner network rebuilt with churn cut from over 35% to under 5%; brands' existing post-purchase, email, loyalty and in-pack surfaces turned into a co-branded care layer with no tech build; a virtual care partner went from first email to ready to sign in 19 days through our field sales bot. Never name the companies involved and never present these as ad results.";
+  "Team and portfolio track record (anonymous, internally reported, not Birch Reserve campaign results): a service placed inside one host business grew 5.4x from its first month and the host signed a five-year term at month six; a partner network rebuilt with churn cut from over 35% to under 5%; brands' existing post-purchase, email, loyalty and in-pack surfaces turned into a co-branded care layer with no tech build; a virtual care partner went from first email to signed pilot in 21 days through our field sales bot (contract signed, now onboarding). Never name the companies involved and never present these as ad results.";

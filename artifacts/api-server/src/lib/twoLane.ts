@@ -97,7 +97,7 @@ export function bandAmountLabel(band: BlockBand): string {
   return b.highUsd === null ? `${fmt(b.lowUsd)}+ USD` : b.highUsd === b.lowUsd ? `${fmt(b.lowUsd)} USD` : `${fmt(b.lowUsd)}–${fmt(b.highUsd)} USD`;
 }
 
-/** Agency cash at 10% of media spend, on the band's low end (modelled; the IO sets the real figure). */
+/** Written 10% discount off list, on the band's low end (modelled; the IO sets the real figure). */
 export function agencyCashLabel(band: BlockBand): string {
   const b = BLOCK_BANDS.find((x) => x.key === band)!;
   const lo = Math.round((b.lowUsd * AGENCY_CASH_PCT) / 100);
@@ -146,7 +146,7 @@ export function agencyTestLeadPayload(input: { email: string; agency: string; cl
     kind: "agency_inquiry" as const,
     email: input.email.trim(),
     company: input.agency.trim() || input.client.trim(),
-    message: `Agency client test ($1K–$5K USD) from /intake for ${input.client.trim() || "a client"}. ${AGENCY_CASH_PCT}% of media spend to the agency of record.`,
+    message: `Agency client test ($1K–$5K USD) from /intake for ${input.client.trim() || "a client"}. Written ${AGENCY_CASH_PCT}% discount off the published rate card.`,
     path,
     fields: { lane: "agency_test", budget: "$1,000–$5,000 USD", client: input.client.trim(), agency: input.agency.trim() },
   };
@@ -176,14 +176,15 @@ export function agencyPrepayLeadPayload(
     kind: "agency_inquiry" as const,
     email: input.email.trim(),
     company: input.agency.trim() ? `${input.agency.trim()} for ${client}` : client,
-    message: `Prepay a client test budget: ${fmt(budget)} ${C} for ${client} (from ${input.where}). Pre-filled IO request ${ref}. ${AGENCY_CASH_PCT}% of media spend (${fmt(cash)} ${C}) to the agency of record. No card charged.`,
+    message: `Prepay a client test budget: ${fmt(budget)} ${C} list for ${client} (from ${input.where}). Pre-filled IO request ${ref}. Written ${AGENCY_CASH_PCT}% discount off the published rate card (agency pays ${fmt(budget - cash)} ${C}). No card charged.`,
     path,
     fields: {
       lane: "agency_prepay",
       budget: `${fmt(budget)} ${C}`,
       currency: C.toLowerCase(),
       budget_usd: String(budget),
-      agency_cash: `${fmt(cash)} ${C}`,
+      agency_discount: `${fmt(cash)} ${C}`,
+      agency_pays: `${fmt(budget - cash)} ${C}`,
       client: input.client.trim(),
       agency: input.agency.trim(),
       draft_ref: ref,

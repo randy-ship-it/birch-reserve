@@ -8,7 +8,7 @@ import { usePageMeta } from "@/components/br/ui";
 import { GTM_BOT, GTM_BOT_BUSINESS_LINE, GTM_BOT_KIND, GTM_BOT_PREFS, GTM_BOT_SOURCE, GTM_BOT_STAGES } from "../../../../api-server/src/lib/overhaul/gtmBot";
 
 export default function BrGtmBot() {
-  usePageMeta("The GTM bot | Silver Birch Growth", "A go-to-market system built on decades of GTM experience and trained on Silver Birch Growth's own data. Set up selectively, then monthly ranges scoped to your needs.");
+  usePageMeta("B2B go-to-market | Silver Birch Growth Inc.", "B2B go-to-market, powered by Silver Birch Growth Inc. SBG takes on only rare strategic projects and is pointed at portfolio value creation right now.");
   return (
     <div className="bg-[radial-gradient(ellipse_at_top,_#ecfccb_0%,_transparent_55%)]" data-testid="gtm-bot-page">
       <header className="container mx-auto max-w-3xl px-4 pb-4 pt-8 md:pt-12">
@@ -33,8 +33,8 @@ export default function BrGtmBot() {
             <p className="mt-1 text-sm text-foreground/75">{GTM_BOT.selective.d}</p>
           </div>
           <div className="rounded-2xl bg-[#ecfccb]/70 p-4" data-testid="gtm-bot-pricing">
-            <p className="font-display text-xl text-[#0b1f3a]">{GTM_BOT.pricing.t}</p>
-            <p className="mt-1 text-sm text-foreground/75" data-currency-fixed>{GTM_BOT.pricing.d}</p>
+            <p className="font-display text-xl text-[#0b1f3a]">{GTM_BOT.availability.t}</p>
+            <p className="mt-1 text-sm text-foreground/75">{GTM_BOT.availability.d}</p>
           </div>
         </div>
       </section>
@@ -69,7 +69,7 @@ export default function BrGtmBot() {
               { name: "email", label: "Work email", type: "email", required: true },
               { name: "what_they_sell", label: "What do you sell?", required: true, placeholder: "e.g. recovery product" },
               { name: "stage", label: "Where is the product today?", type: "select", required: true, options: [...GTM_BOT_STAGES] },
-              { name: "bots_preference", label: "Your bots or ours?", type: "select", required: true, options: [...GTM_BOT_PREFS] },
+              { name: "bots_preference", label: "Kind of fit", type: "select", required: true, options: [...GTM_BOT_PREFS] },
               { name: "website", label: "Website", type: "url" },
               { name: "message", label: "Anything else we should know", type: "textarea" },
               { name: "source", label: "Source", type: "hidden", defaultValue: GTM_BOT_SOURCE },

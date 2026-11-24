@@ -88,7 +88,7 @@ test("reply guard catches the hard bans and lets good replies through", () => {
     "Prices are in USD for every buyer, including Canadian brands: $190 USD and $490 USD.",
     "Reserve for $490 USD at https://birchreserve.net/buycalc?sku=reserve-490",
     "Four placements in every hub, right after a member books or buys.",
-    "The agency of record earns 10% of media spend, paid in cash.",
+    "Agencies buy at a standard written 10% discount off the published rate card.",
   ]) assert.equal(findBannedContent(good), null, good);
   assert.equal(softenReply("Hi there! Happy to help."), "Hi! Happy to help.");
 });

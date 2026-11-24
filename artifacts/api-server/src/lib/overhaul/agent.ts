@@ -93,7 +93,7 @@ export function agentCatalog(_status?: unknown) {
       agent_checkout: "held",
       held_means: `Agent checkout is on hold. POST /v1/agent/checkout records the request and we reply by email from ${HANDOFF_EMAIL}; no charge is made. To pay now, send the buyer to the offer's human_checkout page (Stripe-hosted).`,
     },
-    agency: { commission_pct_of_media_spend: AGENCY.commissionPct, paid_to: "agency of record", paid_in: "cash" },
+    agency: { discount_pct_off_rate_card: AGENCY.commissionPct, resale_price: "set_by_agency", client_disclosure: "agency", direct_buyers: "pay_rate_card", undercut_agency_clients: false },
     endpoints: {
       catalog: "/v1/agent/catalog.json",
       quote: "/v1/agent/quote?offer=reserve-490",

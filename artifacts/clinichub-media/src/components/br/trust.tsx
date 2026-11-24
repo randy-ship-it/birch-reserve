@@ -49,7 +49,7 @@ const YOU_GET = [
   { t: "A placement in a private member experience", d: "Ads run inside co-branded hubs, not on the open web. Every brand is hand-picked to fit the audience." },
   { t: "Media credit toward display or CPC", d: "The $190 USD look and the $490 USD seat are 100% media credit (the look credits over if you convert within 7 days)." },
   { t: "Aggregate campaign reporting", d: "Your UTMs on every placement, an optional promo code, and results per hub and surface. Reports go out on the schedule your IO sets." },
-  { t: "Agency cash, if you place a client", d: "The agency of record earns 10% of media spend, paid in cash." },
+  { t: "Agency discount, if you place a client", d: "Agencies buy at a standard written 10% discount off the published rate card. You set your own resale price." },
 ];
 
 const SAMPLE_ROWS = [
