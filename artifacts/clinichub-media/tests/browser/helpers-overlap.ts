@@ -115,8 +115,9 @@ async function dockAudit(page: Page): Promise<Hit[]> {
     const hits: { kind: "overflow" | "overlap" | "clip"; a: string; b?: string; detail: string }[] = [];
     const vw = document.documentElement.clientWidth;
     const name = (e: Element) => `${e.tagName.toLowerCase()}${(e.textContent || "").trim().slice(0, 30) ? ":" + (e.textContent || "").trim().slice(0, 30) : ""}`;
-    // Floating dock (squirrel + call button) must not cover a button, link, field, heading or card, on the first screen
-    // and at the bottom of the page. A dock that yielded (visibility hidden) is fine.
+    // Floating dock (squirrel + call button) must not cover a button, link, field, heading or card at the bottom of the
+    // page (body padding keeps it clear). Nov 23 2026: the dock no longer steps aside at runtime (Randy: it "keeps
+    // flashing", "just stay there"), so mid-page/first-screen passes are scrolled clear by the visitor, not hidden.
     if (vw <= 767) {
       const dock = (): DOMRect[] => {
         const out: DOMRect[] = [];
@@ -146,8 +147,7 @@ async function dockAudit(page: Page): Promise<Hit[]> {
           });
         }
       };
-      await new Promise((r) => setTimeout(r, 1800)); // let the dock settle / yield
-      check("first screen");
+      await new Promise((r) => setTimeout(r, 1800)); // let the dock settle
       for (let k = 0; k < 4; k++) { // lazy sections grow the page as we reach the end: settle first
         scrollTo(0, document.documentElement.scrollHeight);
         await new Promise((r) => setTimeout(r, 700));
