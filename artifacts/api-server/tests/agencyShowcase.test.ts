@@ -24,7 +24,7 @@ test("/agencies: 10% paid in cash; client tests start on the $190 / $490 USD off
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
   assert.match(page, /10% of media spend, paid in cash to the agency of record/);
   assert.doesNotMatch(page, /\$1,500|\$3,000|\$6,000|SLOT_LADDER/);
-  assert.match(page, /StarterOffers/);
+  assert.match(page, /<BuyPaths /); // Nov 24: card vs IO compare replaces the duplicate StarterOffers block
   assert.equal(AGENCY.line, "10% of media spend, paid in cash to the agency of record.");
   assert.match(AGENCY.bonusNote, /\$190 USD/);
   assert.match(AGENCY.bonusNote, /\$490 USD/);
@@ -184,4 +184,21 @@ test("Nov 23: /agencies payout table pays 10% of the seat price actually shown (
   const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
   assert.match(ui, /agencyPayoutRows\(priceFor\("reserve-490"/);
   assert.match(ui, /data-currency-fixed data-testid="agency-payout-table"/);
+});
+
+test("Nov 24: /agencies leads with two ways to buy (card vs insertion order), published terms only", async () => {
+  const { BUY_PATHS } = await import("../src/lib/overhaul/agencyShowcase");
+  assert.deepEqual(BUY_PATHS.rows.map((r) => r.k), ["Best for", "Pay", "Before it runs", "Refunds", "Agency cash"]);
+  assert.equal(BUY_PATHS.io.price, "$1K–$5K USD");
+  assert.match(BUY_PATHS.io.kicker, /^Insertion order \(IO\)/);
+  const text = JSON.stringify(BUY_PATHS);
+  for (const t of ["$190 USD", "$490 USD", "10% of media spend", "14 days before launch", "Deposit collected at confirmation", "Stripe-hosted"]) assert.ok(text.includes(t), t);
+  assert.doesNotMatch(text, /guarantee|CTR|ROAS|lift|\bCAD\b|signed partners?|Align\b|Clairvoyant|Kalaya|80 locations|call|minutes|hours|today only|left\b/i);
+  const page = read("../clinichub-media/src/pages/br/agencies.tsx");
+  // Decision first: the compare sits right under the hero, before plain terms; the duplicate offer block is gone.
+  assert.ok(page.indexOf('id="two-ways-to-buy"') > 0 && page.indexOf('id="two-ways-to-buy"') < page.indexOf('id="plain-terms"'));
+  assert.match(page, /<BuyPaths reserveHref=\{RESERVE_HREF\} lookHref=\{lookHref\("agencies_paths_look"\)\} \/>/);
+  assert.doesNotMatch(page, /Same two offers as brands/);
+  // "IO" is spelled out on first use, in the hero.
+  assert.ok(page.indexOf("insertion order (IO)") > 0 && page.indexOf("insertion order (IO)") < page.indexOf("Request a draft IO"));
 });
