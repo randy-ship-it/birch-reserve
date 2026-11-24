@@ -94,6 +94,20 @@ export default function BrHome() {
     io.observe(hero);
     return () => { io.disconnect(); root.classList.remove("br-hero-in-view"); };
   }, []);
+  // Deep links like /#gtm-setup open the collapsed section that holds the target.
+  useEffect(() => {
+    const openHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      const el = id ? document.getElementById(id) : null;
+      let d = el?.closest("details") ?? null;
+      if (!el || !d) return;
+      while (d) { d.open = true; d = d.parentElement?.closest("details") ?? null; }
+      requestAnimationFrame(() => el.scrollIntoView({ behavior: "smooth", block: "start" }));
+    };
+    openHash();
+    window.addEventListener("hashchange", openHash);
+    return () => window.removeEventListener("hashchange", openHash);
+  }, []);
   return (
     <div className="w-full overflow-x-hidden bg-[#FAF8F3]" data-testid="br-home">
       <JsonLd
@@ -140,7 +154,7 @@ export default function BrHome() {
       {/* 2. What you're buying (Randy, voice, Nov 23 2026 2:37 PM ET): the inventory, plain and visual, for a cold advertiser. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10 pt-2" data-testid="home-stats">
         <WhatYoureBuying testId="home-what-youre-buying" />
-        <div className="mt-3 rounded-2xl border border-[#0b1f3a]/10 bg-white p-5 shadow-sm md:p-6"><Tam2027 compact testId="home-tam-2027" /><div className="mt-3"><HubAlerts compact where="home" pagePath="/" /></div></div>
+        <div className="mt-3 rounded-2xl border border-[#0b1f3a]/10 bg-white p-5 shadow-sm md:p-6"><Tam2027 compact testId="home-tam-2027" /><details className="group mt-3 rounded-xl border border-[#0b1f3a]/10" data-testid="home-alerts-expand"><summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-[#0b1f3a] [&::-webkit-details-marker]:hidden">Get launch alerts for your category<ChevronDown className="size-4 transition group-open:rotate-180" aria-hidden /></summary><div className="border-t border-[#0b1f3a]/10 p-3"><HubAlerts compact where="home" pagePath="/" /></div></details></div>
         <p className="mt-2 text-[12px] text-foreground/60" data-testid="home-stats-label">{MODELLED_FOOTER}</p>
       </section>
 
@@ -151,36 +165,15 @@ export default function BrHome() {
         <HubFunnel />
       </section>
 
-      {/* 4b. Own the moment + how buying works + proof (Randy, Nov 23 2026). */}
-      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-own-moment"><OwnTheMoment /></section>
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-four-steps"><FourSteps look={price.look} seat={price.seat} /></section>
-      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-see-proof"><SeeTheProof /></section>
 
       {/* 2b. Offer ladder, rising order. The longer mid-tier detail lives in "The details" below. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-offer-stairs">
         <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Start small. Scale when it works.</h2>
         <div className="mt-4"><OfferStairs look={price.look} seat={price.seat} /></div>
-        <div className="mt-4"><FlightReportExample where="home" /></div><div className="mt-4"><PerformanceRanges where="home" /></div><div className="mt-4"><PerformanceOnly where="home" /></div>
       </section>
 
       {/* 2c. Categories + Questions brands ask moved up: strip under the hero, compact questions by the kit CTA (Nov 21). */}
-
-      {/* 2d. GTM setup packages (Randy t332u, Nov 21 2026): separate from the ad product, same systems. */}
-      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-gtm-setup">
-        <div className="mb-4"><HowWeGotHere where="home" /></div><div className="mb-4"><TrackRecord where="home" /></div>
-        <GtmSetup where="home" />
-        <div className="mt-4"><GtmBotTeaser /></div>
-      </section>
-
-      {/* 2e. Street team program, coming 2027 (Randy, voice, Nov 21 2026 2:03 PM ET). */}
-      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-street-team">
-        <StreetTeamProgram where="home" />
-      </section>
-
-      {/* 2f. Partnerships teaser (Randy, voice, Nov 21 2026 4:51 PM ET). */}
-      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-partners">
-        <PartnersTeaser />
-      </section>
 
       {/* 3. Two ways in (same cards as the intake). */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-ways">
@@ -205,22 +198,6 @@ export default function BrHome() {
         <p className="mt-2 text-[12px] text-foreground/55">Most brands are both. One form covers both views.</p>
       </section>
 
-      {/* 5. Link tiles to the deeper pages. */}
-      <section className="container mx-auto max-w-5xl px-4 pb-12" data-testid="home-tiles">
-        <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Go deeper</h2>
-        <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3">
-          {TILES.map((t) => (
-            <a key={t.tid} href={t.href} data-testid={t.tid} className={`group flex min-h-[132px] flex-col justify-between rounded-2xl p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:p-5 ${t.hot ? "bg-lime-300 text-[#0b1f3a]" : "border border-[#0b1f3a]/10 bg-white text-[#0b1f3a]"}`}>
-              <span className={`grid size-10 place-items-center rounded-full ${t.hot ? "bg-[#0b1f3a] text-lime-300" : "bg-[#ecfccb] text-[#0b1f3a]"}`}><t.icon className="size-5" aria-hidden /></span>
-              <span className="mt-3 block">
-                <span className="flex items-center gap-1 text-base font-bold md:text-lg">{t.title}<ArrowRight className="size-4 transition group-hover:translate-x-0.5" aria-hidden /></span>
-                <span className="mt-0.5 block text-[13px] leading-snug text-[#0b1f3a]/65">{t.line}</span>
-              </span>
-            </a>
-          ))}
-        </div>
-      </section>
-
       {/* 6. Everything long, collapsed. */}
       <section className="border-t border-[#0b1f3a]/10 bg-white/60" id="more" data-testid="home-more">
         <div className="container mx-auto max-w-5xl space-y-3 px-4 py-10 md:py-14">
@@ -228,6 +205,26 @@ export default function BrHome() {
             <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">The details</h2>
             <MediaKitPdfLink variant="line" testId="home-media-kit-pdf" />
           </div>
+
+          <Expand title="Example report and expected ranges" sub="What a flight report shows. Estimates, not guarantees" testId="home-reports">
+            <div className="space-y-4 p-4 md:p-6"><FlightReportExample where="home" /><PerformanceRanges where="home" /></div>
+          </Expand>
+
+          <Expand title="See the card in context" sub="Example mockups on live hubs, and the proof behind them" testId="home-own-moment">
+            <div className="space-y-6 p-4 md:p-6"><OwnTheMoment /><SeeTheProof /></div>
+          </Expand>
+
+          <Expand title="Our track record" sub="How we got here" testId="home-track">
+            <div className="space-y-4 p-4 md:p-6"><HowWeGotHere where="home" /><TrackRecord where="home" /></div>
+          </Expand>
+
+          <Expand title="More ways to work with us" sub="Your own site, outreach setup, partnerships" testId="home-more-ways">
+            <div className="space-y-4 p-4 md:p-6"><PerformanceOnly where="home" /><div data-testid="home-gtm-setup"><GtmSetup where="home" /></div><GtmBotTeaser /><PartnersTeaser /></div>
+          </Expand>
+
+          <Expand title="Street Team program" sub="Coming 2027. Door-to-door, by route" testId="home-street-team">
+            <div className="p-4 md:p-6"><StreetTeamProgram where="home" /></div>
+          </Expand>
 
           <Expand title="Questions brands ask" sub="Six short answers" testId="home-questions-expand">
             <div className="p-5 md:p-6"><QuestionsBrandsAskCompact testId="home-questions-compact" /></div>
