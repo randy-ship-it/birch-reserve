@@ -1,11 +1,13 @@
 /**
- * /intake (birchreserve.net only; no links out to the CRM). Simplified one-form intake (Randy, Nov 19 2026 8:30 AM ET
- * voice + 9:34 AM ET via Emma): Supplier + Hub preselected, one fast form (website + email), optional shared answers,
- * role detail after submit on the same record. The full advertiser form stays one click away (#expanded).
- * Below: a labelled sample showing both sides (supplier exposure + hub earnings).
+ * /intake (birchreserve.net and the scalehealth.ca/intake mirror; no links out to the CRM). Simplified one-form intake
+ * (Randy, Nov 19 2026 8:30 AM ET voice + 9:34 AM ET via Emma): Supplier + Hub preselected, one fast form (website +
+ * email), optional shared answers, role detail after submit on the same record. The full advertiser form stays one click
+ * away (#expanded). Below: a labelled sample showing both sides (supplier exposure + hub earnings).
+ * Scale-facing (?ref=scale or Scale skin): define a Hub at the top, drop the reserve/block hero and activity toasts;
+ * form fields and submit stay the same. The default Birch /intake is unchanged.
  */
 import { WatchHowItWorks } from "@/components/br/reel-button";
-import { skinText } from "@/lib/siteSkin";
+import { HUB_DEFINITION, isScaleFacing, skinText } from "@/lib/siteSkin";
 import { useEffect, useMemo, useState } from "react";
 import { KitBuilder } from "@/components/br/kit-builder";
 import { trackIntake, type IntakeSide } from "@/lib/intakeTrack";
@@ -43,6 +45,8 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
   const sup = preset === "supplier";
   const brand = useMemo(() => (sup ? brandFromUrl() : ""), [sup]);
   const [mode, setMode] = useState<Mode>(() => (typeof window !== "undefined" && window.location.hash === "#expanded" ? "expanded" : "fast"));
+  const [scaleFacing] = useState(() => (typeof window === "undefined" ? false : isScaleFacing()));
+  const [showLanes, setShowLanes] = useState(false);
   useEffect(() => trackIntake("advertiser", "mode", mode), [mode]);
   const expand = (side: IntakeSide) => {
     if (side === "publisher") return window.location.assign("/intake/publisher#expanded");
@@ -56,7 +60,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
   }, []);
   // Scroll depth, first touch and time to first interaction for the intake (same code serves scalehealth.ca/intake via the mirror).
   useAttention({ ladder: "[data-testid=intake-next-step]" });
-  usePageMeta(sup ? "Supplier intake · Max your exposure | Birch Reserve" : "Get your free Monetization Kit | Birch Reserve", sup ? "Suppliers start performance-only: no setup fee, no monthly fee, you approve every placement. Max your exposure with your own hub or CPM/CPC display." : "One short form for suppliers and hubs. See your hub earnings and your supplier exposure on performance-only terms (pay on results), side by side. Estimates in USD, reviewed by a person.");
+  usePageMeta(sup ? "Supplier intake · Max your exposure | Birch Reserve" : "Get your free Monetization Kit | Birch Reserve", sup ? "Suppliers start performance-only: no setup fee, no monthly fee, you approve every placement. Max your exposure with your own hub or CPM/CPC display." : scaleFacing ? HUB_DEFINITION : "One short form for suppliers and hubs. See your hub earnings and your supplier exposure on performance-only terms (pay on results), side by side. Estimates in USD, reviewed by a person.");
   return (
     <div data-testid="intake-landing">
       <MockBanner />
@@ -72,16 +76,33 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
             </div>
           ) : (
             <>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">{skinText("Birch Reserve · Monetization Kit")}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">{scaleFacing ? "Scale Health · Monetization Kit" : skinText("Birch Reserve · Monetization Kit")}</p>
               <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Get your free Monetization Kit.</h1>
-              <p className="mt-2 max-w-2xl text-base text-muted-foreground">Reserve space now, book a big block, or get your free kit.</p>
+              {scaleFacing ? (
+                <p className="mt-3 max-w-2xl text-base text-foreground/80" data-testid="hub-definition">{HUB_DEFINITION}</p>
+              ) : (
+                <p className="mt-2 max-w-2xl text-base text-muted-foreground">Reserve space now, book a big block, or get your free kit.</p>
+              )}
               <div className="mt-3"><WatchHowItWorks placement="hero_intake" testId="intake-watch-reel" /></div>
-              <div className="mt-5"><TwoLane /></div>
-              <div className="mt-6 flex items-center gap-3" data-testid="kit-divider"><span className="h-px flex-1 bg-foreground/15" /><span className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Or get your free Monetization Kit</span><span className="h-px flex-1 bg-foreground/15" /></div>
-              <ActivityPulse mode="inline" className="mt-3" />
+              {scaleFacing ? null : (
+                <>
+                  <div className="mt-5"><TwoLane /></div>
+                  <div className="mt-6 flex items-center gap-3" data-testid="kit-divider"><span className="h-px flex-1 bg-foreground/15" /><span className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Or get your free Monetization Kit</span><span className="h-px flex-1 bg-foreground/15" /></div>
+                  <ActivityPulse mode="inline" className="mt-3" />
+                </>
+              )}
             </>
           )}
           <div className={sup ? "mt-5" : "mt-3"}>{mode === "fast" ? <IntakeShortForm onExpand={expand} preset={preset} /> : null}</div>
+          {scaleFacing && !sup ? (
+            <div className="mt-3">
+              {showLanes ? (
+                <TwoLane />
+              ) : (
+                <button type="button" onClick={() => setShowLanes(true)} className="text-left text-[13px] text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-reserve-space-link">Buying ads on existing hubs? Reserve space</button>
+              )}
+            </div>
+          ) : null}
           <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <ShareBar testId="share-bar-intake" />
             {mode === "fast" ? (
@@ -102,18 +123,22 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
         <h2 className="mt-3 text-3xl md:text-5xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you get.</h2>
         <Details testId="sample-details"><p>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range, not a result or a guarantee.</p></Details>
         <div className="mt-4"><ReportV2 report={sample} sample compact exposure={SAMPLE_EXPOSURE} exposureSource="sample" /></div>
-        {sup ? null : <div className="mt-10" data-testid="intake-next-step"><NextStep where="intake" yieldToPostKit /></div>}
+        {sup || scaleFacing ? null : <div className="mt-10" data-testid="intake-next-step"><NextStep where="intake" yieldToPostKit /></div>}
         {sup ? null : (
           <div className="mt-10 space-y-10" data-testid="intake-hub-story">
             <div><LiveHubGrid /><HubFunnel /></div>
-            <OwnTheMoment testId="intake-own-moment" />
-            <FourSteps look={price.look} seat={price.seat} testId="intake-four-steps" />
-            <SeeTheProof testId="intake-see-proof" />
+            {scaleFacing ? null : (
+              <>
+                <OwnTheMoment testId="intake-own-moment" />
+                <FourSteps look={price.look} seat={price.seat} testId="intake-four-steps" />
+                <SeeTheProof testId="intake-see-proof" />
+              </>
+            )}
           </div>
         )}
         {sup ? null : (
           <div className="mt-10 space-y-8" style={{ fontFamily: "inherit" }} data-testid="intake-market-signals">
-            <div className="hidden min-h-[6.5rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div>
+            {scaleFacing ? null : <div className="hidden min-h-[6.5rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div>}
             <Details label="Categories we serve and questions brands ask" testId="intake-more-details" className="text-[14px]">
               <div className="space-y-8 pt-3">
                 <CategoriesWeServe />
@@ -123,7 +148,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
           </div>
         )}
         {/* GTM setup packages (Randy Nov 21 2026): same shared block as home + media kit, below the main intake options. */}
-        {sup ? null : <div className="mx-auto mt-10 max-w-5xl" data-testid="intake-gtm-setup"><GtmSetup where="intake" /></div>}
+        {sup || scaleFacing ? null : <div className="mx-auto mt-10 max-w-5xl" data-testid="intake-gtm-setup"><GtmSetup where="intake" /></div>}
       </div>
     </div>
   );
