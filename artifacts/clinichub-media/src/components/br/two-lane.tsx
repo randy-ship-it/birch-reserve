@@ -18,7 +18,6 @@ import { Details } from "@/components/br/details";
 import { HUB_MOCKS, HUB_KEYS, type HubKey } from "@/lib/hub-mocks";
 import { trackCta as trackCtaRaw } from "@/lib/track-cta";
 import { trackIntake as trackIntakeRaw } from "@/lib/intakeTrack";
-import { openRandyChat } from "@/lib/book-call";
 import { kitPdfBlob, saveBlob } from "@/lib/kitRender";
 import { ioDraftSvg } from "@/lib/ioDraft";
 import { CALM_EXAMPLE, CalmExampleCreative, showCalmExample } from "@/components/br/calm-example-ad";
@@ -314,7 +313,7 @@ function BlockLane() {
         if (!res.ok) throw new Error(String(res.status));
       } catch {
         setState("idle");
-        setError("We could not send that. Call (647) 931-6278 or email randy@scalehealth.ca.");
+        setError("We could not send that. Email randy@scalehealth.ca.");
         return;
       }
     }
@@ -339,7 +338,7 @@ function BlockLane() {
             <p className="mt-1 text-sm text-foreground/70">Ref {ref} · {BLOCK_BANDS.find((b) => b.key === band)!.label} · sales replies within 1 business day.{mock ? " Preview · mock: nothing sent." : ""}</p>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row">
               <button type="button" onClick={download} disabled={pdfBusy} data-testid="lane-block-pdf" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-sm font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30">{pdfBusy ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}Download draft IO (PDF)</button>
-              <button type="button" onClick={() => openRandyChat({ reason: "book-a-call" })} className="inline-flex h-12 items-center justify-center rounded-full px-6 text-sm font-bold text-[#0b1f3a] ring-1 ring-[#0b1f3a]/30" data-testid="lane-block-call">Book a call</button>
+              <a href="/buycalc?sku=reserve-490#reserve" className="inline-flex h-12 items-center justify-center rounded-full px-6 text-sm font-bold text-[#0b1f3a] ring-1 ring-[#0b1f3a]/30" data-testid="lane-block-buy">Buy ads now</a>
             </div>
           </div>
           <div className="rounded-2xl p-4 text-white" style={{ background: NAVY }}>

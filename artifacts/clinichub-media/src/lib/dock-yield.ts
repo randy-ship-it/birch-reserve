@@ -12,10 +12,6 @@ function dockRects(): DOMRect[] {
   const out: DOMRect[] = [];
   const sq = document.querySelector(".birch-dock-squirrel");
   if (sq) out.push(sq.getBoundingClientRect());
-  const host = document.querySelector("elevenlabs-convai");
-  const btn = host?.shadowRoot?.querySelector("button");
-  if (btn) out.push(btn.getBoundingClientRect());
-  else if (host) out.push(new DOMRect(window.innerWidth - 12 - 56, window.innerHeight - 14 - 56, 56, 56));
   return out.filter((r) => r.width > 0 && r.height > 0);
 }
 
@@ -25,7 +21,7 @@ function coversSomething(cards = true): boolean {
     for (const fx of [0.1, 0.5, 0.9]) for (const fy of [0.1, 0.5, 0.9]) pts.push([r.left + r.width * fx, r.top + r.height * fy]);
     for (const [x, y] of pts) {
       for (const el of document.elementsFromPoint(x, y)) {
-        if (el.closest(".birch-dock-squirrel,elevenlabs-convai,[data-testid=activity-pulse],[data-testid=activity-pulse-inline]")) continue;
+        if (el.closest(".birch-dock-squirrel,[data-testid=activity-pulse],[data-testid=activity-pulse-inline]")) continue;
         if (el.matches(COVERABLE)) return true;
         const cs = getComputedStyle(el);
         if (cards && parseFloat(cs.borderTopWidth) > 0 && parseFloat(cs.borderTopLeftRadius) > 0 && el.getBoundingClientRect().height < 400) return true;

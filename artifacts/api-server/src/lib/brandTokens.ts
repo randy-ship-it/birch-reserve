@@ -33,7 +33,7 @@ export function buyerHeaderHtml(active: BuyerNavKey | null, extra = ""): string 
     ["media-kit", "/media-kit", "Media kit"],
   ];
   const links = items.map(([k, href, label]) => `<a href="${href}"${k === active ? ' aria-current="page"' : ""}>${label}</a>`).join("");
-  return `<header class="br-bh"><div class="br-bh-in"><a class="br-bh-logo" href="/">BIRCH RESERVE</a><nav class="br-bh-nav" aria-label="Buying">${links}</nav><div class="br-bh-end">${extra}<a class="br-bh-tel" href="tel:+16479316278">(647) 931-6278</a></div></div></header>`;
+  return `<header class="br-bh"><div class="br-bh-in"><a class="br-bh-logo" href="/">BIRCH RESERVE</a><nav class="br-bh-nav" aria-label="Buying">${links}</nav><div class="br-bh-end">${extra}</div></div></header>`;
 }
 
 export const BUYER_HEADER_CSS = `header.br-bh{max-width:none;margin:0;padding:0;display:block;align-items:initial;border-bottom:1px solid var(--br-line)}.br-bh{position:sticky;top:0;z-index:20;background:rgba(249,248,246,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--br-line);font-family:var(--br-sans)}

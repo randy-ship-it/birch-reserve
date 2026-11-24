@@ -118,8 +118,8 @@ export const SUGGESTION_CHIPS: ReadonlyArray<{
   },
   {
     id: "talk_human",
-    label: "Talk to a human",
-    message: "I’d like to talk to a human.",
+    label: "Buy ads now",
+    message: "I want to buy ads now. How do I place a bid?",
   },
 ] as const;
 
@@ -160,7 +160,7 @@ export const QUALIFY_QUESTIONS: ReadonlyArray<{ key: QualifyKey; prompt: string 
   {
     key: "company",
     prompt:
-      "Happy to set up a call. Three quick questions so it's useful. First, what's your brand or company?",
+      "Happy to get you set up to buy. Three quick questions so I match you right. First, what's your brand or company?",
   },
   {
     key: "category",
@@ -175,8 +175,8 @@ export const QUALIFY_QUESTIONS: ReadonlyArray<{ key: QualifyKey; prompt: string 
 
 export function qualifyDoneMessage(company?: string): string {
   const who = company?.trim() ? `Perfect, ${company.trim()}.` : "Perfect.";
-  return `${who} Fastest next step: ${AI_CALL_LABEL.replace("Get", "get")} (it picks up right away), or leave your details and the team will call you back.`;
+  return `${who} Fastest next step: reserve at birchreserve.net/buycalc ($490 USD, 100% media credit until the IO) or take the $190 USD 7-day look.`;
 }
 
 export const TALK_HUMAN_REPLY =
-  "Sure. The fastest way is a call from Randy's AI right now, or leave your number and we'll call you back." as const;
+  "Easiest is to buy ads now: reserve for $490 USD (100% media credit until the IO) or take the $190 USD 7-day look, both at birchreserve.net/buycalc. Or grab the media kit and rate card." as const;

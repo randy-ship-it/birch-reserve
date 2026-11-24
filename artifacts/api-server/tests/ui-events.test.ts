@@ -888,9 +888,9 @@ test("marketing CTAs call the first-party helper and no third-party pixel", asyn
   assert.match(helper, /keepalive:\s*true/);
   assert.match(home, /cta_hero_reserve/);
   assert.match(home, /buycalc_open/);
-  assert.match(home, /cta_book_call/);
+  assert.doesNotMatch(home, /cta_book_call/); // call CTAs removed (Randy, Nov 23 2026)
   // cta_custom_onprem CTA was removed from home in #25 (Book a call CTAs dropped).
-  assert.match(concierge, /cta_book_call/);
+  assert.doesNotMatch(concierge, /cta_book_call/);
   // Nov 12 overhaul: the public site moved to the /br layout; legacy nav events stay in the helper.
   assert.match(home, /id="placements"/);
   assert.match(home, /data-testid="three-steps"/);

@@ -158,7 +158,7 @@ export function scoreMatch(s: SiteSignals, blurbRaw: string): MatchResult {
         ? { product: "brand_deposit", label: "Brand spend commit", href: "/advertise/brands", why: "Prepay a test budget across the best-fit hubs and get bonus credit." }
         : score >= 55
           ? { product: "starter_slot", label: "Starter slot", href: "/advertise/brands#slots", why: "Start small with a non-exclusive slot and see the response." }
-          : { product: "display_cpc_inquiry", label: "Talk to us about display / CPC", href: "/publish/brands#display-cpc", why: "We'll suggest the hubs and formats where your offer fits." };
+          : { product: "display_cpc_inquiry", label: "Request display / CPC", href: "/publish/brands#display-cpc", why: "We'll suggest the hubs and formats where your offer fits." };
 
   return {
     score,

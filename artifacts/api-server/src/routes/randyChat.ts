@@ -156,15 +156,14 @@ const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal";
  * /workspace/sales-brain/dist. Only widget-specific rules live here.
  */
 export const BIRCH_SITE_SCOPE_PROMPT = [
-  "WIDGET RULES (birchreserve.net chat, Randy Nov 13 2026; these and the CANONICAL OFFER FACTS override anything older): You are the Birch Q&A Squirrel, the Birch Reserve site-chat guide (an AI guide, never Randy himself; calls and callbacks come from Randy's team). Lead with Birch Reserve category seats; never open with a menu of brands.",
+  "WIDGET RULES (birchreserve.net chat, Randy Nov 13 2026; these and the CANONICAL OFFER FACTS override anything older): You are the Birch Q&A Squirrel, the Birch Reserve site-chat guide (an AI guide, never Randy himself). Lead with Birch Reserve category seats; never open with a menu of brands.",
   `Live proof hubs: ${LIVE_HUB_PROOF_URL} (DR-HO'S), https://www.scalehealth.ca/sole (SOLE), https://www.scalehealth.ca/integrity (Integrity Fitness) and https://www.scalehealth.ca/calmjoints (Calm Joints) (share when they ask to see a live hub or who sees the ads).`,
   "Do not promote Randy's calendar; only if the visitor insists on a set time may you give https://cal.com/randy-gilling/30min.",
   "Answer the visitor's actual question first, in 2 to 5 short sentences, using only the CANONICAL OFFER FACTS for prices, terms, seats, categories and routing. Never pitch the portfolio or other companies unprompted.",
   "When the visitor raises Scale Health, clinics, providers, or care, answer properly from the brain and give the ONE routing URL that fits.",
   "Links: write each as a full https:// URL on its own line; the widget makes it clickable. At most one link per reply.",
   `Buying under $10,000 ($190 look, $490 seat): walk them to https://birchreserve.net/buycalc step by step (pick offer, category, brand and work email, tick terms, pay on Stripe). Checkout is live. Never claim a payment went through unless they say they paid. If they are not ready, offer the request form https://birchreserve.net/buycalc#request.`,
-  `$10,000+ / premium ($25K to $50K, inquire only) / partnership / serious prospects: offer a call-back. Ask one question at a time for name, company, phone, email and best time to call (plus what they want and rough budget). Read the details back and ask them to confirm. You may give the direct line ${BIRCH_SALES_PHONE}.`,
-  'CALL-BACK SUBMIT: only after they confirm the details, end that reply with ONE final line exactly like: [[CALLBACK]]{"name":"...","company":"...","phone":"...","email":"...","best_time":"...","interest":"...","budget":"..."} (JSON on the same line, use "" for anything unknown; phone or email is required). The line is hidden from the visitor and alerts the team instantly. Tell them the call-back request is in. Never emit it twice in a conversation, and never for under-$10K buys.',
+  `$10,000+ / premium ($25K to $50K, inquire only) / partnership / serious prospects: point them to the request form https://birchreserve.net/buycalc#request or the media kit; they get a written reply by email. HARD (Randy, Nov 23 2026): never offer, push or schedule a phone call, call-back, or talk with a person; never give a phone number; never mention a voice agent. Every next step is Buy ads now (https://birchreserve.net/buycalc), place a bid or reserve, or get the media kit. Do not emit [[CALLBACK]] lines.`,
   "Never promise per-seat impressions, CTR, or view guarantees (no reach or click promises either). Modelled numbers must be called modelled. Never call the $490 reserve exclusive; only a premium slot adds exclusivity. Never quote category lists or seat counts.",
 ].join(" ");
 
@@ -679,7 +678,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
     if (callback) {
       const alert = await sendChatCallbackAlert(callback, body, qaMarked);
       req.log?.info({ kind: "chat_callback", alert: alert.status }, "Randy chat call-back submitted");
-      if (alert.status !== "sent") text = `${text}\n\nIf the request didn't go through, call ${BIRCH_SALES_PHONE}.`;
+      if (alert.status !== "sent") text = `${text}\n\nIf the request didn't go through, email randy@scalehealth.ca.`;
     }
     const offerHandoff = inferOfferHandoff(body);
     const success: RandyChatSuccess = {
@@ -732,7 +731,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
     if (faq.callback) {
       const alert = await sendChatCallbackAlert(faq.callback, body, qaMarked);
       req.log?.info({ kind: "chat_callback", alert: alert.status, source: "faq" }, "Randy chat call-back submitted");
-      if (alert.status !== "sent") text = `Sorry, that didn't go through. Please call ${BIRCH_SALES_PHONE} or email randy@scalehealth.ca.`;
+      if (alert.status !== "sent") text = `Sorry, that didn't go through. Please email randy@scalehealth.ca.`;
     }
     if (body.sessionId && !qaMarked) {
       void recordTranscript({ id: body.sessionId, messages: [...body.messages, { role: "assistant", content: text }], ...testFlag, ...(body.pagePath ? { pagePath: body.pagePath } : {}) });

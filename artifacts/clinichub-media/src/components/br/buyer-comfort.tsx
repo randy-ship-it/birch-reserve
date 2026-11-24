@@ -70,7 +70,7 @@ export function SeeTheUnit() {
             <a href={SAMPLE_IO_HREF} className="underline underline-offset-2">sample insertion order</a>, so you know what the next step asks for.
           </li>
           <li>
-            A real person: <a href="tel:+16479316278" className="underline underline-offset-2">(647) 931-6278</a> or{" "}
+            Questions by email:{" "}
             <a href="mailto:randy@scalehealth.ca" className="underline underline-offset-2">randy@scalehealth.ca</a>.
           </li>
         </ul>
@@ -185,8 +185,8 @@ export function ProgramsCallout() {
         <p className="mt-2 text-xs text-muted-foreground">{DUAL_MOTION.sharedKit}</p>
       </div>
       <div className="flex flex-col gap-2 text-sm sm:flex-row md:flex-none md:flex-col md:items-stretch">
-        <a href={SALES_PHONE_HREF} className="inline-flex min-h-11 items-center justify-center bg-foreground px-4 font-semibold text-background hover:bg-accent hover:text-foreground" data-testid="programs-call">
-          Request a call back · {SALES_PHONE_DISPLAY}
+        <a href="/buycalc?sku=reserve-490#reserve" className="inline-flex min-h-11 items-center justify-center bg-foreground px-4 font-semibold text-background hover:bg-accent hover:text-foreground" data-testid="programs-buy">
+          Buy ads now
         </a>
         <a href={`mailto:${SALES_EMAIL}?subject=Birch%20Reserve%20program`} className="inline-flex min-h-11 items-center justify-center border border-foreground/30 px-4 font-semibold hover:border-foreground" data-testid="programs-email">
           {SALES_EMAIL}

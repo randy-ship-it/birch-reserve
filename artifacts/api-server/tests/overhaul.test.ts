@@ -308,7 +308,7 @@ test("media kit page copy: required language in, banned words out", () => {
   const path = candidates.find((p) => { try { readFileSync(p); return true; } catch { return false; } });
   assert.ok(path, "media-kit.tsx not found");
   const src = readFileSync(path!, "utf8");
-  for (const must of [/Media credit until IO/, /Modelled volumes/, /fully refundable until 14 days before your launch date/, /Aggregate UTM reporting only/, /No personal data/, /share of display space across the hub network/, /No impression guarantees/, /guarantees of reach, clicks or sales/, /Estimates are modelled; terms on IO/, /Randy Gilling, Founder/, /randy@scalehealth\.ca/, /\(647\) 931-6278/, /curated as hubs launch/, /FaceBeforeFlight/, /CategoryRequestForm/, /AvailabilityStrip/, /Small business package/, /Premium slots/, /from \$25K/i, /\$25K–\$50K/, /Inquire only/, /UPGRADE_PATH_LINE/, /Exclusivity/, /larger display share/, /priority placement/]) {
+  for (const must of [/Media credit until IO/, /Modelled volumes/, /fully refundable until 14 days before your launch date/, /Aggregate UTM reporting only/, /No personal data/, /share of display space across the hub network/, /No impression guarantees/, /guarantees of reach, clicks or sales/, /Estimates are modelled; terms on IO/, /Randy Gilling, Founder/, /randy@scalehealth\.ca/, /curated as hubs launch/, /FaceBeforeFlight/, /CategoryRequestForm/, /AvailabilityStrip/, /Small business package/, /Premium slots/, /from \$25K/i, /\$25K–\$50K/, /Inquire only/, /UPGRADE_PATH_LINE/, /Exclusivity/, /larger display share/, /priority placement/]) {
     assert.match(src, must);
   }
   for (const banned of [/Align/, /Clairvoyant/i, /80 locations/i, /Kalaya/i, /we sell them customers/i, /\bsigned partner\b/i, /\bCTR\b/, /guarantee(d)? (reach|delivery|results)/i, /Test Rail/, /Category Lock/, /\$10K Test Rail/, /\$35K[–-]\$75K/, /8 self-serve seats/, /Eight categories/, /seats open/]) {
@@ -339,7 +339,7 @@ test("media kit dual sales motion: programs callout under the tiers, one FAQ, sh
   assert.ok(kit.indexOf("<ProgramsCallout />") > kit.indexOf('data-testid="mk-rate-cards"'));
   assert.ok(kit.indexOf("<ProgramsCallout />") < kit.indexOf("The math <Tag>Modelled</Tag>"));
   assert.equal((kit.match(/<BuyerFaq \/>/g) ?? []).length, 1);
-  assert.match(comp, /Request a call back · \{SALES_PHONE_DISPLAY\}/);
+  assert.doesNotMatch(comp, /Request a call back/);
   assert.match(comp, /href=\{SAMPLE_IO_HREF\}[^>]*data-testid="programs-sample-io"/);
   const { DUAL_MOTION, BUYER_FAQ, BUYER_FAQ_TITLE, REPLY_LINE } = await import("../src/lib/buyerComfort");
   assert.equal(BUYER_FAQ_TITLE, "Questions buyers ask.");

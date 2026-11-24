@@ -48,7 +48,7 @@ test("prompt follows checkout state and turn context", () => {
   assert.match(forPage, /private brand-fit page/);
   const hear = buildBirchChatSystemPrompt({ checkout: live, mode: "hear", chipId: "talk_human" });
   assert.match(hear, /spoken-friendly/);
-  assert.match(hear, /Talk to a human/);
+  assert.match(hear, /Buy ads now/);
 });
 
 test("grok request: one system prompt, full recent history, tuned sampling, GROK_MODEL respected", () => {

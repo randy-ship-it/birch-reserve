@@ -49,7 +49,7 @@ test("operator line, founder contact, and one-page media kit are present", () =>
   assert.match(identity, /randy@scalehealth\.ca/);
   assert.match(identity, /We reply within 1 business day\./);
   assert.match(identity, /\/birch-reserve-one-pager\.pdf/);
-  assert.match(layout, /Call our sales line\./);
+  assert.doesNotMatch(layout, /Call our sales line\./);
   assert.match(layout, /<OperatorLine/);
   assert.match(layout, /<SalesContact/);
   assert.match(layout, /<PrivacyNote/);
