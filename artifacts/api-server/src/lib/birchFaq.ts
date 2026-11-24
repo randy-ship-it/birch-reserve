@@ -3,7 +3,7 @@
  * down (Randy Nov 13 2026: chat must always answer). Same facts as
  * birchCanonicalFacts(); no model call, no invented numbers.
  */
-import { BIRCH_SALES_EMAIL, BIRCH_SALES_PHONE } from "./birchFacts";
+import { BIRCH_SALES_EMAIL } from "./birchFacts";
 import { ladderLine, liveLine, activatingLine, ladderMarkdown, MORE_LAUNCHING } from "./hubLadder";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -50,7 +50,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return {
       intent: "callback_submit",
       callback,
-      text: `Thanks${c.name ? `, ${c.name.split(" ")[0]}` : ""}. I've sent your call-back request to the Birch team${c.best_time ? ` for ${c.best_time}` : ""}. They'll reply by email at ${c.email || c.phone}.`,
+      text: `Thanks${c.name ? `, ${c.name.split(" ")[0]}` : ""}. I've sent your request to the Birch team. They'll reply by email at ${c.email || c.phone}.`,
     };
   }
   if (/get(ting)? started|onboard|how do i (start|sign up|begin|join|apply)|where do i (start|sign up)|what do i do/.test(t)) {
@@ -117,6 +117,6 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
   return {
     intent: "general",
     callback: null,
-    text: `Birch Reserve sells display space inside private, members-only health and wellness hubs, right after a member books or buys. Reserve for $490 USD or take a 7-day look for $190 USD at ${BUY}. Not ready? Send a quick question with no card at ${REQ}, or call ${BIRCH_SALES_PHONE}.`,
+    text: `Birch Reserve sells display space inside private, members-only health and wellness hubs, right after a member books or buys. Reserve for $490 USD or take a 7-day look for $190 USD at ${BUY}. Not ready? Send a quick question with no card at ${REQ}, or email ${BIRCH_SALES_EMAIL}.`,
   };
 }

@@ -120,7 +120,7 @@ export default function VoiceDemo() {
           className="mt-3 inline-block border border-border px-4 py-2 text-xs font-medium uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent"
           data-testid="voice-demo-book-call"
         >
-          Book a call
+          Ask about a bid
         </button>
       </div>
     </article>

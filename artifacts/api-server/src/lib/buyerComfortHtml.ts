@@ -13,8 +13,6 @@ import {
   DUAL_MOTION,
   REQUEST_HREF,
   SALES_EMAIL,
-  SALES_PHONE_DISPLAY,
-  SALES_PHONE_HREF,
 } from "./buyerComfort";
 
 /**
