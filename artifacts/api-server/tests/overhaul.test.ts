@@ -241,6 +241,10 @@ test("media kit network: live cockpit values, static fallback on bad data", () =
   assert.equal(mm(live.monthlyViews), "128MM");
   assert.equal(live.listedPartners, 42);
   assert.equal(parseCockpit({ orders_yr: 20000000, monthly_views: 127890000, signed: { value: 0, listed: 42 } }).listedPartners, 42);
+  // listed_partners absent (Friday public JSON no longer guarantees it): still live, listed falls back to the static count.
+  const noListed = parseCockpit({ orders_yr: 20000000, monthly_views: 127890000 });
+  assert.equal(noListed.live, true);
+  assert.equal(noListed.listedPartners, MEDIA_KIT_NETWORK_FALLBACK.listedPartners);
   for (const bad of [null, {}, { orders_yr: "x" }, { orders_yr: 0, monthly_views: 1, listed_partners: 1 }]) {
     const f = parseCockpit(bad);
     assert.equal(f.live, false);
