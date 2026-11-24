@@ -19,7 +19,7 @@ export function TrustedAgencyPartners() {
         <div className="grid items-end gap-8 md:grid-cols-[1fr_auto]">
           <div className="min-w-0">
             <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              For agencies <span aria-hidden className="h-px w-8 bg-foreground/30" /> Trusted Agency Partners
+              For agencies <span aria-hidden className="hidden h-px w-8 bg-foreground/30 sm:block" /> <span className="hidden sm:inline">Partner program</span>
             </p>
             <h2 id="tap-title" className="mt-5 font-display text-5xl leading-[0.95] tracking-tight text-foreground sm:text-6xl md:text-7xl">
               Trusted Agency <em className="italic">Partners</em>
@@ -42,12 +42,12 @@ export function TrustedAgencyPartners() {
         <div className="mt-10 grid gap-px border border-foreground bg-foreground lg:grid-cols-[1.15fr_1fr]">
           {/* Allocation */}
           <div className="min-w-0 bg-background p-6 md:p-10" data-testid="tap-allocation">
-            <h3 className="font-display text-3xl leading-tight text-foreground md:text-4xl">
+            <h3 className="font-display text-2xl leading-tight text-foreground sm:text-3xl md:text-4xl">
               Half reserved. <em className="italic">Half open.</em>
             </h3>
             <div className="mt-6 grid grid-cols-2 border border-foreground">
               <div className="relative flex min-h-[200px] min-w-0 flex-col justify-between bg-foreground p-4 text-background md:min-h-[240px] md:p-6">
-                <span aria-hidden className="absolute right-3 top-3 grid size-7 place-items-center bg-accent md:right-5 md:top-5"><Check className="size-4 text-foreground" strokeWidth={3} /></span>
+                <span aria-hidden className="absolute right-3 top-3 hidden size-7 place-items-center bg-accent md:right-5 md:top-5 md:grid"><Check className="size-4 text-foreground" strokeWidth={3} /></span>
                 <span className="font-display text-5xl leading-none text-accent md:text-6xl">~50%</span>
                 <span>
                   <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] md:text-xs">Reserved for partners</span>
@@ -69,10 +69,8 @@ export function TrustedAgencyPartners() {
 
           {/* Economics */}
           <div className="min-w-0 bg-foreground p-6 text-background md:p-10" data-testid="tap-economics">
-            <div className="flex items-start justify-between gap-4">
-              <h3 className="font-display text-3xl leading-tight md:text-4xl">What a partner <em className="italic">keeps.</em></h3>
-              <span className="mt-1 shrink-0 border border-accent px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-accent" data-testid="tap-illustrative">Illustrative</span>
-            </div>
+            <span className="inline-block border border-accent px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-accent" data-testid="tap-illustrative">Illustrative example</span>
+            <h3 className="mt-4 font-display text-2xl leading-tight sm:text-3xl md:text-4xl">What a partner <em className="italic">keeps.</em></h3>
             <dl className="mt-6 border-t border-background/30">
               {ROWS.map((r) => (
                 <div key={r.k} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 border-b border-background/15 py-4">
