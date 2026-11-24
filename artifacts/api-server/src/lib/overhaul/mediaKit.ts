@@ -60,8 +60,10 @@ export function parseCockpit(data: unknown): KitNetwork {
   const signed = (d.signed ?? {}) as Record<string, unknown>;
   const orders = num(d.orders_yr);
   const views = num(d.monthly_views);
-  const listed = num(d.listed_partners) ?? num(signed.listed);
-  if (!orders || !views || !listed) return { ...MEDIA_KIT_NETWORK_FALLBACK, live: false };
+  // Friday no longer publishes signed counts, and listed_partners is optional: volumes stay live and the listed count
+  // falls back to the static value rather than flipping the whole kit to the fallback.
+  const listed = num(d.listed_partners) ?? num(signed.listed) ?? MEDIA_KIT_NETWORK_FALLBACK.listedPartners;
+  if (!orders || !views) return { ...MEDIA_KIT_NETWORK_FALLBACK, live: false };
   return { ordersYr: orders, monthlyViews: views, listedPartners: Math.round(listed), live: true, asOf: typeof d.as_of === "string" ? d.as_of : undefined };
 }
 
