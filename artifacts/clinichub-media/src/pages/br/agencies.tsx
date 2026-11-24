@@ -110,7 +110,7 @@ export default function BrAgencies() {
           <Fold id="plan-by-goal" title="Plan by goal" sub="Match a client brief to the placement that fits">
             <GoalPlanner />
             <p className="mt-4 text-sm text-muted-foreground" data-testid="agency-media-buyers-link">
-              Client already runs display, retargeting or paid social? <a className="underline underline-offset-2" href="/media-buyers#display-mix">See how Birch sits next to that mix</a>.
+              Client already runs display, retargeting or paid social? <a className="underline underline-offset-2" href="/media-buyers#display-mix">{skinText("See how Birch sits next to that mix")}</a>.
             </p>
           </Fold>
           <Fold id="forward-kit" title="Forward-ready kit" sub="Media kit, sample IO, audiences, terms">
