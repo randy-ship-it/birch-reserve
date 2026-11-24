@@ -4,7 +4,7 @@
  * api-server/src/lib/overhaul/trackRecord.ts. Short and visual: one stat + one line per card, detail collapsed.
  */
 import { ArrowRight, ChevronDown } from "lucide-react";
-import { LOOK_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, lookHref} from "@/components/br/pricing";
 import { trackCta } from "@/lib/track-cta";
 import { useCurrency, usePriceText } from "@/lib/currency";
 import { skinText } from "@/lib/siteSkin";
@@ -43,7 +43,7 @@ export function TrackRecord({ where }: { where: "home" | "media_kit" }) {
       </ul>
       <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
         <a
-          href={LOOK_HREF}
+          href={lookHref("track_record_look")}
           onClick={() => trackCta("cta_hold_190", { offer: "hold-190" })}
           data-testid={`track-record-look-${where}`}
           className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white transition hover:bg-lime-300 hover:text-[#0b1f3a]"

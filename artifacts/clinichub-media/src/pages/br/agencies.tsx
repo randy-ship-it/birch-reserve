@@ -5,7 +5,7 @@ import { CheckCircle2 } from "lucide-react";
 import { LeadForm } from "@/components/br/lead-form";
 import { AgencyPayouts, GoalPlanner, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
 import { AGENCY_FAQ } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
-import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
 import { StarterOffers } from "@/components/br/starter-offers";
 
@@ -46,7 +46,7 @@ export default function BrAgencies() {
               <Cta href="/media-kit" variant="line">Media kit</Cta>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
-              Small test? Start with the <a className="underline underline-offset-2" href={LOOK_HREF}>$190 USD 7-day look</a>. It converts in full to the reserve within 7 days, or is refunded.
+              Small test? Start with the <a className="underline underline-offset-2" href={lookHref("agencies_look")}>$190 USD 7-day look</a>. It converts in full to the reserve within 7 days, or is refunded.
             </p>
           </div>
           <div className="border border-foreground/15 bg-white p-6">

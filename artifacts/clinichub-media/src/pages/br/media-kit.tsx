@@ -18,14 +18,15 @@ import { GtmSetup } from "@/components/br/gtm-setup";
 import { isScaleSkin, siteName, skinText } from "@/lib/siteSkin";
 import { PerformanceOnly } from "@/components/br/performance-only";
 import { STREET_TEAM_ONE_LINE } from "../../../../api-server/src/lib/overhaul/streetTeam";
-import { KitCta } from "@/components/br/kit-cta";
+import { KitCta, KIT_CTA_LABEL, intakeHref } from "@/components/br/kit-cta";
+import { logCtaClick } from "@/lib/shareTrack";
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { Check, ChevronDown, Mail, Phone } from "lucide-react";
 import { Cta, usePageMeta } from "@/components/br/ui";
 import { MediaKitPdfLink } from "@/components/br/trust";
 import { SALES_REPLY_LINE } from "@/lib/seller-identity";
 import { PlacementVisual, type PlacementKey } from "@/components/br/placement-example";
-import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 import { BUYER_FAQ_TITLE, BuyerFaq, EarlySlots, FlightTimeline, ProgramsCallout, SAMPLE_REPORT, FLIGHT_TIMELINE, SampleIoLink, SampleReport, SeeTheUnit } from "@/components/br/buyer-comfort";
 import { DoorRoute } from "@/components/br/door-route";
 import { Details } from "@/components/br/details";
@@ -184,17 +185,17 @@ export default function BrMediaKit() {
             <AvailabilityStrip />
             <EarlySlots />
           </div>
-          <div className="mt-6" data-testid="mk-kit-cta">
-            <KitCta placement="hero_media_kit" size="lg" sub="Free · website + email · hub earnings and supplier exposure, estimated" />
-          </div>
-          {/* One button shape with the kit CTA above: rounded, single-line, wraps as a row (design cal, Nov 23 2026). */}
-          <div className="mt-4 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap" id="download">
-            <Cta href="#my-kit" variant="lime" testId="mk-download-kit-hero" className={HERO_BTN}>Download my kit</Cta>
-            <Cta href={RESERVE_HREF} variant="lime" testId="mk-reserve-hero" className={HERO_BTN}>Reserve your space — {price.seat}</Cta>
-            <Cta href={LOOK_HREF} variant="ink" testId="mk-look-hero" className={HERO_BTN}>Take a 7-day look — {price.look}</Cta>
+          <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap" id="download">
+            <Cta href="/buy?ref=hero_media_kit" variant="lime" testId="mk-buy-hero" className={HERO_BTN}>Buy ads now</Cta>
+            <Cta href={RESERVE_HREF} variant="line" testId="mk-reserve-hero" className={HERO_BTN}>Reserve your space — {price.seat}</Cta>
+            <Cta href={lookHref("hero_media_kit")} variant="line" testId="mk-look-hero" className={HERO_BTN}>Take a 7-day look — {price.look}</Cta>
             <Cta href="#request" variant="line" testId="mk-request-hero" className={HERO_BTN}>Ask about a placement</Cta>
-            <MediaKitPdfLink variant="line" testId="mk-pdf-hero" className={HERO_BTN}>One-page media kit (PDF)</MediaKitPdfLink>
           </div>
+          <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-foreground/60" data-testid="mk-kit-cta">
+            <span>Not ready? <a href={intakeHref("hero_media_kit")} onClick={() => logCtaClick("hero_media_kit")} className="font-semibold text-foreground underline underline-offset-4" data-testid="mk-cta-kit-quiet">{KIT_CTA_LABEL}</a></span>
+            <a href="#my-kit" className="underline underline-offset-4" data-testid="mk-download-kit-hero">Download my kit</a>
+            <MediaKitPdfLink variant="line" testId="mk-pdf-hero" className="!h-auto !border-0 !bg-transparent !p-0 !text-[13px] underline underline-offset-4">One-page media kit (PDF)</MediaKitPdfLink>
+          </p>
           <div className="mt-4" data-testid="mk-reel-link"><WatchHowItWorks placement="hero_media_kit" testId="mk-watch-reel" /></div>
 
         </div>
@@ -332,7 +333,7 @@ export default function BrMediaKit() {
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Cta href={RESERVE_HREF} testId="mk-cta-seat" className="w-full sm:w-auto">Reserve your space — {price.seat}</Cta>
-              <Cta href={LOOK_HREF} variant="line" testId="mk-cta-look" className="w-full sm:w-auto">Take a 7-day look — {price.look}</Cta>
+              <Cta href={lookHref("media_kit_look")} variant="line" testId="mk-cta-look" className="w-full sm:w-auto">Take a 7-day look — {price.look}</Cta>
             </div>
             <WhatHundredGets />
           </article>

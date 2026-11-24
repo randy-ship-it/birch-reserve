@@ -1,7 +1,7 @@
 import { Check } from "lucide-react";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
 import { MediaKitPdfLink } from "@/components/br/trust";
-import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 import { AvailabilityStrip, NETWORK_HUBS, priceLabels, useAvailability } from "@/components/br/prime-hero";
 import { buyersOffersJsonLd } from "../../../../api-server/src/lib/overhaul/seo";
 
@@ -64,7 +64,7 @@ export default function BrAiBuyers() {
             <p className="mt-2 font-display text-5xl leading-none">{price.look}</p>
             <p className="mt-4 text-sm text-foreground/80">Hold your category for 7 days. It converts in full to the {price.seat} reserve within 7 days, or it's refunded. It does not lock in a slot.</p>
             <div className="mt-6 sm:mt-auto sm:pt-6">
-              <Cta href={LOOK_HREF} variant="ink" testId="buyers-look" className="w-full sm:w-auto">Take a 7-day look — {price.look}</Cta>
+              <Cta href={lookHref("ai_buyers_look")} variant="ink" testId="buyers-look" className="w-full sm:w-auto">Take a 7-day look — {price.look}</Cta>
             </div>
           </article>
           <article className="flex flex-col border-2 border-foreground bg-white p-6">

@@ -4,7 +4,7 @@
  */
 import { ArrowRight } from "lucide-react";
 import { Details } from "@/components/br/details";
-import { LOOK_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, lookHref} from "@/components/br/pricing";
 import { GTM_SETUP, GTM_SETUP_HREF } from "../../../../api-server/src/lib/overhaul/gtmSetup";
 
 export function GtmSetup({ where }: { where: "home" | "media_kit" | "intake" }) {
@@ -33,7 +33,7 @@ export function GtmSetup({ where }: { where: "home" | "media_kit" | "intake" }) 
         <a href={GTM_SETUP_HREF} data-currency-fixed data-testid={`gtm-cta-${where}`} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-6 text-sm font-bold text-white transition hover:bg-lime-300 hover:text-[#0b1f3a]">
           {GTM_SETUP.cta} <ArrowRight className="size-4" aria-hidden />
         </a>
-        <a href={LOOK_HREF} className="text-sm font-semibold text-foreground/70 underline-offset-2 hover:underline">Or start with the $190 USD 7-day look</a>
+        <a href={lookHref("gtm_setup_look")} className="text-sm font-semibold text-foreground/70 underline-offset-2 hover:underline">Or start with the $190 USD 7-day look</a>
       </div>
       <Details label={GTM_SETUP.detailsLabel} testId={`gtm-details-${where}`}>
         <ul className="list-disc space-y-1 pl-5">{GTM_SETUP.details.map((d) => <li key={d} {...(d.includes("$3,500") ? { "data-currency-fixed": "" } : {})}>{d}</li>)}</ul>

@@ -3,7 +3,7 @@ import { CheckCircle2 } from "lucide-react";
 import { LeadForm } from "@/components/br/lead-form";
 import { InventorySpec, IoProcess } from "@/components/br/agency-showcase";
 import { MEASUREMENT_STEPS, MEDIA_BUYER_FAQ, MIX_ROWS } from "../../../../api-server/src/lib/overhaul/mediaBuyers";
-import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, Lede, Modelled, Section, usePageMeta } from "@/components/br/ui";
 import { StarterOffers } from "@/components/br/starter-offers";
 
@@ -29,7 +29,7 @@ export default function BrMediaBuyers() {
               Your programmatic, retargeting and paid social stay as they are. Birch Reserve adds hand-placed display inside private health and wellness hubs, on the pages members use right after they buy or book, and when they log back in. It runs as its own line item, tagged with your UTM links and promo codes.
             </Lede>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Cta href={LOOK_HREF} variant="ink" testId="mb-cta-look">Start a test · $190 USD 7-day look</Cta>
+              <Cta href={lookHref("media_buyers_look")} variant="ink" testId="mb-cta-look">Start a test · $190 USD 7-day look</Cta>
               <Cta href={RESERVE_HREF} testId="mb-cta-reserve">Reserve · $490 USD</Cta>
               <Cta href="#talk" variant="line" testId="mb-cta-brief">Send a brief</Cta>
             </div>

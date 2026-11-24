@@ -1,6 +1,6 @@
 import { SampleBenefitsProfile } from "@/components/br/sample-benefits-profile";
 import { Cta, Eyebrow, H1, Lede, Section, usePageMeta } from "@/components/br/ui";
-import { LOOK_HREF, SeatCtas } from "@/components/br/pricing";
+import { LOOK_HREF, SeatCtas, lookHref} from "@/components/br/pricing";
 
 export default function BrSampleProfile() {
   usePageMeta(
@@ -27,7 +27,7 @@ export default function BrSampleProfile() {
       <Section>
         <SeatCtas />
         <div className="mt-4">
-          <Cta href={LOOK_HREF} variant="line">Start with a $190 look</Cta>
+          <Cta href={lookHref("sample_profile_look")} variant="line">Start with a $190 look</Cta>
         </div>
       </Section>
     </div>
