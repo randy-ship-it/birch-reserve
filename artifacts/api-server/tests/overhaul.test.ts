@@ -151,7 +151,9 @@ test("agent catalog: the two media-kit offers in USD, only live hubs, agent chec
   assert.deepEqual(c.currencies, ["USD"]);
   assert.equal(c.inventory.surfaces.length, 4);
   assert.deepEqual(c.inventory.live_hubs.map((h) => h.name), ["DR-HO'S physio", "SOLE", "Integrity Fitness", "Calm Joints"]);
-  assert.equal(c.agency.commission_pct_of_media_spend, 10);
+  assert.equal(c.agency.discount_pct_off_rate_card, 10);
+  assert.equal(c.agency.resale_price, "set_by_agency");
+  assert.equal(c.agency.undercut_agency_clients, false);
   assert.equal(c.checkout_status.agent_checkout, "held");
   assert.doesNotMatch(JSON.stringify(c), /CAD|sponsor-|area-lock|live inventory/);
   assert.equal(slotProductsJsonLd().length, SLOT_LADDER.length);

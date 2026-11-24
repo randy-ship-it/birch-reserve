@@ -9,12 +9,11 @@ import { OVERHAUL_ROUTES, llmsTxt } from "../src/lib/overhaul/seo";
 
 const read = (f: string) => readFileSync(resolve(process.cwd(), f), "utf8");
 
-test("agency cut: 10% of media spend, paid in cash to the agency of record (Randy 8:14 PM ET)", () => {
+test("agency terms: standard written 10% discount off the published rate card (Randy Nov 24 2026)", () => {
   assert.equal(AGENCY_SHARE.pct, 10);
   assert.equal(AGENCY_CASH_PCT, AGENCY.commissionPct);
-  assert.match(AGENCY_SHARE.line, /10% of media spend, paid in cash/);
-  assert.match(AGENCY_SHARE.line, /agency of record/);
-  assert.equal(AGENCY_SHARE.timing, "Paid to the agency of record per the IO.");
+  assert.match(AGENCY_SHARE.line, /standard written 10% discount off the published rate card/);
+  assert.equal(AGENCY_SHARE.timing, "The discount is written into the insertion order.");
   assert.deepEqual(AGENCY_EXAMPLES.map((e) => [e.spend, e.cash]), [[490, 49], [25000, 2500]]);
   assert.equal(agencyCash(25000), 2500);
   assert.equal(agencyCash(50000), 5000);
@@ -26,7 +25,7 @@ test("/agencies: written 10% discount off the published rate card; client tests 
   assert.match(page, /published rate card/);
   assert.doesNotMatch(page, /\$1,500|\$3,000|\$6,000|SLOT_LADDER/);
   assert.match(page, /<BuyPaths /); // Nov 24: card vs IO compare, now folded under "The details"
-  assert.equal(AGENCY.line, "10% of media spend, paid in cash to the agency of record.");
+  assert.equal(AGENCY.line, "Agencies buy at a standard written 10% discount off the published rate card.");
   assert.match(AGENCY.bonusNote, /\$190 USD/);
   assert.match(AGENCY.bonusNote, /\$490 USD/);
 });
@@ -118,6 +117,8 @@ test("/agencies (Nov 16 2026, rebuilt Nov 24): fast lock path, brokers folded in
   assert.match(page, /lookHref\("agencies_paths_look"\)/);
   // Brokers & resellers: same agency-of-record terms (agency tier copy), no new commission number.
   assert.match(page, /Partner access, client tests and broker lists all come here/);
+  assert.match(page, /Inquire within about blocking out dedicated inventory chunks similar to our agency partners\./);
+  assert.doesNotMatch(read("../clinichub-media/src/pages/br/home.tsx"), /blocking out dedicated inventory chunks/);
   assert.doesNotMatch(page, /\b(5|8|12|15|20)% (broker|referral|finder)/i);
   // No invented deadlines, countdowns or seat counts.
   assert.doesNotMatch(page, /\d+ (seats?|spots?|placements?) (left|remaining|open)/i);

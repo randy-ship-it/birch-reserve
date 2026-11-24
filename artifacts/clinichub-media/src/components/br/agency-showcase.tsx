@@ -119,7 +119,7 @@ export function AgencyHero() {
               For agencies &amp; media buyers <span aria-hidden className="h-px w-6 bg-foreground/30" /> First-party health inventory
             </p>
             <h2 className="font-display text-[2.1rem] leading-[1.04] tracking-tight md:text-[3.5rem]">
-              Agencies: place a client inside the health hubs. <em className="not-italic text-foreground/55">Keep {AGENCY_SHARE.pct}% of the spend.</em>
+              Agencies: place a client inside the health hubs. <em className="not-italic text-foreground/55">A written {AGENCY_SHARE.pct}% off the rate card.</em>
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground" data-testid="agency-inventory-line">
               {INVENTORY_LINE} Fixed starting rates, the surface named on the IO, and UTM and promo-code reporting per hub.
@@ -160,8 +160,8 @@ export function AgencyHero() {
               <div className="mt-2 grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 text-sm tabular-nums">
                 <span className="text-background/70">Client prepays: {ex.label}</span>
                 <span className="text-right">{usd(ex.spend)}</span>
-                <span className="text-background/70">Agency of record earns, in cash</span>
-                <span className="text-right font-semibold text-accent">{usd(ex.cash)}</span>
+                <span className="text-background/70">Agency pays (10% off list)</span>
+                <span className="text-right font-semibold text-accent">{usd(ex.spend - ex.cash)}</span>
               </div>
             </div>
             <ul className="mt-6 space-y-2 border-t border-background/15 pt-5 text-sm text-background/80">
@@ -170,7 +170,7 @@ export function AgencyHero() {
               <li className="text-background/60">{BRAND_BONUS_LINE}</li>
             </ul>
             <a href="#agency-payouts" className="mt-6 inline-block text-sm text-background/70 underline underline-offset-4 hover:text-background">
-              How agency payouts work
+              How the discount works
             </a>
           </aside>
         </div>
@@ -346,7 +346,7 @@ export function IoProcess() {
   );
 }
 
-/** How agency payouts work: the stated share, worked examples, and marked placeholders. */
+/** How the discount works: the stated share, worked examples, and marked placeholders. */
 export function AgencyPayouts() {
   const { currency, prices } = useCurrency();
   const cur = currency === "cad" ? "CAD" : "USD";
@@ -366,7 +366,7 @@ export function AgencyPayouts() {
             <tr className="border-b border-foreground/80 text-[11px] uppercase tracking-wider text-foreground/60">
               <th className="px-4 py-3 font-semibold md:px-5">Client buy</th>
               <th className="px-4 py-3 text-right font-semibold md:px-5">Prepaid ({cur})</th>
-              <th className="px-4 py-3 text-right font-semibold md:px-5">Agency cash ({cur})</th>
+              <th className="px-4 py-3 text-right font-semibold md:px-5">Agency pays ({cur})</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -374,22 +374,22 @@ export function AgencyPayouts() {
               <tr key={e.key} data-testid={`agency-payout-${e.key}`}>
                 <td className="px-4 py-3 md:px-5">{e.label}</td>
                 <td className="whitespace-nowrap px-4 py-3 text-right md:px-5">{e.spend}</td>
-                <td className="whitespace-nowrap px-4 py-3 text-right font-semibold md:px-5">{e.cash}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-right font-semibold md:px-5">{e.pays}</td>
               </tr>
             ))}
           </tbody>
         </table>
         <dl className="divide-y divide-border border-t border-foreground/15 text-sm" data-testid="agency-payout-terms">
           <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
-            <dt className="text-foreground/75">Paid in</dt>
-            <dd className="font-semibold">Cash</dd>
+            <dt className="text-foreground/75">Discount</dt>
+            <dd className="font-semibold">Written 10% off list</dd>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
             <dt className="text-foreground/75">When</dt>
             <dd className="font-semibold">{AGENCY_SHARE.timing}</dd>
           </div>
         </dl>
-        <p className="border-t border-border px-4 py-3 text-[11px] text-muted-foreground md:px-5">{AGENCY_SHARE.pct}% of media spend, paid in cash to the agency of record. Examples use prices already on the site.</p>
+        <p className="border-t border-border px-4 py-3 text-[11px] text-muted-foreground md:px-5">Written {AGENCY_SHARE.pct}% discount off the published rate card. Examples use prices already on the site. What you charge the client is yours.</p>
       </div>
     </div>
   );

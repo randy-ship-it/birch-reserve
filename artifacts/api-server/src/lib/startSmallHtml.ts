@@ -19,7 +19,7 @@ export function startSmallHtml(): string {
   const fine = [
     ["Refund terms", "Every deposit is 100% media credit. Ask by email and the full amount goes back to your card any time before activation, which today means up to 14 days before the launch date on your insertion order (IO). The $190 look converts in full to the $490 seat within 7 days, or is refunded. After launch, unused credit can be extended or refunded under your IO."],
     ["What you get", "A share of display space across a growing network of private health and wellness hubs, curated as hubs launch. The IO names the hub and placement before anything runs. Views are modelled estimates at the starter rate, not a guarantee. Aggregate reporting only. No PHI, no clinical pixels."],
-    ["Agencies", "Prepay a $1,000–$5,000 USD client test. Each client gets its own IO and reporting. The agency of record earns 10% of media spend, paid in cash."],
+    ["Agencies", "Prepay a $1,000–$5,000 USD client test. Each client gets its own IO and reporting. Agencies buy at a standard written 10% discount off the published rate card. You set your own resale price and handle your own client disclosure."],
     ["Bigger budgets", "Premium slots ($25K–$50K) are by inquiry. Start small now and move up any time; your credit carries over."],
   ];
   return `<section class="band" id="start-small" data-testid="start-small"><div class="wrap"><p class="kicker">Start small</p><h2>Start small from $190. Fully refundable deposit.</h2><p class="fine" style="margin:8px 0 0">Pick a size. Nothing runs until you approve the IO.</p>
@@ -27,7 +27,7 @@ export function startSmallHtml(): string {
     tier({ key: "look", eyebrow: "7-day look", price: "$190 USD", name: "See it before you commit", line: "Your placement, live in a hub for 7 days.", cta: "Start the 7-day look", href: `/buycalc?sku=hold-190&amp;${utm("look")}#reserve`, pick: "hold-190", note: "Card checkout below" }),
     tier({ key: "seat", on: true, eyebrow: "Category seat", price: "$490 USD", name: "Your named category seat", line: "All $490 is media credit for your category.", cta: "Reserve my seat", href: `/buycalc?sku=reserve-490&amp;${utm("seat")}#reserve`, pick: "reserve-490", note: "Card checkout below" }),
     tier({ key: "block", eyebrow: "Starter view block", price: `From ${fmtUsd(START_SMALL_BLOCK_USD)} USD`, name: "100K modelled views", line: "One hub surface at the starter rate.", cta: "Request a block", href: `/?inquire=pack&amp;block=100000&amp;surfaces=landing&amp;${utm("block")}#quick-buy`, note: "Deposit collected at confirmation" }),
-    tier({ key: "agency", eyebrow: "Agency client test", price: "$1K–$5K USD", name: "Test a client in the hubs", line: "One IO per client. 10% of spend paid to the agency.", cta: "Request a client test", href: `/agencies?${utm("agency")}#talk`, note: "Deposit collected at confirmation" }),
+    tier({ key: "agency", eyebrow: "Agency client test", price: "$1K–$5K USD", name: "Test a client in the hubs", line: "One IO per client. Written 10% discount off the published rate card.", cta: "Request a client test", href: `/agencies?${utm("agency")}#talk`, note: "Deposit collected at confirmation" }),
   ].join("")}</div>
 <div class="ss-fine">${fine.map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join("")}</div>
 <p class="fine" style="margin-top:10px">USD. Views are modelled estimates, not a guarantee.</p></div></section>`;

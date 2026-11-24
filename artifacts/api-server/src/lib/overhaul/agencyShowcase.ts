@@ -3,8 +3,8 @@
  * Pure numbers shared by the home page and its tests. No Node imports.
  *
  * Every figure here is re-used from an existing source, never invented:
- *   - agency cut: AGENCY_CASH_PCT in ./mediaKit = AGENCY.commissionPct in ./model (live
- *     /agencies + AGENCY.line: "10% of media spend, paid in cash to the agency of record" (Randy 8:14 PM ET).
+ *   - agency discount: AGENCY_CASH_PCT in ./mediaKit = AGENCY.commissionPct in ./model
+ *     (live /agencies + AGENCY.line: written 10% off the published rate card).
  *   - starting CPMs: SURFACES (./model) / RATE_SURFACES (./pricing), illustrative estimates.
  *   - 20MM+ orders: TAM.ordersLabel (./model), modelled.
  *   - sell assumption: Randy 7:33 PM ET, "20% of available display space". An ASSUMPTION.
@@ -19,19 +19,19 @@ import { isPremiumPlacement } from "../premiumInquireOnly";
 export const SELL_ASSUMPTION_PCT = 20;
 export const SELL_ASSUMPTION_LINE = `Planning assumption: we model selling ${SELL_ASSUMPTION_PCT}% of available display space on each placement. An assumption, not a delivery commitment; your IO sizes views against live hub supply.`;
 
-/** Randy, Nov 12 2026 8:14 PM ET: 10% of media spend, paid in cash to the agency of record. */
+/** Randy, Nov 24 2026: standard written 10% discount off the published rate card. */
 export const AGENCY_SHARE = {
   pct: AGENCY_CASH_PCT,
   matchesModel: AGENCY_CASH_PCT === AGENCY.commissionPct,
-  line: `The agency of record earns ${AGENCY_CASH_PCT}% of media spend, paid in cash.`,
-  timing: "Paid to the agency of record per the IO.",
+  line: `Agencies buy at a standard written ${AGENCY_CASH_PCT}% discount off the published rate card.`,
+  timing: "The discount is written into the insertion order.",
 } as const;
 
 /**
  * Brand bonus credit: already stated for brands on /advertise/brands (DEPOSIT_TIERS, +5/+10/+15%).
- * It is the client's media credit, separate from the agency's 10% cash.
+ * It is the client's media credit, separate from the written 10% agency discount.
  */
-export const BRAND_BONUS_LINE = `Client tests start self-serve on the $190 USD 7-day look or the $490 USD reserve; premium slots by inquiry. Separate from your ${AGENCY_CASH_PCT}% cash.`;
+export const BRAND_BONUS_LINE = `Client tests start self-serve on the $190 USD 7-day look or the $490 USD reserve; premium slots by inquiry. Separate from the written ${AGENCY_CASH_PCT}% agency discount.`;
 
 /** Worked examples on the public tiers: $490 seat (card) and the $25K premium floor (inquire). */
 export const AGENCY_EXAMPLES = [
@@ -44,26 +44,29 @@ export const AGENCY_CLIENT_TEST = { lo: 1_000, hi: 5_000 } as const;
 
 /**
  * The /agencies payout table in the visitor's currency (daily scan Nov 23 2026).
- * Bug fixed: CAD visitors saw "$690 CAD reserve -> $49 agency cash" because the page relabelled USD
+ * Bug fixed: CAD visitors saw "$690 CAD reserve vs $49 USD discount" because the page relabelled USD
  * text but kept the USD cash figure. Cash is now 10% of the seat price actually shown ($690 CAD -> $69 CAD).
  * Other rows keep the same number in both currencies (the site rule when no CAD table exists).
  * No new prices: seat price comes from /api/currency (priceFor), bands are the ones already on /agencies.
  */
 export function agencyPayoutRows(seatPrice: number, cur: "USD" | "CAD") {
   const m = (n: number) => `$${n.toLocaleString("en-US")}`;
+  const pays = (n: number) => m(n - agencyCash(n));
   return [
-    { key: "seat", label: `${m(seatPrice)} ${cur} reserve (card)`, spend: m(seatPrice), cash: m(agencyCash(seatPrice)) },
+    { key: "seat", label: `${m(seatPrice)} ${cur} reserve (card)`, spend: m(seatPrice), cash: m(agencyCash(seatPrice)), pays: pays(seatPrice) },
     {
       key: "client_test",
       label: "Client test (IO)",
       spend: `${m(AGENCY_CLIENT_TEST.lo / 1000)}K–${m(AGENCY_CLIENT_TEST.hi / 1000)}K`,
       cash: `${m(agencyCash(AGENCY_CLIENT_TEST.lo))}–${m(agencyCash(AGENCY_CLIENT_TEST.hi))}`,
+      pays: `${pays(AGENCY_CLIENT_TEST.lo)}–${pays(AGENCY_CLIENT_TEST.hi)}`,
     },
     {
       key: "premium",
       label: `Premium slot from ${m(MEDIA_KIT_OFFERS.premium.spendLo / 1000)}K (inquire)`,
       spend: m(MEDIA_KIT_OFFERS.premium.spendLo),
       cash: m(agencyCash(MEDIA_KIT_OFFERS.premium.spendLo)),
+      pays: pays(MEDIA_KIT_OFFERS.premium.spendLo),
     },
   ];
 }

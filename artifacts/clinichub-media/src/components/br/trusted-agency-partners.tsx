@@ -23,7 +23,7 @@ const TERMS = [
 
 export function TrustedAgencyPartners() {
   return (
-    <section className="overflow-hidden border-y border-foreground/15 bg-background" data-testid="home-tap" aria-labelledby="tap-title">
+    <section id="trusted-agency-partners" className="scroll-mt-24 overflow-hidden border-y border-foreground/15 bg-background" data-testid="home-tap" aria-labelledby="tap-title">
       <div className="container mx-auto max-w-6xl px-4 py-14 md:py-20">
         <div className="grid items-end gap-8 md:grid-cols-[1fr_auto]">
           <div className="min-w-0">

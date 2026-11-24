@@ -328,10 +328,10 @@ export const PUBLISHER_INCENTIVE = {
 
 // ---------------------------------------------------------------- agencies
 
-/** Market-friendly agency deal (Randy, Nov 12 2026 8:14 PM ET: 10% of media spend, paid in cash). Brand bonus credit is the client's, separate from the agency cash. */
+/** Agency deal (updated Nov 24 2026): standard written 10% discount off the published rate card. */
 export const AGENCY = {
   commissionPct: 10,
-  line: "10% of media spend, paid in cash to the agency of record.",
+  line: "Agencies buy at a standard written 10% discount off the published rate card.",
   bonusNote: "Client tests can start self-serve on the $190 USD 7-day look or the $490 USD category reserve.",
 } as const;
 

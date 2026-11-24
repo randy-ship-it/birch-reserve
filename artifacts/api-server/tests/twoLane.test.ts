@@ -110,7 +110,7 @@ test("lane analytics events are on the fixed list", () => {
   }
 });
 
-test("prepay a client test budget: stays in the live $1K–$5K band, 10% agency cash, pre-filled IO on /v1/leads", () => {
+test("prepay a client test budget: stays in the live $1K–$5K band, written 10% discount, pre-filled IO on /v1/leads", () => {
   assert.equal(clampAgencyBudget(200), 1_000);
   assert.equal(clampAgencyBudget(99_000), 5_000);
   assert.equal(clampAgencyBudget("abc"), 1_000);
@@ -118,7 +118,8 @@ test("prepay a client test budget: stays in the live $1K–$5K band, 10% agency 
   assert.equal(p.kind, "agency_inquiry");
   assert.equal(p.email, "a@agency.com");
   assert.equal(p.fields.budget_usd, "2500");
-  assert.equal(p.fields.agency_cash, "$250 USD");
+  assert.equal(p.fields.agency_discount, "$250 USD");
+  assert.equal(p.fields.agency_pays, "$2,250 USD");
   assert.equal(p.fields.draft_ref, "BR-IO-20261120-CALMCO");
   for (const k of Object.keys(p.fields)) assert.match(k, /^[a-z_]{2,40}$/);
   assert.doesNotMatch(p.message, /guarantee|CAD/i);

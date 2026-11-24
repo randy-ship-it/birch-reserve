@@ -71,7 +71,7 @@ export default function BrAgencies() {
       <Section tone="soft" id="model">
         <div className="max-w-3xl">
           <Eyebrow>How buying works</Eyebrow>
-          <H2>One rate card. A written 10% for agencies.</H2>
+          <H2>One rate card. A written 10% for&nbsp;agencies.</H2>
         </div>
         <div className="mt-8">
           <AgencyRateCardModel />
@@ -123,11 +123,12 @@ export default function BrAgencies() {
         </div>
       </Section>
 
-      <Section tone="soft" id="talk">
+      <Section tone="soft" id="talk" className="scroll-mt-24">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <H2>Ask about partner access, or tell us about your clients.</H2>
             <p className="mt-4 text-sm text-muted-foreground">Partner access, client tests and broker lists all come here. We reply in writing with hub fit and a draft insertion order.</p>
+            <p className="mt-6 max-w-md text-[11px] leading-relaxed text-foreground/50" data-testid="agencies-inventory-aside">Inquire within about blocking out dedicated inventory chunks similar to our agency partners.</p>
           </div>
           <LeadForm
             kind="agency_inquiry"
