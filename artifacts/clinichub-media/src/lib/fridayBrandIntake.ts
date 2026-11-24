@@ -361,14 +361,27 @@ async function j<T>(r: Response): Promise<T> {
   return d;
 }
 export const PARTIAL_EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/;
-/** Served under a mirror host (SCALE-MIRROR.md): tag the record's source (Birch strips it into the blurb). */
-const mirrorSrc = (): { src?: string } => (typeof window !== "undefined" && mirrorSource() ? { src: mirrorSource()! } : {});
+/** Served under a mirror host (SCALE-MIRROR.md) or ?ref=scale: tag the record's source (Birch strips it into the blurb). */
+const pageRef = (): string | null => {
+  if (typeof window === "undefined") return null;
+  try {
+    const r = new URLSearchParams(window.location.search).get("ref");
+    return r && /^[a-z0-9_]{2,32}$/.test(r) ? r : null;
+  } catch {
+    return null;
+  }
+};
+const mirrorSrc = (): { src?: string; ref?: string } => {
+  const src = typeof window !== "undefined" ? mirrorSource() : null;
+  const ref = pageRef();
+  return { ...(src ? { src } : {}), ...(ref ? { ref } : {}) };
+};
 const H = (ref?: IntakeRef) => ({ "Content-Type": "application/json", ...(ref ? { "X-Edit-Token": ref.editToken } : {}) });
 const BIRCH = ""; // same origin: Birch server routes, which forward to Friday server-side
 const live = {
   /** v1.3 fast mode: ONE POST with submit_mode "fast" + website + email; Friday auto-fills and submits. */
   async fast(payload: IntakePayload, contact: SubmitContact): Promise<FastResult> {
-    const r = await fetch(`${BIRCH}/v1/brand-intake`, { method: "POST", headers: H(), body: JSON.stringify({ ...toFridayBody(payload, { ...contact, submit: true }), submit_mode: "fast" }) });
+    const r = await fetch(`${BIRCH}/v1/brand-intake`, { method: "POST", headers: H(), body: JSON.stringify({ ...toFridayBody(payload, { ...contact, submit: true }), submit_mode: "fast", ...mirrorSrc() }) });
     const d = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string; id?: string; editToken?: string; reportToken?: string; version?: number; submit_mode?: string; autofill?: Autofill; fallback?: string; status?: IntakeStatus; approvals?: Record<string, string>; public_mirror?: "published" | "held"; report_ready?: boolean };
     if (r.status === 409 && d.error === "fast_unsupported") {
       // Friday not on v1.3 yet: v1 create + submit (still one final click with the email); labelled defaults on screen.

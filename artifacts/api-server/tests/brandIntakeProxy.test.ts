@@ -307,13 +307,13 @@ test("v1.3 fast mode: website+email required (nothing sent otherwise); strict Fr
 });
 
 /* ------------------------------------------------------------------ partial-lead capture (Nov 19 2026 10:21 AM ET) */
-import { PARTIAL_TAG, SUBMITTED_TAG, prepareStage, type IntakeLeadEvent } from "../src/routes/brandIntakeProxy";
+import { PARTIAL_TAG, SUBMITTED_TAG, prepareStage, kitIntakeAlert, isScaleIntakeSource, KIT_INTAKE_ALERT_TO, type IntakeLeadEvent, type KitIntakeAlert } from "../src/routes/brandIntakeProxy";
 
-async function serveRL(fetchImpl: typeof fetch, leads: IntakeLeadEvent[]) {
+async function serveRL(fetchImpl: typeof fetch, leads: IntakeLeadEvent[], alerts: KitIntakeAlert[] = []) {
   const app = express();
   const wrapped = (async (url: string, init?: RequestInit) =>
     String(url).endsWith("/api/public/brand-categories") ? new Response("{}", { status: 404 }) : fetchImpl(url, init as RequestInit)) as unknown as typeof fetch;
-  app.use(createBrandIntakeProxy({ env: ENV, fetchImpl: wrapped, recordLead: async (e) => void leads.push(e) }));
+  app.use(createBrandIntakeProxy({ env: ENV, fetchImpl: wrapped, recordLead: async (e) => void leads.push(e), sendAlert: async (a) => (alerts.push(a), { status: "sent" as const, id: "alert_test", to: a.to }) }));
   const srv = app.listen(0);
   await new Promise((r) => srv.once("listening", r));
   return { base: `http://127.0.0.1:${(srv.address() as AddressInfo).port}`, close: () => srv.close() };
@@ -441,4 +441,55 @@ test("/api/track: TRACK_FORWARD_DISABLED stops forwarding; no secret configured 
   assert.equal(calls.length, 1);
   assert.equal((calls[0].headers as Record<string, string>)["x-intake-secret"], undefined);
   assert.equal((calls[0].headers as Record<string, string>)["x-client-ip"], "203.0.113.9");
+});
+
+test("isScaleIntakeSource: scale_mirror, ref=scale, and scalehealth.ca host; not a plain Birch intake", () => {
+  assert.equal(isScaleIntakeSource({ src: "scale_mirror" }), true);
+  assert.equal(isScaleIntakeSource({ ref: "scale" }), true);
+  assert.equal(isScaleIntakeSource({ host: "scalehealth.ca" }), true);
+  assert.equal(isScaleIntakeSource({ host: "www.scalehealth.ca" }), true);
+  assert.equal(isScaleIntakeSource({ origin: "https://www.scalehealth.ca/intake" }), true);
+  assert.equal(isScaleIntakeSource({ host: "birchreserve.net", ref: "nav" }), false);
+  assert.equal(KIT_INTAKE_ALERT_TO.join(","), "randy@scalehealth.ca");
+  assert.ok(!KIT_INTAKE_ALERT_TO.some((a) => /silverbirchgrowth/.test(a)));
+});
+
+test("kitIntakeAlert: Scale-sourced TEST submissions email only randy@scalehealth.ca, never SBG", () => {
+  const a = kitIntakeAlert({
+    body: { email: "test@example.com", website: "example.com", company_name: "TEST – Emma QA, ignore", roles: ["brand", "supplier"] },
+    src: "scale_mirror",
+    ref: "scale",
+    host: "birchreserve.net",
+    origin: "",
+    fridayId: "bi_test0001",
+    path: "/intake",
+  });
+  assert.equal(a.tag, "SCALE KIT");
+  assert.equal(a.isTest, true);
+  assert.deepEqual(a.to, ["randy@scalehealth.ca"]);
+  assert.ok(!a.to.some((x) => /silverbirchgrowth/.test(x)));
+  assert.match(a.title, /TEST – Emma QA, ignore/);
+  assert.equal(a.rows.find(([k]) => k === "Source")?.[1], "Scale (ref=scale)");
+  assert.equal(a.replyTo, "test@example.com");
+});
+
+test("final Scale submit (POST submit + src=scale_mirror) emails randy@scalehealth.ca; a partial does not", async () => {
+  const leads: IntakeLeadEvent[] = [];
+  const alerts: KitIntakeAlert[] = [];
+  const f = (async (_url: string, init: RequestInit) => new Response(JSON.stringify({ ok: true, id: "bi_scale001", status: "submitted", version: 1 }), { status: 201 })) as unknown as typeof fetch;
+  const s = await serveRL(f, leads, alerts);
+  const part = await realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ roles: ["brand"], stage: "partial", email: "test@example.com", website: "example.com", src: "scale_mirror", ref: "scale" }) });
+  await settle();
+  assert.equal(part.status, 201);
+  assert.equal(alerts.length, 0);
+  const r = await realFetch(`${s.base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json", "x-forwarded-host": "scalehealth.ca", origin: "https://scalehealth.ca" }, body: JSON.stringify({ roles: ["brand"], submit: true, email: "test@example.com", website: "example.com", company_name: "TEST – Emma QA, ignore", src: "scale_mirror", ref: "scale" }) });
+  await settle();
+  s.close();
+  assert.equal(r.status, 201);
+  assert.equal(leads.filter((l) => l.stage === "submitted").length, 1);
+  assert.equal(alerts.length, 1);
+  assert.deepEqual(alerts[0]!.to, ["randy@scalehealth.ca"]);
+  assert.equal(alerts[0]!.tag, "SCALE KIT");
+  assert.equal(alerts[0]!.isTest, true);
+  assert.equal(alerts[0]!.rows.find(([k]) => k === "Friday id")?.[1], "bi_scale001");
 });

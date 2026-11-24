@@ -29,6 +29,7 @@ import { MIRROR_ORIGIN_HOSTS } from "../middlewares/mirrorHost";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
 import { coarseRegion, recordPulse } from "../lib/activityPulse";
 import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
+import { sendSalesAlert, type SalesAlertResult } from "../lib/salesAlert";
 import { FRIENDLY_429, limiter } from "../lib/rateLimit";
 import { isIP } from "node:net";
 import { visitorDayHash } from "../lib/siteAnalytics";
@@ -131,24 +132,26 @@ export function hubPendingOf(b: Record<string, unknown>): { hub_status: "pending
 }
 /** Mirror hosts (SCALE-MIRROR.md): a short, allow-listed source tag only. */
 const SRC_RE = /^[a-z0-9_]{2,32}$/;
-export function prepareStage(body: unknown): { body: Record<string, unknown>; stage: Stage; error?: string } {
+export function prepareStage(body: unknown): { body: Record<string, unknown>; stage: Stage; src: string | null; ref: string | null; error?: string } {
   const b = { ...((body ?? {}) as Record<string, unknown>) };
   const stage = stageOf(b);
   const fromPartial = b.from_partial === true;
   const src = typeof b.src === "string" && SRC_RE.test(b.src) ? b.src : null;
+  const ref = typeof b.ref === "string" && SRC_RE.test(b.ref) ? b.ref : null;
   const hub = hubRequestOf(b.hub_request);
   delete b.stage;
   delete b.from_partial;
   delete b.src;
+  delete b.ref;
   delete b.hub_request;
   if (hub && !(typeof b.blurb === "string" && b.blurb.includes(HUB_PENDING_TAG))) b.blurb = [hubPendingLine(hub), typeof b.blurb === "string" ? b.blurb : ""].filter(Boolean).join("\n").slice(0, 6000);
   if (stage === "partial") {
-    if (!legacyIntakeAllowed({ ...b, submit: true })) return { body: b, stage, error: "partial_needs_email" };
+    if (!legacyIntakeAllowed({ ...b, submit: true })) return { body: b, stage, src, ref, error: "partial_needs_email" };
     delete b.submit;
   }
   const lines = [stage === "partial" ? PARTIAL_TAG : stage === "submitted" && fromPartial ? SUBMITTED_TAG : null, src ? `Source: ${src.replace(/_/g, " ")}.` : null].filter(Boolean) as string[];
   if (lines.length) b.blurb = [...lines, typeof b.blurb === "string" ? b.blurb : ""].filter(Boolean).join("\n").slice(0, 6000);
-  return { body: b, stage };
+  return { body: b, stage, src, ref };
 }
 
 /** Headers Birch sends to Friday. The secret only ever goes in X-Intake-Secret. */
@@ -249,7 +252,75 @@ export function publicGates(text: string): string {
 }
 
 export type IntakeLeadEvent = { fridayId: string | null; email: string; website: string | null; stage: "partial" | "submitted"; roles: string[]; path: string; /** Supplier hub request: always pending_approval until Randy or Jon approve. */ hub?: { hub_status: "pending_approval"; hub_slug?: string } | null };
-export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fetch; log?: (msg: string, extra?: Record<string, unknown>) => void; recordLead?: (e: IntakeLeadEvent) => Promise<void> } = {}) {
+
+/** Sales alerts for kit intake go only to randy@scalehealth.ca (care@ is the Resend sender). Never SBG addresses. */
+export const KIT_INTAKE_ALERT_TO = ["randy@scalehealth.ca"] as const;
+
+export function isScaleIntakeSource(input: { src?: string | null; ref?: string | null; host?: string | null; origin?: string | null }): boolean {
+  const src = (input.src ?? "").toLowerCase();
+  const ref = (input.ref ?? "").toLowerCase();
+  const host = (input.host ?? "").toLowerCase();
+  const origin = (input.origin ?? "").toLowerCase();
+  return src === "scale_mirror" || src === "scale" || ref === "scale" || /(^|[./])scalehealth\.ca(?=$|[/:])/.test(host) || /scalehealth\.ca/.test(origin);
+}
+
+export function requestHost(req: { get: (n: string) => string | undefined }): { host: string; origin: string } {
+  const host = String(req.get("x-forwarded-host") || req.get("host") || "").split(",")[0]!.trim().toLowerCase().replace(/:\d+$/, "");
+  const origin = String(req.get("origin") || req.get("referer") || "").toLowerCase();
+  return { host, origin };
+}
+
+export type KitIntakeAlert = {
+  event: "inquiry";
+  tag: string;
+  title: string;
+  rows: Array<[string, string]>;
+  replyTo?: string;
+  isTest: boolean;
+  to: string[];
+};
+
+export function kitIntakeAlert(input: {
+  body: Record<string, unknown>;
+  src: string | null;
+  ref: string | null;
+  host: string;
+  origin: string;
+  fridayId: string | null;
+  path: string;
+}): KitIntakeAlert {
+  const b = input.body;
+  const email = typeof b.email === "string" ? b.email.trim() : "";
+  const website = typeof b.website === "string" ? b.website.trim() : "";
+  const brand = typeof b.company_name === "string" ? b.company_name.trim() : "";
+  const roles = Array.isArray(b.roles) ? (b.roles as unknown[]).map(String).slice(0, 6).join(", ") : "";
+  const scale = isScaleIntakeSource({ src: input.src, ref: input.ref, host: input.host, origin: input.origin });
+  const isTest = TEST_EMAIL_RE.test(email) || isTestIdentity({ email, name: brand }) || /\bTEST\b/.test(brand);
+  const source = scale ? (input.ref === "scale" ? "Scale (ref=scale)" : "Scale (scalehealth.ca / scale_mirror)") : "Birch Reserve";
+  return {
+    event: "inquiry",
+    tag: scale ? "SCALE KIT" : "BIRCH KIT",
+    title: `Monetization Kit: ${brand || website || email || "new inquiry"}`,
+    rows: [
+      ["Form", "Monetization Kit intake"],
+      ["Source", source],
+      ["Host", input.host],
+      ["Ref", input.ref || ""],
+      ["Src tag", input.src || ""],
+      ["Brand", brand],
+      ["Email", email],
+      ["Website", website],
+      ["Roles", roles],
+      ["Friday id", input.fridayId || ""],
+      ["Page", input.path],
+    ],
+    replyTo: email || undefined,
+    isTest,
+    to: [...KIT_INTAKE_ALERT_TO],
+  };
+}
+
+export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fetch; log?: (msg: string, extra?: Record<string, unknown>) => void; recordLead?: (e: IntakeLeadEvent) => Promise<void>; sendAlert?: (a: KitIntakeAlert) => Promise<SalesAlertResult> } = {}) {
   const router = Router();
   const body = json({ limit: "64kb" });
   // Per-IP cap on new intakes / kit sends (security audit Nov 21 2026). Autosave PATCHes stay unlimited here; they need
@@ -316,6 +387,23 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
   const send = (res: Response, out: { status: number; text: string }) => res.status(out.status).type("application/json").send(publicGates(out.text || "{}"));
   /** BR leads mirror of partial + submitted intakes (same pipeline as full submissions). Never throws, never blocks. */
   const recordLead = opts.recordLead ?? defaultRecordLead(env);
+  const alerter = opts.sendAlert ?? ((a: KitIntakeAlert) => sendSalesAlert(a));
+  function fridayIdOf(out: { status: number; text: string }, id?: string): string | null {
+    if (id) return id;
+    try {
+      const d = JSON.parse(out.text || "{}") as { id?: unknown };
+      if (typeof d.id === "string" && ID_RE.test(d.id)) return d.id;
+    } catch {
+      /* ignore */
+    }
+    return null;
+  }
+  async function notifySubmitted(prep: { body: Record<string, unknown>; src: string | null; ref: string | null }, out: { status: number; text: string }, req: Request, id?: string) {
+    if (prep.body && typeof prep.body.email !== "string") return;
+    const { host, origin } = requestHost(req);
+    const path = hubPendingOf(prep.body) ? "/intake/supplier" : "/intake";
+    await alerter(kitIntakeAlert({ body: prep.body, src: prep.src, ref: prep.ref, host, origin, fridayId: fridayIdOf(out, id), path })).catch(() => undefined);
+  }
   function noteLead(b: Record<string, unknown>, stage: Stage, out: { status: number; text: string }, id?: string, region: string | null = null) {
     if (!stage || out.status >= 300 || typeof b.email !== "string") return;
     let fid: string | null = id ?? null;
@@ -363,11 +451,15 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
         return;
       }
       const r = await sendIntake(legacyLead(b, "/intake"), env);
+      if (r.status === "sent") await notifySubmitted(prep, { status: 202, text: "{}" }, req);
       res.status(r.status === "sent" ? 202 : 503).json({ ok: r.status === "sent", fallback: "api_intake", lead: r.status === "sent", status: "submitted", version: 1, approvals: {}, error: r.status === "sent" ? undefined : "intake_failed" });
       return;
     }
     noteLead(eff, prep.stage, out, undefined, coarseRegion((h) => req.get(h)));
-    if (prep.stage === "submitted" && out.status < 300) await onIntakeSubmitted(promoCtxOf(req), String((eff as Record<string, unknown>).email ?? ""), typeof (eff as Record<string, unknown>).website === "string" ? ((eff as Record<string, unknown>).website as string) : null);
+    if (prep.stage === "submitted" && out.status < 300) {
+      await notifySubmitted(prep, out, req);
+      await onIntakeSubmitted(promoCtxOf(req), String((eff as Record<string, unknown>).email ?? ""), typeof (eff as Record<string, unknown>).website === "string" ? ((eff as Record<string, unknown>).website as string) : null);
+    }
     send(res, out);
   });
   router.patch("/v1/brand-intake/:id", body, async (req, res) => {
@@ -381,7 +473,10 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     const out = await forward(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, await shaped(prep.body));
     if (!out) return;
     noteLead(prep.body, prep.stage, out, id);
-    if (prep.stage === "submitted" && out.status < 300) await onIntakeSubmitted(promoCtxOf(req), String((prep.body as Record<string, unknown>)?.email ?? ""), typeof (prep.body as Record<string, unknown>)?.website === "string" ? ((prep.body as Record<string, unknown>).website as string) : null);
+    if (prep.stage === "submitted" && out.status < 300) {
+      await notifySubmitted(prep, out, req, id);
+      await onIntakeSubmitted(promoCtxOf(req), String((prep.body as Record<string, unknown>)?.email ?? ""), typeof (prep.body as Record<string, unknown>)?.website === "string" ? ((prep.body as Record<string, unknown>).website as string) : null);
+    }
     send(res, out);
   });
   router.post("/v1/brand-intake/:id/kit", capped, body, async (req, res) => {
