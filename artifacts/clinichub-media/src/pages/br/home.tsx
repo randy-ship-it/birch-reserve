@@ -149,6 +149,24 @@ export default function BrHome() {
           <div className="order-2 md:order-none md:col-start-2 md:row-span-2 md:row-start-1 md:self-center"><SeeYourAd testId="home-hero-mock" /><p className="mt-1 text-[12px] leading-snug text-foreground/60" data-testid="home-hub-host">{hubHostLine()}</p></div>
         </div>
       </section>
+      {/* Front door (Randy, outside review Nov 23 2026 10:37 PM): the $190 look and $490 shared reserve, right under the hero. */}
+      <section className="container mx-auto max-w-5xl px-4 pb-6 pt-1" data-testid="home-plan-strip">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="flex flex-col rounded-2xl border border-[#0b1f3a]/15 bg-white p-4 shadow-sm" data-testid="home-strip-look">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">7-day look</p>
+            <p className="mt-0.5 font-display text-3xl leading-none text-[#0b1f3a]">{price.look}</p>
+            <p className="mt-2 flex-1 text-[13px] leading-snug text-foreground/75">See your ad on a live hub for 7 days. It converts in full to a reserve, or it is refunded.</p>
+            <a href="/buy?plan=hold-190&ref=home_strip" data-testid="home-strip-look-cta" onClick={() => trackAttn("strip.look")} className="mt-3 inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-[#0b1f3a]/30 px-5 text-sm font-bold text-[#0b1f3a] hover:border-[#0b1f3a]">Start my look · {price.look} <ArrowRight className="size-4" aria-hidden /></a>
+          </div>
+          <div className="flex flex-col rounded-2xl bg-lime-200 p-4 shadow-sm" data-testid="home-strip-reserve">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#0b1f3a]/70">Reserve</p>
+            <p className="mt-0.5 font-display text-3xl leading-none text-[#0b1f3a]">{price.seat}</p>
+            <p className="mt-2 flex-1 text-[13px] leading-snug text-[#0b1f3a]/80">A shared reserve in your category. 100% media credit toward your insertion order, refundable until 14 days before launch.</p>
+            <a href="/buy?plan=reserve-490&ref=home_strip" data-testid="home-strip-reserve-cta" onClick={() => trackAttn("strip.reserve")} className="mt-3 inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-white hover:text-[#0b1f3a]">Reserve · {price.seat} <ArrowRight className="size-4" aria-hidden /></a>
+          </div>
+        </div>
+        <p className="mt-2 text-[12px] text-foreground/60">Prices in USD unless shown. Want a category to yourself? <a href="/exclusive?ref=home_strip" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-strip-exclusive">See the exclusive reserve</a>.</p>
+      </section>
       {/* Light continuous category strip under the hero (Randy Nov 21 10:20 AM). */}
       <div className="container mx-auto max-w-6xl px-4 pb-5"><div className="hidden mb-3 min-h-[6.5rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div><CategoryStrip testId="home-category-strip" /></div>
 
@@ -166,38 +184,7 @@ export default function BrHome() {
         <HubFunnel />
       </section>
 
-      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-four-steps"><FourSteps look={price.look} seat={price.seat} /></section>
-
-      {/* 2b. Offer ladder, rising order. The longer mid-tier detail lives in "The details" below. */}
-      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-offer-stairs">
-        <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Start small. Scale when it works.</h2>
-        <div className="mt-4"><OfferStairs look={price.look} seat={price.seat} /></div>
-      </section>
-
       {/* 2c. Categories + Questions brands ask moved up: strip under the hero, compact questions by the kit CTA (Nov 21). */}
-
-      {/* 3. Two ways in (same cards as the intake). */}
-      <section className="container mx-auto max-w-5xl px-4 pb-10" data-testid="home-ways">
-        <div className="grid gap-3 sm:grid-cols-2">
-          {[
-            { icon: Package, title: "Supplier", tag: "Performance-only", sub: "Get into curated hubs. Pay on results.", tid: "home-way-supplier", ref: "home_supplier" },
-            { icon: Store, title: "Hub", tag: "Max exposure", sub: "Your audience, shelf or screens. Earn a share.", tid: "home-way-hub", ref: "home_hub" },
-          ].map((w) => (
-            <a key={w.tid} href={`/intake?ref=${w.ref}`} data-testid={w.tid} className="group flex items-center gap-4 rounded-2xl p-5 text-white shadow-md transition hover:-translate-y-0.5" style={{ background: NAVY }}>
-              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-lime-300 text-[#0b1f3a]"><w.icon className="size-5" aria-hidden /></span>
-              <span className="min-w-0 flex-1">
-                <span className="flex flex-wrap items-center gap-2">
-                  <span className="text-lg font-bold">{w.title}</span>
-                  <span className="rounded-full bg-lime-300 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]">{w.tag}</span>
-                </span>
-                <span className="mt-0.5 block text-sm text-white/70">{w.sub}</span>
-              </span>
-              <ArrowRight className="size-5 shrink-0 text-lime-300 transition group-hover:translate-x-0.5" aria-hidden />
-            </a>
-          ))}
-        </div>
-        <p className="mt-2 text-[12px] text-foreground/55">Most brands are both. One form covers both views.</p>
-      </section>
 
       {/* 6. Everything long, collapsed. */}
       <section className="border-t border-[#0b1f3a]/10 bg-white/60" id="more" data-testid="home-more">
@@ -219,9 +206,13 @@ export default function BrHome() {
             <div className="space-y-4 p-4 md:p-6"><HowWeGotHere where="home" /><TrackRecord where="home" /></div>
           </Expand>
 
-          <Expand title="More ways to work with us" sub="Your own site, outreach setup, partnerships" testId="home-more-ways">
-            <div className="space-y-4 p-4 md:p-6"><PerformanceOnly where="home" /><div data-testid="home-gtm-setup"><GtmSetup where="home" /></div><GtmBotTeaser /><PartnersTeaser /></div>
+          <Expand title="Every step, from $190 to premium" sub="The ladder, and how a first order runs" testId="home-ladder">
+            <div className="space-y-6 p-4 md:p-6">
+              <div data-testid="home-offer-stairs"><h3 className="mb-3 font-display text-2xl text-[#0b1f3a]">Start small. Scale when it works.</h3><OfferStairs look={price.look} seat={price.seat} /></div>
+              <div data-testid="home-four-steps"><FourSteps look={price.look} seat={price.seat} /></div>
+            </div>
           </Expand>
+
 
           <Expand title="Street Team program" sub="Coming 2027. Door-to-door, by route" testId="home-street-team">
             <div className="p-4 md:p-6"><StreetTeamProgram where="home" /></div>
@@ -274,6 +265,35 @@ export default function BrHome() {
               {/* Nov 18 2026: one FAQPage for the page (was two: trust + home), so search engines read it cleanly. */}
               <TrustFaq schema={false} />
               <Faq items={FAQ} schema={false} />
+            </div>
+          </Expand>
+
+          <Expand title="Other ways to work with us" sub="Performance-only, your own hub, outreach setup, partnerships" testId="home-more-ways">
+            <div className="space-y-4 p-4 md:p-6">
+              <div data-testid="home-ways">
+                <div className="grid gap-3 sm:grid-cols-2">
+          {[
+            { icon: Package, title: "Supplier", tag: "Performance-only", sub: "Get into curated hubs. Pay on results.", tid: "home-way-supplier", ref: "home_supplier" },
+            { icon: Store, title: "Hub", tag: "Max exposure", sub: "Your audience, shelf or screens. Earn a share.", tid: "home-way-hub", ref: "home_hub" },
+          ].map((w) => (
+            <a key={w.tid} href={`/intake?ref=${w.ref}`} data-testid={w.tid} className="group flex items-center gap-4 rounded-2xl p-5 text-white shadow-md transition hover:-translate-y-0.5" style={{ background: NAVY }}>
+              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-lime-300 text-[#0b1f3a]"><w.icon className="size-5" aria-hidden /></span>
+              <span className="min-w-0 flex-1">
+                <span className="flex flex-wrap items-center gap-2">
+                  <span className="text-lg font-bold">{w.title}</span>
+                  <span className="rounded-full bg-lime-300 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]">{w.tag}</span>
+                </span>
+                <span className="mt-0.5 block text-sm text-white/70">{w.sub}</span>
+              </span>
+              <ArrowRight className="size-5 shrink-0 text-lime-300 transition group-hover:translate-x-0.5" aria-hidden />
+            </a>
+          ))}
+        </div>
+        <p className="mt-2 text-[12px] text-foreground/55">Most brands are both. One form covers both views.</p>
+      
+                <p className="mt-2 text-[12px] text-foreground/55">Most brands are both. One form covers both views.</p>
+              </div>
+              <PerformanceOnly where="home" /><div data-testid="home-gtm-setup"><GtmSetup where="home" /></div><GtmBotTeaser /><PartnersTeaser />
             </div>
           </Expand>
 
