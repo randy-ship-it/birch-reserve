@@ -23,6 +23,19 @@ export function loginLinkEmail(link: string): { subject: string; text: string; h
   return { subject, text, html };
 }
 
+export function adminLinkEmail(link: string): { subject: string; text: string; html: string } {
+  const subject = "Your Birch Reserve admin sign-in link";
+  const text = `Here's your admin sign-in link for Birch Reserve:\n\n${link}\n\nIt works for 30 minutes. If you didn't ask for it, ignore this email.\n\nBirch Reserve`;
+  const html = emailLayout({
+    title: subject,
+    preheader: "Your admin sign-in link (works for 30 minutes)",
+    eyebrow: "Birch Reserve · Ads admin",
+    body: emailP("Here's your admin sign-in link:") + emailButton(link, "Open ads admin") + emailP("It works for 30 minutes. If you didn't ask for it, ignore this email.", { muted: true, small: true }),
+    footer: "Birch Reserve",
+  });
+  return { subject, text, html };
+}
+
 export function hubAlertEmail(o: { hubName: string; category: string; hubUrl: string; unsubscribeUrl?: string }): { subject: string; text: string; html: string } {
   const subject = `New private hub: ${o.hubName} (${o.category})`;
   const off = o.unsubscribeUrl ?? "https://birchreserve.net/account#alerts";
@@ -42,6 +55,10 @@ export const siteMail = {
     if (process.env.ADS_LOGIN_EMAIL_ENABLED !== "true") return;
     const m = loginLinkEmail(link);
     await sendBuyerEmail({ from: ADS_FROM(), to: [to], ...m });
+  },
+  async adminLink(to: string, link: string): Promise<void> {
+    if (process.env.ADS_LOGIN_EMAIL_ENABLED !== "true") return;
+    await sendBuyerEmail({ from: ADS_FROM(), to: [to], ...adminLinkEmail(link) });
   },
   /** Send a new-hub alert once to one opted-in subscriber (caller dedupes). */
   async hubAlert(to: string, hub: { hubName: string; category: string; hubUrl: string }, unsubscribeUrl: string): Promise<void> {

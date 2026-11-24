@@ -593,6 +593,41 @@ router.post("/ads/admin/login", json, (req, res) =>
     res.json({ message: "Signed in", redirect: "/ads/admin" });
   }),
 );
+/** Emailed admin sign-in: allowlisted address only, 30-minute link, same 12h admin session as the key sign-in. */
+router.post("/ads/admin/email-link", json, (req, res) =>
+  safe(res, async () => {
+    noStore(res);
+    const email = str((req.body as { email?: unknown })?.email, 200).toLowerCase();
+    if (!sameOrigin(req) || loginLimiter.hit(`admlink:${req.ip}`).limited) {
+      res.status(429).json({ message: "Too many tries. Wait 15 minutes." });
+      return;
+    }
+    const generic = { message: "If that email is on the admin list, a sign-in link is on its way. It works for 30 minutes." };
+    if (!adsLoginEmailEnabled()) {
+      res.status(503).json({ message: "Email sign-in is off. Use your admin key." });
+      return;
+    }
+    if (adminEmails().includes(email)) {
+      const link = `${origin(req)}/ads/admin/auth?t=${encodeURIComponent(sign("al", { e: email }, 30 * 60_000))}`;
+      await siteMail.adminLink(email, link).catch((err: unknown) => logger.warn({ err: String(err) }, "ads admin login email failed"));
+      await store.audit(email, "admin.link_sent", null);
+    } else {
+      await store.audit(email || "?", "admin.link_rejected", null);
+    }
+    res.json(generic);
+  }),
+);
+router.get("/ads/admin/auth", (req, res) => {
+  noStore(res);
+  const t = verify<{ e: string }>("al", req.query.t);
+  if (!t || !adminEmails().includes(t.e)) {
+    res.redirect(302, "/ads/admin");
+    return;
+  }
+  setCookie(res, ADM, sign("adm", { e: t.e }, 12 * 3600_000), 12 * 3600);
+  void store.audit(t.e, "admin.login_link", null).catch(() => undefined);
+  res.redirect(302, "/ads/admin");
+});
 router.post("/ads/admin/logout", json, (_req, res) => {
   setCookie(res, ADM, "", 0);
   res.json({ message: "Signed out", redirect: "/ads/admin" });
