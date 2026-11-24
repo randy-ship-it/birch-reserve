@@ -488,7 +488,7 @@ export function InventoryCanister() {
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1.5 text-[12px] md:text-[13px]">
                   <span className="rounded-full border border-[#0b1f3a]/25 bg-white px-2.5 py-1 font-semibold text-[#0b1f3a]">Pay: {t.pay.charAt(0).toLowerCase() + t.pay.slice(1)}{t.key === "exclusive" ? "*" : ""}</span>
-                  {t.key === "direct" ? null : <span className="rounded-full bg-[#0b1f3a] px-2.5 py-1 font-semibold text-white">Keep: {t.keep}</span>}
+                  {t.key === "direct" ? null : <span className="rounded-full bg-[#0b1f3a] px-2.5 py-1 font-semibold text-white">{t.keep}</span>}
                 </div>
               </div>
             </div>
@@ -517,7 +517,7 @@ export function AgencyTierCards({ reserveHref, buyHref, bidHref = "#talk", ioHre
             <p className="mt-1 text-sm text-foreground/70">{t.who}</p>
             <dl className="mt-4 divide-y divide-[#0b1f3a]/10 border-y border-[#0b1f3a]/10 text-sm">
               <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2 py-2"><dt className="text-foreground/60">You pay</dt><dd className="font-semibold text-[#0b1f3a]">{t.pay}</dd></div>
-              <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2 py-2"><dt className="text-foreground/60">You keep</dt><dd className="font-semibold text-[#0b1f3a]">{t.keep}</dd></div>
+              <div className="grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2 py-2"><dt className="text-foreground/60">You get</dt><dd className="font-semibold text-[#0b1f3a]">{t.keep}</dd></div>
             </dl>
             <div className="mt-5 flex flex-col gap-2 md:mt-auto md:pt-5">
               {t.key === "direct" ? (
@@ -545,7 +545,7 @@ export function ExclusivePerks() {
   return (
     <details className="group rounded-2xl border-2 border-[#0b1f3a] bg-white" data-testid="exclusive-perks" id="exclusive-partners">
       <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-semibold text-[#0b1f3a] md:px-5 [&::-webkit-details-marker]:hidden">
-        <span>* What exclusive partners get</span>
+        <span>* What Trusted Agency Partners get</span>
         <ChevronDown className="size-5 shrink-0 transition group-open:rotate-180" aria-hidden />
       </summary>
       <div className="grid gap-5 border-t border-[#0b1f3a]/15 p-4 md:grid-cols-[1.1fr_0.9fr] md:p-5">
@@ -553,12 +553,12 @@ export function ExclusivePerks() {
           {EXCLUSIVE_PARTNER_PERKS.map((p) => (
             <li key={p} className="flex gap-2"><span className="mt-1.5 size-2 shrink-0 rounded-full bg-lime-500" aria-hidden />{skinText(p)}</li>
           ))}
-          <li className="pt-1 text-[12px] text-foreground/60">The exact discount, within 10–25% off list price, is agreed per partner.</li>
+          <li className="pt-1 text-[12px] text-foreground/60">Partners buy at the same written 10% discount off the published rate card.</li>
         </ul>
         <div className="rounded-xl bg-[#0b1f3a] p-4 text-white" data-testid="exclusive-example">
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-lime-300">Example · names withheld</p>
           <p className="mt-2 font-display text-xl leading-snug">{ex.outcome}</p>
-          <p className="mt-2 text-[13px] text-white/80">{how} The same GTM bot runs field sales motions for exclusive partners.</p>
+          <p className="mt-2 text-[13px] text-white/80">{how}</p>
           <p className="mt-3 text-[11px] text-white/55">{skinText(TRACK_RECORD.note)}</p>
         </div>
       </div>

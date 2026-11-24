@@ -205,8 +205,7 @@ export const BUY_PATHS = {
  * Rate-card agency model (Randy, Nov 24 2026): published rate card, standard written 10% agency
  * discount, agencies set their own resale price, agencies handle their own client disclosure,
  * direct buyers pay the rate card, no undercutting of agency clients.
- * /agencies uses this. The older three-tier cash + 10–25% exclusive-partner constants below stay
- * for the current home section until that page is aligned.
+ * Shared by /agencies and the home Trusted Agency Partners section.
  */
 export const AGENCY_DISCOUNT_PCT = AGENCY_CASH_PCT;
 export const AGENCY_RATE_CARD = {
@@ -237,15 +236,12 @@ export const AGENCY_DISCOUNT_EXAMPLE = {
 } as const;
 
 /**
- * Three ways to buy the same hub inventory (Randy, Nov 24 2026 12:57 PM ET, t543u):
- *   "Direct brands pay X. Agencies pay X, keep 10%. Exclusive inventory agency partners pay 10%-25% off X,
- *    plus keep 10% of spend."
- * X = the live list-price ladder (priceLadder: look, reserve and the 1,900 top step), never a new price.
- * The 10–25% discount and the 10% are Randy's numbers, shown exactly. Exclusive partners ask for a bid on the
- * existing agency form; no call, no new checkout. Perks restate Randy's footnote; the example reuses the nameless
- * "partner launch" track-record card (./trackRecord), already public on home + media kit.
+ * How the same published rate card is bought (Randy, Nov 24 2026): direct buyers pay the card;
+ * agencies and Trusted Agency Partners buy at the standard written 10% discount. Partners also
+ * get first look at reserved inventory. No deeper discount, no cash commission on this path,
+ * no GTM or field-sales perk. The list-price ladder (look, reserve, exclusive reserve) is unchanged.
  */
-export const EXCLUSIVE_PARTNER_DISCOUNT = { lo: 10, hi: 25 } as const;
+export const EXCLUSIVE_PARTNER_DISCOUNT = { lo: AGENCY_DISCOUNT_PCT, hi: AGENCY_DISCOUNT_PCT } as const;
 
 export type AgencyTierKey = "direct" | "agency" | "exclusive";
 export const AGENCY_TIERS: ReadonlyArray<{
@@ -256,22 +252,22 @@ export const AGENCY_TIERS: ReadonlyArray<{
   keep: string;
   badge?: string;
 }> = [
-  { key: "direct", name: "Direct brands", who: "A brand buying space for itself.", pay: "List price", keep: "Your own placement and reporting" },
-  { key: "agency", name: "Agencies", who: "Agencies, brokers and media resellers buying for clients as agency of record.", pay: "List price", keep: `${AGENCY_CASH_PCT}% of media spend, paid in cash` },
+  { key: "direct", name: "Direct buyers", who: "A brand buying space for itself.", pay: "The published rate card", keep: "Your own placement and reporting" },
+  { key: "agency", name: "Agencies", who: "Agencies, brokers and media resellers buying for clients as agency of record.", pay: `${AGENCY_DISCOUNT_PCT}% off the published rate card`, keep: "You set your own resale price" },
   {
     key: "exclusive",
-    name: "Exclusive inventory partners",
-    who: "Agencies that want first pick of the network as it grows.",
-    pay: `${EXCLUSIVE_PARTNER_DISCOUNT.lo}–${EXCLUSIVE_PARTNER_DISCOUNT.hi}% off list price`,
-    keep: `${AGENCY_CASH_PCT}% of spend`,
-    badge: "First pick",
+    name: "Trusted Agency Partners",
+    who: "Agencies with reserved access to exclusive packages and newly activating hubs.",
+    pay: `${AGENCY_DISCOUNT_PCT}% off the published rate card`,
+    keep: "First look as new hubs activate",
+    badge: "First look",
   },
 ];
 
-/** "What exclusive partners get" (Randy's footnote, t543u). Commitments about our own effort only; no reach or results. */
+/** Access perks for Trusted Agency Partners. No services or GTM promise. Same 10% discount as every agency. */
 export const EXCLUSIVE_PARTNER_PERKS = [
-  "First chance to buy new inventory before anyone else, as the network grows.",
-  "Inventory blocked for you as new hubs come on.",
+  "First look at new exclusive packages and hubs before they open publicly.",
+  "Reserved access to exclusive packages and newly activating hubs.",
   "A named mention on the Birch Reserve site and in our sales materials.",
-  "Birch-run go-to-market sales motions in the field, alongside yours.",
+  "The same written 10% discount off the published rate card.",
 ] as const;

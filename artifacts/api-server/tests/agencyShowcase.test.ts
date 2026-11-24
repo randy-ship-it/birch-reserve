@@ -239,12 +239,13 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   const { TRACK_RECORD } = await import("../src/lib/overhaul/trackRecord");
   assert.deepEqual(AGENCY_TIERS.map((t) => t.key), ["direct", "agency", "exclusive"]);
   const [direct, agency, exclusive] = AGENCY_TIERS;
-  assert.equal(direct!.pay, "List price");
-  assert.equal(agency!.pay, "List price");
-  assert.equal(agency!.keep, "10% of media spend, paid in cash");
-  assert.deepEqual(EXCLUSIVE_PARTNER_DISCOUNT, { lo: 10, hi: 25 });
-  assert.equal(exclusive!.pay, "10–25% off list price");
-  assert.equal(exclusive!.keep, "10% of spend");
+  assert.equal(direct!.pay, "The published rate card");
+  assert.equal(agency!.pay, "10% off the published rate card");
+  assert.equal(agency!.keep, "You set your own resale price");
+  assert.deepEqual(EXCLUSIVE_PARTNER_DISCOUNT, { lo: 10, hi: 10 });
+  assert.equal(exclusive!.name, "Trusted Agency Partners");
+  assert.equal(exclusive!.pay, "10% off the published rate card");
+  assert.equal(exclusive!.keep, "First look as new hubs activate");
   assert.equal(EXCLUSIVE_PARTNER_PERKS.length, 4);
   const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
@@ -270,16 +271,22 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.match(home, /<BuyCta placement="hero_home"/);
 });
 
-test("Nov 24 1:53 PM (Randy): home partner section says 'Exclusive inventory partners' and 10–25% off list, same as /agencies; no blended effective figure", () => {
+test("Nov 24 PM: home Trusted Agency Partners section matches the /agencies rate-card model", () => {
   const tap = read("../clinichub-media/src/components/br/trusted-agency-partners.tsx");
   const home = read("../clinichub-media/src/pages/br/home.tsx");
-  // Name and numbers come from the /agencies tier data, not a second copy.
+  // Name and terms come from the shared /agencies constants, not a second copy.
   assert.match(tap, /AGENCY_TIERS\.find\(\(t\) => t\.key === "exclusive"\)/);
-  assert.match(tap, /EXCLUSIVE\.pay/);
-  assert.match(tap, /EXCLUSIVE\.keep/);
-  assert.match(tap, /Exclusive inventory partner/);
-  assert.match(tap, /within 10–25% off list price/);
-  assert.doesNotMatch(tap + home, /Trusted Agency Partner|10–20%|20–30%|Effective/);
-  assert.doesNotMatch(tap, /trusted-agency-partner-badge\.svg/); // the old badge image said "Birch Reserve" on the Scale skin too
-  assert.match(home, /Exclusive inventory partners get 10–25% off list price\./);
+  assert.match(tap, /AGENCY_RATE_CARD/);
+  assert.match(tap, /AGENCY_DISCOUNT_PCT/);
+  assert.match(tap, /<ListPriceLine \/>/);
+  assert.match(tap, /Trusted Agency Partner/);
+  assert.match(tap, /Written discount/);
+  assert.match(tap, /AGENCY_RATE_CARD\.resale/);
+  assert.match(tap, /AGENCY_RATE_CARD\.disclosure/);
+  assert.match(tap, /AGENCY_RATE_CARD\.direct/);
+  assert.match(tap, /AGENCY_RATE_CARD\.noUndercut/);
+  assert.match(home, /written 10% off the (published )?rate card/);
+  assert.match(home, /We do not undercut your clients/);
+  assert.doesNotMatch(tap + home, /10–25%|keep 10% of spend|10% of media spend, paid in cash|GTM bot|go-to-market sales motions|10–20%|20–30%|Effective/);
+  assert.doesNotMatch(tap, /trusted-agency-partner-badge\.svg/);
 });
