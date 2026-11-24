@@ -410,7 +410,10 @@ export function BuyPaths({ reserveHref, lookHref, ioHref = "#talk" }: { reserveH
                   <a href={lookHref} data-testid="buy-path-look" className="text-center text-sm font-semibold underline underline-offset-2">or the $190 USD 7-day look</a>
                 </>
               ) : (
-                <Cta href={ioHref} variant="ink" testId="buy-path-io" className="w-full">Request a draft IO</Cta>
+                <>
+                  <Cta href={ioHref} variant="ink" testId="buy-path-io" className="w-full">Request a draft IO</Cta>
+                  <a href="/sample-io" data-testid="buy-path-sample-io" className="text-center text-sm font-semibold underline underline-offset-2">or read the sample IO first</a>
+                </>
               )}
             </div>
           </article>
