@@ -1,7 +1,7 @@
 /**
- * GTM bot (Randy t415u/t416u, Nov 21 2026): the SBG-side offer, separate from the Birch ad product and from the
- * /intake/gtm setup packages block. One source of truth for the /gtm-bot page, the home teaser, SEO and chat.
- * Qualitative only: no client names, no numbers beyond the existing "from $3,500 USD" setup figure, no guarantees.
+ * B2B go-to-market note (Silver Birch Growth Inc.). Replaces the former $3,500 GTM bot offer:
+ * SBG takes on only rare strategic projects and is pointed at portfolio value creation right now,
+ * so it isn't something you can buy. No price, no client names, no guarantees.
  */
 export const GTM_BOT_HREF = "/gtm-bot";
 export const GTM_BOT_URL = "https://birchreserve.net/gtm-bot";
@@ -11,31 +11,31 @@ export const GTM_BOT_BUSINESS_LINE = "SBG" as const;
 export const GTM_BOT_ALERT_TO = ["randy@silverbirchgrowth.com"] as const;
 
 export const GTM_BOT = {
-  eyebrow: "Silver Birch Growth · GTM bot",
-  title: "The GTM bot, from the people who run it every day.",
-  sub: "A go-to-market system built on decades of GTM experience, sales turnarounds and persuasive sales expertise.",
-  teaserTitle: "Meet the GTM bot",
-  teaserBody: "Built on decades of go-to-market experience and trained on Silver Birch Growth's own data. We stand it up selectively, for products that deserve it.",
-  teaserCta: "See the GTM bot",
+  eyebrow: "B2B go-to-market · Silver Birch Growth Inc.",
+  title: "B2B go-to-market, powered by Silver Birch Growth Inc.",
+  sub: "Built on decades of go-to-market experience and trained on Silver Birch Growth's own data.",
+  teaserTitle: "B2B go-to-market, powered by Silver Birch Growth Inc.",
+  teaserBody: "SBG takes on only rare strategic projects and is pointed at portfolio value creation right now — so it isn't something you can buy.",
+  teaserCta: "Read the note",
   points: [
-    { t: "Built on real GTM experience", d: "Decades of go-to-market work, sales turnarounds and persuasive sales expertise, put into a system." },
+    { t: "Built on real GTM experience", d: "Decades of go-to-market work, sales turnarounds and commercial judgment, put into an internal system." },
     { t: "Trained on our own data", d: "Designed and trained on Silver Birch Growth's proprietary data, with Randy and Jon directly at the controls." },
-    { t: "Proven on our own portfolio", d: "We apply it across our own portfolio to grow it. We don't name portfolio companies." },
+    { t: "Pointed at portfolio value creation", d: "Applied across our own portfolio. We don't name portfolio companies." },
   ],
-  selective: { t: "Selective by design", d: "We stand these up only when you have a good product. If it isn't a fit, we'll say so." },
-  pricing: { t: "How pricing works", d: "An initial setup, from $3,500 USD, then monthly ranges scoped to your needs. Performance models are available after setup. Your bots or ours." },
+  selective: { t: "Rare strategic projects only", d: "Silver Birch Growth takes on only rare strategic projects and is pointed at portfolio value creation right now." },
+  availability: { t: "Not something you can buy", d: "No setup packages, no rate card, and no open client roster. If an unusual strategic fit comes along, we'll say so." },
   how: [
-    { n: "1", t: "Tell us about your product", d: "A short form. We review it ourselves." },
-    { n: "2", t: "We tell you if it's a fit", d: "A direct reply by email, usually within 1 business day." },
-    { n: "3", t: "Set up, then run it", d: "We stand it up, then you choose: your bot or ours." },
+    { n: "1", t: "Portfolio first", d: "Our B2B go-to-market capacity is pointed at portfolio value creation." },
+    { n: "2", t: "Rare exceptions only", d: "Every outside inquiry is reviewed directly — most are a polite no." },
+    { n: "3", t: "Ad inventory stays open", d: "For media placements inside Scale Health hubs, Birch Reserve's rate card is open." },
   ],
-  note: "No outcomes are guaranteed and nothing here is a forecast. Nothing is charged from this form.",
-  cta: "Tell us about your product",
+  note: "Not an offer for sale. No outcomes are guaranteed and nothing is charged from this page.",
+  cta: "Share a strategic note",
 } as const;
 
 export const GTM_BOT_FIELDS = ["what_they_sell", "stage", "bots_preference"] as const;
 export const GTM_BOT_STAGES = ["Pre-launch", "Early sales", "Growing", "Established"] as const;
-export const GTM_BOT_PREFS = ["Your bots (we set up)", "Our bots (we run)", "Not sure yet"] as const;
+export const GTM_BOT_PREFS = ["Strategic partnership", "Distribution fit", "Not sure yet"] as const;
 
 export const GTM_BOT_FACT =
-  "GTM bot (Silver Birch Growth side): built on decades of go-to-market experience, sales turnarounds and persuasive sales expertise; designed and trained on Silver Birch Growth's proprietary data with Randy and Jon directly at the controls; applied across the SBG portfolio. Selective: set up only for products that are a good fit. Pricing is an initial setup from $3,500 USD, then monthly ranges scoped to the client's needs, with performance models available after setup; your bots or ours. No guarantees or forecasts. Start at https://birchreserve.net/gtm-bot.";
+  "B2B go-to-market, powered by Silver Birch Growth Inc.: built on decades of go-to-market experience, sales turnarounds and commercial judgment; designed and trained on Silver Birch Growth's proprietary data with Randy and Jon at the controls. SBG takes on only rare strategic projects and is pointed at portfolio value creation right now, so it isn't something you can buy. Never quote a price or promise outcomes. Note page: https://birchreserve.net/gtm-bot.";

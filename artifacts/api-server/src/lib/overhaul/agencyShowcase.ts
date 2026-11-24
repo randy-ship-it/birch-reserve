@@ -267,10 +267,12 @@ export const AGENCY_TIERS: ReadonlyArray<{
   },
 ];
 
-/** Access perks for Trusted Agency Partners. No services or GTM promise. Same 10% discount as every agency. */
+/** Access perks for Trusted Agency Partners. Same 10% discount as every agency. */
+export const EXCLUSIVE_CASE_STUDY_URL = "https://fridayapp.org/share/deal/digital-md-partner";
+
 export const EXCLUSIVE_PARTNER_PERKS = [
   "First look at new exclusive packages and hubs before they open publicly.",
   "Reserved access to exclusive packages and newly activating hubs.",
   "A named mention on the Birch Reserve site and in our sales materials.",
-  "The same written 10% discount off the published rate card.",
+  "Partners get woven into our bot chats, already under way with hundreds of brands and thousands of retailers.",
 ] as const;

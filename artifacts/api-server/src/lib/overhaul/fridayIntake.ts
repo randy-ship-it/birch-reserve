@@ -38,7 +38,7 @@ const SOURCE: Record<IntakeKind, string> = {
   premium_inquiry: "Birch premium slot inquiry (inquire-only, IO)",
   category_request: "Birch request-this-category form",
   brand_intake: "Birch brand intake (brand-intake-v1 fallback)",
-  gtm_setup_inquiry: "Birch GTM setup package inquiry (from $3,500 USD)",
+  gtm_setup_inquiry: "SBG B2B go-to-market strategic note (not a package)",
   street_team_inquiry: "Birch street team program inquiry (2027)",
   gtm_bot_inquiry: "SBG GTM bot inquiry (business line SBG)",
   partner_inquiry: "Birch partnership inquiry (flyer / ad-buying / media)",

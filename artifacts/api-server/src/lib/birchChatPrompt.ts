@@ -223,7 +223,7 @@ function buildBirchPromptText(opts: BirchChatPromptOptions, brand: ChatBrand): s
     `- "How long until ads would be live?" / timing: there is no fixed go-live time to promise. After checkout a person reviews the ad, and the team replies within 1 business day with the IO naming the hub, placement and launch date. The ad runs from the launch date on the IO once they approve it; nothing runs before that. The $${look.spendUsd} USD 7-day look is the quickest first step. If no approved surface is named within 60 days of payment, they get a cash refund. Never promise a specific date or day count beyond these.`,
     `- "Send me something": the media kit, ${BIRCH_LINKS.mediaKit} (PDF one-pager: ${BIRCH_LINKS.onePager}).`,
     `- "Not ready" or "want something custom": the request form at ${BIRCH_LINKS.request} (brand, email, what they sell, no card). The sales team replies by email within 1 business day.`,
-    `- "What is the GTM bot / who built it?": ${GTM_BOT_FACT} Never name portfolio companies, never promise outcomes, never give monthly prices (say monthly ranges scoped to their needs).`,
+    `- "What is the GTM bot / who built it?": ${GTM_BOT_FACT} Never name portfolio companies, never promise outcomes, never quote a price.`,
     `- "Do you do setup / GTM / partnership bot help?": ${GTM_SETUP_FACT} ${GTM_SETUP_CHAT_RULE} Keep it separate from ad buying; it does not change the ad rules.`,
     `- "Brand not accepted into / not a fit for the clinic hub program?" / "Can we work with you without a clinic hub?" / "performance only": ${PERF_ONLY_FACT} ${PERF_ONLY_CHAT_RULE}`,
     `- "What's your track record?" / "Why trust you?": ${TRACK_RECORD_FACT} Then point to the $190 USD 7-day look.`,

@@ -17,7 +17,7 @@ export function HowWeGotHere({ where }: { where: "home" | "media_kit" }) {
         {HOW_WE_GOT_HERE.steps.map((s, i) => (
           <li key={i} className={`relative items-start gap-3 ${i >= VISIBLE_MOBILE && !open ? "hidden md:flex" : "flex"}`}>
             <span className="z-10 inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-[#0b1f3a] text-sm font-bold text-white">{i + 1}</span>
-            <p className="min-w-0 flex-1 rounded-xl bg-white px-3 py-1.5 text-[13px] leading-snug text-foreground/80 shadow-sm" {...(s.includes("$3,500") ? { "data-currency-fixed": "" } : {})}>{s}</p>
+            <p className="min-w-0 flex-1 rounded-xl bg-white px-3 py-1.5 text-[13px] leading-snug text-foreground/80 shadow-sm">{s}</p>
           </li>
         ))}
       </ol>

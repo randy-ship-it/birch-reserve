@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import { Cta } from "./ui";
 import { InquireBadge } from "./quick-buy";
 import { priceFor, useCurrency } from "@/lib/currency";
-import { ChevronDown } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 import { skinText } from "@/lib/siteSkin";
 import { priceLadder } from "../../../../api-server/src/lib/priceLadder";
 import { TRACK_RECORD } from "../../../../api-server/src/lib/overhaul/trackRecord";
@@ -20,6 +20,7 @@ import {
   AGENCY_RATE_RULES,
   AGENCY_SHARE,
   AGENCY_TIERS,
+  EXCLUSIVE_CASE_STUDY_URL,
   EXCLUSIVE_PARTNER_PERKS,
   type AgencyTierKey,
   BRAND_BONUS_LINE,
@@ -538,14 +539,13 @@ export function AgencyTierCards({ reserveHref, buyHref, bidHref = "#talk", ioHre
   );
 }
 
-/** "What exclusive partners get" (Randy's footnote), with the nameless partner-launch example from the track record. */
+/** "What exclusive partners get" (Randy t8307u), with the nameless partner-launch example (Contract signed · Onboarding) linked to the live blurred case study. */
 export function ExclusivePerks() {
   const ex = TRACK_RECORD.cards.find((c) => c.key === "partner-launch")!;
-  const how = ex.detail.split(", with the prospect")[0] + ".";
   return (
-    <details className="group rounded-2xl border-2 border-[#0b1f3a] bg-white" data-testid="exclusive-perks" id="exclusive-partners">
+    <details open className="group rounded-2xl border-2 border-[#0b1f3a] bg-white" data-testid="exclusive-perks" id="exclusive-partners">
       <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-semibold text-[#0b1f3a] md:px-5 [&::-webkit-details-marker]:hidden">
-        <span>* What Trusted Agency Partners get</span>
+        <span>* What exclusive partners get</span>
         <ChevronDown className="size-5 shrink-0 transition group-open:rotate-180" aria-hidden />
       </summary>
       <div className="grid gap-5 border-t border-[#0b1f3a]/15 p-4 md:grid-cols-[1.1fr_0.9fr] md:p-5">
@@ -555,11 +555,29 @@ export function ExclusivePerks() {
           ))}
           <li className="pt-1 text-[12px] text-foreground/60">Partners buy at the same written 10% discount off the published rate card.</li>
         </ul>
-        <div className="rounded-xl bg-[#0b1f3a] p-4 text-white" data-testid="exclusive-example">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-lime-300">Example · names withheld</p>
-          <p className="mt-2 font-display text-xl leading-snug">{ex.outcome}</p>
-          <p className="mt-2 text-[13px] text-white/80">{how}</p>
-          <p className="mt-3 text-[11px] text-white/55">{skinText(TRACK_RECORD.note)}</p>
+        <div className="flex flex-col justify-between rounded-xl bg-[#0b1f3a] p-4 text-white" data-testid="exclusive-example">
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-lime-300">Example · names withheld</p>
+              <span className="rounded-full bg-lime-300/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-lime-300" data-testid="exclusive-example-stage">
+                Contract signed · Onboarding
+              </span>
+            </div>
+            <p className="mt-2 font-display text-xl leading-snug">{ex.outcome}</p>
+            <p className="mt-2 text-[13px] text-white/80">{ex.detail}</p>
+          </div>
+          <div className="mt-4 space-y-3">
+            <a
+              href={EXCLUSIVE_CASE_STUDY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="exclusive-example-link"
+              className="inline-flex items-center gap-1.5 rounded-full bg-lime-300 px-4 py-2 text-xs font-bold text-[#0b1f3a] transition hover:bg-white"
+            >
+              See the live case study <ArrowUpRight className="size-3.5" aria-hidden />
+            </a>
+            <p className="text-[11px] text-white/55">{skinText(TRACK_RECORD.note)}</p>
+          </div>
         </div>
       </div>
     </details>

@@ -20,7 +20,7 @@ export const QUESTIONS = [
   { id: "exclusive", q: "what is the $1,900 exclusive reserve?", any: [[/1,900/], [/25%/], [/5K|\$5,000/i]], link: [/\/exclusive/] },
   { id: "free-kit", q: "how does the free monetization kit work?", any: [[/website|email/i], [/free|no card/i]], link: [/\/intake(\)|\s|$|\?|#)/] },
   { id: "provider-join", q: "I run a recovery studio. How do I join as a provider or get a hub?", link: [/\/intake|\/partners|\/hubs/], mustNot: [/your hub (is|will be) (open|live)/i] },
-  { id: "gtm-bot", q: "tell me about the GTM bot setup", any: [[/3,500/]], link: [/\/intake\/gtm/], mustNot: [/\$\s?\d[\d,]*\s*(\/|per|a)\s*(month|mo)\b/i] },
+  { id: "gtm-bot", q: "tell me about the GTM bot setup", any: [[/Silver Birch Growth/i], [/rare strategic|not.*buy|can't buy/i]], mustNot: [/3,500|\$\s?\d[\d,]*\s*(\/|per|a)\s*(month|mo)\b/i] },
   { id: "street-team", q: "do you do street team product sampling and door to door?", link: [/street-team/], any: [[/sampl/i], [/door/i]] },
   { id: "refund", q: "can I get a refund if I change my mind?", any: [[/14 days/i], [/refund/i]], link: [/\/terms/] },
   { id: "alerts", q: "how do I get notified when new hubs launch?", link: [/hub-alerts/], any: [[/alert|notif/i]] },
@@ -35,7 +35,7 @@ export const QUESTIONS = [
   { id: "human", q: "can I talk to a real person?", any: [[/647|call-?back|request form|team|person|human/i]] },
   { id: "which-offer", q: "I have a $2,000 budget for a first test. what should I buy?", any: [[/\$190|7-day look|pack|\$1,500|reserve/i]], link: [/buycalc|sponsor|\/buy/] },
   { id: "order-of-ops", q: "walk me through the whole onboarding from free kit to my ad running", any: [[/kit/i], [/look|reserve|pack/i], [/IO|insertion order/i]], link: [/\/intake/] },
-  { id: "proof-19-day", q: "can you actually execute? do you have any proof you move fast with partners?", any: [[/19 days/i], [/virtual care/i]], mustNot: [/\bour (campaign )?results (show|prove)/i, /guarantee(?!s? (no|any))/i] },
+  { id: "proof-19-day", q: "can you actually execute? do you have any proof you move fast with partners?", any: [[/21 days/i], [/virtual care/i]], mustNot: [/\bour (campaign )?results (show|prove)/i, /guarantee(?!s? (no|any))/i] },
   { id: "activate-step", q: "I submitted the free kit form. what's the Step 2 of 2 about inventory and ads?", any: [[/inventory|estimate|range/i], [/ads|curated|premium|which ads/i]], link: [/\/intake\/activate/] },
   { id: "ad-openness", q: "I run a hub. can I choose which kinds of ads run on it, and exclude alcohol?", any: [[/curated|premium|any approved/i], [/exclu/i], [/review|approv/i]], link: [/\/intake\/activate/] },
 ];

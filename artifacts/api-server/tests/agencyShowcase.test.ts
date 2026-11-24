@@ -102,7 +102,7 @@ test("copy scan: agency sections, home and media kit carry no banned or retired 
   }
   const agencyOnly = ["../clinichub-media/src/components/br/agency-showcase.tsx", "./src/lib/overhaul/agencyShowcase.ts"].map(read).join("\n");
   assert.doesNotMatch(agencyOnly, /\(\d{3}\)\s?\d{3}-\d{4}|\b\d{3}-\d{3}-\d{4}\b/);
-  assert.doesNotMatch(agencyOnly, /fridayapp|cockpit/i);
+  assert.doesNotMatch(agencyOnly.replaceAll("https://fridayapp.org/share/deal/digital-md-partner", ""), /fridayapp|cockpit/i);
   assert.doesNotMatch(agencyOnly, /keeps?[^.\n]{0,30}as media credit/i);
   // Nov 14 2026: broad network positioning; the reserve CTA shows the buyer-currency price.
   assert.match(files, /Reserve your space — \{price\.seat\}/);
@@ -254,8 +254,11 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.match(ui, /priceLadder\("usd"\)/);
   assert.match(ui, /TRACK_RECORD\.cards\.find\(\(c\) => c\.key === "partner-launch"\)/);
   assert.ok(TRACK_RECORD.cards.some((c) => c.key === "partner-launch"));
-  for (const c of ["<AgencyRateCardModel />", "<AgencyDiscountExample />"]) assert.ok(page.includes(c), c);
-  assert.doesNotMatch(page, /<InventoryCanister \/>|<AgencyTierCards |<ExclusivePerks \/>/);
+  for (const c of ["<AgencyRateCardModel />", "<AgencyDiscountExample />", "<ExclusivePerks />"]) assert.ok(page.includes(c), c);
+  assert.doesNotMatch(page, /<InventoryCanister \/>|<AgencyTierCards /);
+  assert.ok(EXCLUSIVE_PARTNER_PERKS.some((p) => /Partners get woven into our bot chats, already under way with hundreds of brands and thousands of retailers/.test(p)));
+  assert.match(ui, /Contract signed · Onboarding/);
+  assert.doesNotMatch(ui, /19 days|ready to sign/i);
   // One primary hero CTA, before the model.
   const hero = page.slice(page.indexOf("<H1>"), page.indexOf('id="model"'));
   assert.equal((hero.match(/<Cta /g) ?? []).length, 1);
@@ -263,7 +266,7 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.match(ui, /Send a bid or interest/);
   const all = page + ui + JSON.stringify({ AGENCY_TIERS, EXCLUSIVE_PARTNER_PERKS });
   assert.doesNotMatch(all, /book a call|phone|tel:|talk to (the founder|randy)|chat with randy|schedule a call/i);
-  assert.doesNotMatch(all, /MedVibe|Kalaya|Clairvoyant|Alset|\bAlign\b|80 locations|pier ?39|Ankita|Friday/i);
+  assert.doesNotMatch(all, /MedVibe|Kalaya|Clairvoyant|Alset|\bAlign\b|80 locations|pier ?39|Ankita|\bFriday\b/i);
   assert.doesNotMatch(JSON.stringify({ AGENCY_TIERS, EXCLUSIVE_PARTNER_PERKS }), /guarantee|CTR|ROAS|reach|\d+ (views|clicks)/i);
   // Home: a visible agencies door next to the $190/$490 strip and in the hero; the lime Buy ads now stays primary.
   const home = read("../clinichub-media/src/pages/br/home.tsx");

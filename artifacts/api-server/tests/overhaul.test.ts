@@ -435,7 +435,7 @@ test("GTM bot lead: validated, honeypotted, tagged SBG, alert to randy@silverbir
   const port = (server.address() as { port: number }).port;
   const post = (b: unknown) => fetch(`http://127.0.0.1:${port}/v1/gtm-bot-lead`, { method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": `9.9.9.${Math.floor(Math.random() * 200)}` }, body: JSON.stringify(b) });
   try {
-    const good = { name: "QA", company: "Acme TEST", email: "qa+gtmbot@silverbirchgrowth.com", fields: { what_they_sell: "a product", stage: "Growing", bots_preference: "Our bots (we run)" } };
+    const good = { name: "QA", company: "Acme TEST", email: "qa+gtmbot@silverbirchgrowth.com", fields: { what_they_sell: "a product", stage: "Growing", bots_preference: "Strategic partnership" } };
     const r = await post(good);
     assert.equal(r.status, 200);
     const j = (await r.json()) as { ok: boolean; alert: string };

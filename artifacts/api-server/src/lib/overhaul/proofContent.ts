@@ -21,7 +21,7 @@ export const HOW_WE_GOT_HERE = {
     "Then we added more ways to activate, like our Street Team, on-site and door to door.",
     "We started in recovery, built on our team's experience opening and scaling digital-first clinics, with vertical integration to curate providers quickly.",
     "That clinic layer became the foundation. Hubs are now turning into inventory that can be monetized immediately, at low or zero incremental cost to the brand.",
-    "The same systems and GTM expertise we use to sign and onboard partners now power our ad product and the $3,500+ USD partnership bot setup.",
+    "The same systems and B2B go-to-market discipline — powered by Silver Birch Growth Inc. for rare strategic portfolio work — now sit behind our ad product.",
   ],
   note: "Internal testing that informed the product, not campaign results or current sold performance.",
   cta: "Start with the $190 USD 7-day look",
@@ -102,7 +102,7 @@ function trackHtml(): string {
   return `<section data-ssr="track-record"><h2>${esc(TRACK_RECORD.eyebrow)}: ${esc(TRACK_RECORD.title)}</h2><ul>${TRACK_RECORD.cards.map((c) => `<li><strong>${esc(c.stat)}</strong> (${esc(c.tag)}) ${esc(c.outcome)} ${esc(c.detail)}</li>`).join("")}</ul><p>${esc(TRACK_RECORD.note)}</p></section>`;
 }
 function gtmHtml(): string {
-  return `<section data-ssr="gtm-setup"><h2>${esc(GTM_SETUP.eyebrow)}</h2><h3>${esc(GTM_SETUP.title)}</h3><p>${esc(GTM_SETUP.sub)}</p><ol>${GTM_SETUP.steps.map((s) => `<li><strong>${esc(s.t)}.</strong> ${esc(s.d)}</li>`).join("")}</ol><ul>${GTM_SETUP.cases.map((c) => `<li>${esc(c)}</li>`).join("")}</ul><p>${esc(GTM_SETUP.casesNote)} ${esc(GTM_SETUP.separate)}</p><p><a href="/intake/gtm">${esc(GTM_SETUP.cta)}</a></p></section>`;
+  return `<section data-ssr="gtm-setup"><h2>${esc(GTM_SETUP.eyebrow)}</h2><h3>${esc(GTM_SETUP.title)}</h3><p>${esc(GTM_SETUP.sub)}</p><ul>${GTM_SETUP.notes.map((n) => `<li>${esc(n)}</li>`).join("")}</ul><p>${esc(GTM_SETUP.separate)}</p></section>`;
 }
 function reportHtml(): string {
   const r = FLIGHT_REPORT_EXAMPLE;
@@ -146,12 +146,10 @@ export function llmsProofSection(): string {
     ...TRACK_RECORD.cards.map((c) => `- ${c.stat} · ${c.tag}: ${c.outcome} ${c.detail}`),
     TRACK_RECORD.note,
     "",
-    "## GTM setup packages (separate from the ad product)",
+    "## B2B go-to-market, powered by Silver Birch Growth Inc. (not for sale)",
     `- ${GTM_SETUP.eyebrow}. ${GTM_SETUP.title} ${GTM_SETUP.sub}`,
-    ...GTM_SETUP.steps.map((s) => `- ${s.n}. ${s.t}: ${s.d}`),
-    ...GTM_SETUP.cases.map((c) => `- ${c}`),
-    `- ${GTM_SETUP.casesNote} ${GTM_SETUP.separate}`,
-    "- Start: https://birchreserve.net/intake/gtm",
+    ...GTM_SETUP.notes.map((n) => `- ${n}`),
+    `- ${GTM_SETUP.separate}`,
     "",
     "## What your flight report shows (example, illustrative numbers, not results)",
     `- ${r.watermark}`,

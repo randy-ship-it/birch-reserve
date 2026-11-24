@@ -3,7 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { isScaleSkin, skinText } from "@/lib/siteSkin";
 import { LeadForm } from "@/components/br/lead-form";
 import { KitEntry } from "@/components/br/pilot-path";
-import { AgencyDiscountExample, AgencyRateCardModel, BuyPaths, GoalPlanner, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
+import { AgencyDiscountExample, AgencyRateCardModel, BuyPaths, ExclusivePerks, GoalPlanner, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
 import { AGENCY_FAQ } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { RESERVE_HREF, lookHref } from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
@@ -92,8 +92,9 @@ export default function BrAgencies() {
           <Eyebrow>How buying works</Eyebrow>
           <H2>One rate card. A written 10% for&nbsp;agencies.</H2>
         </div>
-        <div className="mt-8">
+        <div className="mt-8 space-y-6">
           <AgencyRateCardModel />
+          <ExclusivePerks />
         </div>
         <p className="mt-6 text-xs text-muted-foreground">Reserved inventory for a few agencies uses the same written 10% discount, with first look as new hubs activate. Nothing runs until the insertion order names the hub and placement. Full terms on <a className="underline underline-offset-2" href="/terms">/terms</a>.</p>
       </Section>
