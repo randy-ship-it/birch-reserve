@@ -16,7 +16,8 @@ export function adminLoginPage(error?: string): string {
     body: `<div style="max-width:480px;margin:48px auto"><h1>Ads admin</h1><p class="lede">Randy and Jon only.</p>
 ${error ? `<p class="warn" role="alert">${esc(error)}</p>` : ""}
 <div class="card"><form class="f" data-post="/ads/admin/login"><label>Email<input type="email" name="email" required autocomplete="username"></label>
-<label>Admin key<input type="password" name="key" required autocomplete="current-password"></label><button type="submit">Sign in</button></form></div></div>`,
+<label>Admin key<input type="password" name="key" required autocomplete="current-password"></label><button type="submit">Sign in</button></form></div>
+<div class="card" style="margin-top:14px"><form class="f" data-post="/ads/admin/email-link"><p class="fine">No key? Get a sign-in link by email.</p><label>Email<input type="email" name="email" required autocomplete="email"></label><button type="submit">Email me a sign-in link</button></form></div></div>`,
   });
 }
 
