@@ -585,7 +585,7 @@ export const THE_AD_ON_THE_PAGE_ALREADY_OPEN_ARTICLE = {
   authorName: "Birch Reserve Editorial",
   topic: "Closed-hub advertising",
   summary:
-    "Most advertising asks for attention. A private hub card sits on a page the customer already opened after they booked or bought. What the unit is, and how to look before you reserve.",
+    "Most advertising asks for attention. A private hub card sits on the page a customer lands on right after they book or buy. What the unit is, and how to look before you reserve.",
   publishedAt: new Date("2026-11-23T22:00:00.000Z"),
   body: `# The ad on the page that is already open
 
