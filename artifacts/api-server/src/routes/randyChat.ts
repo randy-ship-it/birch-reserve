@@ -58,6 +58,8 @@ type RandyChatBody = {
   pagePath?: string;
   /** Widget skin: "scale" on the scalehealth.ca/intake mirror (chat name Scale Squirrel). Same module, swapped name and links. */
   skin?: ChatBrand;
+  /** Visitor display currency (the page shows prices in it). */
+  currency?: "usd" | "cad";
 };
 
 type RandyChatSuccess = {
@@ -346,7 +348,7 @@ export function parseBody(raw: unknown): ParseOk<RandyChatBody> | ParseErr {
   }
 
   const obj = raw as Record<string, unknown>;
-  const allowedKeys = new Set(["messages", "mode", "chipId", "sessionId", "pagePath", "skin"]);
+  const allowedKeys = new Set(["messages", "mode", "chipId", "sessionId", "pagePath", "skin", "currency"]);
   for (const key of Object.keys(obj)) {
     if (!allowedKeys.has(key)) {
       return { ok: false, error: "Unknown field." };
@@ -379,11 +381,14 @@ export function parseBody(raw: unknown): ParseOk<RandyChatBody> | ParseErr {
   if (!pagePath.ok) return pagePath;
   if (obj.skin !== undefined && obj.skin !== "birch" && obj.skin !== "scale") return { ok: false, error: "Invalid skin." };
   const skin = obj.skin as ChatBrand | undefined;
+  if (obj.currency !== undefined && obj.currency !== "usd" && obj.currency !== "cad") return { ok: false, error: "Invalid currency." };
+  const currency = obj.currency as "usd" | "cad" | undefined;
 
   return {
     ok: true,
     body: {
       ...(skin ? { skin } : {}),
+      ...(currency ? { currency } : {}),
       messages: parsedMessages.body,
       ...(mode ? { mode } : {}),
       ...(chipId ? { chipId } : {}),
@@ -507,6 +512,7 @@ export function buildGrokRequest(body: RandyChatBody, model = getGrokModel(), pu
     pagePath: body.pagePath,
     checkout: siteCheckoutState(),
     pulseThemes,
+    currency: body.currency,
   });
   return {
     model,

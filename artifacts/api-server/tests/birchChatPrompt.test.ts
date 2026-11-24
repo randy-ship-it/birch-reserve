@@ -186,3 +186,13 @@ test("prompt explains the performance-only path without rejecting anyone or quot
   assert.match(p, /intake\?program=performance-only/);
   assert.match(p, /never that anyone was rejected/);
 });
+
+test("visitor currency: one price per reply, no bracketed restatement (Randy, Nov 23 2026)", () => {
+  const cad = buildBirchChatSystemPrompt({ checkout: live, currency: "cad" });
+  assert.match(cad, /prices are shown in CAD/);
+  assert.match(cad, /no USD figure and no bracketed equivalent/);
+  const usd = buildBirchChatSystemPrompt({ checkout: live, currency: "usd" });
+  assert.match(usd, /prices are shown in USD/);
+  const none = buildBirchChatSystemPrompt({ checkout: live });
+  assert.doesNotMatch(none, /prices are shown in (CAD|USD)/);
+});
