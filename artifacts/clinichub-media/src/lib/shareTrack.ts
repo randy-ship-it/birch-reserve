@@ -33,8 +33,12 @@ export function mirrorSource(): string | null {
   const boot = (window as { __BR_MIRROR?: { src?: string } }).__BR_MIRROR?.src;
   if (boot && SRC_OK.test(boot)) return boot;
   try {
-    const q = new URLSearchParams(window.location.search).get("src");
-    if (q && SRC_OK.test(q)) sessionStorage.setItem("br_src", q);
+    const q = new URLSearchParams(window.location.search);
+    const src = q.get("src");
+    if (src && SRC_OK.test(src)) sessionStorage.setItem("br_src", src);
+    // The Scale homepage Brands CTA lands on birchreserve.net/intake?ref=scale (not ?src=).
+    const ref = q.get("ref");
+    if (ref === "scale") sessionStorage.setItem("br_src", "scale_mirror");
     const saved = sessionStorage.getItem("br_src");
     if (saved && SRC_OK.test(saved)) return saved;
   } catch {
