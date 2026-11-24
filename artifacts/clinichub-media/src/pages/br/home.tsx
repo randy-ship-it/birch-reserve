@@ -150,7 +150,7 @@ export default function BrHome() {
         </div>
       </section>
       {/* Front door (Randy, outside review Nov 23 2026 10:37 PM): the $190 look and $490 shared reserve, right under the hero. */}
-      <section className="container mx-auto max-w-5xl px-4 pb-6 pt-1" data-testid="home-plan-strip">
+      <section className="container mx-auto max-w-6xl px-4 pb-6 pt-1" data-testid="home-plan-strip">
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="flex flex-col rounded-2xl border border-[#0b1f3a]/15 bg-white p-4 shadow-sm" data-testid="home-strip-look">
             <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">7-day look</p>
