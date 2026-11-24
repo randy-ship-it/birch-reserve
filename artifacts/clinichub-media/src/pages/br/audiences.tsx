@@ -2,7 +2,7 @@ import { AudienceChannels } from "@/components/br/audience-channels";
 import { Tam2027 } from "@/components/br/inventory-plan";
 import { StartSmall } from "@/components/br/start-small";
 import { Lock, ShieldCheck, Sparkles } from "lucide-react";
-import { LOOK_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, lookHref} from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
 import { TRUST_FAQ } from "@/components/br/trust";
 import { SampleBenefitsProfile } from "@/components/br/sample-benefits-profile";
@@ -108,7 +108,7 @@ export default function BrAudiences() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta href="#segments">See the segments</Cta>
               <Cta href="#sample-profile" variant="line">See a sample partner profile</Cta>
-              <Cta href={LOOK_HREF} variant="line" testId="audiences-hero-hold-190" onClick={() => trackCta("cta_hold_190", { offer: "hold-190" })}>
+              <Cta href={lookHref("audiences_look")} variant="line" testId="audiences-hero-hold-190" onClick={() => trackCta("cta_hold_190", { offer: "hold-190" })}>
                 Start with a $190 look
               </Cta>
             </div>

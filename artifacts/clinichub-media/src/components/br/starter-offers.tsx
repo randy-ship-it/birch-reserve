@@ -1,5 +1,5 @@
 import { Cta } from "@/components/br/ui";
-import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 import { priceLabels, useAvailability } from "@/components/br/prime-hero";
 
 /** The two public self-serve offers from the media kit (Nov 2026): $190 USD look, $490 USD reserve. USD only. */
@@ -13,7 +13,7 @@ export function StarterOffers({ testId = "starter-offers" }: { testId?: string }
           <p className="mt-2 font-display text-5xl leading-none">{price.look}</p>
           <p className="mt-4 text-sm text-foreground/80">Hold your category for 7 days. It converts in full to the {price.seat} reserve within 7 days, or it's refunded. It does not lock in a slot.</p>
           <div className="mt-6 sm:mt-auto sm:pt-6">
-            <Cta href={LOOK_HREF} variant="ink" testId={`${testId}-look`} className="w-full sm:w-auto">Take a 7-day look — {price.look}</Cta>
+            <Cta href={lookHref("starter_offers_look")} variant="ink" testId={`${testId}-look`} className="w-full sm:w-auto">Take a 7-day look — {price.look}</Cta>
           </div>
         </article>
         <article className="flex flex-col border-2 border-foreground bg-white p-6">

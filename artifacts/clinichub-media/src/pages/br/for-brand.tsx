@@ -3,7 +3,7 @@ import "./for-brand.css";
 import { useRoute } from "wouter";
 import { ShoppingBag, Trophy, Stethoscope, Users } from "lucide-react";
 import { Cta, H1, usePageMeta } from "@/components/br/ui";
-import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 import NotFound from "@/pages/not-found";
 import {
   getBrandFit,
@@ -205,7 +205,7 @@ function BrandFitPage({ fit }: { fit: BrandFit }) {
               <H1 className="mt-3 text-background">{fit.headline}</H1>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-background/80 md:text-lg">{fit.lede}</p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Cta href={LOOK_HREF} variant="lime" testId="for-brand-look-hero" className="w-full sm:w-auto">
+                <Cta href={lookHref("for_brand_look")} variant="lime" testId="for-brand-look-hero" className="w-full sm:w-auto">
                   $190 USD look
                 </Cta>
                 <Cta href={RESERVE_HREF} variant="lineDark" testId="for-brand-lock-hero" className="w-full sm:w-auto">
@@ -388,7 +388,7 @@ function BrandFitPage({ fit }: { fit: BrandFit }) {
             . {fit.performanceOnlyLine}
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Cta href={LOOK_HREF} variant="lime" testId="for-brand-look" className="w-full sm:w-auto">
+            <Cta href={lookHref("for_brand_look")} variant="lime" testId="for-brand-look" className="w-full sm:w-auto">
               $190 USD look
             </Cta>
             <Cta href={RESERVE_HREF} variant="lineDark" testId="for-brand-lock" className="w-full sm:w-auto">

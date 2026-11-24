@@ -26,7 +26,7 @@ import { PartnersTeaser } from "@/components/br/partners";
 import { KitCta, intakeHref } from "@/components/br/kit-cta";
 import { logCtaClick } from "@/lib/shareTrack";
 import { Faq, JsonLd, usePageMeta } from "@/components/br/ui";
-import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 import { BuyCta } from "@/components/br/buy-cta";
 import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
 import { OwnTheMoment, FourSteps, SeeTheProof } from "@/components/br/hub-story";
@@ -243,7 +243,7 @@ export default function BrHome() {
                 <p className="mt-2 text-sm text-foreground/75">Card checkout. 100% media credit until the insertion order (IO), usable 12 months; fully refundable until 14 days before launch. The {price.look} look converts in full to the reserve within 7 days, or is refunded.</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <a href={RESERVE_HREF} data-testid="home-cta-seat" className="inline-flex h-11 items-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-lime-300 hover:text-[#0b1f3a]">Reserve · {price.seat} <ArrowRight className="size-4" aria-hidden /></a>
-                  <a href={LOOK_HREF} className="inline-flex h-11 items-center gap-1.5 rounded-full border border-[#0b1f3a]/25 px-5 text-sm font-bold text-[#0b1f3a] hover:border-[#0b1f3a]">7-day look · {price.look}</a>
+                  <a href={lookHref("home_look")} className="inline-flex h-11 items-center gap-1.5 rounded-full border border-[#0b1f3a]/25 px-5 text-sm font-bold text-[#0b1f3a] hover:border-[#0b1f3a]">7-day look · {price.look}</a>
                 </div>
               </div>
               <div className="rounded-xl p-4 text-white" style={{ background: NAVY }}>

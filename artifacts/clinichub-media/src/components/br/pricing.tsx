@@ -28,7 +28,9 @@ import { InquireBadge } from "./quick-buy";
 import { PlacementDialog, PlacementTrigger, type PlacementKey } from "./placement-example";
 
 export const RESERVE_HREF = "/buycalc?sku=reserve-490#reserve";
-export const LOOK_HREF = "/buycalc?sku=hold-190#reserve";
+/** Every $190 look goes through the short /buy flow; ref names the placement. */
+export const lookHref = (ref: string) => `/buy?plan=hold-190&ref=${encodeURIComponent(ref)}`;
+export const LOOK_HREF = lookHref("look");
 
 export function Estimate({ children = "Illustrative estimate" }: { children?: string }) {
   return (

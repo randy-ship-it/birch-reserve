@@ -5,7 +5,7 @@
  */
 import { LeadForm } from "@/components/br/lead-form";
 import { usePageMeta } from "@/components/br/ui";
-import { LOOK_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, lookHref} from "@/components/br/pricing";
 import { isScaleSkin, SCALE_HOME } from "@/lib/siteSkin";
 import { GTM_PARTNER_TYPES, GTM_SETUP, GTM_SETUP_KIND } from "../../../../api-server/src/lib/overhaul/gtmSetup";
 
@@ -27,7 +27,7 @@ export default function BrIntakeGtm() {
             testId="form-gtm"
             submitLabel="Send my setup request"
             done={<p>Thanks. We have your GTM setup request.</p>}
-            next={<p>We reply by email within 1 business day with next steps. Nothing is charged from this form. <a href="/" className="font-semibold underline">Back to the home page</a> or <a href={LOOK_HREF} className="font-semibold underline">see the $190 USD 7-day look</a>.</p>}
+            next={<p>We reply by email within 1 business day with next steps. Nothing is charged from this form. <a href="/" className="font-semibold underline">Back to the home page</a> or <a href={lookHref("intake_gtm_look")} className="font-semibold underline">see the $190 USD 7-day look</a>.</p>}
             fields={[
               { name: "name", label: "Your name", required: true },
               { name: "company", label: "Company", required: true },

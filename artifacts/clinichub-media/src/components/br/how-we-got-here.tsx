@@ -1,7 +1,7 @@
 /** "How we got here" origin story (Randy t424u, Nov 21 2026). Nameless, qualitative, no numbers as results. Home + media kit, right above the GTM block. */
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { LOOK_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, lookHref} from "@/components/br/pricing";
 
 import { HOW_WE_GOT_HERE } from "../../../../api-server/src/lib/overhaul/proofContent";
 export { HOW_WE_GOT_HERE };
@@ -25,7 +25,7 @@ export function HowWeGotHere({ where }: { where: "home" | "media_kit" }) {
         {open ? HOW_WE_GOT_HERE.less : HOW_WE_GOT_HERE.more}
       </button>
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <a href={LOOK_HREF} data-testid={`how-we-got-here-cta-${where}`} className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white transition hover:bg-lime-300 hover:text-[#0b1f3a]">
+        <a href={lookHref("how_we_got_here_look")} data-testid={`how-we-got-here-cta-${where}`} className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white transition hover:bg-lime-300 hover:text-[#0b1f3a]">
           {HOW_WE_GOT_HERE.cta} <ArrowRight className="size-4" aria-hidden />
         </a>
         <p className="text-[12px] text-foreground/60">{HOW_WE_GOT_HERE.note}</p>

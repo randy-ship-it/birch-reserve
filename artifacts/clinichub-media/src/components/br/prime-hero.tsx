@@ -7,7 +7,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { ArrowRight, Mail } from "lucide-react";
 import { FieldError, SavedNote, SuccessPanel } from "@/components/br/form-steps";
 import { fieldError, useSavedState } from "@/lib/form-save";
-import { LOOK_HREF, RESERVE_HREF } from "@/components/br/pricing";
+import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 
 /**
  * Prime-time path (Randy, Nov 13 2026 9:41 PM ET): someone fresh from an ad-sales
@@ -116,7 +116,7 @@ export function PrimeHero() {
           <a href={RESERVE_HREF} data-testid="prime-cta-seat" className="inline-flex h-14 items-center justify-center gap-2 bg-accent px-6 text-base font-semibold text-accent-foreground transition-colors hover:bg-background hover:text-foreground">
             Reserve your space — {p.seat} <ArrowRight className="size-4" aria-hidden />
           </a>
-          <a href={LOOK_HREF} data-testid="prime-cta-look" className="inline-flex h-14 items-center justify-center gap-2 border border-background/50 px-6 text-base font-semibold text-background transition-colors hover:bg-background hover:text-foreground">
+          <a href={lookHref("prime_hero_look")} data-testid="prime-cta-look" className="inline-flex h-14 items-center justify-center gap-2 border border-background/50 px-6 text-base font-semibold text-background transition-colors hover:bg-background hover:text-foreground">
             Take a 7-day look — {p.look} <ArrowRight className="size-4" aria-hidden />
           </a>
         </div>
@@ -218,7 +218,7 @@ export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path
   const input = "h-12 w-full border border-foreground/25 bg-white px-3 text-base text-foreground outline-none focus:border-foreground focus:ring-2 focus:ring-accent disabled:opacity-60";
   if (state.status === "done")
     return (
-      <SuccessPanel title="Request sent." testId="category-request-done" next={<p>Our sales team reads it today and replies by email with options and an insertion order draft. Nothing runs until you approve it. Want to move now? <a className="font-semibold underline" href={LOOK_HREF}>Start the $190 look</a>.</p>}>
+      <SuccessPanel title="Request sent." testId="category-request-done" next={<p>Our sales team reads it today and replies by email with options and an insertion order draft. Nothing runs until you approve it. Want to move now? <a className="font-semibold underline" href={lookHref("prime_hero_look")}>Start the $190 look</a>.</p>}>
         <p data-testid="cr-message">{state.msg}</p>
       </SuccessPanel>
     );
