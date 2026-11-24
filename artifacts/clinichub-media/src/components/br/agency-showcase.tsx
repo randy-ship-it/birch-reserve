@@ -11,6 +11,7 @@ import {
   AGENCY_EXAMPLES,
   AGENCY_SHARE,
   BRAND_BONUS_LINE,
+  BUY_PATHS,
   GOAL_PLAN,
   INVENTORY_LINE,
   PLAIN_TERMS,
@@ -378,6 +379,43 @@ export function AgencyPayouts() {
         </dl>
         <p className="border-t border-border px-4 py-3 text-[11px] text-muted-foreground md:px-5">{AGENCY_SHARE.pct}% of media spend, paid in cash to the agency of record. Examples use prices already on the site.</p>
       </div>
+    </div>
+  );
+}
+
+/** Two ways to buy (Nov 24 2026): card (self-serve) vs insertion order (managed), same rows side by side. */
+export function BuyPaths({ reserveHref, lookHref, ioHref = "#talk" }: { reserveHref: string; lookHref: string; ioHref?: string }) {
+  const cols = [BUY_PATHS.card, BUY_PATHS.io] as const;
+  return (
+    <div className="grid gap-4 md:grid-cols-2" data-testid="agency-buy-paths">
+      {cols.map((c) => {
+        const card = c.key === "card";
+        return (
+          <article key={c.key} data-testid={`buy-path-${c.key}`} className={`flex flex-col bg-white p-5 md:p-6 ${card ? "border-2 border-foreground" : "border border-foreground/20"}`}>
+            <Kicker>{c.kicker}</Kicker>
+            <p className="mt-2 font-display text-4xl leading-none tabular-nums">{c.price}</p>
+            <p className="mt-2 text-sm text-foreground/70">{c.sub}</p>
+            <dl className="mt-5 divide-y divide-border border-y border-border text-sm">
+              {BUY_PATHS.rows.map((r) => (
+                <div key={r.k} className="grid grid-cols-[6.25rem_1fr] gap-3 py-2.5 md:grid-cols-[7.5rem_1fr]">
+                  <dt className="text-foreground/60">{r.k}</dt>
+                  <dd className="font-medium">{card ? r.card : r.io}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-5 flex flex-col gap-2 sm:mt-auto sm:pt-5">
+              {card ? (
+                <>
+                  <Cta href={reserveHref} variant="lime" testId="buy-path-reserve" className="w-full">Reserve for a client · $490 USD</Cta>
+                  <a href={lookHref} data-testid="buy-path-look" className="text-center text-sm font-semibold underline underline-offset-2">or the $190 USD 7-day look</a>
+                </>
+              ) : (
+                <Cta href={ioHref} variant="ink" testId="buy-path-io" className="w-full">Request a draft IO</Cta>
+              )}
+            </div>
+          </article>
+        );
+      })}
     </div>
   );
 }

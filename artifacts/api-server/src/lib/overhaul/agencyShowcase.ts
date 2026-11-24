@@ -170,3 +170,31 @@ export function faqPageJsonLd(items: Array<{ q: string; a: string }>): Record<st
 
 export const INVENTORY_LINE = `First-party post-purchase and member-hub placements across private, co-branded health and wellness hubs.`;
 export const SPEND_DOWN_MONTHS = INVENTORY.liveSpendDownMonths;
+
+/**
+ * "Two ways to buy" on /agencies (daily scan Nov 24 2026; Lyft Ads / Walgreens wag put managed and
+ * self-serve side by side with the minimum stated plainly). Replaces the mid-page "Same two offers" block
+ * and sits right under the hero so an agency picks a path first. Every line restates terms already
+ * published on /agencies, /media-kit, /terms and the start-small tiers. No new price, no time promise.
+ */
+export const BUY_PATHS = {
+  card: {
+    key: "card",
+    kicker: "Card · self-serve",
+    price: "From $190 USD",
+    sub: "7-day look, or the $490 USD category reserve",
+  },
+  io: {
+    key: "io",
+    kicker: "Insertion order (IO) · managed",
+    price: `$${AGENCY_CLIENT_TEST.lo / 1000}K–$${AGENCY_CLIENT_TEST.hi / 1000}K USD`,
+    sub: "Per client test · premium slots by inquiry",
+  },
+  rows: [
+    { k: "Best for", card: "One client, starting now", io: "Several clients or a bigger test" },
+    { k: "Pay", card: "Card on a Stripe-hosted page, no login", io: "Deposit collected at confirmation" },
+    { k: "Before it runs", card: "You approve an IO naming the hub and placement", io: "Send the brief; we reply with hub fit and a draft IO" },
+    { k: "Refunds", card: "$490 refundable until 14 days before launch; $190 converts or is refunded", io: "Same terms as every deposit" },
+    { k: "Agency cash", card: `${AGENCY_CASH_PCT}% of media spend`, io: `${AGENCY_CASH_PCT}% of media spend` },
+  ],
+} as const;

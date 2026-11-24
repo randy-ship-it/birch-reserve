@@ -3,11 +3,10 @@ import { isScaleSkin, skinText } from "@/lib/siteSkin";
 import { KitEntry } from "@/components/br/pilot-path";
 import { CheckCircle2 } from "lucide-react";
 import { LeadForm } from "@/components/br/lead-form";
-import { AgencyPayouts, GoalPlanner, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
+import { AgencyPayouts, BuyPaths, GoalPlanner, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
 import { AGENCY_FAQ } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
-import { StarterOffers } from "@/components/br/starter-offers";
 
 /**
  * Why lock a client test now (Nov 16 2026 daily scan). Honest urgency only: every line restates terms
@@ -39,7 +38,7 @@ export default function BrAgencies() {
           <div>
             <Eyebrow>For agencies, brokers &amp; media resellers</Eyebrow>
             <H1>Park a client test budget where health buyers already are.</H1>
-            <Lede>Prepay once for one or more clients. The credit runs inside co-branded Recovery Brand hubs and health &amp; wellness business hubs as the right hubs launch, and every placement is tracked with UTM links and promo codes.</Lede>
+            <Lede>Prepay once for one or more clients. The credit runs under an insertion order (IO) inside co-branded Recovery Brand hubs and health &amp; wellness business hubs as the right hubs launch, and every placement is tracked with UTM links and promo codes.</Lede>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta href="#talk" testId="agency-cta-io">Request a draft IO</Cta>
               <Cta href={RESERVE_HREF} variant="ink" testId="agency-cta-reserve">Reserve for a client · $490 USD</Cta>
@@ -66,11 +65,13 @@ export default function BrAgencies() {
           </div>
         </div>
       </Section>
-      <Section tone="soft" id="client-test">
-        <Eyebrow>Client tests</Eyebrow>
-        <H2>Test a client from $1K–$5K. Fully refundable deposit.</H2>
-        <p className="mt-4 max-w-2xl text-muted-foreground">One IO per client. The agency of record earns 10% of media spend in cash. Smaller clients can start at $190.</p>
-        <StartSmall page="agencies" highlight="agency" id="start-small-tiers" heading={false} />
+      <Section tone="soft" id="two-ways-to-buy">
+        <Eyebrow>Two ways to buy</Eyebrow>
+        <H2>Card today, or an insertion order.</H2>
+        <div className="mt-8">
+          <BuyPaths reserveHref={RESERVE_HREF} lookHref={lookHref("agencies_paths_look")} />
+        </div>
+        <p className="mt-4 text-xs text-muted-foreground">Nothing runs until the IO names the hub and placement. Full terms on <a className="underline underline-offset-2" href="/terms">/terms</a>.</p>
       </Section>
 
       <Section tone="soft" id="plain-terms">
@@ -121,12 +122,11 @@ export default function BrAgencies() {
           <p className="mt-4 text-xs text-muted-foreground">Aggregate reporting only. Any view figure is a modelled estimate, not measured delivery or a guarantee.</p>
         </div>
       </Section>
-      <Section>
-        <Eyebrow>Client test budgets</Eyebrow>
-        <H2>Same two offers as brands. Both USD.</H2>
-        <div className="mt-8">
-          <StarterOffers testId="agency-offers" />
-        </div>
+      <Section id="client-test">
+        <Eyebrow>Client tests</Eyebrow>
+        <H2>Test a client from $1K–$5K. Fully refundable deposit.</H2>
+        <p className="mt-4 max-w-2xl text-muted-foreground">One IO per client. The agency of record earns 10% of media spend in cash. Smaller clients can start at $190.</p>
+        <StartSmall page="agencies" highlight="agency" id="start-small-tiers" heading={false} />
       </Section>
       <Section tone="soft">
         <Eyebrow>Spec sheet</Eyebrow>
