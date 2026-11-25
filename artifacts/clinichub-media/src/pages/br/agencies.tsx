@@ -3,6 +3,8 @@ import { ChevronDown } from "lucide-react";
 import { isScaleSkin, skinText } from "@/lib/siteSkin";
 import { LeadForm } from "@/components/br/lead-form";
 import { KitEntry } from "@/components/br/pilot-path";
+import { SeeYourAd } from "@/components/br/see-your-ad";
+import { INVENTORY } from "../../../../api-server/src/lib/overhaul/model";
 import { AgencyDiscountExample, AgencyRateCardModel, BlockLadder, BuyPaths, ExclusivePerks, GoalPlanner, InventoryCanister, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
 import { AGENCY_FAQ, PARTNER_VALUE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { RESERVE_HREF, lookHref } from "@/components/br/pricing";
@@ -66,14 +68,14 @@ export default function BrAgencies() {
       <Section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]">
         <div className="grid items-start gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
           <div className="max-w-3xl">
-            <Eyebrow>For agencies, brokers &amp; media resellers</Eyebrow>
-            <H1>The rate card is public. Agencies earn the standard 15%.</H1>
+            <Eyebrow>For agencies &amp; media buyers</Eyebrow>
+            <H1>Reach health and wellness customers right after they buy.</H1>
             <Lede>
-              Direct buyers pay the published rate card. Agencies earn the standard 15% agency commission off gross, with committed-spend tiers on top. You set the resale price and handle client disclosure. We do not undercut an agency&apos;s client.
+              Display inside private, members-only health and wellness hubs: the post-purchase page, the hub home, product and booking pages, and the member dashboard. First-party, brand-safe, tracked on your UTMs. Agencies earn the standard 15% commission off a public rate card. We do not undercut an agency&apos;s client.
             </Lede>
             <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-              <Cta href="#talk" testId="agency-cta-io">Get a draft IO</Cta>
-              <a href="#blocks" className="text-sm font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="agency-cta-model">See inventory blocks</a>
+              <Cta href="#talk" testId="agency-cta-io">Book a starter block</Cta>
+              <a href="#model" className="text-sm font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="agency-cta-model">See the rate card</a>
               <a href={RESERVE_HREF} className="text-sm text-[#0b1f3a]/70 underline underline-offset-4" data-testid="agency-cta-reserve">Or reserve a client test · $490 USD</a>
             </div>
           </div>
@@ -85,6 +87,30 @@ export default function BrAgencies() {
               </li>
             ))}
           </ul>
+        </div>
+        <dl className="mt-12 grid gap-px border border-[#0b1f3a]/15 bg-[#0b1f3a]/15 sm:grid-cols-2 lg:grid-cols-4" data-testid="agency-proof">
+          {[
+            { k: "Where ads run", d: "Post-purchase, hub home, product and booking pages, member dashboard." },
+            { k: "Live hubs", d: INVENTORY.line },
+            { k: "Measurement", d: "Your UTM links and promo codes. Views and clicks per hub and surface, aggregate only." },
+            { k: "Brand safety", d: "Private, members-only hubs. No open web. Nothing runs before you approve the IO." },
+          ].map((p) => (
+            <div key={p.k} className="bg-background p-5">
+              <dt className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/55">{p.k}</dt>
+              <dd className="mt-2 text-sm leading-relaxed text-foreground/80">{p.d}</dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
+
+      <Section id="see-it">
+        <div className="max-w-3xl">
+          <Eyebrow>Sample placement</Eyebrow>
+          <H2>See a client&apos;s ad on a live hub.</H2>
+          <p className="mt-3 text-sm text-muted-foreground">Type the client&apos;s brand or drop in a logo. Illustrative mock on a real hub page; nothing is uploaded.</p>
+        </div>
+        <div className="mt-8">
+          <SeeYourAd testId="agency-see-your-ad" />
         </div>
       </Section>
 
@@ -162,7 +188,7 @@ export default function BrAgencies() {
       <Section tone="soft" id="talk" className="scroll-mt-24">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <H2>Get a draft IO for a client.</H2>
+            <H2>Book a starter block for a client.</H2>
             <p className="mt-4 text-sm text-muted-foreground">Starter blocks, upfront blocks and partner access all come here. We reply in writing within one business day with hub fit, flight dates and a draft insertion order.</p>
           </div>
           <LeadForm
@@ -171,11 +197,9 @@ export default function BrAgencies() {
             submitLabel="Send"
             done={<p>Thanks. We&apos;ll reply in writing with hub fit and a draft insertion order.</p>}
             fields={[
-              { name: "company", label: "Agency", required: true },
-              { name: "name", label: "Your name", required: true },
               { name: "email", label: "Work email", type: "email", required: true },
+              { name: "company", label: "Agency", required: true },
               { name: "test_budget", label: "What are you after?", type: "select", options: ["Starter block ($1K–$5K USD)", "Upfront block ($25K–$50K USD)", "Partner access", "Not sure yet"] },
-              { name: "message", label: "Client or brief (optional)", type: "textarea" },
             ]}
           />
         </div>
