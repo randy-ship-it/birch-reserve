@@ -1,15 +1,14 @@
 import { KitEntry } from "@/components/br/pilot-path";
 import { CheckCircle2 } from "lucide-react";
 import { LeadForm } from "@/components/br/lead-form";
-import { InventorySpec, IoProcess } from "@/components/br/agency-showcase";
-import { MEASUREMENT_STEPS, MEDIA_BUYER_FAQ, MIX_ROWS } from "../../../../api-server/src/lib/overhaul/mediaBuyers";
+import { BuyPaths, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
+import { MB_BUY_PATHS, MEASUREMENT_STEPS, MEDIA_BUYER_FAQ, MIX_ROWS } from "../../../../api-server/src/lib/overhaul/mediaBuyers";
 import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, Lede, Modelled, Section, usePageMeta } from "@/components/br/ui";
-import { StarterOffers } from "@/components/br/starter-offers";
 
 /**
  * /media-buyers (Nov 18 2026 preview): for teams already running display and paid-channel campaigns.
- * Positions Birch as one incremental line item in an existing mix. Same two USD offers, same premium
+ * Positions Birch as one incremental line item in an existing mix. Same two USD offers (as a card vs IO compare), same premium
  * inquiry, same refund and IO rules as /media-kit. No impression, CTR or ROAS claims.
  */
 export default function BrMediaBuyers() {
@@ -108,9 +107,16 @@ export default function BrMediaBuyers() {
 
       <Section>
         <Eyebrow>Start a test</Eyebrow>
-        <H2>Same two offers as every buyer. Both USD.</H2>
+        <H2>Two ways to buy.</H2>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">Card for a first test today. An insertion order (IO) for premium or several hubs.</p>
         <div className="mt-8">
-          <StarterOffers testId="mb-offers" />
+          <BuyPaths
+            paths={MB_BUY_PATHS}
+            labels={{ reserve: "Reserve · $490 USD", look: "or start with the $190 USD 7-day look", io: "Send a brief" }}
+            reserveHref={RESERVE_HREF}
+            lookHref={lookHref("media_buyers_paths_look")}
+            testId="mb-buy-paths"
+          />
         </div>
       </Section>
 

@@ -35,6 +35,32 @@ export const MIX_ROWS: Array<{ key: string; channel: string; youBuyItFor: string
   },
 ];
 
+/**
+ * "Two ways to buy" for direct media buyers (daily scan Nov 25 2026). Same compare pattern as BUY_PATHS on /agencies,
+ * minus the agency-discount row (direct buyers pay the published rate card). Restates published terms only; no new
+ * price points (premium stays inquire-only on this page).
+ */
+export const MB_BUY_PATHS = {
+  card: {
+    key: "card",
+    kicker: "Card · self-serve",
+    price: "From $190 USD",
+    sub: "7-day look, or the $490 USD category reserve",
+  },
+  io: {
+    key: "io",
+    kicker: "Premium · insertion order (IO)",
+    price: "By inquiry",
+    sub: "Exclusivity and priority placement",
+  },
+  rows: [
+    { k: "Best for", card: "A first test, starting now", io: "Several hubs or a bigger test" },
+    { k: "Pay", card: "Card on a Stripe-hosted page, no login", io: "Rate, currency and term set on your IO" },
+    { k: "Before it runs", card: "You approve an IO naming the hub and placement", io: "Send the brief; we reply with hub fit and a draft IO" },
+    { k: "Refunds", card: "$490 refundable until 14 days before launch; $190 converts or is refunded", io: "Set on your IO before anything runs" },
+  ],
+} as const;
+
 /** How a test is read. Aggregate only; matches /agencies plain terms and /terms. */
 export const MEASUREMENT_STEPS: Array<{ k: string; t: string; d: string }> = [
   { k: "1", t: "Your UTM links", d: "Every placement carries the UTM parameters you send, so Birch traffic shows up as its own line in the analytics you already use." },
