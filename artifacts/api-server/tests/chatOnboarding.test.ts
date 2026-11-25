@@ -44,7 +44,7 @@ test("onboarding module carries every path, price, currency and term from the li
   for (const re of [
     /\/intake\b/, /\/intake\/supplier/, /\/buy\b/, /\/sponsor/, /\/exclusive/, /\/partners/, /\/terms/, /\/intake\/gtm/, /\/street-team/, /hub-alerts/, /ads\/specs/, /sample-io/,
     /\$190 USD/, /\$270 CAD/, /\$490 USD/, /\$690 CAD/, /\$1,500 USD \(\$2,100 CAD\)/, /\$3,000 USD \(\$4,200 CAD\)/, /\$6,000 USD \(\$8,400 CAD\)/, /\+5%/, /\+10%/, /\+15%/,
-    /\$1,900/, /25% below/, /Silver Birch Growth Inc\./, /intake\/activate/, /21 days/, /Step 2 of 2/, /30 days/, /14 days/, /60 days/, /IO before flight|IO|insertion order/, /aggregate only/i, /Calm Joints/, /door-to-door/, /signed partnership contracts/,
+    /\$1,900/, /25% below/, /Silver Birch Growth Inc\./, /intake\/activate/, /5\.4x/, /Step 2 of 2/, /30 days/, /14 days/, /60 days/, /IO before flight|IO|insertion order/, /aggregate only/i, /Calm Joints/, /door-to-door/, /signed partnership contracts/,
   ]) assert.match(m, re);
   assert.doesNotMatch(m, /STREET100|Align|Clairvoyant|Alset|MedVibe|pier39|Friday/i);
   assert.doesNotMatch(m, /\u2014|\u2013/);

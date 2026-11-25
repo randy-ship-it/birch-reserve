@@ -7,10 +7,9 @@ import type { ReactNode } from "react";
 import { Cta } from "./ui";
 import { InquireBadge } from "./quick-buy";
 import { priceFor, useCurrency } from "@/lib/currency";
-import { ArrowUpRight, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { skinText } from "@/lib/siteSkin";
 import { priceLadder } from "../../../../api-server/src/lib/priceLadder";
-import { TRACK_RECORD } from "../../../../api-server/src/lib/overhaul/trackRecord";
 import {
   AGENCY_CLIENT_TEST,
   AGENCY_DISCOUNT_EXAMPLE,
@@ -20,7 +19,6 @@ import {
   AGENCY_RATE_RULES,
   AGENCY_SHARE,
   AGENCY_TIERS,
-  EXCLUSIVE_CASE_STUDY_URL,
   EXCLUSIVE_PARTNER_PERKS,
   type AgencyTierKey,
   BRAND_BONUS_LINE,
@@ -539,47 +537,20 @@ export function AgencyTierCards({ reserveHref, buyHref, bidHref = "#talk", ioHre
   );
 }
 
-/** "What exclusive partners get" (Randy t8307u), with the nameless partner-launch example (Contract signed · Onboarding) linked to the live blurred case study. */
+/** "What exclusive partners get" (Randy t8307u). The prior example card is unlinked for now (Randy t552u). */
 export function ExclusivePerks() {
-  const ex = TRACK_RECORD.cards.find((c) => c.key === "partner-launch")!;
   return (
     <details open className="group rounded-2xl border-2 border-[#0b1f3a] bg-white" data-testid="exclusive-perks" id="exclusive-partners">
       <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-semibold text-[#0b1f3a] md:px-5 [&::-webkit-details-marker]:hidden">
         <span>* What exclusive partners get</span>
         <ChevronDown className="size-5 shrink-0 transition group-open:rotate-180" aria-hidden />
       </summary>
-      <div className="grid gap-5 border-t border-[#0b1f3a]/15 p-4 md:grid-cols-[1.1fr_0.9fr] md:p-5">
-        <ul className="space-y-2.5 text-sm text-foreground/80">
-          {EXCLUSIVE_PARTNER_PERKS.map((p) => (
-            <li key={p} className="flex gap-2"><span className="mt-1.5 size-2 shrink-0 rounded-full bg-lime-500" aria-hidden />{skinText(p)}</li>
-          ))}
-          <li className="pt-1 text-[12px] text-foreground/60">Partners buy at the same written 10% discount off the published rate card.</li>
-        </ul>
-        <div className="flex flex-col justify-between rounded-xl bg-[#0b1f3a] p-4 text-white" data-testid="exclusive-example">
-          <div>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-lime-300">Example · names withheld</p>
-              <span className="rounded-full bg-lime-300/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-lime-300" data-testid="exclusive-example-stage">
-                Contract signed · Onboarding
-              </span>
-            </div>
-            <p className="mt-2 font-display text-xl leading-snug">{ex.outcome}</p>
-            <p className="mt-2 text-[13px] text-white/80">{ex.detail}</p>
-          </div>
-          <div className="mt-4 space-y-3">
-            <a
-              href={EXCLUSIVE_CASE_STUDY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-testid="exclusive-example-link"
-              className="inline-flex items-center gap-1.5 rounded-full bg-lime-300 px-4 py-2 text-xs font-bold text-[#0b1f3a] transition hover:bg-white"
-            >
-              See the live case study <ArrowUpRight className="size-3.5" aria-hidden />
-            </a>
-            <p className="text-[11px] text-white/55">{skinText(TRACK_RECORD.note)}</p>
-          </div>
-        </div>
-      </div>
+      <ul className="space-y-2.5 border-t border-[#0b1f3a]/15 p-4 text-sm text-foreground/80 md:p-5">
+        {EXCLUSIVE_PARTNER_PERKS.map((p) => (
+          <li key={p} className="flex gap-2"><span className="mt-1.5 size-2 shrink-0 rounded-full bg-lime-500" aria-hidden />{skinText(p)}</li>
+        ))}
+        <li className="pt-1 text-[12px] text-foreground/60">Partners buy at the same written 10% discount off the published rate card.</li>
+      </ul>
     </details>
   );
 }
