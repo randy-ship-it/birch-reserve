@@ -55,8 +55,8 @@ export function PlainTerms() {
       {PLAIN_TERMS.map((t, i) => (
         <li key={t.key} className={`min-w-0 bg-background p-6 ${i === PLAIN_TERMS.length - 1 && PLAIN_TERMS.length % 2 ? "md:col-span-2" : ""}`}>
           <Kicker>{String(i + 1).padStart(2, "0")}</Kicker>
-          <h3 className="mt-2 font-display text-2xl leading-tight">{t.q}</h3>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t.a}</p>
+          <h3 className="mt-2 font-display text-2xl leading-tight">{skinText(t.q)}</h3>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{skinText(t.a)}</p>
         </li>
       ))}
     </ol>

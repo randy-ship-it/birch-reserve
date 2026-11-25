@@ -5,6 +5,7 @@ import { BuyPaths, InventorySpec, IoProcess } from "@/components/br/agency-showc
 import { MB_BUY_PATHS, MEASUREMENT_STEPS, MEDIA_BUYER_FAQ, MIX_ROWS } from "../../../../api-server/src/lib/overhaul/mediaBuyers";
 import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, Lede, Modelled, Section, usePageMeta } from "@/components/br/ui";
+import { siteName, skinText } from "@/lib/siteSkin";
 
 /**
  * /media-buyers (Nov 18 2026 preview): for teams already running display and paid-channel campaigns.
@@ -25,7 +26,7 @@ export default function BrMediaBuyers() {
             <Eyebrow>For media buyers &amp; performance marketers</Eyebrow>
             <H1>Add one first-party health channel to the display mix you already run.</H1>
             <Lede>
-              Your programmatic, retargeting and paid social stay as they are. Birch Reserve adds hand-placed display inside private health and wellness hubs, on the pages members use right after they buy or book, and when they log back in. It runs as its own line item, tagged with your UTM links and promo codes.
+              Your programmatic, retargeting and paid social stay as they are. {siteName()} adds hand-placed display inside private health and wellness hubs, on the pages members use right after they buy or book, and when they log back in. It runs as its own line item, tagged with your UTM links and promo codes.
             </Lede>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta href={lookHref("media_buyers_look")} variant="ink" testId="mb-cta-look">Start a test · $190 USD 7-day look</Cta>
@@ -58,14 +59,14 @@ export default function BrMediaBuyers() {
       <Section tone="soft" id="display-mix">
         <Eyebrow>Add to your display mix</Eyebrow>
         <H2>Where it sits next to what you already buy.</H2>
-        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">Keep every channel you run today. Birch is one more source, read on its own line in your reporting.</p>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">{skinText("Keep every channel you run today. Birch is one more source, read on its own line in your reporting.")}</p>
         <div className="mt-8 grid gap-px border border-foreground/15 bg-foreground/15 md:grid-cols-2" data-testid="mb-mix">
           {MIX_ROWS.map((r) => (
             <article key={r.key} className="bg-background p-6" data-testid={`mb-mix-${r.key}`}>
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">You already run</p>
               <h3 className="mt-1 font-display text-2xl leading-tight">{r.channel}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{r.youBuyItFor}</p>
-              <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Birch adds</p>
+              <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">{skinText("Birch adds")}</p>
               <p className="mt-1 text-sm leading-relaxed text-foreground/85">{r.birchAdds}</p>
             </article>
           ))}
@@ -78,7 +79,7 @@ export default function BrMediaBuyers() {
             <Eyebrow>How measurement works</Eyebrow>
             <H2>Read it in the analytics you already use.</H2>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              No new dashboard to trust. Birch traffic arrives on your UTM links, and redemptions arrive on your promo codes. Our report adds views and clicks per hub and surface.
+              {skinText("No new dashboard to trust. Birch traffic arrives on your UTM links, and redemptions arrive on your promo codes. Our report adds views and clicks per hub and surface.")}
             </p>
             <p className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground" data-testid="mb-modelled-note">
               <Modelled /> Pre-launch view figures are modelled estimates, not measured delivery or a guarantee. No impression guarantees.
@@ -89,7 +90,7 @@ export default function BrMediaBuyers() {
               <li key={s.k} className="bg-background p-5">
                 <p className="font-display text-3xl leading-none text-foreground/35">{s.k}</p>
                 <h3 className="mt-2 font-display text-xl leading-tight">{s.t}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.d}</p>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{skinText(s.d)}</p>
               </li>
             ))}
           </ol>
@@ -158,7 +159,7 @@ export default function BrMediaBuyers() {
 
       <Section tone="soft">
         {/* FAQPage JSON-LD for /media-buyers is emitted once, server-side (seo.ts). */}
-        <Faq items={MEDIA_BUYER_FAQ} schema={false} />
+        <Faq items={MEDIA_BUYER_FAQ.map((f) => ({ q: skinText(f.q), a: skinText(f.a) }))} schema={false} />
       </Section>
     </div>
   );
