@@ -16,7 +16,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "wouter";
 import { ArrowRight, Check, ChevronDown, Loader2, ShieldAlert, Store, Package, Plus, Rocket } from "lucide-react";
 import type { IntakeRole } from "../../../../api-server/src/lib/overhaul/brandIntake";
-import { AGENCY_PARTNER_QUESTION, RETAIL_COPY, RETAIL_TAG } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { RETAIL_COPY, RETAIL_TAG } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { FRIDAY_CATEGORIES } from "../../../../api-server/src/lib/kitCalc/fridayV12";
 import { HELD_COPY, PARTIAL_EMAIL_RE, adapterMode, fridayIntake, reportPath, saveRef, type IntakeRef } from "@/lib/fridayBrandIntake";
 import { basePayload } from "@/components/br/intake-kit";
@@ -109,6 +109,20 @@ function AccelerateToggle({ on, onClick }: { on: boolean; onClick: () => void })
         <span className={`mt-0.5 block text-[12px] leading-snug ${on ? "text-[#0b1f3a]/80" : "text-white/75"}`}>Add premium display placements to speed up exposure.</span>
       </span>
       <span aria-hidden data-static-toggle className={`inline-flex h-6 shrink-0 items-center rounded-full px-2.5 text-[10px] font-bold uppercase tracking-wider ${on ? "bg-[#0b1f3a] text-lime-300" : "bg-white/25 text-white/80"}`}>{on ? "On" : "Off"}</span>
+    </button>
+  );
+}
+
+
+/** Optional agency-partner intros: same On/Off pill as Accelerate, restyled for the light form surface (Randy, Nov 24 2026). */
+function AgencyPartnerToggle({ on, onClick }: { on: boolean; onClick: () => void }) {
+  return (
+    <button type="button" role="switch" aria-checked={on} onClick={onClick} data-testid="intake-agency-partner" className={`mt-4 flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${on ? "bg-lime-300 text-[#0b1f3a]" : "bg-foreground/[0.03] text-[#0b1f3a] hover:bg-foreground/[0.06]"}`}>
+      <span className="min-w-0 flex-1">
+        <span className="text-sm font-bold">Want intros to our agency partners?</span>
+        <span className={`mt-0.5 block text-[12px] leading-snug ${on ? "text-[#0b1f3a]/80" : "text-foreground/60"}`}>Creative, new distribution channels, full-service ad buying, and end-to-end campaign management.</span>
+      </span>
+      <span aria-hidden data-static-toggle className={`inline-flex h-6 shrink-0 items-center rounded-full px-2.5 text-[10px] font-bold uppercase tracking-wider ${on ? "bg-[#0b1f3a] text-lime-300" : "bg-foreground/15 text-foreground/70"}`}>{on ? "On" : "Off"}</span>
     </button>
   );
 }
@@ -390,10 +404,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
         </div>
       ) : null}
 
-      <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-3 text-sm leading-snug text-[#0b1f3a]" data-testid="intake-agency-partner">
-        <input type="checkbox" checked={agencyPartner} onChange={(e) => setAgencyPartner(e.target.checked)} data-testid="intake-agency-partner-checkbox" className="mt-0.5 size-4 shrink-0 accent-[#0b1f3a]" />
-        <span>{AGENCY_PARTNER_QUESTION}</span>
-      </label>
+      <AgencyPartnerToggle on={agencyPartner} onClick={() => setAgencyPartner((v) => !v)} />
 
       <div className="mt-4 border-t border-foreground/10 pt-3 text-[13px]" data-testid="intake-secondary">
         <a href="/intake/sponsor" className="text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-sponsor-link">Want to own a category or an area? See category and area locks</a>
