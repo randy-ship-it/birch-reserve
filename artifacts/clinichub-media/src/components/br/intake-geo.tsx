@@ -42,7 +42,7 @@ export function MarketPicker({ value, onChange, side = "advertiser", compact = f
         </label>
       ) : null}
       {side === "advertiser" && !shipsSame ? <div className="mt-2"><span className="block text-[11px] font-bold uppercase tracking-wider text-foreground/60">Ships to</span><div className="mt-1">{chips(value.ships_to, (c) => onChange({ ...value, ships_to: c }), "market-ships")}</div></div> : null}
-      <input data-testid="market-regions" value={regionsText} onChange={(e) => { setRegionsText(e.target.value); onChange({ ...value, regions: parseRegions(e.target.value) }); }} onFocus={() => trackIntake(side, "field_start", "regions", { dedupe: true })} placeholder="Provinces / states, optional (e.g. ON, BC, NY)" aria-label="Provinces or states, optional" className="mt-2 h-10 w-full rounded-xl border border-foreground/20 bg-white px-3 text-sm outline-none focus:border-foreground" />
+      <input data-testid="market-regions" value={regionsText} onChange={(e) => { setRegionsText(e.target.value); onChange({ ...value, regions: parseRegions(e.target.value) }); }} onFocus={() => trackIntake(side, "field_start", "regions", { dedupe: true })} placeholder="Provinces / states (optional)" aria-label="Provinces or states, optional" className="mt-2 h-10 w-full rounded-xl border border-foreground/20 bg-white px-3 text-sm outline-none focus:border-foreground" />
     </div>
   );
 }
