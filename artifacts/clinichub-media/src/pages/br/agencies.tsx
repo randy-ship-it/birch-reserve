@@ -71,7 +71,7 @@ export default function BrAgencies() {
             <Eyebrow>For agencies &amp; media buyers</Eyebrow>
             <H1>Reach health and wellness customers right after they buy.</H1>
             <Lede>
-              Display inside private, members-only health and wellness hubs: the post-purchase page, the hub home, product and booking pages, and the member dashboard. First-party, brand-safe, tracked on your UTMs. Agencies earn the standard 15% commission off a public rate card. We do not undercut an agency&apos;s client.
+              Display in post-purchase moments and inside health and wellness member hubs: the post-purchase page, the hub home, product and booking pages, and the member dashboard. First-party, brand-safe, tracked on your UTMs. Agencies earn the standard 15% commission off a public rate card. We do not undercut an agency&apos;s client.
             </Lede>
             <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
               <Cta href="#talk" testId="agency-cta-io">Book a starter block</Cta>
@@ -93,7 +93,7 @@ export default function BrAgencies() {
             { k: "Where ads run", d: "Post-purchase, hub home, product and booking pages, member dashboard." },
             { k: "Live hubs", d: INVENTORY.line },
             { k: "Measurement", d: "Your UTM links and promo codes. Views and clicks per hub and surface, aggregate only." },
-            { k: "Brand safety", d: "Private, members-only hubs. No open web. Nothing runs before you approve the IO." },
+            { k: "Brand safety", d: "Post-purchase pages and member hubs. No open web. Nothing runs before you approve the IO." },
           ].map((p) => (
             <div key={p.k} className="bg-background p-5">
               <dt className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/55">{p.k}</dt>

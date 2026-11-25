@@ -33,8 +33,8 @@ const PLACEMENTS = ["After purchase", "Hub home", "Products & services", "Member
 /** One plain definition of a hub, per skin. Used by the hero subhead and the explainer. */
 export const hubDefinition = (): string =>
   isScaleSkin()
-    ? "Scale Health hubs are private, members-only pages inside a brand, clinic or retailer, where its own customers land right after they buy or book. Your ad shows there."
-    : "A hub is a private, members-only page inside a brand, clinic or retailer, where its own customers land right after they buy or book. Your ad shows there.";
+    ? "Scale Health hubs are pages inside a brand, clinic or retailer, where its own customers land right after they buy or book. Your ad shows in those post-purchase moments and inside the member hub."
+    : "A hub is a page inside a brand, clinic or retailer, where its own customers land right after they buy or book. Your ad shows in those post-purchase moments and inside the member hub.";
 
 /** Where the hubs live, said once in plain words (an outsider has never heard of ScaleHealth.ca). */
 export const hubHostLine = (): string =>
@@ -91,7 +91,7 @@ export function WhatYoureBuying({ testId = "what-youre-buying" }: { testId?: str
         <div className="min-w-0">
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">The main buy · Private display network</p>
           <p className="mt-2 font-display text-2xl leading-tight md:text-3xl">Your ad inside brand hubs</p>
-          <p className="mt-1.5 text-sm leading-snug text-white/75">Private, members-only pages that brands, clinics and retailers give their own customers. Your card shows on four spots in each hub.</p>
+          <p className="mt-1.5 text-sm leading-snug text-white/75">Post-purchase pages and member hubs that brands, clinics and retailers give their own customers. Your card shows on four spots in each hub.</p>
           <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Placements in each hub">
             {PLACEMENTS.map((p) => (
               <li key={p} className="rounded-full bg-white/10 px-2.5 py-1 text-[12px] font-semibold text-white ring-1 ring-white/15">{p}</li>

@@ -66,7 +66,7 @@ export function twoSurfaceExample(creditUsd: number) {
 
 /** Live-hub mock with numbered pins (DR-HO'S physio or SOLE, the two live hubs). Legend lives in an expander. */
 /** Audit #3 (Randy, Nov 20 2026): always-visible badge + pin legend + DR-HO'S/SOLE toggle. */
-export const MOCK_PINS = ["Your ad card, approved by a person", "Live members-only hub", "Clicks to your site, UTM-tagged"] as const;
+export const MOCK_PINS = ["Your ad card, approved by a person", "Live member hub", "Clicks to your site, UTM-tagged"] as const;
 export function mockBadge(hub: HubKey): string {
   return mockBadgeFor(hub);
 }
@@ -204,7 +204,7 @@ export function DepositMock({ hub = "sole" }: { hub?: HubKey }) {
     <figure className="w-full max-w-[300px] shrink-0" data-testid="deposit-mock">
       <span className="mb-1.5 inline-block rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A5A00]">Illustrative mock</span>
       <HubMock brand="" logo={null} hub={hub} category="Your category" pins badge="Illustrative mock" />
-      <figcaption className="mt-1.5 text-[11px] leading-snug text-white/70">Sample card on the live {HUB_MOCKS[hub].name} hub: <b className="text-lime-300">1</b> your card, approved by a person · <b className="text-lime-300">2</b> members-only hub · <b className="text-lime-300">3</b> UTM-tagged click to your site.</figcaption>
+      <figcaption className="mt-1.5 text-[11px] leading-snug text-white/70">Sample card on the live {HUB_MOCKS[hub].name} hub: <b className="text-lime-300">1</b> your card, approved by a person · <b className="text-lime-300">2</b> member hub · <b className="text-lime-300">3</b> UTM-tagged click to your site.</figcaption>
     </figure>
   );
 }
