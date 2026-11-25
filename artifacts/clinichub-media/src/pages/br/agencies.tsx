@@ -76,10 +76,10 @@ export default function BrAgencies() {
               <a href="#model" className="text-sm font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="agency-cta-model">See how it works</a>
             </div>
           </div>
-          <ul className="border-t border-[#0b1f3a]/15 lg:mt-2" data-testid="agency-benefits" aria-label="Why agencies use Birch">
+          <ul className="border-t border-[#0b1f3a]/15 lg:mt-2" data-testid="agency-benefits" aria-label={skinText("Why agencies use Birch")}>
             {AGENCY_BENEFITS.map((b) => (
               <li key={b.t} className="border-b border-[#0b1f3a]/15 py-4">
-                <p className="font-display text-xl leading-tight text-[#0b1f3a]">{b.t}</p>
+                <p className="font-display text-xl leading-tight text-[#0b1f3a]">{skinText(b.t)}</p>
                 <p className="mt-1 text-[13px] leading-snug text-foreground/60">{b.d}</p>
               </li>
             ))}
@@ -169,7 +169,7 @@ export default function BrAgencies() {
       </Section>
       <Section>
         {/* FAQPage JSON-LD for /agencies is emitted once, server-side (seo.ts), with the plain-terms answers. */}
-        <Faq items={AGENCY_FAQ} schema={false} />
+        <Faq items={AGENCY_FAQ.map((f) => ({ q: skinText(f.q), a: skinText(f.a) }))} schema={false} />
       </Section>
       {/* The free-kit strip stays on every buyer page, moved to the end so the hero keeps one CTA. */}
       <KitEntry from="agencies" />
