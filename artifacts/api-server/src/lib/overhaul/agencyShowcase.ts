@@ -161,7 +161,7 @@ export const AGENCY_FAQ: Array<{ q: string; a: string }> = [
   { q: "Is there an agency discount?", a: "Yes. Agencies, brokers and media resellers buy at a standard written 10% discount off the published rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. Small tests can start self-serve on the $190 USD look or the $490 USD reserve." },
   { q: "Which placement fits which goal?", a: "Awareness: the hub home page. Consideration: product, services and booking pages. Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Retention and loyalty: the member dashboard behind login. One IO can mix them." },
   { q: "How is performance tracked?", a: "Every placement carries your UTM parameters and, if you want, a promo code. We report views and clicks per hub and surface. Aggregate only." },
-  { q: "What is reserved partner inventory?", a: "A limited set-aside of exclusive packages and newly activating hubs, for a few agencies. Partners buy at the same written 10% discount off the rate card, and get first look as new hubs activate. Send a note on the agency form if that is useful." },
+  { q: "What is reserved partner inventory?", a: "A limited set-aside of exclusive packages and newly activating hubs, for a few agencies. Partners who commit to inventory get 10–20% better value than regular agency buyers, who buy at 10% off the rate card. Committed volume or term sets the exact rate. Partners also get first look as new hubs activate. Send a note on the agency form if that is useful." },
   { q: "Do brokers and media resellers qualify?", a: "Yes. When you are the agency of record on the insertion order, you buy at the same written 10% discount as an agency. You set your own resale price and handle your own client disclosure. List every brand you represent in one inquiry; each gets its own IO and reporting." },
   { q: "Why lock a test now?", a: "New placements open at starter rates, and a placement's rate can step up only once reporting shows it performs. Prepaid credit keeps its rate for its term, and the $490 USD reserve stays fully refundable until 14 days before the launch date on the IO." },
   { q: "Can our bots read this site?", a: "Yes: see /llms.txt, /sitemap.xml and the structured data on each page." },
@@ -227,6 +227,7 @@ export const AGENCY_RATE_RULES: ReadonlyArray<{ k: string; d: string }> = [
   { k: "You disclose to your client", d: "Client disclosure sits with you. We do not brief your client on what you paid." },
   { k: "Direct buyers pay the card", d: "A brand buying for itself pays the published rate card. No agency discount." },
   { k: "No undercutting agency clients", d: "If you are the agency of record on an insertion order, we will not sell that client the same inventory cheaper behind you." },
+  { k: "Committed partner inventory", d: "Trusted Agency Partners who commit to inventory get 10–20% better value than regular agency pricing. Committed volume or term sets the exact rate." },
 ];
 
 /** $10,000 USD worked example. Planning illustration only, not a quote. */
@@ -239,12 +240,35 @@ export const AGENCY_DISCOUNT_EXAMPLE = {
 } as const;
 
 /**
- * How the same published rate card is bought (Randy, Nov 24 2026): direct buyers pay the card;
- * agencies and Trusted Agency Partners buy at the standard written 10% discount. Partners also
- * get first look at reserved inventory. No deeper discount, no cash commission on this path,
- * no GTM or field-sales perk. The list-price ladder (look, reserve, exclusive reserve) is unchanged.
+ * Committed partner inventory (Randy, Nov 25 2026 t570u): Trusted Agency Partners who commit
+ * to inventory get 10–20% better value than regular agency buyers (who buy at the written 10%
+ * off the published rate card). Exact rate is set by committed volume or term. Range, not a
+ * guarantee. The list-price ladder is unchanged.
  */
-export const EXCLUSIVE_PARTNER_DISCOUNT = { lo: AGENCY_DISCOUNT_PCT, hi: AGENCY_DISCOUNT_PCT } as const;
+export const PARTNER_VALUE_VS_AGENCY_PCT = { lo: 10, hi: 20 } as const;
+/** Percent better than regular agency pricing (not percent off the rate card). */
+export const EXCLUSIVE_PARTNER_DISCOUNT = PARTNER_VALUE_VS_AGENCY_PCT;
+
+export const PARTNER_VALUE = {
+  pay: `${PARTNER_VALUE_VS_AGENCY_PCT.lo}–${PARTNER_VALUE_VS_AGENCY_PCT.hi}% better than agency pricing`,
+  line: `${PARTNER_VALUE_VS_AGENCY_PCT.lo}–${PARTNER_VALUE_VS_AGENCY_PCT.hi}% better value than regular agency buyers, by committing to inventory.`,
+  fine: "Committed volume or term sets the exact rate.",
+} as const;
+
+const agencyPaysOn = (list: number) => list * (1 - AGENCY_DISCOUNT_PCT / 100);
+const partnerPaysOn = (list: number, betterPct: number) => agencyPaysOn(list) * (1 - betterPct / 100);
+
+/** Illustrative $10,000 USD rate-card buy. 10–20% better than the $9,000 agency price is $8,100–$7,200. */
+export const BUYER_VALUE_EXAMPLE = {
+  list: 10_000,
+  direct: 10_000,
+  agency: agencyPaysOn(10_000),
+  partnerLo: partnerPaysOn(10_000, PARTNER_VALUE_VS_AGENCY_PCT.hi),
+  partnerHi: partnerPaysOn(10_000, PARTNER_VALUE_VS_AGENCY_PCT.lo),
+  label: "Illustrative example",
+  brief: "A $10,000 USD rate-card buy.",
+  note: "Illustrative example, modelled. Not a quote. Committed volume or term sets the exact rate.",
+} as const;
 
 export type AgencyTierKey = "direct" | "agency" | "exclusive";
 export const AGENCY_TIERS: ReadonlyArray<{
@@ -261,13 +285,13 @@ export const AGENCY_TIERS: ReadonlyArray<{
     key: "exclusive",
     name: "Trusted Agency Partners",
     who: "Agencies with reserved access to exclusive packages and newly activating hubs.",
-    pay: `${AGENCY_DISCOUNT_PCT}% off the published rate card`,
-    keep: "First look as new hubs activate",
+    pay: PARTNER_VALUE.pay,
+    keep: "By committing to inventory",
     badge: "First look",
   },
 ];
 
-/** Access perks for Trusted Agency Partners. Same 10% discount as every agency. */
+/** Access perks for Trusted Agency Partners. The 10–20% better value is stated in PARTNER_VALUE. */
 export const EXCLUSIVE_PARTNER_PERKS = [
   "First look at new exclusive packages and hubs before they open publicly.",
   "Reserved access to exclusive packages and newly activating hubs.",

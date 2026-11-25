@@ -3,14 +3,15 @@
  * page to pop"; aligned to the /agencies rate-card model later the same day).
  * Same terms as /agencies, from shared constants: published rate card, standard written 10%
  * agency discount, agency sets resale, agency handles disclosure, direct buyers pay the card,
- * no undercutting of agency clients. Reserved inventory is first look, not a deeper discount.
+ * no undercutting of agency clients. Committed partner inventory is 10–20% better value than
+ * regular agency pricing; volume or term sets the exact rate.
  * No GTM or services promise; no counts; soft CTA to /agencies#talk, never a call push.
  */
 import { ArrowRight, Check } from "lucide-react";
 import { trackAttn } from "@/lib/attention";
 import { siteName } from "@/lib/siteSkin";
 import { ListPriceLine } from "@/components/br/agency-showcase";
-import { AGENCY_DISCOUNT_PCT, AGENCY_RATE_CARD, AGENCY_TIERS } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
+import { AGENCY_RATE_CARD, AGENCY_TIERS, PARTNER_VALUE, PARTNER_VALUE_VS_AGENCY_PCT } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 
 const PARTNER = AGENCY_TIERS.find((t) => t.key === "exclusive")!;
 
@@ -78,10 +79,10 @@ export function TrustedAgencyPartners() {
             <h3 className="mt-4 font-display text-2xl leading-tight sm:text-3xl md:text-4xl">What a partner <em className="italic">gets.</em></h3>
             <dl className="mt-6 border-t border-background/30">
               <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 border-b border-background/15 py-4">
-                <dt className="whitespace-nowrap font-display text-5xl leading-none tracking-tight sm:text-6xl text-accent">{AGENCY_DISCOUNT_PCT}%</dt>
+                <dt className="whitespace-nowrap font-display text-5xl leading-none tracking-tight sm:text-6xl text-accent">{PARTNER_VALUE_VS_AGENCY_PCT.lo}–{PARTNER_VALUE_VS_AGENCY_PCT.hi}%</dt>
                 <dd className="text-sm leading-snug text-background/70">
-                  <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">Written discount</span>
-                  Off the published rate card
+                  <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">Better value</span>
+                  Than regular agency pricing, by committing to inventory
                 </dd>
               </div>
             </dl>
@@ -94,7 +95,7 @@ export function TrustedAgencyPartners() {
               ))}
             </ul>
             <p className="mt-4 text-[12px] leading-snug text-background/60" data-testid="tap-economics-note">
-              The same written 10% for every agency, including partners. First look is reserved access, not a deeper discount. Nothing runs until an insertion order names the placement.
+              {PARTNER_VALUE.line} {PARTNER_VALUE.fine} Regular agencies still buy at the written 10% off the rate card. Nothing runs until an insertion order names the placement.
             </p>
           </div>
         </div>
