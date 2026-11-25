@@ -267,7 +267,7 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.match(ui, /aria-label=\{skinText\("One tank of hub inventory with three outlets: direct buyers, agencies and Trusted Agency Partners"\)\}/);
   assert.match(ui, /skinText\(t\.name\)/);
   assert.match(ui, /<BuyerValueCompare \/>/);
-  assert.match(ui, /data-testid="buyer-value-compare"/);
+  assert.match(ui, /data-testid="buyer-value-compare" data-currency-fixed/);
   assert.match(ui, /data-testid="lane-partner"/);
   // List price lives under the canister only, not again under the rate card.
   assert.equal((ui.match(/<ListPriceLine \/>/g) ?? []).length, 1);
@@ -332,6 +332,6 @@ test("Nov 25 (Randy t570u): committed partners get 10–20% better value than ag
   assert.doesNotMatch(partnerSurfaces, /same 10%|same written 10%/);
   assert.doesNotMatch(JSON.stringify({ AGENCY_TIERS, PARTNER_VALUE, BUYER_VALUE_EXAMPLE }) + partnerFaq, /guarantee/i);
   assert.doesNotMatch(ui, /same 10%|same written 10%/);
-  assert.match(ui, /data-testid="buyer-value-compare"/);
+  assert.match(ui, /data-testid="buyer-value-compare" data-currency-fixed/);
   assert.match(ui + page + tap, /10–20% better/);
 });
