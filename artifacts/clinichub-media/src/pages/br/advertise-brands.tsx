@@ -1,36 +1,41 @@
-import { ladderLine, liveLine } from "../../../../api-server/src/lib/hubLadder";
-import { MetaComparison, SurfacesGrid, TamStrip } from "@/components/br/blocks";
-import { BrandBanners } from "@/components/br/brand-banners";
-import { RateCard } from "@/components/br/rate-card";
+import { MetaComparison, SurfacesGrid } from "@/components/br/blocks";
+import { BrandsAccessCta, BrandsAccessGate, PublicBrandTotals } from "@/components/br/brands-gate";
 import { StarterOffers } from "@/components/br/starter-offers";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
 
 const FAQ = [
   { q: "What do I buy?", a: "Start with a $190 USD 7-day category look or a $490 USD category reserve. Your payment is media credit. We send an insertion order naming the hub and placements, and nothing runs until you approve it." },
-  { q: "Which hubs are live?", a: `${ladderLine()} Placements are curated as each one goes live.` },
+  { q: "Which hubs are live?", a: "Hubs are live now, and more are activating. Placements are curated as each one goes live. The named list and per-hub volumes are available with an access code on this page." },
   { q: "Can I own a category?", a: "Premium slots add exclusivity and priority placement, by inquiry only. See the media kit or ask us and we'll quote it against the hubs you want." },
   { q: "How is it reported?", a: "Aggregate only: views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. No patient data and no clinical pixels." },
 ];
 
+const META_DESC = "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. 700MM+ captive page views activating, based on signed partnership contracts.";
+
 export default function BrAdvertiseBrands() {
-  usePageMeta("Advertise to brands | Birch Reserve", "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. " + liveLine());
+  usePageMeta("Advertise to brands | Birch Reserve", META_DESC);
   return (
     <div data-testid="br-advertise-brands">
       <JsonLd data={{ "@context": "https://schema.org", "@type": "OfferCatalog", name: "Birch Reserve self-serve offers", itemListElement: [{ "@type": "Offer", name: "7-day category look", sku: "hold-190", price: 190, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=hold-190" }, { "@type": "Offer", name: "Category reserve", sku: "reserve-490", price: 490, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=reserve-490" }] }} />
       <Section>
-        <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div>
-            <Eyebrow>Advertise · Brands</Eyebrow>
-            <H1>Put your brand inside private health and wellness hubs.</H1>
-            <Lede>Your ad runs on the pages members use right after they buy or book, and when they log back in. {liveLine()} More hubs are launching. Start for $190 USD or $490 USD.</Lede>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Cta href="#slots">See the two offers</Cta>
-              <Cta href="/match" variant="line">Match my audience</Cta>
-            </div>
-          </div>
-          <div className="border border-foreground/15 bg-white p-6">
-            <TamStrip compact />
-          </div>
+        <Eyebrow>Advertise · Brands</Eyebrow>
+        <H1>Put your brand inside private health and wellness hubs.</H1>
+        <Lede>Your ad runs on the pages members use right after they buy or book, and when they log back in. Hubs are live now, with more activating. Start for $190 USD or $490 USD.</Lede>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Cta href="#slots">See the two offers</Cta>
+          <Cta href="/match" variant="line">Match my audience</Cta>
+        </div>
+        <div className="mt-12 border border-foreground/15 bg-white p-6 md:p-10">
+          <PublicBrandTotals />
+        </div>
+      </Section>
+
+      <Section id="list">
+        <Eyebrow>Brand list</Eyebrow>
+        <H2>Names and per-hub volumes, with an access code.</H2>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">The public page shows combined totals only. Enter the access code to see the full brand list and modelled volumes per hub.</p>
+        <div className="mt-8">
+          <BrandsAccessGate />
         </div>
       </Section>
 
@@ -48,19 +53,7 @@ export default function BrAdvertiseBrands() {
         <div className="mt-10">
           <SurfacesGrid />
         </div>
-      </Section>
-
-      <Section tone="soft">
-        <Eyebrow>Rate card</Eyebrow>
-        <H2>Per hub, per month.</H2>
-        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">Starting-at rates, the same ones as the <a href="/rates" className="underline underline-offset-2">five-surface rate card</a>. Illustrative estimates, not a quote.</p>
-        <div className="mt-8">
-          <RateCard currency="usd" />
-        </div>
-      </Section>
-
-      <Section>
-        <BrandBanners title="Brand hubs listed with Scale (live and activating)" />
+        <BrandsAccessCta />
       </Section>
 
       <Section tone="soft">

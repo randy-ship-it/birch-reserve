@@ -6,6 +6,8 @@
  *  GET  /v1/area/quote       lock-down-my-area quote (modelled)
  *  POST /v1/area/checkout    Stripe Checkout (gated: AREA_LOCK_ENABLED / AREA_LOCK_LIVE)
  *  POST /v1/leads            email gate + publisher / agency inquiries -> Friday
+ *  POST /v1/advertise/brands-access  access-code gate for brand list + per-hub volumes
+ *  GET  /v1/advertise/brands-access  same payload with a signed token
  *  GET  /v1/overhaul/status  which checkouts are open (no secrets)
  */
 import { CALLBACK_KEY_HEADER, callbackKeyOk } from "../lib/callbackKey";
@@ -26,6 +28,7 @@ import { upsertLeadSafe } from "../lib/leads";
 import { queueFridayPush } from "../lib/fridayPush";
 import { ACT_OPENNESS, ACT_ROLES, activationMeta, activationSummary, parseActivation } from "../lib/overhaul/adActivation";
 import { createHash } from "node:crypto";
+import { buildBrandsAccessPayload, codeMatches, signBrandsAccessToken, verifyBrandsAccessToken } from "../lib/overhaul/brandsAccess";
 
 export type CreateSession = (params: Record<string, unknown>) => Promise<{ url: string | null; livemode: boolean }>;
 
@@ -502,6 +505,50 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
       return;
     }
     res.json({ ok: true, alert: alert.status, category: label });
+  });
+
+
+  const brandsAccessHeaders = (res: Response) => {
+    res.set("Cache-Control", "no-store");
+    res.set("Pragma", "no-cache");
+    res.set("X-Robots-Tag", "noindex, nofollow");
+  };
+
+  const sendBrandsAccess = (res: Response, token: string) => {
+    brandsAccessHeaders(res);
+    res.json(buildBrandsAccessPayload(token));
+  };
+
+  router.post("/v1/advertise/brands-access", json, (req: Request, res: Response) => {
+    if (limited(req, 8)) {
+      brandsAccessHeaders(res);
+      res.status(429).json({ error: "Too many tries in a minute. Try again shortly." });
+      return;
+    }
+    const body = (req.body ?? {}) as Record<string, unknown>;
+    const code = str(body.code, 80);
+    if (!code) {
+      brandsAccessHeaders(res);
+      res.status(400).json({ error: "Enter the access code." });
+      return;
+    }
+    if (!codeMatches(code)) {
+      brandsAccessHeaders(res);
+      res.status(401).json({ error: "That code didn't match." });
+      return;
+    }
+    sendBrandsAccess(res, signBrandsAccessToken());
+  });
+
+  router.get("/v1/advertise/brands-access", (req: Request, res: Response) => {
+    const header = String(req.headers.authorization ?? "");
+    const token = header.toLowerCase().startsWith("bearer ") ? header.slice(7).trim() : "";
+    if (!verifyBrandsAccessToken(token)) {
+      brandsAccessHeaders(res);
+      res.status(401).json({ error: "Unlock this list with the access code." });
+      return;
+    }
+    sendBrandsAccess(res, token);
   });
 
   return router;
