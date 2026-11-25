@@ -34,6 +34,7 @@ import { FRIENDLY_429, limiter } from "../lib/rateLimit";
 import { isIP } from "node:net";
 import { visitorDayHash } from "../lib/siteAnalytics";
 import { FRIDAY_CATEGORIES, toV1Body } from "../lib/kitCalc/fridayV12";
+import { agencyPartnerBlurb } from "../lib/overhaul/brandIntake";
 import { NEVER_HUB_NAME } from "../lib/overhaul/hubNameFilter";
 
 type Env = NodeJS.ProcessEnv;
@@ -139,12 +140,17 @@ export function prepareStage(body: unknown): { body: Record<string, unknown>; st
   const src = typeof b.src === "string" && SRC_RE.test(b.src) ? b.src : null;
   const ref = typeof b.ref === "string" && SRC_RE.test(b.ref) ? b.ref : null;
   const hub = hubRequestOf(b.hub_request);
+  const agency = agencyPartnerInterestOf(b);
   delete b.stage;
   delete b.from_partial;
   delete b.src;
   delete b.ref;
   delete b.hub_request;
+  delete b.agency_partner_interest; // Friday v1 is strict; keep the labelled blurb line only
   if (hub && !(typeof b.blurb === "string" && b.blurb.includes(HUB_PENDING_TAG))) b.blurb = [hubPendingLine(hub), typeof b.blurb === "string" ? b.blurb : ""].filter(Boolean).join("\n").slice(0, 6000);
+  if (agency !== null && !(typeof b.blurb === "string" && /Agency partner interest:/i.test(b.blurb))) {
+    b.blurb = [agencyPartnerBlurb(agency), typeof b.blurb === "string" ? b.blurb : ""].filter(Boolean).join("\n").slice(0, 6000);
+  }
   if (stage === "partial") {
     if (!legacyIntakeAllowed({ ...b, submit: true })) return { body: b, stage, src, ref, error: "partial_needs_email" };
     delete b.submit;
@@ -182,6 +188,7 @@ function legacyLead(body: Record<string, unknown>, path: string) {
       avg_cart_usd: typeof calc.avg_cart_usd === "number" ? calc.avg_cart_usd : undefined,
       orders_per_month: typeof calc.orders_per_month === "number" ? calc.orders_per_month : undefined,
       margin_band: typeof calc.margin_band === "string" ? calc.margin_band : undefined,
+      ...(agencyPartnerInterestOf(body) !== null ? { agency_partner_interest: agencyPartnerInterestOf(body)! } : {}),
     },
   };
 }
@@ -252,7 +259,17 @@ export function publicGates(text: string): string {
   return JSON.stringify(root);
 }
 
-export type IntakeLeadEvent = { fridayId: string | null; email: string; website: string | null; stage: "partial" | "submitted"; roles: string[]; path: string; /** Supplier hub request: always pending_approval until Randy or Jon approve. */ hub?: { hub_status: "pending_approval"; hub_slug?: string } | null };
+export type IntakeLeadEvent = { fridayId: string | null; email: string; website: string | null; stage: "partial" | "submitted"; roles: string[]; path: string; /** Supplier hub request: always pending_approval until Randy or Jon approve. */ hub?: { hub_status: "pending_approval"; hub_slug?: string } | null; agency_partner_interest?: boolean | null };
+
+
+/** Read the optional agency-partner checkbox from the Birch-only boolean or the labelled v1 blurb line. */
+export function agencyPartnerInterestOf(body: Record<string, unknown>): boolean | null {
+  if (typeof body.agency_partner_interest === "boolean") return body.agency_partner_interest;
+  const blurb = typeof body.blurb === "string" ? body.blurb : "";
+  if (/Agency partner interest:\s*yes\./i.test(blurb)) return true;
+  if (/Agency partner interest:\s*no\./i.test(blurb)) return false;
+  return null;
+}
 
 /** Sales alerts for kit intake go only to randy@scalehealth.ca (care@ is the Resend sender). Never SBG addresses. */
 export const KIT_INTAKE_ALERT_TO = ["randy@scalehealth.ca"] as const;
@@ -312,6 +329,7 @@ export function kitIntakeAlert(input: {
       ["Email", email],
       ["Website", website],
       ["Roles", roles],
+      ...((() => { const v = agencyPartnerInterestOf(b); return v === null ? [] : [["Agency partner interest", v ? "Yes" : "No"] as [string, string]]; })()),
       ["Friday id", input.fridayId || ""],
       ["Page", input.path],
     ],
@@ -430,7 +448,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       const email = b.email.trim().toLowerCase();
       void recordPulse("kit_request", cat, { isTest: TEST_EMAIL_RE.test(email) || isTestIdentity({ email }) || /@(silverbirchgrowth\.com|scalehealth\.ca|birchreserve\.net|example\.(com|org))$/.test(email), src: typeof b.src === "string" ? b.src : null, region });
     }
-    void recordLead({ fridayId: fid, email: b.email.trim().toLowerCase(), website: typeof b.website === "string" ? b.website.slice(0, 200) : null, stage, roles: Array.isArray(b.roles) ? (b.roles as unknown[]).map(String).slice(0, 6) : [], path: hubPendingOf(b) ? "/intake/supplier" : "/intake", hub: hubPendingOf(b) }).catch(() => undefined);
+    void recordLead({ fridayId: fid, email: b.email.trim().toLowerCase(), website: typeof b.website === "string" ? b.website.slice(0, 200) : null, stage, roles: Array.isArray(b.roles) ? (b.roles as unknown[]).map(String).slice(0, 6) : [], path: hubPendingOf(b) ? "/intake/supplier" : "/intake", hub: hubPendingOf(b), agency_partner_interest: agencyPartnerInterestOf(b) }).catch(() => undefined);
   }
 
   router.post("/v1/brand-intake", capped, body, async (req, res) => {
@@ -570,7 +588,7 @@ function defaultRecordLead(env: Env) {
     if (env.VERCEL_ENV !== "production") return;
     const { upsertLeadSafe, getLeadStore } = await import("../lib/leads");
     const id = `brandintake:${e.fridayId ?? e.email}`.slice(0, 200);
-    const lead = await upsertLeadSafe({ id, source: "brand_intake", sourceRef: e.fridayId ?? e.email, email: e.email, company: e.website, need: `${e.hub ? "Supplier hub request · pending approval (Randy or Jon) · " : ""}Monetization Kit intake (${e.roles.join(", ") || "brand"}) · ${e.stage === "partial" ? "abandoned (partial)" : "submitted"}`, pagePath: e.path, isTest: TEST_EMAIL_RE.test(e.email), meta: { stage: e.stage === "partial" ? "abandoned" : "submitted", friday_intake_id: e.fridayId ?? undefined, ...(e.hub ? { intake_role: "supplier", hub_status: e.hub.hub_status, hub_slug: e.hub.hub_slug } : {}) } });
+    const lead = await upsertLeadSafe({ id, source: "brand_intake", sourceRef: e.fridayId ?? e.email, email: e.email, company: e.website, need: `${e.hub ? "Supplier hub request · pending approval (Randy or Jon) · " : ""}Monetization Kit intake (${e.roles.join(", ") || "brand"}) · ${e.stage === "partial" ? "abandoned (partial)" : "submitted"}`, pagePath: e.path, isTest: TEST_EMAIL_RE.test(e.email), meta: { stage: e.stage === "partial" ? "abandoned" : "submitted", friday_intake_id: e.fridayId ?? undefined, ...(e.hub ? { intake_role: "supplier", hub_status: e.hub.hub_status, hub_slug: e.hub.hub_slug } : {}), ...(typeof e.agency_partner_interest === "boolean" ? { agency_partner_interest: e.agency_partner_interest } : {}) } });
     if (lead) await getLeadStore().markFriday(lead.id, { status: "sent", contactId: e.fridayId, dealId: null }, new Date(), false).catch(() => undefined);
   };
 }

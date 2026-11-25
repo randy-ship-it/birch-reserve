@@ -18,7 +18,7 @@ import { mirrorSource } from "./shareTrack";
 import { marketToFridayGeo, marketToGeographyText, splitRegions, type Eligibility, type Market } from "../../../api-server/src/lib/kitCalc/channelGeo";
 import { mockExposure, type FridayExposure } from "../../../api-server/src/lib/kitCalc/activation";
 import type { IntakePayload, IntakeRole, PubSurfaceKey } from "../../../api-server/src/lib/overhaul/brandIntake";
-import { SUPPLIER_CATEGORIES } from "../../../api-server/src/lib/overhaul/brandIntake";
+import { SUPPLIER_CATEGORIES, agencyPartnerBlurb } from "../../../api-server/src/lib/overhaul/brandIntake";
 import { mockReport } from "./fridayMockReport";
 import { FRIDAY_CATEGORIES, V12_MARGIN, V12_REPEAT, toFridayCategory } from "../../../api-server/src/lib/kitCalc/fridayV12";
 
@@ -167,6 +167,8 @@ export function toFridayBody(p: IntakePayload, extra: Partial<SubmitContact> & {
   oneFormFields(p, body);
   // Supplier hub request: Birch-only key (the Birch server strips it and tags the v1 blurb). Always pending_approval.
   if (p.hub_request?.role === "supplier") body.hub_request = { role: "supplier", status: "pending_approval", ...(p.hub_request.hub_name ? { hub_name: p.hub_request.hub_name.slice(0, 120) } : {}), ...(p.hub_request.hub_slug ? { hub_slug: p.hub_request.hub_slug.slice(0, 64) } : {}) };
+  // Birch-only: the proxy strips this before Friday (strict v1) and keeps the labelled blurb line.
+  if (typeof p.agency_partner_interest === "boolean") body.agency_partner_interest = p.agency_partner_interest;
   if (extra.email) body.email = extra.email;
   if (extra.website) body.website = extra.website;
   if (extra.elapsed_ms != null) body.elapsed_ms = extra.elapsed_ms;
@@ -234,6 +236,7 @@ export function oneFormFields(p: IntakePayload, body: Record<string, unknown>): 
     const supBits = [sd.retail_now ? `in retail now: ${sd.retail_now}` : null, sd.ships ? `fulfilment: ${sd.ships}` : null, sd.accelerate_budget ? `Accelerate test budget: ${sd.accelerate_budget}` : null].filter(Boolean);
     if (supBits.length) lines.push(`Supplier: ${supBits.join("; ")}.`);
   }
+  if (typeof p.agency_partner_interest === "boolean") lines.push(agencyPartnerBlurb(p.agency_partner_interest));
   for (const n of p.notes ?? []) if (n.trim()) lines.push(n.trim().slice(0, 600));
   if (lines.length) body.blurb = lines.join("\n").slice(0, 6000);
 }

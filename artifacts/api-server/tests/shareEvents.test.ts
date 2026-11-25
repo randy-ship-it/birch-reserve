@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { channelFromRef, isProductionRuntime, memoryStore, parseShareEvent, referrerHost, shareStore, summarize } from "../src/lib/shareEvents";
 import { oneFormFields } from "../../clinichub-media/src/lib/fridayBrandIntake";
+import { agencyPartnerBlurb } from "../src/lib/overhaul/brandIntake";
 
 test("share events: parse, sanitize, never store report tokens or full referrers", () => {
   const e = parseShareEvent({ kind: "share", channel: "linkedin", path: "/kit/r/abc123secret", sid: "a1b2c3d4e5" })!;
@@ -54,6 +55,19 @@ test("one form: supplier + hub map to v1 keys, extras to a labelled blurb, no na
   const loc: Record<string, unknown> = {};
   oneFormFields({ schema: "birch-brand-intake/v1-draft", role: "supplier", roles: ["supplier", "publisher"], site: "birchreserve.net", terms_version: "t", shared: { physical: { has: true, locations: 3, visitors_month: 1200, basis: "per_location" } } }, loc);
   assert.match(String(loc.blurb), /Physical locations \(brand-reported\): yes; 3 locations; 1200 visitors \/ month \(per location\); ≈ 3600 in-person visits \/ month in total\. In-location display: priced by IO\./);
+});
+
+test("one form: agency_partner_interest is a labelled blurb line (yes, no, or omitted)", () => {
+  const yes: Record<string, unknown> = {};
+  oneFormFields({ schema: "birch-brand-intake/v1-draft", role: "supplier", roles: ["supplier"], site: "birchreserve.net", terms_version: "t", agency_partner_interest: true }, yes);
+  assert.match(String(yes.blurb), /Agency partner interest: yes\./);
+  assert.equal(agencyPartnerBlurb(true), "Agency partner interest: yes.");
+  const no: Record<string, unknown> = {};
+  oneFormFields({ schema: "birch-brand-intake/v1-draft", role: "supplier", roles: ["supplier"], site: "birchreserve.net", terms_version: "t", agency_partner_interest: false }, no);
+  assert.match(String(no.blurb), /Agency partner interest: no\./);
+  const omit: Record<string, unknown> = {};
+  oneFormFields({ schema: "birch-brand-intake/v1-draft", role: "supplier", roles: ["supplier"], site: "birchreserve.net", terms_version: "t" }, omit);
+  assert.doesNotMatch(String(omit.blurb ?? ""), /Agency partner interest/);
 });
 
 test("share events: mirror source tag (src) is allow-listed and summarized by host", () => {
