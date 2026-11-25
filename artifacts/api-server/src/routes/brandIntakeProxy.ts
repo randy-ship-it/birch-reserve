@@ -28,7 +28,7 @@ import { Router, json, text, type Request, type Response } from "express";
 import { MIRROR_ORIGIN_HOSTS } from "../middlewares/mirrorHost";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
 import { coarseRegion, recordPulse } from "../lib/activityPulse";
-import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
+import { hasValidQaHeader, isSyntheticIntake, isTestIdentity } from "../lib/testTraffic";
 import { sendSalesAlert, type SalesAlertResult } from "../lib/salesAlert";
 import { FRIENDLY_429, limiter } from "../lib/rateLimit";
 import { isIP } from "node:net";
@@ -155,13 +155,14 @@ export function prepareStage(body: unknown): { body: Record<string, unknown>; st
 }
 
 /** Headers Birch sends to Friday. The secret only ever goes in X-Intake-Secret. */
-export function fridayHeaders(cfg: { key: string; org: string }, req: Request): Record<string, string> {
+export function fridayHeaders(cfg: { key: string; org: string }, req: Request, env: Env = process.env): Record<string, string> {
   const h: Record<string, string> = { "Content-Type": "application/json", "X-Intake-Secret": cfg.key, "X-Org-Id": cfg.org };
   const edit = req.get("x-edit-token");
   if (edit && TOKEN_RE.test(edit)) h["X-Edit-Token"] = edit;
   // v1.2 §3: Friday rate-limits per visitor via X-Client-IP (server-to-server only; one IP, validated).
   const ip = clientIp(req);
   if (ip) h["X-Client-IP"] = ip;
+  if (isSyntheticIntake(req, env)) h["X-Intake-Synthetic"] = "1";
   return h;
 }
 
@@ -327,7 +328,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
   // the edit token and Friday applies its own limits. Valid X-Birch-QA traffic is exempt.
   const createLimiter = limiter({ max: 30, windowMs: 10 * 60_000 });
   const capped = (req: Request, res: Response, next: () => void) => {
-    if (hasValidQaHeader(req)) return next();
+    if (hasValidQaHeader(req) || isSyntheticIntake(req, env)) return next();
     const hit = createLimiter.hit(req.ip || "unknown");
     if (!hit.limited) return next();
     res.setHeader("Retry-After", String(hit.retryAfterSec));
@@ -345,7 +346,7 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       return null;
     }
     try {
-      const r = await f(`${cfg.base}${path}`, { method, headers: fridayHeaders(cfg, req), body: payload === undefined ? undefined : JSON.stringify(payload), signal: AbortSignal.timeout(10_000) });
+      const r = await f(`${cfg.base}${path}`, { method, headers: fridayHeaders(cfg, req, env), body: payload === undefined ? undefined : JSON.stringify(payload), signal: AbortSignal.timeout(10_000) });
       const text = await r.text();
       const retry = r.headers.get("retry-after");
       if (retry) res.setHeader("Retry-After", retry);
@@ -384,7 +385,15 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     const b = markTest(body ?? {}) as Record<string, unknown>;
     return (await fridayV12()).v12 ? b : toV1Body(b);
   }
-  const send = (res: Response, out: { status: number; text: string }) => res.status(out.status).type("application/json").send(publicGates(out.text || "{}"));
+  const send = (res: Response, out: { status: number; text: string }) => {
+    const gated = publicGates(out.text || "{}");
+    if (out.status >= 500) {
+      try { JSON.parse(gated); } catch {
+        return res.status(out.status).json({ ok: false, error: "upstream_error", error_message: "Something went wrong on our side. Please try again." });
+      }
+    }
+    return res.status(out.status).type("application/json").send(gated);
+  };
   /** BR leads mirror of partial + submitted intakes (same pipeline as full submissions). Never throws, never blocks. */
   const recordLead = opts.recordLead ?? defaultRecordLead(env);
   const alerter = opts.sendAlert ?? ((a: KitIntakeAlert) => sendSalesAlert(a));
@@ -455,8 +464,9 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
       res.status(r.status === "sent" ? 202 : 503).json({ ok: r.status === "sent", fallback: "api_intake", lead: r.status === "sent", status: "submitted", version: 1, approvals: {}, error: r.status === "sent" ? undefined : "intake_failed" });
       return;
     }
-    noteLead(eff, prep.stage, out, undefined, coarseRegion((h) => req.get(h)));
-    if (prep.stage === "submitted" && out.status < 300) {
+    const synthetic = isSyntheticIntake(req, env);
+    if (!synthetic) noteLead(eff, prep.stage, out, undefined, coarseRegion((h) => req.get(h)));
+    if (!synthetic && prep.stage === "submitted" && out.status < 300) {
       await notifySubmitted(prep, out, req);
       await onIntakeSubmitted(promoCtxOf(req), String((eff as Record<string, unknown>).email ?? ""), typeof (eff as Record<string, unknown>).website === "string" ? ((eff as Record<string, unknown>).website as string) : null);
     }
@@ -472,8 +482,9 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     if (prep.error) return void res.status(400).json({ ok: false, error: prep.error });
     const out = await forward(req, res, "PATCH", `/api/public/brand-intake/${encodeURIComponent(id)}`, await shaped(prep.body));
     if (!out) return;
-    noteLead(prep.body, prep.stage, out, id);
-    if (prep.stage === "submitted" && out.status < 300) {
+    const synthetic = isSyntheticIntake(req, env);
+    if (!synthetic) noteLead(prep.body, prep.stage, out, id);
+    if (!synthetic && prep.stage === "submitted" && out.status < 300) {
       await notifySubmitted(prep, out, req, id);
       await onIntakeSubmitted(promoCtxOf(req), String((prep.body as Record<string, unknown>)?.email ?? ""), typeof (prep.body as Record<string, unknown>)?.website === "string" ? ((prep.body as Record<string, unknown>).website as string) : null);
     }

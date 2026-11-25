@@ -19,7 +19,7 @@ import { buildAreaLockSession, checkoutGate } from "../lib/overhaul/checkout";
 import { intakeExternalId, sendIntake, type IntakeKind } from "../lib/overhaul/fridayIntake";
 import { PREMIUM_INQUIRY_MESSAGE, isPremiumOffer } from "../lib/premiumInquireOnly";
 import { sendSalesAlert } from "../lib/salesAlert";
-import { isTestIdentity, isTestLead } from "../lib/testTraffic";
+import { isSyntheticIntake, isTestIdentity, isTestLead } from "../lib/testTraffic";
 import { coarseRegion, recordPulse } from "../lib/activityPulse";
 import { GTM_BOT_ALERT_TO, GTM_BOT_BUSINESS_LINE, GTM_BOT_KIND, GTM_BOT_SOURCE, GTM_BOT_STAGES, GTM_BOT_PREFS } from "../lib/overhaul/gtmBot";
 import { MEDIA_KIT_CATEGORIES } from "../lib/overhaul/mediaKit";
@@ -285,7 +285,8 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
    * and pushed to Friday with the existing lead push. Never changes public inventory figures; never turns an ad on.
    */
   router.post("/v1/activation", json, async (req: Request, res: Response) => {
-    if (limited(req, 10)) {
+    const synthetic = isSyntheticIntake(req);
+    if (!synthetic && limited(req, 10)) {
       res.status(429).json({ error: "Too many requests. Try again shortly." });
       return;
     }
@@ -302,6 +303,10 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     const parsed = parseActivation(body);
     if (!parsed.ok) {
       res.status(400).json({ error: parsed.error });
+      return;
+    }
+    if (synthetic) {
+      res.json({ ok: true, stored: "synthetic", alert: "synthetic", synthetic: true });
       return;
     }
     const v = parsed.v;
