@@ -16,6 +16,8 @@ import type { Request } from "express";
 
 export const BIRCH_QA_HEADER = "x-birch-qa" as const;
 export const BIRCH_QA_SECRET_ENV = "BIRCH_QA_SECRET" as const;
+export const INTAKE_SYNTHETIC_HEADER = "x-intake-synthetic" as const;
+export const INTAKE_SYNTHETIC_SECRET_ENV = "INTAKE_SYNTHETIC_SECRET" as const;
 
 /** Constant-time compare (hash both sides so length differences don't leak). */
 export function constantTimeEquals(given: string, expected: string): boolean {
@@ -30,6 +32,18 @@ export function birchQaSecret(env: NodeJS.ProcessEnv = process.env): string | un
 }
 
 /** True only when the X-Birch-QA header carries the configured secret. */
+export function intakeSyntheticSecret(env: NodeJS.ProcessEnv = process.env): string | undefined {
+  return env[INTAKE_SYNTHETIC_SECRET_ENV]?.trim() || undefined;
+}
+
+/** True only when X-Intake-Synthetic matches INTAKE_SYNTHETIC_SECRET (constant-time). */
+export function isSyntheticIntake(req: Pick<Request, "get">, env: NodeJS.ProcessEnv = process.env): boolean {
+  const expected = intakeSyntheticSecret(env);
+  if (!expected) return false;
+  const given = req.get(INTAKE_SYNTHETIC_HEADER)?.trim() ?? "";
+  return constantTimeEquals(given, expected);
+}
+
 export function hasValidQaHeader(req: Pick<Request, "get">): boolean {
   const expected = birchQaSecret();
   if (!expected) return false;

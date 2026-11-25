@@ -590,3 +590,46 @@ test("Meta comparison column uses siteName so the Scale mirror says Scale Health
   const visible = page.split("\n").filter((l) => !/usePageMeta\(/.test(l)).join("\n");
   assert.doesNotMatch(visible, /"Birch Reserve/);
 });
+
+test("POST /v1/activation validates input and short-circuits persistence/alerts when X-Intake-Synthetic matches", async () => {
+  const prev = process.env.INTAKE_SYNTHETIC_SECRET;
+  process.env.INTAKE_SYNTHETIC_SECRET = "syn-act-secret";
+  const app = express();
+  app.use(createOverhaulRouter());
+  const server = app.listen(0);
+  const port = (server.address() as { port: number }).port;
+  const url = `http://127.0.0.1:${port}/v1/activation`;
+  try {
+    const invalid = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-intake-synthetic": "syn-act-secret" },
+      body: JSON.stringify({ email: "not-an-email" }),
+    });
+    assert.equal(invalid.status, 400);
+
+    const ok = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-intake-synthetic": "syn-act-secret" },
+      body: JSON.stringify({
+        role: "brand",
+        email: "qa+syn@silverbirchgrowth.com",
+        company: "QA Synthetic",
+        pages: "lt10",
+        views: "lt5k",
+        list: "lt1k",
+        openness: "curated",
+        ack: true,
+      }),
+    });
+    assert.equal(ok.status, 200);
+    const j = await ok.json() as { ok: boolean; stored: string; alert: string; synthetic: boolean };
+    assert.equal(j.ok, true);
+    assert.equal(j.stored, "synthetic");
+    assert.equal(j.alert, "synthetic");
+    assert.equal(j.synthetic, true);
+  } finally {
+    server.close();
+    if (prev === undefined) delete process.env.INTAKE_SYNTHETIC_SECRET;
+    else process.env.INTAKE_SYNTHETIC_SECRET = prev;
+  }
+});

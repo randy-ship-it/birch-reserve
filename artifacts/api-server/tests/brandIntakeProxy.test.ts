@@ -493,3 +493,63 @@ test("final Scale submit (POST submit + src=scale_mirror) emails randy@scaleheal
   assert.equal(alerts[0]!.isTest, true);
   assert.equal(alerts[0]!.rows.find(([k]) => k === "Friday id")?.[1], "bi_scale001");
 });
+
+test("X-Intake-Synthetic: validates secret, forwards X-Intake-Synthetic: 1 to Friday, suppresses BR leads and alerts, and guards HTML 5xx", async () => {
+  const calls: Array<{ url: string; init: RequestInit }> = [];
+  const leads: IntakeLeadEvent[] = [];
+  const alerts: KitIntakeAlert[] = [];
+  let mode: "ok" | "html503" = "ok";
+  const f = (async (url: string, init: RequestInit) => {
+    calls.push({ url, init });
+    if (mode === "html503") return new Response("<html>503</html>", { status: 503 });
+    return new Response(JSON.stringify({ ok: true, id: "bi_syn001", status: "submitted", version: 1 }), { status: 201 });
+  }) as unknown as typeof fetch;
+  const app = express();
+  const wrapped = (async (url: string, init?: RequestInit) =>
+    String(url).endsWith("/api/public/brand-categories") ? new Response("{}", { status: 404 }) : f(url, init as RequestInit)) as unknown as typeof fetch;
+  app.use(createBrandIntakeProxy({
+    env: { ...ENV, INTAKE_SYNTHETIC_SECRET: "syn-secret-123" },
+    fetchImpl: wrapped,
+    recordLead: async (e) => void leads.push(e),
+    sendAlert: async (a) => (alerts.push(a), { status: "sent" as const, id: "alert_test", to: a.to }),
+  }));
+  const srv = app.listen(0);
+  await new Promise((r) => srv.once("listening", r));
+  const base = `http://127.0.0.1:${(srv.address() as AddressInfo).port}`;
+  try {
+    const r = await realFetch(`${base}/v1/brand-intake`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-intake-synthetic": "syn-secret-123" },
+      body: JSON.stringify({ roles: ["brand"], submit: true, email: "qa+syn@silverbirchgrowth.com", website: "example.com" }),
+    });
+    await settle();
+    assert.equal(r.status, 201);
+    assert.equal(leads.length, 0);
+    assert.equal(alerts.length, 0);
+    assert.equal((calls[0]!.init.headers as Record<string, string>)["X-Intake-Synthetic"], "1");
+
+    const bad = await realFetch(`${base}/v1/brand-intake`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-intake-synthetic": "wrong" },
+      body: JSON.stringify({ roles: ["brand"], submit: true, email: "real@example.com", website: "example.com" }),
+    });
+    await settle();
+    assert.equal(bad.status, 201);
+    assert.equal(leads.length, 1);
+    assert.equal(alerts.length, 1);
+    assert.equal((calls[1]!.init.headers as Record<string, string>)["X-Intake-Synthetic"], undefined);
+
+    mode = "html503";
+    const errRes = await realFetch(`${base}/v1/brand-intake`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-intake-synthetic": "syn-secret-123" },
+      body: JSON.stringify({ roles: ["brand"], submit: true, email: "qa+syn@silverbirchgrowth.com", website: "example.com" }),
+    });
+    assert.equal(errRes.status, 503);
+    const errJson = await errRes.json();
+    assert.equal(errJson.ok, false);
+    assert.equal(errJson.error, "upstream_error");
+  } finally {
+    srv.close();
+  }
+});
