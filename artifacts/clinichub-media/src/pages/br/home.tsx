@@ -45,7 +45,7 @@ import { UPGRADE_PATH_LINE } from "../../../../api-server/src/lib/overhaul/media
 const NAVY = "#0b1f3a";
 
 const FAQ = [
-  { q: "Where exactly do the ads run?", a: "Only inside private, members-only hubs: pages inside a brand, clinic or retailer where its own customers land right after they buy or book. Categories start with recovery, then longevity, sleep, nutrition and more. Private clinic network display, retail micro hubs and the Street Team are separate add-ons. Each hub has four placements: post-purchase, the hub home page, product and services pages, and the member dashboard behind login." },
+  { q: "Where exactly do the ads run?", a: "In post-purchase moments and inside health and wellness member hubs: pages inside a brand, clinic or retailer where its own customers land right after they buy or book. Categories start with recovery, then longevity, sleep, nutrition and more. Private clinic network display, retail micro hubs and the Street Team are separate add-ons. Each hub has four placements: post-purchase, the hub home page, product and services pages, and the member dashboard behind login." },
   { q: "Which hubs are live?", a: `${INVENTORY.line} More hubs launch over time.` },
   { q: "Is this display or cost-per-click?", a: "Both. Every placement can be bought as display (priced per thousand views) or CPC (priced per click). Deposits and area locks draw down against either." },
   { q: "Are the audience numbers measured?", a: "Not yet. Audience and view figures on this site are based on signed partnership contracts, not measured delivery. We don't publish a measured network views figure (the 2027 inventory figure is based on signed partnership contracts); your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
@@ -85,7 +85,7 @@ function Expand({ title, sub, children, testId, open = false }: { title: string;
 
 export default function BrHome() {
   useAttention({ audience: "[data-testid=home-stats]", hubs: "#proof-live", ladder: "[data-testid=home-offer-stairs]", street: "[data-testid=home-street-team]", details: "#more", end: "[data-testid=home-close]" });
-  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand inside private, members-only health and wellness hubs: 700MM+ captive page views activating, 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 1MM+ consumers now through our provider network and Street Team, expanding to an estimated 3MM+ in 2027. Get a free Monetization Kit. Prices in USD; figures are based on signed partnership contracts: reach and audience, not delivered impressions.");
+  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand in post-purchase moments and inside health and wellness member hubs: 700MM+ captive page views activating, 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 1MM+ consumers now through our provider network and Street Team, expanding to an estimated 3MM+ in 2027. Get a free Monetization Kit. Prices in USD; figures are based on signed partnership contracts: reach and audience, not delivered impressions.");
   const price = priceLabels(useAvailability());
   // Phones: the floating chat + voice buttons stay out of the hero preview until the visitor scrolls past it.
   useEffect(() => {
@@ -143,7 +143,7 @@ export default function BrHome() {
             or <a href="/buy?plan=hold-190&ref=hero_home" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-look" onClick={() => trackAttn("hero_cta.look")}>start with a {price.look} 7-day look</a>
           </p>
           <p className="mt-2 text-[13px] text-foreground/60" data-testid="home-hero-agencies">
-            Buying for clients? <a href="/agencies?ref=hero_home" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-agencies" onClick={() => trackAttn("hero_cta.agencies")}>For agencies: a written 10% off the rate card</a>
+            Buying for clients? <a href="/agencies?ref=hero_home" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-agencies" onClick={() => trackAttn("hero_cta.agencies")}>For agencies: the standard 15% agency commission off the rate card</a>
           </p>
           <p className="mt-2 text-[13px] text-foreground/60" data-testid="home-kit-cta">
             Not ready? <a href={intakeHref("hero_home")} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-kit" onClick={() => { logCtaClick("hero_home"); trackAttn("hero_cta.kit"); }}>Get my free Monetization Kit</a>

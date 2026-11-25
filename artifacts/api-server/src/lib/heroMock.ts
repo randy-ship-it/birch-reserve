@@ -2,7 +2,7 @@
  * Audit #3 (Randy, Nov 20 2026): the annotated live-hub mock as the main visual on server-rendered pages (/buycalc).
  * Mirrors components/br/next-step.tsx AnnotatedHubMock: always-visible badge, pins 1–3, 4 live-hub toggle.
  */
-export const MOCK_PINS = ["Your ad card, approved by a person", "Live members-only hub", "Clicks to your site, UTM-tagged"] as const;
+export const MOCK_PINS = ["Your ad card, approved by a person", "Live member hub", "Clicks to your site, UTM-tagged"] as const;
 const HUBS = {
   drho: { name: "DR-HO'S physio", host: "physio.drhonow.com", img: "/hub-gallery/drho.webp", surface: "Booking confirmation", card: "right:2.5%;bottom:3%", pin3: "right:-12px", pin2: "left:62%;top:19%" },
   sole: { name: "SOLE", host: "scalehealth.ca/sole", img: "/hub-gallery/sole.webp", surface: "Hub home", card: "right:2.5%;bottom:3%", pin3: "right:-12px", pin2: "left:3%;top:27%" },
