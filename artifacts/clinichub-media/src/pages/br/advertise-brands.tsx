@@ -2,6 +2,7 @@ import { MetaComparison, SurfacesGrid } from "@/components/br/blocks";
 import { BrandsAccessCta, BrandsAccessGate, PublicBrandTotals } from "@/components/br/brands-gate";
 import { StarterOffers } from "@/components/br/starter-offers";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
+import { siteName, siteUrl } from "@/lib/siteSkin";
 
 const FAQ = [
   { q: "What do I buy?", a: "Start with a $190 USD 7-day category look or a $490 USD category reserve. Your payment is media credit. We send an insertion order naming the hub and placements, and nothing runs until you approve it." },
@@ -16,7 +17,7 @@ export default function BrAdvertiseBrands() {
   usePageMeta("Advertise to brands | Birch Reserve", META_DESC);
   return (
     <div data-testid="br-advertise-brands">
-      <JsonLd data={{ "@context": "https://schema.org", "@type": "OfferCatalog", name: "Birch Reserve self-serve offers", itemListElement: [{ "@type": "Offer", name: "7-day category look", sku: "hold-190", price: 190, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=hold-190" }, { "@type": "Offer", name: "Category reserve", sku: "reserve-490", price: 490, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=reserve-490" }] }} />
+      <JsonLd data={{ "@context": "https://schema.org", "@type": "OfferCatalog", name: `${siteName()} self-serve offers`, itemListElement: [{ "@type": "Offer", name: "7-day category look", sku: "hold-190", price: 190, priceCurrency: "USD", url: siteUrl("/buycalc?sku=hold-190") }, { "@type": "Offer", name: "Category reserve", sku: "reserve-490", price: 490, priceCurrency: "USD", url: siteUrl("/buycalc?sku=reserve-490") }] }} />
       <Section>
         <Eyebrow>Advertise · Brands</Eyebrow>
         <H1>Put your brand inside private health and wellness hubs.</H1>

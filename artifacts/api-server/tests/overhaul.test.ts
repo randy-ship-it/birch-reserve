@@ -578,3 +578,15 @@ test("advertise-brands page source has no named hubs or liveLine and does not im
     assert.doesNotMatch(src, new RegExp(h.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), h.name);
   }
 });
+
+test("Meta comparison column uses siteName so the Scale mirror says Scale Health hubs", () => {
+  const blocks = readFileSync(resolve(process.cwd(), "../clinichub-media/src/components/br/blocks.tsx"), "utf8");
+  const page = readFileSync(resolve(process.cwd(), "../clinichub-media/src/pages/br/advertise-brands.tsx"), "utf8");
+  assert.match(blocks, /siteName\(\)\} hubs/);
+  assert.doesNotMatch(blocks, /Birch Reserve hubs/);
+  assert.match(page, /siteName\(\)/);
+  assert.match(page, /siteUrl\(/);
+  // Visible page copy (excluding usePageMeta, which skinText already rewrites) must not hardcode the Birch name.
+  const visible = page.split("\n").filter((l) => !/usePageMeta\(/.test(l)).join("\n");
+  assert.doesNotMatch(visible, /"Birch Reserve/);
+});

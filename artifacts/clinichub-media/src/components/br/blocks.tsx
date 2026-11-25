@@ -1,5 +1,6 @@
 import { ArrowUpRight, Building2, Megaphone, Store, Users } from "lucide-react";
 import { BENCHMARKS, POSITIONING, SURFACES, TAM, blendedHubCpmUsd, CPC_FLOOR_USD } from "../../../../api-server/src/lib/overhaul/model";
+import { siteName } from "@/lib/siteSkin";
 import { Modelled } from "./ui";
 import { BLENDED, RATE_SURFACES } from "../../../../api-server/src/lib/overhaul/pricing";
 
@@ -120,7 +121,7 @@ export function MetaComparison() {
             <tr className="border-b-2 border-foreground">
               <th className="py-3 pr-4 font-semibold"> </th>
               <th className="py-3 pr-4 font-semibold">Meta / public social</th>
-              <th className="py-3 font-semibold">Birch Reserve hubs</th>
+              <th className="py-3 font-semibold">{siteName()} hubs</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
