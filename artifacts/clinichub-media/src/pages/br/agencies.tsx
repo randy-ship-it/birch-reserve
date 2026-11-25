@@ -6,7 +6,7 @@ import { KitEntry } from "@/components/br/pilot-path";
 import { SeeYourAd } from "@/components/br/see-your-ad";
 import { INVENTORY } from "../../../../api-server/src/lib/overhaul/model";
 import { AgencyDiscountExample, AgencyRateCardModel, BlockLadder, BuyPaths, ExclusivePerks, GoalPlanner, InventoryCanister, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
-import { AGENCY_FAQ, PARTNER_VALUE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
+import { AGENCY_FAQ } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { RESERVE_HREF, lookHref } from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
 
@@ -127,7 +127,7 @@ export default function BrAgencies() {
           <AgencyRateCardModel />
           <ExclusivePerks />
         </div>
-        <p className="mt-6 text-xs text-muted-foreground">{PARTNER_VALUE.line} {PARTNER_VALUE.fine} First look as new hubs activate. Nothing runs until the insertion order names the hub and placement. Full terms on <a className="underline underline-offset-2" href="/terms">/terms</a>.</p>
+        <p className="mt-6 text-xs text-muted-foreground">Nothing runs until the insertion order names the hub, placement and flight dates. Full terms on <a className="underline underline-offset-2" href="/terms">/terms</a>.</p>
       </Section>
 
       <Section id="blocks" className="scroll-mt-24">
