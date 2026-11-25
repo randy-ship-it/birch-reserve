@@ -479,7 +479,7 @@ export function BuyerValueCompare() {
     { key: "partner", label: "Committed partner", pay: `${usd(e.partnerLo)}–${usd(e.partnerHi)}`, lo: Math.round((e.partnerLo / e.list) * 100), hi: Math.round((e.partnerHi / e.list) * 100), bar: "bg-lime-400" },
   ] as const;
   return (
-    <div className="rounded-xl border-2 border-[#0b1f3a]/15 bg-white p-3 md:p-4" data-testid="buyer-value-compare">
+    <div className="rounded-xl border-2 border-[#0b1f3a]/15 bg-white p-3 md:p-4" data-testid="buyer-value-compare" data-currency-fixed>
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55">{e.label}</span>
         <span className="text-[12px] text-foreground/60">{e.brief}</span>
