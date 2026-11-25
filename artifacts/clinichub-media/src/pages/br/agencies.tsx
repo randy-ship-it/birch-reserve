@@ -3,7 +3,7 @@ import { ChevronDown } from "lucide-react";
 import { isScaleSkin, skinText } from "@/lib/siteSkin";
 import { LeadForm } from "@/components/br/lead-form";
 import { KitEntry } from "@/components/br/pilot-path";
-import { AgencyDiscountExample, AgencyRateCardModel, BuyPaths, ExclusivePerks, GoalPlanner, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
+import { AgencyDiscountExample, AgencyRateCardModel, BuyPaths, ExclusivePerks, GoalPlanner, InventoryCanister, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
 import { AGENCY_FAQ } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { RESERVE_HREF, lookHref } from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
@@ -91,6 +91,10 @@ export default function BrAgencies() {
         <div className="max-w-3xl">
           <Eyebrow>How buying works</Eyebrow>
           <H2>One rate card. A written 10% for&nbsp;agencies.</H2>
+          <p className="mt-3 text-sm text-muted-foreground">One inventory. Direct buyers, agencies and partners each draw from the same tank.</p>
+        </div>
+        <div className="mt-8">
+          <InventoryCanister />
         </div>
         <div className="mt-8 space-y-6">
           <AgencyRateCardModel />

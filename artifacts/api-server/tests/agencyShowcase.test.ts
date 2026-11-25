@@ -168,7 +168,7 @@ test("in plain terms (Nov 18 2026): five category answers, published terms only,
   assert.match(page, /id="plain-terms"/);
   assert.match(page, /<PlainTerms \/>/);
   // The client FAQ does not emit a second FAQPage.
-  assert.match(page, /<Faq items=\{AGENCY_FAQ\} schema=\{false\} \/>/);
+  assert.match(page, /<Faq items=\{AGENCY_FAQ\.map\(\(f\) => \(\{ q: skinText\(f\.q\), a: skinText\(f\.a\) \}\)\)\} schema=\{false\} \/>/);
   assert.match(llmsTxt(), /agencies#plain-terms/);
 });
 
@@ -255,8 +255,13 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.doesNotMatch(ui, /TRACK_RECORD|partner-launch|EXCLUSIVE_CASE_STUDY|digital-md-partner|fridayapp|See the live case study|Contract signed · Onboarding|names withheld/i);
   assert.ok(TRACK_RECORD_UNLINKED_CARDS.some((c) => c.key === "partner-launch"));
   assert.ok(!TRACK_RECORD.cards.some((c) => c.key === "partner-launch"));
-  for (const c of ["<AgencyRateCardModel />", "<AgencyDiscountExample />", "<ExclusivePerks />"]) assert.ok(page.includes(c), c);
-  assert.doesNotMatch(page, /<InventoryCanister \/>|<AgencyTierCards /);
+  for (const c of ["<InventoryCanister />", "<AgencyRateCardModel />", "<AgencyDiscountExample />", "<ExclusivePerks />"]) assert.ok(page.includes(c), c);
+  // Canister sits after the hero and before the rate card, so the tank explains the three buyer types.
+  assert.ok(page.indexOf("<InventoryCanister") > page.indexOf("<H1>"));
+  assert.ok(page.indexOf("<InventoryCanister") < page.indexOf("<AgencyRateCardModel"));
+  assert.doesNotMatch(page, /<AgencyTierCards /);
+  assert.match(ui, /aria-label=\{skinText\("One tank of hub inventory with three outlets: direct buyers, agencies and Trusted Agency Partners"\)\}/);
+  assert.match(ui, /skinText\(t\.name\)/);
   assert.ok(EXCLUSIVE_PARTNER_PERKS.some((p) => /Partners get woven into our bot chats, already under way with hundreds of brands and thousands of retailers/.test(p)));
   assert.doesNotMatch(ui, /19 days|ready to sign|21 days|virtual care partner/i);
   // One primary hero CTA, before the model.
