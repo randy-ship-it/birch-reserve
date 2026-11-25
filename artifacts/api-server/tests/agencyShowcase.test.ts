@@ -47,6 +47,7 @@ test("Nov 24 PM: /agencies is the published rate-card model (written 10% discoun
     "You disclose to your client",
     "Direct buyers pay the card",
     "No undercutting agency clients",
+    "Committed partner inventory",
   ]);
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
   const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
@@ -61,6 +62,9 @@ test("Nov 24 PM: /agencies is the published rate-card model (written 10% discoun
   const faq = AGENCY_FAQ.map((i) => i.q + " " + i.a).join("\n");
   assert.match(faq, /standard written 10% discount off the published rate card/);
   assert.match(faq, /We do not undercut an agency's client/);
+  assert.match(faq, /Partners who commit to inventory get 10–20% better value than regular agency buyers/);
+  assert.match(AGENCY_FAQ.find((f) => /reserved partner inventory/i.test(f.q))!.a, /10–20% better value/);
+  assert.doesNotMatch(AGENCY_FAQ.find((f) => /reserved partner inventory/i.test(f.q))!.a, /same (written )?10%/);
   assert.doesNotMatch(faq, /10–25%|go-to-market sales motions|GTM bot/);
 });
 
@@ -243,10 +247,10 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.equal(direct!.pay, "The published rate card");
   assert.equal(agency!.pay, "10% off the published rate card");
   assert.equal(agency!.keep, "You set your own resale price");
-  assert.deepEqual(EXCLUSIVE_PARTNER_DISCOUNT, { lo: 10, hi: 10 });
+  assert.deepEqual(EXCLUSIVE_PARTNER_DISCOUNT, { lo: 10, hi: 20 });
   assert.equal(exclusive!.name, "Trusted Agency Partners");
-  assert.equal(exclusive!.pay, "10% off the published rate card");
-  assert.equal(exclusive!.keep, "First look as new hubs activate");
+  assert.equal(exclusive!.pay, "10–20% better than agency pricing");
+  assert.equal(exclusive!.keep, "By committing to inventory");
   assert.equal(EXCLUSIVE_PARTNER_PERKS.length, 4);
   const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
@@ -262,6 +266,11 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.doesNotMatch(page, /<AgencyTierCards /);
   assert.match(ui, /aria-label=\{skinText\("One tank of hub inventory with three outlets: direct buyers, agencies and Trusted Agency Partners"\)\}/);
   assert.match(ui, /skinText\(t\.name\)/);
+  assert.match(ui, /<BuyerValueCompare \/>/);
+  assert.match(ui, /data-testid="buyer-value-compare"/);
+  assert.match(ui, /data-testid="lane-partner"/);
+  // List price lives under the canister only, not again under the rate card.
+  assert.equal((ui.match(/<ListPriceLine \/>/g) ?? []).length, 1);
   assert.ok(EXCLUSIVE_PARTNER_PERKS.some((p) => /Partners get woven into our bot chats, already under way with hundreds of brands and thousands of retailers/.test(p)));
   assert.doesNotMatch(ui, /19 days|ready to sign|21 days|virtual care partner/i);
   // One primary hero CTA, before the model.
@@ -286,16 +295,43 @@ test("Nov 24 PM: home Trusted Agency Partners section matches the /agencies rate
   // Name and terms come from the shared /agencies constants, not a second copy.
   assert.match(tap, /AGENCY_TIERS\.find\(\(t\) => t\.key === "exclusive"\)/);
   assert.match(tap, /AGENCY_RATE_CARD/);
-  assert.match(tap, /AGENCY_DISCOUNT_PCT/);
   assert.match(tap, /<ListPriceLine \/>/);
   assert.match(tap, /Trusted Agency Partner/);
-  assert.match(tap, /Written discount/);
+  assert.match(tap, /Better value/);
+  assert.match(tap, /PARTNER_VALUE_VS_AGENCY_PCT/);
+  assert.match(tap, /PARTNER_VALUE\.line/);
   assert.match(tap, /AGENCY_RATE_CARD\.resale/);
   assert.match(tap, /AGENCY_RATE_CARD\.disclosure/);
   assert.match(tap, /AGENCY_RATE_CARD\.direct/);
   assert.match(tap, /AGENCY_RATE_CARD\.noUndercut/);
   assert.match(home, /written 10% off the (published )?rate card/);
   assert.match(home, /We do not undercut your clients/);
-  assert.doesNotMatch(tap + home, /10–25%|keep 10% of spend|10% of media spend, paid in cash|GTM bot|go-to-market sales motions|10–20%|20–30%|Effective/);
+  assert.doesNotMatch(tap, /same written 10%|not a deeper discount|including partners/);
+  assert.doesNotMatch(tap + home, /10–25%|keep 10% of spend|10% of media spend, paid in cash|GTM bot|go-to-market sales motions|20–30%|Effective/);
   assert.doesNotMatch(tap, /trusted-agency-partner-badge\.svg/);
+});
+
+test("Nov 25 (Randy t570u): committed partners get 10–20% better value than agency buyers, with an illustrative $10,000 compare", async () => {
+  const { BUYER_VALUE_EXAMPLE, EXCLUSIVE_PARTNER_DISCOUNT, PARTNER_VALUE, AGENCY_TIERS, AGENCY_FAQ } = await import("../src/lib/overhaul/agencyShowcase");
+  assert.deepEqual(EXCLUSIVE_PARTNER_DISCOUNT, { lo: 10, hi: 20 });
+  assert.equal(BUYER_VALUE_EXAMPLE.list, 10_000);
+  assert.equal(BUYER_VALUE_EXAMPLE.direct, 10_000);
+  assert.equal(BUYER_VALUE_EXAMPLE.agency, 9_000);
+  assert.equal(BUYER_VALUE_EXAMPLE.partnerLo, 7_200);
+  assert.equal(BUYER_VALUE_EXAMPLE.partnerHi, 8_100);
+  assert.equal(PARTNER_VALUE.pay, "10–20% better than agency pricing");
+  assert.match(PARTNER_VALUE.line, /by committing to inventory/);
+  assert.equal(PARTNER_VALUE.fine, "Committed volume or term sets the exact rate.");
+  const partner = AGENCY_TIERS.find((t) => t.key === "exclusive")!;
+  assert.equal(partner.pay, PARTNER_VALUE.pay);
+  const page = read("../clinichub-media/src/pages/br/agencies.tsx");
+  const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
+  const tap = read("../clinichub-media/src/components/br/trusted-agency-partners.tsx");
+  const partnerFaq = AGENCY_FAQ.find((f) => /reserved partner inventory/i.test(f.q))!.a;
+  const partnerSurfaces = page + tap + JSON.stringify({ AGENCY_TIERS, PARTNER_VALUE, BUYER_VALUE_EXAMPLE }) + partnerFaq;
+  assert.doesNotMatch(partnerSurfaces, /same 10%|same written 10%/);
+  assert.doesNotMatch(JSON.stringify({ AGENCY_TIERS, PARTNER_VALUE, BUYER_VALUE_EXAMPLE }) + partnerFaq, /guarantee/i);
+  assert.doesNotMatch(ui, /same 10%|same written 10%/);
+  assert.match(ui, /data-testid="buyer-value-compare"/);
+  assert.match(ui + page + tap, /10–20% better/);
 });

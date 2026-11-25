@@ -19,7 +19,9 @@ import {
   AGENCY_RATE_RULES,
   AGENCY_SHARE,
   AGENCY_TIERS,
+  BUYER_VALUE_EXAMPLE,
   EXCLUSIVE_PARTNER_PERKS,
+  PARTNER_VALUE,
   type AgencyTierKey,
   BRAND_BONUS_LINE,
   BUY_PATHS,
@@ -466,6 +468,41 @@ export function ListPriceLine({ className = "" }: { className?: string }) {
   );
 }
 
+
+/** Compact $10,000 USD illustration of how the three outlets compare (Randy t570u). */
+export function BuyerValueCompare() {
+  const e = BUYER_VALUE_EXAMPLE;
+  const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
+  const rows = [
+    { key: "direct", label: "Direct", pay: usd(e.direct), lo: 100, hi: 100, bar: "bg-[#e7ecf3]" },
+    { key: "agency", label: "Agency", pay: usd(e.agency), lo: Math.round((e.agency / e.list) * 100), hi: Math.round((e.agency / e.list) * 100), bar: "bg-[#0b1f3a]" },
+    { key: "partner", label: "Committed partner", pay: `${usd(e.partnerLo)}–${usd(e.partnerHi)}`, lo: Math.round((e.partnerLo / e.list) * 100), hi: Math.round((e.partnerHi / e.list) * 100), bar: "bg-lime-400" },
+  ] as const;
+  return (
+    <div className="rounded-xl border-2 border-[#0b1f3a]/15 bg-white p-3 md:p-4" data-testid="buyer-value-compare">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55">{e.label}</span>
+        <span className="text-[12px] text-foreground/60">{e.brief}</span>
+      </div>
+      <ul className="mt-3 space-y-2.5">
+        {rows.map((r) => (
+          <li key={r.key} data-testid={`value-${r.key}`}>
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="text-[12px] font-semibold leading-tight text-[#0b1f3a] md:text-[13px]">{r.label}</span>
+              <span className="font-display text-sm tabular-nums text-[#0b1f3a] md:text-base">{r.pay}</span>
+            </div>
+            <span className="relative mt-1 block h-2.5 overflow-hidden rounded-sm bg-[#0b1f3a]/10" aria-hidden>
+              {r.hi !== r.lo ? <span className="absolute inset-y-0 left-0 bg-lime-200" style={{ width: `${r.hi}%` }} /> : null}
+              <span className={`absolute inset-y-0 left-0 ${r.bar}`} style={{ width: `${r.lo}%` }} />
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2.5 text-[11px] leading-snug text-foreground/55">{PARTNER_VALUE.fine}</p>
+    </div>
+  );
+}
+
 export function InventoryCanister() {
   const n = AGENCY_TIERS.length;
   return (
@@ -503,7 +540,10 @@ export function InventoryCanister() {
           );
         })}
       </div>
-      <figcaption className="mt-3"><ListPriceLine /></figcaption>
+      <figcaption className="mt-3 space-y-4">
+        <ListPriceLine />
+        <BuyerValueCompare />
+      </figcaption>
     </figure>
   );
 }
@@ -558,7 +598,7 @@ export function ExclusivePerks() {
         {EXCLUSIVE_PARTNER_PERKS.map((p) => (
           <li key={p} className="flex gap-2"><span className="mt-1.5 size-2 shrink-0 rounded-full bg-lime-500" aria-hidden />{skinText(p)}</li>
         ))}
-        <li className="pt-1 text-[12px] text-foreground/60">Partners buy at the same written 10% discount off the published rate card.</li>
+        <li className="pt-1 text-[12px] text-foreground/60">{PARTNER_VALUE.line} {PARTNER_VALUE.fine}</li>
       </ul>
     </details>
   );
@@ -568,16 +608,21 @@ export function ExclusivePerks() {
 export function AgencyRateCardModel() {
   return (
     <div data-testid="agency-rate-card-model">
-      <div className="grid gap-px border border-foreground bg-foreground md:grid-cols-2">
-        <article className="bg-background p-6 md:p-8" data-testid="lane-direct">
+      <div className="grid gap-px border border-foreground bg-foreground md:grid-cols-3">
+        <article className="bg-background p-5 md:p-6" data-testid="lane-direct">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Direct buyers</p>
-          <h3 className="mt-3 font-display text-3xl leading-tight text-foreground md:text-4xl">Pay the rate card.</h3>
+          <h3 className="mt-3 font-display text-2xl leading-tight text-foreground md:text-3xl">Pay the rate card.</h3>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">A brand buying space for itself pays the published list price. No agency discount.</p>
         </article>
-        <article className="bg-foreground p-6 text-background md:p-8" data-testid="lane-agency">
+        <article className="bg-foreground p-5 text-background md:p-6" data-testid="lane-agency">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-background/55">Agencies, brokers &amp; resellers</p>
-          <h3 className="mt-3 font-display text-3xl leading-tight md:text-4xl">{AGENCY_DISCOUNT_PCT}% off, in writing.</h3>
+          <h3 className="mt-3 font-display text-2xl leading-tight md:text-3xl">{AGENCY_DISCOUNT_PCT}% off, in writing.</h3>
           <p className="mt-3 text-sm leading-relaxed text-background/75">{AGENCY_RATE_CARD.line} {AGENCY_RATE_CARD.resale} {AGENCY_RATE_CARD.disclosure}</p>
+        </article>
+        <article className="bg-lime-100 p-5 text-[#0b1f3a] md:p-6" data-testid="lane-partner">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#0b1f3a]/55">Trusted Agency Partners</p>
+          <h3 className="mt-3 font-display text-2xl leading-tight md:text-3xl">{PARTNER_VALUE.pay}.</h3>
+          <p className="mt-3 text-sm leading-relaxed text-[#0b1f3a]/70">{PARTNER_VALUE.line} {PARTNER_VALUE.fine}</p>
         </article>
       </div>
       <ol className="mt-6 grid gap-px border border-foreground/15 bg-foreground/15 sm:grid-cols-2 lg:grid-cols-3" data-testid="agency-rate-rules">
@@ -589,7 +634,6 @@ export function AgencyRateCardModel() {
           </li>
         ))}
       </ol>
-      <div className="mt-5"><ListPriceLine /></div>
     </div>
   );
 }
