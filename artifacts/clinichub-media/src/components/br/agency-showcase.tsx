@@ -19,6 +19,8 @@ import {
   AGENCY_RATE_RULES,
   AGENCY_SHARE,
   AGENCY_TIERS,
+  BLOCK_LADDER,
+  BLOCK_TERMS,
   BUYER_VALUE_EXAMPLE,
   EXCLUSIVE_PARTNER_PERKS,
   PARTNER_VALUE,
@@ -161,7 +163,7 @@ export function AgencyHero() {
               <div className="mt-2 grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 text-sm tabular-nums">
                 <span className="text-background/70">Client prepays: {ex.label}</span>
                 <span className="text-right">{usd(ex.spend)}</span>
-                <span className="text-background/70">Agency pays (10% off list)</span>
+                <span className="text-background/70">Agency pays (15% commission off gross)</span>
                 <span className="text-right font-semibold text-accent">{usd(ex.spend - ex.cash)}</span>
               </div>
             </div>
@@ -171,7 +173,7 @@ export function AgencyHero() {
               <li className="text-background/60">{BRAND_BONUS_LINE}</li>
             </ul>
             <a href="#agency-payouts" className="mt-6 inline-block text-sm text-background/70 underline underline-offset-4 hover:text-background">
-              How the discount works
+              How the commission works
             </a>
           </aside>
         </div>
@@ -383,7 +385,7 @@ export function AgencyPayouts() {
         <dl className="divide-y divide-border border-t border-foreground/15 text-sm" data-testid="agency-payout-terms">
           <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
             <dt className="text-foreground/75">Discount</dt>
-            <dd className="font-semibold">Written 10% off list</dd>
+            <dd className="font-semibold">15% agency commission off gross</dd>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 md:px-5">
             <dt className="text-foreground/75">When</dt>
@@ -616,7 +618,7 @@ export function AgencyRateCardModel() {
         </article>
         <article className="bg-foreground p-5 text-background md:p-6" data-testid="lane-agency">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-background/55">Agencies, brokers &amp; resellers</p>
-          <h3 className="mt-3 font-display text-2xl leading-tight md:text-3xl">{AGENCY_DISCOUNT_PCT}% off, in writing.</h3>
+          <h3 className="mt-3 font-display text-2xl leading-tight md:text-3xl">{AGENCY_DISCOUNT_PCT}% agency commission.</h3>
           <p className="mt-3 text-sm leading-relaxed text-background/75">{AGENCY_RATE_CARD.line} {AGENCY_RATE_CARD.resale} {AGENCY_RATE_CARD.disclosure}</p>
         </article>
         <article className="bg-lime-100 p-5 text-[#0b1f3a] md:p-6" data-testid="lane-partner">
@@ -638,14 +640,14 @@ export function AgencyRateCardModel() {
   );
 }
 
-/** Illustrative $10,000 USD worked example of the 10% written discount. */
+/** Illustrative $10,000 USD worked example of the standard 15% agency commission. */
 export function AgencyDiscountExample() {
   const e = AGENCY_DISCOUNT_EXAMPLE;
   const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
   const rows = [
     { k: "Rate card", n: usd(e.list) },
-    { k: "Written 10% discount", n: `−${usd(e.discount)}` },
-    { k: "Agency pays", n: usd(e.agencyPays), accent: true },
+    { k: `${e.discountPct}% agency commission`, n: `−${usd(e.discount)}` },
+    { k: "Agency pays (net)", n: usd(e.agencyPays), accent: true },
   ] as const;
   return (
     <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]" data-testid="agency-discount-example">
@@ -664,6 +666,33 @@ export function AgencyDiscountExample() {
         ))}
         <p className="border-t border-background/15 px-5 py-3 text-[12px] leading-snug text-background/65">{e.note}</p>
       </div>
+    </div>
+  );
+}
+
+/** Committing inventory blocks (Randy, Nov 25 2026): start small, scale to upfront blocks; flight dates, cancellation, makegoods. */
+export function BlockLadder() {
+  return (
+    <div data-testid="agency-block-ladder">
+      <ol className="grid gap-px border border-foreground bg-foreground md:grid-cols-2">
+        {BLOCK_LADDER.map((b, i) => (
+          <li key={b.key} className={`p-5 md:p-6 ${i === 0 ? "bg-background" : "bg-lime-100 text-[#0b1f3a]"}`} data-testid={`block-${b.key}`}>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/55">{String(i + 1).padStart(2, "0")} · {b.step}</p>
+            <h3 className="mt-3 font-display text-2xl leading-tight md:text-3xl">{b.name}</h3>
+            <p className="mt-2 font-display text-xl tabular-nums">{b.price}</p>
+            <p className="mt-3 text-sm leading-relaxed text-foreground/70">{b.line}</p>
+            <p className="mt-4 inline-block border border-foreground/30 px-2 py-1 text-[12px] font-semibold">{b.rate}</p>
+          </li>
+        ))}
+      </ol>
+      <dl className="mt-px grid gap-px border border-t-0 border-foreground/15 bg-foreground/15 sm:grid-cols-3" data-testid="agency-block-terms">
+        {BLOCK_TERMS.map((t) => (
+          <div key={t.k} className="bg-background p-5">
+            <dt className="font-display text-lg leading-tight text-foreground">{t.k}</dt>
+            <dd className="mt-1 text-sm leading-relaxed text-muted-foreground">{t.d}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   );
 }

@@ -9,45 +9,45 @@ import { OVERHAUL_ROUTES, llmsTxt } from "../src/lib/overhaul/seo";
 
 const read = (f: string) => readFileSync(resolve(process.cwd(), f), "utf8");
 
-test("agency terms: standard written 10% discount off the published rate card (Randy Nov 24 2026)", () => {
-  assert.equal(AGENCY_SHARE.pct, 10);
+test("agency terms: standard 15% agency commission off the gross rate card (Randy Nov 25 2026)", () => {
+  assert.equal(AGENCY_SHARE.pct, 15);
   assert.equal(AGENCY_CASH_PCT, AGENCY.commissionPct);
-  assert.match(AGENCY_SHARE.line, /standard written 10% discount off the published rate card/);
+  assert.match(AGENCY_SHARE.line, /standard 15% agency commission off the gross rate card/);
   assert.equal(AGENCY_SHARE.timing, "The discount is written into the insertion order.");
-  assert.deepEqual(AGENCY_EXAMPLES.map((e) => [e.spend, e.cash]), [[490, 49], [25000, 2500]]);
-  assert.equal(agencyCash(25000), 2500);
-  assert.equal(agencyCash(50000), 5000);
+  assert.deepEqual(AGENCY_EXAMPLES.map((e) => [e.spend, e.cash]), [[490, 73.5], [25000, 3750]]);
+  assert.equal(agencyCash(25000), 3750);
+  assert.equal(agencyCash(50000), 7500);
 });
 
-test("/agencies: written 10% discount off the published rate card; client tests start on the $190 / $490 USD offers", () => {
+test("/agencies: standard 15% agency commission off the gross rate card; client tests start on the $190 / $490 USD offers", () => {
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
-  assert.match(page, /standard written 10% discount/);
+  assert.match(page, /standard 15% agency commission/);
   assert.match(page, /published rate card/);
   assert.doesNotMatch(page, /\$1,500|\$3,000|\$6,000|SLOT_LADDER/);
   assert.match(page, /<BuyPaths /); // Nov 24: card vs IO compare, now folded under "The details"
-  assert.equal(AGENCY.line, "Agencies buy at a standard written 10% discount off the published rate card.");
+  assert.equal(AGENCY.line, "Agencies earn the standard 15% agency commission off the gross rate card.");
   assert.match(AGENCY.bonusNote, /\$190 USD/);
   assert.match(AGENCY.bonusNote, /\$490 USD/);
 });
 
-test("Nov 24 PM: /agencies is the published rate-card model (written 10% discount, agency sets resale, no undercutting)", async () => {
+test("Nov 24 PM: /agencies is the published rate-card model (standard 15% agency commission, agency sets resale, no undercutting)", async () => {
   const { AGENCY_DISCOUNT_PCT, AGENCY_DISCOUNT_EXAMPLE, AGENCY_RATE_CARD, AGENCY_RATE_RULES, AGENCY_FAQ } = await import("../src/lib/overhaul/agencyShowcase");
-  assert.equal(AGENCY_DISCOUNT_PCT, 10);
+  assert.equal(AGENCY_DISCOUNT_PCT, 15);
   assert.equal(AGENCY_DISCOUNT_EXAMPLE.list, 10_000);
-  assert.equal(AGENCY_DISCOUNT_EXAMPLE.agencyPays, 9_000);
-  assert.match(AGENCY_RATE_CARD.line, /standard written 10% discount off the published rate card/);
+  assert.equal(AGENCY_DISCOUNT_EXAMPLE.agencyPays, 8_500);
+  assert.match(AGENCY_RATE_CARD.line, /standard 15% agency commission off the gross rate card/);
   assert.equal(AGENCY_RATE_CARD.resale, "You set your own resale price.");
   assert.equal(AGENCY_RATE_CARD.disclosure, "You handle your own client disclosure.");
   assert.equal(AGENCY_RATE_CARD.direct, "Direct buyers pay the published rate card.");
   assert.equal(AGENCY_RATE_CARD.noUndercut, "We do not undercut an agency's client.");
   assert.deepEqual(AGENCY_RATE_RULES.map((r) => r.k), [
     "Published rate card",
-    "Written 10% discount",
+    "Standard 15% agency commission",
     "You set the resale price",
     "You disclose to your client",
     "Direct buyers pay the card",
     "No undercutting agency clients",
-    "Committed partner inventory",
+    "Committed-spend tiers",
   ]);
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
   const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
@@ -60,10 +60,10 @@ test("Nov 24 PM: /agencies is the published rate-card model (written 10% discoun
   assert.doesNotMatch(page + ui, /book a call|schedule a call|talk to (the founder|randy)|chat with randy/i);
   assert.doesNotMatch(page, /Clairvoyant|\bAlign\b|MedVibe|Kalaya/);
   const faq = AGENCY_FAQ.map((i) => i.q + " " + i.a).join("\n");
-  assert.match(faq, /standard written 10% discount off the published rate card/);
+  assert.match(faq, /standard 15% agency commission off the gross rate card/);
   assert.match(faq, /We do not undercut an agency's client/);
-  assert.match(faq, /Partners who commit to inventory get 10–20% better value than regular agency buyers/);
-  assert.match(AGENCY_FAQ.find((f) => /reserved partner inventory/i.test(f.q))!.a, /10–20% better value/);
+  assert.match(faq, /a further 10–20% off the net agency rate, on top of the standard 15% agency commission/);
+  assert.match(AGENCY_FAQ.find((f) => /reserved partner inventory/i.test(f.q))!.a, /further 10–20% off the net agency rate/);
   assert.doesNotMatch(AGENCY_FAQ.find((f) => /reserved partner inventory/i.test(f.q))!.a, /same (written )?10%/);
   assert.doesNotMatch(faq, /10–25%|go-to-market sales motions|GTM bot/);
 });
@@ -120,8 +120,8 @@ test("/agencies (Nov 16 2026, rebuilt Nov 24): fast lock path, brokers folded in
   assert.match(page, /RESERVE_HREF/);
   assert.match(page, /lookHref\("agencies_paths_look"\)/);
   // Brokers & resellers: same agency-of-record terms (agency tier copy), no new commission number.
-  assert.match(page, /Partner access, client tests and broker lists all come here/);
-  assert.match(page, /Inquire within about blocking out dedicated inventory chunks similar to our agency partners\./);
+  assert.match(page, /Starter blocks, upfront blocks and partner access all come here/);
+  assert.match(page, /<BlockLadder \/>/);
   assert.doesNotMatch(read("../clinichub-media/src/pages/br/home.tsx"), /blocking out dedicated inventory chunks/);
   assert.doesNotMatch(page, /\b(5|8|12|15|20)% (broker|referral|finder)/i);
   // No invented deadlines, countdowns or seat counts.
@@ -207,18 +207,18 @@ test("start small (Nov 19 2026): $190 / $490 / starter block / $1K–$5K agency 
   assert.doesNotMatch(read("../clinichub-media/src/pages/br/agencies.tsx"), /<StartSmall /);
 });
 
-test("Nov 23: /agencies payout table pays 10% of the seat price actually shown (CAD $690 -> $69, not $49)", async () => {
+test("Nov 23 (15% from Nov 25): /agencies payout table pays the agency commission on the seat price actually shown (CAD $690 -> $69, not $49)", async () => {
   const { agencyPayoutRows } = await import("../src/lib/overhaul/agencyShowcase");
   const cad = agencyPayoutRows(690, "CAD");
   assert.deepEqual(cad.map((r) => r.key), ["seat", "client_test", "premium"]);
   assert.equal(cad[0]!.label, "$690 CAD reserve (card)");
-  assert.equal(cad[0]!.cash, "$69");
+  assert.equal(cad[0]!.cash, "$103.5");
   assert.equal(cad[1]!.spend, "$1K–$5K");
-  assert.equal(cad[1]!.cash, "$100–$500");
-  assert.equal(cad[2]!.cash, "$2,500");
+  assert.equal(cad[1]!.cash, "$150–$750");
+  assert.equal(cad[2]!.cash, "$3,750");
   const usd = agencyPayoutRows(490, "USD");
   assert.equal(usd[0]!.label, "$490 USD reserve (card)");
-  assert.equal(usd[0]!.cash, "$49");
+  assert.equal(usd[0]!.cash, "$73.5");
   const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
   assert.match(ui, /agencyPayoutRows\(priceFor\("reserve-490"/);
   assert.match(ui, /data-currency-fixed data-testid="agency-payout-table"/);
@@ -226,11 +226,11 @@ test("Nov 23: /agencies payout table pays 10% of the seat price actually shown (
 
 test("Nov 24: /agencies leads with two ways to buy (card vs insertion order), published terms only", async () => {
   const { BUY_PATHS } = await import("../src/lib/overhaul/agencyShowcase");
-  assert.deepEqual(BUY_PATHS.rows.map((r) => r.k), ["Best for", "Pay", "Before it runs", "Refunds", "Agency discount"]);
+  assert.deepEqual(BUY_PATHS.rows.map((r) => r.k), ["Best for", "Pay", "Before it runs", "Refunds", "Agency commission"]);
   assert.equal(BUY_PATHS.io.price, "$1K–$5K USD");
   assert.match(BUY_PATHS.io.kicker, /^Insertion order \(IO\)/);
   const text = JSON.stringify(BUY_PATHS);
-  for (const t of ["$190 USD", "$490 USD", "10% off the published rate card", "14 days before launch", "Deposit collected at confirmation", "Stripe-hosted"]) assert.ok(text.includes(t), t);
+  for (const t of ["$190 USD", "$490 USD", "15% off the published rate card", "14 days before launch", "Deposit collected at confirmation", "Stripe-hosted"]) assert.ok(text.includes(t), t);
   assert.doesNotMatch(text, /guarantee|CTR|ROAS|lift|\bCAD\b|signed partners?|Align\b|Clairvoyant|Kalaya|80 locations|call|minutes|hours|today only|left\b/i);
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
   // The compare sits in "The details", after the rate-card model; still one block, no duplicate offers.
@@ -245,13 +245,13 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.deepEqual(AGENCY_TIERS.map((t) => t.key), ["direct", "agency", "exclusive"]);
   const [direct, agency, exclusive] = AGENCY_TIERS;
   assert.equal(direct!.pay, "The published rate card");
-  assert.equal(agency!.pay, "10% off the published rate card");
+  assert.equal(agency!.pay, "15% off the published rate card");
   assert.equal(agency!.keep, "You set your own resale price");
   assert.deepEqual(EXCLUSIVE_PARTNER_DISCOUNT, { lo: 10, hi: 20 });
   assert.equal(exclusive!.name, "Trusted Agency Partners");
-  assert.equal(exclusive!.pay, "10–20% better than agency pricing");
+  assert.equal(exclusive!.pay, "15% + a further 10–20% off net");
   assert.equal(exclusive!.keep, "By committing to inventory");
-  assert.equal(EXCLUSIVE_PARTNER_PERKS.length, 4);
+  assert.equal(EXCLUSIVE_PARTNER_PERKS.length, 3);
   const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
   // List price = the live ladder (no new prices). The names-withheld partner-launch example is unlinked for now (Randy t552u).
@@ -271,7 +271,7 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.match(ui, /data-testid="lane-partner"/);
   // List price lives under the canister only, not again under the rate card.
   assert.equal((ui.match(/<ListPriceLine \/>/g) ?? []).length, 1);
-  assert.ok(EXCLUSIVE_PARTNER_PERKS.some((p) => /Partners get woven into our bot chats, already under way with hundreds of brands and thousands of retailers/.test(p)));
+  assert.ok(!EXCLUSIVE_PARTNER_PERKS.some((p) => /bot chats/.test(p)));
   assert.doesNotMatch(ui, /19 days|ready to sign|21 days|virtual care partner/i);
   // One primary hero CTA, before the model.
   const hero = page.slice(page.indexOf("<H1>"), page.indexOf('id="model"'));
@@ -304,24 +304,24 @@ test("Nov 24 PM: home Trusted Agency Partners section matches the /agencies rate
   assert.match(tap, /AGENCY_RATE_CARD\.disclosure/);
   assert.match(tap, /AGENCY_RATE_CARD\.direct/);
   assert.match(tap, /AGENCY_RATE_CARD\.noUndercut/);
-  assert.match(home, /written 10% off the (published )?rate card/);
+  assert.match(home, /standard 15% agency commission off the gross rate card/);
   assert.match(home, /We do not undercut your clients/);
   assert.doesNotMatch(tap, /same written 10%|not a deeper discount|including partners/);
   assert.doesNotMatch(tap + home, /10–25%|keep 10% of spend|10% of media spend, paid in cash|GTM bot|go-to-market sales motions|20–30%|Effective/);
   assert.doesNotMatch(tap, /trusted-agency-partner-badge\.svg/);
 });
 
-test("Nov 25 (Randy t570u): committed partners get 10–20% better value than agency buyers, with an illustrative $10,000 compare", async () => {
+test("Nov 25 (Randy t570u, reworded 5:21 PM): committed blocks get a further 10–20% off the net agency rate, with an illustrative $10,000 compare", async () => {
   const { BUYER_VALUE_EXAMPLE, EXCLUSIVE_PARTNER_DISCOUNT, PARTNER_VALUE, AGENCY_TIERS, AGENCY_FAQ } = await import("../src/lib/overhaul/agencyShowcase");
   assert.deepEqual(EXCLUSIVE_PARTNER_DISCOUNT, { lo: 10, hi: 20 });
   assert.equal(BUYER_VALUE_EXAMPLE.list, 10_000);
   assert.equal(BUYER_VALUE_EXAMPLE.direct, 10_000);
-  assert.equal(BUYER_VALUE_EXAMPLE.agency, 9_000);
-  assert.equal(BUYER_VALUE_EXAMPLE.partnerLo, 7_200);
-  assert.equal(BUYER_VALUE_EXAMPLE.partnerHi, 8_100);
-  assert.equal(PARTNER_VALUE.pay, "10–20% better than agency pricing");
-  assert.match(PARTNER_VALUE.line, /by committing to inventory/);
-  assert.equal(PARTNER_VALUE.fine, "Committed volume or term sets the exact rate.");
+  assert.equal(BUYER_VALUE_EXAMPLE.agency, 8_500);
+  assert.equal(BUYER_VALUE_EXAMPLE.partnerLo, 6_800);
+  assert.equal(BUYER_VALUE_EXAMPLE.partnerHi, 7_650);
+  assert.equal(PARTNER_VALUE.pay, "15% + a further 10–20% off net");
+  assert.match(PARTNER_VALUE.line, /commit to an inventory block/);
+  assert.equal(PARTNER_VALUE.fine, "Block size and term set the tier.");
   const partner = AGENCY_TIERS.find((t) => t.key === "exclusive")!;
   assert.equal(partner.pay, PARTNER_VALUE.pay);
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
@@ -333,5 +333,5 @@ test("Nov 25 (Randy t570u): committed partners get 10–20% better value than ag
   assert.doesNotMatch(JSON.stringify({ AGENCY_TIERS, PARTNER_VALUE, BUYER_VALUE_EXAMPLE }) + partnerFaq, /guarantee/i);
   assert.doesNotMatch(ui, /same 10%|same written 10%/);
   assert.match(ui, /data-testid="buyer-value-compare" data-currency-fixed/);
-  assert.match(ui + page + tap, /10–20% better/);
+  assert.match(ui + page + tap, /BLOCK_LADDER|PARTNER_VALUE/);
 });

@@ -35,14 +35,14 @@ export function startSmallTiers(): Tier[] {
     { key: "look", eyebrow: "7-day look", price: "$190 USD", name: "See it before you commit", line: "Your placement, live in a hub for 7 days.", cta: "Start the 7-day look", href: "/buycalc?sku=hold-190#reserve", note: "Card checkout" },
     { key: "seat", eyebrow: "Category seat", price: "$490 USD", name: "Your named category seat", line: "All $490 is media credit for your category.", cta: "Reserve my seat", href: "/buycalc?sku=reserve-490#reserve", note: "Card checkout" },
     { key: "block", eyebrow: "Starter view block", price: `From ${fmtUsd(STARTER_BLOCK.startingUsd)} USD`, name: "100K modelled views", line: "One hub surface at the starter rate.", cta: "Request a block", href: "/?inquire=pack&block=100000&surfaces=landing#quick-buy", note: "Deposit collected at confirmation" },
-    { key: "agency", eyebrow: "Agency client test", price: "$1K–$5K USD", name: "Test a client in the hubs", line: "One IO per client. Written 10% discount off the published rate card.", cta: "Request a client test", href: "/agencies#talk", note: "Deposit collected at confirmation" },
+    { key: "agency", eyebrow: "Agency client test", price: "$1K–$5K USD", name: "Test a client in the hubs", line: "One IO per client. Standard 15% agency commission off the gross rate card.", cta: "Request a client test", href: "/agencies#talk", note: "Deposit collected at confirmation" },
   ];
 }
 
 const SMALL_PRINT = [
   { q: "Refund terms", a: "Every deposit is 100% media credit. Ask by email and the full amount goes back to your card any time before activation, which today means up to 14 days before the launch date on your insertion order (IO). The $190 look converts in full to the $490 seat within 7 days, or is refunded. After launch, unused credit can be extended or refunded under your IO." },
   { q: "What you get", a: "A share of display space across a growing network of private health and wellness hubs, curated as hubs launch. The IO names the hub and placement before anything runs. Views are modelled estimates at the starter rate, not a guarantee. Reporting is aggregate: views, clicks, UTM visits and promo-code redemptions. No PHI, no clinical pixels." },
-  { q: "Agencies", a: "Prepay a $1,000–$5,000 USD client test. Each client gets its own IO and reporting. Agencies buy at a standard written 10% discount off the published rate card. You set your own resale price and handle your own client disclosure. Refundable on the same terms as every deposit." },
+  { q: "Agencies", a: "Prepay a $1,000–$5,000 USD client test. Each client gets its own IO and reporting. Agencies earn the standard 15% agency commission off the gross rate card. You set your own resale price and handle your own client disclosure. Refundable on the same terms as every deposit." },
   { q: "Bigger budgets", a: "Premium slots ($25K–$50K) and area locks are by inquiry. Start small now and move up any time; your credit carries over." },
 ];
 

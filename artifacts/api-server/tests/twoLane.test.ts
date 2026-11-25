@@ -67,8 +67,8 @@ test("Lane B: bands, lead payload on the existing /v1/leads kinds, draft IO says
   assert.deepEqual(BLOCK_BANDS.map((b) => b.label), ["$10K", "$25K–$50K", "$100K+"]);
   assert.equal(bandAmountLabel("category_lock"), "$25,000–$50,000 USD");
   assert.equal(bandAmountLabel("network_100k"), "$100,000+ USD");
-  assert.equal(agencyCashLabel("category_lock"), "$2,500–$5,000 USD");
-  assert.equal(agencyCashLabel("test_10k"), "$1,000 USD");
+  assert.equal(agencyCashLabel("category_lock"), "$3,750–$7,500 USD");
+  assert.equal(agencyCashLabel("test_10k"), "$1,500 USD");
   const p = blockLeadPayload({ band: "test_10k", flightStart: "2027-01-05", flightEnd: "2027-02-05", client: "Acme", agency: "Ad Co", email: "x@y.co" }, "BR-IO-1");
   assert.equal(p.kind, "premium_inquiry");
   assert.equal(p.fields.lane, "big_block");
@@ -110,7 +110,7 @@ test("lane analytics events are on the fixed list", () => {
   }
 });
 
-test("prepay a client test budget: stays in the live $1K–$5K band, written 10% discount, pre-filled IO on /v1/leads", () => {
+test("prepay a client test budget: stays in the live $1K–$5K band, standard 15% agency commission, pre-filled IO on /v1/leads", () => {
   assert.equal(clampAgencyBudget(200), 1_000);
   assert.equal(clampAgencyBudget(99_000), 5_000);
   assert.equal(clampAgencyBudget("abc"), 1_000);
@@ -118,8 +118,8 @@ test("prepay a client test budget: stays in the live $1K–$5K band, written 10%
   assert.equal(p.kind, "agency_inquiry");
   assert.equal(p.email, "a@agency.com");
   assert.equal(p.fields.budget_usd, "2500");
-  assert.equal(p.fields.agency_discount, "$250 USD");
-  assert.equal(p.fields.agency_pays, "$2,250 USD");
+  assert.equal(p.fields.agency_discount, "$375 USD");
+  assert.equal(p.fields.agency_pays, "$2,125 USD");
   assert.equal(p.fields.draft_ref, "BR-IO-20261120-CALMCO");
   for (const k of Object.keys(p.fields)) assert.match(k, /^[a-z_]{2,40}$/);
   assert.doesNotMatch(p.message, /guarantee|CAD/i);

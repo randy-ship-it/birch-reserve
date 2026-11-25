@@ -328,10 +328,10 @@ export const PUBLISHER_INCENTIVE = {
 
 // ---------------------------------------------------------------- agencies
 
-/** Agency deal (updated Nov 24 2026): standard written 10% discount off the published rate card. */
+/** Agency deal (updated Nov 24 2026): standard 15% agency commission off the gross rate card. */
 export const AGENCY = {
-  commissionPct: 10,
-  line: "Agencies buy at a standard written 10% discount off the published rate card.",
+  commissionPct: 15,
+  line: "Agencies earn the standard 15% agency commission off the gross rate card.",
   bonusNote: "Client tests can start self-serve on the $190 USD 7-day look or the $490 USD category reserve.",
 } as const;
 

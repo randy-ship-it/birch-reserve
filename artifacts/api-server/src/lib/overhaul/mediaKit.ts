@@ -41,9 +41,9 @@ export const MEDIA_KIT_EXAMPLES: KitExample[] = [
   kitExample(MEDIA_KIT_OFFERS.premium.spendHi, 0),
 ];
 
-/** Agency discount off the published rate card (Randy, Nov 24 2026). Same 10 figure as AGENCY.commissionPct. */
-export const AGENCY_CASH_PCT = 10;
-/** Dollar amount of the written 10% discount off a list-price spend. */
+/** Agency discount off the published rate card (Randy, Nov 24 2026). Same 15 figure as AGENCY.commissionPct. */
+export const AGENCY_CASH_PCT = 15;
+/** Dollar amount of the standard 15% agency commission discount off a list-price spend. */
 export function agencyCash(clientSpend: number): number {
   return Math.round(clientSpend * AGENCY_CASH_PCT) / 100;
 }

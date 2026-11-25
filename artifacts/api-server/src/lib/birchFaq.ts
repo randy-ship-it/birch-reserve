@@ -91,7 +91,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     return { intent: "guarantee", callback: null, text: `No. We don't guarantee impressions, clicks, reach or a CTR. Any impression figure we show is a modelled estimate (about $8 to $12 CPM). Reporting is aggregate only: UTM links and promo codes per hub and surface. All spend is media credit until the insertion order names the hub and surface.` };
   }
   if (/agenc|commission|cut|kickback|referral fee/.test(t)) {
-    return { intent: "agency", callback: null, text: `Agencies buy at a standard written 10% discount off the published rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. Illustrative: on a $490 USD reserve the agency pays $441. You can reserve space for a client yourself at ${BUY}.` };
+    return { intent: "agency", callback: null, text: `Agencies earn the standard 15% agency commission off the gross rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. Illustrative: on a $490 USD reserve the agency pays $441. You can reserve space for a client yourself at ${BUY}.` };
   }
   if (/exclusiv|one brand|competitor|lock (the|my) category/.test(t)) {
     return { intent: "exclusive", callback: null, text: `The $490 reserve isn't exclusive. It reserves a share of display space across the hub network, curated as hubs launch. Exclusivity is a premium slot, $25,000 to $50,000, inquire only.` };

@@ -1,9 +1,9 @@
 /**
  * Trusted Agency Partners on the home page (Randy Nov 24 2026 t8289u: "love this for the landing
  * page to pop"; aligned to the /agencies rate-card model later the same day).
- * Same terms as /agencies, from shared constants: published rate card, standard written 10%
- * agency discount, agency sets resale, agency handles disclosure, direct buyers pay the card,
- * no undercutting of agency clients. Committed partner inventory is 10–20% better value than
+ * Same terms as /agencies, from shared constants: published rate card, standard 15%
+ * agency commission off gross, agency sets resale, agency handles disclosure, direct buyers pay the card,
+ * no undercutting of agency clients. Committed blocks get a further 10–20% off net, on top of
  * regular agency pricing; volume or term sets the exact rate.
  * No GTM or services promise; no counts; soft CTA to /agencies#talk, never a call push.
  */
@@ -95,7 +95,7 @@ export function TrustedAgencyPartners() {
               ))}
             </ul>
             <p className="mt-4 text-[12px] leading-snug text-background/60" data-testid="tap-economics-note">
-              {PARTNER_VALUE.line} {PARTNER_VALUE.fine} Regular agencies still buy at the written 10% off the rate card. Nothing runs until an insertion order names the placement.
+              {PARTNER_VALUE.line} {PARTNER_VALUE.fine} Regular agencies still earn the standard 15% agency commission off the rate card. Nothing runs until an insertion order names the placement.
             </p>
           </div>
         </div>
