@@ -455,3 +455,126 @@ test("GTM bot lead: validated, honeypotted, tagged SBG, alert to randy@silverbir
     setSalesAlertDepsForTests({ send: null, ready: null });
   }
 });
+
+import { AUDIENCE_LINE, RETAIL_COPY, STREET_REACH_FIG, AUDIENCE_FINE } from "../src/lib/overhaul/brandIntake";
+import { POSITIONING, TAM, CLINIC_NETWORK } from "../src/lib/overhaul/model";
+import { publicHubs } from "../src/lib/hubLadder";
+import { PUBLIC_BRAND_TOTALS, PUBLIC_CATEGORIES, PUBLIC_FINE, CLAIM_LINE } from "../src/lib/overhaul/publicBrandTotals";
+import { buildBrandsAccessPayload, codeMatches, signBrandsAccessToken, verifyBrandsAccessToken } from "../src/lib/overhaul/brandsAccess";
+
+const BANNED_PUBLIC = /Align|Clairvoyant|Alset|80 locations|MedVibe|\bFriday\b|pier39|Ankita|Kalaya|gwen2027|Gwen2027|GWEN2027/i;
+
+test("public brand totals are copied from approved sources and name no brands", () => {
+  const text = [...PUBLIC_BRAND_TOTALS.map((x) => `${x.v} ${x.l}`), ...PUBLIC_CATEGORIES, PUBLIC_FINE, CLAIM_LINE].join("\n");
+  assert.equal(CLAIM_LINE, "Based on signed partnership contracts");
+  assert.match(AUDIENCE_LINE, /700MM\+ captive page views activating/);
+  assert.equal(PUBLIC_BRAND_TOTALS[0]?.v, "700MM+");
+  assert.equal(PUBLIC_BRAND_TOTALS[1]?.v, TAM.ordersLabel);
+  assert.equal(PUBLIC_BRAND_TOTALS[2]?.v, String(TAM.listedPartners));
+  assert.match(RETAIL_COPY, /200\+ locations, 500\+ soon/);
+  assert.equal(PUBLIC_BRAND_TOTALS[3]?.v, "200+");
+  assert.equal(PUBLIC_BRAND_TOTALS[4]?.v, "1MM+");
+  assert.equal(STREET_REACH_FIG.v, "1MM+");
+  assert.match(STREET_REACH_FIG.l, /3MM\+ est\. in 2027/);
+  assert.equal(PUBLIC_BRAND_TOTALS[6]?.v, "3MM+");
+  assert.equal((PUBLIC_BRAND_TOTALS[6] as { estimate?: boolean }).estimate, true);
+  assert.equal(PUBLIC_BRAND_TOTALS[7]?.v, "4");
+  assert.deepEqual([...PUBLIC_CATEGORIES], POSITIONING.recoveryBrandVerticals.filter((v) => !v.inQueue).map((v) => v.label));
+  assert.match(PUBLIC_FINE, /Based on signed partnership contracts/);
+  assert.match(AUDIENCE_FINE, /based on signed partnership contracts/i);
+  assert.doesNotMatch(text, BANNED_PUBLIC);
+  for (const h of [...publicHubs(), ...BRAND_HUBS, CLINIC_NETWORK]) {
+    assert.doesNotMatch(text, new RegExp(h.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), h.name);
+  }
+  const desc = OVERHAUL_ROUTES["/advertise/brands"]!.description;
+  assert.match(desc, /700MM\+/);
+  assert.match(desc, /based on signed partnership contracts/i);
+  assert.doesNotMatch(desc, BANNED_PUBLIC);
+  for (const h of publicHubs()) assert.doesNotMatch(desc, new RegExp(h.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), h.name);
+});
+
+test("advertise/brands access code is case-insensitive and never echoed", () => {
+  const env = { TAM_ACCESS_CODE: "gwen2027", SESSION_SECRET: "test-brands-access-secret" };
+  assert.equal(codeMatches("gwen2027", env), true);
+  assert.equal(codeMatches("GWEN2027", env), true);
+  assert.equal(codeMatches("Gwen2027", env), true);
+  assert.equal(codeMatches("nope", env), false);
+  assert.equal(codeMatches("", env), false);
+  const token = signBrandsAccessToken(Date.now(), env);
+  assert.equal(verifyBrandsAccessToken(token, Date.now(), env), true);
+  assert.equal(verifyBrandsAccessToken("nope", Date.now(), env), false);
+  const payload = buildBrandsAccessPayload(token);
+  const blob = JSON.stringify(payload);
+  assert.equal(payload.ok, true);
+  assert.equal(payload.claim, "Based on signed partnership contracts");
+  assert.ok(payload.hubs.length >= publicHubs().length);
+  assert.ok(payload.hubs.some((h) => /DR-HO/i.test(h.name) && h.surfaces.some((s) => s.views > 0)));
+  assert.ok(payload.hubs.some((h) => h.key === "clinic-network"));
+  assert.doesNotMatch(blob, /gwen2027/i);
+  const first = payload.hubs[0]!;
+  const live = BRAND_HUBS.find((h) => h.key === first.key);
+  assert.ok(live);
+});
+
+test("POST/GET /v1/advertise/brands-access: code gate, token, noindex, no password in body", async () => {
+  const prevA = process.env.TAM_ACCESS_CODE;
+  const prevB = process.env.BRANDS_ACCESS_CODE;
+  const prevS = process.env.SESSION_SECRET;
+  process.env.TAM_ACCESS_CODE = "gwen2027";
+  delete process.env.BRANDS_ACCESS_CODE;
+  process.env.SESSION_SECRET = "test-brands-access-secret-http";
+  const app = express();
+  app.use(createOverhaulRouter());
+  const server = app.listen(0);
+  const port = (server.address() as { port: number }).port;
+  const url = `http://127.0.0.1:${port}/v1/advertise/brands-access`;
+  try {
+    const bad = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ code: "wrong" }) });
+    assert.equal(bad.status, 401);
+    assert.equal(bad.headers.get("cache-control"), "no-store");
+    assert.match(String(bad.headers.get("x-robots-tag")), /noindex/i);
+    const badJ = await bad.json();
+    assert.doesNotMatch(JSON.stringify(badJ), /gwen2027/i);
+    assert.equal("hubs" in badJ, false);
+
+    const empty = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ code: "" }) });
+    assert.equal(empty.status, 400);
+
+    const ok = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ code: "Gwen2027" }) });
+    assert.equal(ok.status, 200);
+    assert.equal(ok.headers.get("cache-control"), "no-store");
+    assert.match(String(ok.headers.get("x-robots-tag")), /noindex/i);
+    const j = (await ok.json()) as { ok: boolean; token: string; hubs: Array<{ name: string; surfaces: Array<{ views: number }> }> };
+    assert.equal(j.ok, true);
+    assert.ok(j.token);
+    assert.ok(j.hubs.some((h) => /DR-HO/i.test(h.name)));
+    assert.doesNotMatch(JSON.stringify(j), /gwen2027/i);
+
+    const denied = await fetch(url);
+    assert.equal(denied.status, 401);
+    const again = await fetch(url, { headers: { Authorization: `Bearer ${j.token}` } });
+    assert.equal(again.status, 200);
+    const j2 = (await again.json()) as { hubs: unknown[] };
+    assert.equal(j2.hubs.length, j.hubs.length);
+  } finally {
+    server.close();
+    if (prevA === undefined) delete process.env.TAM_ACCESS_CODE; else process.env.TAM_ACCESS_CODE = prevA;
+    if (prevB === undefined) delete process.env.BRANDS_ACCESS_CODE; else process.env.BRANDS_ACCESS_CODE = prevB;
+    if (prevS === undefined) delete process.env.SESSION_SECRET; else process.env.SESSION_SECRET = prevS;
+  }
+});
+
+test("advertise-brands page source has no named hubs or liveLine and does not import the brand list", () => {
+  const pageSrc = readFileSync(resolve(process.cwd(), "../clinichub-media/src/pages/br/advertise-brands.tsx"), "utf8");
+  const gateSrc = readFileSync(resolve(process.cwd(), "../clinichub-media/src/components/br/brands-gate.tsx"), "utf8");
+  const src = pageSrc + "\n" + gateSrc;
+  const importsOf = (s: string) => s.split("\n").filter((l) => /^\s*import\b/.test(l)).join("\n");
+  assert.match(pageSrc, /PublicBrandTotals/);
+  assert.match(pageSrc, /BrandsAccessGate/);
+  assert.doesNotMatch(importsOf(pageSrc), /BrandBanners|RateCard|liveLine|ladderLine|BRAND_HUBS/);
+  assert.doesNotMatch(importsOf(gateSrc), /brandsAccess"|BRAND_HUBS|BrandBanners|rate-card/);
+  assert.doesNotMatch(src, BANNED_PUBLIC);
+  for (const h of publicHubs()) {
+    assert.doesNotMatch(src, new RegExp(h.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), h.name);
+  }
+});

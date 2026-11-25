@@ -39,7 +39,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/intake/sponsor": { title: "Supplier + Accelerate · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
   "/advertise/brands": {
     title: "Advertise to brands | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. " + liveLine(),
+    description: "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. 700MM+ captive page views activating, based on signed partnership contracts.",
     jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/advertise/local": {
