@@ -303,6 +303,11 @@ export type IntakePayload = {
    * → the v1 `blurb` as labelled lines. See /workspace/br-intake/CONTRACT-GAPS.md §H.
    */
   company_name?: string;
+  /**
+   * Optional checkbox (Randy, voice, Nov 24 2026): interest in trusted agency partners.
+   * Birch-only boolean (Friday v1 is strict, so the server strips it and keeps a labelled blurb line).
+   */
+  agency_partner_interest?: boolean;
   /** physical: "Do you have physical locations?" (Nov 19 2026 10:54 AM ET) → In-location display line; see inLocation.ts. */
   shared?: { categories?: string[]; skus?: number; audience_customers?: number; physical?: import("./inLocation").PhysicalAnswer };
   hub?: { type?: string; locations?: number; foot_traffic_month?: number; web_visitors_month?: number; page_views_month?: number; email_list?: number; screens?: number; surfaces?: string[]; cities?: string; decision_maker_role?: string };
@@ -313,6 +318,11 @@ export type IntakePayload = {
   /** Lead events (e.g. kit_download). Not yet in Friday's contract: see CONTRACT-GAPS.md. */
   events?: Array<{ type: "kit_download"; at: string; formats: Array<"pdf" | "png"> }>;
 };
+
+/** Exact checkbox wording on /intake (Randy, voice, Nov 24 2026). */
+export const AGENCY_PARTNER_QUESTION =
+  "Do you want to know about any of our trusted agency partners that can help with things like creative new distribution channels, traditional full-service ad buying and end-to-end campaign management?";
+export const agencyPartnerBlurb = (yes: boolean) => `Agency partner interest: ${yes ? "yes" : "no"}.`;
 
 /* ------------------------------------------------------------------ kit Side B: exposure */
 

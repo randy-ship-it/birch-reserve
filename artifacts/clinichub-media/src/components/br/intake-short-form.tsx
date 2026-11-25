@@ -16,7 +16,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "wouter";
 import { ArrowRight, Check, ChevronDown, Loader2, ShieldAlert, Store, Package, Plus, Rocket } from "lucide-react";
 import type { IntakeRole } from "../../../../api-server/src/lib/overhaul/brandIntake";
-import { RETAIL_COPY, RETAIL_TAG } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { AGENCY_PARTNER_QUESTION, RETAIL_COPY, RETAIL_TAG } from "../../../../api-server/src/lib/overhaul/brandIntake";
 import { FRIDAY_CATEGORIES } from "../../../../api-server/src/lib/kitCalc/fridayV12";
 import { HELD_COPY, PARTIAL_EMAIL_RE, adapterMode, fridayIntake, reportPath, saveRef, type IntakeRef } from "@/lib/fridayBrandIntake";
 import { basePayload } from "@/components/br/intake-kit";
@@ -129,6 +129,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   const setMarket = (m: Market) => { setMarketTouched(true); setMarketRaw(m); };
   const [shared, setShared] = useState<SharedAnswers>(() => (sup ? { ...EMPTY_SHARED, brand: brandFromUrl() } : EMPTY_SHARED));
   const [phys, setPhys] = useState<PhysForm>(EMPTY_PHYS);
+  const [agencyPartner, setAgencyPartner] = useState(false);
   const [more, setMore] = useState(false);
   const [website, setWebsite] = useState("");
   const [email, setEmail] = useState("");
@@ -164,13 +165,14 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   const loaded = useRef(false);
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("resume")) { loaded.current = true; return; }
-    const x = loadSaved<{ website: string; email: string; r: OneFormRoles; phys: PhysForm; shared: SharedAnswers }>(SAVE_KEY);
+    const x = loadSaved<{ website: string; email: string; r: OneFormRoles; phys: PhysForm; shared: SharedAnswers; agencyPartner?: boolean }>(SAVE_KEY);
     if (x && (x.website || x.email)) {
       if (x.website) setWebsite(String(x.website));
       if (x.email) setEmail(String(x.email));
       if (x.r && typeof x.r === "object" && (x.r.supplier || x.r.hub)) setR({ supplier: Boolean(x.r.supplier), hub: Boolean(x.r.hub), accelerate: Boolean(x.r.accelerate) });
       if (x.phys && typeof x.phys === "object") setPhys({ ...EMPTY_PHYS, ...x.phys });
       if (x.shared && typeof x.shared === "object") setShared((cur) => ({ ...cur, ...x.shared, categories: Array.isArray(x.shared!.categories) ? x.shared!.categories.slice(0, 3) : cur.categories }));
+      if (typeof x.agencyPartner === "boolean") setAgencyPartner(x.agencyPartner);
       setLocalRestored(true);
     }
     loaded.current = true;
@@ -178,10 +180,10 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   }, []);
   useEffect(() => {
     if (!loaded.current || submitted.current) return;
-    if (website.trim() || email.trim()) saveForm(SAVE_KEY, { website, email, r, phys, shared });
+    if (website.trim() || email.trim()) saveForm(SAVE_KEY, { website, email, r, phys, shared, agencyPartner });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [website, email, r, phys, shared]);
-  const startOver = () => { clearSaved(SAVE_KEY); setWebsite(""); setEmail(""); setPhys(EMPTY_PHYS); setShared(sup ? { ...EMPTY_SHARED, brand: brandFromUrl() } : EMPTY_SHARED); setLocalRestored(false); setTouched({}); };
+  }, [website, email, r, phys, shared, agencyPartner]);
+  const startOver = () => { clearSaved(SAVE_KEY); setWebsite(""); setEmail(""); setPhys(EMPTY_PHYS); setAgencyPartner(false); setShared(sup ? { ...EMPTY_SHARED, brand: brandFromUrl() } : EMPTY_SHARED); setLocalRestored(false); setTouched({}); };
   const fieldErrs = { website: fieldError("website", website), email: fieldError("email", email) };
   const flip = (k: keyof OneFormRoles) => {
     setR((cur) => {
@@ -201,6 +203,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
     roles,
     ...(marketTouched && market.sells_in.length ? { market } : {}),
     ...(shared.brand.trim() ? { company_name: shared.brand.trim() } : {}),
+    agency_partner_interest: agencyPartner,
     shared: { categories: shared.categories, skus: numOrU(shared.skus), audience_customers: numOrU(shared.audience), ...(physOf(phys) ? { physical: physOf(phys) } : {}) },
     // Supplier preset + own hub: the hub is created as pending_approval (Randy or Jon approve; never auto-publish).
     ...(sup ? (hubEstimateNote() ? { notes: [hubEstimateNote()!] } : {}) : { notes: [perfOnly ? PERF_ONLY_PROGRAM_NOTE : CLINIC_PROGRAM_NOTE, ...(hubEstimateNote() ? [hubEstimateNote()!] : [])] }),
@@ -214,7 +217,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   const partialSig = useRef("");
   const submitted = useRef(false);
   const emailOk = PARTIAL_EMAIL_RE.test(email.trim());
-  const partialKey = JSON.stringify([email.trim(), website.trim(), roles, shared, phys, marketTouched ? market : null]);
+  const partialKey = JSON.stringify([email.trim(), website.trim(), roles, shared, phys, agencyPartner, marketTouched ? market : null]);
   useEffect(() => {
     if (!emailOk || hp || submitted.current || partialKey === partialSig.current) return;
     const t = window.setTimeout(() => {
@@ -386,6 +389,11 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
           <div className="md:col-span-2"><MarketPicker value={market} onChange={setMarket} side={side} compact /></div>
         </div>
       ) : null}
+
+      <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-3 text-sm leading-snug text-[#0b1f3a]" data-testid="intake-agency-partner">
+        <input type="checkbox" checked={agencyPartner} onChange={(e) => setAgencyPartner(e.target.checked)} data-testid="intake-agency-partner-checkbox" className="mt-0.5 size-4 shrink-0 accent-[#0b1f3a]" />
+        <span>{AGENCY_PARTNER_QUESTION}</span>
+      </label>
 
       <div className="mt-4 border-t border-foreground/10 pt-3 text-[13px]" data-testid="intake-secondary">
         <a href="/intake/sponsor" className="text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-sponsor-link">Want to own a category or an area? See category and area locks</a>

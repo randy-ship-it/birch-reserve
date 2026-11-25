@@ -307,7 +307,7 @@ test("v1.3 fast mode: website+email required (nothing sent otherwise); strict Fr
 });
 
 /* ------------------------------------------------------------------ partial-lead capture (Nov 19 2026 10:21 AM ET) */
-import { PARTIAL_TAG, SUBMITTED_TAG, prepareStage, kitIntakeAlert, isScaleIntakeSource, KIT_INTAKE_ALERT_TO, type IntakeLeadEvent, type KitIntakeAlert } from "../src/routes/brandIntakeProxy";
+import { PARTIAL_TAG, SUBMITTED_TAG, prepareStage, kitIntakeAlert, isScaleIntakeSource, KIT_INTAKE_ALERT_TO, agencyPartnerInterestOf, type IntakeLeadEvent, type KitIntakeAlert } from "../src/routes/brandIntakeProxy";
 
 async function serveRL(fetchImpl: typeof fetch, leads: IntakeLeadEvent[], alerts: KitIntakeAlert[] = []) {
   const app = express();
@@ -471,6 +471,43 @@ test("kitIntakeAlert: Scale-sourced TEST submissions email only randy@scalehealt
   assert.match(a.title, /TEST – Emma QA, ignore/);
   assert.equal(a.rows.find(([k]) => k === "Source")?.[1], "Scale (ref=scale)");
   assert.equal(a.replyTo, "test@example.com");
+  assert.equal(a.rows.find(([k]) => k === "Agency partner interest"), undefined);
+});
+
+test("prepareStage strips agency_partner_interest (Friday strict) and keeps a labelled blurb line", () => {
+  const withLine = prepareStage({ submit: true, email: "a@example.com", agency_partner_interest: true, blurb: "Agency partner interest: yes.\nIntent: supplier + hub." });
+  assert.equal("agency_partner_interest" in withLine.body, false);
+  assert.match(String(withLine.body.blurb), /Agency partner interest: yes\./);
+  const fromBool = prepareStage({ email: "a@example.com", agency_partner_interest: false, blurb: "Intent: supplier only." });
+  assert.equal("agency_partner_interest" in fromBool.body, false);
+  assert.match(String(fromBool.body.blurb), /Agency partner interest: no\./);
+  assert.match(String(fromBool.body.blurb), /Intent: supplier only/);
+  assert.equal(agencyPartnerInterestOf(fromBool.body), false);
+  assert.equal(agencyPartnerInterestOf({ agency_partner_interest: true }), true);
+  assert.equal(agencyPartnerInterestOf({}), null);
+});
+
+test("kitIntakeAlert includes Agency partner interest when the blurb or boolean is present", () => {
+  const yes = kitIntakeAlert({
+    body: { email: "brand@example.com", website: "example.com", company_name: "Glow", roles: ["supplier"], blurb: "Agency partner interest: yes." },
+    src: "scale_mirror",
+    ref: "scale",
+    host: "www.scalehealth.ca",
+    origin: "https://www.scalehealth.ca",
+    fridayId: "bi_agency01",
+    path: "/intake",
+  });
+  assert.equal(yes.rows.find(([k]) => k === "Agency partner interest")?.[1], "Yes");
+  const no = kitIntakeAlert({
+    body: { email: "brand@example.com", website: "example.com", roles: ["supplier"], agency_partner_interest: false },
+    src: null,
+    ref: null,
+    host: "birchreserve.net",
+    origin: "",
+    fridayId: null,
+    path: "/intake",
+  });
+  assert.equal(no.rows.find(([k]) => k === "Agency partner interest")?.[1], "No");
 });
 
 test("final Scale submit (POST submit + src=scale_mirror) emails randy@scalehealth.ca; a partial does not", async () => {
