@@ -46,15 +46,6 @@ export const TRACK_RECORD = {
         "We wrap a brand's existing post-purchase, email, loyalty and in-pack surfaces in real care, so its name sits next to registered physiotherapists, not affiliate banners. Each hub has four ad surfaces: the post-purchase thank-you page, the member dashboard, the hub home and product or service pages.",
       sources: ["https://silverbirchgrowth.com/work", "https://silverbirchgrowth.com/"],
     },
-    {
-      key: "partner-launch",
-      tag: "Partner launch · Contract signed · Onboarding",
-      stat: "21 days",
-      outcome: "A virtual care partner went from first email to signed pilot in 21 days — now in onboarding.",
-      detail:
-        "Our field sales bot ran the thread: 12 emails, each one scored, with the prospect's tone rising from 55 on the first reply to 94 before signing (our read of the wording). Contract signed Nov 18; onboarding is under way across partner pages and hubs.",
-      sources: ["https://fridayapp.org/share/deal/digital-md-partner (Case study · names withheld, Oct 28 to Nov 24, 2026)"],
-    },
   ] as const satisfies readonly TrackRecordCard[],
   more: "How",
   note: "Team and portfolio track record. Internally reported and unaudited. Not Birch Reserve campaign results, and no outcomes are guaranteed.",
@@ -64,4 +55,20 @@ export const TRACK_RECORD = {
 
 /** One line for the chat prompt / llms.txt. */
 export const TRACK_RECORD_FACT =
-  "Team and portfolio track record (anonymous, internally reported, not Birch Reserve campaign results): a service placed inside one host business grew 5.4x from its first month and the host signed a five-year term at month six; a partner network rebuilt with churn cut from over 35% to under 5%; brands' existing post-purchase, email, loyalty and in-pack surfaces turned into a co-branded care layer with no tech build; a virtual care partner went from first email to signed pilot in 21 days through our field sales bot (contract signed, now onboarding). Never name the companies involved and never present these as ad results.";
+  "Team and portfolio track record (anonymous, internally reported, not Birch Reserve campaign results): a service placed inside one host business grew 5.4x from its first month and the host signed a five-year term at month six; a partner network rebuilt with churn cut from over 35% to under 5%; brands' existing post-purchase, email, loyalty and in-pack surfaces turned into a co-branded care layer with no tech build. Never name the companies involved and never present these as ad results.";
+
+/**
+ * Kept on disk, unlinked from public pages, SSR, chat, and llms.txt for now (Randy t552u).
+ * Do not import this from clinichub-media or any public bundle.
+ */
+export const TRACK_RECORD_UNLINKED_CARDS = [
+  {
+    key: "partner-launch",
+    tag: "Partner launch · Contract signed · Onboarding",
+    stat: "21 days",
+    outcome: "A virtual care partner went from first email to signed pilot in 21 days — now in onboarding.",
+    detail:
+      "Our field sales bot ran the thread: 12 emails, each one scored, with the prospect's tone rising from 55 on the first reply to 94 before signing (our read of the wording). Contract signed Nov 18; onboarding is under way across partner pages and hubs.",
+    sources: ["https://fridayapp.org/share/deal/digital-md-partner (Case study · names withheld, Oct 28 to Nov 24, 2026)"],
+  },
+] as const satisfies readonly TrackRecordCard[];

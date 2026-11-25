@@ -35,7 +35,7 @@ export const QUESTIONS = [
   { id: "human", q: "can I talk to a real person?", any: [[/647|call-?back|request form|team|person|human/i]] },
   { id: "which-offer", q: "I have a $2,000 budget for a first test. what should I buy?", any: [[/\$190|7-day look|pack|\$1,500|reserve/i]], link: [/buycalc|sponsor|\/buy/] },
   { id: "order-of-ops", q: "walk me through the whole onboarding from free kit to my ad running", any: [[/kit/i], [/look|reserve|pack/i], [/IO|insertion order/i]], link: [/\/intake/] },
-  { id: "proof-19-day", q: "can you actually execute? do you have any proof you move fast with partners?", any: [[/21 days/i], [/virtual care/i]], mustNot: [/\bour (campaign )?results (show|prove)/i, /guarantee(?!s? (no|any))/i] },
+  { id: "proof-track-record", q: "can you actually execute? do you have any proof of a track record?", any: [[/5\.4x/i], [/under 5%|churn/i], [/no tech build|co-branded care/i]], mustNot: [/\bour (campaign )?results (show|prove)/i, /guarantee(?!s? (no|any))/i, /21 days/i, /virtual care partner/i] },
   { id: "activate-step", q: "I submitted the free kit form. what's the Step 2 of 2 about inventory and ads?", any: [[/inventory|estimate|range/i], [/ads|curated|premium|which ads/i]], link: [/\/intake\/activate/] },
   { id: "ad-openness", q: "I run a hub. can I choose which kinds of ads run on it, and exclude alcohol?", any: [[/curated|premium|any approved/i], [/exclu/i], [/review|approv/i]], link: [/\/intake\/activate/] },
 ];

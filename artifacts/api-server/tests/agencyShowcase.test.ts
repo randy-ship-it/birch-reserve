@@ -102,7 +102,7 @@ test("copy scan: agency sections, home and media kit carry no banned or retired 
   }
   const agencyOnly = ["../clinichub-media/src/components/br/agency-showcase.tsx", "./src/lib/overhaul/agencyShowcase.ts"].map(read).join("\n");
   assert.doesNotMatch(agencyOnly, /\(\d{3}\)\s?\d{3}-\d{4}|\b\d{3}-\d{3}-\d{4}\b/);
-  assert.doesNotMatch(agencyOnly.replaceAll("https://fridayapp.org/share/deal/digital-md-partner", ""), /fridayapp|cockpit/i);
+  assert.doesNotMatch(agencyOnly, /fridayapp|cockpit|digital-md-partner/i);
   assert.doesNotMatch(agencyOnly, /keeps?[^.\n]{0,30}as media credit/i);
   // Nov 14 2026: broad network positioning; the reserve CTA shows the buyer-currency price.
   assert.match(files, /Reserve your space — \{price\.seat\}/);
@@ -237,7 +237,7 @@ test("Nov 24: /agencies leads with two ways to buy (card vs insertion order), pu
 
 test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's exact numbers, no call CTA", async () => {
   const { AGENCY_TIERS, EXCLUSIVE_PARTNER_DISCOUNT, EXCLUSIVE_PARTNER_PERKS } = await import("../src/lib/overhaul/agencyShowcase");
-  const { TRACK_RECORD } = await import("../src/lib/overhaul/trackRecord");
+  const { TRACK_RECORD, TRACK_RECORD_UNLINKED_CARDS } = await import("../src/lib/overhaul/trackRecord");
   assert.deepEqual(AGENCY_TIERS.map((t) => t.key), ["direct", "agency", "exclusive"]);
   const [direct, agency, exclusive] = AGENCY_TIERS;
   assert.equal(direct!.pay, "The published rate card");
@@ -250,15 +250,15 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.equal(EXCLUSIVE_PARTNER_PERKS.length, 4);
   const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
-  // List price = the live ladder (no new prices); the example is the existing nameless track-record card.
+  // List price = the live ladder (no new prices). The names-withheld partner-launch example is unlinked for now (Randy t552u).
   assert.match(ui, /priceLadder\("usd"\)/);
-  assert.match(ui, /TRACK_RECORD\.cards\.find\(\(c\) => c\.key === "partner-launch"\)/);
-  assert.ok(TRACK_RECORD.cards.some((c) => c.key === "partner-launch"));
+  assert.doesNotMatch(ui, /TRACK_RECORD|partner-launch|EXCLUSIVE_CASE_STUDY|digital-md-partner|fridayapp|See the live case study|Contract signed · Onboarding|names withheld/i);
+  assert.ok(TRACK_RECORD_UNLINKED_CARDS.some((c) => c.key === "partner-launch"));
+  assert.ok(!TRACK_RECORD.cards.some((c) => c.key === "partner-launch"));
   for (const c of ["<AgencyRateCardModel />", "<AgencyDiscountExample />", "<ExclusivePerks />"]) assert.ok(page.includes(c), c);
   assert.doesNotMatch(page, /<InventoryCanister \/>|<AgencyTierCards /);
   assert.ok(EXCLUSIVE_PARTNER_PERKS.some((p) => /Partners get woven into our bot chats, already under way with hundreds of brands and thousands of retailers/.test(p)));
-  assert.match(ui, /Contract signed · Onboarding/);
-  assert.doesNotMatch(ui, /19 days|ready to sign/i);
+  assert.doesNotMatch(ui, /19 days|ready to sign|21 days|virtual care partner/i);
   // One primary hero CTA, before the model.
   const hero = page.slice(page.indexOf("<H1>"), page.indexOf('id="model"'));
   assert.equal((hero.match(/<Cta /g) ?? []).length, 1);

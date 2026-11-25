@@ -506,7 +506,8 @@ test("no-JS shell carries origin story, track record, GTM and the example report
     const html = withProofShell(shell, path);
     assert.match(html, /How we got here/);
     assert.match(html, /Track record/);
-    assert.match(html, /21 days/);
+    assert.match(html, /5\.4/);
+    assert.doesNotMatch(html, /21 days|virtual care partner|digital-md-partner|fridayapp/i);
     assert.match(html, /rare strategic projects/i);
     assert.match(html, /Example report · illustrative numbers, not results/);
     assert.match(html, /unaudited/);
@@ -523,6 +524,7 @@ test("no-JS shell carries origin story, track record, GTM and the example report
   for (const bad of [/Align|Clairvoyant|Alset|MedVibe|Friday|pier39|STREET100/i, /(?<!not a )(?<!no )guarantee(?!d)(?! s)/i, /\b80 locations\b/i]) assert.doesNotMatch(txt, bad);
   assert.match(txt, /How we got here/);
   assert.match(txt, /Track record/);
+  assert.doesNotMatch(txt, /21 days|virtual care partner|digital-md-partner|fridayapp/i);
   assert.match(txt, /## Performance only/);
   assert.match(txt, /intake\?program=performance-only/);
   assert.doesNotMatch(txt, /reject/i);

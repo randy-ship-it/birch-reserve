@@ -26,7 +26,7 @@ export function TrackRecord({ where }: { where: "home" | "media_kit" }) {
           <h2 className="mt-1 font-display text-2xl leading-tight text-[#0b1f3a] md:text-3xl">{TRACK_RECORD.title}</h2>
         </div>
       </div>
-      <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" data-testid={`track-record-cards-${where}`}>
+      <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-testid={`track-record-cards-${where}`}>
         {TRACK_RECORD.cards.map((c) => (
           <li key={c.key} className="flex min-w-0 flex-col rounded-2xl bg-[#0b1f3a] p-4 text-white" data-testid={`track-record-card-${c.key}`}>
             <p className="text-[11px] font-bold uppercase tracking-wider text-lime-300">{c.tag}</p>

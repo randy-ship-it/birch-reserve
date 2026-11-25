@@ -268,8 +268,6 @@ export const AGENCY_TIERS: ReadonlyArray<{
 ];
 
 /** Access perks for Trusted Agency Partners. Same 10% discount as every agency. */
-export const EXCLUSIVE_CASE_STUDY_URL = "https://fridayapp.org/share/deal/digital-md-partner";
-
 export const EXCLUSIVE_PARTNER_PERKS = [
   "First look at new exclusive packages and hubs before they open publicly.",
   "Reserved access to exclusive packages and newly activating hubs.",
