@@ -3,13 +3,13 @@ import { ChevronDown } from "lucide-react";
 import { isScaleSkin, skinText } from "@/lib/siteSkin";
 import { LeadForm } from "@/components/br/lead-form";
 import { KitEntry } from "@/components/br/pilot-path";
-import { AgencyDiscountExample, AgencyRateCardModel, BuyPaths, ExclusivePerks, GoalPlanner, InventoryCanister, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
+import { AgencyDiscountExample, AgencyRateCardModel, BlockLadder, BuyPaths, ExclusivePerks, GoalPlanner, InventoryCanister, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
 import { AGENCY_FAQ, PARTNER_VALUE } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { RESERVE_HREF, lookHref } from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
 
 /**
- * /agencies (Randy, Nov 24 2026): published rate card, standard written 10% agency discount,
+ * /agencies (Randy, Nov 24 2026; Nov 25: industry-standard 15% agency commission off gross + committed-block tiers):
  * agencies set their own resale price, agencies handle their own client disclosure, direct buyers
  * pay the rate card, no undercutting of agency clients. No call CTA. No services or GTM promise.
  */
@@ -51,7 +51,7 @@ function Fold({ id, title, sub, children }: { id: string; title: string; sub: st
 export default function BrAgencies() {
   usePageMeta(
     "For agencies & brokers | Birch Reserve",
-    "Published rate card. Agencies buy at a standard written 10% discount, set their own resale price and handle their own client disclosure. Direct buyers pay the rate card. We do not undercut agency clients.",
+    "Published rate card. Agencies earn the standard 15% agency commission off the gross rate card, with committed-spend tiers on top. Agencies set their own resale price and handle their own client disclosure. We do not undercut agency clients.",
   );
   // Deep links (/agencies#plain-terms) open the fold they name before the layout scrolls to it.
   useEffect(() => {
@@ -67,13 +67,14 @@ export default function BrAgencies() {
         <div className="grid items-start gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
           <div className="max-w-3xl">
             <Eyebrow>For agencies, brokers &amp; media resellers</Eyebrow>
-            <H1>The rate card is public. Agencies buy 10% off.</H1>
+            <H1>The rate card is public. Agencies earn the standard 15%.</H1>
             <Lede>
-              Direct buyers pay the published rate card. Agencies get a standard written 10% discount, set their own resale price, and handle their own client disclosure. We do not undercut an agency&apos;s client.
+              Direct buyers pay the published rate card. Agencies earn the standard 15% agency commission off gross, with committed-spend tiers on top. You set the resale price and handle client disclosure. We do not undercut an agency&apos;s client.
             </Lede>
             <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-              <Cta href={RESERVE_HREF} testId="agency-cta-reserve">Reserve for a client · $490 USD</Cta>
-              <a href="#model" className="text-sm font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="agency-cta-model">See how it works</a>
+              <Cta href="#talk" testId="agency-cta-io">Get a draft IO</Cta>
+              <a href="#blocks" className="text-sm font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="agency-cta-model">See inventory blocks</a>
+              <a href={RESERVE_HREF} className="text-sm text-[#0b1f3a]/70 underline underline-offset-4" data-testid="agency-cta-reserve">Or reserve a client test · $490 USD</a>
             </div>
           </div>
           <ul className="border-t border-[#0b1f3a]/15 lg:mt-2" data-testid="agency-benefits" aria-label={skinText("Why agencies use Birch")}>
@@ -90,7 +91,7 @@ export default function BrAgencies() {
       <Section tone="soft" id="model">
         <div className="max-w-3xl">
           <Eyebrow>How buying works</Eyebrow>
-          <H2>One rate card. A written 10% for&nbsp;agencies.</H2>
+          <H2>One rate card. The standard 15% for&nbsp;agencies.</H2>
           <p className="mt-3 text-sm text-muted-foreground">One inventory. Direct buyers, agencies and partners each draw from the same tank.</p>
         </div>
         <div className="mt-8">
@@ -103,6 +104,17 @@ export default function BrAgencies() {
         <p className="mt-6 text-xs text-muted-foreground">{PARTNER_VALUE.line} {PARTNER_VALUE.fine} First look as new hubs activate. Nothing runs until the insertion order names the hub and placement. Full terms on <a className="underline underline-offset-2" href="/terms">/terms</a>.</p>
       </Section>
 
+      <Section id="blocks" className="scroll-mt-24">
+        <div className="max-w-3xl">
+          <Eyebrow>Committing inventory blocks</Eyebrow>
+          <H2>Start with one client. Scale to upfront blocks.</H2>
+          <p className="mt-3 text-sm text-muted-foreground">A small first commitment that proves the placement, then larger blocks booked ahead at a better tier. Fixed flight dates, a standard cancellation window and makegoods on every block.</p>
+        </div>
+        <div className="mt-8">
+          <BlockLadder />
+        </div>
+      </Section>
+
       <Section id="details">
         <Eyebrow>The details</Eyebrow>
         <H2>Everything a client will ask. Folded.</H2>
@@ -110,7 +122,7 @@ export default function BrAgencies() {
           <Fold id="two-ways-to-buy" title="Card or insertion order" sub="Self-serve from $190 USD, or a managed $1K–$5K USD client test">
             <BuyPaths reserveHref={RESERVE_HREF} lookHref={lookHref("agencies_paths_look")} />
           </Fold>
-          <Fold id="payouts" title="The 10% discount, worked out" sub="An illustrative $10,000 USD example off the published rate card">
+          <Fold id="payouts" title="The 15% commission, worked out" sub="An illustrative $10,000 USD example off the gross rate card">
             <AgencyDiscountExample />
           </Fold>
           <Fold id="spec-sheet" title="Spec sheet" sub="Four placements, public starting rates">
@@ -150,9 +162,8 @@ export default function BrAgencies() {
       <Section tone="soft" id="talk" className="scroll-mt-24">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <H2>Ask about partner access, or tell us about your clients.</H2>
-            <p className="mt-4 text-sm text-muted-foreground">Partner access, client tests and broker lists all come here. We reply in writing with hub fit and a draft insertion order.</p>
-            <p className="mt-6 max-w-md text-[11px] leading-relaxed text-foreground/50" data-testid="agencies-inventory-aside">Inquire within about blocking out dedicated inventory chunks similar to our agency partners.</p>
+            <H2>Get a draft IO for a client.</H2>
+            <p className="mt-4 text-sm text-muted-foreground">Starter blocks, upfront blocks and partner access all come here. We reply in writing within one business day with hub fit, flight dates and a draft insertion order.</p>
           </div>
           <LeadForm
             kind="agency_inquiry"
@@ -163,10 +174,8 @@ export default function BrAgencies() {
               { name: "company", label: "Agency", required: true },
               { name: "name", label: "Your name", required: true },
               { name: "email", label: "Work email", type: "email", required: true },
-              { name: "website", label: "Agency website", type: "url" },
-              { name: "client_categories", label: "Client categories", type: "select", options: ["Health & wellness DTC", "Supplements / nutrition", "Fitness / recovery", "Food / beverage", "Pets", "Mixed"] },
-              { name: "test_budget", label: "What are you after?", type: "select", options: ["Partner access", "$190 USD 7-day look", "$490 USD reserve", "$1K–$5K USD client test (IO)", "Premium slot (inquiry)", "Not sure yet"] },
-              { name: "message", label: "Notes", type: "textarea" },
+              { name: "test_budget", label: "What are you after?", type: "select", options: ["Starter block ($1K–$5K USD)", "Upfront block ($25K–$50K USD)", "Partner access", "Not sure yet"] },
+              { name: "message", label: "Client or brief (optional)", type: "textarea" },
             ]}
           />
         </div>

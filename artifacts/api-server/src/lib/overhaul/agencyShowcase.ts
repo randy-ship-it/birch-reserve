@@ -4,7 +4,7 @@
  *
  * Every figure here is re-used from an existing source, never invented:
  *   - agency discount: AGENCY_CASH_PCT in ./mediaKit = AGENCY.commissionPct in ./model
- *     (live /agencies + AGENCY.line: written 10% off the published rate card).
+ *     (live /agencies + AGENCY.line: standard 15% agency commission off the gross rate card).
  *   - starting CPMs: SURFACES (./model) / RATE_SURFACES (./pricing), illustrative estimates.
  *   - 20MM+ orders: TAM.ordersLabel (./model), modelled.
  *   - sell assumption: Randy 7:33 PM ET, "20% of available display space". An ASSUMPTION.
@@ -19,19 +19,19 @@ import { isPremiumPlacement } from "../premiumInquireOnly";
 export const SELL_ASSUMPTION_PCT = 20;
 export const SELL_ASSUMPTION_LINE = `Planning assumption: we model selling ${SELL_ASSUMPTION_PCT}% of available display space on each placement. An assumption, not a delivery commitment; your IO sizes views against live hub supply.`;
 
-/** Randy, Nov 24 2026: standard written 10% discount off the published rate card. */
+/** Randy, Nov 24 2026: standard 15% agency commission off the gross rate card. */
 export const AGENCY_SHARE = {
   pct: AGENCY_CASH_PCT,
   matchesModel: AGENCY_CASH_PCT === AGENCY.commissionPct,
-  line: `Agencies buy at a standard written ${AGENCY_CASH_PCT}% discount off the published rate card.`,
+  line: `Agencies earn the standard ${AGENCY_CASH_PCT}% agency commission off the gross rate card.`,
   timing: "The discount is written into the insertion order.",
 } as const;
 
 /**
  * Brand bonus credit: already stated for brands on /advertise/brands (DEPOSIT_TIERS, +5/+10/+15%).
- * It is the client's media credit, separate from the written 10% agency discount.
+ * It is the client's media credit, separate from the standard 15% agency commission.
  */
-export const BRAND_BONUS_LINE = `Client tests start self-serve on the $190 USD 7-day look or the $490 USD reserve; premium slots by inquiry. Separate from the written ${AGENCY_CASH_PCT}% agency discount.`;
+export const BRAND_BONUS_LINE = `Client tests start self-serve on the $190 USD 7-day look or the $490 USD reserve; premium slots by inquiry. Separate from the standard ${AGENCY_CASH_PCT}% agency commission.`;
 
 /** Worked examples on the public tiers: $490 seat (card) and the $25K premium floor (inquire). */
 export const AGENCY_EXAMPLES = [
@@ -158,13 +158,12 @@ export const PLAIN_TERMS: Array<{ key: string; q: string; a: string }> = [
 /** The /agencies FAQ (moved here from the page on Nov 18 2026 so the server can emit one FAQPage). */
 export const AGENCY_FAQ: Array<{ q: string; a: string }> = [
   { q: "Can we prepay for several clients?", a: "Yes. One prepay can be split across clients; each client gets its own insertion order and reporting." },
-  { q: "Is there an agency discount?", a: "Yes. Agencies, brokers and media resellers buy at a standard written 10% discount off the published rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. Small tests can start self-serve on the $190 USD look or the $490 USD reserve." },
+  { q: "Is there an agency commission?", a: "Yes. Agencies, brokers and media resellers earn the standard 15% agency commission off the gross rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. Small tests can start self-serve on the $190 USD look or the $490 USD reserve." },
   { q: "Which placement fits which goal?", a: "Awareness: the hub home page. Consideration: product, services and booking pages. Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Retention and loyalty: the member dashboard behind login. One IO can mix them." },
   { q: "How is performance tracked?", a: "Every placement carries your UTM parameters and, if you want, a promo code. We report views and clicks per hub and surface. Aggregate only." },
-  { q: "What is reserved partner inventory?", a: "A limited set-aside of exclusive packages and newly activating hubs, for a few agencies. Partners who commit to inventory get 10–20% better value than regular agency buyers, who buy at 10% off the rate card. Committed volume or term sets the exact rate. Partners also get first look as new hubs activate. Send a note on the agency form if that is useful." },
-  { q: "Do brokers and media resellers qualify?", a: "Yes. When you are the agency of record on the insertion order, you buy at the same written 10% discount as an agency. You set your own resale price and handle your own client disclosure. List every brand you represent in one inquiry; each gets its own IO and reporting." },
+  { q: "What is reserved partner inventory?", a: "A limited set-aside of exclusive packages and newly activating hubs, for a few agencies. Agencies that commit to an inventory block get a further 10–20% off the net agency rate, on top of the standard 15% agency commission. Block size and term set the tier. Partners also get first look as new hubs activate. Send a note on the agency form if that is useful." },
+  { q: "Do brokers and media resellers qualify?", a: "Yes. When you are the agency of record on the insertion order, you earn the same standard 15% agency commission. You set your own resale price and handle your own client disclosure. List every brand you represent in one inquiry; each gets its own IO and reporting." },
   { q: "Why lock a test now?", a: "New placements open at starter rates, and a placement's rate can step up only once reporting shows it performs. Prepaid credit keeps its rate for its term, and the $490 USD reserve stays fully refundable until 14 days before the launch date on the IO." },
-  { q: "Can our bots read this site?", a: "Yes: see /llms.txt, /sitemap.xml and the structured data on each page." },
 ];
 
 /** schema.org FAQPage for a list of Q&As (one per page; Google flags duplicate FAQPage blocks). */
@@ -199,21 +198,21 @@ export const BUY_PATHS = {
     { k: "Pay", card: "Card on a Stripe-hosted page, no login", io: "Deposit collected at confirmation" },
     { k: "Before it runs", card: "You approve an IO naming the hub and placement", io: "Send the brief; we reply with hub fit and a draft IO" },
     { k: "Refunds", card: "$490 refundable until 14 days before launch; $190 converts or is refunded", io: "Same terms as every deposit" },
-    { k: "Agency discount", card: `${AGENCY_CASH_PCT}% off the published rate card`, io: `${AGENCY_CASH_PCT}% off the published rate card` },
+    { k: "Agency commission", card: `${AGENCY_CASH_PCT}% off the published rate card`, io: `${AGENCY_CASH_PCT}% off the published rate card` },
   ],
 } as const;
 
 
 /**
- * Rate-card agency model (Randy, Nov 24 2026): published rate card, standard written 10% agency
- * discount, agencies set their own resale price, agencies handle their own client disclosure,
+ * Rate-card agency model (Randy, Nov 24 2026; commission moved to the industry-standard 15% off gross on Nov 25 2026):
+ * published rate card, standard 15% agency commission, agencies set their own resale price, agencies handle their own client disclosure,
  * direct buyers pay the rate card, no undercutting of agency clients.
  * Shared by /agencies and the home Trusted Agency Partners section.
  */
 export const AGENCY_DISCOUNT_PCT = AGENCY_CASH_PCT;
 export const AGENCY_RATE_CARD = {
   discountPct: AGENCY_DISCOUNT_PCT,
-  line: `Agencies buy at a standard written ${AGENCY_DISCOUNT_PCT}% discount off the published rate card.`,
+  line: `Agencies earn the standard ${AGENCY_DISCOUNT_PCT}% agency commission off the gross rate card.`,
   resale: "You set your own resale price.",
   disclosure: "You handle your own client disclosure.",
   direct: "Direct buyers pay the published rate card.",
@@ -222,12 +221,12 @@ export const AGENCY_RATE_CARD = {
 
 export const AGENCY_RATE_RULES: ReadonlyArray<{ k: string; d: string }> = [
   { k: "Published rate card", d: "The same list prices every buyer can see. The 7-day look, the reserve and the exclusive reserve are on the media kit." },
-  { k: "Written 10% discount", d: "Agencies, brokers and media resellers buy 10% off that card. The discount is standard and in writing." },
+  { k: "Standard 15% agency commission", d: "Agencies, brokers and media resellers earn the standard 15% commission off the gross rate card, written into every insertion order." },
   { k: "You set the resale price", d: "What you charge your client is yours. We do not set a resale price for you." },
   { k: "You disclose to your client", d: "Client disclosure sits with you. We do not brief your client on what you paid." },
   { k: "Direct buyers pay the card", d: "A brand buying for itself pays the published rate card. No agency discount." },
   { k: "No undercutting agency clients", d: "If you are the agency of record on an insertion order, we will not sell that client the same inventory cheaper behind you." },
-  { k: "Committed partner inventory", d: "Trusted Agency Partners who commit to inventory get 10–20% better value than regular agency pricing. Committed volume or term sets the exact rate." },
+  { k: "Committed-spend tiers", d: "Commit to an inventory block and a further 10–20% comes off the net agency rate. Block size and term set the tier." },
 ];
 
 /** $10,000 USD worked example. Planning illustration only, not a quote. */
@@ -236,12 +235,12 @@ export const AGENCY_DISCOUNT_EXAMPLE = {
   discountPct: AGENCY_DISCOUNT_PCT,
   discount: 10_000 * (AGENCY_DISCOUNT_PCT / 100),
   agencyPays: 10_000 * (1 - AGENCY_DISCOUNT_PCT / 100),
-  note: "Illustrative example, modelled. Not a forecast or a quote. Assumes a 10% discount off the published rate card. What you charge the client is yours. Nothing runs until an insertion order names the placement.",
+  note: "Illustrative example, modelled. Not a forecast or a quote. Assumes the standard 15% agency commission off the gross rate card. What you charge the client is yours. Nothing runs until an insertion order names the placement.",
 } as const;
 
 /**
- * Committed partner inventory (Randy, Nov 25 2026 t570u): Trusted Agency Partners who commit
- * to inventory get 10–20% better value than regular agency buyers (who buy at the written 10%
+ * Committed partner inventory (Randy, Nov 25 2026 t570u; reworded 5:21 PM ET as a committed-spend tier on top of the
+ * standard 15% agency commission): a further 10–20% off the net agency rate (agencies earn the standard 15% agency commission
  * off the published rate card). Exact rate is set by committed volume or term. Range, not a
  * guarantee. The list-price ladder is unchanged.
  */
@@ -250,15 +249,46 @@ export const PARTNER_VALUE_VS_AGENCY_PCT = { lo: 10, hi: 20 } as const;
 export const EXCLUSIVE_PARTNER_DISCOUNT = PARTNER_VALUE_VS_AGENCY_PCT;
 
 export const PARTNER_VALUE = {
-  pay: `${PARTNER_VALUE_VS_AGENCY_PCT.lo}–${PARTNER_VALUE_VS_AGENCY_PCT.hi}% better than agency pricing`,
-  line: `${PARTNER_VALUE_VS_AGENCY_PCT.lo}–${PARTNER_VALUE_VS_AGENCY_PCT.hi}% better value than regular agency buyers, by committing to inventory.`,
-  fine: "Committed volume or term sets the exact rate.",
+  pay: `15% + a further ${PARTNER_VALUE_VS_AGENCY_PCT.lo}–${PARTNER_VALUE_VS_AGENCY_PCT.hi}% off net`,
+  line: `Committed-spend tiers: commit to an inventory block and a further ${PARTNER_VALUE_VS_AGENCY_PCT.lo}–${PARTNER_VALUE_VS_AGENCY_PCT.hi}% comes off the net agency rate.`,
+  fine: "Block size and term set the tier.",
 } as const;
+
+/**
+ * Committing inventory blocks (Randy, Nov 25 2026 5:21 PM ET): small first commitment that scales, standard
+ * cancellation window, makegoods for under-delivery, clear flight dates. Every figure is an existing Birch price:
+ * the $1K–$5K USD client test (AGENCY_CLIENT_TEST) and the $25K–$50K USD premium band (MEDIA_KIT_OFFERS.premium).
+ * Cancellation restates the 14-days-before-launch refund already on /terms; makegoods follow IAB (already on the spec).
+ */
+export const BLOCK_LADDER = [
+  {
+    key: "starter",
+    step: "Start",
+    name: "Starter block",
+    price: `$${AGENCY_CLIENT_TEST.lo / 1000}K–$${AGENCY_CLIENT_TEST.hi / 1000}K USD`,
+    line: "One client, one flight, one insertion order. Prove it before you scale.",
+    rate: `${AGENCY_CASH_PCT}% agency commission`,
+  },
+  {
+    key: "upfront",
+    step: "Scale",
+    name: "Upfront block",
+    price: `$${MEDIA_KIT_OFFERS.premium.spendLo / 1000}K–$${MEDIA_KIT_OFFERS.premium.spendHi / 1000}K USD`,
+    line: "Book premium and exclusive placements ahead, across several clients and flights.",
+    rate: `${AGENCY_CASH_PCT}% + a further ${PARTNER_VALUE_VS_AGENCY_PCT.lo}–${PARTNER_VALUE_VS_AGENCY_PCT.hi}% off net`,
+  },
+] as const;
+
+export const BLOCK_TERMS = [
+  { k: "Flight dates", d: "Fixed start and end dates for every hub and placement, written on the insertion order." },
+  { k: "Cancellation", d: "Cancel for a full refund up to 14 days before a flight starts." },
+  { k: "Makegoods", d: "If a placement under-delivers against the IO, we run makegoods on equal or better placements, per IAB standard terms." },
+] as const;
 
 const agencyPaysOn = (list: number) => list * (1 - AGENCY_DISCOUNT_PCT / 100);
 const partnerPaysOn = (list: number, betterPct: number) => agencyPaysOn(list) * (1 - betterPct / 100);
 
-/** Illustrative $10,000 USD rate-card buy. 10–20% better than the $9,000 agency price is $8,100–$7,200. */
+/** Illustrative $10,000 USD rate-card buy. A further 10–20% off the $8,500 net agency price is $7,650–$6,800. */
 export const BUYER_VALUE_EXAMPLE = {
   list: 10_000,
   direct: 10_000,
@@ -267,7 +297,7 @@ export const BUYER_VALUE_EXAMPLE = {
   partnerHi: partnerPaysOn(10_000, PARTNER_VALUE_VS_AGENCY_PCT.lo),
   label: "Illustrative example",
   brief: "A $10,000 USD rate-card buy.",
-  note: "Illustrative example, modelled. Not a quote. Committed volume or term sets the exact rate.",
+  note: "Illustrative example, modelled. Not a quote. Block size and term set the tier.",
 } as const;
 
 export type AgencyTierKey = "direct" | "agency" | "exclusive";
@@ -291,10 +321,9 @@ export const AGENCY_TIERS: ReadonlyArray<{
   },
 ];
 
-/** Access perks for Trusted Agency Partners. The 10–20% better value is stated in PARTNER_VALUE. */
+/** Access perks for Trusted Agency Partners. The committed-spend tier is stated in PARTNER_VALUE. */
 export const EXCLUSIVE_PARTNER_PERKS = [
   "First look at new exclusive packages and hubs before they open publicly.",
   "Reserved access to exclusive packages and newly activating hubs.",
   "A named mention on the Birch Reserve site and in our sales materials.",
-  "Partners get woven into our bot chats, already under way with hundreds of brands and thousands of retailers.",
 ] as const;

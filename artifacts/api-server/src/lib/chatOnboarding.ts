@@ -115,7 +115,7 @@ export function buildOnboardingModule(opts: { payLive?: boolean } = {}): string 
     `6. Pay by card on Stripe, then the after-payment path below. Not ready: the request form ${U("/buycalc#request")} (no card, reply within 1 business day) or an email reply from the team.`,
     "",
     "PATH B: AGENCY (buying for a client)",
-    `1. Reserve for a client on the checkout page, ${U("/buycalc")}, or self-serve at ${U("/buy")}. 2. Agencies buy at a standard written ${AGENCY_CASH_PCT}% discount off the published rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. 3. Page: ${U("/agencies")}. 4. 'Can my agency resell?': agencies, media houses and newspapers with inventory and customers can offer our display inventory to their own customers and keep their margin through a wholesale inventory deal; terms are discussed directly (never state a wholesale price or margin). Apply at ${U("/partners")}.`,
+    `1. Reserve for a client on the checkout page, ${U("/buycalc")}, or self-serve at ${U("/buy")}. 2. Agencies earn the standard ${AGENCY_CASH_PCT}% agency commission off the gross rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. 3. Page: ${U("/agencies")}. 4. 'Can my agency resell?': agencies, media houses and newspapers with inventory and customers can offer our display inventory to their own customers and keep their margin through a wholesale inventory deal; terms are discussed directly (never state a wholesale price or margin). Apply at ${U("/partners")}.`,
     "",
     "PATH C: PROVIDER, CLINIC, STUDIO OR RETAILER (wants a hub or to join the provider network)",
     `1. Start the same one-form intake at ${U("/intake")} and choose the hub side (${U("/intake/publisher")} shows what a hub could earn, as a labelled estimate). 2. The team reviews the hub for approval and onboards it. 3. Never say a hub is open or live before it is; only the hubs on the status ladder are live (${liveLine()}). Then the Step 2 of 2 page ${U("/intake/activate")} (inventory estimate and which ads can run). Hub launch alerts by category: ${U("/media-kit#hub-alerts")}. Local gyms, studios and clinics can also check the area lock at ${U("/advertise/local")}.`,
@@ -173,7 +173,7 @@ export const ONBOARDING_HARD_RULES: readonly string[] = [
   "Never name any client, prospect, investor, internal system, CRM or managed-services partner, or the partner companies behind the hubs (a reply that names one is blocked). Never name the AI model or provider.",
   "Scale Health is a distribution platform that started in Recovery. It is never gig, Uber-type or on-demand.",
   "If the visitor names a company and asks whether it is a client, partner or investor (or asks which clients you have), never repeat the company name and never confirm or deny: say client and partner details are confidential and offer the request form or a person.",
-  "Never discuss commissions or revenue splits between Birch, Scale, hubs or partners, other than the public 10% agency payment.",
+  "Never discuss commissions or revenue splits between Birch, Scale, hubs or partners, other than the public 15% agency commission.",
 ];
 
 /** Brand-aware identity block (swapForBrand handles the rest of the name swaps). */

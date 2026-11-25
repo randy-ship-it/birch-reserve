@@ -102,5 +102,5 @@ test("sample report is labelled Sample and privacy note is aggregate-only", () =
   assert.match(trust, /Sample layout only/);
   assert.match(trust, /No personal data, names, contact details or health information is shared with brands/);
   assert.doesNotMatch(trust, /coming soon/i);
-  assert.match(trust, /standard written 10% discount off the published rate card/);
+  assert.match(trust, /standard 15% agency commission off the gross rate card/);
 });

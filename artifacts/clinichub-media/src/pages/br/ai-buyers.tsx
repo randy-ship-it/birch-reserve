@@ -105,9 +105,9 @@ export default function BrAiBuyers() {
           </div>
           <div>
             <Eyebrow>Agencies</Eyebrow>
-            <H2>Place a client at 10% off the rate card.</H2>
+            <H2>Place a client at the standard 15% agency commission.</H2>
             <ul className="mt-4 space-y-2 text-sm">
-              {["Agencies buy at a standard written 10% discount off the published rate card.", "Aggregate UTM reporting only. No personal data is shared.", "Modelled volumes, labelled as estimates. No impression guarantees."].map((r) => (
+              {["Agencies earn the standard 15% agency commission off the gross rate card.", "Aggregate UTM reporting only. No personal data is shared.", "Modelled volumes, labelled as estimates. No impression guarantees."].map((r) => (
                 <li key={r} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden /><span>{r}</span></li>
               ))}
             </ul>

@@ -128,7 +128,7 @@ export default function BrMediaBuyers() {
           <IoProcess />
         </div>
         <p className="mt-6 text-sm text-muted-foreground">
-          Buying for clients? See <a className="underline underline-offset-2" href="/agencies">agencies &amp; brokers</a> for the 10% agency-of-record terms. Everything in one link: the <a className="underline underline-offset-2" href="/media-kit">media kit</a>.
+          Buying for clients? See <a className="underline underline-offset-2" href="/agencies">agencies &amp; brokers</a> for the standard 15% agency-of-record commission. Everything in one link: the <a className="underline underline-offset-2" href="/media-kit">media kit</a>.
         </p>
       </Section>
 

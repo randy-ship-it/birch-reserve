@@ -97,7 +97,7 @@ export function bandAmountLabel(band: BlockBand): string {
   return b.highUsd === null ? `${fmt(b.lowUsd)}+ USD` : b.highUsd === b.lowUsd ? `${fmt(b.lowUsd)} USD` : `${fmt(b.lowUsd)}–${fmt(b.highUsd)} USD`;
 }
 
-/** Written 10% discount off list, on the band's low end (modelled; the IO sets the real figure). */
+/** Standard 15% agency commission off list, on the band's low end (modelled; the IO sets the real figure). */
 export function agencyCashLabel(band: BlockBand): string {
   const b = BLOCK_BANDS.find((x) => x.key === band)!;
   const lo = Math.round((b.lowUsd * AGENCY_CASH_PCT) / 100);
