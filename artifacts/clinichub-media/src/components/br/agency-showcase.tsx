@@ -395,10 +395,15 @@ export function AgencyPayouts() {
 }
 
 /** Two ways to buy (Nov 24 2026): card (self-serve) vs insertion order (managed), same rows side by side. */
-export function BuyPaths({ reserveHref, lookHref, ioHref = "#talk" }: { reserveHref: string; lookHref: string; ioHref?: string }) {
-  const cols = [BUY_PATHS.card, BUY_PATHS.io] as const;
+type BuyPathCol = { key: string; kicker: string; price: string; sub: string };
+type BuyPathData = { card: BuyPathCol; io: BuyPathCol; rows: ReadonlyArray<{ k: string; card: string; io: string }> };
+const AGENCY_BUY_LABELS = { reserve: "Reserve for a client · $490 USD", look: "or the $190 USD 7-day look", io: "Request a draft IO" };
+
+/** Card vs IO compare. Defaults to the /agencies copy; /media-buyers passes its own data (no agency row) and labels. */
+export function BuyPaths({ reserveHref, lookHref, ioHref = "#talk", paths = BUY_PATHS, labels = AGENCY_BUY_LABELS, testId = "agency-buy-paths" }: { reserveHref: string; lookHref: string; ioHref?: string; paths?: BuyPathData; labels?: typeof AGENCY_BUY_LABELS; testId?: string }) {
+  const cols = [paths.card, paths.io] as const;
   return (
-    <div className="grid gap-4 md:grid-cols-2" data-testid="agency-buy-paths">
+    <div className="grid gap-4 md:grid-cols-2" data-testid={testId}>
       {cols.map((c) => {
         const card = c.key === "card";
         return (
@@ -407,7 +412,7 @@ export function BuyPaths({ reserveHref, lookHref, ioHref = "#talk" }: { reserveH
             <p className="mt-2 font-display text-4xl leading-none tabular-nums">{c.price}</p>
             <p className="mt-2 text-sm text-foreground/70">{c.sub}</p>
             <dl className="mt-5 divide-y divide-border border-y border-border text-sm">
-              {BUY_PATHS.rows.map((r) => (
+              {paths.rows.map((r) => (
                 <div key={r.k} className="grid grid-cols-[6.25rem_1fr] gap-3 py-2.5 md:grid-cols-[7.5rem_1fr]">
                   <dt className="text-foreground/60">{r.k}</dt>
                   <dd className="font-medium">{card ? r.card : r.io}</dd>
@@ -417,11 +422,15 @@ export function BuyPaths({ reserveHref, lookHref, ioHref = "#talk" }: { reserveH
             <div className="mt-5 flex flex-col gap-2 sm:mt-auto sm:pt-5">
               {card ? (
                 <>
-                  <Cta href={reserveHref} variant="lime" testId="buy-path-reserve" className="w-full">Reserve for a client · $490 USD</Cta>
-                  <a href={lookHref} data-testid="buy-path-look" className="text-center text-sm font-semibold underline underline-offset-2">or the $190 USD 7-day look</a>
+                  <Cta href={reserveHref} variant="lime" testId="buy-path-reserve" className="w-full">{labels.reserve}</Cta>
+                  <a href={lookHref} data-testid="buy-path-look" className="text-center text-sm font-semibold underline underline-offset-2">{labels.look}</a>
                 </>
               ) : (
-                <Cta href={ioHref} variant="ink" testId="buy-path-io" className="w-full">Request a draft IO</Cta>
+                <>
+                  {/* Design (PR #433 carried, Nov 25): a matching secondary link keeps both buttons on one line at desktop. */}
+                  <Cta href={ioHref} variant="ink" testId="buy-path-io" className="w-full">{labels.io}</Cta>
+                  <a href="/sample-io" data-testid="buy-path-sample-io" className="text-center text-sm font-semibold underline underline-offset-2">or read the sample IO first</a>
+                </>
               )}
             </div>
           </article>

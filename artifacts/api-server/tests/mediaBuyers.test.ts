@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { MEASUREMENT_STEPS, MEDIA_BUYER_FAQ, MIX_ROWS } from "../src/lib/overhaul/mediaBuyers";
+import { MB_BUY_PATHS, MEASUREMENT_STEPS, MEDIA_BUYER_FAQ, MIX_ROWS } from "../src/lib/overhaul/mediaBuyers";
 import { OVERHAUL_ROUTES, llmsTxt } from "../src/lib/overhaul/seo";
 import { PUBLIC_SITEMAP_PATHS, SPA_SHELL_PATHS } from "../src/lib/publicSeo";
 
@@ -14,6 +14,7 @@ function allCopy(): string {
   return [
     read(PAGE),
     JSON.stringify(MIX_ROWS),
+    JSON.stringify(MB_BUY_PATHS),
     JSON.stringify(MEASUREMENT_STEPS),
     JSON.stringify(MEDIA_BUYER_FAQ),
     JSON.stringify(OVERHAUL_ROUTES["/media-buyers"]),
@@ -36,7 +37,7 @@ test("/media-buyers: same two USD offers and the same refund / IO rules; USD onl
   assert.match(copy, /\$490 USD/);
   assert.match(copy, /fully refundable until 14 days before/);
   assert.match(copy, /nothing runs until (the|an) insertion order/i);
-  assert.match(read(PAGE), /<StarterOffers /);
+  assert.match(read(PAGE), /<BuyPaths\b/);
   assert.doesNotMatch(copy, /\bCAD\b|C\$/);
   assert.doesNotMatch(copy, /\$(?!190\b|490\b)\d[\d,]*/, "no new price points on /media-buyers");
 });
@@ -63,4 +64,15 @@ test("/media-buyers: one server-side FAQPage plus Service and the two Offers", (
   const faq = graph.find((n) => n["@type"] === "FAQPage") as { mainEntity: unknown[] };
   assert.equal(faq.mainEntity.length, MEDIA_BUYER_FAQ.length);
   assert.match(read(PAGE), /<Faq items=\{MEDIA_BUYER_FAQ\} schema=\{false\} \/>/);
+});
+
+test("/media-buyers (Nov 25 2026): 'Two ways to buy' compare replaces the duplicate offers block; no agency row", () => {
+  const page = read(PAGE);
+  assert.doesNotMatch(page, /Same two offers as every buyer/);
+  assert.doesNotMatch(page, /<StarterOffers /);
+  assert.match(page, /Two ways to buy\./);
+  assert.match(page, /insertion order \(IO\)/);
+  assert.deepEqual(MB_BUY_PATHS.rows.map((r) => r.k), ["Best for", "Pay", "Before it runs", "Refunds"]);
+  assert.doesNotMatch(JSON.stringify(MB_BUY_PATHS), /agency|discount|client/i);
+  assert.match(MB_BUY_PATHS.io.kicker, /insertion order \(IO\)/);
 });
