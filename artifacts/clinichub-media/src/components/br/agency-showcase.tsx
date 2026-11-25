@@ -469,11 +469,11 @@ export function ListPriceLine({ className = "" }: { className?: string }) {
 export function InventoryCanister() {
   const n = AGENCY_TIERS.length;
   return (
-    <figure className="mx-auto w-full max-w-3xl" data-testid="agency-canister" aria-label="One tank of hub inventory with three outlets: direct brands, agencies and exclusive inventory partners">
+    <figure className="mx-auto w-full max-w-3xl" data-testid="agency-canister" aria-label={skinText("One tank of hub inventory with three outlets: direct buyers, agencies and Trusted Agency Partners")}>
       <div className="grid grid-cols-[4.25rem_1.25rem_minmax(0,1fr)] md:grid-cols-[8.5rem_3.5rem_minmax(0,1fr)]">
         {/* Lid + label */}
         <div className="col-start-1 flex flex-col items-center">
-          <span className="mb-1 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.14em] text-[#0b1f3a]/70 md:text-[11px]">Hub inventory</span>
+          <span className="mb-1 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.14em] text-[#0b1f3a]/70 md:text-[11px]">{skinText("Hub inventory")}</span>
           <span className="block h-4 w-full rounded-[50%] border-2 border-[#0b1f3a] bg-white md:h-6" aria-hidden />
         </div>
         <span className="col-span-2" aria-hidden />
@@ -491,12 +491,12 @@ export function InventoryCanister() {
               </div>
               <div className={`my-1.5 rounded-xl border-2 p-3 md:my-2 md:p-4 ${st.card}`}>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  <p className="font-display text-lg leading-tight text-[#0b1f3a] md:text-2xl">{t.name}</p>
+                  <p className="font-display text-lg leading-tight text-[#0b1f3a] md:text-2xl">{skinText(t.name)}</p>
                   {t.badge ? <span className="rounded-full bg-[#0b1f3a] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-lime-300">{t.badge}</span> : null}
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1.5 text-[12px] md:text-[13px]">
-                  <span className="rounded-full border border-[#0b1f3a]/25 bg-white px-2.5 py-1 font-semibold text-[#0b1f3a]">Pay: {t.pay.charAt(0).toLowerCase() + t.pay.slice(1)}{t.key === "exclusive" ? "*" : ""}</span>
-                  {t.key === "direct" ? null : <span className="rounded-full bg-[#0b1f3a] px-2.5 py-1 font-semibold text-white">{t.keep}</span>}
+                  <span className="rounded-full border border-[#0b1f3a]/25 bg-white px-2.5 py-1 font-semibold text-[#0b1f3a]">Pay: {skinText(t.pay.charAt(0).toLowerCase() + t.pay.slice(1))}{t.key === "exclusive" ? "*" : ""}</span>
+                  {t.key === "direct" ? null : <span className="rounded-full bg-[#0b1f3a] px-2.5 py-1 font-semibold text-white">{skinText(t.keep)}</span>}
                 </div>
               </div>
             </div>
