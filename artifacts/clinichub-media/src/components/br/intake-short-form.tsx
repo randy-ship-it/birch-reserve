@@ -10,7 +10,7 @@
  */
 import { HubDemandCard } from "@/components/br/hundred";
 import { PromoBox } from "@/components/br/promo-box";
-import { skinText } from "@/lib/siteSkin";
+import { isScaleFacing, skinText } from "@/lib/siteSkin";
 import { IntakeWarnings } from "@/components/br/intake-warnings";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link } from "wouter";
@@ -330,7 +330,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
           <RoleCard on={r.supplier} onClick={() => flip("supplier")} icon={Package} title="Supplier" tag="Performance-only" sub="Get into curated hubs. Pay on results." testId="intake-role-supplier">
             {r.supplier ? <AccelerateToggle on={r.accelerate} onClick={() => flip("accelerate")} /> : null}
           </RoleCard>
-          <RoleCard on={r.hub} onClick={() => flip("hub")} icon={Store} title="Hub" tag="Max exposure" sub="Your audience, shelf or screens. Earn a share." testId="intake-role-hub" />
+          <RoleCard on={r.hub} onClick={() => flip("hub")} icon={Store} title="Hub" tag="Max exposure" sub={isScaleFacing() ? "Your audience books care and buys products through it." : "Your audience, shelf or screens. Earn a share."} testId="intake-role-hub" />
         </div>
         {supplierOnly ? (
           <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-lime-300 bg-lime-50 p-4 md:flex-row md:items-center md:justify-between" data-testid="supplier-only-note">

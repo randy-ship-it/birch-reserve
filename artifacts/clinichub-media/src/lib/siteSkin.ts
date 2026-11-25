@@ -17,6 +17,23 @@ export function siteSkin(): SiteSkin {
 
 export const isScaleSkin = () => siteSkin() === "scale";
 
+/** True on the Scale-skinned mirror (scalehealth.ca/intake) and on the Scale homepage Brands CTA landing (?ref=scale).
+ *  Used for Scale-facing intake copy only (hub definition, simpler hero). Form fields, submit and tracking stay identical. */
+export function isScaleFacing(search: string = typeof window === "undefined" ? "" : window.location.search, skin: boolean = typeof window === "undefined" ? false : isScaleSkin()): boolean {
+  if (skin) return true;
+  try {
+    const q = search.startsWith("?") || search === "" ? search : `?${search}`;
+    return new URLSearchParams(q).get("ref") === "scale";
+  } catch {
+    return false;
+  }
+}
+
+/** Plain definition of a Scale Hub, drawn from the Scale home and intake copy: a co-branded clinic storefront,
+ *  audience books care and buys products, earn from day 1, costs nothing to host. No splits, margins or prices. */
+export const HUB_DEFINITION =
+  "A hub is your own co-branded Scale clinic storefront. Your audience books care and buys products through it, and you earn from day 1. It costs nothing to host.";
+
 /** The brand name a visitor should see on this host. */
 /** Absolute URL of a Birch page. On the Scale skin it stays on scalehealth.ca (the same page served at /intake/_m/<path>, Scale skin);
  *  on birchreserve.net it is the Birch URL, unchanged. */
