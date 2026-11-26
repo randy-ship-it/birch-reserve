@@ -18,7 +18,7 @@ import { quoteAreaLock, type Currency } from "../lib/overhaul/model";
 import { buildAreaLockSession, checkoutGate } from "../lib/overhaul/checkout";
 import { intakeExternalId, sendIntake, type IntakeKind } from "../lib/overhaul/fridayIntake";
 import { PREMIUM_INQUIRY_MESSAGE, isPremiumOffer } from "../lib/premiumInquireOnly";
-import { sendSalesAlert } from "../lib/salesAlert";
+import { sendSalesAlert, alertSiteOf } from "../lib/salesAlert";
 import { isSyntheticIntake, isTestIdentity, isTestLead } from "../lib/testTraffic";
 import { coarseRegion, recordPulse } from "../lib/activityPulse";
 import { GTM_BOT_ALERT_TO, GTM_BOT_BUSINESS_LINE, GTM_BOT_KIND, GTM_BOT_SOURCE, GTM_BOT_STAGES, GTM_BOT_PREFS } from "../lib/overhaul/gtmBot";
@@ -159,6 +159,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     const meta = built.params.metadata as Record<string, string>;
     const friday = await sendIntake({ kind: "area_lock_interest", email: str(body.email, 320), company: meta.business, website: meta.website || undefined, path: "/advertise/local", meta: { ...meta, checkout_open: gate.open, amount: built.amountCents / 100, currency: built.currency } });
     await sendSalesAlert({
+      via: alertSiteOf(req),
       event: "seat_hold",
       title: `Area lock: ${meta.business || str(body.email, 320) || "local business"}`,
       rows: [["Business", meta.business], ["Email", str(body.email, 320)], ["Website", meta.website], ["Amount", `${built.amountCents / 100} ${String(built.currency).toUpperCase()}`], ["Checkout open", String(gate.open)], ["Page", "/advertise/local"]],
@@ -258,6 +259,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     log("lead", { kind, friday: friday.status });
     // Randy 9:41pm Nov 13: every request emails randy@scalehealth.ca + randy@silverbirchgrowth.com.
     const alert = await sendSalesAlert({
+      via: alertSiteOf(req),
       event: "inquiry",
       title: `${kind.replace(/_/g, " ")}: ${str(body.company, 160) || email}`,
       rows: [
@@ -321,6 +323,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     if (lead && !leadTest) queueFridayPush(lead.id);
     const open = ACT_OPENNESS.find((o) => o.key === v.openness)!;
     const alert = await sendSalesAlert({
+      via: alertSiteOf(req),
       event: "inquiry",
       title: `Ad activation: ${company || email}${v.openness === "curated" ? "" : " (open to non-core ads)"}`,
       rows: [["Who", ACT_ROLES.find((r) => r.key === v.role)!.label], ["Company", company ?? ""], ["Email", email], ["Pages or hub screens", size.split(" · ")[0]!.replace("Pages/screens ", "")], ["Views and list", size.split(" · ").slice(1).join(" · ")], ["Ads allowed", open.label], ["Excluded", v.exclusions.join(", ") || "none"], ["Other ad data", v.other], ["Hub", v.hubSlug], ["Admin", "https://birchreserve.net/ads/admin#activation"]],
@@ -370,6 +373,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     const intake = { kind: GTM_BOT_KIND, email, name, company, website, message: str(body.message, 2000) || undefined, path: "/gtm-bot", meta, utm: utmOf(body) };
     const friday = leadTest ? { status: "skipped" as const, externalId: intakeExternalId(intake) } : await sendIntake(intake);
     const alert = await sendSalesAlert({
+      via: alertSiteOf(req),
       event: "inquiry",
       tag: "SBG GTM BOT",
       to: [...GTM_BOT_ALERT_TO],
@@ -423,6 +427,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     }
     const isTest = body.test === true || /\bTEST\b/.test(`${name} ${company} ${notes}`) || isTestIdentity({ email, name });
     const alert = await sendSalesAlert({
+      via: alertSiteOf(req),
       event: "inquiry",
       title: `CALL-BACK: ${company || name || email || phone} (${channel})${budget ? ` · ${budget}` : ""}`,
       rows: [
@@ -484,6 +489,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     const isTest = body.test === true || /\bTEST\b/.test(brand) || isTestIdentity({ email, name: brand });
     const [alert, friday] = await Promise.all([
       sendSalesAlert({
+      via: alertSiteOf(req),
         event: "category_request",
         title: `Category request: ${brand} · ${label}`,
         rows: [

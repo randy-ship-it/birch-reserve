@@ -9,7 +9,7 @@ import { z } from "zod";
 import { captureInventorySignupLead } from "../lib/leadCapture";
 import { attributionFrom } from "../lib/publicGuards";
 import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
-import { sendSalesAlert } from "../lib/salesAlert";
+import { sendSalesAlert, alertSiteOf } from "../lib/salesAlert";
 
 const InventoryType = z.enum(["site", "email", "sms", "waiting_room"]);
 
@@ -72,6 +72,7 @@ router.post("/launch/ads-inventory-signup", async (req, res): Promise<void> => {
   // Same internal alert as every other form (randy@scalehealth.ca + randy@silverbirchgrowth.com). Awaited so the
   // serverless function cannot freeze before it sends; sendSalesAlert never throws.
   await sendSalesAlert({
+      via: alertSiteOf(req),
     event: "inquiry",
     tag: "BIRCH SUPPLIER",
     title: `Inventory host signup: ${data.company}`,

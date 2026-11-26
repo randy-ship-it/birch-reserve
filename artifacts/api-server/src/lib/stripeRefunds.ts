@@ -12,7 +12,7 @@
 import type Stripe from "stripe";
 import { getStripeClient } from "./stripeClient";
 import { audit, claimOnce, db, S } from "./adserver/store";
-import { sendSalesAlert } from "./salesAlert";
+import { sendSalesAlert, alertSiteOf } from "./salesAlert";
 import { logger } from "./logger";
 
 type SessionFinder = (paymentIntentId: string) => Promise<Stripe.Checkout.Session | null>;
@@ -86,6 +86,7 @@ export async function handleChargeRefundedSafe(charge: Stripe.Charge, previous?:
     }
     await audit("stripe-webhook", full ? "stripe.refund_full" : "stripe.refund_partial", campaignId ?? session?.id ?? charge.id, `${charge.id} refunded ${money(delta, cur)} (total ${money(refunded, cur)} of ${money(charge.amount ?? 0, cur)}) · ${budgetLine}`);
     await sendSalesAlert({
+      via: alertSiteOf(null, { site: session?.metadata?.site }),
       event: "paid_checkout",
       tag: "BIRCH REFUND",
       isTest,
@@ -129,6 +130,7 @@ export async function handleDisputeCreatedSafe(dispute: Stripe.Dispute): Promise
     }
     await audit("stripe-webhook", "stripe.dispute", campaignId ?? session?.id ?? dispute.id, `${dispute.id} ${money(dispute.amount ?? 0, cur)} reason=${dispute.reason} · campaign ${campaignId ? "paused" : "not found"}`);
     await sendSalesAlert({
+      via: alertSiteOf(null, { site: session?.metadata?.site }),
       event: "paid_checkout",
       tag: "BIRCH DISPUTE",
       isTest,

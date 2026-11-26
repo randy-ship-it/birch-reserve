@@ -30,7 +30,7 @@ import { attributionFrom } from "../lib/publicGuards";
 import { MIRROR_ORIGIN_HOSTS } from "../middlewares/mirrorHost";
 import { birchFaqAnswer } from "../lib/birchFaq";
 import { BRAND_NAMES, chatBrandFor, swapForBrand, type ChatBrand } from "../lib/chatOnboarding";
-import { sendSalesAlert } from "../lib/salesAlert";
+import { sendSalesAlert, alertSiteOf } from "../lib/salesAlert";
 import { isTestIdentity } from "../lib/testTraffic";
 import { chatTopic, coarseRegion, currentPulseThemes, recordPulse } from "../lib/activityPulse";
 
@@ -586,11 +586,12 @@ export function extractCallbackMarker(raw: string): { text: string; callback: Re
   return { text, callback };
 }
 
-async function sendChatCallbackAlert(c: Record<string, string>, body: RandyChatBody, qa: boolean) {
+async function sendChatCallbackAlert(c: Record<string, string>, body: RandyChatBody, qa: boolean, req: { get: (n: string) => string | undefined }) {
   const label = c.company || c.name || c.email || c.phone || "visitor";
   const isTest = qa || /\bTEST\b/.test(`${c.name ?? ""} ${c.company ?? ""}`) || isTestIdentity({ email: c.email, name: c.name });
   const transcript = body.messages.slice(-8).map((m) => `${m.role === "assistant" ? "Bot" : "Visitor"}: ${m.content}`).join("\n");
   return sendSalesAlert({
+    via: alertSiteOf(req, { skin: body.skin }),
     event: "inquiry",
     title: `CALL-BACK: ${label} (site chat)${c.budget ? ` · ${c.budget}` : ""}`,
     rows: [
@@ -681,7 +682,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
       text = swapForBrand(birchFaqAnswer(body.messages).text, brand);
     }
     if (callback) {
-      const alert = await sendChatCallbackAlert(callback, body, qaMarked);
+      const alert = await sendChatCallbackAlert(callback, body, qaMarked, req);
       req.log?.info({ kind: "chat_callback", alert: alert.status }, "Randy chat call-back submitted");
       if (alert.status !== "sent") text = `${text}\n\nIf the request didn't go through, email randy@scalehealth.ca.`;
     }
@@ -734,7 +735,7 @@ router.post("/launch/randy-chat", async (req, res): Promise<void> => {
     const faq = birchFaqAnswer(body.messages);
     let text = swapForBrand(faq.text, brand);
     if (faq.callback) {
-      const alert = await sendChatCallbackAlert(faq.callback, body, qaMarked);
+      const alert = await sendChatCallbackAlert(faq.callback, body, qaMarked, req);
       req.log?.info({ kind: "chat_callback", alert: alert.status, source: "faq" }, "Randy chat call-back submitted");
       if (alert.status !== "sent") text = `Sorry, that didn't go through. Please email randy@scalehealth.ca.`;
     }
@@ -786,6 +787,7 @@ router.post("/launch/randy-chat/event", async (req, res): Promise<void> => {
   if (b.type === "callback_request" && b.contact && (b.contact.phone || b.contact.email)) {
     // Randy 9:52pm Nov 13: call-backs alert randy@scalehealth.ca + randy@silverbirchgrowth.com too.
     await sendSalesAlert({
+      via: alertSiteOf(req, { skin: (b as { skin?: string }).skin }),
       event: "inquiry",
       title: `CALL-BACK: ${b.contact.name || b.contact.email || b.contact.phone} (chat callback form)`,
       rows: [
