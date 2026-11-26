@@ -27,7 +27,7 @@ export const SERVED_CATEGORIES = [
   { name: "Diagnostics / services", sub: "Testing, clinics, programs", icon: Microscope },
 ] as const;
 
-/** 8 seat categories as a light, horizontally scrollable strip on mobile, a grid on desktop. */
+/** 8 seat categories as a wrapping grid (2 columns on small screens, 4 on desktop). */
 export function CategoriesWeServe({ dark = false }: { dark?: boolean }) {
   return (
     <section data-testid="categories-we-serve" aria-labelledby="cats-h">
@@ -35,9 +35,9 @@ export function CategoriesWeServe({ dark = false }: { dark?: boolean }) {
         <h2 id="cats-h" className={`font-display text-2xl leading-tight md:text-3xl ${dark ? "text-white" : "text-[#0b1f3a]"}`}>Categories we serve</h2>
         <p className={`text-[12px] ${dark ? "text-white/60" : "text-foreground/55"}`}>Shared seats. A premium slot locks one brand per category.</p>
       </div>
-      <ul className="-mx-4 mt-3 flex snap-x gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
+      <ul className="mt-3 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 md:grid-cols-4">
         {SERVED_CATEGORIES.map((c) => (
-          <li key={c.name} className="flex min-w-[240px] snap-start items-center gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-foreground/10 md:min-w-0" data-testid="served-category">
+          <li key={c.name} className="flex min-w-0 items-center gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-foreground/10" data-testid="served-category">
             <span className="grid size-9 shrink-0 place-items-center rounded-full bg-lime-300 text-[#0b1f3a]"><c.icon className="size-4" aria-hidden /></span>
             <span className="min-w-0">
               <span className="block text-[14px] font-bold leading-tight text-[#0b1f3a]">{c.name}</span>

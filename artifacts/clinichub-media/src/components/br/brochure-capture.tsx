@@ -245,7 +245,7 @@ export function BrochureSlideIn() {
   return (
     <aside
       aria-label="Get the brochure"
-      className={`fixed bottom-[calc(var(--birch-dock-bottom,14px)_-_2px)] left-3 right-[84px] z-[56] rounded-2xl border border-black/5 bg-white ${expanded ? "p-4" : "px-3 py-1.5 md:w-[290px]"} text-slate-900 shadow-[0_18px_50px_-16px_rgba(7,26,57,0.45)] md:bottom-6 md:left-6 md:right-auto ${expanded ? "md:w-[340px]" : ""}`}
+      className={`fixed z-[56] rounded-2xl border border-black/5 bg-white text-slate-900 shadow-[0_18px_50px_-16px_rgba(7,26,57,0.45)] bottom-[calc(var(--birch-dock-bottom,14px)_-_2px)] left-3 right-auto md:bottom-6 md:left-6 ${expanded ? "right-[84px] p-4 md:right-auto md:w-[340px]" : "w-max max-w-[min(20rem,calc(100vw-5.5rem))] px-3 py-1.5 md:w-[290px]"}`}
       style={{ marginBottom: "env(safe-area-inset-bottom)" }}
       data-testid="brochure-slidein"
     >

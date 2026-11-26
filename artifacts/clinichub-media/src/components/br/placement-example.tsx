@@ -75,7 +75,7 @@ function LandingShot() {
   const H = HUB_MOCKS[hub];
   return (
     <div>
-      <div className="mb-1.5 flex max-w-full gap-1 overflow-x-auto [scrollbar-width:none]" role="group" aria-label="Example hub" data-testid="placement-hub-tabs">
+      <div className="mb-1.5 flex max-w-full flex-wrap gap-1" role="group" aria-label="Example hub" data-testid="placement-hub-tabs">
         {HUB_KEYS.map((k) => (
           <button key={k} type="button" aria-pressed={hub === k} onClick={() => setHub(k)} className={`inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider ${hub === k ? "bg-foreground text-background" : "bg-white ring-1 ring-foreground/15 text-foreground/70"}`}>{HUB_MOCKS[k].tab}</button>
         ))}
