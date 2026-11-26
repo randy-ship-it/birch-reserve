@@ -6,7 +6,7 @@
  */
 import { createHash } from "node:crypto";
 
-export type IntakeKind = "match_tool" | "hub_access" | "cobranded_hub_inquiry" | "display_cpc_inquiry" | "publisher_studio" | "area_lock_interest" | "agency_inquiry" | "deposit_interest" | "agent_checkout" | "premium_inquiry" | "category_request" | "brand_intake" | "gtm_setup_inquiry" | "street_team_inquiry" | "gtm_bot_inquiry" | "partner_inquiry";
+export type IntakeKind = "match_tool" | "hub_access" | "cobranded_hub_inquiry" | "display_cpc_inquiry" | "publisher_studio" | "area_lock_interest" | "agency_inquiry" | "deposit_interest" | "agent_checkout" | "premium_inquiry" | "category_request" | "brand_intake" | "gtm_setup_inquiry" | "street_team_inquiry" | "gtm_bot_inquiry" | "partner_inquiry" | "pulse_check";
 
 export type IntakeInput = {
   kind: IntakeKind;
@@ -42,6 +42,7 @@ const SOURCE: Record<IntakeKind, string> = {
   street_team_inquiry: "Birch street team program inquiry (2027)",
   gtm_bot_inquiry: "SBG GTM bot inquiry (business line SBG)",
   partner_inquiry: "Birch partnership inquiry (flyer / ad-buying / media)",
+  pulse_check: "Birch rapid pulse check (agency client-base fit)",
 };
 
 export function intakeExternalId(input: IntakeInput): string {

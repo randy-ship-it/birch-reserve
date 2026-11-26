@@ -119,14 +119,19 @@ export const SPA_SHELL_PATHS = [
   "/street-team",
   "/intake/report",
   "/brand-kit",
+  // Rapid pulse check direct link (Nov 26 2026): the /agencies card on its own. noindex, canonical /agencies, not in the sitemap.
+  "/fit",
+  "/fit-check",
 ] as const;
 
 /** Client routes that duplicate another URL. The canonical is the target. */
 const CANONICAL_ALIAS: Readonly<Record<string, string>> = {
   "/list-inventory": "/sell-ads",
+  "/fit": "/agencies",
+  "/fit-check": "/agencies",
 };
 
-const NOINDEX_PATHS = new Set<string>(["/success", "/splash/activation"]);
+const NOINDEX_PATHS = new Set<string>(["/success", "/splash/activation", "/fit", "/fit-check"]);
 
 export function isNoIndexPath(pathname: string): boolean {
   const clean = normalizedPath(pathname);

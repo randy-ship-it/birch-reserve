@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { isScaleSkin, skinText } from "@/lib/siteSkin";
 import { LeadForm } from "@/components/br/lead-form";
+import { PulseCheckCard } from "@/components/br/pulse-check";
 import { KitEntry } from "@/components/br/pilot-path";
 import { SeeYourAd } from "@/components/br/see-your-ad";
 import { INVENTORY } from "../../../../api-server/src/lib/overhaul/model";
@@ -66,7 +67,7 @@ export default function BrAgencies() {
     <div data-testid="br-agencies">
       <JsonLd data={{ "@context": "https://schema.org", "@type": "Service", name: "Birch Reserve agency placements", provider: { "@type": "Organization", name: "Birch Reserve" }, areaServed: ["CA", "US"], serviceType: "Retail media / post-purchase advertising", url: "https://birchreserve.net/agencies" }} />
       <Section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]">
-        <div className="grid items-start gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
+        <div className="grid items-start gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-x-16 lg:gap-y-12">
           <div className="max-w-3xl">
             <Eyebrow>For agencies &amp; media buyers</Eyebrow>
             <H1>Reach health and wellness customers right after they buy.</H1>
@@ -79,7 +80,9 @@ export default function BrAgencies() {
               <a href={RESERVE_HREF} className="text-sm text-[#0b1f3a]/70 underline underline-offset-4" data-testid="agency-cta-reserve">Or a category placement · $490 USD</a>
             </div>
           </div>
-          <ul className="border-t border-[#0b1f3a]/15 lg:mt-2" data-testid="agency-benefits" aria-label={skinText("Why agencies use Birch")}>
+          {/* Rapid pulse check: right of the hero on desktop, stacked right under the hero copy on mobile. */}
+          <PulseCheckCard className="lg:col-start-2 lg:row-span-2 lg:row-start-1" />
+          <ul className="border-t border-[#0b1f3a]/15 lg:col-start-1 lg:row-start-2 lg:mt-2" data-testid="agency-benefits" aria-label={skinText("Why agencies use Birch")}>
             {AGENCY_BENEFITS.map((b) => (
               <li key={b.t} className="border-b border-[#0b1f3a]/15 py-4">
                 <p className="font-display text-xl leading-tight text-[#0b1f3a]">{skinText(b.t)}</p>

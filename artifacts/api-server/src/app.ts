@@ -29,6 +29,7 @@ import { promoContext, withPromoMetadata } from "./lib/adserver/promoContext";
 import sponsorPageRouter from "./routes/sponsorPage";
 import { createOverhaulRouter } from "./routes/overhaul";
 import { createBrandIntakeProxy } from "./routes/brandIntakeProxy";
+import { createPulseCheckRouter } from "./routes/pulseCheck";
 import { createKitEmailRouter } from "./routes/kitEmail";
 import { createAgentRouter } from "./routes/agent";
 import { getStripeClient } from "./lib/stripeClient";
@@ -126,6 +127,8 @@ app.use(
     log: (msg, extra) => logger.info({ extra }, `overhaul ${msg}`),
   }),
 );
+// Rapid pulse check (/agencies card + /fit): own JSON parser, honeypot, throttle; team alert + CRM + DB row (no submitter email).
+app.use(createPulseCheckRouter());
 app.use(
   createAgentRouter({
     createSession: async (params) => {
