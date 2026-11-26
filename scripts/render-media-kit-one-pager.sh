@@ -1,13 +1,62 @@
 #!/usr/bin/env bash
-# Render scripts/media-kit-one-pager.html to artifacts/clinichub-media/public/birch-reserve-one-pager.pdf
+# Render scripts/media-kit-one-pager.html to Birch and Scale one-pagers in public/
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-TMP="$(mktemp -d)"
-cp "$ROOT/scripts/media-kit-one-pager.html" "$TMP/one-pager.html"
-cp "$ROOT/attached_assets/brand/birch-reserve-mark-v2.svg" "$TMP/mark.svg"
-OUT="$ROOT/artifacts/clinichub-media/public/birch-reserve-one-pager.pdf"
-google-chrome --headless=new --disable-gpu --no-pdf-header-footer \
-  --print-to-pdf="$OUT" --no-sandbox --disable-dev-shm-usage \
-  --virtual-time-budget=20000 "file://$TMP/one-pager.html"
-rm -rf "$TMP"
-pdfinfo "$OUT" | grep Pages
+SRC="$ROOT/scripts/media-kit-one-pager.html"
+MARK="$ROOT/attached_assets/brand/birch-reserve-mark-v2.svg"
+SCALE_LOGO="$ROOT/attached_assets/brand/scalehealth-logo-srgb-v2.png"
+PUB="$ROOT/artifacts/clinichub-media/public"
+render() {
+  local skin="$1" out="$2"
+  local TMP; TMP="$(mktemp -d)"
+  local html="$TMP/one-pager.html"
+  cp "$SRC" "$html"
+  if [ "$skin" = "scale" ]; then
+    cp "$SCALE_LOGO" "$TMP/logo.png"
+    python3 - "$html" << 'PY'
+import sys
+from pathlib import Path
+p = Path(sys.argv[1])
+s = p.read_text()
+repl = {
+  "{{BRAND}}": "Scale Health",
+  "{{SITE}}": "scalehealth.ca",
+  "{{LOGO}}": "logo.png",
+  "{{OPERATOR}}": "Scale Health is operated by Silver Birch Growth Inc., Toronto, Ontario.",
+  "{{FOOTER_LINKS}}": "scalehealth.ca/intake/_m/media-kit · /terms · /sample-io",
+  "{{TERMS}}": "scalehealth.ca/intake/_m/terms",
+  "{{FINE_SITE}}": "scalehealth.ca",
+}
+for k,v in repl.items():
+    s = s.replace(k, v)
+p.write_text(s)
+PY
+  else
+    cp "$MARK" "$TMP/mark.svg"
+    python3 - "$html" << 'PY'
+import sys
+from pathlib import Path
+p = Path(sys.argv[1])
+s = p.read_text()
+repl = {
+  "{{BRAND}}": "Birch Reserve",
+  "{{SITE}}": "birchreserve.net",
+  "{{LOGO}}": "mark.svg",
+  "{{OPERATOR}}": "Birch Reserve is operated by Silver Birch Growth Inc., Toronto, Ontario.",
+  "{{FOOTER_LINKS}}": "birchreserve.net/media-kit · birchreserve.net/terms · birchreserve.net/sample-io",
+  "{{TERMS}}": "birchreserve.net/terms",
+  "{{FINE_SITE}}": "birchreserve.net",
+}
+for k,v in repl.items():
+    s = s.replace(k, v)
+p.write_text(s)
+PY
+  fi
+  google-chrome --headless=new --disable-gpu --no-pdf-header-footer \
+    --print-to-pdf="$out" --no-sandbox --disable-dev-shm-usage \
+    --virtual-time-budget=20000 "file://$html"
+  rm -rf "$TMP"
+  echo "$skin $(pdfinfo "$out" | awk '/Pages/{print}')"
+}
+render birch "$PUB/birch-reserve-one-pager.pdf"
+render scale "$PUB/scale-health-one-pager.pdf"

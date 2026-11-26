@@ -11,3 +11,5 @@ export const SALES_EMAIL_HREF = "mailto:randy@scalehealth.ca" as const;
 export const SALES_REPLY_LINE = "We reply within 1 business day." as const;
 export const MEDIA_KIT_ONE_PAGER_HREF = "/birch-reserve-one-pager.pdf" as const;
 export const MEDIA_KIT_ONE_PAGER_NAME = "birch-reserve-one-pager.pdf" as const;
+export const SCALE_MEDIA_KIT_ONE_PAGER_HREF = "/scale-health-one-pager.pdf" as const;
+export const SCALE_MEDIA_KIT_ONE_PAGER_NAME = "scale-health-one-pager.pdf" as const;
