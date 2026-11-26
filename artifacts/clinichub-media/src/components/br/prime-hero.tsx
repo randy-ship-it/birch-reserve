@@ -176,7 +176,16 @@ export function FounderNote() {
   );
 }
 
-export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path?: string; defaultCategory?: string }) {
+/** intent (Randy, voice, Nov 26 2026 1:11 PM ET): "offer" = make an offer on mid-size inventory; "inquire" = bigger slots. Same endpoint; the intent and offer ride in the notes line. */
+export type RequestIntent = "ask" | "offer" | "inquire";
+const INTENT_COPY: Record<RequestIntent, { title: string; hint: string; send: string; notes: string }> = {
+  ask: { title: "Ask about a placement", hint: "Add your brand and work email, then press Send request. That's it.", send: "Send request", notes: "" },
+  offer: { title: "Make an offer", hint: "Mid-size inventory. Name your budget, we reply by email.", send: "Send my offer", notes: "Offer on mid-size inventory" },
+  inquire: { title: "Inquire about bigger slots", hint: "Premium and exclusive slots. We write the insertion order.", send: "Send inquiry", notes: "Inquiry: bigger slots" },
+};
+export function CategoryRequestForm({ path = "/", defaultCategory = "", intent = "ask" }: { path?: string; defaultCategory?: string; intent?: RequestIntent }) {
+  const ic = INTENT_COPY[intent];
+  const [offer, setOffer] = useState("");
   // Guided (Randy, voice, Nov 21 2026): two required fields, notes behind "Add details", inline checks,
   // answers kept in this browser until sent, and a success panel that says what happens next.
   const [v, setV, saved] = useSavedState<{ brand: string; email: string; notes: string }>(`category-request:${path}`, { brand: "", email: "", notes: "" });
@@ -203,7 +212,7 @@ export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path
       /* ignore */
     }
     try {
-      const r = await fetch("/v1/category-request", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ brand: v.brand.trim(), email: v.email.trim(), notes: v.notes.trim(), category: defaultCategory || "other", company_website: hp, path, utm }) });
+      const r = await fetch("/v1/category-request", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ brand: v.brand.trim(), email: v.email.trim(), notes: [ic.notes ? `${ic.notes}${intent === "offer" && offer.trim() ? `: ${offer.trim().slice(0, 40)} USD` : ""}.` : "", v.notes.trim()].filter(Boolean).join(" ").slice(0, 1000), category: defaultCategory || "other", company_website: hp, path, utm }) });
       const o = (await r.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (r.ok && o.ok) {
         saved.clear();
@@ -224,10 +233,10 @@ export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path
     );
   const err = (k: "brand" | "email") => (touched[k] ? errs[k] : "");
   return (
-    <form onSubmit={submit} noValidate className="relative border border-foreground bg-white p-5 md:p-6" data-testid="category-request-form">
+    <form onSubmit={submit} noValidate className="relative border border-foreground bg-white p-5 md:p-6" data-testid="category-request-form" data-intent={intent}>
       <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">No card needed · 1 step</p>
-      <h3 className="mt-1 font-display text-2xl md:text-3xl">Ask about a placement</h3>
-      <p className="mt-1 text-sm font-semibold text-[#0b1f3a]" data-testid="form-step-hint">Add your brand and work email, then press Send request. That's it.</p>
+      <h3 className="mt-1 font-display text-2xl md:text-3xl">{ic.title}</h3>
+      <p className="mt-1 text-sm font-semibold text-[#0b1f3a]" data-testid="form-step-hint">{ic.hint}</p>
       <SavedNote show={restored} onClear={() => { saved.clear(); setV({ brand: "", email: "", notes: "" }); setRestored(false); setTouched({}); }} />
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <label className="block text-sm">
@@ -242,6 +251,12 @@ export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path
           <FieldError msg={err("email")} />
         </label>
       </div>
+      {intent === "offer" ? (
+        <label className="mt-3 block text-sm">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-foreground/70">Your offer (USD, optional)</span>
+          <input name="offer" inputMode="numeric" maxLength={40} placeholder="e.g. 5,000" value={offer} onChange={(e) => setOffer(e.target.value)} className={input} data-testid="cr-offer" />
+        </label>
+      ) : null}
       <button type="button" onClick={() => setMore((m) => !m)} aria-expanded={more} className="mt-3 text-sm font-semibold text-foreground/70 underline-offset-2 hover:underline" data-testid="cr-more">{more ? "Hide details" : "+ Add details (optional)"}</button>
       {more ? (
         <label className="mt-2 block text-sm">
@@ -253,7 +268,7 @@ export function CategoryRequestForm({ path = "/", defaultCategory = "" }: { path
         <label>Company website<input name="company_website" tabIndex={-1} autoComplete="off" value={hp} onChange={(e) => setHp(e.target.value)} /></label>
       </div>
       <button type="submit" disabled={state.status === "sending"} className="mt-4 inline-flex h-14 w-full items-center justify-center gap-2 bg-foreground px-6 text-base font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-70" data-testid="cr-submit">
-        {state.status === "sending" ? "Sending…" : "Send request"} <ArrowRight className="size-4" aria-hidden />
+        {state.status === "sending" ? "Sending…" : ic.send} <ArrowRight className="size-4" aria-hidden />
       </button>
       {state.status === "error" ? <p role="alert" className="mt-3 text-sm font-semibold text-[#b42318]" data-testid="cr-message">{state.msg}</p> : null}
       <p className="mt-2 text-xs text-muted-foreground">

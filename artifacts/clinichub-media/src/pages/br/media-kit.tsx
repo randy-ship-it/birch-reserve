@@ -27,6 +27,7 @@ import { MediaKitPdfLink } from "@/components/br/trust";
 import { SALES_REPLY_LINE } from "@/lib/seller-identity";
 import { PlacementVisual, type PlacementKey } from "@/components/br/placement-example";
 import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
+import { BuyJourney, FourPaths } from "@/components/br/journey";
 import { BUYER_FAQ_TITLE, BuyerFaq, EarlySlots, FlightTimeline, ProgramsCallout, SAMPLE_REPORT, FLIGHT_TIMELINE, SampleIoLink, SampleReport, SeeTheUnit } from "@/components/br/buyer-comfort";
 import { DoorRoute } from "@/components/br/door-route";
 import { Details } from "@/components/br/details";
@@ -180,16 +181,10 @@ export default function BrMediaKit() {
           </div>
           <AnnotatedHubMock testId="mk-hero-mock" initial="drho" />
           </div>
-          <p className="mt-3 text-sm font-semibold" data-testid="mk-upgrade">{UPGRADE_PATH_LINE}</p>
+          <div className="mt-8" id="download"><BuyJourney where="media_kit" testId="mk-journey" /></div>
           <div className="mt-5">
             <AvailabilityStrip />
             <EarlySlots />
-          </div>
-          <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap" id="download">
-            <Cta href="/buy?ref=hero_media_kit" variant="lime" testId="mk-buy-hero" className={HERO_BTN}>Buy ads now</Cta>
-            <Cta href={RESERVE_HREF} variant="line" testId="mk-reserve-hero" className={HERO_BTN}>Reserve your space — {price.seat}</Cta>
-            <Cta href={lookHref("hero_media_kit")} variant="line" testId="mk-look-hero" className={HERO_BTN}>Take a 7-day look — {price.look}</Cta>
-            <Cta href="#request" variant="line" testId="mk-request-hero" className={HERO_BTN}>Ask about a placement</Cta>
           </div>
           <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px] text-foreground/60" data-testid="mk-kit-cta">
             <span>Not ready? <a href={intakeHref("hero_media_kit")} onClick={() => logCtaClick("hero_media_kit")} className="font-semibold text-foreground underline underline-offset-4" data-testid="mk-cta-kit-quiet">{KIT_CTA_LABEL}</a></span>
@@ -200,6 +195,7 @@ export default function BrMediaKit() {
 
         </div>
       </section>
+      <section className="border-b border-border/70 bg-secondary/30" data-testid="mk-paths"><div className="container mx-auto max-w-5xl px-5 py-8 md:px-6"><FourPaths testId="mk-four-paths" /></div></section>
       <section className="border-b border-border/70 bg-background" data-testid="mk-audience"><div className="container mx-auto max-w-5xl px-5 py-8 md:px-6"><AudienceChannels testId="mk-audience-channels" /></div></section>
       {/* Mobile: the live feed sits in the gap below the first section (Randy, Nov 20 4:54 PM). */}
       <div className="px-4 py-3 md:hidden"><ActivityPulse mode="inline" /></div>

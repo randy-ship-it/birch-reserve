@@ -36,7 +36,10 @@ import { FieldError, SavedNote, StepHeader } from "@/components/br/form-steps";
 import { clearSaved, fieldError, loadSaved, saveForm } from "@/lib/form-save";
 import { AdActivation } from "@/components/br/ad-activation";
 import { CLINIC_PROGRAM_NOTE, PERF_ONLY_PROGRAM_NOTE } from "../../../../api-server/src/lib/overhaul/performanceOnly";
-import { ExposureLadder, SupplierDone, SupplierFees, brandFromUrl, hubSlugOf, levelOf, rolesForLevel, type IntakePreset } from "@/components/br/supplier-mode";
+import { DemandAsk, PathBuyNow, PathPicker, SupplierDone, SupplierFees, VerticalPicker, anyPath, brandFromUrl, hubSlugOf, pathLabels, pathsFromUrl, rolesForPaths, verticalCats, verticalLabels, type IntakePreset, type PathKey, type Paths, type VerticalKey } from "@/components/br/supplier-mode";
+import { RESERVE_HREF, lookHref } from "@/components/br/pricing";
+import { BuyJourney } from "@/components/br/journey";
+import { priceLabels, useAvailability } from "@/components/br/prime-hero";
 
 /** "Do you have physical locations?" (Randy, Nov 19 2026 10:54 AM ET): yes/no; if yes, how many + monthly visitors. */
 export type PhysForm = { has: boolean | null; locations: string; visitors: string; basis: "per_location" | "total" };
@@ -136,8 +139,16 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   const [perfOnly, setPerfOnly] = useState<boolean>(() => !sup && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("program") === "performance-only");
   const pickProgram = (po: boolean) => { setPerfOnly(po); setR(po ? { supplier: true, hub: false, accelerate: false } : { supplier: true, hub: true, accelerate: false }); trackIntake("advertiser", "field_start", "role", { dedupe: true }); };
   useEffect(() => { if (perfOnly) setR({ supplier: true, hub: false, accelerate: false }); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  const roles = rolesOf(r);
-  const side = sideFor(r);
+  // Supplier preset paths (Nov 26 2026): pick some or all; categories multi-select; optional demand question.
+  const [paths, setPaths] = useState<Paths>(() => (sup ? pathsFromUrl() : { supply: true, hub: false, display: false, ads: false }));
+  const [verts, setVerts] = useState<VerticalKey[]>([]);
+  const [demand, setDemand] = useState(false);
+  const price = priceLabels(useAvailability());
+  const togglePath = (k: PathKey) => { setPaths((c) => ({ ...c, [k]: !c[k] })); trackIntake("advertiser", "field_start", k === "hub" ? "add_hub" : k === "supply" ? "supplier" : "accelerate", { dedupe: true }); };
+  const toggleVert = (k: VerticalKey) => setVerts((c) => (c.includes(k) ? c.filter((x) => x !== k) : [...c, k]));
+  const supHub = sup && paths.hub;
+  const roles: IntakeRole[] = sup ? rolesForPaths(paths) : rolesOf(r);
+  const side = sup ? (paths.hub && !paths.supply && !paths.display && !paths.ads ? "publisher" : "advertiser") : sideFor(r);
   const [market, setMarketRaw] = useState<Market>(DEFAULT_MARKET);
   const [marketTouched, setMarketTouched] = useState(false);
   const setMarket = (m: Market) => { setMarketTouched(true); setMarketRaw(m); };
@@ -179,7 +190,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   const loaded = useRef(false);
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get("resume")) { loaded.current = true; return; }
-    const x = loadSaved<{ website: string; email: string; r: OneFormRoles; phys: PhysForm; shared: SharedAnswers; agencyPartner?: boolean }>(SAVE_KEY);
+    const x = loadSaved<{ website: string; email: string; r: OneFormRoles; phys: PhysForm; shared: SharedAnswers; agencyPartner?: boolean; paths?: Paths; verts?: VerticalKey[]; demand?: boolean }>(SAVE_KEY);
     if (x && (x.website || x.email)) {
       if (x.website) setWebsite(String(x.website));
       if (x.email) setEmail(String(x.email));
@@ -187,6 +198,9 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
       if (x.phys && typeof x.phys === "object") setPhys({ ...EMPTY_PHYS, ...x.phys });
       if (x.shared && typeof x.shared === "object") setShared((cur) => ({ ...cur, ...x.shared, categories: Array.isArray(x.shared!.categories) ? x.shared!.categories.slice(0, 3) : cur.categories }));
       if (typeof x.agencyPartner === "boolean") setAgencyPartner(x.agencyPartner);
+      if (sup && x.paths && typeof x.paths === "object") setPaths({ supply: Boolean(x.paths.supply), hub: Boolean(x.paths.hub), display: Boolean(x.paths.display), ads: Boolean(x.paths.ads) });
+      if (sup && Array.isArray(x.verts)) setVerts(x.verts.filter((v): v is VerticalKey => ["recovery", "longevity", "sleep", "fitness", "nutrition"].includes(String(v))));
+      if (sup && typeof x.demand === "boolean") setDemand(x.demand);
       setLocalRestored(true);
     }
     loaded.current = true;
@@ -194,9 +208,9 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   }, []);
   useEffect(() => {
     if (!loaded.current || submitted.current) return;
-    if (website.trim() || email.trim()) saveForm(SAVE_KEY, { website, email, r, phys, shared, agencyPartner });
+    if (website.trim() || email.trim()) saveForm(SAVE_KEY, { website, email, r, phys, shared, agencyPartner, ...(sup ? { paths, verts, demand } : {}) });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [website, email, r, phys, shared, agencyPartner]);
+  }, [website, email, r, phys, shared, agencyPartner, paths, verts, demand]);
   const startOver = () => { clearSaved(SAVE_KEY); setWebsite(""); setEmail(""); setPhys(EMPTY_PHYS); setAgencyPartner(false); setShared(sup ? { ...EMPTY_SHARED, brand: brandFromUrl() } : EMPTY_SHARED); setLocalRestored(false); setTouched({}); };
   const fieldErrs = { website: fieldError("website", website), email: fieldError("email", email) };
   const flip = (k: keyof OneFormRoles) => {
@@ -212,16 +226,25 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   const addHub = () => { setR((c) => ({ ...c, hub: true })); trackIntake("advertiser", "cta_click", "add_hub"); };
   const toggleCat = (k: string) => setShared((s) => ({ ...s, categories: s.categories.includes(k) ? s.categories.filter((x) => x !== k) : s.categories.length >= 3 ? s.categories : [...s.categories, k] }));
 
+  // Supplier preset blurb lines (land in the lead blurb; Friday v1 has no fields for these).
+  const supNotes = () => [
+    `Supplier intake (/intake/supplier) paths: ${pathLabels(paths).join(", ") || "none picked"}${paths.hub ? " (own hub pending approval)" : ""}.`,
+    ...(verts.length ? [`Categories: ${verticalLabels(verts).join(", ")}.`] : []),
+    ...(demand ? ["Demand inquiry: asked what demand / interest we see for their categories."] : []),
+    ...(paths.display ? ["CPC requested (no published CPC price yet)."] : []),
+    ...(hubEstimateNote() ? [hubEstimateNote()!] : []),
+  ];
   const buildPayload = () => ({
     ...basePayload(roles[0]!),
     roles,
     ...(marketTouched && market.sells_in.length ? { market } : {}),
     ...(shared.brand.trim() ? { company_name: shared.brand.trim() } : {}),
     agency_partner_interest: agencyPartner,
-    shared: { categories: shared.categories, skus: numOrU(shared.skus), audience_customers: numOrU(shared.audience), ...(physOf(phys) ? { physical: physOf(phys) } : {}) },
+    shared: { categories: sup && verts.length ? verticalCats(verts) : shared.categories, skus: numOrU(shared.skus), audience_customers: numOrU(shared.audience), ...(physOf(phys) ? { physical: physOf(phys) } : {}) },
     // Supplier preset + own hub: the hub is created as pending_approval (Randy or Jon approve; never auto-publish).
-    ...(sup ? (hubEstimateNote() ? { notes: [hubEstimateNote()!] } : {}) : { notes: [perfOnly ? PERF_ONLY_PROGRAM_NOTE : CLINIC_PROGRAM_NOTE, ...(hubEstimateNote() ? [hubEstimateNote()!] : [])] }),
-    ...(sup && r.hub ? { hub_request: { role: "supplier" as const, status: "pending_approval" as const, ...(shared.brand.trim() ? { hub_name: shared.brand.trim().slice(0, 120) } : {}), ...(hubSlugOf(shared.brand.trim() || hostOf(website).split(".")[0]!) ? { hub_slug: hubSlugOf(shared.brand.trim() || hostOf(website).split(".")[0]!) } : {}) }, notes: [`Supplier intake (/intake/supplier), exposure level ${levelOf(r)}: ${r.accelerate ? "own hub + CPM/CPC display" : "own hub"}, pending Birch Reserve approval.`] } : sup ? { notes: ["Supplier intake (/intake/supplier), exposure level 1: performance only."] } : {}),
+    ...(sup ? {} : { notes: [perfOnly ? PERF_ONLY_PROGRAM_NOTE : CLINIC_PROGRAM_NOTE, ...(hubEstimateNote() ? [hubEstimateNote()!] : [])] }),
+    ...(sup ? { notes: supNotes() } : {}),
+    ...(supHub ? { hub_request: { role: "supplier" as const, status: "pending_approval" as const, ...(shared.brand.trim() ? { hub_name: shared.brand.trim().slice(0, 120) } : {}), ...(hubSlugOf(shared.brand.trim() || hostOf(website).split(".")[0]!) ? { hub_slug: hubSlugOf(shared.brand.trim() || hostOf(website).split(".")[0]!) } : {}) } } : {}),
   });
   // Partial lead (Randy via Emma, Nov 19 2026 10:21 AM ET): once the email is valid, save what's filled in
   // (debounced) and keep updating the SAME record. It stays "abandoned" until the final click flips it to submitted.
@@ -231,7 +254,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   const partialSig = useRef("");
   const submitted = useRef(false);
   const emailOk = PARTIAL_EMAIL_RE.test(email.trim());
-  const partialKey = JSON.stringify([email.trim(), website.trim(), roles, shared, phys, agencyPartner, marketTouched ? market : null]);
+  const partialKey = JSON.stringify([email.trim(), website.trim(), roles, shared, phys, agencyPartner, marketTouched ? market : null, sup ? [paths, verts, demand] : null]);
   useEffect(() => {
     if (!emailOk || hp || submitted.current || partialKey === partialSig.current) return;
     const t = window.setTimeout(() => {
@@ -263,7 +286,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
       return;
     }
     trackIntake(side, "step_complete", "contact");
-    if (r.supplier && !r.hub && !r.accelerate) trackIntake("advertiser", "submit", "supply_only");
+    if (sup ? paths.supply && !paths.hub && !paths.display && !paths.ads : r.supplier && !r.hub && !r.accelerate) trackIntake("advertiser", "submit", "supply_only");
     setBusy(true);
     submitted.current = true;
     try {
@@ -275,7 +298,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
       const { ref: next, sub, autofill } = fr;
       saveRef(roles[0]!, next);
       clearSaved(SAVE_KEY);
-      if (r.supplier && r.accelerate) saveRef("kit", next); // Expanded (kit builder) upgrades this same record
+      if (sup ? paths.display || paths.ads : r.supplier && r.accelerate) saveRef("kit", next); // Expanded (kit builder) upgrades this same record
       const af = autofill?.fields ?? {};
       const afMarket = af.geo?.value?.sells?.length ? { sells_in: af.geo.value.sells.filter((c): c is "CA" | "US" => c === "CA" || c === "US"), ships_to: (af.geo.value.ships ?? af.geo.value.sells).filter((c): c is "CA" | "US" => c === "CA" || c === "US"), regions: [] } : undefined;
       savePrefill({ website: website.trim(), email: email.trim(), market: marketTouched ? market : afMarket ?? market, category: shared.categories[0] ?? af.category?.value, categorySource: shared.categories[0] ? "typed" : af.category ? "site" : "default", brand: shared.brand.trim() || af.company_name?.value, aov: af.avg_cart_usd?.value, needs: autofill?.needs_input, physical: physOf(phys) });
@@ -295,8 +318,9 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   if (done && quick)
     return (
       <>
-      {sup ? <SupplierDone brand={quick.brand ?? ""} level={levelOf(r)} /> : null}
-      <div className="mb-4" data-testid="intake-activation-step"><AdActivation role={sup ? "supplier" : "brand"} email={quick.contact?.email ?? ""} company={quick.brand ?? ""} hubSlug={sup && levelOf(r) >= 2 ? hubSlugOf(quick.brand ?? "") : ""} fridayId={quick.ref?.id ?? ""} /></div>
+      {sup ? <SupplierDone brand={quick.brand ?? ""} paths={paths} demand={demand} /> : null}
+      {sup && (paths.display || paths.ads) ? <div className="mb-4 rounded-3xl border border-foreground/10 bg-white p-5 shadow-xl md:p-6"><BuyJourney where="intake_supplier_done" title="Don't wait. Buy a small slot now." testId="supplier-done-journey" /></div> : null}
+      {sup && !supHub ? null : <div className="mb-4" data-testid="intake-activation-step"><AdActivation role={sup ? "supplier" : "brand"} email={quick.contact?.email ?? ""} company={quick.brand ?? ""} hubSlug={supHub ? hubSlugOf(quick.brand ?? "") : ""} fridayId={quick.ref?.id ?? ""} /></div>}
       <FastReport
         q={quick}
         onAddDetail={() => {
@@ -325,9 +349,16 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
   const supplierOnly = r.supplier && !r.hub;
   return (
     <form onSubmit={submit} noValidate data-testid="intake-short-form" data-roles={roles.join(",")} className="rounded-3xl border border-foreground/10 bg-white p-5 shadow-xl md:p-6">
-      <StepHeader step={1} total={2} title="Your free kit" hint={sup ? "Pick your level, add your website and work email, then press the green button." : perfOnly ? "Add your website and work email, then press Get my free Monetization Kit." : "Both boxes are on (most brands are both). Add your website and work email, then press Get my free Monetization Kit."} testId="intake-steps" />
+      <StepHeader step={1} total={2} title={sup ? "Pick your path" : "Your free kit"} hint={sup ? "Pick some or all, add your website and work email, then press the green button." : perfOnly ? "Add your website and work email, then press Get my free Monetization Kit." : "Both boxes are on (most brands are both). Add your website and work email, then press Get my free Monetization Kit."} testId="intake-steps" />
       <SavedNote show={localRestored && !resumed} onClear={startOver} />
-      {sup ? <ExposureLadder level={levelOf(r)} onPick={(l) => { setR(rolesForLevel(l)); trackIntake("advertiser", "field_start", l === 3 ? "accelerate" : l === 2 ? "add_hub" : "supplier", { dedupe: true }); }} /> : null}
+      {sup ? (
+        <div data-testid="supplier-step-paths">
+          <PathPicker value={paths} onToggle={togglePath} />
+          <PathBuyNow paths={paths} look={price.look} seat={price.seat} lookHref={lookHref("supplier_intake_path")} reserveHref={RESERVE_HREF} />
+          <VerticalPicker value={verts} onToggle={toggleVert} />
+          <DemandAsk on={demand} onClick={() => setDemand((v) => !v)} />
+        </div>
+      ) : null}
       {sup ? null : (
         <fieldset className="mb-4" data-testid="intake-program">
           <legend className="text-[11px] font-bold uppercase tracking-wider text-foreground/60">How do you want to work with us?</legend>
@@ -374,7 +405,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
           <FieldError msg={touched.email ? fieldErrs.email : ""} />
         </div>
         <button type="submit" disabled={busy} data-testid="intake-submit" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 transition hover:bg-[#0b1f3a] hover:text-white">
-          {busy ? <Loader2 className="size-5 animate-spin" /> : null} {sup && r.hub ? "Create my hub" : "Get my free Monetization Kit"} <ArrowRight className="size-5" />
+          {busy ? <Loader2 className="size-5 animate-spin" /> : null} {supHub ? "Create my hub" : sup && !anyPath(paths) ? "Ask about demand" : sup ? "Get started" : "Get my free Monetization Kit"} <ArrowRight className="size-5" />
         </button>
       </div>
       <PromoBox />
@@ -409,7 +440,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
       <div className="mt-4 border-t border-foreground/10 pt-3 text-[13px]" data-testid="intake-secondary">
         <a href="/intake/sponsor" className="text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-sponsor-link">Want to own a category or an area? See category and area locks</a>
       </div>
-      {sup ? <HubDemandCard className="mt-4" /> : null}
+      {supHub ? <HubDemandCard className="mt-4" /> : null}
       {sup ? <SupplierFees /> : null}
       <Details testId="intake-fine"><p>Business-level only, no customer data. Every figure is an estimate, reviewed by a person. Nothing is booked or charged. Optional answers are asked once and used for both sides.</p></Details>
     </form>
