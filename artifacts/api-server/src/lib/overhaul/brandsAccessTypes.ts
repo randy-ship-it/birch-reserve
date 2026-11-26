@@ -28,7 +28,7 @@ export type BrandsAccessHub = {
 export type BrandsAccessPayload = {
   ok: true;
   token: string;
-  claim: "Based on signed partnership contracts";
+  claim: "Modelled estimates from listed partners";
   modelled: string;
   hubs: BrandsAccessHub[];
 };

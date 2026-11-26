@@ -1,6 +1,6 @@
 /**
  * $1,900 CAD exclusive display reserve (Randy, voice, Nov 21 2026 9:59 AM ET).
- * Locks a $5K–$50K exclusive display package in one category at 25% below the regular rate.
+ * Holds a $5K–$50K exclusive display package in one category pending the IO; refunded if another brand commits first.
  * One source for /exclusive, /terms, llms.txt and the Stripe line item, so they never drift.
  * Geo currency since Nov 21 2026 3:34 PM ET: the same $1,900 in CAD (Canada) or USD (everyone else),
  * charged in the currency the page showed (body.currency).

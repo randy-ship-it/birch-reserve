@@ -111,7 +111,7 @@ test("promo credit charges the regular rate; same buyer's promo credit is spent 
   const r = regularRateSummary();
   assert.equal(r.cpmLow, 4);
   assert.equal(r.cpmHigh, 30);
-  assert.match(r.compare, /25% below regular/);
+  assert.match(r.compare, /Exclusive display packages/);
 });
 
 test("QR PNG is a valid PNG", () => {

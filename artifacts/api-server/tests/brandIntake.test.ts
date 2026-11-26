@@ -96,7 +96,7 @@ test("sponsor: existing SKUs and prices only, existing Stripe paths, area lock i
 test("channel tiles: Randy's figures labelled network figures / targets; Calm Joints shows none", () => {
   assert.equal(CHANNEL_TILES_LABEL, "Network figures / targets");
   const t = Object.fromEntries(CHANNEL_TILES.map((x) => [x.key, x]));
-  assert.deepEqual(t["scale-hubs"]!.stats.map((s) => s.v), ["700MM+"]);
+  assert.deepEqual(t["scale-hubs"]!.stats.map((s) => s.v), ["~128MM"]);
   assert.equal(t["calm-joints"]!.stats.length, 0);
   assert.deepEqual(t["street-team"]!.stats.map((s) => s.v), ["1MM+"]);
   assert.deepEqual(t["retail-network"]!.stats.map((s) => s.v), ["200+", "1MM+", "CA + US"]);

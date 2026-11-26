@@ -10,16 +10,16 @@ export default function Privacy() {
       <p className="mt-6 text-sm text-muted-foreground">{SELLER_IDENTITY}</p>
       <div className="mt-10 space-y-6 text-base leading-relaxed text-muted-foreground">
         <p>
-          This draft describes what Birch Reserve collects to sell the public
-          $190 USD and $490 USD reservations. This page is not in force until counsel
-          stamps it.
+          Draft. This page describes what Birch Reserve collects to sell the
+          public $190 USD and $490 USD reservations and the $1,900 exclusive
+          display reserve. Final terms for any purchase are in your insertion order.
         </p>
         <p>
           Reservation checkout collects the brand legal name, work email,
           optional website, format preference, and an idempotency key so a
           repeated request does not open a second hold. Stripe hosts the card
           form. Silver Birch Growth Inc. receives payment status from Stripe
-          and does not store full card numbers on Birch Reserve servers.
+          and does not store full card numbers on its servers.
         </p>
         <p>
           Birch Reserve does not collect protected health information, clinical
@@ -28,7 +28,8 @@ export default function Privacy() {
           later authorizes a flight, is aggregate only.
         </p>
         <p>
-          The Stripe descriptor should read SCALE HEALTH*BIRCH or BIRCH RESERVE.
+          Card statements show BIRCHRSV* followed by a short label (for
+          example BIRCHRSV* RESERVE). The seller is Silver Birch Growth Inc.
           Contact{" "}
           <a className="text-foreground underline" href="mailto:randy@scalehealth.ca">
             randy@scalehealth.ca

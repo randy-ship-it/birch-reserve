@@ -45,7 +45,7 @@ export const STREET_TEAM = {
     "Planning is by area and route. We do not share home or address lists.",
     "No outcomes are guaranteed. Reach figures are plans and audience, not delivered impressions, clicks or sales.",
   ],
-  fine: "Reach figures are based on signed partnership contracts, as a plan and not a guarantee.",
+  fine: "Reach figures are modelled estimates from listed partners, as a plan and not a guarantee.",
 } as const;
 
 export const STREET_TEAM_TIMING = ["Early 2027 (Q1)", "Q2 2027", "Q3 2027", "Q4 2027", "Not sure yet"] as const;

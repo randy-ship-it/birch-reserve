@@ -43,7 +43,7 @@ function page(open: boolean, status: Status, currency: ReserveCurrency = "cad", 
         : "";
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Exclusive display reserve · ${X.label} — Birch Reserve</title>
-<meta name="description" content="Reserve ${X.label} to lock a $5K–$50K exclusive display package in your category at 25% below the regular rate. Insertion order before anything runs.">
+<meta name="description" content="Reserve ${X.label} to hold a $5K–$50K exclusive display package in your category pending your insertion order. Refunded if another brand commits first. Nothing runs before the IO.">
 <link rel="canonical" href="https://birchreserve.net/exclusive"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>*{box-sizing:border-box}body{margin:0;background:#F9F8F6;color:#071A39;font:16px/1.6 "IBM Plex Sans",sans-serif}
@@ -58,12 +58,12 @@ details{border-top:1px solid #ccd2d8;padding:12px 0}summary{cursor:pointer;font-
 ${buyerHeaderHtml("exclusive", currencyToggleHtml(currency, (c) => currencyHref("/exclusive", query, c)))}
 <main>${banner}<div data-promo-box="success"></div>
 <p class="fine">EXCLUSIVE DISPLAY · ONE BRAND PER CATEGORY</p>
-<h1>Reserve ${X.label}. Lock your category's exclusive display.</h1>
-<p>Your $1,900 locks a ${X.packageLabel} exclusive display package in your category at ${EXCLUSIVE_RESERVE.discountPct}% below the regular rate. All $1,900 counts toward the package. Your insertion order names the hub, placement and dates before anything runs.</p>
+<h1>Reserve ${X.label}. Hold your category's exclusive display.</h1>
+<p>Your $1,900 holds a ${X.packageLabel} exclusive display package in your category while we write your insertion order. All $1,900 counts toward the package. The category becomes exclusive to you when you sign the IO, which names the hub, placement and dates. If another brand commits to the category first, we refund the $1,900 in full.</p>
 <div class="grid">
 <div class="stat"><b>${X.label}</b>today, by card, counted in full</div>
 <div class="stat"><b>${EXCLUSIVE_RESERVE.packageRange}</b>exclusive display package, ${C}</div>
-<div class="stat"><b>${EXCLUSIVE_RESERVE.discountPct}% below</b>the regular rate, set on the IO</div>
+<div class="stat"><b>Held pending IO</b>refunded if another brand commits first</div>
 <div class="stat"><span class="mc">Modelled</span><b>${esc(pace.perMonth)}</b>over up to 6 months (${esc(pace.viewsPerMonth)})</div>
 </div>
 ${open ? `<form id="f"><label>Brand<input name="brand" required maxlength="160" autocomplete="organization"></label>

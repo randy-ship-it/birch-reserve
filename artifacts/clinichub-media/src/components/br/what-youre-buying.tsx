@@ -5,7 +5,7 @@
  * inside retail businesses) and the Street Team. Visual first, detail in expanders.
  *
  * Figures come only from the shared sources (AUDIENCE_CHANNELS, STREET_REACH_FIG, the hub ladder); nothing new is
- * invented. Reach figures are based on signed partnership contracts, the 2027 figure is an estimate, and every ad
+ * invented. Reach figures are modelled estimates from listed partners, the 2027 figure is an estimate, and every ad
  * shown on the site stays a labelled example mockup.
  */
 import type { ReactNode } from "react";

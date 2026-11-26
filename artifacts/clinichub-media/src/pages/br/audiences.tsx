@@ -55,7 +55,7 @@ function Bar({ pct, ink = false }: { pct: number; ink?: boolean }) {
 const FAQ = [
   {
     q: "Where do these numbers come from?",
-    a: "Three places, each labelled. Measured figures come from our own hub analytics and are shown as shares. Modelled figures are based on signed partnership contracts and built from the customers of the brands launching on the network (the TAM feed at scalehealth.ca/tam). Estimates are benchmark ranges. None of it is audited delivery, and we say so on every number.",
+    a: "Three places, each labelled. Measured figures come from our own hub analytics and are shown as shares. Modelled figures are estimates from partner data and built from the customers of the brands launching on the network (the TAM feed at scalehealth.ca/tam). Estimates are benchmark ranges. None of it is audited delivery, and we say so on every number.",
   },
   {
     q: "Do brands ever see customer or patient data?",
@@ -260,7 +260,7 @@ export default function BrAudiences() {
               <a href={AUDIENCE_SNAPSHOT.tamSource} className="underline underline-offset-2" target="_blank" rel="noopener noreferrer">
                 scalehealth.ca/tam
               </a>
-              . Modelled, based on signed partnership contracts, not audited.
+              . Modelled estimates from partner data, not audited.
             </p>
           </div>
           <div className="border border-foreground/15 bg-white" data-testid="category-demand">

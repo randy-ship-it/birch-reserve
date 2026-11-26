@@ -77,7 +77,7 @@ export function StreetTeamProgram({ where }: { where: "home" | "page" }) {
             <div className="self-end">
               <p className="whitespace-nowrap font-display text-[2.6rem] leading-none md:text-5xl" data-testid={`street-team-figure-${where}`}>{STREET_REACH_FIG.v}</p>
               <p className="mt-1.5 text-sm text-white/80">{STREET_REACH_FIG.l}</p>
-              <p className="mt-1 text-[11px] text-white/60">Calm Joints and our Street Team Ambassadors. Based on signed partnership contracts.</p>
+              <p className="mt-1 text-[11px] text-white/60">Calm Joints and our Street Team Ambassadors. Modelled estimates from listed partners.</p>
             </div>
           </div>
         </div>

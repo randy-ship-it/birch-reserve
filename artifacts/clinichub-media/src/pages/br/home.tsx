@@ -49,7 +49,7 @@ const FAQ = [
   { q: "Where exactly do the ads run?", a: "In post-purchase moments and inside health and wellness member hubs: pages inside a brand, clinic or retailer where its own customers land right after they buy or book. Categories start with recovery, then longevity, sleep, nutrition and more. Private clinic network display, retail micro hubs and the Street Team are separate add-ons. Each hub has four placements: post-purchase, the hub home page, product and services pages, and the member dashboard behind login." },
   { q: "Which hubs are live?", a: `${INVENTORY.line} More hubs launch over time.` },
   { q: "Is this display or cost-per-click?", a: "Both. Every placement can be bought as display (priced per thousand views) or CPC (priced per click). Deposits and area locks draw down against either." },
-  { q: "Are the audience numbers measured?", a: "Not yet. Audience and view figures on this site are based on signed partnership contracts, not measured delivery. We don't publish a measured network views figure (the 2027 inventory figure is based on signed partnership contracts); your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
+  { q: "Are the audience numbers measured?", a: "Not yet. Audience and view figures on this site are modelled estimates from listed partners, not measured delivery. We don't publish a measured network views figure (the 2027 inventory figure is a modelled estimate); your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
   { q: "Can a local business or studio buy?", a: "Yes. Start with the same $190 USD 7-day look or $490 USD reserve. Locking your area (a share of hub display near your postal code) is a premium option, by inquiry." },
   { q: "How does my business become a hub?", a: `Studios and retailers activate a hub on ScaleHealth.ca, the platform that hosts the hubs (scalehealth.ca/clinichubs), and earn cash or ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded hub.` },
   { q: "Do agencies get anything?", a: `Yes. ${AGENCY_RATE_CARD.line} ${AGENCY_RATE_CARD.resale} ${AGENCY_RATE_CARD.disclosure} ${AGENCY_RATE_CARD.direct} ${AGENCY_RATE_CARD.noUndercut} Agencies can also prepay a client test budget and get UTM and promo-code reporting per hub and surface.` },
@@ -86,7 +86,7 @@ function Expand({ title, sub, children, testId, open = false }: { title: string;
 
 export default function BrHome() {
   useAttention({ audience: "[data-testid=home-stats]", hubs: "#proof-live", ladder: "[data-testid=home-offer-stairs]", street: "[data-testid=home-street-team]", details: "#more", end: "[data-testid=home-close]" });
-  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand in post-purchase moments and inside health and wellness member hubs: 700MM+ captive page views activating, 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 1MM+ consumers now through our provider network and Street Team, expanding to an estimated 3MM+ in 2027. Get a free Monetization Kit. Prices in USD; figures are based on signed partnership contracts: reach and audience, not delivered impressions.");
+  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand in post-purchase moments and inside health and wellness member hubs: ~128MM modelled page views a month (estimate), 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 1MM+ consumers now through our provider network and Street Team, expanding to an estimated 3MM+ in 2027. Get a free Monetization Kit. Prices in USD; figures are modelled estimates from listed partners: reach and audience, not delivered impressions.");
   const price = priceLabels(useAvailability());
   // Phones: the floating chat + voice buttons stay out of the hero preview until the visitor scrolls past it.
   useEffect(() => {
@@ -324,7 +324,7 @@ export default function BrHome() {
             <KitCta placement="footer_home" size="md" testId="home-cta-kit-bottom" sub={null} />
             <a href="/terms" className="inline-flex items-center gap-1 text-sm text-foreground/60 underline underline-offset-4"><FileText className="size-4" aria-hidden />Terms</a>
           </div>
-          <p className="text-[12px] text-foreground/50">Prices in USD. Audience and reach figures are based on signed partnership contracts, not measured delivery.</p>
+          <p className="text-[12px] text-foreground/50">Prices in USD. Audience and reach figures are modelled estimates from listed partners, not measured delivery.</p>
         </div>
       </section>
 
