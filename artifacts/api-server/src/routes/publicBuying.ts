@@ -2427,13 +2427,13 @@ ${buyerHeaderHtml("buycalc", `<a class="br-bh-tel" href="#request" data-testid="
 ${heroSubHtml(price(look), price(seat))}
 <p class="avail" data-testid="buycalc-avail"><span class="dot" aria-hidden="true"></span><span><strong>Curated placements</strong> · placed by hand, hub by hub</span></p>
 <p class="lede">Reserve a share of display space across our growing network of private, members-only health and wellness hubs (physio, fitness and recovery today), with more launching. Your brand shows right after a member books or buys. All of it is media credit until the insertion order (IO), fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
-<div class="ctas"><a class="btn" href="/buycalc?sku=reserve-490#reserve" data-pick-sku="reserve-490">Reserve your space · ${price(seat)}</a><a class="btn line" href="/buycalc?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · ${price(look)}</a></div>
+<div class="ctas"><a class="btn" href="/buycalc?sku=reserve-490#reserve" data-pick-sku="reserve-490">Category placement · ${price(seat)}</a><a class="btn line" href="/buycalc?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · ${price(look)}</a></div>
 ${heroInquireHtml()}</div>${heroMockHtml("buycalc-hero-mock")}</div></section>
 
 <section class="band" id="buy"><div class="wrap"><div class="buy">
 <form id="reserve" novalidate><p class="kicker">Reserve without a login</p><h2 style="margin-bottom:6px">Lock it in.</h2>
 <p class="fine" style="margin:0 0 6px" data-testid="buy-tagline">${CHECKOUT_TAGLINE} Want to upload your ad too? <a href="/buy">Use the 3-step buy</a>.</p>
-<label for="f-sku">Offer</label><select id="f-sku" name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${offer.sku === selected.sku ? " selected" : ""}>${price(offer)} · ${offer.sku === "reserve-490" ? "Reserve your space" : "7-day look"}</option>`).join("")}</select>
+<label for="f-sku">Offer</label><select id="f-sku" name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${offer.sku === selected.sku ? " selected" : ""}>${price(offer)} · ${offer.sku === "reserve-490" ? "Category placement" : "7-day look"}</option>`).join("")}</select>
 ${category ? `<input type="hidden" name="category" value="${category}">` : ""}
 <label for="f-brand">Brand</label><input id="f-brand" name="brand" required maxlength="160" autocomplete="organization">
 <label for="f-email">Work email</label><input id="f-email" name="email" type="email" required autocomplete="email">
@@ -2452,7 +2452,7 @@ ${sampleIoCheckoutHtml()}
 
 <section class="band" id="more"><div class="wrap"><details class="more" id="more-details"><summary>How it works, what you get, refunds and the network</summary>
 <section class="band" id="offers"><div class="wrap"><p class="kicker">Two ways in</p><h2>Pick your start.</h2>
-<div class="offers">${offerCard(look, { eyebrow: "7-day look", name: "See it before you commit", lines: ["See your placement for 7 days while you decide.", "Converts in full to the reserve within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Reserve", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the hub network. Credit lasts 12 months.`, "Placements are curated as hubs launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Reserve your space · ${price(seat)}` })}</div>
+<div class="offers">${offerCard(look, { eyebrow: "7-day look", name: "See it before you commit", lines: ["See your placement for 7 days while you decide.", "Converts in full to the category placement within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Category placement", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the hub network. Credit lasts 12 months.`, "Placements are curated as hubs launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Category placement · ${price(seat)}` })}</div>
 ${priceLadderHtml(currency, { title: "Every step, in " + currency.toUpperCase() })}
 ${offersSampleIoHtml()}
 ${hundredHtml()}

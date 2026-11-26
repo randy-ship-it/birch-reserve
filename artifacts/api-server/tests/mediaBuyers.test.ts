@@ -87,8 +87,8 @@ test("/media-buyers: 'What to check before you buy' is six published answers und
   const byLabel = Object.fromEntries(MB_BUY_CHECKLIST.map((r) => [r.label, r.answer]));
   assert.equal(byLabel["Where it shows"], "Four placements: post-purchase (premium, by IO), hub home page, product / services pages, member dashboard behind login. The IO names the hub, surface, format and dates.");
   assert.equal(byLabel["Controls"], "Nothing runs until you approve an insertion order naming the hub, placement and flight dates. No open web, no user-generated content, no programmatic resale.");
-  assert.equal(byLabel["Cost"], "From {look} for a 7-day look, or the {reserve} category reserve by card. Premium and several hubs by IO.");
-  assert.equal(byLabel["Refunds"], "The reserve is media credit, fully refundable until 14 days before the launch date on the IO. The look converts in full to the reserve within 7 days, or it's refunded.");
+  assert.equal(byLabel["Cost"], "From {look} for a 7-day look, or the {reserve} category placement by card. Premium and several hubs by IO.");
+  assert.equal(byLabel["Refunds"], "The category placement is media credit, fully refundable until 14 days before the launch date on the IO. The look converts in full to the category placement within 7 days, or it's refunded.");
   assert.equal(byLabel["Tracking"], "Your UTM links and promo codes. No clinical pixels and no patient data on hub pages.");
   assert.equal(byLabel["Reporting"], "Aggregate views and clicks per hub and surface, plus UTM visits and redemptions. Pre-launch figures are labelled Modelled. No impression guarantees.");
 

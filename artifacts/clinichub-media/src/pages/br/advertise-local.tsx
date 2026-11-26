@@ -13,13 +13,13 @@ const FAQ = [
   { q: "What does “up to 50%” mean?", a: `We hold up to ${AREA_LOCK.standardSharePct}% of the display slots shown to hub members within ${AREA_LOCK.radiusKm} km of your postal code for your category. In dense downtown cores (for example Toronto M5, downtown Montreal, Vancouver V6B/V6C/V6E and major US downtowns) the cap is ${AREA_LOCK.denseCoreSharePct}% because so many businesses share the same blocks.` },
   { q: "When does my term start?", a: "Your 1 to 6 month term starts the day your displays go live, not the day you pay." },
   { q: "What if traffic in my area grows?", a: "Your share grows with it. You keep the right to keep pace: more views in your area are offered to you first, at your locked discount, before anyone else can buy them." },
-  { q: "What does it cost?", a: "Self-serve starts at a $190 USD 7-day look or a $490 USD category reserve, priced in USD for every buyer. An area lock is a premium slot, quoted by inquiry against the hubs near you." },
+  { q: "What does it cost?", a: "Self-serve starts at a $190 USD 7-day look or a $490 USD category placement, priced in USD for every buyer. An area lock is a premium slot, quoted by inquiry against the hubs near you." },
   { q: "Which placements can I get?", a: `${PLACEMENT_LABELS.join(", ")}. Display or CPC, on the live hubs (DR-HO'S physio, SOLE, Integrity Fitness and Calm Joints today) plus hubs near you as they launch.` },
   { q: "Is it exclusive?", a: "Yes, by category in your area: while your lock is active we won't sell another lock in your category within your radius." },
 ];
 
 export default function BrAdvertiseLocal() {
-  usePageMeta("Local businesses & studios | Birch Reserve", "Reach hub members near you. Start with a $190 USD 7-day look or a $490 USD category reserve; area locks are premium, by inquiry.");
+  usePageMeta("Local businesses & studios | Birch Reserve", "Reach hub members near you. Start with a $190 USD 7-day look or a $490 USD category placement; area locks are premium, by inquiry.");
   const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const [postal, setPostal] = useState(params.get("postal") ?? "");
   const [term, setTerm] = useState(3);
@@ -65,7 +65,7 @@ export default function BrAdvertiseLocal() {
 
   return (
     <div data-testid="br-advertise-local">
-      <JsonLd data={{ "@context": "https://schema.org", "@type": "OfferCatalog", name: "Birch Reserve self-serve offers", itemListElement: [{ "@type": "Offer", name: "7-day category look", sku: "hold-190", price: 190, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=hold-190" }, { "@type": "Offer", name: "Category reserve", sku: "reserve-490", price: 490, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=reserve-490" }] }} />
+      <JsonLd data={{ "@context": "https://schema.org", "@type": "OfferCatalog", name: "Birch Reserve self-serve offers", itemListElement: [{ "@type": "Offer", name: "7-day category look", sku: "hold-190", price: 190, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=hold-190" }, { "@type": "Offer", name: "Category placement", sku: "reserve-490", price: 490, priceCurrency: "USD", url: "https://birchreserve.net/buycalc?sku=reserve-490" }] }} />
       <Section>
         <div className="grid gap-12 lg:grid-cols-[1fr_1fr]">
           <div>
@@ -73,7 +73,7 @@ export default function BrAdvertiseLocal() {
             <H1>Reach hub members near you.</H1>
             {areaInquireOnly ? <p className="mt-3"><InquireBadge /> <span className="text-sm text-muted-foreground">Premium slot: by inquiry, not card.</span></p> : null}
             <Lede>
-              Start self-serve for <strong>$190 USD</strong> (7-day look) or <strong>$490 USD</strong> (category reserve): <a className="underline underline-offset-2" href="#slots">see the two offers</a>. Want your area to yourself? Put your postal code in to ask about an area lock: up to <strong>{AREA_LOCK.standardSharePct}%</strong> of hub display within <strong>{AREA_LOCK.radiusKm} km</strong> of you ({AREA_LOCK.denseCoreSharePct}% in busy city centres), for <strong>1 to 6 months</strong> from when your displays start.
+              Start self-serve for <strong>$190 USD</strong> (7-day look) or <strong>$490 USD</strong> (category placement): <a className="underline underline-offset-2" href="#slots">see the two offers</a>. Want your area to yourself? Put your postal code in to ask about an area lock: up to <strong>{AREA_LOCK.standardSharePct}%</strong> of hub display within <strong>{AREA_LOCK.radiusKm} km</strong> of you ({AREA_LOCK.denseCoreSharePct}% in busy city centres), for <strong>1 to 6 months</strong> from when your displays start.
             </Lede>
             <ul className="mt-8 space-y-3 text-sm">
               {[

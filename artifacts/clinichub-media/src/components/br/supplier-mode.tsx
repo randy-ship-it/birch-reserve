@@ -112,7 +112,7 @@ export function PathBuyNow({ paths, look, seat, lookHref, reserveHref }: { paths
       <p className="text-sm font-bold text-[#0b1f3a]">Skip the wait. Buy a small slot now.</p>
       <div className="flex flex-wrap gap-2">
         <a href={lookHref} className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#0b1f3a] px-4 text-sm font-bold text-white hover:bg-lime-300 hover:text-[#0b1f3a]" data-testid="path-buy-look">Buy display now · {look}</a>
-        <a href={reserveHref} className="inline-flex h-10 items-center rounded-full bg-white px-4 text-sm font-bold text-[#0b1f3a] ring-1 ring-[#0b1f3a]/20 hover:ring-[#0b1f3a]" data-testid="path-buy-reserve">Reserve · {seat}</a>
+        <a href={reserveHref} className="inline-flex h-10 items-center rounded-full bg-white px-4 text-sm font-bold text-[#0b1f3a] ring-1 ring-[#0b1f3a]/20 hover:ring-[#0b1f3a]" data-testid="path-buy-reserve">Category placement · {seat}</a>
       </div>
       {paths.display ? <p className="text-[12px] text-foreground/65 md:basis-full" data-testid="path-cpc-note">Request CPC: keep Display / CPC ticked and send. Max CPC exposure needs your own hub.</p> : null}
     </div>

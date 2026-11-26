@@ -76,7 +76,7 @@ export default function BrAgencies() {
             <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
               <Cta href="#talk" testId="agency-cta-io">Book a starter block</Cta>
               <a href="#model" className="text-sm font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="agency-cta-model">See the rate card</a>
-              <a href={RESERVE_HREF} className="text-sm text-[#0b1f3a]/70 underline underline-offset-4" data-testid="agency-cta-reserve">Or reserve a client test · $490 USD</a>
+              <a href={RESERVE_HREF} className="text-sm text-[#0b1f3a]/70 underline underline-offset-4" data-testid="agency-cta-reserve">Or a category placement · $490 USD</a>
             </div>
           </div>
           <ul className="border-t border-[#0b1f3a]/15 lg:mt-2" data-testid="agency-benefits" aria-label={skinText("Why agencies use Birch")}>

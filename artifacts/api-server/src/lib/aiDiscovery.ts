@@ -35,7 +35,7 @@ export const AI_FAQ: readonly { q: string; a: string }[] = [
   },
   {
     q: "What does it cost to start on Birch Reserve?",
-    a: "A $190 USD 7-day category look, fully credited to the $490 USD category reserve if you convert within 7 days, otherwise refunded. The $490 USD reserve is media credit, fully refundable until 14 days before the launch date on the insertion order. Premium exclusive display from $5K to $50K USD is set through intake and an insertion order.",
+    a: "A $190 USD 7-day category look, fully credited to the $490 USD category placement if you convert within 7 days, otherwise refunded. The $490 USD category placement is media credit, fully refundable until 14 days before the launch date on the insertion order. Premium exclusive display from $5K to $50K USD is set through intake and an insertion order.",
   },
   {
     q: "Can agencies buy on Birch Reserve?",
@@ -50,7 +50,7 @@ export const AI_FAQ: readonly { q: string; a: string }[] = [
 const KEY_URLS: [string, string, string][] = [
   ["/", "Home: what Birch Reserve is and the starting offers", ""],
   ["/rates", "Rates", ""],
-  ["/buycalc", "Pay online (Stripe-hosted): $190 look or $490 reserve", ""],
+  ["/buycalc", "Pay online (Stripe-hosted): $190 look or $490 category placement", ""],
   ["/intake", "Start intake for a brand, incl. premium exclusive display", ""],
   ["/agencies", "Agencies: insertion order and invoice", ""],
   ["/audiences", "Audience insights", ""],
@@ -92,13 +92,13 @@ export function llmsFullTxt(): string {
     "Seller: Silver Birch Growth Inc. · Toronto, Ontario · randy@scalehealth.ca",
     "",
     "## What you can buy (USD)",
-    "- $190 · 7-day category look · credited in full toward the $490 reserve if you convert within 7 days, otherwise refunded · does not lock in a slot",
-    "- $490 · category reserve · all of it becomes media credit · fully refundable until 14 days before the launch date on the insertion order · credit usable for 12 months",
+    "- $190 · 7-day category look · credited in full toward the $490 category placement if you convert within 7 days, otherwise refunded · does not lock in a slot",
+    "- $490 · category placement · all of it becomes media credit · fully refundable until 14 days before the launch date on the insertion order · credit usable for 12 months",
     "- Premium exclusive display, $5K to $50K · set through intake and an insertion order",
     "- Agencies: buy by insertion order and invoice",
     "",
     "## How to buy",
-    "1. Pay the $190 look or the $490 reserve at https://birchreserve.net/buycalc (Stripe-hosted checkout).",
+    "1. Pay the $190 look or the $490 category placement at https://birchreserve.net/buycalc (Stripe-hosted checkout).",
     "2. For premium exclusive display, or if you are an agency, start at https://birchreserve.net/intake or https://birchreserve.net/agencies.",
     "3. Send creative. Creatives get a quick human review before going live. No fixed live time is promised.",
     "",
@@ -152,8 +152,8 @@ export function jsonLdGraph(): Record<string, unknown> {
         brand: { "@type": "Brand", name: "Birch Reserve" },
         category: "Advertising",
         offers: [
-          offer("hold-190", 190, "7-day category look", "Credited in full toward the $490 reserve if you convert within 7 days, otherwise refunded. Does not lock in a slot."),
-          offer("reserve-490", 490, "Category reserve", "Media credit, fully refundable until 14 days before the launch date on the insertion order."),
+          offer("hold-190", 190, "7-day category look", "Credited in full toward the $490 category placement if you convert within 7 days, otherwise refunded. Does not lock in a slot."),
+          offer("reserve-490", 490, "Category placement", "Media credit, fully refundable until 14 days before the launch date on the insertion order."),
         ],
       },
       {

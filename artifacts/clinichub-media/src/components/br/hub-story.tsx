@@ -45,7 +45,7 @@ export function OwnTheMoment({ testId = "own-the-moment" }: { testId?: string })
 
 export function FourSteps({ look, seat, testId = "four-steps" }: { look: string; seat: string; testId?: string }) {
   const steps = [
-    { n: "1", title: `${look} look or ${seat} reserve`, line: "Media credit, not a fee. The look converts to a reserve or is refunded.", href: LOOK_HREF },
+    { n: "1", title: `${look} look or ${seat} category placement`, line: "Media credit, not a fee. The look converts to a category placement or is refunded.", href: LOOK_HREF },
     { n: "2", title: "See the mock on a live hub", line: "Your card on any hub, shown as an example mockup.", href: RESERVE_HREF },
     { n: "3", title: "Sign the insertion order (IO)", line: "It names the hub, surface, category and dates. Nothing runs until the IO is signed and approved.", href: undefined },
     { n: "4", title: "The flight runs, you get the report", line: "Aggregate report only. Clicks arrive UTM-tagged, so you can check them in your own analytics. First measured reports coming soon.", href: undefined },
@@ -63,7 +63,7 @@ export function FourSteps({ look, seat, testId = "four-steps" }: { look: string;
         ))}
       </ol>
       <p className="mt-3 text-[12px] leading-snug text-foreground/65" data-testid={`${testId}-refund`}>
-        The {look} look is credited to the reserve if you convert within 7 days, otherwise refunded. The reserve is media credit, fully refundable until 14 days before the launch date on your insertion order. Nothing runs until the IO. Not a guarantee of views, clicks or results.
+        The {look} look is credited to the category placement if you convert within 7 days, otherwise refunded. The category placement is media credit, fully refundable until 14 days before the launch date on your insertion order. Nothing runs until the IO. Not a guarantee of views, clicks or results.
       </p>
       <details className="mt-2 rounded-xl border border-[#0b1f3a]/10 bg-white px-3 py-2 text-[13px]" data-testid={`${testId}-io`}>
         <summary className="cursor-pointer font-semibold text-[#0b1f3a]">What is an insertion order (IO)?</summary>

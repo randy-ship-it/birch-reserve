@@ -40,7 +40,7 @@ export type BuyPlan = {
 export function buyPlans(currency: ReserveCurrency): readonly BuyPlan[] {
   const L = Object.fromEntries(priceLadder(currency).map((s) => [s.key, s]));
   return [
-    { key: "reserve-490", price: L["reserve-490"]!.price, name: "Reserve your space", line: "Shared category seat. 100% media credit. Refundable until 14 days before launch.", pay: "card" },
+    { key: "reserve-490", price: L["reserve-490"]!.price, name: "Category placement", line: "Shared category seat. 100% media credit. Refundable until 14 days before launch.", pay: "card" },
     { key: "hold-190", price: L["hold-190"]!.price, name: "7-day look", line: "See your placement for 7 days. Converts in full, or refunded.", pay: "card" },
     { key: "exclusive", price: L["exclusive"]!.price, name: "Starter placement", line: `${L["exclusive"]!.line.replace(/ All \$1,900 counts toward it\.$/, "")} One brand per category; the IO sets hub and dates.`, pay: "reserve" },
   ];

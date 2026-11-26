@@ -20,7 +20,7 @@ export const SPEND_DOWN_LINE =
 
 /** /terms wording: pacing window for every credit (reserves, packs, agency tests, exclusive packages). */
 export const SPEND_DOWN_TERM =
-  "Once an insertion order starts, prepaid credit can be paced over a flexible window of up to 6 months, or faster. The IO sets the pacing. This does not shorten any credit's validity (12 months from payment for the $490 reserve) or change any refund window. Any monthly figure we show is a modelled illustration, not a delivery promise.";
+  "Once an insertion order starts, prepaid credit can be paced over a flexible window of up to 6 months, or faster. The IO sets the pacing. This does not shorten any credit's validity (12 months from payment for the $490 category placement) or change any refund window. Any monthly figure we show is a modelled illustration, not a delivery promise.";
 
 /** Blended starter CPM (USD), rounded to the cent. */
 export const BLENDED_STARTER_CPM = Math.round(blendedHubCpmUsd() * 100) / 100;
@@ -48,7 +48,7 @@ function row(key: string, label: string, lo: number, hi: number | null, cur: "US
 
 /** Illustrative 6-month pacing for every buyable item. Modelled at the blended starter CPM. */
 export const PACING_ROWS: readonly PacingRow[] = [
-  row("reserve-490", "$490 reserve", 490, null, "USD"),
+  row("reserve-490", "$490 category placement", 490, null, "USD"),
   row("pack-1500", "Starter sponsor ($1,575 credit)", 1575, null, "USD"),
   row("pack-3000", "Partner sponsor ($3,300 credit)", 3300, null, "USD"),
   row("pack-6000", "Network sponsor ($6,900 credit)", 6900, null, "USD"),

@@ -37,7 +37,7 @@ export function BuyJourney({ where, title = "Buy small. Offer mid. Inquire big."
         <li className={`${card} bg-lime-200 text-[#0b1f3a]`} data-testid={`${testId}-buy`}>
           <span className={step}><ShoppingCart className="mr-1 inline size-3.5" aria-hidden />1 · Small slots</span>
           <span className="mt-1 font-display text-2xl leading-none md:text-3xl">Buy now</span>
-          <span className="mt-1 text-[13px] opacity-80">{price.look} look · {price.seat} reserve</span>
+          <span className="mt-1 text-[13px] opacity-80">{price.look} look · {price.seat} category placement</span>
           <span className="mt-auto flex flex-wrap gap-2 pt-3">
             <a href={lookHref(`journey_${where}`)} onClick={() => trackCta("cta_hold_190", { offer: "hold-190" })} className={`${btn} bg-[#0b1f3a] text-white hover:bg-white hover:text-[#0b1f3a]`} data-testid={`${testId}-buy-look`}>7-day look <ArrowRight className="size-4" aria-hidden /></a>
             <a href={RESERVE_HREF} onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })} className={`${btn} bg-white text-[#0b1f3a] ring-1 ring-[#0b1f3a]/20 hover:ring-[#0b1f3a]`} data-testid={`${testId}-buy-reserve`}>Reserve</a>

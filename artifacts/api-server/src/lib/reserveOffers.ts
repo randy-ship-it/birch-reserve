@@ -107,7 +107,7 @@ export const PUBLIC_RESERVE_OFFERS = [
     dueTodayUsd: 190,
     offerType: "category_look",
     scope:
-      "Hold your category for 7 days. 100% credit if you convert to the full reserve within 7 days, else refund. Does not lock in a slot.",
+      "Hold your category for 7 days. 100% credit if you convert to the $490 category placement within 7 days, else refund. Does not lock in a slot.",
     bestFor: "Brands that want a short look at one category before locking in a slot.",
     consumesSeat: false,
     published: true,

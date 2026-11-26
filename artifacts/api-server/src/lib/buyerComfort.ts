@@ -40,7 +40,7 @@ export const REPLY_LINE = "We reply within 1 business day.";
 
 export const DUAL_MOTION = {
   /** A1: /buycalc subhead under the H1. */
-  heroSub: "Start yourself with a $190 USD look or $490 USD reserve. Or ask about a larger display share, priority placement, or a program across more than one hub.",
+  heroSub: "Start yourself with a $190 USD look or $490 USD category placement. Or ask about a larger display share, priority placement, or a program across more than one hub.",
   /** A2: secondary inquire link under the self-serve buttons. */
   inquireLabel: "Ask about a premium slot or multi-hub program",
   callBack: "to request a call back",
@@ -69,9 +69,9 @@ export const FLIGHT_TIMELINE = {
   ],
   refundTitle: "Three ways your money comes back",
   refunds: [
-    { k: "Day 7 · the look", d: "Move to the $490 USD reserve within 7 days and all $190 USD carries over. Otherwise it is refunded." },
+    { k: "Day 7 · the look", d: "Move to the $490 USD category placement within 7 days and all $190 USD carries over. Otherwise it is refunded." },
     { k: "Day 60 · no hub named", d: "If no approved surface is named within 60 days of your payment, you get a cash refund." },
-    { k: "14 days before launch", d: "The $490 USD reserve is fully refundable until 14 days before the launch date on your IO. After that it stays credit, usable for 12 months." },
+    { k: "14 days before launch", d: "The $490 USD category placement is fully refundable until 14 days before the launch date on your IO. After that it stays credit, usable for 12 months." },
   ],
 } as const;
 
@@ -87,7 +87,7 @@ const SEE_THE_UNIT_BASE = {
     "The creative brief and the sample insertion order, so you know what the next step asks for.",
     "Questions by email: randy@scalehealth.ca.",
   ],
-  decide: "Then decide: move to the $490 USD reserve within 7 days and all $190 USD carries over, otherwise it is refunded. The look does not lock a category; seats are shared, not exclusive.",
+  decide: "Then decide: move to the $490 USD category placement within 7 days and all $190 USD carries over, otherwise it is refunded. The look does not lock a category; seats are shared, not exclusive.",
   imageAlt: "Illustrative mock: an example brand card drawn beside the recovery path on the live DR-HO'S hub dashboard",
   caption: "Example of the mock Birch sends: an illustrative card drawn on a live hub page (DR-HO'S recovery path). Not a live ad and not a Birch result. Your IO names the hub and surface.",
 } as const;
@@ -98,16 +98,16 @@ export const BUYER_FAQ_TITLE = "Questions buyers ask.";
 export const BUYER_FAQ: Array<{ q: string; a: string; link?: BuyerLink; tail?: string }> = [
   {
     q: "Can I start with a small test and grow?",
-    a: "Yes. The $190 USD look and the $490 USD reserve are media credit, paid by card. A larger display share, priority placement or a program across more than one hub is a conversation:",
+    a: "Yes. The $190 USD look and the $490 USD category placement are media credit, paid by card. A larger display share, priority placement or a program across more than one hub is a conversation:",
     link: { label: "ask about a premium slot", href: "/buycalc#request" },
   },
   {
     q: "What happens after I pay?",
-    a: "Your payment is media credit. An insertion order names the hub and surface before anything runs. The $490 USD reserve is fully refundable until 14 days before the launch date on your IO. The $190 USD look converts in full to the reserve within 7 days, otherwise it's refunded.",
+    a: "Your payment is media credit. An insertion order names the hub and surface before anything runs. The $490 USD category placement is fully refundable until 14 days before the launch date on your IO. The $190 USD look converts in full to the category placement within 7 days, otherwise it's refunded.",
   },
   {
     q: "Is my category exclusive or shared?",
-    a: "Shared. The $490 USD reserve is a shared category seat, open to more than one brand in the same category. It does not lock your category, and neither does the $190 USD look. A category to yourself comes with dedicated placements from $1,900, which hold a $5,000 to $50,000 package in your currency pending your IO, or a premium slot ($25,000 to $1.5M USD, inquire only). Both are set on an insertion order.",
+    a: "Shared. The $490 USD category placement is a shared category seat, open to more than one brand in the same category. It does not lock your category, and neither does the $190 USD look. A category to yourself comes with dedicated placements from $1,900, which hold a $5,000 to $50,000 package in your currency pending your IO, or a premium slot ($25,000 to $1.5M USD, inquire only). Both are set on an insertion order.",
   },
   {
     q: "How do larger or priority placements work?",

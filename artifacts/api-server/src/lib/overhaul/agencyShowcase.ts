@@ -31,11 +31,11 @@ export const AGENCY_SHARE = {
  * Brand bonus credit: already stated for brands on /advertise/brands (DEPOSIT_TIERS, +5/+10/+15%).
  * It is the client's media credit, separate from the standard 15% agency commission.
  */
-export const BRAND_BONUS_LINE = `Client tests start self-serve on the $190 USD 7-day look or the $490 USD reserve; premium slots by inquiry. Separate from the standard ${AGENCY_CASH_PCT}% agency commission.`;
+export const BRAND_BONUS_LINE = `Client tests start self-serve on the $190 USD 7-day look or the $490 USD category placement; premium slots by inquiry. Separate from the standard ${AGENCY_CASH_PCT}% agency commission.`;
 
 /** Worked examples on the public tiers: $490 seat (card) and the $25K premium floor (inquire). */
 export const AGENCY_EXAMPLES = [
-  { label: "$490 USD reserve (card)", spend: 490 },
+  { label: "$490 USD category placement (card)", spend: 490 },
   { label: `Premium slot from $${MEDIA_KIT_OFFERS.premium.spendLo / 1000}K (inquire)`, spend: MEDIA_KIT_OFFERS.premium.spendLo },
 ].map((e) => ({ ...e, cash: agencyCash(e.spend) }));
 
@@ -53,7 +53,7 @@ export function agencyPayoutRows(seatPrice: number, cur: "USD" | "CAD") {
   const m = (n: number) => `$${n.toLocaleString("en-US")}`;
   const pays = (n: number) => m(n - agencyCash(n));
   return [
-    { key: "seat", label: `${m(seatPrice)} ${cur} reserve (card)`, spend: m(seatPrice), cash: m(agencyCash(seatPrice)), pays: pays(seatPrice) },
+    { key: "seat", label: `${m(seatPrice)} ${cur} category placement (card)`, spend: m(seatPrice), cash: m(agencyCash(seatPrice)), pays: pays(seatPrice) },
     {
       key: "client_test",
       label: "Client test (IO)",
@@ -151,23 +151,23 @@ export const PLAIN_TERMS: Array<{ key: string; q: string; a: string }> = [
   {
     key: "start",
     q: "How does a client start, and what is the risk?",
-    a: "Self-serve with the $190 USD 7-day look, which converts in full to the reserve within 7 days or is refunded, or the $490 USD reserve: 100% media credit, fully refundable until 14 days before the launch date on the insertion order. Premium slots are by inquiry. Nothing runs until the IO names the hub and surface.",
+    a: "Self-serve with the $190 USD 7-day look, which converts in full to the category placement within 7 days or is refunded, or the $490 USD category placement: 100% media credit, fully refundable until 14 days before the launch date on the insertion order. Premium slots are by inquiry. Nothing runs until the IO names the hub and surface.",
   },
 ];
 
 /** The /agencies FAQ (moved here from the page on Nov 18 2026 so the server can emit one FAQPage). */
 export const AGENCY_FAQ: Array<{ q: string; a: string }> = [
   { q: "Can we prepay for several clients?", a: "Yes. One prepay can be split across clients; each client gets its own insertion order and reporting." },
-  { q: "Is there an agency commission?", a: "Yes. Agencies, brokers and media resellers earn the standard 15% agency commission off the gross rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. Small tests can start self-serve on the $190 USD look or the $490 USD reserve." },
+  { q: "Is there an agency commission?", a: "Yes. Agencies, brokers and media resellers earn the standard 15% agency commission off the gross rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. Small tests can start self-serve on the $190 USD look or the $490 USD category placement." },
   { q: "Which placement fits which goal?", a: "Awareness: the hub home page. Consideration: product, services and booking pages. Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Retention and loyalty: the member dashboard behind login. One IO can mix them." },
   { q: "How is performance tracked?", a: "Every placement carries your UTM parameters and, if you want, a promo code. We report views and clicks per hub and surface. Aggregate only." },
   { q: "What is reserved partner inventory?", a: "A limited set-aside of exclusive packages and newly activating hubs, for a few agencies. Agencies that commit to an inventory block get a further 10–20% off the net agency rate, on top of the standard 15% agency commission. Block size and term set the tier. Partners also get first look as new hubs activate. Send a note on the agency form if that is useful." },
   { q: "Do brokers and media resellers qualify?", a: "Yes. When you are the agency of record on the insertion order, you earn the same standard 15% agency commission. You set your own resale price and handle your own client disclosure. List every brand you represent in one inquiry; each gets its own IO and reporting." },
   { q: "Is it brand safe?", a: "Ads run in post-purchase moments and inside health and wellness member hubs: pages a brand, clinic or retailer runs for its own paying customers. No open web, no user-generated content, no programmatic resale. Nothing runs until you approve an insertion order naming the hub, placement and flight dates." },
   { q: "What if a placement under-delivers?", a: "We run makegoods on equal or better placements, per IAB standard terms. Every IO states the flight dates for each hub and placement, and reporting shows views and clicks per hub and surface." },
-  { q: "Can we cancel?", a: "Yes. Cancel for a full refund up to 14 days before a flight starts. The $190 USD 7-day look converts in full to the reserve within 7 days or is refunded." },
+  { q: "Can we cancel?", a: "Yes. Cancel for a full refund up to 14 days before a flight starts. The $190 USD 7-day look converts in full to the category placement within 7 days or is refunded." },
   { q: "How does billing work?", a: "Small tests pay by card on a Stripe-hosted page. Blocks run on an insertion order: deposit collected at confirmation, then payment by cheque, wire or EFT to Silver Birch Growth Inc. Ask about terms for upfront blocks when you request the draft IO." },
-  { q: "Why lock a test now?", a: "New placements open at starter rates, and a placement's rate can step up only once reporting shows it performs. Prepaid credit keeps its rate for its term, and the $490 USD reserve stays fully refundable until 14 days before the launch date on the IO." },
+  { q: "Why lock a test now?", a: "New placements open at starter rates, and a placement's rate can step up only once reporting shows it performs. Prepaid credit keeps its rate for its term, and the $490 USD category placement stays fully refundable until 14 days before the launch date on the IO." },
 ];
 
 /** schema.org FAQPage for a list of Q&As (one per page; Google flags duplicate FAQPage blocks). */
@@ -189,7 +189,7 @@ export const BUY_PATHS = {
     key: "card",
     kicker: "Card · self-serve",
     price: "From $190 USD",
-    sub: "7-day look, or the $490 USD category reserve",
+    sub: "7-day look, or the $490 USD category placement",
   },
   io: {
     key: "io",

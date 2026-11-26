@@ -51,6 +51,6 @@ export const EXCLUSIVE_RESERVE_TERMS: readonly string[] = [
   "Your placement is pending the IO: the category is dedicated to you when you sign the IO, which names the hub, placement and dates. Nothing runs before then. If the category is committed to another brand before your IO is signed, we refund the $1,900 in full.",
   "Fully refundable until 14 days before the launch date in your IO. A cash refund is also available if no approved surface is named within 60 days of payment. To cancel, reply to your confirmation email and we refund the original card.",
   `${SPEND_DOWN_LINE}`,
-  "A paid $190 look or $490 reserve (or the CAD equivalent) from the 30 days before counts in full toward the package on the IO.",
+  "A paid $190 look or $490 category placement (or the CAD equivalent) from the 30 days before counts in full toward the package on the IO.",
   "No impression guarantees. Any view figure is a modelled planning estimate. Reporting is aggregate only. No patient data, no clinical pixels.",
 ];

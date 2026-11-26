@@ -10,7 +10,7 @@
  *   - Monthly views: the network median partner row (../sponsorKit HUBS, modelled).
  *   - Sell-through: SELL_ASSUMPTION_PCT (./agencyShowcase), Randy's 20% planning assumption; bands 20/40/60% (low/typical/high), same as hubEstimate.
  *   - Payout share 70% base, tiered 75/80/85% at 1MM/3MM/5MM views a month (SHARE_TIERS) (Randy, Nov 22 2026: "don't be under market"; was 35%). Market set: Rokt Thanks 50%, AdSense 68%, Journey 70%, Mediavine/Raptive 75%, Ezoic 82% (median ~72%). Tier breakpoints are NOT set: placeholders only.
- *   - Sponsor SKUs: $190 look, $490 reserve (./agent publicOffers), $3,500 area lock launch price (./model AREA_LOCK).
+ *   - Sponsor SKUs: $190 look, $490 category placement (./agent publicOffers), $3,500 area lock launch price (./model AREA_LOCK).
  *   - Channel tiles: Randy's network figures / targets (Nov 18 2026). They differ from /inventory, which is unchanged.
  * Every projection is an Estimate. Nothing here is a guarantee, a booking or a checkout.
  */
@@ -239,8 +239,8 @@ export const INTEREST_FINE =
 /* ------------------------------------------------------------------ sponsor */
 
 export const SPONSOR_OFFERS = [
-  { key: "hold-190", name: "7-day category look", priceUsd: 190, priceLabel: "$190 USD", href: "/buycalc?sku=hold-190", line: "Hold your category for 7 days. Converts in full to the $490 USD reserve within 7 days, or refunded.", kind: "category" as const },
-  { key: "reserve-490", name: "Category reserve", priceUsd: 490, priceLabel: "$490 USD", href: "/buycalc?sku=reserve-490", line: "Media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months. Nothing runs before you approve an insertion order.", kind: "category" as const },
+  { key: "hold-190", name: "7-day category look", priceUsd: 190, priceLabel: "$190 USD", href: "/buycalc?sku=hold-190", line: "Hold your category for 7 days. Converts in full to the $490 USD category placement within 7 days, or refunded.", kind: "category" as const },
+  { key: "reserve-490", name: "Category placement", priceUsd: 490, priceLabel: "$490 USD", href: "/buycalc?sku=reserve-490", line: "Media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months. Nothing runs before you approve an insertion order.", kind: "category" as const },
   { key: "area-lock", name: "Area lock", priceUsd: AREA_LOCK.priceUsd, priceLabel: `$${AREA_LOCK.priceUsd.toLocaleString("en-US")} USD`, href: "/advertise/local", line: `Launch price through ${AREA_LOCK.launchRateUntil}. Up to ${AREA_LOCK.standardSharePct}% of hub display slots within ${AREA_LOCK.radiusKm} km, for the term on the IO.`, kind: "area" as const, launchPrice: true },
 ] as const;
 

@@ -45,7 +45,7 @@ export const MB_BUY_PATHS = {
     key: "card",
     kicker: "Card · self-serve",
     price: "From $190 USD",
-    sub: "7-day look, or the $490 USD category reserve",
+    sub: "7-day look, or the $490 USD category placement",
   },
   io: {
     key: "io",
@@ -77,11 +77,11 @@ export const MB_BUY_CHECKLIST: ReadonlyArray<{ label: string; answer: string }> 
   },
   {
     label: "Cost",
-    answer: "From {look} for a 7-day look, or the {reserve} category reserve by card. Premium and several hubs by IO.",
+    answer: "From {look} for a 7-day look, or the {reserve} category placement by card. Premium and several hubs by IO.",
   },
   {
     label: "Refunds",
-    answer: "The reserve is media credit, fully refundable until 14 days before the launch date on the IO. The look converts in full to the reserve within 7 days, or it's refunded.",
+    answer: "The category placement is media credit, fully refundable until 14 days before the launch date on the IO. The look converts in full to the category placement within 7 days, or it's refunded.",
   },
   {
     label: "Tracking",
@@ -108,7 +108,7 @@ export const MEDIA_BUYER_FAQ: Array<{ q: string; a: string }> = [
   { q: "How does it fit an existing display mix?", a: "Run it as its own line item next to your programmatic, paid social and retail media buys. Tag it with your UTM links and promo codes so it reads as a separate source in your own analytics." },
   { q: "How is a test measured?", a: "Aggregate reporting per hub and surface: views, clicks, UTM visits and promo-code redemptions. Never names, contact details or health information. Any pre-launch view figure is labelled Modelled and is not a guarantee." },
   { q: "Do you guarantee impressions, CTR or ROAS?", a: "No. There are no impression guarantees and no promised click-through or return figures. Your campaign is measured with your UTM links and promo codes." },
-  { q: "What does the smallest test cost?", a: "The $190 USD 7-day category look, which converts in full to the $490 USD reserve within 7 days or is refunded. The $490 USD reserve is 100% media credit, fully refundable until 14 days before the launch date on the IO and usable for 12 months. Premium slots are inquire-only." },
+  { q: "What does the smallest test cost?", a: "The $190 USD 7-day category look, which converts in full to the $490 USD category placement within 7 days or is refunded. The $490 USD category placement is 100% media credit, fully refundable until 14 days before the launch date on the IO and usable for 12 months. Premium slots are inquire-only." },
   { q: "Which placement suits a performance goal?", a: "Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Consideration: product, services and booking pages. Retention: the member dashboard behind login. Awareness: the hub home page. One IO can mix them." },
   { q: "Do you drop tracking pixels on hub pages?", a: "No clinical pixels and no patient data. Measurement runs on your UTM links, your promo codes and our aggregate hub analytics." },
 ];

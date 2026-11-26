@@ -95,7 +95,7 @@ export function HowCalculated({ feed, showAudience = false }: { feed: Feed | nul
         {showAudience ? (<>
           <li>Audience: members of private health and wellness hubs, reached right after they buy or book.</li>
         </>) : null}
-        <li>Pick a category to see the seat. The $490 reserve is shared; it does not lock the category.</li>
+        <li>Pick a category to see the seat. The $490 category placement is shared; it does not lock the category.</li>
         <li>Views are sized on your insertion order against live hub supply. No click, conversion or order forecast.</li>
       </ul>
     </details>

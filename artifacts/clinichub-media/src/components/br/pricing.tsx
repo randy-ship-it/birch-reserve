@@ -48,7 +48,7 @@ export function SeatCtas({ tone = "light", className = "" }: { tone?: "light" | 
   return (
     <div className={`flex flex-col gap-3 sm:flex-row sm:flex-wrap ${className}`}>
       <Cta href={RESERVE_HREF} testId="cta-reserve-490" onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })}>
-        Reserve your space · $490 USD credit
+        Category placement · $490 USD credit
       </Cta>
       <Cta
         href={LOOK_HREF}
@@ -74,7 +74,7 @@ export function MetaHook() {
           You&apos;re already paying Meta {fmtRange(META_CPM)} CPM for cold recovery audiences.
         </h2>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-background/75">
-          Reach people already inside the recovery hub with a $490 USD reserve, at fixed starting-at rates instead of an auction.
+          Reach people already inside the recovery hub with a $490 USD category placement, at fixed starting-at rates instead of an auction.
         </p>
         <SeatCtas tone="dark" className="mt-8" />
         <a href="#rates" className="mt-4 inline-block text-sm text-background/70 underline underline-offset-4 hover:text-background">
@@ -259,11 +259,11 @@ export function PackPicker() {
             </Cta>
           )}
           <Cta href={RESERVE_HREF} variant="lineDark" testId="pack-reserve" onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })}>
-            Start with a $490 USD reserve
+            Start with a $490 USD category placement
           </Cta>
         </div>
         <p className="mt-4 text-[11px] leading-relaxed text-background/50">
-          The $490 USD reserve is all media credit toward the pack. Starter rates hold for your first period; rates may step up later only once a placement proves out. <Estimate /> The IO sets the final rate.
+          The $490 USD category placement is all media credit toward the pack. Starter rates hold for your first period; rates may step up later only once a placement proves out. <Estimate /> The IO sets the final rate.
         </p>
       </div>
     </div>
@@ -336,7 +336,7 @@ export function ScenarioCalculator() {
 /** Prove-it-then-raise explainer. */
 export function ProveItLadder() {
   const steps = [
-    { n: "1", t: "Start at starter rates", d: "Your first period runs at the starting-at rates above. Reserve for $490 USD, all of it media credit." },
+    { n: "1", t: "Start at starter rates", d: "Your first period runs at the starting-at rates above. Start with a $490 USD category placement, all of it media credit." },
     { n: "2", t: "We report, you judge", d: "Views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. Aggregate only, no patient data." },
     { n: "3", t: "Rates rise only when it's proven", d: "A placement's rate can step up only after reporting shows it performs. Your deposit keeps its rate for its term." },
   ];

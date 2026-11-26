@@ -3,7 +3,7 @@
  * "it is based on where you are coming from").
  *
  * The same three steps everywhere, in the visitor's currency:
- *   $190 7-day look → $490 shared reserve → $1,900 starter placement that holds a $5K–$50K dedicated package.
+ *   $190 7-day look → $490 category placement → $1,900 starter placement that holds a $5K–$50K dedicated package.
  * Look and reserve use the existing CAD table ($270 / $690 CAD, reserveOffers.ts). The $1,900 starter placement has no
  * CAD/USD table, so it is the same number in both. $25,000–$1.5M premium slots stay inquire-only at the top.
  *
@@ -29,8 +29,8 @@ export const PREMIUM_RANGE = "$25,000–$1.5M USD" as const;
 export function priceLadder(currency: ReserveCurrency): readonly LadderStep[] {
   const ex = exclusiveReserveFor(currency);
   return [
-    { key: "hold-190", price: offerPriceLabel(look, currency), name: "7-day look", line: "See your placement for 7 days. Converts in full to the reserve, or refunded.", href: "/buy?plan=hold-190", cta: "Take a look" },
-    { key: "reserve-490", price: offerPriceLabel(seat, currency), name: "Reserve your space", line: "A shared category seat. 100% media credit, refundable until 14 days before launch.", href: "/buy?plan=reserve-490", cta: "Reserve" },
+    { key: "hold-190", price: offerPriceLabel(look, currency), name: "7-day look", line: "See your placement for 7 days. Converts in full to the category placement, or refunded.", href: "/buy?plan=hold-190", cta: "Take a look" },
+    { key: "reserve-490", price: offerPriceLabel(seat, currency), name: "Category placement", line: "A shared category seat. 100% media credit, refundable until 14 days before launch.", href: "/buy?plan=reserve-490", cta: "Get a placement" },
     { key: "exclusive", price: ex.label, name: "Starter placement", line: `Holds a ${ex.packageLabel} dedicated package in your category pending your IO. All $1,900 counts toward it.`, href: "/starter", cta: "Get started" },
   ];
 }

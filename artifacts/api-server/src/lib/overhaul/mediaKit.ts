@@ -27,7 +27,7 @@ export function kitExample(spend: number, bonusPct: number, cpm = MEDIA_KIT_CPM)
  */
 export const MEDIA_KIT_OFFERS = {
   look: { name: "7-day look", spendUsd: 190, spendCad: 270, sku: "hold-190" },
-  seat: { name: "Reserve", spendUsd: 490, spendCad: 690, sku: "reserve-490" },
+  seat: { name: "Category placement", spendUsd: 490, spendCad: 690, sku: "reserve-490" },
   premium: { name: "Own a block", spendLo: 25_000, spendHi: 1_500_000, inquireOnly: true as const },
 } as const;
 

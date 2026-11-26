@@ -18,8 +18,8 @@ export const AGENT_LIVE_HUBS = liveHubs().map((h) => ({ name: h.name, type: h.ke
 /** The two public offers, same as the media kit. USD only. Humans pay on the Stripe-hosted /buycalc page. */
 export function publicOffers() {
   return [
-    { offer_key: "hold-190", name: "7-day category look", price_usd: 190, currency: "USD", terms: "Hold your category for 7 days. Converts in full to the $490 USD reserve within 7 days, or refunded. Does not lock in a slot.", human_checkout: `${SITE}/buycalc?sku=hold-190` },
-    { offer_key: "reserve-490", name: "Category reserve", price_usd: 490, currency: "USD", terms: "Reserve display space across the hub network. Media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months. Nothing runs before the buyer approves an insertion order.", human_checkout: `${SITE}/buycalc?sku=reserve-490` },
+    { offer_key: "hold-190", name: "7-day category look", price_usd: 190, currency: "USD", terms: "Hold your category for 7 days. Converts in full to the $490 USD category placement within 7 days, or refunded. Does not lock in a slot.", human_checkout: `${SITE}/buycalc?sku=hold-190` },
+    { offer_key: "reserve-490", name: "Category placement", price_usd: 490, currency: "USD", terms: "Reserve display space across the hub network. Media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months. Nothing runs before the buyer approves an insertion order.", human_checkout: `${SITE}/buycalc?sku=reserve-490` },
   ];
 }
 
@@ -126,7 +126,7 @@ export function agentCard() {
   return {
     schema_version: "agent-card/0.1",
     name: "Birch Reserve ad buying",
-    description: "Display space inside private health & wellness hubs: a $190 USD 7-day look or a $490 USD category reserve. Machine-readable catalog and quotes; buyers pay on a Stripe-hosted page.",
+    description: "Display space inside private health & wellness hubs: a $190 USD 7-day look or a $490 USD category placement. Machine-readable catalog and quotes; buyers pay on a Stripe-hosted page.",
     url: SITE,
     provider: { organization: "Silver Birch Growth Inc.", url: SITE, email: HANDOFF_EMAIL },
     documentation: `${SITE}/buyers`,
@@ -149,7 +149,7 @@ export function agentOpenApi() {
   const offerEnum = ["hold-190", "reserve-490"];
   return {
     openapi: "3.1.0",
-    info: { title: "Birch Reserve buying API", version: AGENT_CATALOG_VERSION, description: "Catalog and quotes for the two public offers ($190 USD look, $490 USD reserve). Agent checkout is on hold: requests are saved with no charge; buyers pay on the Stripe-hosted human_checkout page. Audience figures are modelled.", contact: { email: HANDOFF_EMAIL } },
+    info: { title: "Birch Reserve buying API", version: AGENT_CATALOG_VERSION, description: "Catalog and quotes for the two public offers ($190 USD look, $490 USD category placement). Agent checkout is on hold: requests are saved with no charge; buyers pay on the Stripe-hosted human_checkout page. Audience figures are modelled.", contact: { email: HANDOFF_EMAIL } },
     servers: [{ url: SITE }],
     paths: {
       "/v1/agent/catalog.json": { get: { operationId: "getCatalog", summary: "Inventory, surfaces, offers and checkout status", responses: { "200": { description: "Catalog" } } } },

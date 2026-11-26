@@ -38,7 +38,7 @@
   "spendLevels": [
     {
       "usd": 490,
-      "label": "$490 USD reserve",
+      "label": "$490 USD category placement",
       "source": "Birch public SKU reserve-490"
     },
     {

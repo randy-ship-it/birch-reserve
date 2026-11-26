@@ -49,7 +49,7 @@ const FAQ = [
   { q: "Which hubs are live?", a: `${INVENTORY.line} More hubs launch over time.` },
   { q: "Is this display or cost-per-click?", a: "Both. Every placement can be bought as display (priced per thousand views) or CPC (priced per click). Deposits and area locks draw down against either." },
   { q: "Are the audience numbers measured?", a: "Not yet. Audience and view figures on this site are modelled estimates from listed partners, not measured delivery. We don't publish a measured network views figure (the 2027 inventory figure is a modelled estimate); your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
-  { q: "Can a local business or studio buy?", a: "Yes. Start with the same $190 USD 7-day look or $490 USD reserve. Locking your area (a share of hub display near your postal code) is a premium option, by inquiry." },
+  { q: "Can a local business or studio buy?", a: "Yes. Start with the same $190 USD 7-day look or $490 USD category placement. Locking your area (a share of hub display near your postal code) is a premium option, by inquiry." },
   { q: "How does my business become a hub?", a: `Studios and retailers activate a hub on ScaleHealth.ca, the platform that hosts the hubs (scalehealth.ca/clinichubs), and earn cash or ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded hub.` },
   { q: "Do agencies get anything?", a: `Yes. ${AGENCY_RATE_CARD.line} ${AGENCY_RATE_CARD.resale} ${AGENCY_RATE_CARD.disclosure} ${AGENCY_RATE_CARD.direct} ${AGENCY_RATE_CARD.noUndercut} Agencies can also prepay a client test budget and get UTM and promo-code reporting per hub and surface.` },
 ];
@@ -153,20 +153,20 @@ export default function BrHome() {
           <div className="order-2 md:order-none md:col-start-2 md:row-span-2 md:row-start-1 md:self-center"><SeeYourAd testId="home-hero-mock" /><p className="mt-1 text-[12px] leading-snug text-foreground/60" data-testid="home-hub-host">{hubHostLine()}</p></div>
         </div>
       </section>
-      {/* Front door (Randy, outside review Nov 23 2026 10:37 PM): the $190 look and $490 shared reserve, right under the hero. */}
+      {/* Front door (Randy, outside review Nov 23 2026 10:37 PM): the $190 look and $490 category placement, right under the hero. */}
       <section className="container mx-auto max-w-6xl px-4 pb-6 pt-1" data-testid="home-plan-strip">
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="flex flex-col rounded-2xl border border-[#0b1f3a]/15 bg-white p-4 shadow-sm" data-testid="home-strip-look">
             <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">7-day look</p>
             <p className="mt-0.5 font-display text-3xl leading-none text-[#0b1f3a]">{price.look}</p>
-            <p className="mt-2 flex-1 text-[13px] leading-snug text-foreground/75">See your placement for 7 days. It converts in full to a reserve, or it is refunded.</p>
+            <p className="mt-2 flex-1 text-[13px] leading-snug text-foreground/75">See your placement for 7 days. It converts in full to a category placement, or it is refunded.</p>
             <a href="/buy?plan=hold-190&ref=home_strip" data-testid="home-strip-look-cta" onClick={() => trackAttn("strip.look")} className="mt-3 inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-[#0b1f3a]/30 px-5 text-sm font-bold text-[#0b1f3a] hover:border-[#0b1f3a]">Start my look · {price.look} <ArrowRight className="size-4" aria-hidden /></a>
           </div>
           <div className="flex flex-col rounded-2xl bg-lime-200 p-4 shadow-sm" data-testid="home-strip-reserve">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#0b1f3a]/70">Reserve</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#0b1f3a]/70">Category placement</p>
             <p className="mt-0.5 font-display text-3xl leading-none text-[#0b1f3a]">{price.seat}</p>
-            <p className="mt-2 flex-1 text-[13px] leading-snug text-[#0b1f3a]/80">A shared reserve in your category. 100% media credit toward your insertion order, refundable until 14 days before launch.</p>
-            <a href="/buy?plan=reserve-490&ref=home_strip" data-testid="home-strip-reserve-cta" onClick={() => trackAttn("strip.reserve")} className="mt-3 inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-white hover:text-[#0b1f3a]">Reserve · {price.seat} <ArrowRight className="size-4" aria-hidden /></a>
+            <p className="mt-2 flex-1 text-[13px] leading-snug text-[#0b1f3a]/80">A shared category placement. 100% media credit toward your insertion order, refundable until 14 days before launch.</p>
+            <a href="/buy?plan=reserve-490&ref=home_strip" data-testid="home-strip-reserve-cta" onClick={() => trackAttn("strip.reserve")} className="mt-3 inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-white hover:text-[#0b1f3a]">Category placement · {price.seat} <ArrowRight className="size-4" aria-hidden /></a>
           </div>
         </div>
         {/* Agencies get their own door (Randy, Nov 24 2026 12:57 PM ET, t543u): a clear secondary next to the two prices. */}
@@ -245,10 +245,10 @@ export default function BrHome() {
             <div className="grid gap-3 p-5 md:grid-cols-2 md:p-6">
               <div className="rounded-xl border border-[#0b1f3a]/10 p-4">
                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Small business package</p>
-                <p className="mt-1 font-display text-2xl text-[#0b1f3a]">{price.look} look · {price.seat} reserve</p>
-                <p className="mt-2 text-sm text-foreground/75">Card checkout. 100% media credit until the insertion order (IO), usable 12 months; fully refundable until 14 days before launch. The {price.look} look converts in full to the reserve within 7 days, or is refunded.</p>
+                <p className="mt-1 font-display text-2xl text-[#0b1f3a]">{price.look} look · {price.seat} category placement</p>
+                <p className="mt-2 text-sm text-foreground/75">Card checkout. 100% media credit until the insertion order (IO), usable 12 months; fully refundable until 14 days before launch. The {price.look} look converts in full to the category placement within 7 days, or is refunded.</p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <a href={RESERVE_HREF} data-testid="home-cta-seat" className="inline-flex h-11 items-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-lime-300 hover:text-[#0b1f3a]">Reserve · {price.seat} <ArrowRight className="size-4" aria-hidden /></a>
+                  <a href={RESERVE_HREF} data-testid="home-cta-seat" className="inline-flex h-11 items-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-lime-300 hover:text-[#0b1f3a]">Category placement · {price.seat} <ArrowRight className="size-4" aria-hidden /></a>
                   <a href={lookHref("home_look")} className="inline-flex h-11 items-center gap-1.5 rounded-full border border-[#0b1f3a]/25 px-5 text-sm font-bold text-[#0b1f3a] hover:border-[#0b1f3a]">7-day look · {price.look}</a>
                 </div>
               </div>

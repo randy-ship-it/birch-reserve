@@ -86,7 +86,7 @@ test("published insights copy drops legacy $899 and inserts the Scale Health art
   assert.equal(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.publishedAt.toISOString(), "2026-10-15T16:00:00.000Z");
   assert.equal(
     WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.summary,
-    "Birch Reserve sells the aisle, not the auction. Shared category reserves sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.",
+    "Birch Reserve sells the aisle, not the auction. Shared category placements sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.",
   );
   assert.match(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.body, /^# What you send for a seat\n\nMost ad networks ask for a banner and a bid\.\n/);
   assert.match(WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE.body, /Send four things\./);
