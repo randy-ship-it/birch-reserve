@@ -35,6 +35,17 @@ const AGENCY_BENEFITS = [
   { t: "High-value customers", d: "For your clients, at below-market CAC." },
 ] as const;
 
+/** Same hero CTAs at both breakpoints; one is hidden with CSS so the source stays in sync. */
+function HeroCtas({ className }: { className?: string }) {
+  return (
+    <div className={className}>
+      <Cta href="#talk" testId="agency-cta-io">Book a starter block</Cta>
+      <a href="#model" className="text-sm font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="agency-cta-model">See the rate card</a>
+      <a href={RESERVE_HREF} className="text-sm text-[#0b1f3a]/70 underline underline-offset-4" data-testid="agency-cta-reserve">Or a category placement · $490 USD</a>
+    </div>
+  );
+}
+
 /** One expandable detail row. Native <details>, so it works without JS; opens itself when the URL hash names it. */
 function Fold({ id, title, sub, children }: { id: string; title: string; sub: string; children: ReactNode }) {
   return (
@@ -66,22 +77,26 @@ export default function BrAgencies() {
   return (
     <div data-testid="br-agencies">
       <JsonLd data={{ "@context": "https://schema.org", "@type": "Service", name: "Birch Reserve agency placements", provider: { "@type": "Organization", name: "Birch Reserve" }, areaServed: ["CA", "US"], serviceType: "Retail media / post-purchase advertising", url: "https://birchreserve.net/agencies" }} />
-      <Section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]">
-        <div className="grid items-start gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-x-16 lg:gap-y-12">
+      <Section pad="hero" className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]">
+        <div className="grid items-start gap-5 md:gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-x-16 lg:gap-y-12">
           <div className="max-w-3xl">
             <Eyebrow>For agencies &amp; media buyers</Eyebrow>
             <H1>Reach health and wellness customers right after they buy.</H1>
-            <Lede>
+            <p className="mt-4 text-base leading-snug text-muted-foreground md:hidden" data-testid="agency-hero-sub">
+              Post-purchase and in-hub display.
+            </p>
+            <Lede className="hidden md:block">
               Display in post-purchase moments and inside health and wellness member hubs: the post-purchase page, the hub home, product and booking pages, and the member dashboard. First-party, brand-safe, tracked on your UTMs. Agencies earn the standard 15% commission off a public rate card. We do not undercut an agency&apos;s client.
             </Lede>
-            <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-              <Cta href="#talk" testId="agency-cta-io">Book a starter block</Cta>
-              <a href="#model" className="text-sm font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="agency-cta-model">See the rate card</a>
-              <a href={RESERVE_HREF} className="text-sm text-[#0b1f3a]/70 underline underline-offset-4" data-testid="agency-cta-reserve">Or a category placement · $490 USD</a>
-            </div>
+            <HeroCtas className="mt-8 hidden flex-col items-start gap-3 sm:flex-row sm:items-center md:flex" />
           </div>
-          {/* Rapid pulse check: right of the hero on desktop, stacked right under the hero copy on mobile. */}
-          <PulseCheckCard className="lg:col-start-2 lg:row-span-2 lg:row-start-1" />
+          {/* Mobile only: the inventory canister sits between the short subhead and the pulse-check card. Hidden from md up, so desktop is unchanged. */}
+          <div className="min-w-0 md:hidden" data-testid="agency-hero-canister">
+            <InventoryCanister compact />
+          </div>
+          {/* Rapid pulse check: right of the hero on desktop; on mobile, after the canister. */}
+          <PulseCheckCard className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1" />
+          <HeroCtas className="flex flex-col items-start gap-3 md:hidden" />
           <ul className="border-t border-[#0b1f3a]/15 lg:col-start-1 lg:row-start-2 lg:mt-2" data-testid="agency-benefits" aria-label={skinText("Why agencies use Birch")}>
             {AGENCY_BENEFITS.map((b) => (
               <li key={b.t} className="border-b border-[#0b1f3a]/15 py-4">
@@ -123,7 +138,7 @@ export default function BrAgencies() {
           <H2>One rate card. The standard 15% for&nbsp;agencies.</H2>
           <p className="mt-3 text-sm text-muted-foreground">One inventory. Direct buyers, agencies and partners each draw from the same tank.</p>
         </div>
-        <div className="mt-8">
+        <div className="mt-8 hidden md:block">
           <InventoryCanister />
         </div>
         <div className="mt-8 space-y-6">

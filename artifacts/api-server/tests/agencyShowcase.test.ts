@@ -273,9 +273,13 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.equal((ui.match(/<ListPriceLine \/>/g) ?? []).length, 1);
   assert.ok(!EXCLUSIVE_PARTNER_PERKS.some((p) => /bot chats/.test(p)));
   assert.doesNotMatch(ui, /19 days|ready to sign|21 days|virtual care partner/i);
-  // One primary hero CTA, before the model.
+  // One primary hero CTA, defined once and shown twice (desktop under the lede; mobile after the pulse card).
   const hero = page.slice(page.indexOf("<H1>"), page.indexOf('id="model"'));
-  assert.equal((hero.match(/<Cta /g) ?? []).length, 1);
+  assert.equal((hero.match(/<HeroCtas /g) ?? []).length, 2);
+  assert.equal((page.match(/<Cta href="#talk"/g) ?? []).length, 1);
+  assert.match(page, /<InventoryCanister compact \/>/);
+  assert.match(page, /data-testid="agency-hero-canister"/);
+  assert.match(page, /className="mt-8 hidden md:block">\s*<InventoryCanister \/>/s);
   // Exclusive partners ask for a bid on the existing form; never a phone call or a chat with Randy.
   assert.match(ui, /Send a bid or interest/);
   const all = page + ui + JSON.stringify({ AGENCY_TIERS, EXCLUSIVE_PARTNER_PERKS });
