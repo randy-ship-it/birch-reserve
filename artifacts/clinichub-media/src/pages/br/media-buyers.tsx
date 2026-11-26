@@ -1,10 +1,11 @@
 import { KitEntry } from "@/components/br/pilot-path";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, ChevronDown } from "lucide-react";
 import { LeadForm } from "@/components/br/lead-form";
 import { BuyPaths, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
-import { MB_BUY_PATHS, MEASUREMENT_STEPS, MEDIA_BUYER_FAQ, MIX_ROWS } from "../../../../api-server/src/lib/overhaul/mediaBuyers";
+import { MB_BUY_CHECKLIST, MB_BUY_PATHS, MEASUREMENT_STEPS, MEDIA_BUYER_FAQ, MIX_ROWS } from "../../../../api-server/src/lib/overhaul/mediaBuyers";
 import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, Lede, Modelled, Section, usePageMeta } from "@/components/br/ui";
+import { priceLabel, useCurrency } from "@/lib/currency";
 import { siteName, skinText } from "@/lib/siteSkin";
 
 /**
@@ -13,6 +14,9 @@ import { siteName, skinText } from "@/lib/siteSkin";
  * inquiry, same refund and IO rules as /media-kit. No impression, CTR or ROAS claims.
  */
 export default function BrMediaBuyers() {
+  const { currency, prices } = useCurrency();
+  const look = priceLabel("hold-190", currency, prices);
+  const reserve = priceLabel("reserve-490", currency, prices);
   usePageMeta(
     "For media buyers & performance marketers | Birch Reserve",
     "Already running display, retargeting and paid social? Add one first-party health and wellness channel as its own line item: hand-placed placements inside private hubs, tracked with your UTM links and promo codes. Test from $190 USD.",
@@ -119,6 +123,23 @@ export default function BrMediaBuyers() {
             testId="mb-buy-paths"
           />
         </div>
+        <details data-testid="mb-buy-checklist" className="group mt-10 border-y border-[#0b1f3a]/15">
+          <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-4 [&::-webkit-details-marker]:hidden">
+            <span className="min-w-0">
+              <span className="block font-display text-xl leading-tight text-[#0b1f3a] md:text-2xl">What to check before you buy</span>
+              <span className="mt-0.5 block text-[13px] text-foreground/60">Six answers from our published terms</span>
+            </span>
+            <ChevronDown className="size-5 shrink-0 text-[#0b1f3a] transition group-open:rotate-180" aria-hidden />
+          </summary>
+          <dl className="divide-y divide-border border-t border-[#0b1f3a]/15 text-sm">
+            {MB_BUY_CHECKLIST.map((row) => (
+              <div key={row.label} className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[9.5rem_minmax(0,1fr)] sm:items-baseline sm:gap-4">
+                <dt className="text-foreground/60">{skinText(row.label)}</dt>
+                <dd className="min-w-0 font-medium leading-relaxed">{skinText(row.answer.replaceAll("{look}", look).replaceAll("{reserve}", reserve))}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
       </Section>
 
       <Section tone="soft">
