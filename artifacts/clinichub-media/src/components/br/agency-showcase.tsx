@@ -508,11 +508,11 @@ export function BuyerValueCompare() {
   );
 }
 
-export function InventoryCanister() {
+export function InventoryCanister({ compact = false }: { compact?: boolean }) {
   const n = AGENCY_TIERS.length;
   return (
-    <figure className="mx-auto w-full max-w-3xl" data-testid="agency-canister" aria-label={skinText("One tank of hub inventory with three outlets: direct buyers, agencies and Trusted Agency Partners")}>
-      <div className="grid grid-cols-[4.25rem_1.25rem_minmax(0,1fr)] md:grid-cols-[8.5rem_3.5rem_minmax(0,1fr)]">
+    <figure className={`w-full ${compact ? "max-w-none" : "mx-auto max-w-3xl"}`} data-testid="agency-canister" data-compact={compact || undefined} aria-label={skinText("One tank of hub inventory with three outlets: direct buyers, agencies and Trusted Agency Partners")}>
+      <div className={`grid grid-cols-[4.25rem_1.25rem_minmax(0,1fr)] md:grid-cols-[8.5rem_3.5rem_minmax(0,1fr)]${compact ? " [&_.canister-card]:my-1 [&_.canister-card]:p-2.5" : ""}`}>
         {/* Lid + label */}
         <div className="col-start-1 flex flex-col items-center">
           <span className="mb-1 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.14em] text-[#0b1f3a]/70 md:text-[11px]">{skinText("Hub inventory")}</span>
@@ -531,7 +531,7 @@ export function InventoryCanister() {
                 <span className="block h-[3px] w-full bg-[#0b1f3a]" />
                 <span className={`absolute right-0 size-2.5 rounded-full md:size-3 ${st.dot} ring-2 ring-white`} />
               </div>
-              <div className={`my-1.5 rounded-xl border-2 p-3 md:my-2 md:p-4 ${st.card}`}>
+              <div className={`canister-card my-1.5 rounded-xl border-2 p-3 md:my-2 md:p-4 ${st.card}`}>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <p className="font-display text-lg leading-tight text-[#0b1f3a] md:text-2xl">{skinText(t.name)}</p>
                   {t.badge ? <span className="rounded-full bg-[#0b1f3a] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-lime-300">{t.badge}</span> : null}
@@ -545,10 +545,14 @@ export function InventoryCanister() {
           );
         })}
       </div>
+      {compact ? (
+        <figcaption className="mt-2 text-center text-[13px] text-foreground/60"><a href="#model" className="font-semibold text-[#0b1f3a] underline underline-offset-2">See how buying works</a></figcaption>
+      ) : (
       <figcaption className="mt-3 space-y-4">
         <ListPriceLine />
         <BuyerValueCompare />
       </figcaption>
+      )}
     </figure>
   );
 }

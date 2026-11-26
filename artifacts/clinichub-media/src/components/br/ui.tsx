@@ -5,11 +5,12 @@ import { getAttribution } from "@/lib/attribution";
 
 export * as M from "../../../../api-server/src/lib/overhaul/model";
 
-export function Section({ id, children, className = "", tone = "plain" }: { id?: string; children: ReactNode; className?: string; tone?: "plain" | "soft" | "ink" }) {
+export function Section({ id, children, className = "", tone = "plain", pad = "default" }: { id?: string; children: ReactNode; className?: string; tone?: "plain" | "soft" | "ink"; pad?: "default" | "hero" }) {
   const toneClass = tone === "ink" ? "bg-foreground text-background" : tone === "soft" ? "bg-secondary/40" : "bg-background";
+  const padClass = pad === "hero" ? "py-8 md:py-24" : "py-16 md:py-24";
   return (
     <section id={id} className={`${toneClass} scroll-mt-20 border-b border-border/70 ${className}`}>
-      <div className="container mx-auto px-6 py-16 md:py-24">{children}</div>
+      <div className={`container mx-auto px-6 ${padClass}`}>{children}</div>
     </section>
   );
 }
