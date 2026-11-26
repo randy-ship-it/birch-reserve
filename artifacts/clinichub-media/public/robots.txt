@@ -27,6 +27,9 @@ Allow: /llms.txt
 Allow: /llms-full.txt
 Allow: /*.md$
 Allow: /openapi.yaml
+Allow: /.well-known/search
+Allow: /api/search
+Allow: /.well-known/agent.json
 Disallow: /api/editorial/admin
 Disallow: /sales/
 Disallow: /sign-in/
@@ -42,10 +45,14 @@ Allow: /llms.txt
 Allow: /llms-full.txt
 Allow: /*.md$
 Allow: /openapi.yaml
+Allow: /.well-known/search
+Allow: /api/search
+Allow: /.well-known/agent.json
 Disallow: /api/editorial/admin
 Disallow: /sales/
 Disallow: /sign-in/
 Disallow: /sign-up/
 Disallow: /for/
 Disallow: /dev/
+# Agent search (GET or QUERY): https://birchreserve.net/.well-known/search?q={query} . Described in /llms.txt
 Sitemap: https://birchreserve.net/sitemap.xml

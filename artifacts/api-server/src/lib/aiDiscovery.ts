@@ -125,6 +125,7 @@ export function llmsFullTxt(): string {
     `- Quote: ${AI_SITE}/v1/agent/quote?offer=reserve-490`,
     `- OpenAPI: ${AI_SITE}/v1/agent/openapi.json`,
     `- Agent card: ${AI_SITE}/.well-known/agent.json`,
+    `- Search the public pages: GET ${AI_SITE}/.well-known/search?q={query} (also QUERY with a text or JSON body). Details: ${AI_SITE}/llms.txt`,
     "",
     "## FAQ",
     faq,

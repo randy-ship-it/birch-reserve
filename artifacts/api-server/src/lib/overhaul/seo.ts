@@ -1,4 +1,5 @@
 import { BUYER_PAGES } from "../buyerAnswers";
+import { searchDiscoverySection, whenToUseSection } from "../agentSearchMeta";
 import { GTM_SETUP_FACT, GTM_SETUP_URL } from "./gtmSetup";
 import { PERF_ONLY_FACT, PERF_ONLY_URL } from "./performanceOnly";
 import { GTM_BOT_FACT } from "./gtmBot";
@@ -221,6 +222,10 @@ export function llmsTxt(): string {
     "- Checkout: agent checkout is on hold. POST /v1/agent/checkout {offer, email, brand, agree:true} records the request (202 held, no charge). To pay, send the buyer to the offer's buycalc link (Stripe-hosted).",
     "- OpenAPI: https://birchreserve.net/v1/agent/openapi.json · Agent card: https://birchreserve.net/.well-known/agent.json",
     "- Always show the buyer the terms and price before sending agree:true.",
+    "",
+    ...whenToUseSection().split("\n"),
+    "",
+    ...searchDiscoverySection().split("\n"),
     "",
     "## For media buyers (answer-ready)",
     "- Not programmatic: not an open auction, not sold through a DSP. Placements are curated by hand; nothing runs until the IO names the hub, surface, format and dates.",

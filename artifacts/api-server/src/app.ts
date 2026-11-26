@@ -16,6 +16,8 @@ import advertiserGuidesRouter from "./routes/advertiserGuides";
 import blogRouter from "./routes/blog";
 import aiDiscoveryRouter from "./routes/aiDiscovery";
 import aiMarkdownRouter from "./routes/aiMarkdown";
+import agentSearchRouter from "./routes/agentSearch";
+import { agentDiscovery } from "./middlewares/agentDiscovery";
 import { aiBotLog } from "./middlewares/aiBotLog";
 import buyRouter, { buyStaffRouter } from "./routes/buy";
 import exclusiveReserveRouter from "./routes/exclusiveReserve";
@@ -68,6 +70,9 @@ app.use(ioExplain());
 app.use(promoContext());
 // Markdown mirrors (/index.md, /media-kit.md, ...) + Accept: text/markdown + Link header. Public, no cloaking.
 app.use(aiMarkdownRouter);
+// Search for agents (Nov 26 2026): GET/QUERY /.well-known/search + /api/search over public page copy; agent:* meta on public HTML.
+app.use(agentSearchRouter);
+app.use(agentDiscovery());
 
 // ── Standard middleware ───────────────────────────────────────────────────────
 app.use(
