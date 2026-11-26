@@ -212,14 +212,14 @@ import { MEDIA_KIT_EXAMPLES, MEDIA_KIT_NETWORK_FALLBACK, agencyCash, kitExample,
 import { createOverhaulRouter } from "../src/routes/overhaul";
 import { OVERHAUL_ROUTES } from "../src/lib/overhaul/seo";
 
-test("media kit math: $490 seat and $25K–$50K premium, no assumed bonus; credit / CPM x 1000 = modelled impressions", () => {
+test("media kit math: $490 seat and $25,000–$1.5M block band, no assumed bonus; credit / CPM x 1000 = modelled impressions", () => {
   const [seat, lo, hi] = MEDIA_KIT_EXAMPLES;
   assert.deepEqual(seat, kitExample(490, 0));
   assert.deepEqual(lo, kitExample(25_000, 0));
-  assert.deepEqual(hi, kitExample(50_000, 0));
+  assert.deepEqual(hi, kitExample(1_500_000, 0));
   assert.equal(seat.spend, 490);
   assert.equal(lo.spend, 25_000);
-  assert.equal(hi.spend, 50_000);
+  assert.equal(hi.spend, 1_500_000);
   for (const e of MEDIA_KIT_EXAMPLES) {
     assert.equal(e.bonusPct, 0);
     assert.ok(Math.abs(e.credit - e.spend * (1 + e.bonusPct / 100)) < 0.01);
@@ -228,7 +228,7 @@ test("media kit math: $490 seat and $25K–$50K premium, no assumed bonus; credi
   }
   assert.equal(usd(seat.credit), "$490");
   assert.equal(usd(lo.credit), "$25,000");
-  assert.equal(usd(hi.credit), "$50,000");
+  assert.equal(usd(hi.credit), "$1,500,000");
   assert.equal(agencyCash(490), 49);
   assert.equal(agencyCash(25_000), 2500);
   assert.equal(agencyCash(50_000), 5000);
@@ -310,7 +310,7 @@ test("media kit page copy: required language in, banned words out", () => {
   const path = candidates.find((p) => { try { readFileSync(p); return true; } catch { return false; } });
   assert.ok(path, "media-kit.tsx not found");
   const src = readFileSync(path!, "utf8");
-  for (const must of [/Media credit until IO/, /Modelled volumes/, /fully refundable until 14 days before your launch date/, /Aggregate UTM reporting only/, /No personal data/, /share of display space across the hub network/, /No impression guarantees/, /guarantees of reach, clicks or sales/, /Estimates are modelled; terms on IO/, /Randy Gilling, Founder/, /randy@scalehealth\.ca/, /curated as hubs launch/, /FaceBeforeFlight/, /CategoryRequestForm/, /AvailabilityStrip/, /Small business package/, /Premium slots/, /from \$25K/i, /\$25K–\$50K/, /Inquire only/, /UPGRADE_PATH_LINE/, /Exclusivity/, /larger display share/, /priority placement/]) {
+  for (const must of [/Media credit until IO/, /Modelled volumes/, /fully refundable until 14 days before your launch date/, /Aggregate UTM reporting only/, /No personal data/, /share of display space across the hub network/, /No impression guarantees/, /guarantees of reach, clicks or sales/, /Estimates are modelled; terms on IO/, /Randy Gilling, Founder/, /randy@scalehealth\.ca/, /curated as hubs launch/, /FaceBeforeFlight/, /CategoryRequestForm/, /AvailabilityStrip/, /Small business package/, /Premium slots/, /Blocks from \$25,000 to \$1\.5M USD/, /Inquire only/, /UPGRADE_PATH_LINE/, /Exclusivity/, /larger display share/, /priority placement/]) {
     assert.match(src, must);
   }
   for (const banned of [/Align/, /Clairvoyant/i, /80 locations/i, /Kalaya/i, /we sell them customers/i, /\bsigned partner\b/i, /\bCTR\b/, /guarantee(d)? (reach|delivery|results)/i, /Test Rail/, /Category Lock/, /\$10K Test Rail/, /\$35K[–-]\$75K/, /8 self-serve seats/, /Eight categories/, /seats open/]) {

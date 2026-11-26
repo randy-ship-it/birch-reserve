@@ -23,14 +23,16 @@ export function kitExample(spend: number, bonusPct: number, cpm = MEDIA_KIT_CPM)
 /**
  * Two public tiers (Randy, Nov 13 2026 11:57 AM ET).
  * SMB: $190 look / $490 seat, self-serve card checkout.
- * Premium: $25,000–$50,000 inquire-only (reconciles the former $10K Test Rail
- * and $35K–$75K Category Lock into this band). No card purchase. No invented bonus.
+ * Blocks: $25,000–$1,500,000 USD inquire-only (Randy, Nov 26 2026). No card purchase. No invented bonus.
  */
 export const MEDIA_KIT_OFFERS = {
   look: { name: "7-day look", spendUsd: 190, spendCad: 270, sku: "hold-190" },
   seat: { name: "Reserve", spendUsd: 490, spendCad: 690, sku: "reserve-490" },
-  premium: { name: "Premium slot", spendLo: 25_000, spendHi: 50_000, inquireOnly: true as const },
+  premium: { name: "Own a block", spendLo: 25_000, spendHi: 1_500_000, inquireOnly: true as const },
 } as const;
+
+/** Public label for the inquire-only block band. */
+export const BLOCK_BAND_LINE = "Blocks from $25,000 to $1.5M USD";
 
 export const UPGRADE_PATH_LINE = "Start with a reserve, then go premium." as const;
 

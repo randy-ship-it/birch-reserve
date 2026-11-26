@@ -92,12 +92,12 @@ test("copy rules: 20mm+ allowed, no 8.7mm, no gross profit, no street address on
   assert.match(read("../clinichub-media/src/pages/br/kit-report.tsx"), /<BuyJourney /);
 });
 
-test("two-tier offers: SMB $190/$490 to start, premium $25K–$50K is the main event", () => {
+test("two-tier offers: SMB $190/$490 to start, blocks from $25,000 to $1.5M USD", () => {
   // Nov 19 2026 condensed home: the upgrade line renders from UPGRADE_PATH_LINE (the Pricing expander) instead of a literal H2.
   assert.match(home, /UPGRADE_PATH_LINE/);
   assert.match(home, /Small business package/);
   assert.match(home, /Premium slots · the main event/);
-  assert.match(home, /From \$25K, \$25K–\$50K/);
+  assert.match(home, /Blocks from \$25,000 to \$1\.5M USD/);
   assert.match(home, /Inquire only/);
   assert.match(mediaKit, /UPGRADE_PATH_LINE/);
   assert.match(mediaKit, /Small business package/);
