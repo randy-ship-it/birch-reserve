@@ -19,13 +19,13 @@ export type Basis = "measured" | "modelled" | "estimated";
 
 export const BASIS_LABEL: Record<Basis, string> = {
   measured: "Measured",
-  modelled: "Modelled from launch customers, based on signed partnership contracts",
+  modelled: "Modelled estimate from launch customers and listed partners",
   estimated: "Estimated",
 };
 
 export const BASIS_NOTE: Record<Basis, string> = {
   measured: "First-party hub analytics, aggregated and de-identified. Shares only.",
-  modelled: "Based on signed partnership contracts: launch-partner order volumes and typical channel rates (TAM feed, read 2026-11-13). Not audited, not measured delivery.",
+  modelled: "Modelled estimates from listed partners: launch-partner order volumes and typical channel rates (TAM feed, read 2026-11-13). Not audited, not measured delivery.",
   estimated: "Benchmark range or editorial estimate. Not measured delivery.",
 };
 

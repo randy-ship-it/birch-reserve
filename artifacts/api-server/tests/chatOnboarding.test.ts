@@ -44,7 +44,7 @@ test("onboarding module carries every path, price, currency and term from the li
   for (const re of [
     /\/intake\b/, /\/intake\/supplier/, /\/buy\b/, /\/sponsor/, /\/exclusive/, /\/partners/, /\/terms/, /\/intake\/gtm/, /\/street-team/, /hub-alerts/, /ads\/specs/, /sample-io/,
     /\$190 USD/, /\$270 CAD/, /\$490 USD/, /\$690 CAD/, /\$1,500 USD \(\$2,100 CAD\)/, /\$3,000 USD \(\$4,200 CAD\)/, /\$6,000 USD \(\$8,400 CAD\)/, /\+5%/, /\+10%/, /\+15%/,
-    /\$1,900/, /25% below/, /Silver Birch Growth Inc\./, /intake\/activate/, /5\.4x/, /Step 2 of 2/, /30 days/, /14 days/, /60 days/, /IO before flight|IO|insertion order/, /aggregate only/i, /Calm Joints/, /door-to-door/, /signed partnership contracts/,
+    /\$1,900/, /at or below the rate card/, /Silver Birch Growth Inc\./, /intake\/activate/, /5\.4x/, /Step 2 of 2/, /30 days/, /14 days/, /60 days/, /IO before flight|IO|insertion order/, /aggregate only/i, /Calm Joints/, /door-to-door/, /modelled estimates from listed partners/,
   ]) assert.match(m, re);
   assert.doesNotMatch(m, /STREET100|Align|Clairvoyant|Alset|MedVibe|pier39|Friday/i);
   assert.doesNotMatch(m, /\u2014|\u2013/);
@@ -67,7 +67,7 @@ test("guard blocks promo codes, internal names, gig positioning, guarantees, zer
   assert.equal(findBannedContent("Align your ad with the hub."), null);
   assert.equal(birchFaqAnswer([{ role: "user", content: "is this like uber for health?" }]).intent, "positioning");
   assert.equal(birchFaqAnswer([{ role: "user", content: "is Align a client?" }]).intent, "confidential");
-  for (const ok of ["No, the Toronto hub is not live; only DR-HO'S and SOLE are live today.", "No guarantees: any figure is modelled.", "Toronto is in queue; get launch alerts.", "Based on signed partnership contracts, 200+ locations."]) {
+  for (const ok of ["No, the Toronto hub is not live; only DR-HO'S and SOLE are live today.", "No guarantees: any figure is modelled.", "Toronto is in queue; get launch alerts.", "Modelled estimates from listed partners, 200+ locations."]) {
     assert.equal(findBannedContent(ok), null, ok);
   }
 });

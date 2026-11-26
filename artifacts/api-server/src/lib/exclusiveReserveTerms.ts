@@ -39,12 +39,15 @@ export function exclusiveReserveFor(currency: ReserveCur) {
 
 export const EXCLUSIVE_RESERVE_NAME = "Birch Reserve exclusive display reserve · $1,900 CAD";
 export const EXCLUSIVE_RESERVE_DESCRIPTION =
-  "Locks a $5K–$50K exclusive display package in your category at 25% below the regular rate. The full $1,900 counts toward that package. Nothing runs until you sign an insertion order (IO). Refundable until 14 days before the IO launch date.";
+  "Holds a $5K–$50K exclusive display package in your category while we write your insertion order (IO). The full $1,900 counts toward that package. Nothing runs until you sign the IO. Refunded in full if another brand commits to the category first, and refundable until 14 days before the IO launch date.";
+
+/** One factual rate line for every surface (replaces the "25% below the regular rate" claim: no firm published reference price). */
+export const EXCLUSIVE_RATE_LINE = "The package rate is set on your IO, at or below the published rate card.";
 
 export const EXCLUSIVE_RESERVE_TERMS: readonly string[] = [
   "The exclusive display reserve is $1,900, charged by card in the currency shown when you pay: CAD for visitors in Canada, USD everywhere else. You can switch currency on the page before you pay; you are charged in the currency you saw.",
-  "It locks your right to one exclusive display package in your category, sized $5,000 to $50,000 on the insertion order in the same currency as your reserve, at 25% below the regular rate for that package. The full $1,900 counts toward the package. Larger premium slots ($25K–$50K) are by inquiry.",
-  "Exclusivity starts when you sign the IO, which names the hub, placement and dates. Nothing runs before then. If the category is already committed to another brand before your IO is signed, we refund the $1,900 in full.",
+  "It holds one exclusive display package in your category while we write your insertion order, sized $5,000 to $50,000 on the IO in the same currency as your reserve. The package rate is set on the IO, at or below the published rate card. The full $1,900 counts toward the package. Larger premium slots ($25K–$50K) are by inquiry.",
+  "The hold is pending your IO: the category becomes exclusive to you when you sign the IO, which names the hub, placement and dates. Nothing runs before then. If the category is committed to another brand before your IO is signed, we refund the $1,900 in full.",
   "Fully refundable until 14 days before the launch date in your IO. A cash refund is also available if no approved surface is named within 60 days of payment. To cancel, reply to your confirmation email and we refund the original card.",
   `${SPEND_DOWN_LINE}`,
   "A paid $190 look or $490 reserve (or the CAD equivalent) from the 30 days before counts in full toward the package on the IO.",

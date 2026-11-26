@@ -323,7 +323,7 @@ export function SplashAdReservationDialog({
                     <div className="border-y border-border py-4 text-xs leading-relaxed text-muted-foreground">
                       <p><strong className="text-foreground">Credit, not a flight.</strong> Nothing runs until an insertion order names the surface.</p>
                       {selectedOffer.key !== "hold-190" && <p><strong className="text-foreground">Fully refundable</strong> until 14 days before your launch date.</p>}
-                      <p className="mt-1">Draft terms apply until counsel stamps them.</p>
+                      <p className="mt-1">Draft terms. Final terms are in your insertion order.</p>
                     </div>
 
                     <FormField

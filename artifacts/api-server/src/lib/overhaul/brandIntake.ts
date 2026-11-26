@@ -253,26 +253,26 @@ export const RETAIL_COPY = "200+ locations, 500+ soon · 1MM+ captive recovery c
 export const RETAIL_TAG = "private network of digital and brick-and-mortar fitness & recovery retailers";
 /** Randy Nov 21 1:00 PM: one audience framing, three channels, sitewide (AUDIENCE_CHANNELS). Plan figures, not delivered impressions. */
 export const AUDIENCE_CHANNELS = [
-  { key: "scale-hubs", name: "Branded ScaleHealth.ca hubs", v: "700MM+", l: "captive page views activating", detail: "Private, members-only hubs on ScaleHealth.ca where recovery and wellness customers already shop and book care." },
+  { key: "scale-hubs", name: "Branded ScaleHealth.ca hubs", v: "~128MM", l: "modelled page views a month (estimate)", detail: "Private, members-only hubs on ScaleHealth.ca where recovery and wellness customers already shop and book care." },
   { key: "retail-network", name: "Private retail network", v: "200+", l: "locations · 500+ soon · 1MM+ captive recovery consumers", detail: "Our private network of digital and brick-and-mortar fitness & recovery retailers, in Canada and the USA." },
   { key: "calm-street", name: "Calm Joints + Street Team Ambassadors", v: "1MM+", l: "consumers now · 3MM+ est. in 2027", detail: "Our provider network activating, our owned digital clinic Calm Joints, and the Street Team Ambassadors doing on-site product sampling and door-to-door." },
 ] as const;
-export const AUDIENCE_LINE = "700MM+ captive page views activating · 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers · 1MM+ consumers now through our provider network and Street Team, expanding to an estimated 3MM+ in 2027";
-export const AUDIENCE_FINE = "Audience and reach figures are based on signed partnership contracts. Reach and audience, not delivered impressions, and not a guarantee of views, clicks or results. The 3MM+ figure for 2027 is an estimate. Street Team: Canada for now.";
+export const AUDIENCE_LINE = "~128MM modelled page views a month (estimate) · 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers · 1MM+ consumers now through our provider network and Street Team, expanding to an estimated 3MM+ in 2027";
+export const AUDIENCE_FINE = "Audience and reach figures are modelled estimates from listed partners. Reach and audience, not delivered impressions, and not a guarantee of views, clicks or results. The 3MM+ figure for 2027 is an estimate. Street Team: Canada for now.";
 /** Street Team + Calm Joints reach. */
 export const STREET_REACH_FIG = { v: "1MM+", l: "consumers now · 3MM+ est. in 2027" } as const;
 export const STREET_REACH_LINE = "reaching 1MM+ consumers now, expanding to an estimated 3MM+ in 2027";
 export const STREET_REACH_SENTENCE = "Our provider network is activating and, with our Street Team Ambassadors, reaches 1MM+ consumers now, expanding to an estimated 3MM+ in 2027.";
 
 export const CHANNEL_TILES = [
-  { key: "scale-hubs", name: "Branded ScaleHealth.ca hubs", stats: [{ v: "700MM+", l: "captive page views activating" }], line: "Private health and wellness hubs: physio, recovery, longevity and food brands." },
+  { key: "scale-hubs", name: "Branded ScaleHealth.ca hubs", stats: [{ v: "~128MM", l: "modelled page views a month (estimate)" }], line: "Private health and wellness hubs: physio, recovery, longevity and food brands." },
   { key: "calm-joints", name: "Calm Joints", stats: [] as { v: string; l: string }[], line: "Our owned digital clinic. Its reach is counted with the Street Team: 1MM+ consumers now, 3MM+ est. in 2027." },
   { key: "street-team", name: "Calm Joints + Street Team", stats: [{ v: STREET_REACH_FIG.v, l: STREET_REACH_FIG.l }], line: "Street Team Ambassadors: on-site product sampling and door-to-door, targeted by neighbourhood. Area-level only.", image: "/street-team/door-route.webp", imageNote: "Day-1 route heat map (area-level). The network-wide census map is still needed." },
   { key: "retail-network", name: "Private retail network", stats: [{ v: "200+", l: "locations (500+ soon)" }, { v: "1MM+", l: "captive recovery consumers" }, { v: "CA + US", l: "Canada + USA" }], line: `${RETAIL_COPY} · ${RETAIL_TAG}` },
 ] as const;
 
 export const CHANNEL_TILES_FINE =
-  "Audience figures are based on signed partnership contracts, as of Nov 21 2026. They are reach and audience, not delivered impressions, and not a guarantee. The 3MM+ figure for 2027 is an estimate. Street Team: Canada for now. They are separate from the /inventory pricing feed.";
+  "Audience figures are modelled estimates from listed partners, as of Nov 21 2026. They are reach and audience, not delivered impressions, and not a guarantee. The 3MM+ figure for 2027 is an estimate. Street Team: Canada for now. They are separate from the /inventory pricing feed.";
 
 /* ------------------------------------------------------------------ Friday payload (adapter) */
 
@@ -369,7 +369,7 @@ export function hubFit(categoryKey: string) {
 
 /** Side B channels. Rates only where the rate card / spec sheet has one; reach = network figures / targets. */
 export const EXPOSURE_CHANNELS = [
-  { key: "hubs", name: "Branded ScaleHealth.ca hubs", reach: "700MM+ captive page views activating", cpm: HUB_RATE_RANGE.cpm, cpc: HUB_RATE_RANGE.cpc, rateNote: "Rate card starter range" },
+  { key: "hubs", name: "Branded ScaleHealth.ca hubs", reach: "~128MM modelled page views a month (estimate)", cpm: HUB_RATE_RANGE.cpm, cpc: HUB_RATE_RANGE.cpc, rateNote: "Rate card starter range" },
   { key: "calm-joints", name: "Calm Joints", reach: "Counted with the Street Team: 1MM+ consumers now, 3MM+ est. in 2027", cpm: null, cpc: null, rateNote: "Priced by IO" },
   { key: "street-team", name: "Calm Joints + Street Team", reach: "1MM+ consumers now, 3MM+ est. in 2027", cpm: null, cpc: null, rateNote: "Inquire: priced by route" },
   { key: "retail-network", name: "Private retail network", reach: RETAIL_COPY, cpm: null, cpc: null, rateNote: "Priced by IO" },

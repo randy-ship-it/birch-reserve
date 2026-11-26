@@ -123,7 +123,7 @@ ${sources}`;
     ] },
   ];
   if (g.faq?.length) graph.push({ "@type": "FAQPage", mainEntity: [...(g.answer ? [{ q: g.h1, a: g.answer }] : []), ...g.faq].map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) });
-  if (isNew) graph.push({ "@type": "Offer", name: "Exclusive display reserve", price: "1900", priceCurrency: "CAD", url: `${PUBLIC_SITE_ORIGIN}/exclusive`, description: "Locks a $5K–$50K exclusive display package in your category at 25% below the regular rate. The full $1,900 counts toward that package. Nothing runs until you sign an insertion order.", seller: { "@type": "Organization", name: "Silver Birch Growth Inc." } });
+  if (isNew) graph.push({ "@type": "Offer", name: "Exclusive display reserve", price: "1900", priceCurrency: "CAD", url: `${PUBLIC_SITE_ORIGIN}/exclusive`, description: "Holds a $5K–$50K exclusive display package in your category pending your insertion order. The full $1,900 counts toward that package. Refunded if another brand commits first. Nothing runs until you sign an insertion order.", seller: { "@type": "Organization", name: "Silver Birch Growth Inc." } });
   return shell(path, g.title, g.description, body, { "@context": "https://schema.org", "@graph": graph }, stickyHtml(g));
 }
 

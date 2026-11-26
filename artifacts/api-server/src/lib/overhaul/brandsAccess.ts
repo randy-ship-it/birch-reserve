@@ -109,7 +109,7 @@ export function buildBrandsAccessPayload(token: string): BrandsAccessPayload {
   return {
     ok: true,
     token,
-    claim: "Based on signed partnership contracts",
+    claim: "Modelled estimates from listed partners",
     modelled: "Per-hub views are modelled estimates for one sponsor position (20% share of voice at 75% availability), not measured delivery or a guarantee. Prices are starting-at rates, illustrative estimates, not sold rates or a quote.",
     hubs: [...brandRows, clinic],
   };

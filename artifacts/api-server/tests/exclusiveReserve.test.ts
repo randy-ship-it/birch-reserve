@@ -56,7 +56,7 @@ test("pacing and 2027 figure are modelled and never zero", () => {
   for (const c of TAM_2027.cases) assert.ok(c.usdYear > 0 && c.viewsYear > 0);
   assert.match(tam2027Headline(), /^\$\d/);
   const txt = tam2027Text();
-  assert.match(txt, /Based on signed partnership contracts, not a commitment/);
+  assert.match(txt, /Modelled estimates from listed partners, not a commitment/);
   assert.doesNotMatch(txt, /\bsigned partners\b|Align|Clairvoyant|Alset|MedVibe|Friday|80 locations|Integrity Fitness|CTR|ROAS/i);
 });
 
@@ -76,12 +76,12 @@ test("e2e (local): /exclusive renders, checkout is held when deposits are off, s
   try {
     // Geo currency (Nov 21 2026 3:34 PM ET): Canada sees CAD, everyone else USD, same $1,900.
     const page = await (await fetch(`http://127.0.0.1:${port}/exclusive`, { headers: { "x-vercel-ip-country": "CA" } })).text();
-    assert.match(page, /Reserve \$1,900 CAD\. Lock your category/);
-    assert.match(page, /25% below the regular rate/);
+    assert.match(page, /Reserve \$1,900 CAD\. Hold your category/);
+    assert.doesNotMatch(page, /25%|regular rate|locks a/);
     assert.match(page, /\$833–\$8,333 CAD\/mo/);
     assert.match(page, /name="currency" value="cad"/);
     const us = await (await fetch(`http://127.0.0.1:${port}/exclusive`, { headers: { "x-vercel-ip-country": "US" } })).text();
-    assert.match(us, /Reserve \$1,900 USD\. Lock your category/);
+    assert.match(us, /Reserve \$1,900 USD\. Hold your category/);
     assert.match(us, /\$5K–\$50K USD exclusive display package/);
     assert.match(us, /charged in USD/);
     assert.match(us, /data-testid="price-ladder" data-currency="usd"/);

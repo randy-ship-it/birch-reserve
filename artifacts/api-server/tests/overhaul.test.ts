@@ -175,7 +175,7 @@ test("agent quote: public offers only, USD", () => {
   // CAD appears only on the $1,900 CAD exclusive display reserve lines (Randy, voice, Nov 21 2026).
   assert.doesNotMatch(llms.replace(/^.*exclusive.*$/gim, ""), /CAD|sponsor-|All eight/);
   assert.match(llms, /exclusive-reserve-1900-cad · \$1,900 CAD/);
-  assert.match(llms, /Based on signed partnership contracts, not a commitment/);
+  assert.match(llms, /Modelled estimates from listed partners, not a commitment/);
 });
 
 test("agent checkout always holds (202, no charge) and points to the human checkout", async () => {
@@ -466,9 +466,9 @@ const BANNED_PUBLIC = /Align|Clairvoyant|Alset|80 locations|MedVibe|\bFriday\b|p
 
 test("public brand totals are copied from approved sources and name no brands", () => {
   const text = [...PUBLIC_BRAND_TOTALS.map((x) => `${x.v} ${x.l}`), ...PUBLIC_CATEGORIES, PUBLIC_FINE, CLAIM_LINE].join("\n");
-  assert.equal(CLAIM_LINE, "Based on signed partnership contracts");
-  assert.match(AUDIENCE_LINE, /700MM\+ captive page views activating/);
-  assert.equal(PUBLIC_BRAND_TOTALS[0]?.v, "700MM+");
+  assert.equal(CLAIM_LINE, "Modelled estimates from listed partners");
+  assert.match(AUDIENCE_LINE, /~128MM modelled page views a month \(estimate\)/);
+  assert.equal(PUBLIC_BRAND_TOTALS[0]?.v, "~128MM");
   assert.equal(PUBLIC_BRAND_TOTALS[1]?.v, TAM.ordersLabel);
   assert.equal(PUBLIC_BRAND_TOTALS[2]?.v, String(TAM.listedPartners));
   assert.match(RETAIL_COPY, /200\+ locations, 500\+ soon/);
@@ -480,15 +480,15 @@ test("public brand totals are copied from approved sources and name no brands", 
   assert.equal((PUBLIC_BRAND_TOTALS[6] as { estimate?: boolean }).estimate, true);
   assert.equal(PUBLIC_BRAND_TOTALS[7]?.v, "4");
   assert.deepEqual([...PUBLIC_CATEGORIES], POSITIONING.recoveryBrandVerticals.filter((v) => !v.inQueue).map((v) => v.label));
-  assert.match(PUBLIC_FINE, /Based on signed partnership contracts/);
-  assert.match(AUDIENCE_FINE, /based on signed partnership contracts/i);
+  assert.match(PUBLIC_FINE, /Modelled estimates from listed partners/);
+  assert.match(AUDIENCE_FINE, /modelled estimates from listed partners/i);
   assert.doesNotMatch(text, BANNED_PUBLIC);
   for (const h of [...publicHubs(), ...BRAND_HUBS, CLINIC_NETWORK]) {
     assert.doesNotMatch(text, new RegExp(h.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), h.name);
   }
   const desc = OVERHAUL_ROUTES["/advertise/brands"]!.description;
-  assert.match(desc, /700MM\+/);
-  assert.match(desc, /based on signed partnership contracts/i);
+  assert.match(desc, /128MM/);
+  assert.match(desc, /modelled estimates from listed partners/i);
   assert.doesNotMatch(desc, BANNED_PUBLIC);
   for (const h of publicHubs()) assert.doesNotMatch(desc, new RegExp(h.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), h.name);
 });
@@ -506,7 +506,7 @@ test("advertise/brands access code is case-insensitive and never echoed", () => 
   const payload = buildBrandsAccessPayload(token);
   const blob = JSON.stringify(payload);
   assert.equal(payload.ok, true);
-  assert.equal(payload.claim, "Based on signed partnership contracts");
+  assert.equal(payload.claim, "Modelled estimates from listed partners");
   assert.ok(payload.hubs.length >= publicHubs().length);
   assert.ok(payload.hubs.some((h) => /DR-HO/i.test(h.name) && h.surfaces.some((s) => s.views > 0)));
   assert.ok(payload.hubs.some((h) => h.key === "clinic-network"));
