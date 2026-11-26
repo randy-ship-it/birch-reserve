@@ -8,7 +8,7 @@ import { resolve } from "node:path";
 import { HUB_PENDING_TAG, createBrandIntakeProxy, hubPendingOf, hubRequestOf, prepareStage, type IntakeLeadEvent } from "../src/routes/brandIntakeProxy";
 import { cleanLeadMeta } from "../src/lib/leads";
 import { toFridayBody } from "../../clinichub-media/src/lib/fridayBrandIntake";
-import { brandFromParam, hubSlugOf, levelOf, presetOf, rolesForLevel, SUPPLIER_FEES } from "../../clinichub-media/src/components/br/supplier-mode";
+import { brandFromParam, hubSlugOf, pathsFromParam, presetOf, rolesForPaths, verticalCats, SUPPLIER_FEES, VERTICALS_NOTE } from "../../clinichub-media/src/components/br/supplier-mode";
 
 const ENV = { FRIDAY_API_URL: "https://friday.example", FRIDAY_API_KEY: "test-only-not-a-real-secret-value" } as NodeJS.ProcessEnv;
 const HUB = { role: "supplier", status: "pending_approval", hub_name: "Crossover Symmetry", hub_slug: "crossover-symmetry" };
@@ -79,9 +79,15 @@ test("brand prefill, slug, alias, fees", () => {
   assert.equal(presetOf("?role=supplier&brand=crossover-symmetry"), "supplier");
   assert.equal(presetOf(""), undefined, "plain /intake unchanged");
   assert.equal(presetOf("?resume=demo&mock=1"), undefined);
-  // exposure ladder: performance only → + own hub → + CPM/CPC display (Accelerate); supplier always on
-  assert.deepEqual([1, 2, 3].map((l) => rolesForLevel(l as 1 | 2 | 3)), [{ supplier: true, hub: false, accelerate: false }, { supplier: true, hub: true, accelerate: false }, { supplier: true, hub: true, accelerate: true }]);
-  assert.deepEqual([levelOf({ hub: false, accelerate: false }), levelOf({ hub: true, accelerate: false }), levelOf({ hub: true, accelerate: true })], [1, 2, 3]);
+  // paths (Nov 26 2026): pick some or all; nothing forced on; display / ads → kit; nothing picked → supplier
+  assert.deepEqual(pathsFromParam(""), { supply: true, hub: false, display: false, ads: false });
+  assert.deepEqual(pathsFromParam("hub,ads,bogus"), { supply: false, hub: true, display: false, ads: true });
+  assert.deepEqual(rolesForPaths({ supply: true, hub: true, display: true, ads: false }), ["supplier", "publisher", "kit"]);
+  assert.deepEqual(rolesForPaths({ supply: false, hub: false, display: false, ads: true }), ["kit"]);
+  assert.deepEqual(rolesForPaths({ supply: false, hub: false, display: false, ads: false }), ["supplier"]);
+  assert.deepEqual(verticalCats(["recovery", "nutrition"]), ["recovery_devices", "sports_nutrition"]);
+  assert.match(VERTICALS_NOTE, /recovery-focused today/);
+  assert.ok(!/\b20\d\d\b|soon|by (q\d|spring|summer|fall|winter)/i.test(VERTICALS_NOTE), "no timelines");
   assert.equal(SUPPLIER_FEES.standUpUsd, 5000);
   assert.deepEqual(SUPPLIER_FEES.lines.map((l) => l.v), ["10%", "~35%"]);
 });
@@ -96,9 +102,8 @@ test("supplier preset copy: hard rules; /intake/supplier is the shared intake, n
     assert.ok(!bad.test(visible.replace(/fridayIntake|fridayBrandIntake|fridayV12|FRIDAY_CATEGORIES|"advertiser"|"publisher"/g, "")), `found ${bad}`);
   }
   assert.match(visible, /Your hub is created and goes live once our team approves it\./);
-  assert.match(visible, /Performance only/);
-  assert.match(visible, /\+ Own hub/);
-  assert.match(visible, /\+ Display CPM\/CPC/);
+  for (const t of ["Supply", "Your own hub", "Display / CPC", "Ads only", "200+ brick-and-mortar locations", "Needed for max CPC exposure"]) assert.ok(visible.includes(t), t);
+  assert.ok(!/Start performance-only/.test(readFileSync(resolve(process.cwd(), "../clinichub-media/src/pages/br/intake.tsx"), "utf8")), "no forced 'say you are a supplier' step");
 });
 
 test("network figures (2:27 PM): shared constants site-wide, no homes figure, no override", async () => {

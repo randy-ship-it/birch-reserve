@@ -35,7 +35,7 @@ import { MidTier } from "@/components/br/next-step";
 import { WhatYoureBuying, hubDefinition, hubHostLine } from "@/components/br/what-youre-buying";
 import { siteName } from "@/lib/siteSkin";
 import { SeeYourAd } from "@/components/br/see-your-ad";
-import { OfferStairs } from "@/components/br/offer-stairs";
+import { BuyJourney } from "@/components/br/journey";
 import { trackAttn, useAttention } from "@/lib/attention";
 import { ActivityPulse, CategoryStrip, QuestionsBrandsAskCompact } from "@/components/br/market-pulse";
 import { AGENCY_RATE_CARD } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
@@ -223,7 +223,7 @@ export default function BrHome() {
 
           <Expand title="Every step, from $190 to premium" sub="The ladder, and how a first order runs" testId="home-ladder">
             <div className="space-y-6 p-4 md:p-6">
-              <div data-testid="home-offer-stairs"><h3 className="mb-3 font-display text-2xl text-[#0b1f3a]">Start small. Scale when it works.</h3><OfferStairs look={price.look} seat={price.seat} /></div>
+              <div data-testid="home-offer-stairs"><BuyJourney where="home" testId="home-journey" /></div>
               <div data-testid="home-four-steps"><FourSteps look={price.look} seat={price.seat} /></div>
             </div>
           </Expand>
