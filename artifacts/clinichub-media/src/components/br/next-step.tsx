@@ -9,7 +9,7 @@
  *
  * Only tiers that already exist: hold-190 / reserve-490 (card, /buy), STARTER_BLOCK (pricing.ts), AGENCY_TEST (twoLane.ts),
  * DEPOSIT_TIERS (sponsorKit.ts), premium $25,000–$1.5M inquire-only. No new prices, no new Stripe prices, nothing charged here.
- * Refund wording is the live /terms line for the $490 reserve; everything else says the IO sets the terms.
+ * Refund wording is the live /terms line for the $490 category placement; everything else says the IO sets the terms.
  * Copy rules: no counts, never "open/available/unclaimed", no impression/CTR/ROAS guarantees, modelled figures labelled.
  */
 import { siteUrl } from "@/lib/siteSkin";
@@ -264,7 +264,7 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
       </article>
       {agencyOpen ? <div className="mt-3 rounded-2xl bg-white/[0.06] p-4 ring-1 ring-lime-300/50" data-testid="mid-tier-agency-panel"><AgencyPrepayForm where={where} dark /></div> : null}
       <div className="mt-3"><ExclusiveReserveCard where={where} /></div>
-      <p className="mt-3 text-[12px] text-white/70" data-testid="mid-tier-pack-terms">Packs: refundable until 14 days before the IO launch date. Bonus is media credit only, no cash value. No impression guarantees; reporting is aggregate. A paid $190 look or $490 reserve counts in full toward a pack within 30 days.</p>
+      <p className="mt-3 text-[12px] text-white/70" data-testid="mid-tier-pack-terms">Packs: refundable until 14 days before the IO launch date. Bonus is media credit only, no cash value. No impression guarantees; reporting is aggregate. A paid $190 look or $490 category placement counts in full toward a pack within 30 days.</p>
       <div className="mt-3"><SpendDown dark testId="mid-tier-spend-down" /></div>
       <Details dark label="Agency terms, view blocks and a $1.5K–$5K example" testId="mid-tier-details">
         <p data-testid="mid-tier-agency-terms">{MID_TIER_LINE} One IO per client. {AGENCY_REPORTING_LINE}.</p>
@@ -409,7 +409,7 @@ export function PostKitNext({ kit, where = "post_kit" }: { kit: KitPrefill; wher
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-foreground/10 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 shadow-[0_-8px_24px_-12px_rgba(7,26,57,0.35)] backdrop-blur md:hidden" data-testid="post-kit-sticky">
         <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={go("hold-190")} className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-[#0b1f3a] text-sm font-bold text-white" data-testid="post-kit-sticky-look">$190 look</a>
         <span aria-hidden className="text-foreground/40">·</span>
-        <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={go("reserve-490")} className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-[#0b1f3a] text-sm font-bold text-[#0b1f3a]" data-testid="post-kit-sticky-reserve">$490 reserve</a>
+        <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={go("reserve-490")} className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-[#0b1f3a] text-sm font-bold text-[#0b1f3a]" data-testid="post-kit-sticky-reserve">$490 category placement</a>
       </div>,
         document.body,
       ) : null}

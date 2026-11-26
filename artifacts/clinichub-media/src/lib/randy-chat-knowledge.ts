@@ -85,7 +85,7 @@ export const LIVE_HUB_PROOF_DISPLAY = "the live DR-HO hub" as const;
 export const WEPRIZE_EXAMPLE_URL = "https://weprize.net" as const;
 
 export const SMART_OPENER =
-  "Hey! Birch Q&A Squirrel here. Want to see what a $490 reserve gets you across our hub network?" as const;
+  "Hey! Birch Q&A Squirrel here. Want to see what a $490 category placement gets you across our hub network?" as const;
 
 /** Teaser bubble shown beside the full-body figure (closed state). */
 export const TEASER_TEXT = "Got a brand to place? Ask me." as const;
@@ -179,4 +179,4 @@ export function qualifyDoneMessage(company?: string): string {
 }
 
 export const TALK_HUMAN_REPLY =
-  "Easiest is to buy ads now: reserve for $490 USD (100% media credit until the IO) or take the $190 USD 7-day look, both at birchreserve.net/buycalc. Or grab the media kit and rate card." as const;
+  "Easiest is to buy ads now: start with a $490 USD category placement (100% media credit until the IO) or take the $190 USD 7-day look, both at birchreserve.net/buycalc. Or grab the media kit and rate card." as const;

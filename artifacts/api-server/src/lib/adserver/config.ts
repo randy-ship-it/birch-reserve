@@ -110,7 +110,7 @@ export function regularRateSummary(): { cpmLow: number; cpmHigh: number; cpcLow:
   return {
     cpmLow, cpmHigh, cpcLow, cpcHigh,
     line: `Promo credit runs at regular rate-card rates (current pricing: ${f(cpmLow)}–${f(cpmHigh)} CPM or ${f(cpcLow)}–${f(cpcHigh)} CPC depending on the placement).`,
-    compare: `Dedicated packages are priced on the IO, at or below the card rate; $190 looks, $490 reserves and sponsor packs run at the card rate.`,
+    compare: `Dedicated packages are priced on the IO, at or below the card rate; $190 looks, $490 category placements and sponsor packs run at the card rate.`,
   };
 }
 

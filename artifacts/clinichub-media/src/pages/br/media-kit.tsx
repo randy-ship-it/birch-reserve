@@ -81,15 +81,15 @@ function ZoomFit({ children }: { children: ReactNode }) {
 const RULES = [
   "Media credit until IO. Your payment is media credit; nothing runs until an insertion order names the hub and surface.",
   "A share of display space across the hub network, curated as hubs launch. Premium slots add exclusivity and priority placement.",
-  "The $490 USD reserve is fully refundable until 14 days before your launch date; credit is usable 12 months. The $190 USD look converts in full to the reserve within 7 days, or is refunded.",
+  "The $490 USD category placement is fully refundable until 14 days before your launch date; credit is usable 12 months. The $190 USD look converts in full to the category placement within 7 days, or is refunded.",
   "Modelled volumes. Views and impressions are estimates, not measured delivery.",
   "Aggregate UTM reporting only. No personal data is shared.",
   "No impression guarantees, and no guarantees of reach, clicks or sales.",
 ];
 
 const HOW_TO_START = [
-  { n: "1", t: "Reserve your space", d: "Get a share of display space across our growing hub network. Placements are curated hub by hub." },
-  { n: "2", t: "Pay by card", d: "$490 USD reserves your space, or take a $190 USD 7-day look first. Stripe checkout, no login." },
+  { n: "1", t: "Category placement", d: "Get a share of display space across our growing hub network. Placements are curated hub by hub." },
+  { n: "2", t: "Pay by card", d: "$490 USD category placements your space, or take a $190 USD 7-day look first. Stripe checkout, no login." },
   { n: "3", t: "Approve the IO", d: "We send an insertion order naming the hub and surface. Nothing runs before you approve it." },
 ];
 
@@ -339,7 +339,7 @@ export default function BrMediaKit() {
               </div>
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Cta href={RESERVE_HREF} testId="mk-cta-seat" className="w-full sm:w-auto">Reserve your space — {price.seat}</Cta>
+              <Cta href={RESERVE_HREF} testId="mk-cta-seat" className="w-full sm:w-auto">Category placement — {price.seat}</Cta>
               <Cta href={lookHref("media_kit_look")} variant="line" testId="mk-cta-look" className="w-full sm:w-auto">Take a 7-day look — {price.look}</Cta>
             </div>
             <WhatHundredGets />
@@ -449,7 +449,7 @@ export default function BrMediaKit() {
             <FounderNote />
           </div>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Cta href={RESERVE_HREF} variant="lime" testId="mk-reserve-foot" className="w-full sm:w-auto">Reserve your space — {price.seat}</Cta>
+            <Cta href={RESERVE_HREF} variant="lime" testId="mk-reserve-foot" className="w-full sm:w-auto">Category placement — {price.seat}</Cta>
             <Cta href="#premium" variant="lineDark" testId="mk-premium-foot" className="w-full sm:w-auto">Inquire · Blocks from $25,000 to $1.5M USD</Cta>
           </div>
           <p className="mt-8 border-t border-background/20 pt-4 text-xs text-background/65" data-testid="mk-footnote">

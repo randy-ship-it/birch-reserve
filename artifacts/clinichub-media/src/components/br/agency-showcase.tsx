@@ -324,7 +324,7 @@ export function InsiderGrid() {
 }
 
 const IO_STEPS = [
-  { t: "Brief", d: "Send the client and picks through the agency form or a quick-buy inquiry. Small tests can start self-serve on the $190 USD look or the $490 USD reserve." },
+  { t: "Brief", d: "Send the client and picks through the agency form or a quick-buy inquiry. Small tests can start self-serve on the $190 USD look or the $490 USD category placement." },
   { t: "Draft IO", d: "We reply with hub fit and a draft insertion order naming the hub, surface, format, category and dates." },
   { t: "Sign & prepay", d: "Seats pay by card. Post-Purchase, 100K+ view blocks and exclusive locks go on the IO by inquiry." },
   { t: "Traffic", d: "Creative, UTMs and an optional promo code. Exact position is confirmed on the IO." },
@@ -404,7 +404,7 @@ export function AgencyPayouts() {
 /** Two ways to buy (Nov 24 2026): card (self-serve) vs insertion order (managed), same rows side by side. */
 type BuyPathCol = { key: string; kicker: string; price: string; sub: string };
 type BuyPathData = { card: BuyPathCol; io: BuyPathCol; rows: ReadonlyArray<{ k: string; card: string; io: string }> };
-const AGENCY_BUY_LABELS = { reserve: "Reserve for a client · $490 USD", look: "or the $190 USD 7-day look", io: "Request a draft IO" };
+const AGENCY_BUY_LABELS = { reserve: "Category placement for a client · $490 USD", look: "or the $190 USD 7-day look", io: "Request a draft IO" };
 
 /** Card vs IO compare. Defaults to the /agencies copy; /media-buyers passes its own data (no agency row) and labels. */
 export function BuyPaths({ reserveHref, lookHref, ioHref = "#talk", paths = BUY_PATHS, labels = AGENCY_BUY_LABELS, testId = "agency-buy-paths" }: { reserveHref: string; lookHref: string; ioHref?: string; paths?: BuyPathData; labels?: typeof AGENCY_BUY_LABELS; testId?: string }) {
@@ -577,7 +577,7 @@ export function AgencyTierCards({ reserveHref, buyHref, bidHref = "#talk", ioHre
                 <Cta href={buyHref} variant="line" testId="tier-direct-cta" className="w-full">Buy ads now</Cta>
               ) : t.key === "agency" ? (
                 <>
-                  <Cta href={reserveHref} variant="ink" testId="tier-agency-cta" className="w-full">Reserve for a client · $490 USD</Cta>
+                  <Cta href={reserveHref} variant="ink" testId="tier-agency-cta" className="w-full">Category placement for a client · $490 USD</Cta>
                   <a href={ioHref} data-testid="tier-agency-io" className="text-center text-[13px] font-semibold text-[#0b1f3a] underline underline-offset-2">or a {io} client test on an insertion order (IO)</a>
                 </>
               ) : (

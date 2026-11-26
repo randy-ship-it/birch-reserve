@@ -142,7 +142,7 @@ async function stubRandyReply(
 
   if (chip === "talk_human" || /\b(call|human|phone)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: `Easiest is to buy ads now: reserve for $490 USD or take a $190 USD 7-day look at https://birchreserve.net/buycalc, or get the media kit.`,
+      text: `Easiest is to buy ads now: start with a $490 USD category placement or take a $190 USD 7-day look at https://birchreserve.net/buycalc, or get the media kit.`,
       source: "stub",
       offerHandoff: true,
     };
@@ -150,14 +150,14 @@ async function stubRandyReply(
 
   if (chip === "how_seats") {
     return {
-      text: "You reserve a share of display space across our growing network of private health and wellness hubs, curated as hubs launch. Reserving is $490 USD (100% media credit until the IO), or take a 7-day look for $190 USD. Premium slots ($25,000 to $1.5M USD, inquire only) add exclusivity. Start at https://birchreserve.net/buycalc. What do you sell?",
+      text: "You reserve a share of display space across our growing network of private health and wellness hubs, curated as hubs launch. A category placement is $490 USD (100% media credit until the IO), or take a 7-day look for $190 USD. Premium slots ($25,000 to $1.5M USD, inquire only) add exclusivity. Start at https://birchreserve.net/buycalc. What do you sell?",
       source: "stub",
     };
   }
 
   if (chip === "hold_190") {
     return {
-      text: "Reserve at https://birchreserve.net/buycalc: pick the $490 reserve or the $190 look, add your brand and work email, then pay on the secure Stripe checkout. What do you sell?",
+      text: "Reserve at https://birchreserve.net/buycalc: pick the $490 category placement or the $190 look, add your brand and work email, then pay on the secure Stripe checkout. What do you sell?",
       source: "stub",
     };
   }
@@ -172,14 +172,14 @@ async function stubRandyReply(
 
   if (/\b(190|490|hold|reserve|seat|price|pricing|buy|checkout)\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "Reserve for $490 USD (100% media credit until the IO) or take a $190 USD 7-day look at https://birchreserve.net/buycalc. Prices are USD for every buyer. Want to pay there or keep going here?",
+      text: "Start with a $490 USD category placement (100% media credit until the IO) or take a $190 USD 7-day look at https://birchreserve.net/buycalc. Prices are USD for every buyer. Want to pay there or keep going here?",
       source: "stub",
       offerHandoff: true,
     };
   }
 
   return {
-    text: "Got it. What do you sell? I'll match you to the right category. You can reserve for $490 USD or take a $190 USD 7-day look at https://birchreserve.net/buycalc, or send a quick question with no card at https://birchreserve.net/buycalc#request.",
+    text: "Got it. What do you sell? I'll match you to the right category. You can start with a $490 USD category placement or take a $190 USD 7-day look at https://birchreserve.net/buycalc, or send a quick question with no card at https://birchreserve.net/buycalc#request.",
     source: "stub",
     offerHandoff: stubOfferHandoff(req),
   };

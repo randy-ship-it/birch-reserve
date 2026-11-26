@@ -40,12 +40,12 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/intake/sponsor": { title: "Supplier + Accelerate · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
   "/advertise/brands": {
     title: "Advertise to brands | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. Modelled estimates from listed partners: about 128MM page views a month (estimate).",
+    description: "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category placement, self-serve. Modelled estimates from listed partners: about 128MM page views a month (estimate).",
     jsonld: { "@context": "https://schema.org", "@graph": [...buyersOffersJsonLd(), ...buyerDiscoveryJsonLd()] },
   },
   "/advertise/local": {
     title: "Local businesses & studios | Birch Reserve",
-    description: "Reach hub members near you. Start with a $190 USD 7-day look or a $490 USD category reserve; area locks are premium, by inquiry.",
+    description: "Reach hub members near you. Start with a $190 USD 7-day look or a $490 USD category placement; area locks are premium, by inquiry.",
     jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/publish/brands": { title: "Publish · Brands | Birch Reserve", description: "Brands with a recovery audience can apply for a co-branded hub. Otherwise, inquire about display or CPC-only opportunities outside hubs." },
@@ -55,7 +55,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/media-kit": {
     title: "Media kit | Birch Reserve",
     image: MEDIA_KIT_OG_IMAGE,
-    description: "Prepaid media credit across a growing network of private health and wellness hubs. Start with the small-business package ($190 USD look or $490 USD reserve, self-serve) or inquire about blocks from $25,000 to $1.5M USD. Modelled volumes, no guarantees.",
+    description: "Prepaid media credit across a growing network of private health and wellness hubs. Start with the small-business package ($190 USD look or $490 USD category placement, self-serve) or inquire about blocks from $25,000 to $1.5M USD. Modelled volumes, no guarantees.",
     jsonld: {
       "@context": "https://schema.org",
       "@type": "WebPage",
@@ -67,12 +67,12 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   },
   "/buyers": {
     title: "For media buyers & agencies | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. " + liveLine(),
+    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category placement, paid by card on a Stripe-hosted page. " + liveLine(),
     jsonld: { "@context": "https://schema.org", "@graph": [...buyersOffersJsonLd(), ...buyerDiscoveryJsonLd()] },
   },
   "/ai-buyers": {
     title: "For media buyers & agencies | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. " + liveLine(),
+    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category placement, paid by card on a Stripe-hosted page. " + liveLine(),
     jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/rates": {
@@ -127,8 +127,8 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
 /** The two public offers (media kit, Nov 2026): USD only, card checkout on the Stripe-hosted /buycalc page. */
 export function buyersOffersJsonLd(): Record<string, unknown>[] {
   return [
-    { sku: "hold-190", name: "7-day category look", price: 190, description: "Hold your category for 7 days. Converts in full to the $490 USD reserve within 7 days, or refunded. Does not lock in a slot." },
-    { sku: "reserve-490", name: "Category reserve", price: 490, description: "Reserve display space across the hub network. Media credit, fully refundable until 14 days before your launch date, usable for 12 months." },
+    { sku: "hold-190", name: "7-day category look", price: 190, description: "Hold your category for 7 days. Converts in full to the $490 USD category placement within 7 days, or refunded. Does not lock in a slot." },
+    { sku: "reserve-490", name: "Category placement", price: 490, description: "Reserve display space across the hub network. Media credit, fully refundable until 14 days before your launch date, usable for 12 months." },
   ].map((o) => ({
     "@type": "Product",
     "@id": `https://birchreserve.net/buyers#${o.sku}`,
@@ -226,8 +226,8 @@ export function llmsTxt(): string {
     "",
     "## Offers (same as the media kit)",
     "Prepay your category. Not an open auction.",
-    "- hold-190 · $190 USD · 7-day category look · converts in full to the $490 USD reserve within 7 days, or refunded · does not lock in a slot · pay: https://birchreserve.net/buycalc?sku=hold-190",
-    "- reserve-490 · $490 USD · category reserve · media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months · pay: https://birchreserve.net/buycalc?sku=reserve-490",
+    "- hold-190 · $190 USD · 7-day category look · converts in full to the $490 USD category placement within 7 days, or refunded · does not lock in a slot · pay: https://birchreserve.net/buycalc?sku=hold-190",
+    "- reserve-490 · $490 USD · category placement · media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months · pay: https://birchreserve.net/buycalc?sku=reserve-490",
     "- starter-placement-1900-cad · $1,900 CAD · starter placement · holds a $5K–$50K CAD dedicated package in one category pending the IO · package rate set on the IO, at or below the rate card · all $1,900 counts toward it · refunded if another brand commits to the category first, and refundable until 14 days before the IO launch date · nothing runs before a signed IO · pay: https://birchreserve.net/starter · terms: https://birchreserve.net/terms#exclusive",
     "- starter-placement-1900-usd · $1,900 USD · starter placement (visitors outside Canada; Canada sees the CAD line above) · holds a $5K–$50K USD dedicated package in one category pending the IO · package rate set on the IO, at or below the rate card · all $1,900 counts toward it · refunded if another brand commits to the category first, and refundable until 14 days before the IO launch date · nothing runs before a signed IO · pay: https://birchreserve.net/starter · terms: https://birchreserve.net/terms#exclusive",
     "- Premium slots (exclusivity, priority placement, area locks): inquire-only · https://birchreserve.net/media-kit#premium",

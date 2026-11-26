@@ -45,7 +45,7 @@ test("index is public copy only and clean", () => {
 });
 
 test("search finds the buy path and rate pages", () => {
-  const r = agentSearch("how do I buy a category reserve", 5);
+  const r = agentSearch("how do I buy a category placement", 5);
   assert.ok(r.length >= 3);
   assert.ok(r.every((h) => h.title && h.url && h.snippet));
   assert.equal(new Set(r.map((h) => h.url)).size, r.length);

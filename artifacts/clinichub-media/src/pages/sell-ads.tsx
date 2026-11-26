@@ -24,7 +24,7 @@ type Status = "idle" | "submitting" | "ok" | "error";
 
 const PAGE_TITLE = "List inventory | Birch Reserve";
 const PAGE_DESCRIPTION =
-  "Tell us what unused digital space you can sell. Birch matches brand buyers. Separate from the category reserve checkout.";
+  "Tell us what unused digital space you can sell. Birch matches brand buyers. Separate from the category placement checkout.";
 
 export default function SellAdsPage() {
   useEffect(() => {
@@ -118,7 +118,7 @@ export default function SellAdsPage() {
       <p className="mt-4 text-base leading-relaxed text-muted-foreground">
         If you run a health or recovery site, email list, SMS list, or waiting-room screen with
         idle inventory, tell us what you have. Birch brings brand buyers. This is not the $490
-        category reserve checkout.
+        category placement checkout.
       </p>
       <p className="mt-3 text-sm text-muted-foreground">
         Want ads plus product transactions in a free hub? That path is{" "}

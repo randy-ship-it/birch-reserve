@@ -109,7 +109,7 @@ test("copy scan: agency sections, home and media kit carry no banned or retired 
   assert.doesNotMatch(agencyOnly, /fridayapp|cockpit|digital-md-partner/i);
   assert.doesNotMatch(agencyOnly, /keeps?[^.\n]{0,30}as media credit/i);
   // Nov 14 2026: broad network positioning; the reserve CTA shows the buyer-currency price.
-  assert.match(files, /Reserve your space — \{price\.seat\}/);
+  assert.match(files, /Category placement — \{price\.seat\}/);
   assert.doesNotMatch(files, /8 categories|8 self-serve seats|Eight categories/);
   assert.doesNotMatch(files, /\$490[^.\n]{0,40}(lock(s|ed)? (the|your) category|exclusive)/i);
 });
@@ -156,7 +156,7 @@ test("in plain terms (Nov 18 2026): five category answers, published terms only,
   const text = PLAIN_TERMS.map((t) => t.q + " " + t.a).join("\n");
   // Restates published terms only: the two USD offers, the 14-day refund window, aggregate reporting.
   assert.match(text, /\$190 USD 7-day look/);
-  assert.match(text, /\$490 USD reserve/);
+  assert.match(text, /\$490 USD category placement/);
   assert.match(text, /fully refundable until 14 days before the launch date/);
   assert.match(text, /Never names, contact details or health information/);
   // No counts, claims, guarantees, banned names or CAD.
@@ -211,13 +211,13 @@ test("Nov 23 (15% from Nov 25): /agencies payout table pays the agency commissio
   const { agencyPayoutRows } = await import("../src/lib/overhaul/agencyShowcase");
   const cad = agencyPayoutRows(690, "CAD");
   assert.deepEqual(cad.map((r) => r.key), ["seat", "client_test", "premium"]);
-  assert.equal(cad[0]!.label, "$690 CAD reserve (card)");
+  assert.equal(cad[0]!.label, "$690 CAD category placement (card)");
   assert.equal(cad[0]!.cash, "$103.5");
   assert.equal(cad[1]!.spend, "$1K–$5K");
   assert.equal(cad[1]!.cash, "$150–$750");
   assert.equal(cad[2]!.cash, "$3,750");
   const usd = agencyPayoutRows(490, "USD");
-  assert.equal(usd[0]!.label, "$490 USD reserve (card)");
+  assert.equal(usd[0]!.label, "$490 USD category placement (card)");
   assert.equal(usd[0]!.cash, "$73.5");
   const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
   assert.match(ui, /agencyPayoutRows\(priceFor\("reserve-490"/);

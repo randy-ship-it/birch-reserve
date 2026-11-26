@@ -611,7 +611,7 @@ export function RandyChat() {
         className={`${pillBase} h-10 justify-center bg-accent text-accent-foreground shadow-sm`}
         data-testid="randy-handoff-reserve"
       >
-        Buy ads now: reserve for $490 USD
+        Buy ads now: start with a $490 USD category placement
       </a>
     </div>
   );

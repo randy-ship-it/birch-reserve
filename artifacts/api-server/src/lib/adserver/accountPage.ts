@@ -106,7 +106,7 @@ export function dashboardPage(v: AccountView, now = Date.now(), currency: "usd" 
   const body = `<h1 style="margin-top:28px">Welcome back${all[0] ? `, ${esc(all[0].c.brand)}` : ""}</h1>
 <p class="lede">Your Birch Reserve placements in one place. Every number below is counted from real served ads. Aggregate reporting only: we never show or share who saw your ad.</p>
 ${lowCredit ? `<p class="warn"><b>Your credit is more than 75% used.</b> Top up to keep your placement pacing without a gap. <a href="/sponsor">See packs with bonus credit</a>.</p>` : ""}
-${all.length === 0 ? `<div class="empty" style="margin-top:14px"><b>No campaigns on this email yet.</b> If you just paid, your campaign appears within a minute. Start with a <a href="/buy">$190 look or $490 reserve</a>, or prepay a <a href="/sponsor">sponsor pack</a>.</div>` : `
+${all.length === 0 ? `<div class="empty" style="margin-top:14px"><b>No campaigns on this email yet.</b> If you just paid, your campaign appears within a minute. Start with a <a href="/buy">$190 look or $490 category placement</a>, or prepay a <a href="/sponsor">sponsor pack</a>.</div>` : `
 <div class="grid k" style="margin-top:14px"><div class="card kpi"><span>Credit left</span><b>${fmtMoney(remaining, cur)}</b><small>${sameCur.length} campaign${sameCur.length === 1 ? "" : "s"}</small></div>
 <div class="card kpi"><span>Viewable impressions</span><b>${fmtInt(views)}</b><small>all time</small></div>
 <div class="card kpi"><span>Clicks</span><b>${fmtInt(clicks)}</b><small>CTR ${fmtPct(clicks, views)}</small></div>

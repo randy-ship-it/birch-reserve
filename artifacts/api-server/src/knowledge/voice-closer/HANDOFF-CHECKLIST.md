@@ -6,7 +6,7 @@ Capture every call: **name · email · brand/clinic legal name · what they want
 | Caller signal | Do this | Do not |
 |---------------|---------|--------|
 | Brand / CPG exploring a category | **The Reserve List** https://birchreserve.net/inventory (claim a slot) | Invent impressions |
-| Brand clear on category, ready to commit | **$490 category reserve** | Hero $899 |
+| Brand clear on category, ready to commit | **$490 category placement** | Hero $899 |
 | Multi-hub / on-prem Align screens / custom | **Book a call** → only **after** a short qualifying chat or call with Randy; then Cal https://cal.com/randy-gilling/30min (Mon–Fri 1–3pm ET) — **no bare/cold Cal** | Fake a checkout charge |
 | Ready to pay (checkout LIVE, Randy 2026-09-24 6:22pm ET) | Capture lead; send to https://birchreserve.net/inventory to claim a slot, or https://birchreserve.net for the $490 early placement. Invoice + IO only if they prefer it | Say card was charged unless buyer confirms they paid |
 | Clinician wants bookings / “send patients” | Scale https://scalehealth.ca/providers — rails-not-leads | Lead fee / bounty language |

@@ -155,7 +155,7 @@ export function MetaComparison() {
             <tr>
               <td className="py-3 pr-4 font-medium">Bidding</td>
               <td className="py-3 pr-4 text-muted-foreground">Auction, price moves daily</td>
-              <td className="py-3">Fixed price: $190 USD look or $490 USD reserve, no auction</td>
+              <td className="py-3">Fixed price: $190 USD look or $490 USD category placement, no auction</td>
             </tr>
           </tbody>
         </table>

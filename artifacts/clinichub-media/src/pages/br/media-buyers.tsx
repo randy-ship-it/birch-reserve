@@ -34,11 +34,11 @@ export default function BrMediaBuyers() {
             </Lede>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta href={lookHref("media_buyers_look")} variant="ink" testId="mb-cta-look">Start a test · $190 USD 7-day look</Cta>
-              <Cta href={RESERVE_HREF} testId="mb-cta-reserve">Reserve · $490 USD</Cta>
+              <Cta href={RESERVE_HREF} testId="mb-cta-reserve">Category placement · $490 USD</Cta>
               <Cta href="#talk" variant="line" testId="mb-cta-brief">Send a brief</Cta>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
-              The look converts in full to the reserve within 7 days, or it's refunded. The reserve is media credit, fully refundable until 14 days before your launch date.
+              The look converts in full to the category placement within 7 days, or it's refunded. The category placement is media credit, fully refundable until 14 days before your launch date.
             </p>
           </div>
           <div className="border border-foreground/15 bg-white p-6" data-testid="mb-at-a-glance">
@@ -117,7 +117,7 @@ export default function BrMediaBuyers() {
         <div className="mt-8">
           <BuyPaths
             paths={MB_BUY_PATHS}
-            labels={{ reserve: "Reserve · $490 USD", look: "or start with the $190 USD 7-day look", io: "Send a brief" }}
+            labels={{ reserve: "Category placement · $490 USD", look: "or start with the $190 USD 7-day look", io: "Send a brief" }}
             reserveHref={RESERVE_HREF}
             lookHref={lookHref("media_buyers_paths_look")}
             testId="mb-buy-paths"
@@ -171,7 +171,7 @@ export default function BrMediaBuyers() {
               { name: "email", label: "Work email", type: "email", required: true },
               { name: "website", label: "Website", type: "url" },
               { name: "channels", label: "Channels you run today", type: "select", options: ["Programmatic display / retargeting", "Paid social", "Retail media", "Newsletter / creator sponsorships", "Several of these"] },
-              { name: "test_budget", label: "Test budget", type: "select", options: ["$190 USD 7-day look", "$490 USD reserve", "Premium slot (inquiry)", "Not sure yet"] },
+              { name: "test_budget", label: "Test budget", type: "select", options: ["$190 USD 7-day look", "$490 USD category placement", "Premium slot (inquiry)", "Not sure yet"] },
               { name: "message", label: "What you want to test", type: "textarea" },
             ]}
           />

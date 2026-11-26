@@ -8,7 +8,7 @@ import { DEPOSIT_TIERS, type DepositTier } from "./sponsorKit";
 export const SPONSOR_TERMS_VERSION = "sponsor-2026-11-20";
 
 export const CARRY_OVER_CLAUSE =
-  "A paid $190 look or $490 reserve counts in full toward any sponsorship pack bought within 30 days of that payment.";
+  "A paid $190 look or $490 category placement counts in full toward any sponsorship pack bought within 30 days of that payment.";
 
 export const SPONSOR_PACK_TERMS: readonly string[] = [
   `Sponsorship packs are ${DEPOSIT_TIERS.map((t) => `$${t.usd.toLocaleString("en-US")}`).join(", ").replace(/, ([^,]*)$/, " or $1")} USD (${DEPOSIT_TIERS.map((t) => `$${t.cad.toLocaleString("en-US")}`).join(", ").replace(/, ([^,]*)$/, " or $1")} CAD in Canada), charged in the currency shown, paid by card now. Nothing runs until an insertion order (IO) names the hub, placement and dates.`,

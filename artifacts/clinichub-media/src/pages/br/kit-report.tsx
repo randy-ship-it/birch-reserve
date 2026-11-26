@@ -100,7 +100,7 @@ export default function BrKitReport() {
                 <>
                   <div className="mt-5 rounded-[10px] p-4 text-white" style={{ background: RT.forest }} data-testid="report-cost">
                     <p className="text-xs text-white/70">Start</p>
-                    <p className="text-2xl" style={{ fontFamily: RT_SERIF }}>$190 USD look · $490 USD reserve</p>
+                    <p className="text-2xl" style={{ fontFamily: RT_SERIF }}>$190 USD look · $490 USD category placement</p>
                     <p className="mt-1 text-[11px] text-white/70">Existing offers; refund and credit terms on /media-kit and /terms.</p>
                   </div>
                   <ExposureCard exposure={expo.ex} source={expo.source} testId="report-exposure" v2 />

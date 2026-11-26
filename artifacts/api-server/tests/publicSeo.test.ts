@@ -460,9 +460,9 @@ test("GET /for/rad-roller is a public noindex shell and is not in the sitemap", 
 test("buycalc dual sales motion (Randy, Nov 17 2026 8:56 PM ET): additive copy, self-serve path intact", () => {
   const html = renderBuycalcHtml({ seatsOpen: 3, seatsTotal: 8 });
   // A1 subhead sits under the H1.
-  assert.match(html, /No bidding\.<\/h1>\n<p class="hero-sub" data-testid="hero-sub">Start yourself with a \$190 USD look or \$490 USD reserve\. Or ask about a larger display share, priority placement, or a program across more than one hub\.<\/p>/);
+  assert.match(html, /No bidding\.<\/h1>\n<p class="hero-sub" data-testid="hero-sub">Start yourself with a \$190 USD look or \$490 USD category placement\. Or ask about a larger display share, priority placement, or a program across more than one hub\.<\/p>/);
   // Self-serve buttons unchanged; A2 inquire link is a secondary text link, not a third button.
-  assert.match(html, /<div class="ctas"><a class="btn" href="\/buycalc\?sku=reserve-490#reserve" data-pick-sku="reserve-490">Reserve your space · \$490 USD<\/a><a class="btn line" href="\/buycalc\?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · \$190 USD<\/a><\/div>/);
+  assert.match(html, /<div class="ctas"><a class="btn" href="\/buycalc\?sku=reserve-490#reserve" data-pick-sku="reserve-490">Category placement · \$490 USD<\/a><a class="btn line" href="\/buycalc\?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · \$190 USD<\/a><\/div>/);
   assert.match(html, /<p class="hero-inquire" data-testid="hero-inquire"><a href="#request">Ask about a premium slot or multi-hub program →<\/a><\/p>/);
   assert.match(html, /Questions\? <a href="mailto:randy@scalehealth\.ca/);
   assert.doesNotMatch(html, /tel:\+16479316278/);
@@ -473,7 +473,7 @@ test("buycalc dual sales motion (Randy, Nov 17 2026 8:56 PM ET): additive copy, 
   for (const q of ["Can I start with a small test and grow?", "What happens after I pay?", "How do larger or priority placements work?"]) {
     assert.equal((html.match(new RegExp(q.replace(/[?.]/g, "\\$&"), "g")) ?? []).length, 1, q);
   }
-  assert.match(html, /The \$190 USD look converts in full to the reserve within 7 days, otherwise it's refunded\./);
+  assert.match(html, /The \$190 USD look converts in full to the category placement within 7 days, otherwise it's refunded\./);
   // B3 + Live hub tag.
   assert.match(html, /<span class="tag">Live hub<\/span>/);
   assert.doesNotMatch(html, /Live placement/);
@@ -494,8 +494,8 @@ test("no seat counts: /terms copy and insight rewrite", async () => {
   const { rewriteExclusiveInsightCopy } = await import("@workspace/db");
   const src = await readFile(resolve("src/routes/publicPages.ts"), "utf8");
   assert.doesNotMatch(src, /of 8 shared|pool of 8|8 seats/i);
-  assert.match(src, /reserve-490 is a shared self-serve category reserve; it does not lock the category\./);
-  assert.equal(rewriteExclusiveInsightCopy("x Eight category seats sit inside listed Scale Health hubs. y"), "x Shared category reserves sit inside listed Scale Health hubs. y");
+  assert.match(src, /reserve-490 is a shared self-serve category placement; it does not lock the category\./);
+  assert.equal(rewriteExclusiveInsightCopy("x Eight category seats sit inside listed Scale Health hubs. y"), "x Shared category placements sit inside listed Scale Health hubs. y");
 });
 
 // Nov 21 2026 (t450u): proof modules are in the no-JS HTML and llms files, with visitor rules intact.

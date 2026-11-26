@@ -25,7 +25,7 @@ export type TwoLaneCategory = (typeof TWO_LANE_CATEGORIES)[number]["slug"];
 export type CardSku = "hold-190" | "reserve-490";
 export const CARD_OFFERS: Record<CardSku, { sku: CardSku; priceUsd: number; label: string; name: string; line: string }> = {
   "hold-190": { sku: "hold-190", priceUsd: 190, label: "$190 USD", name: "7-day look", line: "See your placement first." },
-  "reserve-490": { sku: "reserve-490", priceUsd: 490, label: "$490 USD", name: "Reserve", line: "All $490 is media credit." },
+  "reserve-490": { sku: "reserve-490", priceUsd: 490, label: "$490 USD", name: "Category placement", line: "All $490 is media credit." },
 };
 
 /** Live /terms wording (routes/publicPages.ts TERMS_HTML), unchanged. */

@@ -17,7 +17,7 @@ export default function Terms() {
           <span className="text-foreground">hold-190</span>, a 7-day category
           look that does not lock a category), $490 USD / $690 CAD (
           <span className="text-foreground">reserve-490</span>, a shared
-          self-serve category reserve; it does not lock the category) and $1,900 USD or CAD (the starter placement, below). Prices show in CAD for
+          self-serve category placement; it does not lock the category) and $1,900 USD or CAD (the starter placement, below). Prices show in CAD for
           visitors in Canada and USD everywhere else, and you can switch on the page. Sponsorship packs are priced and charged in USD. The currency you see at checkout is the currency you are charged.
         </p>
         <p>
@@ -37,7 +37,7 @@ export default function Terms() {
           public sample is <Link href="/sample-io" className="text-foreground underline">/sample-io</Link>.
         </p>
         <p>
-          8 brand categories across hubs, not eight websites. reserve-490 is a shared self-serve category reserve; it does not lock the category. More than one brand can reserve in a category. A category to yourself comes with a premium slot ($25,000 to $1.5M USD, set on an insertion order) or a package secured by the $1,900 starter placement (below). Reporting is aggregate only. No PHI. No clinical pixels.
+          8 brand categories across hubs, not eight websites. reserve-490 is a shared self-serve category placement; it does not lock the category. More than one brand can reserve in a category. A category to yourself comes with a premium slot ($25,000 to $1.5M USD, set on an insertion order) or a package secured by the $1,900 starter placement (below). Reporting is aggregate only. No PHI. No clinical pixels.
         </p>
         <h2 id="sponsorship-packs" className="pt-4 font-display text-2xl text-foreground">Sponsorship packs</h2>
         <ul className="list-disc space-y-2 pl-5" data-testid="terms-sponsor-packs">

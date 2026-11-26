@@ -332,7 +332,7 @@ export const PUBLISHER_INCENTIVE = {
 export const AGENCY = {
   commissionPct: 15,
   line: "Agencies earn the standard 15% agency commission off the gross rate card.",
-  bonusNote: "Client tests can start self-serve on the $190 USD 7-day look or the $490 USD category reserve.",
+  bonusNote: "Client tests can start self-serve on the $190 USD 7-day look or the $490 USD category placement.",
 } as const;
 
 // ---------------------------------------------------------------- benchmarks

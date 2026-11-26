@@ -54,7 +54,7 @@ export function PrimaryCta({ side, where, tone = "light", secondary = true }: { 
           <a href={lookHref("intake_sell_look")} data-testid="primary-cta-look" onClick={(e) => { if (openLane({ lane: "card", sku: "hold-190" })) { e.preventDefault(); return; } trackIntake(side, "cta_click", "look_190"); trackCta("cta_hold_190", { offer: "hold-190" }); }} className={`${big} bg-lime-300 text-[#0b1f3a] shadow-lime-500/30 hover:bg-[#0b1f3a] hover:text-white`}>
             Start the $190 USD look <ArrowRight className="size-5" />
           </a>
-          {secondary ? <a href={RESERVE_HREF} data-testid="primary-cta-reserve" onClick={(e) => { if (openLane({ lane: "card", sku: "reserve-490" })) { e.preventDefault(); return; } trackIntake(side, "cta_click", "reserve_490"); trackCta("cta_reserve_490", { offer: "reserve-490" }); }} className={`text-sm font-semibold underline ${sub}`}>or reserve for $490 USD</a> : null}
+          {secondary ? <a href={RESERVE_HREF} data-testid="primary-cta-reserve" onClick={(e) => { if (openLane({ lane: "card", sku: "reserve-490" })) { e.preventDefault(); return; } trackIntake(side, "cta_click", "reserve_490"); trackCta("cta_reserve_490", { offer: "reserve-490" }); }} className={`text-sm font-semibold underline ${sub}`}>or a $490 USD category placement</a> : null}
         </>
       ) : (
         <a href={where === "done" ? "/intake/publisher" : "/intake/publisher#publisher-contact-submit"} data-testid="primary-cta-publisher" onClick={() => trackIntake(side, "cta_click", where === "done" ? "publisher_payout" : "send_for_review")} className={`${big} bg-lime-300 text-[#0b1f3a] shadow-lime-500/30 hover:bg-[#0b1f3a] hover:text-white`}>

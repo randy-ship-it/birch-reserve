@@ -101,7 +101,7 @@ export const WHAT_YOU_SEND_FOR_A_SEAT_ARTICLE = {
   authorName: "Birch Reserve Editorial",
   topic: "Closed-hub advertising",
   summary:
-    "Birch Reserve sells the aisle, not the auction. Shared category reserves sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.",
+    "Birch Reserve sells the aisle, not the auction. Shared category placements sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.",
   publishedAt: new Date("2026-10-15T16:00:00.000Z"),
   body: `# What you send for a seat
 
@@ -109,7 +109,7 @@ Most ad networks ask for a banner and a bid.
 
 That is the wrong first file for a room a brand already paid to fill. The customer already checked out, booked, or opened a plan. The next unit has to look like it belongs on that shelf, not like it escaped a feed.
 
-Birch Reserve sells the aisle, not the auction. Shared category reserves sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
+Birch Reserve sells the aisle, not the auction. Shared category placements sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
 
 Here is the actual handoff after you look or lock.
 
@@ -148,7 +148,7 @@ Most ad networks start the flight when the card clears.
 
 That is the wrong order for a room a brand already paid to fill. The customer already checked out, booked, or opened a plan. The next unit has to look like it belongs on that shelf before anything runs.
 
-Birch Reserve sells the aisle, not the auction. Shared category reserves sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
+Birch Reserve sells the aisle, not the auction. Shared category placements sit inside listed Scale Health hubs. You pick one aisle. You do not buy a stack of websites.
 
 You see the face before the flight. The square still is the preview. Nothing on the hub changes until the insertion order names the hub and the surface: post-checkout, plan, booking, or member hub.
 
@@ -715,10 +715,13 @@ const EXCLUSIVE_INSIGHT_REWRITES: ReadonlyArray<readonly [string, string]> = [
   ["lock in an early slot", "lock in a slot"],
   ["an early slot", "a slot"],
   // Nov 20 2026 (Randy): no seat counts anywhere. Published rows live in the DB, so rewrite on read.
-  ["Eight category seats sit inside listed Scale Health hubs.", "Shared category reserves sit inside listed Scale Health hubs."],
-  ["It does not consume one of the eight seats.", "It does not use a category reserve."],
+  ["Eight category seats sit inside listed Scale Health hubs.", "Shared category placements sit inside listed Scale Health hubs."],
+  ["Shared category reserves sit inside listed Scale Health hubs.", "Shared category placements sit inside listed Scale Health hubs."],
+  ["It does not consume one of the eight seats.", "It does not use a category placement."],
+  ["It does not use a category reserve.", "It does not use a category placement."],
   // reserve-490 does not lock the category (terms, Nov 20 2026).
-  ["The $190 look does not burn a seat.", "The $190 look does not use a category reserve."],
+  ["The $190 look does not burn a seat.", "The $190 look does not use a category placement."],
+  ["The $190 look does not use a category reserve.", "The $190 look does not use a category placement."],
   [" before you lock the category.", " before you reserve."],
   ["Book a call — multi-hub, exclusive, or on-prem Align surfaces.", "Book a call — multi-hub or on-prem Align surfaces."],
   // Nov 12 2026: no Align references in public copy.

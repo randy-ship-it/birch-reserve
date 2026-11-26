@@ -14,7 +14,7 @@ That is the whole point.
 
 ## What you buy
 
-Hold $190 is a seven-day category look. It does not use a category reserve. Convert to a named seat within seven days and the Hold becomes 100% media credit. Otherwise cash refund.
+Hold $190 is a seven-day category look. It does not use a category placement. Convert to a named seat within seven days and the Hold becomes 100% media credit. Otherwise cash refund.
 
 Reserve $490 locks a named category seat in the eight-pool. Again, 100% media credit. Credit expires at twelve months.
 
