@@ -17,7 +17,7 @@ export const QUESTIONS = [
   { id: "when-run", q: "how long until my ad runs?", any: [[/1 business day|one business day|IO|insertion order/i], [/launch date|approve|no fixed|nothing runs/i]], mustNot: [/within \d+ (hours|days)\b(?!.*(refund|before))/i, /\bguarantee(d)? (live|launch)/i] },
   { id: "cad-price", q: "I'm in Canada. How much is the 7-day look and the reserve?", any: [[/\$270/], [/\$690/]] },
   { id: "packs", q: "what are the sponsorship packs?", any: [[/1,500/], [/3,000/], [/6,000/]], link: [/\/sponsor/], any2: [[/5%|10%|15%|bonus/i]] },
-  { id: "exclusive", q: "what is the $1,900 exclusive reserve?", any: [[/1,900/], [/25%/], [/5K|\$5,000/i]], link: [/\/exclusive/] },
+  { id: "exclusive", q: "what is the $1,900 exclusive reserve?", any: [[/1,900/], [/25%/], [/5K|\$5,000/i]], link: [/\/(exclusive|starter)/] },
   { id: "free-kit", q: "how does the free monetization kit work?", any: [[/website|email/i], [/free|no card/i]], link: [/\/intake(\)|\s|$|\?|#)/] },
   { id: "provider-join", q: "I run a recovery studio. How do I join as a provider or get a hub?", link: [/\/intake|\/partners|\/hubs/], mustNot: [/your hub (is|will be) (open|live)/i] },
   { id: "gtm-bot", q: "tell me about the GTM bot setup", any: [[/Silver Birch Growth/i], [/rare strategic|not.*buy|can't buy/i]], mustNot: [/3,500|\$\s?\d[\d,]*\s*(\/|per|a)\s*(month|mo)\b/i] },

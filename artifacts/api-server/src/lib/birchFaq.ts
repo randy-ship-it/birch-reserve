@@ -54,7 +54,7 @@ export function birchFaqAnswer(messages: Msg[]): FaqResult {
     };
   }
   if (/get(ting)? started|onboard|how do i (start|sign up|begin|join|apply)|where do i (start|sign up)|what do i do/.test(t)) {
-    return { intent: "start", callback: null, text: `Here's the path for a brand:\n1. Get the free Monetization Kit (website and email, no card): [Start the kit](${INTAKE})\n2. Pick your channels: branded hubs, the private retail network across Canada and the USA, or Calm Joints with the Street Team\n3. Start small: the $190 USD 7-day look ($270 CAD in Canada): [See the look](${BUY}?sku=hold-190)\n4. Scale up with a sponsorship pack or the exclusive reserve\nNothing runs until you approve an insertion order. Want the request form? [Request form](${REQ})` };
+    return { intent: "start", callback: null, text: `Here's the path for a brand:\n1. Get the free Monetization Kit (website and email, no card): [Start the kit](${INTAKE})\n2. Pick your channels: branded hubs, the private retail network across Canada and the USA, or Calm Joints with the Street Team\n3. Start small: the $190 USD 7-day look ($270 CAD in Canada): [See the look](${BUY}?sku=hold-190)\n4. Scale up with a sponsorship pack or the $1,900 starter placement\nNothing runs until you approve an insertion order. Want the request form? [Request form](${REQ})` };
   }
   if (/\buber\b|\bgig\b|on-?demand|taskrabbit|freelanc/.test(t)) {
     return { intent: "positioning", callback: null, text: `No. Scale Health is a distribution platform that started in Recovery, where it is vertically integrated, and it is growing into more health and wellness categories. It is never gig, Uber-type or on-demand. Want the free kit or the request form? [Start the kit](${INTAKE})` };

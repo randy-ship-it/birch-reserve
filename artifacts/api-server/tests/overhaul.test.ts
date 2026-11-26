@@ -172,9 +172,9 @@ test("agent quote: public offers only, USD", () => {
   assert.match(llms, /\/v1\/agent\/catalog\.json/);
   assert.match(llms, /\$190 USD/);
   assert.match(llms, /\$490 USD/);
-  // CAD appears only on the $1,900 CAD exclusive display reserve lines (Randy, voice, Nov 21 2026).
-  assert.doesNotMatch(llms.replace(/^.*exclusive.*$/gim, ""), /CAD|sponsor-|All eight/);
-  assert.match(llms, /exclusive-reserve-1900-cad · \$1,900 CAD/);
+  // CAD appears on the $1,900 CAD starter placement line (Randy, Nov 26 2026: keep the price, drop reserve framing).
+  assert.doesNotMatch(llms.replace(/^.*(\$1,900|exclusive|starter-placement).*$/gim, ""), /CAD|sponsor-|All eight/);
+  assert.match(llms, /starter-placement-1900-cad · \$1,900 CAD/);
   assert.match(llms, /Modelled estimates from listed partners, not a commitment/);
 });
 

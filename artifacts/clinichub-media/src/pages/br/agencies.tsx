@@ -29,7 +29,7 @@ const FORWARD_KIT = [
 const AGENCY_BENEFITS = [
   { t: "Win wallet share", d: "A new distribution channel your clients can shift spend to." },
   { t: "High-margin placements", d: "Priced under market." },
-  { t: "Exclusive inventory", d: "Competitors can't tap it, so you can win new clients." },
+  { t: "Dedicated placements", d: "Competitors can't tap it, so you can win new clients." },
   { t: "Trusted Birch referral partner", d: "Customer flow both ways." },
   { t: "High-value customers", d: "For your clients, at below-market CAC." },
 ] as const;

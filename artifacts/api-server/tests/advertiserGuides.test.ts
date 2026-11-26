@@ -15,7 +15,7 @@ test("every guide is self-canonical, titled, described, cited and links to the r
     assert.match(html, new RegExp(`<link rel="canonical" href="https://birchreserve\\.net/${g.slug}" />`));
     assert.match(html, /<title>[^<]{20,}<\/title>/);
     assert.match(html, /<meta name="description" content="[^"]{60,}">/);
-    assert.match(html, /href="\/exclusive(\?category=[^"]+)?" data-cta="reserve"|data-cta="reserve" href="\/exclusive/);
+    assert.match(html, /href="\/starter(\?category=[^"]+)?" data-cta="reserve"|data-cta="reserve" href="\/starter/);
     assert.match(html, /href="\/media-kit"/);
     assert.ok(g.sources.length >= 2, `${g.slug} cites sources`);
     for (const s of g.sources) assert.match(s.url, /^https:\/\//);
@@ -89,7 +89,7 @@ test("Scale mirror: server pages speak as Scale Health, Scale logo, Birch only i
   assert.match(named[0]!, /^Birch Reserve \(Silver Birch Growth Inc\.\)/);
   assert.doesNotMatch(body.replace(/Birch Reserve \(Silver Birch Growth Inc\.\)/g, "").replace(/Silver Birch Growth/g, ""), /\bBirch\b/);
   assert.match(out, /alt="Scale Health"/);
-  assert.match(out, /href="\/intake\/_m\/exclusive"/);
+  assert.match(out, /href="\/intake\/_m\/starter"/);
   assert.match(body, /Scale Health/);
 });
 

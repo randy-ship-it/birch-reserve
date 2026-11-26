@@ -1,5 +1,5 @@
 /**
- * GET  /exclusive                $1,900 exclusive display reserve in the visitor's currency (server-rendered)
+ * GET  /exclusive and /starter   $1,900 starter placement in the visitor's currency (server-rendered)
  * POST /v1/exclusive/reserve     Stripe Checkout in the currency the page showed (body.currency)
  *
  * Same gate as sponsorship packs (sponsorDepositsOpen): live sessions only when
@@ -28,7 +28,7 @@ const esc = (v: string) => v.replaceAll("&", "&amp;").replaceAll("<", "&lt;").re
 
 type Status = { kind: "success"; ref: string; paid: boolean; livemode: boolean; sid?: string } | { kind: "cancelled" } | null;
 
-function page(open: boolean, status: Status, currency: ReserveCurrency = "cad", query: Record<string, unknown> = {}): string {
+function page(open: boolean, status: Status, currency: ReserveCurrency = "cad", query: Record<string, unknown> = {}, path = "/starter"): string {
   const pace = exclusivePacing(currency);
   const X = exclusiveReserveFor(currency);
   const C = currency.toUpperCase();
@@ -37,14 +37,14 @@ function page(open: boolean, status: Status, currency: ReserveCurrency = "cad", 
   const cats = TWO_LANE_CATEGORIES.map((c) => `<option value="${esc(c.label)}"${pre && c.label.toLowerCase() === pre ? " selected" : ""}>${esc(c.label)}</option>`).join("");
   const banner =
     status?.kind === "success"
-      ? `<div class="ok" role="status"><b>${status.paid ? "Payment received." : "Payment is processing."}</b> Your exclusive display reserve is recorded${status.livemode ? "" : " (test mode, no real charge)"}. Ref ${esc(status.ref)}. We email your insertion order within 1 business day. Nothing runs until you sign it.${status.paid && status.sid ? ` <a href="/account/login?session_id=${esc(status.sid)}" style="font-weight:700">Open your ad dashboard →</a>` : ""}</div>`
+      ? `<div class="ok" role="status"><b>${status.paid ? "Payment received." : "Payment is processing."}</b> Your starter placement is recorded${status.livemode ? "" : " (test mode, no real charge)"}. Ref ${esc(status.ref)}. We email your insertion order within 1 business day. Nothing runs until you sign it.${status.paid && status.sid ? ` <a href="/account/login?session_id=${esc(status.sid)}" style="font-weight:700">Open your ad dashboard →</a>` : ""}</div>`
       : status?.kind === "cancelled"
         ? `<div class="note" role="status">Checkout cancelled. No charge was made.</div>`
         : "";
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Exclusive display reserve · ${X.label} — Birch Reserve</title>
-<meta name="description" content="Reserve ${X.label} to hold a $5K–$50K exclusive display package in your category pending your insertion order. Refunded if another brand commits first. Nothing runs before the IO.">
-<link rel="canonical" href="https://birchreserve.net/exclusive"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
+<title>Starter placement · ${X.label} — Birch Reserve</title>
+<meta name="description" content="Dedicated placements from $1,900. ${X.label} holds a $5K–$50K dedicated package in your category pending your insertion order. Refunded if another brand commits first. Nothing runs before the IO.">
+<link rel="canonical" href="https://birchreserve.net/starter"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>*{box-sizing:border-box}body{margin:0;background:#F9F8F6;color:#071A39;font:16px/1.6 "IBM Plex Sans",sans-serif}
 header,main,footer{max-width:880px;margin:auto;padding:18px 22px}header{display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-bottom:1px solid #ccd2d8;flex-wrap:wrap}
@@ -55,34 +55,34 @@ h1,h2{font-family:Fraunces,serif;font-weight:400;line-height:1.15}h1{font-size:c
 form{display:grid;gap:10px;border:1px solid #ccd2d8;border-radius:14px;padding:18px;background:#fff}input,select{width:100%;padding:10px;border:1px solid #b9c1c9;border-radius:8px;font:inherit}
 button{background:#071A39;color:#fff;border:0;border-radius:6px;min-height:44px;padding:12px 18px;justify-self:start;font:600 1rem "IBM Plex Sans";cursor:pointer}button:disabled{opacity:.6}
 details{border-top:1px solid #ccd2d8;padding:12px 0}summary{cursor:pointer;font-weight:600}ul{padding-left:1.1em}${TOKENS_CSS}${BUYER_HEADER_CSS}${PRICE_LADDER_CSS}</style></head><body>
-${buyerHeaderHtml("exclusive", currencyToggleHtml(currency, (c) => currencyHref("/exclusive", query, c)))}
+${buyerHeaderHtml("exclusive", currencyToggleHtml(currency, (c) => currencyHref(path, query, c)))}
 <main>${banner}<div data-promo-box="success"></div>
-<p class="fine">EXCLUSIVE DISPLAY · ONE BRAND PER CATEGORY</p>
-<h1>Reserve ${X.label}. Hold your category's exclusive display.</h1>
-<p>Your $1,900 holds a ${X.packageLabel} exclusive display package in your category while we write your insertion order. All $1,900 counts toward the package. The category becomes exclusive to you when you sign the IO, which names the hub, placement and dates. If another brand commits to the category first, we refund the $1,900 in full.</p>
+<p class="fine">DEDICATED PLACEMENT · ONE BRAND PER CATEGORY</p>
+<h1>Starter placement · ${X.label}</h1>
+<p>Dedicated placements from $1,900. Your $1,900 holds a ${X.packageLabel} dedicated package in your category while we write your insertion order. All $1,900 counts toward the package. The category is yours when you sign the IO, which names the hub, placement and dates. If another brand commits to the category first, we refund the $1,900 in full.</p>
 <div class="grid">
 <div class="stat"><b>${X.label}</b>today, by card, counted in full</div>
-<div class="stat"><b>${EXCLUSIVE_RESERVE.packageRange}</b>exclusive display package, ${C}</div>
-<div class="stat"><b>Held pending IO</b>refunded if another brand commits first</div>
+<div class="stat"><b>${EXCLUSIVE_RESERVE.packageRange}</b>dedicated package, ${C}</div>
+<div class="stat"><b>Pending your IO</b>refunded if another brand commits first</div>
 <div class="stat"><span class="mc">Modelled</span><b>${esc(pace.perMonth)}</b>over up to 6 months (${esc(pace.viewsPerMonth)})</div>
 </div>
 ${open ? `<form id="f"><label>Brand<input name="brand" required maxlength="160" autocomplete="organization"></label>
 <label>Work email<input name="email" type="email" required maxlength="200" autocomplete="email"></label>
 <label>Category<select name="category" required><option value="">Choose a category</option>${cats}</select></label>
-<label class="fine"><input type="checkbox" name="agree" style="width:auto"> I agree to the <a href="/terms#exclusive">reserve terms</a>. Nothing runs until I sign an insertion order.</label>
-<div data-promo-box></div><input type="hidden" name="currency" value="${currency}"><button id="b" type="submit">Reserve for ${X.label}</button><p id="m" class="fine" role="status"></p></form>`
-    : `<form id="f"><p><b>Card checkout is paused right now.</b> Leave your details and we'll send the insertion order and a payment link within 1 business day.</p><label>Brand<input name="brand" required></label><label>Work email<input name="email" type="email" required></label><label>Category<select name="category"><option value="">Choose a category</option>${cats}</select></label><input type="hidden" name="agree" value="on"><input type="hidden" name="currency" value="${currency}"><button id="b" type="submit">Request the reserve</button><p id="m" class="fine" role="status"></p></form>`}
+<label class="fine"><input type="checkbox" name="agree" style="width:auto"> I agree to the <a href="/terms#exclusive">placement terms</a>. Nothing runs until I sign an insertion order.</label>
+<div data-promo-box></div><input type="hidden" name="currency" value="${currency}"><button id="b" type="submit">Pay ${X.label}</button><p id="m" class="fine" role="status"></p></form>`
+    : `<form id="f"><p><b>Card checkout is paused right now.</b> Leave your details and we'll send the insertion order and a payment link within 1 business day.</p><label>Brand<input name="brand" required></label><label>Work email<input name="email" type="email" required></label><label>Category<select name="category"><option value="">Choose a category</option>${cats}</select></label><input type="hidden" name="agree" value="on"><input type="hidden" name="currency" value="${currency}"><button id="b" type="submit">Request this placement</button><p id="m" class="fine" role="status"></p></form>`}
 <p class="fine">Card checkout by Stripe, charged in ${C}, the currency shown on this page. Statement shows BIRCHRSV* RESERVE.</p>
-${priceLadderHtml(currency, { title: "Where the reserve sits", current: "exclusive" })}
-<details><summary>Reserve terms</summary><ul>${EXCLUSIVE_RESERVE_TERMS.map((t) => `<li>${esc(t)}</li>`).join("")}</ul></details>
+${priceLadderHtml(currency, { title: "Where this sits", current: "exclusive" })}
+<details><summary>Placement terms</summary><ul>${EXCLUSIVE_RESERVE_TERMS.map((t) => `<li>${esc(t)}</li>`).join("")}</ul></details>
 <details><summary>How the 6-month spend-down works</summary><p><span class="mc">Modelled</span>A ${esc(pace.credit)} package paced over 6 months is ${esc(pace.perMonth)}, about ${esc(pace.viewsPerMonth)} at today's blended starter CPM. Spend faster if you like. No impression guarantee; reporting is aggregate only.</p></details>
 </main><footer class="fine">Silver Birch Growth Inc. · Toronto, Ontario · <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a></footer>
 ${PROMO_SCRIPT_TAG}
-<script>(function(){var f=document.getElementById("f"),b=document.getElementById("b"),m=document.getElementById("m");f.addEventListener("submit",async function(e){e.preventDefault();var d=Object.fromEntries(new FormData(f));var body={brand:d.brand,email:d.email,category:d.category||"",agree:d.agree==="on",currency:d.currency||"${currency}"};if(!body.agree){m.textContent="Please agree to the reserve terms.";return}b.disabled=true;m.textContent="Opening secure checkout…";try{var r=await fetch("/v1/exclusive/reserve",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});var o=await r.json().catch(function(){return{}});if(o.url){location.assign(o.url);return}if(o.held){m.textContent=o.message;f.querySelectorAll("input,select,button").forEach(function(x){x.disabled=true});return}m.textContent=o.error||"Checkout could not open. Email randy@scalehealth.ca.";b.disabled=false}catch(err){m.textContent="Checkout could not open. No charge was made.";b.disabled=false}})})();</script>
+<script>(function(){var f=document.getElementById("f"),b=document.getElementById("b"),m=document.getElementById("m");f.addEventListener("submit",async function(e){e.preventDefault();var d=Object.fromEntries(new FormData(f));var body={brand:d.brand,email:d.email,category:d.category||"",agree:d.agree==="on",currency:d.currency||"${currency}"};if(!body.agree){m.textContent="Please agree to the placement terms.";return}b.disabled=true;m.textContent="Opening secure checkout…";try{var r=await fetch("/v1/exclusive/reserve",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});var o=await r.json().catch(function(){return{}});if(o.url){location.assign(o.url);return}if(o.held){m.textContent=o.message;f.querySelectorAll("input,select,button").forEach(function(x){x.disabled=true});return}m.textContent=o.error||"Checkout could not open. Email randy@scalehealth.ca.";b.disabled=false}catch(err){m.textContent="Checkout could not open. No charge was made.";b.disabled=false}})})();</script>
 </body></html>`;
 }
 
-router.get(["/exclusive", "/exclusive/"], async (req: Request, res: Response) => {
+router.get(["/exclusive", "/exclusive/", "/starter", "/starter/"], async (req: Request, res: Response) => {
   res.set("Cache-Control", "private, no-store");
   let status: Status = null;
   if (req.query.reserve === "cancelled") status = { kind: "cancelled" };
@@ -96,7 +96,9 @@ router.get(["/exclusive", "/exclusive/"], async (req: Request, res: Response) =>
     }
   }
   const cur = pageCurrency(req, res).currency;
-  res.type("html").send(page(sponsorDepositsOpen(), status, cur, req.query as Record<string, unknown>));
+  const path = req.path.replace(/\/+$/, "") || "/starter";
+  const pagePath = path === "/exclusive" ? "/exclusive" : "/starter";
+  res.type("html").send(page(sponsorDepositsOpen(), status, cur, req.query as Record<string, unknown>, pagePath));
 });
 
 router.post("/v1/exclusive/reserve", express.json({ limit: "8kb" }), async (req: Request, res: Response) => {
@@ -110,7 +112,7 @@ router.post("/v1/exclusive/reserve", express.json({ limit: "8kb" }), async (req:
     const friday = await sendIntake({ kind: "deposit_interest", email, company: typeof b.brand === "string" ? b.brand.slice(0, 160) : undefined, path: "/exclusive", meta: { tier: exclusiveReserveFor(String(b.currency ?? "").toLowerCase() === "usd" ? "usd" : "cad").sku, category: String(b.category ?? ""), checkout_open: false } }).catch(() => ({ status: "failed" }));
     // Form audit Nov 26 2026: held requests only reached Friday; the team now also gets the internal email.
     await sendSalesAlert({
-      via: alertSiteOf(req), event: "inquiry", tag: "BIRCH EXCLUSIVE", title: `Exclusive reserve request (held): ${String(b.brand ?? "").slice(0, 120) || email}`, rows: [["Form", "Exclusive reserve (/exclusive), checkout not open"], ["Brand", String(b.brand ?? "").slice(0, 160)], ["Email", email], ["Category", String(b.category ?? "")], ["Currency", String(b.currency ?? "")]], replyTo: email, isTest: hasValidQaHeader(req) || isTestIdentity({ email, name: String(b.brand ?? "") }) || /\bTEST\b/.test(String(b.brand ?? "")) });
+      via: alertSiteOf(req), event: "inquiry", tag: "BIRCH EXCLUSIVE", title: `Starter placement request (held): ${String(b.brand ?? "").slice(0, 120) || email}`, rows: [["Form", "Starter placement (/exclusive), checkout not open"], ["Brand", String(b.brand ?? "").slice(0, 160)], ["Email", email], ["Category", String(b.category ?? "")], ["Currency", String(b.currency ?? "")]], replyTo: email, isTest: hasValidQaHeader(req) || isTestIdentity({ email, name: String(b.brand ?? "") }) || /\bTEST\b/.test(String(b.brand ?? "")) });
     res.json({ held: true, message: "Got it. We'll send your insertion order and payment link within 1 business day. No charge today.", stored: friday.status });
     return;
   }
@@ -125,7 +127,7 @@ router.post("/v1/exclusive/reserve", express.json({ limit: "8kb" }), async (req:
     if (session.livemode) {
       const em = String(b.email ?? "").trim().toLowerCase();
       await sendSalesAlert({
-      via: alertSiteOf(req), event: "seat_hold", tag: "BIRCH EXCLUSIVE", title: `Exclusive reserve checkout opened: ${String(b.brand ?? "").slice(0, 120) || em}`, rows: [["Form", "Exclusive reserve (/exclusive)"], ["Brand", String(b.brand ?? "").slice(0, 160)], ["Email", em], ["Category", String(b.category ?? "")], ["Currency", String(b.currency ?? "")], ["Status", "Card checkout opened, not paid yet"]], replyTo: em, isTest: hasValidQaHeader(req) || isTestIdentity({ email: em, name: String(b.brand ?? "") }) || /\bTEST\b/.test(String(b.brand ?? "")) });
+      via: alertSiteOf(req), event: "seat_hold", tag: "BIRCH EXCLUSIVE", title: `Starter placement checkout opened: ${String(b.brand ?? "").slice(0, 120) || em}`, rows: [["Form", "Starter placement (/exclusive)"], ["Brand", String(b.brand ?? "").slice(0, 160)], ["Email", em], ["Category", String(b.category ?? "")], ["Currency", String(b.currency ?? "")], ["Status", "Card checkout opened, not paid yet"]], replyTo: em, isTest: hasValidQaHeader(req) || isTestIdentity({ email: em, name: String(b.brand ?? "") }) || /\bTEST\b/.test(String(b.brand ?? "")) });
     }
     res.json({ url: session.url, livemode: session.livemode });
   } catch (err) {

@@ -96,7 +96,7 @@ export const MICROS = 1_000_000;
 
 /**
  * Credit source rate basis. Promo credit is valued and spent at the regular (card) rate. Paid credit keeps the multiplier it was sold at:
- * card for $190 / $490 / sponsor packs, 25% below card for the exclusive display reserve (service.ts). No end date exists in config,
+ * card for $190 / $490 / sponsor packs; starter placement package rate is set on the IO (service.ts). No end date exists in config,
  * so copy says "current pricing" and never a deadline.
  */
 export const PROMO_RATE_BPS = 10_000;
@@ -110,7 +110,7 @@ export function regularRateSummary(): { cpmLow: number; cpmHigh: number; cpcLow:
   return {
     cpmLow, cpmHigh, cpcLow, cpcHigh,
     line: `Promo credit runs at regular rate-card rates (current pricing: ${f(cpmLow)}–${f(cpmHigh)} CPM or ${f(cpcLow)}–${f(cpcHigh)} CPC depending on the placement).`,
-    compare: `Exclusive display packages are priced on the IO, at or below the card rate; $190 looks, $490 reserves and sponsor packs run at the card rate.`,
+    compare: `Dedicated packages are priced on the IO, at or below the card rate; $190 looks, $490 reserves and sponsor packs run at the card rate.`,
   };
 }
 

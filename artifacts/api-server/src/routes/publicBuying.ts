@@ -609,7 +609,7 @@ router.get("/v1/catalog.json", (_req, res) => {
   });
 });
 
-/** The $1,900 exclusive reserve, from the same terms module /exclusive and /terms use. Additive: not in `offers` (agents check out those via /v1/checkout; this one pays on /exclusive). */
+/** The $1,900 starter placement, from the same terms module /exclusive, /starter and /terms use. Additive: not in `offers` (agents check out those via /v1/checkout; this one pays on /exclusive). */
 function catalogExclusiveOffer() {
   const cad = exclusiveReserveFor("cad");
   const usd = exclusiveReserveFor("usd");

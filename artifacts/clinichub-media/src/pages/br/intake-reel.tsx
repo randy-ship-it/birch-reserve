@@ -66,7 +66,7 @@ export default function BrIntakeReel() {
   usePageMeta("Watch: how the Scale Health ad system works | Birch Reserve", `A ${scale ? "one-minute" : "50-second"} walkthrough: start performance-only as a supplier, activate your own audience with a co-branded hub, then run targeted ads. Recovery is live, more categories are next.`);
   // On the Scale skin every link stays under /intake, so the visit and any checkout stay on scalehealth.ca (Scale direct).
   const kit = `/intake?utm_source=reel&utm_medium=${scale ? "scale_reel" : "reel"}`;
-  const exclusive = `${scale ? "/intake/_m" : ""}/exclusive?currency=${currency}&utm_source=reel&utm_medium=${scale ? "scale_reel" : "reel"}`;
+  const exclusive = `${scale ? "/intake/_m" : ""}/starter?currency=${currency}&utm_source=reel&utm_medium=${scale ? "scale_reel" : "reel"}`;
   const talk = `${scale ? "/intake/_m" : ""}/buycalc?sku=reserve-490#reserve`;
   const v = useRef<HTMLVideoElement>(null);
   const h = useRef<HTMLVideoElement>(null);
@@ -82,7 +82,7 @@ export default function BrIntakeReel() {
   const Ctas = ({ dark = false, where }: { dark?: boolean; where: string }) => (
     <div className="flex flex-wrap items-center gap-2.5">
       <a href={kit} className={`${btn} bg-[#C8F55A] text-[#071A39]`} data-testid={`reel-${where}-kit`}>Get my free monetization kit →</a>
-      <a href={exclusive} className={`${btn} ${dark ? "border border-white/40 text-white" : "bg-[#071A39] text-white"}`} data-testid={`reel-${where}-exclusive`}>Reserve ${"1,900"} {C} exclusive</a>
+      <a href={exclusive} className={`${btn} ${dark ? "border border-white/40 text-white" : "bg-[#071A39] text-white"}`} data-testid={`reel-${where}-exclusive`}>Starter placement · ${"1,900"} {C}</a>
       <a href={talk} className={`${btn} border ${dark ? "border-white/40 text-white" : "border-[#c9cfc2] bg-white text-[#071A39]"}`} data-testid={`reel-${where}-talk`}>Buy ads now</a>
     </div>
   );
@@ -119,7 +119,7 @@ export default function BrIntakeReel() {
           <Ctas dark where="band" />
         </div>
         <div className="mt-6 divide-y divide-foreground/10 rounded-2xl border border-[#D3D7DE] bg-white px-5 py-2 text-sm">
-          <details className="py-2.5"><summary className="cursor-pointer font-semibold">What the $1,900 exclusive reserve is</summary><p className="mt-1.5 text-foreground/75">An exclusive display reserve: one brand per category. It holds an exclusive package pending your insertion order, all of it counts toward that package, and it is refunded if another brand commits first. Nothing runs until the IO is signed. Shown in your currency.</p></details>
+          <details className="py-2.5"><summary className="cursor-pointer font-semibold">What the $1,900 starter placement is</summary><p className="mt-1.5 text-foreground/75">A starter placement: one brand per category. It holds a dedicated package pending your insertion order, all of it counts toward that package, and it is refunded if another brand commits first. Nothing runs until the IO is signed. Shown in your currency.</p></details>
           <details className="py-2.5" data-testid="reel-transcript"><summary className="cursor-pointer font-semibold">Transcript</summary><p className="mt-1.5 text-foreground/75">{transcript}</p></details>
         </div>
         <p className="mt-5 max-w-3xl text-[13px] text-foreground/60">Northline Recovery, its hub and all dashboard figures in the video are examples, labelled EXAMPLE, not results. The hub placement shown is an example of how an ad could look, and runs only with the hub owner's approval. Upcoming categories are queued, with no launch dates. Channel figures are modelled estimates from listed partners, not a delivery promise. No guarantee of views, clicks, sales or results. Prices in the video are in USD.</p>

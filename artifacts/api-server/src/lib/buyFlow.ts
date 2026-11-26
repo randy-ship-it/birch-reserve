@@ -11,8 +11,8 @@
  *                bytes, not the name. Held for human approval before anything runs.
  *   3. Slot      where it shows + plan. $190 / $490 go to the SAME Stripe Checkout path as /buycalc
  *                (POST /v1/checkout: Stripe verifies the card, Radar scores it, 3DS when the bank asks).
- *                Exclusive: the $1,900 exclusive reserve by card (POST /v1/exclusive/reserve), which holds a $5K–$50K
- *                exclusive package pending an insertion order. All prices in the visitor's currency (lib/priceLadder.ts).
+ *                Starter placement: the $1,900 starter placement by card (POST /v1/exclusive/reserve), which holds a $5K–$50K
+ *                dedicated package pending an insertion order. All prices in the visitor's currency (lib/priceLadder.ts).
  *
  * Store: production (VERCEL_ENV=production) writes buy_creatives / buy_orders in Postgres (created on first use,
  * additive). Every other environment keeps them in this instance's memory, so preview QA never writes prod data.
@@ -32,7 +32,7 @@ export type BuyPlan = {
   price: string;
   name: string;
   line: string;
-  /** card: $190 / $490 checkout. reserve: the $1,900 exclusive reserve checkout. */
+  /** card: $190 / $490 checkout. reserve: the $1,900 starter placement checkout (internal pay key unchanged). */
   pay: "card" | "reserve";
 };
 
@@ -42,7 +42,7 @@ export function buyPlans(currency: ReserveCurrency): readonly BuyPlan[] {
   return [
     { key: "reserve-490", price: L["reserve-490"]!.price, name: "Reserve your space", line: "Shared category seat. 100% media credit. Refundable until 14 days before launch.", pay: "card" },
     { key: "hold-190", price: L["hold-190"]!.price, name: "7-day look", line: "See your placement for 7 days. Converts in full, or refunded.", pay: "card" },
-    { key: "exclusive", price: L["exclusive"]!.price, name: "Exclusive reserve", line: `${L["exclusive"]!.line.replace(/ All \$1,900 counts toward it\.$/, "")} One brand per category; the IO sets hub and dates.`, pay: "reserve" },
+    { key: "exclusive", price: L["exclusive"]!.price, name: "Starter placement", line: `${L["exclusive"]!.line.replace(/ All \$1,900 counts toward it\.$/, "")} One brand per category; the IO sets hub and dates.`, pay: "reserve" },
   ];
 }
 
@@ -54,7 +54,7 @@ export const BUY_FORMATS: readonly BuyFormat[] = [
   { key: "recovery_plan", label: "Recovery plan", hint: "Next to the plan a member follows at home", premium: false },
   { key: "scheduled_service", label: "Booking page", hint: "Where members book their next visit", premium: false },
   { key: "member_hub", label: "Member hub", hint: "The member's home screen in the hub", premium: false },
-  { key: "post_checkout", label: "After checkout", hint: "Right after a member pays. Exclusive only", premium: true },
+  { key: "post_checkout", label: "After checkout", hint: "Right after a member pays. Starter placement only", premium: true },
 ] as const;
 
 for (const f of BUY_FORMATS) {
