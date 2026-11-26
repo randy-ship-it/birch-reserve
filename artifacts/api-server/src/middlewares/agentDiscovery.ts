@@ -14,7 +14,8 @@ export function agentDiscoveryEligible(path: string): boolean {
 
 export function agentDiscovery() {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (req.method !== "GET" || !agentDiscoveryEligible(req.path) || req.query.br_mirror) return next();
+    // mirrorHost has already stripped /intake/_m from req.url; originalUrl still shows the Scale mirror.
+    if (req.method !== "GET" || !agentDiscoveryEligible(req.path) || req.query.br_mirror || req.originalUrl.startsWith("/intake/_m")) return next();
     const send = res.send.bind(res);
     res.send = ((body?: unknown) => {
       if (typeof body === "string" && body.includes("</head>") && /text\/html/i.test(String(res.get("Content-Type") ?? "")) && !body.includes('name="agent:endpoint"')) {
