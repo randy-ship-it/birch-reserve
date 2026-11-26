@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import express from "express";
 import type { AddressInfo } from "node:net";
+import { mirrorHost } from "../src/middlewares/mirrorHost";
 import router, { rateCheck } from "../src/routes/agentSearch";
 import { agentSearch, agentSearchIndex, AGENT_SEARCH_BLOCKED } from "../src/lib/agentSearch";
 import { agentDiscovery, agentDiscoveryEligible } from "../src/middlewares/agentDiscovery";
@@ -18,6 +19,7 @@ const GATED_OR_BANNED = [
 
 async function withServer(fn: (base: string) => Promise<void>) {
   const app = express();
+  app.use(mirrorHost());
   app.use(router);
   app.use(agentDiscovery());
   app.get("/media-kit", (_req, res) => void res.type("html").send("<html><head><title>x</title></head><body>hi</body></html>"));
@@ -109,6 +111,9 @@ test("agent meta + Link header on public pages, not on gated or mirror paths", a
     assert.doesNotMatch(inv, /agent:/);
     const mirror = await (await fetch(`${b}/media-kit?br_mirror=scale`)).text();
     assert.doesNotMatch(mirror, /agent:/);
+    const viaPrefix = await fetch(`${b}/intake/_m/media-kit`);
+    assert.doesNotMatch(await viaPrefix.text(), /agent:/);
+    assert.equal(viaPrefix.headers.get("link"), null);
   });
   assert.equal(agentDiscoveryEligible("/advertise/brands"), false);
   assert.equal(agentDiscoveryEligible("/intake/_m/agencies"), false);
