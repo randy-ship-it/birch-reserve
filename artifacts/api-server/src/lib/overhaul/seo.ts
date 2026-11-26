@@ -41,7 +41,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/advertise/brands": {
     title: "Advertise to brands | Birch Reserve",
     description: "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. 700MM+ captive page views activating, based on signed partnership contracts.",
-    jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
+    jsonld: { "@context": "https://schema.org", "@graph": [...buyersOffersJsonLd(), ...buyerDiscoveryJsonLd()] },
   },
   "/advertise/local": {
     title: "Local businesses & studios | Birch Reserve",
@@ -68,7 +68,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/buyers": {
     title: "For media buyers & agencies | Birch Reserve",
     description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category reserve, paid by card on a Stripe-hosted page. " + liveLine(),
-    jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
+    jsonld: { "@context": "https://schema.org", "@graph": [...buyersOffersJsonLd(), ...buyerDiscoveryJsonLd()] },
   },
   "/ai-buyers": {
     title: "For media buyers & agencies | Birch Reserve",
@@ -116,6 +116,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
           url: "https://birchreserve.net/media-buyers",
         },
         ...buyersOffersJsonLd(),
+        ...buyerDiscoveryJsonLd(),
         // Nov 18 2026: the one FAQPage for /media-buyers, crawlable without JS.
         faqPageJsonLd(MEDIA_BUYER_FAQ),
       ],
@@ -138,6 +139,50 @@ export function buyersOffersJsonLd(): Record<string, unknown>[] {
     brand: { "@type": "Brand", name: "Birch Reserve" },
     offers: [{ "@type": "Offer", price: o.price, priceCurrency: "USD", availability: "https://schema.org/LimitedAvailability", url: `https://birchreserve.net/buycalc?sku=${o.sku}`, seller: ORG }],
   }));
+}
+
+/**
+ * Buyer-discovery structured data (Nov 26 2026): the words and entities that media-buyer alerts, AI
+ * search and directories match on. Facts already stated on the public pages only: no reach figures,
+ * no guarantees, no named partners. Mirror hosts rewrite "Birch Reserve" to "Scale Health" in head
+ * JSON-LD (scaleMeta), so Scale parity holds without a second copy.
+ */
+export function buyerDiscoveryJsonLd(): Record<string, unknown>[] {
+  return [
+    {
+      "@type": "Organization",
+      "@id": "https://birchreserve.net/#org",
+      name: "Birch Reserve",
+      url: "https://birchreserve.net/",
+      description:
+        "A private health and wellness media channel for brands and agencies: placements inside partner hubs, partner-website display, in-hub screens (rolling out), partner locations and a street team program from 2027, with an organic clinical service offering behind the hubs.",
+      areaServed: [
+        { "@type": "Country", name: "Canada" },
+        { "@type": "Country", name: "United States" },
+      ],
+      knowsAbout: [
+        "health and wellness advertising",
+        "retail media",
+        "post-purchase advertising",
+        "clinic waiting room advertising",
+        "recovery and longevity brand advertising",
+        "new media channel for health brands",
+      ],
+      keywords: "health and wellness media, retail media, post-purchase ads, clinic advertising, recovery brands, new ad channel",
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://birchreserve.net/#website",
+      name: "Birch Reserve",
+      url: "https://birchreserve.net/",
+      publisher: { "@id": "https://birchreserve.net/#org" },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: { "@type": "EntryPoint", urlTemplate: "https://birchreserve.net/.well-known/search?q={search_term_string}" },
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ];
 }
 
 export function slotProductsJsonLd(): Record<string, unknown>[] {
