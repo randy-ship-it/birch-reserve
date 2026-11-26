@@ -57,7 +57,7 @@ export function BuyJourney({ where, title = "Buy small. Offer mid. Inquire big."
         <li className={`${card} bg-[#0b1f3a] text-white`} data-testid={`${testId}-inquire`}>
           <span className={step}><MessageSquare className="mr-1 inline size-3.5" aria-hidden />3 · Bigger slots</span>
           <span className="mt-1 font-display text-2xl leading-none md:text-3xl">Inquire</span>
-          <span className="mt-1 text-[13px] opacity-75">From {k(MEDIA_KIT_OFFERS.premium.spendLo)} USD.</span>
+          <span className="mt-1 text-[13px] opacity-75" data-currency-fixed>From {k(MEDIA_KIT_OFFERS.premium.spendLo)} USD.</span>
           <span className="mt-auto pt-3"><button type="button" aria-expanded={open === "inquire"} onClick={() => pick("inquire")} className={`${btn} bg-lime-300 text-[#0b1f3a] hover:bg-white`} data-testid={`${testId}-inquire-btn`}>Inquire <ArrowRight className="size-4" aria-hidden /></button></span>
         </li>
       </ol>
