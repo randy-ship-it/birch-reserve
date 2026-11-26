@@ -132,12 +132,14 @@ export function agentCard() {
     documentation: `${SITE}/buyers`,
     openapi: `${SITE}/v1/agent/openapi.json`,
     llms: `${SITE}/llms.txt`,
+    search: { endpoint: `${SITE}/.well-known/search?q={query}`, methods: ["GET", "QUERY"], format: "json", scope: "public pages only" },
     ucp: `${SITE}/.well-known/ucp`,
     authentication: { type: "none", note: "Public read endpoints. Agent checkout is on hold; buyers pay on the Stripe-hosted page. No delegated payment." },
     capabilities: { streaming: false, payments: "human_stripe_hosted_checkout" },
     skills: [
       { id: "browse_inventory", name: "Browse inventory and offers", endpoint: "GET /v1/agent/catalog.json" },
             { id: "quote", name: "Quote an offer", endpoint: "GET /v1/agent/quote" },
+      { id: "search", name: "Search the public pages", endpoint: "GET /.well-known/search?q={query}" },
       { id: "checkout", name: "Record a purchase request (held, no charge)", endpoint: "POST /v1/agent/checkout" },
     ],
   };

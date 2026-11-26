@@ -33,6 +33,7 @@ const API_PATHS = [
   "/ucp(?:/.*)?",
   "/\\.well-known/ucp",
   "/\\.well-known/agent\\.json",
+  "/\\.well-known/search",
   "/llms\\.txt",
   "/llms-full\\.txt",
   "/vs-google-ads/?",

@@ -167,7 +167,7 @@ test("agent quote: public offers only, USD", () => {
   assert.equal(agentQuote({ offer: "sponsor-3000" }).ok, false);
   assert.equal(agentQuote({ offer: "nope" }).ok, false);
   assert.ok(agentOpenApi().paths["/v1/agent/checkout"]);
-  assert.equal(agentCard().skills.length, 3);
+  assert.equal(agentCard().skills.length, 4); // catalog, quote, checkout (held), search
   const llms = llmsTxt();
   assert.match(llms, /\/v1\/agent\/catalog\.json/);
   assert.match(llms, /\$190 USD/);
