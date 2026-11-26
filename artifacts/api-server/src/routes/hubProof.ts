@@ -12,7 +12,7 @@ import { adminEmails } from "../lib/adserver/config";
 import { verify } from "../lib/adserver/auth";
 import { siteOf } from "../lib/adserver/promoContext";
 import * as hp from "../lib/adserver/hubProof";
-import { sendSalesAlert } from "../lib/salesAlert";
+import { sendSalesAlert, alertSiteOf } from "../lib/salesAlert";
 import { isTestIdentity } from "../lib/testTraffic";
 
 const router: IRouter = Router();
@@ -69,6 +69,7 @@ router.post("/v1/hub-proof", json, (req, res) =>
     // Form audit Nov 26 2026: awaited (no freeze before send) and the team now gets an internal alert too, not just the submitter.
     await hp.mailReceived({ email, hubName: str(b.hub_name, 160) });
     await sendSalesAlert({
+      via: alertSiteOf(req),
       event: "inquiry",
       tag: "BIRCH HUB PROOF",
       title: `Hub proof: ${str(b.hub_name, 160)}`,

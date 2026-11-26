@@ -296,6 +296,7 @@ export type KitIntakeAlert = {
   replyTo?: string;
   isTest: boolean;
   to: string[];
+  via: "scalehealth.ca" | "birchreserve.net";
 };
 
 export function kitIntakeAlert(input: {
@@ -306,6 +307,8 @@ export function kitIntakeAlert(input: {
   origin: string;
   fridayId: string | null;
   path: string;
+  /** Friday push result, shown on the alert even when the push failed. */
+  friday?: string | null;
 }): KitIntakeAlert {
   const b = input.body;
   const email = typeof b.email === "string" ? b.email.trim() : "";
@@ -314,11 +317,13 @@ export function kitIntakeAlert(input: {
   const roles = Array.isArray(b.roles) ? (b.roles as unknown[]).map(String).slice(0, 6).join(", ") : "";
   const scale = isScaleIntakeSource({ src: input.src, ref: input.ref, host: input.host, origin: input.origin });
   const isTest = TEST_EMAIL_RE.test(email) || isTestIdentity({ email, name: brand }) || /\bTEST\b/.test(brand);
-  const source = scale ? (input.ref === "scale" ? "Scale (ref=scale)" : "Scale (scalehealth.ca / scale_mirror)") : "Birch Reserve";
+  const source = scale ? "via scalehealth.ca" : "via birchreserve.net";
+  const fridayFailed = Boolean(input.friday && /fail/i.test(input.friday));
   return {
     event: "inquiry",
     tag: scale ? "SCALE KIT" : "BIRCH KIT",
-    title: `Monetization Kit: ${brand || website || email || "new inquiry"}`,
+    title: `Monetization Kit: ${brand || website || email || "new inquiry"}${fridayFailed ? " (Friday failed)" : ""}`,
+    via: scale ? "scalehealth.ca" : "birchreserve.net",
     rows: [
       ["Form", "Monetization Kit intake"],
       ["Source", source],
@@ -331,6 +336,7 @@ export function kitIntakeAlert(input: {
       ["Roles", roles],
       ...((() => { const v = agencyPartnerInterestOf(b); return v === null ? [] : [["Agency partner interest", v ? "Yes" : "No"] as [string, string]]; })()),
       ["Friday id", input.fridayId || ""],
+      ["Friday", input.friday || (input.fridayId ? "sent" : "")],
       ["Page", input.path],
     ],
     replyTo: email || undefined,
@@ -425,11 +431,13 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     }
     return null;
   }
-  async function notifySubmitted(prep: { body: Record<string, unknown>; src: string | null; ref: string | null }, out: { status: number; text: string }, req: Request, id?: string) {
+  async function notifySubmitted(prep: { body: Record<string, unknown>; src: string | null; ref: string | null }, out: { status: number; text: string }, req: Request, id?: string, friday?: string) {
     if (prep.body && typeof prep.body.email !== "string") return;
     const { host, origin } = requestHost(req);
     const path = hubPendingOf(prep.body) ? "/intake/supplier" : "/intake";
-    await alerter(kitIntakeAlert({ body: prep.body, src: prep.src, ref: prep.ref, host, origin, fridayId: fridayIdOf(out, id), path })).catch(() => undefined);
+    const fridayId = fridayIdOf(out, id);
+    const fridayStatus = friday ?? (out.status >= 300 ? `failed (HTTP ${out.status})` : fridayId ? "sent" : "sent");
+    await alerter(kitIntakeAlert({ body: prep.body, src: prep.src, ref: prep.ref, host, origin, fridayId, path, friday: fridayStatus })).catch(() => undefined);
   }
   function noteLead(b: Record<string, unknown>, stage: Stage, out: { status: number; text: string }, id?: string, region: string | null = null) {
     if (!stage || out.status >= 300 || typeof b.email !== "string") return;
@@ -478,15 +486,18 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
         return;
       }
       const r = await sendIntake(legacyLead(b, "/intake"), env);
-      if (r.status === "sent") await notifySubmitted(prep, { status: 202, text: "{}" }, req);
+      // Form audit Nov 26 2026: always email the team on a submitted intake, even if Friday failed.
+      if (prep.stage === "submitted" && !isSyntheticIntake(req, env)) {
+        await notifySubmitted(prep, { status: r.status === "sent" ? 202 : 503, text: "{}" }, req, undefined, r.status === "sent" ? "sent (legacy /api/intake)" : "failed (legacy /api/intake)");
+      }
       res.status(r.status === "sent" ? 202 : 503).json({ ok: r.status === "sent", fallback: "api_intake", lead: r.status === "sent", status: "submitted", version: 1, approvals: {}, error: r.status === "sent" ? undefined : "intake_failed" });
       return;
     }
     const synthetic = isSyntheticIntake(req, env);
     if (!synthetic) noteLead(eff, prep.stage, out, undefined, coarseRegion((h) => req.get(h)));
-    if (!synthetic && prep.stage === "submitted" && out.status < 300) {
+    if (!synthetic && prep.stage === "submitted") {
       await notifySubmitted(prep, out, req);
-      await onIntakeSubmitted(promoCtxOf(req), String((eff as Record<string, unknown>).email ?? ""), typeof (eff as Record<string, unknown>).website === "string" ? ((eff as Record<string, unknown>).website as string) : null);
+      if (out.status < 300) await onIntakeSubmitted(promoCtxOf(req), String((eff as Record<string, unknown>).email ?? ""), typeof (eff as Record<string, unknown>).website === "string" ? ((eff as Record<string, unknown>).website as string) : null);
     }
     send(res, out);
   });
@@ -502,9 +513,9 @@ export function createBrandIntakeProxy(opts: { env?: Env; fetchImpl?: typeof fet
     if (!out) return;
     const synthetic = isSyntheticIntake(req, env);
     if (!synthetic) noteLead(prep.body, prep.stage, out, id);
-    if (!synthetic && prep.stage === "submitted" && out.status < 300) {
+    if (!synthetic && prep.stage === "submitted") {
       await notifySubmitted(prep, out, req, id);
-      await onIntakeSubmitted(promoCtxOf(req), String((prep.body as Record<string, unknown>)?.email ?? ""), typeof (prep.body as Record<string, unknown>)?.website === "string" ? ((prep.body as Record<string, unknown>).website as string) : null);
+      if (out.status < 300) await onIntakeSubmitted(promoCtxOf(req), String((prep.body as Record<string, unknown>)?.email ?? ""), typeof (prep.body as Record<string, unknown>)?.website === "string" ? ((prep.body as Record<string, unknown>).website as string) : null);
     }
     send(res, out);
   });

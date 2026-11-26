@@ -13,7 +13,7 @@ import { getStripeClient } from "../lib/stripeClient";
 import { logger } from "../lib/logger";
 import { sponsorDepositsOpen } from "./sponsorPage";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
-import { sendSalesAlert } from "../lib/salesAlert";
+import { sendSalesAlert, alertSiteOf } from "../lib/salesAlert";
 import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
 import { TWO_LANE_CATEGORIES } from "../lib/twoLane";
 import { EXCLUSIVE_RESERVE, EXCLUSIVE_RESERVE_TERMS, buildExclusiveReserveSession, exclusiveReserveFor } from "../lib/exclusiveReserve";
@@ -109,7 +109,8 @@ router.post("/v1/exclusive/reserve", express.json({ limit: "8kb" }), async (req:
     }
     const friday = await sendIntake({ kind: "deposit_interest", email, company: typeof b.brand === "string" ? b.brand.slice(0, 160) : undefined, path: "/exclusive", meta: { tier: exclusiveReserveFor(String(b.currency ?? "").toLowerCase() === "usd" ? "usd" : "cad").sku, category: String(b.category ?? ""), checkout_open: false } }).catch(() => ({ status: "failed" }));
     // Form audit Nov 26 2026: held requests only reached Friday; the team now also gets the internal email.
-    await sendSalesAlert({ event: "inquiry", tag: "BIRCH EXCLUSIVE", title: `Exclusive reserve request (held): ${String(b.brand ?? "").slice(0, 120) || email}`, rows: [["Form", "Exclusive reserve (/exclusive), checkout not open"], ["Brand", String(b.brand ?? "").slice(0, 160)], ["Email", email], ["Category", String(b.category ?? "")], ["Currency", String(b.currency ?? "")]], replyTo: email, isTest: hasValidQaHeader(req) || isTestIdentity({ email, name: String(b.brand ?? "") }) || /\bTEST\b/.test(String(b.brand ?? "")) });
+    await sendSalesAlert({
+      via: alertSiteOf(req), event: "inquiry", tag: "BIRCH EXCLUSIVE", title: `Exclusive reserve request (held): ${String(b.brand ?? "").slice(0, 120) || email}`, rows: [["Form", "Exclusive reserve (/exclusive), checkout not open"], ["Brand", String(b.brand ?? "").slice(0, 160)], ["Email", email], ["Category", String(b.category ?? "")], ["Currency", String(b.currency ?? "")]], replyTo: email, isTest: hasValidQaHeader(req) || isTestIdentity({ email, name: String(b.brand ?? "") }) || /\bTEST\b/.test(String(b.brand ?? "")) });
     res.json({ held: true, message: "Got it. We'll send your insertion order and payment link within 1 business day. No charge today.", stored: friday.status });
     return;
   }
@@ -123,7 +124,8 @@ router.post("/v1/exclusive/reserve", express.json({ limit: "8kb" }), async (req:
     // Form audit Nov 26 2026: a $1,900 card checkout that opens and is abandoned never reached the team (only PAID did).
     if (session.livemode) {
       const em = String(b.email ?? "").trim().toLowerCase();
-      await sendSalesAlert({ event: "seat_hold", tag: "BIRCH EXCLUSIVE", title: `Exclusive reserve checkout opened: ${String(b.brand ?? "").slice(0, 120) || em}`, rows: [["Form", "Exclusive reserve (/exclusive)"], ["Brand", String(b.brand ?? "").slice(0, 160)], ["Email", em], ["Category", String(b.category ?? "")], ["Currency", String(b.currency ?? "")], ["Status", "Card checkout opened, not paid yet"]], replyTo: em, isTest: hasValidQaHeader(req) || isTestIdentity({ email: em, name: String(b.brand ?? "") }) || /\bTEST\b/.test(String(b.brand ?? "")) });
+      await sendSalesAlert({
+      via: alertSiteOf(req), event: "seat_hold", tag: "BIRCH EXCLUSIVE", title: `Exclusive reserve checkout opened: ${String(b.brand ?? "").slice(0, 120) || em}`, rows: [["Form", "Exclusive reserve (/exclusive)"], ["Brand", String(b.brand ?? "").slice(0, 160)], ["Email", em], ["Category", String(b.category ?? "")], ["Currency", String(b.currency ?? "")], ["Status", "Card checkout opened, not paid yet"]], replyTo: em, isTest: hasValidQaHeader(req) || isTestIdentity({ email: em, name: String(b.brand ?? "") }) || /\bTEST\b/.test(String(b.brand ?? "")) });
     }
     res.json({ url: session.url, livemode: session.livemode });
   } catch (err) {

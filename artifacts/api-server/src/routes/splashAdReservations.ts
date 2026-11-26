@@ -67,7 +67,7 @@ import { EXCLUSIVE_RESERVE, recordPaidExclusiveReserveSafe } from "../lib/exclus
 import { draftCampaignFromCheckoutSafe } from "../lib/adserver/service";
 import { sendPaidConfirmationSafe } from "../lib/paidConfirmationEmail";
 import { handleChargeRefundedSafe, handleDisputeCreatedSafe } from "../lib/stripeRefunds";
-import { sendSalesAlert } from "../lib/salesAlert";
+import { sendSalesAlert, alertSiteOf } from "../lib/salesAlert";
 import { logger } from "../lib/logger";
 import { markSplashReservationTestIfQa } from "../lib/splashTestTraffic";
 import { PREMIUM_INQUIRY_MESSAGE, PREMIUM_INQUIRY_PATH, isPremiumFormat } from "../lib/premiumInquireOnly";
@@ -638,6 +638,7 @@ async function sendPaidSalesAlertSafe(session: Stripe.Checkout.Session): Promise
     const email = reservation?.email ?? session.customer_details?.email ?? undefined;
     const amount = typeof session.amount_total === "number" ? `${(session.amount_total / 100).toFixed(2)} ${String(session.currency ?? "").toUpperCase()}` : undefined;
     await sendSalesAlert({
+      via: alertSiteOf(null, { site: session.metadata?.site }),
       event: "paid_checkout",
       title: `PAID: ${reservation?.brandName ?? session.metadata?.brand ?? email ?? "buyer"} · ${reservation?.promotedOffer ?? session.metadata?.sku ?? (session.metadata?.kind === EXCLUSIVE_RESERVE.kind ? "exclusive display reserve $1,900 CAD" : session.metadata?.kind === "sponsorship_credit" ? `sponsorship pack ${session.metadata?.tier ?? ""}`.trim() : "Birch seat")}`,
       rows: [

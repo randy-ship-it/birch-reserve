@@ -469,7 +469,8 @@ test("kitIntakeAlert: Scale-sourced TEST submissions email only randy@scalehealt
   assert.deepEqual(a.to, ["randy@scalehealth.ca"]);
   assert.ok(!a.to.some((x) => /silverbirchgrowth/.test(x)));
   assert.match(a.title, /TEST – Emma QA, ignore/);
-  assert.equal(a.rows.find(([k]) => k === "Source")?.[1], "Scale (ref=scale)");
+  assert.equal(a.via, "scalehealth.ca");
+  assert.equal(a.rows.find(([k]) => k === "Source")?.[1], "via scalehealth.ca");
   assert.equal(a.replyTo, "test@example.com");
   assert.equal(a.rows.find(([k]) => k === "Agency partner interest"), undefined);
 });
@@ -527,6 +528,8 @@ test("final Scale submit (POST submit + src=scale_mirror) emails randy@scaleheal
   assert.equal(alerts.length, 1);
   assert.deepEqual(alerts[0]!.to, ["randy@scalehealth.ca"]);
   assert.equal(alerts[0]!.tag, "SCALE KIT");
+  assert.equal(alerts[0]!.via, "scalehealth.ca");
+  assert.equal(alerts[0]!.rows.find(([k]) => k === "Source")?.[1], "via scalehealth.ca");
   assert.equal(alerts[0]!.isTest, true);
   assert.equal(alerts[0]!.rows.find(([k]) => k === "Friday id")?.[1], "bi_scale001");
 });
@@ -588,5 +591,60 @@ test("X-Intake-Synthetic: validates secret, forwards X-Intake-Synthetic: 1 to Fr
     assert.equal(errJson.error, "upstream_error");
   } finally {
     srv.close();
+  }
+});
+
+test("kitIntakeAlert tags Source as via scalehealth.ca vs via birchreserve.net", () => {
+  const scale = kitIntakeAlert({ body: { email: "a@example.com" }, src: "scale_mirror", ref: null, host: "www.scalehealth.ca", origin: "", fridayId: null, path: "/intake" });
+  assert.equal(scale.via, "scalehealth.ca");
+  assert.equal(scale.rows.find(([k]) => k === "Source")?.[1], "via scalehealth.ca");
+  const birch = kitIntakeAlert({ body: { email: "a@example.com" }, src: null, ref: null, host: "birchreserve.net", origin: "", fridayId: "bi_x", path: "/intake" });
+  assert.equal(birch.via, "birchreserve.net");
+  assert.equal(birch.rows.find(([k]) => k === "Source")?.[1], "via birchreserve.net");
+  assert.equal(birch.title.includes("Friday failed"), false);
+});
+
+test("Friday 5xx on a submitted intake still emails the team, tagged via scalehealth.ca", async () => {
+  const alerts: KitIntakeAlert[] = [];
+  const f = (async () => new Response("upstream down", { status: 503 })) as unknown as typeof fetch;
+  const s = await serveRL(f, [], alerts);
+  const r = await realFetch(`${s.base}/v1/brand-intake`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-forwarded-host": "www.scalehealth.ca", origin: "https://www.scalehealth.ca" },
+    body: JSON.stringify({ roles: ["brand"], submit: true, email: "brand@example.com", website: "example.com", company_name: "Acme Recovery", src: "scale_mirror" }),
+  });
+  await settle();
+  s.close();
+  assert.equal(r.status, 503);
+  assert.equal(alerts.length, 1);
+  assert.equal(alerts[0]!.via, "scalehealth.ca");
+  assert.match(alerts[0]!.title, /Friday failed/);
+  assert.match(String(alerts[0]!.rows.find(([k]) => k === "Friday")?.[1]), /failed \(HTTP 503\)/);
+  assert.equal(alerts[0]!.to[0], "randy@scalehealth.ca");
+});
+
+test("legacy /api/intake failure on a v1 404 still emails the team", async () => {
+  const alerts: KitIntakeAlert[] = [];
+  globalThis.fetch = (async () => new Response("nope", { status: 500 })) as unknown as typeof fetch;
+  try {
+    const f = (async () => new Response(JSON.stringify({ ok: false, error: "not_found" }), { status: 404 })) as unknown as typeof fetch;
+    const app = express();
+    const wrapped = (async (url: string, init?: RequestInit) =>
+      String(url).endsWith("/api/public/brand-categories") ? new Response("{}", { status: 404 }) : f(url, init as RequestInit)) as unknown as typeof fetch;
+    app.use(createBrandIntakeProxy({ env: ENV, fetchImpl: wrapped, sendAlert: async (a) => (alerts.push(a), { status: "sent" as const, id: "alert_test", to: a.to }) }));
+    const srv = app.listen(0);
+    await new Promise((r) => srv.once("listening", r));
+    const base = `http://127.0.0.1:${(srv.address() as import("node:net").AddressInfo).port}`;
+    const r = await realFetch(`${base}/v1/brand-intake`, { method: "POST", headers: { "content-type": "application/json", host: "birchreserve.net" }, body: JSON.stringify({ roles: ["brand", "sponsor"], email: "growth@example.com", website: "example.com", submit: true, company_name: "North Clinic" }) });
+    await settle();
+    srv.close();
+    assert.equal(r.status, 503);
+    assert.equal((await r.json()).error, "intake_failed");
+    assert.equal(alerts.length, 1);
+    assert.match(alerts[0]!.title, /Friday failed/);
+    assert.match(String(alerts[0]!.rows.find(([k]) => k === "Friday")?.[1]), /failed/);
+    assert.equal(alerts[0]!.via, "birchreserve.net");
+  } finally {
+    globalThis.fetch = realFetch;
   }
 });

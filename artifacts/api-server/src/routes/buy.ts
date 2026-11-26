@@ -18,7 +18,7 @@ import {
 } from "../lib/buyFlow";
 import { isBotUserAgent, HONEYPOT_FIELD } from "../lib/publicGuards";
 import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
-import { sendSalesAlert } from "../lib/salesAlert";
+import { sendSalesAlert, alertSiteOf } from "../lib/salesAlert";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
 import { requireSalesStaff } from "../lib/salesStaffAccess";
 import { publicSeoTags } from "../lib/publicSeo";
@@ -187,7 +187,8 @@ router.post("/v1/buy/order", express.json({ limit: "16kb" }), async (req, res): 
   // Internal alert to the sales inbox only. No email goes to the buyer.
   // Awaited (form audit Nov 26 2026): a fire-and-forget send can be frozen with the serverless function after the
   // response. sendSalesAlert never throws and has a 10s mailer timeout.
-  await sendSalesAlert({ event: plan!.pay === "card" ? "seat_hold" : "inquiry", title: `/buy ${plan!.name}: ${acct.c}`, rows, replyTo: acct.e, isTest }).catch((err) =>
+  await sendSalesAlert({
+      via: alertSiteOf(req), event: plan!.pay === "card" ? "seat_hold" : "inquiry", title: `/buy ${plan!.name}: ${acct.c}`, rows, replyTo: acct.e, isTest }).catch((err) =>
     logger.warn({ err }, "buy sales alert failed"),
   );
   // Charge the currency the page showed (sent by the page), else the visitor's geo currency.

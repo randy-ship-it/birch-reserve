@@ -94,7 +94,7 @@ import { BUYER_COMFORT_CSS, buyerFaqHtml, flightTimelineHtml, heroInquireHtml, h
 import { PREPAY_REFUND_CUTOFF_DAYS } from "../lib/reserveOffers";
 import { START_SMALL_CSS, startSmallHtml } from "../lib/startSmallHtml";
 import { handleUiEvent } from "../lib/uiEvents";
-import { sendSalesAlert } from "../lib/salesAlert";
+import { sendSalesAlert, alertSiteOf } from "../lib/salesAlert";
 import { PREMIUM_INQUIRE_ONLY, PREMIUM_INQUIRY_KIND, PREMIUM_INQUIRY_MESSAGE, PREMIUM_INQUIRY_PATH, isPremiumFormat } from "../lib/premiumInquireOnly";
 
 const router: IRouter = Router();
@@ -1025,6 +1025,7 @@ async function handleMachineCheckout(
     // Randy 9:41pm Nov 13: every hold emails randy@scalehealth.ca + randy@silverbirchgrowth.com.
     if (reservation.isTest !== true) {
       await sendSalesAlert({
+      via: alertSiteOf(req),
         event: "seat_hold",
         title: `Seat hold: ${reservation.brandName ?? brand} · ${category?.label ?? "category not picked"} · ${offer.name}`,
         rows: [

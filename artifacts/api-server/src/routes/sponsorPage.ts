@@ -27,7 +27,7 @@ import { decideCurrency, pageCurrency } from "../lib/currency";
 import { PRICE_LADDER_CSS, currencyHref, currencyToggleHtml, priceLadder, priceLadderHtml } from "../lib/priceLadder";
 import { payoutAmount, payoutRegionForCountry, payoutUsNote, type PayoutRegion } from "../lib/payoutCurrency";
 import { sendIntake } from "../lib/overhaul/fridayIntake";
-import { sendSalesAlert } from "../lib/salesAlert";
+import { sendSalesAlert, alertSiteOf } from "../lib/salesAlert";
 import {
   CUSTOM_MAX,
   CUSTOM_MIN,
@@ -352,7 +352,8 @@ router.post("/v1/sponsor/deposit", express.json({ limit: "8kb" }), async (req: R
       const friday = await sendIntake({ kind: "deposit_interest", email, company: typeof b.brand === "string" ? b.brand.slice(0, 160) : undefined, path: "/sponsor", meta: { tier: String(b.tier ?? ""), amount: String(b.amount ?? ""), currency: String(b.currency ?? ""), checkout_open: false } }).catch(() => ({ status: "failed" }));
       stored = friday.status;
       // Form audit Nov 26 2026: held requests only reached Friday; the team now also gets the internal email.
-      await sendSalesAlert({ event: "inquiry", tag: "BIRCH SPONSOR", title: `Sponsorship pack request (held): ${String(b.brand ?? "").slice(0, 120) || email}`, rows: [["Form", "Sponsorship pack (/sponsor), checkout not open"], ["Brand", String(b.brand ?? "").slice(0, 160)], ["Email", email], ["Tier", String(b.tier ?? "")], ["Amount", String(b.amount ?? "")], ["Currency", String(b.currency ?? "")]], replyTo: email, isTest: isTestIdentity({ email, name: String(b.brand ?? "") }) || /\bTEST\b/.test(String(b.brand ?? "")) });
+      await sendSalesAlert({
+      via: alertSiteOf(req), event: "inquiry", tag: "BIRCH SPONSOR", title: `Sponsorship pack request (held): ${String(b.brand ?? "").slice(0, 120) || email}`, rows: [["Form", "Sponsorship pack (/sponsor), checkout not open"], ["Brand", String(b.brand ?? "").slice(0, 160)], ["Email", email], ["Tier", String(b.tier ?? "")], ["Amount", String(b.amount ?? "")], ["Currency", String(b.currency ?? "")]], replyTo: email, isTest: isTestIdentity({ email, name: String(b.brand ?? "") }) || /\bTEST\b/.test(String(b.brand ?? "")) });
     }
     if (stored === "skipped") {
       res.status(400).json({ error: "Add your brand and a work email." });
@@ -373,7 +374,8 @@ router.post("/v1/sponsor/deposit", express.json({ limit: "8kb" }), async (req: R
     // Form audit Nov 26 2026: a card checkout that opens and is abandoned never reached the team (only PAID did).
     if (session.livemode) {
       const bb = (req.body ?? {}) as Record<string, unknown>;
-      await sendSalesAlert({ event: "seat_hold", tag: "BIRCH SPONSOR", title: `Sponsorship checkout opened: ${String(bb.brand ?? "").slice(0, 120) || em}`, rows: [["Form", "Sponsorship pack (/sponsor)"], ["Brand", String(bb.brand ?? "").slice(0, 160)], ["Email", em], ["Tier", String(bb.tier ?? "")], ["Currency", String(bb.currency ?? "")], ["Status", "Card checkout opened, not paid yet"]], replyTo: em, isTest: hasValidQaHeader(req) || isTestIdentity({ email: em, name: String(bb.brand ?? "") }) || /\bTEST\b/.test(String(bb.brand ?? "")) });
+      await sendSalesAlert({
+      via: alertSiteOf(req), event: "seat_hold", tag: "BIRCH SPONSOR", title: `Sponsorship checkout opened: ${String(bb.brand ?? "").slice(0, 120) || em}`, rows: [["Form", "Sponsorship pack (/sponsor)"], ["Brand", String(bb.brand ?? "").slice(0, 160)], ["Email", em], ["Tier", String(bb.tier ?? "")], ["Currency", String(bb.currency ?? "")], ["Status", "Card checkout opened, not paid yet"]], replyTo: em, isTest: hasValidQaHeader(req) || isTestIdentity({ email: em, name: String(bb.brand ?? "") }) || /\bTEST\b/.test(String(bb.brand ?? "")) });
     }
     res.json({ url: session.url, livemode: session.livemode });
   } catch (err) {
