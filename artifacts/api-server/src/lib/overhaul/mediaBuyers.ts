@@ -61,6 +61,38 @@ export const MB_BUY_PATHS = {
   ],
 } as const;
 
+/**
+ * "What to check before you buy", folded under Two ways to buy. Six answers restated from the published
+ * /media-buyers and /agencies terms. {look} and {reserve} are filled on the page from the live price labels
+ * (hold-190 / reserve-490); this copy names no price of its own.
+ */
+export const MB_BUY_CHECKLIST: ReadonlyArray<{ label: string; answer: string }> = [
+  {
+    label: "Where it shows",
+    answer: "Four placements: post-purchase (premium, by IO), hub home page, product / services pages, member dashboard behind login. The IO names the hub, surface, format and dates.",
+  },
+  {
+    label: "Controls",
+    answer: "Nothing runs until you approve an insertion order naming the hub, placement and flight dates. No open web, no user-generated content, no programmatic resale.",
+  },
+  {
+    label: "Cost",
+    answer: "From {look} for a 7-day look, or the {reserve} category reserve by card. Premium and several hubs by IO.",
+  },
+  {
+    label: "Refunds",
+    answer: "The reserve is media credit, fully refundable until 14 days before the launch date on the IO. The look converts in full to the reserve within 7 days, or it's refunded.",
+  },
+  {
+    label: "Tracking",
+    answer: "Your UTM links and promo codes. No clinical pixels and no patient data on hub pages.",
+  },
+  {
+    label: "Reporting",
+    answer: "Aggregate views and clicks per hub and surface, plus UTM visits and redemptions. Pre-launch figures are labelled Modelled. No impression guarantees.",
+  },
+];
+
 /** How a test is read. Aggregate only; matches /agencies plain terms and /terms. */
 export const MEASUREMENT_STEPS: Array<{ k: string; t: string; d: string }> = [
   { k: "1", t: "Your UTM links", d: "Every placement carries the UTM parameters you send, so Birch traffic shows up as its own line in the analytics you already use." },
