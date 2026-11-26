@@ -592,7 +592,7 @@ export async function processStripeEvent(event: Stripe.Event): Promise<void> {
     // already there ("exists"): the order is recorded once and sales is not emailed twice (Stripe audit, Nov 21 2026).
     const firstDelivery = drafted !== "exists";
     if (session.payment_status === "paid" && session.metadata?.kind === EXCLUSIVE_RESERVE.kind) {
-      // $1,900 CAD exclusive display reserve (Nov 21 2026): leads row + Friday, then the sales alert so the IO goes out.
+      // $1,900 CAD starter placement (Nov 21 2026): leads row + Friday, then the sales alert so the IO goes out.
       await recordPaidExclusiveReserveSafe(session);
       if (firstDelivery) await sendPaidSalesAlertSafe(session);
       await sendPaidConfirmationSafe(session); // branded buyer confirmation, once per session (lib/paidConfirmationEmail.ts)
@@ -640,7 +640,7 @@ async function sendPaidSalesAlertSafe(session: Stripe.Checkout.Session): Promise
     await sendSalesAlert({
       via: alertSiteOf(null, { site: session.metadata?.site }),
       event: "paid_checkout",
-      title: `PAID: ${reservation?.brandName ?? session.metadata?.brand ?? email ?? "buyer"} · ${reservation?.promotedOffer ?? session.metadata?.sku ?? (session.metadata?.kind === EXCLUSIVE_RESERVE.kind ? "exclusive display reserve $1,900 CAD" : session.metadata?.kind === "sponsorship_credit" ? `sponsorship pack ${session.metadata?.tier ?? ""}`.trim() : "Birch seat")}`,
+      title: `PAID: ${reservation?.brandName ?? session.metadata?.brand ?? email ?? "buyer"} · ${reservation?.promotedOffer ?? session.metadata?.sku ?? (session.metadata?.kind === EXCLUSIVE_RESERVE.kind ? "starter placement $1,900 CAD" : session.metadata?.kind === "sponsorship_credit" ? `sponsorship pack ${session.metadata?.tier ?? ""}`.trim() : "Birch seat")}`,
       rows: [
         ["Brand", reservation?.brandName],
         ["Email", email],

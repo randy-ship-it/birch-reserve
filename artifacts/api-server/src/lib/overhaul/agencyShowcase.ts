@@ -224,7 +224,7 @@ export const AGENCY_RATE_CARD = {
 } as const;
 
 export const AGENCY_RATE_RULES: ReadonlyArray<{ k: string; d: string }> = [
-  { k: "Published rate card", d: "The same list prices every buyer can see. The 7-day look, the reserve and the exclusive reserve are on the media kit." },
+  { k: "Published rate card", d: "The same list prices every buyer can see. The 7-day look, the reserve and the $1,900 starter placement are on the media kit." },
   { k: "Standard 15% agency commission", d: "Agencies, brokers and media resellers earn the standard 15% commission off the gross rate card, written into every insertion order." },
   { k: "You set the resale price", d: "What you charge your client is yours. We do not set a resale price for you." },
   { k: "You disclose to your client", d: "Client disclosure sits with you. We do not brief your client on what you paid." },

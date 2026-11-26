@@ -174,7 +174,7 @@ test("network explainer: what the private display network is, spend-down, packs,
   assert.match(p, /Never call it gig, on-demand or Uber-like/);
   assert.match(p, /up to 6 months once your IO starts/);
   assert.match(p, /\$1,500, \$3,000 or \$6,000 USD/);
-  assert.ok(p.includes("https://birchreserve.net/exclusive"));
+  assert.ok(p.includes("https://birchreserve.net/starter"));
   assert.doesNotMatch(p, /\bsigned partners\b|unclaimed|\bAlign\b/i);
   assert.match(p, /\$1,900/);
 });

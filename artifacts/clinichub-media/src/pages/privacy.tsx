@@ -11,8 +11,8 @@ export default function Privacy() {
       <div className="mt-10 space-y-6 text-base leading-relaxed text-muted-foreground">
         <p>
           Draft. This page describes what Birch Reserve collects to sell the
-          public $190 USD and $490 USD reservations and the $1,900 exclusive
-          display reserve. Final terms for any purchase are in your insertion order.
+          public $190 USD and $490 USD reservations and the $1,900 starter
+          placement. Final terms for any purchase are in your insertion order.
         </p>
         <p>
           Reservation checkout collects the brand legal name, work email,

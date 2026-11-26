@@ -107,7 +107,7 @@ export const BUYER_FAQ: Array<{ q: string; a: string; link?: BuyerLink; tail?: s
   },
   {
     q: "Is my category exclusive or shared?",
-    a: "Shared, not exclusive. The $490 USD reserve is a shared category seat, open to more than one brand in the same category. It does not lock your category, and neither does the $190 USD look. Category exclusivity comes with exclusive display: the $1,900 exclusive reserve, which holds a $5,000 to $50,000 package in your currency pending your IO, or a premium slot ($25,000 to $1.5M USD, inquire only). Both are set on an insertion order.",
+    a: "Shared. The $490 USD reserve is a shared category seat, open to more than one brand in the same category. It does not lock your category, and neither does the $190 USD look. A category to yourself comes with dedicated placements from $1,900, which hold a $5,000 to $50,000 package in your currency pending your IO, or a premium slot ($25,000 to $1.5M USD, inquire only). Both are set on an insertion order.",
   },
   {
     q: "How do larger or priority placements work?",

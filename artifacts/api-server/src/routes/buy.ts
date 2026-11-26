@@ -155,7 +155,7 @@ router.post("/v1/buy/order", express.json({ limit: "16kb" }), async (req, res): 
   const plan = findPlan(body.plan);
   const format = findFormat(body.format);
   if (!validPick(plan, format)) {
-    res.status(400).json({ error: format?.premium ? "After checkout is exclusive only. Pick Exclusive reserve, or another spot." : "Pick a spot and a plan." });
+    res.status(400).json({ error: format?.premium ? "After checkout is for starter placement only. Pick Starter placement, or another spot." : "Pick a spot and a plan." });
     return;
   }
   if (body.terms !== true) {
@@ -196,7 +196,7 @@ router.post("/v1/buy/order", express.json({ limit: "16kb" }), async (req, res): 
   if (plan!.pay === "reserve") {
     void sendIntake({
       kind: "premium_inquiry", email: acct.e, name: acct.n, company: acct.c, website: acct.w, path: BUY_PATH,
-      message: `Exclusive reserve via /buy (${currency.toUpperCase()}; card checkout opens next). Slot: ${format!.label}. ${crv ? `Creative ${crv.id} held for review.` : "Creative: sending later."} Email vs website: ${acct.d}.`,
+      message: `Starter placement via /buy (${currency.toUpperCase()}; card checkout opens next). Slot: ${format!.label}. ${crv ? `Creative ${crv.id} held for review.` : "Creative: sending later."} Email vs website: ${acct.d}.`,
       meta: { buy_order_id: orderId, format_pref: format!.key, creative_id: crv?.id ?? "later", domain_check: acct.d, is_test: isTest },
     }).catch((err) => logger.warn({ err }, "buy intake failed"));
     res.json({ ok: true, order_id: orderId, next: "reserve", reserve: { brand: acct.c, email: acct.e, category: "", agree: true, currency } });
@@ -244,7 +244,7 @@ buyStaffRouter.get("/api/sales/buy-creatives/:id", requireSalesStaff, async (req
 
 /* ------------------------------------------------------------------ page */
 const TITLE = "Buy Scale Health ads through Birch Reserve";
-const DESCRIPTION = "Set up your account, upload your ad and pick where it shows. Pay by card with Stripe: a 7-day look, a shared reserve, or the exclusive reserve that holds your category pending your IO. USD or CAD.";
+const DESCRIPTION = "Set up your account, upload your ad and pick where it shows. Pay by card with Stripe: a 7-day look, a shared reserve, or the $1,900 starter placement that holds your category pending your IO. USD or CAD.";
 
 const MOCK: Record<string, string> = {
   recovery_plan: `<div class="mk"><i class="l w7"></i><i class="l w5"></i><b class="ad">Your ad</b><i class="l w6"></i></div>`,
@@ -314,7 +314,7 @@ export function renderBuyPage(opts: { checkoutLive: boolean; plan?: unknown; pre
   // ?plan= preselects a plan (deep links from the kit / media kit). Unknown values keep the default.
   const pre = findPlan(opts.plan)?.key ?? BUY_PLANS[0]!.key;
   const formats = BUY_FORMATS.map(
-    (f, i) => `<label class="pick" data-premium="${f.premium ? 1 : 0}"><input type="radio" name="format" value="${f.key}"${i === 0 ? " checked" : ""}>${MOCK[f.key] ?? ""}<strong>${esc(f.label)}</strong><small>${esc(f.hint)}</small>${f.premium ? `<span class="lock">Pick Exclusive reserve above to use this spot</span>` : ""}</label>`,
+    (f, i) => `<label class="pick" data-premium="${f.premium ? 1 : 0}"><input type="radio" name="format" value="${f.key}"${i === 0 ? " checked" : ""}>${MOCK[f.key] ?? ""}<strong>${esc(f.label)}</strong><small>${esc(f.hint)}</small>${f.premium ? `<span class="lock">Pick Starter placement above to use this spot</span>` : ""}</label>`,
   ).join("");
   const plans = PLANS_NOW.map(
     (p) => `<label class="pick" data-pay="${p.pay}"><input type="radio" name="plan" value="${p.key}"${p.key === pre ? " checked" : ""}><span class="price">${esc(p.price)}</span><strong>${esc(p.name)}</strong><small>${esc(p.line)}</small><span class="tag">${p.pay === "card" ? "Card" : "Card · locks category"}</span></label>`,
@@ -359,13 +359,13 @@ ${buyerHeaderHtml("buy", currencyToggleHtml(currency, (c) => currencyHref("/buy"
 <details class="ex"><summary>Example: what your ad looks like on a hub</summary><figure style="margin:8px 0 0"><img src="/ads-examples/hub-example-sole.webp" width="1280" height="720" loading="lazy" alt="Example: a sample ad shown inside a partner hub page, marked Sponsored" style="width:100%;height:auto;border-radius:10px;border:1px solid #e5e7eb"><figcaption class="hint">Illustration only, not a live placement. Ads run on a partner hub only once that hub is approved for ads.</figcaption></figure></details>
 <p class="msg" id="s2b-msg" role="status" aria-live="polite"></p>
 <div class="sum" id="sum" data-testid="buy-summary"></div>
-<label class="check"><input type="checkbox" id="b-terms" required><span>I agree to the <a href="/terms" target="_blank" rel="noopener">terms</a> (for Exclusive, the <a href="/terms#exclusive" target="_blank" rel="noopener">reserve terms</a>). My ad is reviewed before it runs.</span></label>
+<label class="check"><input type="checkbox" id="b-terms" required><span>I agree to the <a href="/terms" target="_blank" rel="noopener">terms</a> (for Starter placement, the <a href="/terms#exclusive" target="_blank" rel="noopener">placement terms</a>). My ad is reviewed before it runs.</span></label>
 <span class="fe" id="e-terms"></span>
 <div data-promo-box></div>
 <div class="actions"><button class="back" type="button" data-back="2">← Back</button><button class="btn alt" id="s3-go" type="submit">${opts.checkoutLive ? "Continue to secure checkout" : "Send my order"}</button></div>
 <p class="msg" id="s3-msg" role="status" aria-live="polite"></p>
 <ul class="trust"><li>Card checkout by Stripe</li><li>Bank check when your bank asks</li><li>Ad reviewed by a person</li><li>Prices and checkout in ${C}</li></ul>
-<details><summary>Small print</summary><ul><li>Card plans open Stripe Checkout. Stripe verifies the card and screens for fraud; your bank may ask you to confirm.</li><li>The $490 reserve is 100% media credit, refundable until 14 days before launch. The $190 look converts in full to the reserve within 7 days, or is refunded.</li><li>The exclusive reserve is ${PLANS_NOW.find((p) => p.key === "exclusive")!.price} by card. It holds one exclusive display package in your category ($5K–$50K ${C}) pending your insertion order, counted in full; the package rate is set on the IO, at or below the rate card. Refunded if another brand commits first. <a href="/terms#exclusive" target="_blank" rel="noopener">Reserve terms</a>. Premium slots ($25,000–$1.5M) are by inquiry.</li><li>Your ad shows inside private retail hubs. Placement is named in your insertion order before anything runs.</li><li>No impression guarantee. Aggregate reporting only. No patient data.</li></ul></details></form>
+<details><summary>Small print</summary><ul><li>Card plans open Stripe Checkout. Stripe verifies the card and screens for fraud; your bank may ask you to confirm.</li><li>The $490 reserve is 100% media credit, refundable until 14 days before launch. The $190 look converts in full to the reserve within 7 days, or is refunded.</li><li>The starter placement is ${PLANS_NOW.find((p) => p.key === "exclusive")!.price} by card. It holds one dedicated package in your category ($5K–$50K ${C}) pending your insertion order, counted in full; the package rate is set on the IO, at or below the rate card. Refunded if another brand commits first. <a href="/terms#exclusive" target="_blank" rel="noopener">Placement terms</a>. Premium slots ($25,000–$1.5M) are by inquiry.</li><li>Your ad shows inside private retail hubs. Placement is named in your insertion order before anything runs.</li><li>No impression guarantee. Aggregate reporting only. No patient data.</li></ul></details></form>
 
 <div class="card done-box" id="done" role="status"><h2 id="done-h">Got it.</h2><p id="done-p"></p><p class="sub">What happens next</p><ol id="done-next"><li>We email your insertion order within 1 business day. It names the hub, placement and dates.</li><li>A person checks your ad. No ad yet? Reply to that email with it.</li><li>You approve the insertion order. Then it runs.</li></ol><div class="actions"><a class="btn" href="/media-kit">See the media kit</a><a class="back" href="/" style="display:inline-flex;align-items:center;text-decoration:none">Back to Birch Reserve</a></div></div>
 </main>

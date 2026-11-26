@@ -29,7 +29,7 @@ export function buyerHeaderHtml(active: BuyerNavKey | null, extra = ""): string 
     ["buycalc", "/buycalc", "Prices"],
     ["buy", "/buy", "Buy"],
     ["sponsor", "/sponsor", "Packs"],
-    ["exclusive", "/exclusive", "Exclusive"],
+    ["exclusive", "/starter", "Starter"],
     ["media-kit", "/media-kit", "Media kit"],
   ];
   const links = items.map(([k, href, label]) => `<a href="${href}"${k === active ? ' aria-current="page"' : ""}>${label}</a>`).join("");

@@ -9,7 +9,7 @@ test("exclusive reserve session is CAD 1,900 with a plain description and the RE
   const p = r.params as any;
   assert.equal(p.line_items[0].price_data.currency, "cad");
   assert.equal(p.line_items[0].price_data.unit_amount, 190000);
-  assert.match(p.line_items[0].price_data.product_data.description, /\$5K–\$50K exclusive display package/);
+  assert.match(p.line_items[0].price_data.product_data.description, /\$5K–\$50K dedicated package/);
   assert.equal(p.metadata.kind, EXCLUSIVE_RESERVE.kind);
   assert.equal(p.payment_intent_data.statement_descriptor_suffix, "RESERVE");
   assert.ok(("BIRCHRSV* " + p.payment_intent_data.statement_descriptor_suffix).length <= 22);
@@ -76,18 +76,22 @@ test("e2e (local): /exclusive renders, checkout is held when deposits are off, s
   try {
     // Geo currency (Nov 21 2026 3:34 PM ET): Canada sees CAD, everyone else USD, same $1,900.
     const page = await (await fetch(`http://127.0.0.1:${port}/exclusive`, { headers: { "x-vercel-ip-country": "CA" } })).text();
-    assert.match(page, /Reserve \$1,900 CAD\. Hold your category/);
+    assert.match(page, /Starter placement · \$1,900 CAD/);
     assert.doesNotMatch(page, /25%|regular rate|locks a/);
     assert.match(page, /\$833–\$8,333 CAD\/mo/);
     assert.match(page, /name="currency" value="cad"/);
     const us = await (await fetch(`http://127.0.0.1:${port}/exclusive`, { headers: { "x-vercel-ip-country": "US" } })).text();
-    assert.match(us, /Reserve \$1,900 USD\. Hold your category/);
-    assert.match(us, /\$5K–\$50K USD exclusive display package/);
+    assert.match(us, /Starter placement · \$1,900 USD/);
+    assert.match(us, /\$5K–\$50K USD dedicated package/);
     assert.match(us, /charged in USD/);
     assert.match(us, /data-testid="price-ladder" data-currency="usd"/);
     const forced = await fetch(`http://127.0.0.1:${port}/exclusive?currency=cad`, { headers: { "x-vercel-ip-country": "US" } });
     assert.match(forced.headers.get("set-cookie") ?? "", /br_currency=cad/);
-    assert.match(await forced.text(), /Reserve \$1,900 CAD/);
+    assert.match(await forced.text(), /Starter placement · \$1,900 CAD/);
+    const starter = await (await fetch(`http://127.0.0.1:${port}/starter`, { headers: { "x-vercel-ip-country": "CA" } })).text();
+    assert.match(starter, /Starter placement · \$1,900 CAD/);
+    assert.match(starter, /canonical" href="https:\/\/birchreserve.net\/starter"/);
+    assert.doesNotMatch(starter, /exclusive display reserve|exclusive reserve|Reserve \$1,900/i);
     const held = await fetch(`http://127.0.0.1:${port}/v1/exclusive/reserve`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ brand: "QA Test", email: "qa+exclusive@example.com", agree: true }) });
     assert.equal(held.status, 200);
     assert.equal(((await held.json()) as { held: boolean }).held, true);

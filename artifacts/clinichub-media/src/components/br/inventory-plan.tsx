@@ -1,5 +1,5 @@
 /**
- * Spend-down pacing + 2027 modelled inventory + the $1,900 CAD exclusive reserve card
+ * Spend-down pacing + 2027 modelled inventory + the $1,900 starter placement card
  * (Randy, voice, Nov 21 2026 9:59 AM ET). Numbers come from api-server/src/lib/inventoryPlan.ts only.
  * Short on the page, math in expanders. Every figure labelled modelled; no impression guarantee, no CTR/ROAS.
  */
@@ -78,16 +78,16 @@ export function Tam2027({ compact = false, dark = false, testId = "tam-2027" }: 
 export function ExclusiveReserveCard({ where, dark = true }: { where: string; dark?: boolean }) {
   const { currency } = useCurrency();
   const X = exclusiveReserveFor(currency);
-  const href = `${siteUrl("/exclusive")}?currency=${currency}&utm_source=birchreserve&utm_medium=next-step&utm_campaign=${encodeURIComponent(`${where}-exclusive-1900`)}`;
+  const href = `${siteUrl("/starter")}?currency=${currency}&utm_source=birchreserve&utm_medium=next-step&utm_campaign=${encodeURIComponent(`${where}-starter-1900`)}`;
   return (
     <article className={`flex flex-col gap-3 rounded-2xl p-4 md:flex-row md:items-center md:justify-between md:gap-4 ${dark ? "bg-white/[0.06] ring-1 ring-lime-300/60" : "border border-[#0b1f3a]/15 bg-white shadow-sm"}`} data-testid="exclusive-reserve-card">
       <div>
-        <p className={`text-[11px] font-bold uppercase tracking-wider ${dark ? "text-white/60" : "text-[#0b1f3a]/60"}`}>Exclusive display reserve · one brand per category</p>
+        <p className={`text-[11px] font-bold uppercase tracking-wider ${dark ? "text-white/60" : "text-[#0b1f3a]/60"}`}>Starter placement · one brand per category</p>
         <p className="mt-1 font-display text-2xl leading-none">{X.label}</p>
-        <p className={`mt-1 text-[13px] ${dark ? "text-white/75" : "text-foreground/75"}`}>Holds a {X.packageLabel} exclusive package pending your IO. All $1,900 counts toward it. Refunded if another brand commits first.</p>
+        <p className={`mt-1 text-[13px] ${dark ? "text-white/75" : "text-foreground/75"}`}>Holds a {X.packageLabel} dedicated package pending your IO. All $1,900 counts toward it. Refunded if another brand commits first.</p>
       </div>
       <a href={href} className={`inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-sm font-bold ${dark ? "bg-lime-300 text-[#0b1f3a] hover:bg-white" : "bg-[#0b1f3a] text-white"}`} data-testid="exclusive-reserve-cta">
-        Reserve {X.label} <ArrowRight className="size-4" />
+        Starter placement · {X.label} <ArrowRight className="size-4" />
       </a>
     </article>
   );

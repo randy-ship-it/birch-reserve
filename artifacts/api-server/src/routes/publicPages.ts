@@ -143,18 +143,18 @@ function sendPage(res: { type: (value: string) => { send: (body: string) => void
 
 const TERMS_HTML = documentPage(
   "Terms of sale — Birch Reserve",
-  "Terms of sale for Birch Reserve hold-190, reserve-490, sponsorship packs and the $1,900 exclusive display reserve.",
+  "Terms of sale for Birch Reserve hold-190, reserve-490, sponsorship packs and the $1,900 starter placement.",
   `<h1>Terms of sale</h1>
 <p class="fine">${escapeHtml(SELLER)}</p>
-<p>Birch Reserve is operated by Silver Birch Growth Inc. Public prices are $190 USD / $270 CAD (<strong>hold-190</strong>, a 7-day category look that does not lock a category), $490 USD / $690 CAD (<strong>reserve-490</strong>, a shared self-serve category reserve; it does not lock the category) and $1,900 USD or CAD (the exclusive display reserve, below). Prices show in CAD for visitors in Canada and USD everywhere else, and you can switch on the page. Sponsorship packs are priced and charged in USD. The currency you see at checkout is the currency you are charged.</p>
+<p>Birch Reserve is operated by Silver Birch Growth Inc. Public prices are $190 USD / $270 CAD (<strong>hold-190</strong>, a 7-day category look that does not lock a category), $490 USD / $690 CAD (<strong>reserve-490</strong>, a shared self-serve category reserve; it does not lock the category) and $1,900 USD or CAD (the starter placement, below). Prices show in CAD for visitors in Canada and USD everywhere else, and you can switch on the page. Sponsorship packs are priced and charged in USD. The currency you see at checkout is the currency you are charged.</p>
 <p>hold-190 is a 100% credit if the buyer converts within 7 days. Otherwise it is a cash refund. It does not lock a category. reserve-490 is 100% display credit, fully refundable until 14 days before the launch date written in your insertion order. To cancel, reply to your confirmation email. We refund the full amount to the original card. After that date the credit is not refundable but stays usable for 12 months after payment. A cash refund is also available if no approved surface is named within 60 days of payment.</p>
 <p>Payment is a reservation credit, not a live flight and not an impression guarantee. Nothing runs until an insertion order names the surface. After that order, cancellation and makegood follow IAB. The public sample is <a href="/sample-io">/sample-io</a>.</p>
-<p>8 brand categories across hubs, not eight websites. reserve-490 is a shared self-serve category reserve; it does not lock the category. More than one brand can reserve in a category. Only exclusive display gives one brand a category for its IO term: a premium slot ($25,000 to $1.5M USD, set on an insertion order) or a $5,000 to $50,000 package secured by the $1,900 exclusive display reserve (below). Reporting is aggregate only. No PHI. No clinical pixels.</p>
+<p>8 brand categories across hubs, not eight websites. reserve-490 is a shared self-serve category reserve; it does not lock the category. More than one brand can reserve in a category. A category to yourself comes with a premium slot ($25,000 to $1.5M USD, set on an insertion order) or a $5,000 to $50,000 package secured by the $1,900 starter placement (below). Reporting is aggregate only. No PHI. No clinical pixels.</p>
 <h2 id="sponsorship-packs">Sponsorship packs</h2>
 <ul>${SPONSOR_PACK_TERMS.map((t) => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
 <p id="carry-over"><strong>Carry-over.</strong> ${escapeHtml(CARRY_OVER_CLAUSE)}</p>
 <p id="spend-down"><strong>Spend-down.</strong> ${escapeHtml(SPEND_DOWN_TERM)}</p>
-<h2 id="exclusive">Exclusive display reserve ($1,900 USD or CAD)</h2>
+<h2 id="exclusive">Starter placement ($1,900 USD or CAD)</h2>
 <ul>${EXCLUSIVE_RESERVE_TERMS.map((t) => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
 <p>Checkout is Stripe-hosted. Silver Birch Growth Inc. does not store full card numbers. Questions: <a href="mailto:randy@scalehealth.ca">Email sales</a>.</p>
 <p><a href="/privacy">Privacy</a></p>`,
@@ -166,7 +166,7 @@ const PRIVACY_HTML = documentPage(
   "Draft privacy note for Birch Reserve reservations. Final terms for any purchase are in your insertion order.",
   `<h1>Privacy</h1>
 <p class="fine">${escapeHtml(SELLER)}</p>
-<p>Draft. This page describes what Birch Reserve collects to sell the public $190 USD and $490 USD reservations and the $1,900 exclusive display reserve. Final terms for any purchase are in your insertion order.</p>
+<p>Draft. This page describes what Birch Reserve collects to sell the public $190 USD and $490 USD reservations and the $1,900 starter placement. Final terms for any purchase are in your insertion order.</p>
 <p>Reservation checkout collects the brand legal name, work email, optional website, format preference, and an idempotency key so a repeated request does not open a second hold. Stripe hosts the card form. Silver Birch Growth Inc. receives payment status from Stripe and does not store full card numbers on its servers.</p>
 <p>Birch Reserve does not collect protected health information, clinical pixels, or patient-level reporting. Birch Guide does not collect patient or PHI data. Placement reporting, when an insertion order later authorizes a flight, is aggregate only.</p>
 <h2 id="ads">Ad delivery, the conversion pixel and storage on your device</h2>
@@ -186,7 +186,7 @@ const SAMPLE_IO_HTML = documentPage(
 <p>Nothing runs until an approved insertion order names the surface. This page is a blank sample, not a flight and not a receipt.</p>
 <dl>
 <div><dt><strong>Advertiser</strong></dt><dd>[Brand legal name]</dd></div>
-<div><dt><strong>SKU</strong></dt><dd>reserve-490 · $490 USD shared category reserve (more than one brand can reserve; it does not lock the category), or hold-190 · $190 USD 7-day look, or the $1,900 exclusive display reserve (holds one exclusive package pending the IO; refunded if another brand commits first)</dd></div>
+<div><dt><strong>SKU</strong></dt><dd>reserve-490 · $490 USD shared category reserve (more than one brand can reserve; it does not lock the category), or hold-190 · $190 USD 7-day look, or the $1,900 starter placement (holds one dedicated package pending the IO; refunded if another brand commits first)</dd></div>
 <div><dt><strong>Named surface</strong></dt><dd>[Hub URL, for example a listed Scale Health hub]</dd></div>
 <div><dt><strong>Format</strong></dt><dd>post-checkout, recovery plan, booking confirmation, native hub module, or motion :15</dd></div>
 <div><dt><strong>Category</strong></dt><dd>One of eight: pain relief / topicals, recovery hardware, nutrition, sleep, meal prep, women’s health, men’s health, diagnostics / services</dd></div>

@@ -26,7 +26,7 @@ export function KitCta({ placement, size = "lg", tone = "lime", label = KIT_CTA_
 }
 
 /** Pages that ARE a form: the sticky bar never shows there (Randy, Nov 21 2026: it covered the form's buttons on phones). */
-export const STICKY_HIDDEN_PATH = /^\/(intake|kit\/r|sales|sign-in|sign-up|success|agencies|media-buyers|media-kit|buy|buycalc|sponsor|exclusive)(\/|$)/;
+export const STICKY_HIDDEN_PATH = /^\/(intake|kit\/r|sales|sign-in|sign-up|success|agencies|media-buyers|media-kit|buy|buycalc|sponsor|exclusive|starter)(\/|$)/;
 const FORM_PRIMARY = "form button[type=submit], form input[type=submit], [data-form-primary]";
 const FIELD = "input:not([type=hidden]):not([type=checkbox]):not([type=radio]), textarea, select";
 

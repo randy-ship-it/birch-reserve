@@ -1,7 +1,7 @@
 /**
- * $1,900 CAD exclusive display reserve (Randy, voice, Nov 21 2026 9:59 AM ET).
- * Holds a $5K–$50K exclusive display package in one category pending the IO; refunded if another brand commits first.
- * One source for /exclusive, /terms, llms.txt and the Stripe line item, so they never drift.
+ * $1,900 starter placement (Randy, Nov 26 2026: keep the price, drop reserve/exclusive/lock framing).
+ * Holds a $5K–$50K dedicated package in one category pending the IO; refunded if another brand commits first.
+ * One source for /exclusive and /starter, /terms, llms.txt and the Stripe line item, so they never drift.
  * Geo currency since Nov 21 2026 3:34 PM ET: the same $1,900 in CAD (Canada) or USD (everyone else),
  * charged in the currency the page showed (body.currency).
  */
@@ -25,7 +25,7 @@ export function buildExclusiveReserveSession(body: ReserveRequest, origin: strin
   const email = String(body.email ?? "").trim().toLowerCase().slice(0, 200);
   const category = String(body.category ?? "").replace(/[\u0000-\u001f<>]/g, " ").trim().slice(0, 80);
   if (!brand || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { ok: false, error: "Add your brand and a work email." };
-  if (body.agree !== true) return { ok: false, error: "Please agree to the reserve terms." };
+  if (body.agree !== true) return { ok: false, error: "Please agree to the placement terms." };
   const offer = exclusiveReserveFor(String(body.currency ?? "").toLowerCase() === "usd" ? "usd" : "cad");
   // Scale mirror checkouts name the product "Scale Health — …" (same amount and currency), so they use inline price_data instead of the Birch-named Stripe Price.
   const envPrice = site === "scale" ? undefined : offer.currency === "cad" ? process.env.STRIPE_PRICE_EXCLUSIVE_1900_CAD?.trim() : process.env.STRIPE_PRICE_EXCLUSIVE_1900_USD?.trim();
@@ -51,13 +51,13 @@ export function buildExclusiveReserveSession(body: ReserveRequest, origin: strin
         price_data: {
           currency: offer.currency,
           unit_amount: offer.amountCents,
-          product_data: { name: site === "scale" ? `Scale Health — Exclusive display reserve ($1,900 ${offer.currency.toUpperCase()})` : offer.name, description: EXCLUSIVE_RESERVE_DESCRIPTION, metadata: { sku: offer.sku } },
+          product_data: { name: site === "scale" ? `Scale Health — Starter placement ($1,900 ${offer.currency.toUpperCase()})` : offer.name, description: EXCLUSIVE_RESERVE_DESCRIPTION, metadata: { sku: offer.sku } },
         },
       }],
       metadata,
       payment_intent_data: {
         statement_descriptor_suffix: EXCLUSIVE_RESERVE.statementSuffix,
-        description: `${CHECKOUT_TAGLINE} Exclusive display reserve · ${brand}${category ? ` · ${category}` : ""}`.slice(0, 1000),
+        description: `${CHECKOUT_TAGLINE} Starter placement · ${brand}${category ? ` · ${category}` : ""}`.slice(0, 1000),
         metadata,
       },
       custom_text: { submit: { message: "Card now. Nothing runs until you sign an insertion order. Refundable until 14 days before the IO launch date." } },
@@ -80,7 +80,7 @@ export async function recordPaidExclusiveReserveSafe(session: Stripe.Checkout.Se
       sourceRef: session.id,
       email: email || undefined,
       company: brand,
-      need: `Paid Birch Reserve exclusive display reserve ($1,900 ${String(session.currency ?? "cad").toUpperCase()})${session.metadata?.category ? ` · ${session.metadata.category}` : ""}`,
+      need: `Paid Birch Reserve starter placement ($1,900 ${String(session.currency ?? "cad").toUpperCase()})${session.metadata?.category ? ` · ${session.metadata.category}` : ""}`,
       isTest,
       meta: {
         paid: true,

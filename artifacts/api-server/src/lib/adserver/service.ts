@@ -199,7 +199,7 @@ export async function draftCampaignFromCheckoutSafe(session: Stripe.Checkout.Ses
       budgetCents = Number(md.credit_cents) || budgetCents;
       orderKind = `sponsor pack ${md.tier ?? ""}`.trim();
     } else if (md.kind === "exclusive_reserve") {
-      orderKind = "exclusive display reserve";
+      orderKind = "starter placement";
       exclusive = true;
       mult = EXCLUSIVE_RATE_BPS;
       notes = "Reserve deposit. The full package budget is set when the insertion order is signed.";

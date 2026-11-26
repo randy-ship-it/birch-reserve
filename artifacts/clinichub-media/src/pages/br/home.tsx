@@ -177,7 +177,7 @@ export default function BrHome() {
           </span>
           <span className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 self-start rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white group-hover:bg-lime-300 group-hover:text-[#0b1f3a] sm:self-auto">See agency terms <ArrowRight className="size-4" aria-hidden /></span>
         </a>
-        <p className="mt-2 text-[12px] text-foreground/60">Prices in USD unless shown. Want a category to yourself? <a href="/exclusive?ref=home_strip" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-strip-exclusive">See the exclusive reserve</a>.</p>
+        <p className="mt-2 text-[12px] text-foreground/60">Prices in USD unless shown. Want a category to yourself? <a href="/starter?ref=home_strip" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-strip-exclusive">Dedicated placements from $1,900</a>.</p>
       </section>
       {/* Light continuous category strip under the hero (Randy Nov 21 10:20 AM). */}
       <div className="container mx-auto max-w-6xl px-4 pb-5"><div className="hidden mb-3 min-h-[6.5rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div><CategoryStrip testId="home-category-strip" /></div>

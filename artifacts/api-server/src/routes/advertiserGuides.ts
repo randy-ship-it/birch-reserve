@@ -59,18 +59,18 @@ ${path === GUIDES_INDEX_PATH ? "" : `<link rel="alternate" type="text/markdown" 
 <style>${CSS}</style>
 <script type="application/ld+json">${JSON.stringify(jsonLd).replaceAll("<", "\\u003c")}</script>
 </head><body>
-<header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav class="tn" aria-label="Advertiser guides"><a href="${GUIDES_INDEX_PATH}">Guides</a><a href="/blog">Blog</a><a href="/media-kit">Media kit</a><a href="/exclusive">Reserve</a></nav></div></header>
+<header class="top"><div class="wrap"><a class="logo" href="/">BIRCH RESERVE</a><nav class="tn" aria-label="Advertiser guides"><a href="${GUIDES_INDEX_PATH}">Guides</a><a href="/blog">Blog</a><a href="/media-kit">Media kit</a><a href="/starter">Starter</a></nav></div></header>
 <main class="wrap">${body}</main>
 <footer><div class="wrap">Silver Birch Growth Inc. · Toronto, Ontario · <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a><br><a href="/terms">Terms</a> · <a href="/privacy">Privacy</a> · <a href="${GUIDES_INDEX_PATH}">All advertiser guides</a></div></footer>
 ${sticky}${CTA_TRACK}${aiRefBeaconScript()}
 </body></html>`;
 }
 
-const reserveHref = (g?: AdvertiserGuide) => `/exclusive${g?.exclusiveCategory ? `?category=${encodeURIComponent(g.exclusiveCategory)}` : ""}`;
-const ctaHtml = (g?: AdvertiserGuide) => `<div class="cta"><a class="btn" data-cta="reserve" href="${reserveHref(g)}">Reserve your category · $1,900</a><a class="btn line" href="/media-kit">See the media kit</a></div>`;
+const reserveHref = (g?: AdvertiserGuide) => `/starter${g?.exclusiveCategory ? `?category=${encodeURIComponent(g.exclusiveCategory)}` : ""}`;
+const ctaHtml = (g?: AdvertiserGuide) => `<div class="cta"><a class="btn" data-cta="reserve" href="${reserveHref(g)}">Starter placement · $1,900</a><a class="btn line" href="/media-kit">See the media kit</a></div>`;
 const CTA = ctaHtml();
-const STEPS = `<div class="steps" aria-label="How buying works"><div class="step"><b>1</b>Reserve $1,900 by card. All of it counts toward your package.</div><div class="step"><b>2</b>Sign the insertion order: hub, placement, dates.</div><div class="step"><b>3</b>Send your creative. It runs after a quick human review.</div></div>`;
-const stickyHtml = (g?: AdvertiserGuide) => `<div class="sticky"><span>One brand per category. Refundable until 14 days before launch.</span><a class="btn" data-cta="reserve" href="${reserveHref(g)}">Reserve your category · $1,900</a></div>`;
+const STEPS = `<div class="steps" aria-label="How buying works"><div class="step"><b>1</b>Pay $1,900 by card. All of it counts toward your package.</div><div class="step"><b>2</b>Sign the insertion order: hub, placement, dates.</div><div class="step"><b>3</b>Send your creative. It runs after a quick human review.</div></div>`;
+const stickyHtml = (g?: AdvertiserGuide) => `<div class="sticky"><span>One brand per category. Refundable until 14 days before launch.</span><a class="btn" data-cta="reserve" href="${reserveHref(g)}">Starter placement · $1,900</a></div>`;
 const CTA_TRACK = `<script>document.addEventListener("click",function(e){var a=e.target&&e.target.closest&&e.target.closest('a[data-cta="reserve"]');if(!a)return;try{navigator.sendBeacon&&navigator.sendBeacon("/v1/ui-events",new Blob([JSON.stringify({event:"cta_open_reserve",path:(location.pathname||"/").slice(0,200)})],{type:"application/json"}))}catch(x){}},true)</script>`;
 const MOCK = `<div class="mock" role="img" aria-label="Illustrative hub page with example placement areas"><div class="b">Hub banner</div><div class="g">Member dashboard</div><div class="p">Product page unit</div><div class="g">Recovery tools</div><div class="b">Thank-you card</div></div><p class="mockcap">Illustrative. Example placement areas on a hub page, no brand creative.</p>`;
 
@@ -123,7 +123,7 @@ ${sources}`;
     ] },
   ];
   if (g.faq?.length) graph.push({ "@type": "FAQPage", mainEntity: [...(g.answer ? [{ q: g.h1, a: g.answer }] : []), ...g.faq].map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) });
-  if (isNew) graph.push({ "@type": "Offer", name: "Exclusive display reserve", price: "1900", priceCurrency: "CAD", url: `${PUBLIC_SITE_ORIGIN}/exclusive`, description: "Holds a $5K–$50K exclusive display package in your category pending your insertion order. The full $1,900 counts toward that package. Refunded if another brand commits first. Nothing runs until you sign an insertion order.", seller: { "@type": "Organization", name: "Silver Birch Growth Inc." } });
+  if (isNew) graph.push({ "@type": "Offer", name: "Starter placement", price: "1900", priceCurrency: "CAD", url: `${PUBLIC_SITE_ORIGIN}/starter`, description: "Holds a $5K–$50K dedicated package in your category pending your insertion order. The full $1,900 counts toward that package. Refunded if another brand commits first. Nothing runs until you sign an insertion order.", seller: { "@type": "Organization", name: "Silver Birch Growth Inc." } });
   return shell(path, g.title, g.description, body, { "@context": "https://schema.org", "@graph": graph }, stickyHtml(g));
 }
 
@@ -136,7 +136,7 @@ export function renderGuideMarkdown(g: AdvertiserGuide): string {
   if (g.compare) out.push(`## ${g.compare.caption}`, "", `| ${g.compare.head.join(" | ")} |`, `|${g.compare.head.map(() => " --- ").join("|")}|`, ...g.compare.rows.map((r) => `| ${r.join(" | ")} |`), "");
   if (g.faq?.length) out.push("## Questions buyers ask", "", ...g.faq.flatMap((f) => [`### ${f.q}`, "", f.a, ""]));
   out.push("## Sources", "", ...g.sources.map((s, i) => `${i + 1}. [${s.label}](${s.url})`), "");
-  out.push(`HTML version: ${PUBLIC_SITE_ORIGIN}/${g.slug}`, `Reserve your category ($1,900, counted in full toward the package): ${PUBLIC_SITE_ORIGIN}/exclusive`, `All pages: ${PUBLIC_SITE_ORIGIN}/llms.txt`, "");
+  out.push(`HTML version: ${PUBLIC_SITE_ORIGIN}/${g.slug}`, `Starter placement ($1,900, counted in full toward the package): ${PUBLIC_SITE_ORIGIN}/starter`, `All pages: ${PUBLIC_SITE_ORIGIN}/llms.txt`, "");
   return out.join("\n");
 }
 

@@ -42,7 +42,7 @@ test("one module, two brands: identical facts, only name, logo and links swap", 
 test("onboarding module carries every path, price, currency and term from the live tables", () => {
   const m = buildOnboardingModule();
   for (const re of [
-    /\/intake\b/, /\/intake\/supplier/, /\/buy\b/, /\/sponsor/, /\/exclusive/, /\/partners/, /\/terms/, /\/intake\/gtm/, /\/street-team/, /hub-alerts/, /ads\/specs/, /sample-io/,
+    /\/intake\b/, /\/intake\/supplier/, /\/buy\b/, /\/sponsor/, /\/starter/, /\/partners/, /\/terms/, /\/intake\/gtm/, /\/street-team/, /hub-alerts/, /ads\/specs/, /sample-io/,
     /\$190 USD/, /\$270 CAD/, /\$490 USD/, /\$690 CAD/, /\$1,500 USD \(\$2,100 CAD\)/, /\$3,000 USD \(\$4,200 CAD\)/, /\$6,000 USD \(\$8,400 CAD\)/, /\+5%/, /\+10%/, /\+15%/,
     /\$1,900/, /at or below the rate card/, /Silver Birch Growth Inc\./, /intake\/activate/, /5\.4x/, /Step 2 of 2/, /30 days/, /14 days/, /60 days/, /IO before flight|IO|insertion order/, /aggregate only/i, /Calm Joints/, /door-to-door/, /modelled estimates from listed partners/,
   ]) assert.match(m, re);

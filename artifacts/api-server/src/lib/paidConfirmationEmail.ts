@@ -1,7 +1,7 @@
 /**
  * Branded buyer confirmation after a paid checkout (Randy, Nov 21 2026 6:12 PM: "Turn on the branded Birch confirmation email").
  *
- * - Every paid SKU: $190 look, $490 reserve, $1,900 exclusive reserve, sponsor packs (USD and CAD).
+ * - Every paid SKU: $190 look, $490 reserve, $1,900 starter placement, sponsor packs (USD and CAD).
  * - Birch buyers get the Birch layout; checkouts that started on the Scale mirror (metadata site=scale) get the ScaleHealth one.
  * - Content: amount paid + currency, ad credit booked (bonus and media credit shown separately), campaign dates when set,
  *   a dashboard button (/account/login?session_id=…, which re-checks the payment with Stripe and signs the buyer in),
@@ -65,7 +65,7 @@ export function skuOf(md: Record<string, string>): PaidConfirmationInput["sku"] 
 const ORDER_LABEL: Record<PaidConfirmationInput["sku"], string> = {
   "hold-190": "7-day look",
   "reserve-490": "Category reserve",
-  exclusive: "Exclusive display reserve",
+  exclusive: "Starter placement",
   sponsor: "Sponsor pack",
   other: "Ad order",
 };

@@ -22,7 +22,7 @@ export function siteFilterHtml(cur: SiteFilter): string {
 export type ReserveStatus = "paid" | "partly_refunded" | "refunded" | "open" | "expired" | "unpaid";
 export type ReserveRow = { id: string; at: Date; site: "birch" | "scale"; flow: string; brand: string; email: string; amountCents: number; refundedCents: number; currency: string; status: ReserveStatus };
 
-const FLOW_LABEL: Record<string, string> = { exclusive_reserve: "Exclusive reserve" };
+const FLOW_LABEL: Record<string, string> = { exclusive_reserve: "Starter placement" };
 const flowOf = (md: Record<string, string>): string | null => {
   const k = md.kind || md.offerKey || md.sku || (md.reservationId ? "reservation" : "");
   if (!k) return null;

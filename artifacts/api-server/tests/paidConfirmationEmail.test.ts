@@ -36,7 +36,7 @@ test("every paid SKU gets one Birch email with paid amount, credit (bonus + medi
   const cases = [
     { s: session("cs_live_look", { sku: "hold-190", reservationId: "r1", site: "birch", sold_by: "birch", promo: "STREET100", promo_net_cents: "10000" }, 9000), paid: "$90 USD", label: /7-day look/ },
     { s: session("cs_live_res", { sku: "reserve-490", reservationId: "r2" }, 69000, { currency: "cad" }), paid: "$690 CAD", label: /Category reserve/ },
-    { s: session("cs_live_exc", { kind: "exclusive_reserve", sku: "exclusive-reserve-1900-cad", brand: "Acme" }, 190000, { currency: "cad" }), paid: "$1,900 CAD", label: /Exclusive display reserve/ },
+    { s: session("cs_live_exc", { kind: "exclusive_reserve", sku: "exclusive-reserve-1900-cad", brand: "Acme" }, 190000, { currency: "cad" }), paid: "$1,900 CAD", label: /Starter placement/ },
     { s: session("cs_live_pack", { kind: "sponsorship_credit", tier: "sponsor-1500", credit_cents: "157500", brand: "Acme" }, 150000), paid: "$1,500 USD", label: /Sponsor pack \(\$1,500 pack\)/ },
   ];
   for (const c of cases) {

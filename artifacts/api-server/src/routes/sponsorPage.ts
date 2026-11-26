@@ -252,7 +252,7 @@ ${statsStrip()}
 <h2>Ways to buy</h2>
 <ul>
 <li>Sponsorship credit: ${DEPOSIT_TIERS.map((t) => `${money(currency === "cad" ? t.cad : t.usd, currency)} (+${t.bonusPct}% credit)`).join(" · ")} or your own amount. <a href="/sponsor">Sponsor</a></li>
-<li>${priceLadder(currency).map((s) => `${s.name}: ${s.price}`).join(" · ")} (the exclusive reserve holds a $5K–$50K ${currency.toUpperCase()} package pending your IO; the shared reserve does not lock the category). <a href="/buycalc">Calculator</a> · <a href="/exclusive">Exclusive</a></li>
+<li>${priceLadder(currency).map((s) => `${s.name}: ${s.price}`).join(" · ")} (the $1,900 starter placement holds a $5K–$50K ${currency.toUpperCase()} package pending your IO; the shared reserve does not lock the category). <a href="/buycalc">Calculator</a> · <a href="/starter">Starter</a></li>
 <li>Multi-hub or annual programs: reserve or ask at <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a></li>
 </ul>
 <h2>What to send</h2>

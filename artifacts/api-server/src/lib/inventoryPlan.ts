@@ -53,12 +53,12 @@ export const PACING_ROWS: readonly PacingRow[] = [
   row("pack-3000", "Partner sponsor ($3,300 credit)", 3300, null, "USD"),
   row("pack-6000", "Network sponsor ($6,900 credit)", 6900, null, "USD"),
   row("agency-test", "Agency client test", 1000, 5000, "USD"),
-  row("exclusive-1900", "Exclusive display held by the $1,900 CAD reserve", 5000, 50000, "CAD", "Rate set on the IO, at or below the rate card"),
+  row("exclusive-1900", "Dedicated placement held by the $1,900 CAD starter", 5000, 50000, "CAD", "Rate set on the IO, at or below the rate card"),
 ];
 
-/** The exclusive package held by the $1,900 reserve, paced in the visitor's currency. */
+/** The dedicated package held by the $1,900 starter placement, paced in the visitor's currency. */
 export function exclusivePacing(currency: "usd" | "cad"): PacingRow {
-  return row("exclusive-1900", `Exclusive display held by the $1,900 ${currency.toUpperCase()} reserve`, 5000, 50000, currency === "usd" ? "USD" : "CAD", "Rate set on the IO, at or below the rate card");
+  return row("exclusive-1900", `Dedicated placement held by the $1,900 ${currency.toUpperCase()} starter`, 5000, 50000, currency === "usd" ? "USD" : "CAD", "Rate set on the IO, at or below the rate card");
 }
 
 /* ------------------------------------------------------------------ 2027 */

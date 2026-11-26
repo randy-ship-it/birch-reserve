@@ -59,7 +59,7 @@ test("Scale voice: docs prose and slot names, not code; reserve product name", (
   assert.match(d, /ads\/embed\.js/); assert.match(d, /birchreserve\.net\/ads\/embed\.js/);
   assert.match(docsPage("https://birchreserve.net"), /How Birch Reserve placements/);
   const mk = (site: "birch" | "scale") => JSON.stringify((buildExclusiveReserveSession({ brand: "B", email: "b@b.co", category: "c", agree: true, currency: "cad" }, "https://x.test", site) as { params: unknown }).params);
-  assert.match(mk("scale"), /Scale Health — Exclusive display reserve \(\$1,900 CAD\)/);
+  assert.match(mk("scale"), /Scale Health — Starter placement \(\$1,900 CAD\)/);
   assert.doesNotMatch(mk("birch"), /Scale Health — Exclusive/);
 });
 

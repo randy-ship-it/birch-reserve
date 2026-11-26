@@ -461,7 +461,7 @@ export const LIST_PRICE_HREF = "/media-kit#start-small";
 
 export function ListPriceLine({ className = "" }: { className?: string }) {
   const steps = priceLadder("usd");
-  const short: Record<string, string> = { "hold-190": "7-day look", "reserve-490": "reserve", exclusive: "exclusive reserve" };
+  const short: Record<string, string> = { "hold-190": "7-day look", "reserve-490": "reserve", exclusive: "starter placement" };
   return (
     <div className={`flex flex-wrap items-center justify-center gap-1.5 text-[13px] text-foreground/70 ${className}`} data-testid="agency-list-price">
       <b className="mr-1 text-[#0b1f3a]">List price =</b>
@@ -591,12 +591,12 @@ export function AgencyTierCards({ reserveHref, buyHref, bidHref = "#talk", ioHre
   );
 }
 
-/** "What exclusive partners get" (Randy t8307u). The prior example card is unlinked for now (Randy t552u). */
+/** "What you get" (was "What exclusive partners get"; Randy Nov 26 2026 dropped exclusive framing). The prior example card is unlinked for now (Randy t552u). */
 export function ExclusivePerks() {
   return (
     <details open className="group rounded-2xl border-2 border-[#0b1f3a] bg-white" data-testid="exclusive-perks" id="exclusive-partners">
       <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 font-semibold text-[#0b1f3a] md:px-5 [&::-webkit-details-marker]:hidden">
-        <span>* What exclusive partners get</span>
+        <span>* What you get</span>
         <ChevronDown className="size-5 shrink-0 transition group-open:rotate-180" aria-hidden />
       </summary>
       <ul className="space-y-2.5 border-t border-[#0b1f3a]/15 p-4 text-sm text-foreground/80 md:p-5">

@@ -27,8 +27,8 @@ const SRC = {
 } as const;
 
 const R = EXCLUSIVE_RESERVE;
-/** The reserve, in the terms' own words (lib/exclusiveReserveTerms.ts). */
-const RESERVE_ANSWER = `A $1,900 exclusive display reserve, paid by card (CAD in Canada, USD elsewhere). It holds one ${R.packageRange} exclusive display package in your category pending your insertion order, and all $1,900 counts toward that package. If another brand commits to the category first, you are refunded in full. Nothing runs until you sign an insertion order naming the hub, placement and dates. Refundable until 14 days before the IO launch date, and refunded in full if your category is committed to another brand before your IO is signed.`;
+/** The $1,900 starter placement, in the terms' own words (lib/exclusiveReserveTerms.ts). */
+const RESERVE_ANSWER = `Dedicated placements from $1,900, paid by card (CAD in Canada, USD elsewhere). A starter placement holds one ${R.packageRange} dedicated package in your category pending your insertion order, and all $1,900 counts toward that package. If another brand commits to the category first, you are refunded in full. Nothing runs until you sign an insertion order naming the hub, placement and dates. Refundable until 14 days before the IO launch date, and refunded in full if your category is committed to another brand before your IO is signed.`;
 const NETWORK_ANSWER = `${AI_NETWORK_LINE}. Audience volumes on a specific hub are modelled until an insertion order names it. No impression guarantee; reporting is aggregate only.`;
 const PRIVACY_ANSWER = "No. Placements are chosen by hub and category, never by anyone's health data. You get aggregate views, clicks, UTM visits and promo redemptions per hub and surface. Nobody's identity or condition is shared.";
 
@@ -41,7 +41,7 @@ const SHARED_FAQ = [
 const PLACEMENT_TILES = [
   { k: "Where", v: "Booking confirmations, member dashboards, hub home and product pages" },
   { k: "Who", v: "Recovery, physio and wellness customers, mostly Ontario and Quebec plus the US" },
-  { k: "How", v: "One brand per category on an exclusive package, set on an insertion order" },
+  { k: "How", v: "One brand per category on a dedicated package, set on an insertion order" },
 ];
 
 export const BUYER_ANSWERS: AdvertiserGuide[] = [
@@ -50,9 +50,9 @@ export const BUYER_ANSWERS: AdvertiserGuide[] = [
     group: "answer",
     title: "How to advertise to recovery, physio and wellness patients in Canada | Birch Reserve",
     h1: "How to advertise to recovery, physio and wellness patients in Canada",
-    description: "Where to reach physio, recovery and wellness customers in Canada, the claim rules that apply, and how to reserve exclusive display in Scale Health Network hubs.",
+    description: "Where to reach physio, recovery and wellness customers in Canada, the claim rules that apply, and how dedicated placements work in Scale Health Network hubs.",
     lede: "Show up on the pages those customers already use, keep claims inside your product licence, and buy by insertion order.",
-    answer: "Reach them inside the hubs where they book and buy care: booking confirmations, member dashboards and product pages. Birch Reserve sells exclusive display there, one brand per category, starting with a $1,900 reserve that counts in full toward your package.",
+    answer: "Reach them inside the hubs where they book and buy care: booking confirmations, member dashboards and product pages. Birch Reserve sells dedicated placements there, one brand per category, starting from $1,900, which counts in full toward your package.",
     tiles: PLACEMENT_TILES,
     sections: [
       { h2: "Where these customers already are", bullets: ["Right after they book a physio or recovery visit.", "In their member dashboard between sessions.", "On hub product and service pages.", "On the thank-you screen after an order."] },
@@ -78,9 +78,9 @@ export const BUYER_ANSWERS: AdvertiserGuide[] = [
     group: "answer",
     title: "Clinic waiting room and hub display advertising for health brands | Birch Reserve",
     h1: "Clinic waiting-room advertising vs hub display",
-    description: "How clinic waiting-room screens compare with hub display on clinic and recovery brands' own pages, and how health brands reserve exclusive hub display by category.",
+    description: "How clinic waiting-room screens compare with hub display on clinic and recovery brands' own pages, and how health brands buy dedicated hub placements by category.",
     lede: "Waiting-room screens reach people for a few minutes in the clinic. Hub display reaches the same customers on their phone, before and after the visit.",
-    answer: "Hub display puts your brand on the clinic or recovery brand's own booking, dashboard and thank-you pages. Birch Reserve sells it by category, one brand per category on an exclusive package, starting with a $1,900 reserve.",
+    answer: "Hub display puts your brand on the clinic or recovery brand's own booking, dashboard and thank-you pages. Birch Reserve sells it by category, one brand per category on a dedicated package, starting from $1,900.",
     tiles: PLACEMENT_TILES,
     mock: true,
     sections: [
@@ -93,8 +93,8 @@ export const BUYER_ANSWERS: AdvertiserGuide[] = [
         ["Where", "TV screens or posters in the clinic", "Hub booking, dashboard, product and thank-you pages"],
         ["When", "While the patient waits", "Before and after the visit, on their phone"],
         ["Measurement", "Varies by vendor", "Aggregate views, clicks, UTM visits, promo redemptions"],
-        ["Exclusivity", "Varies by vendor", "One brand per category on an exclusive package"],
-        ["How you buy", "Vendor contract", "$1,900 reserve, then an insertion order"],
+        ["One brand per category", "Varies by vendor", "One brand per category on a dedicated package"],
+        ["How you buy", "Vendor contract", "$1,900 starter placement, then an insertion order"],
       ],
     },
     faq: [
@@ -110,7 +110,7 @@ export const BUYER_ANSWERS: AdvertiserGuide[] = [
     h1: "Alternatives to Meta ads for health and wellness brands",
     description: "The main alternatives to Meta ads for supplement, recovery and wellness brands: search, retail media, post-purchase networks, creators and curated hub display, with honest trade-offs.",
     lede: "If Meta's cost per first order is eating your margin, here are the alternatives and what each trades away.",
-    answer: "The main alternatives are Google search, retail media networks, post-purchase ad networks, creator and affiliate programs, and curated hub display. Birch Reserve is the curated-hub option: exclusive display inside recovery, physio and wellness hubs, sold by category.",
+    answer: "The main alternatives are Google search, retail media networks, post-purchase ad networks, creator and affiliate programs, and curated hub display. Birch Reserve is the curated-hub option: dedicated placements inside recovery, physio and wellness hubs, sold by category.",
     sections: [
       { h2: "Why brands look for an alternative", paras: ["Across 9 DTC supplement brands, the median Meta cost per first purchase was $80.50 against a $68.68 average order, so the first order loses money (MHI Media, Oct 2026, USD, one agency's client sample). Health and prescription categories also face extra policy gates on Meta and Google."] },
     ],
@@ -154,16 +154,16 @@ export const CATEGORY_PAGES: AdvertiserGuide[] = AD_CATEGORIES.map((c) => ({
   exclusiveCategory: c.exclusiveCategory,
   title: `${c.name} brand advertising in Scale Health Network hubs | Birch Reserve`,
   h1: `Advertise your ${c.name.toLowerCase()} brand in Scale Health Network hubs`,
-  description: `Exclusive display for ${c.name.toLowerCase()} brands inside Scale Health Network hubs: who sees it, what fits, and how the $1,900 category reserve works.`,
+  description: `Dedicated placements for ${c.name.toLowerCase()} brands inside Scale Health Network hubs: who sees it, what fits, and how the $1,900 starter placement works.`,
   lede: c.who,
-  answer: `${c.status === "now" ? `${c.name} is the first Scale Health category in market.` : `${c.name} is queued after Recovery.`} One brand gets the exclusive display package for the category. Hold it with $1,900, counted in full toward a ${R.packageRange} package; the package rate is set on the IO, at or below the rate card.`,
+  answer: `${c.status === "now" ? `${c.name} is the first Scale Health category in market.` : `${c.name} is queued after Recovery.`} One brand gets the dedicated package for the category. Start with $1,900, counted in full toward a ${R.packageRange} package; the package rate is set on the IO, at or below the rate card.`,
   tiles: [{ k: "Who", v: c.who }, { k: "Fits", v: c.fits.slice(0, 2).join(" · ") }, { k: "Status", v: c.status === "now" ? "Reserving now" : "Queued: reserve ahead" }],
   sections: [
     { h2: "Brands that fit", bullets: c.fits },
     { h2: "All Scale Health categories", bullets: AD_CATEGORIES.map((x) => `${x.name}: ${x.status === "now" ? "reserving now" : "queued"}`) },
   ],
   faq: [
-    { q: `What does exclusive mean for ${c.name}?`, a: "One brand per category on an exclusive display package. Exclusivity starts when you sign the insertion order, which names the hub, placement and dates. If the category is committed to another brand before your IO is signed, the $1,900 is refunded in full." },
+    { q: `What does a dedicated placement mean for ${c.name}?`, a: "One brand per category on a dedicated package. That starts when you sign the insertion order, which names the hub, placement and dates. If the category is committed to another brand before your IO is signed, the $1,900 is refunded in full." },
     ...SHARED_FAQ,
   ],
   sources: [SRC.hcNhp, SRC.hcPreclear],
