@@ -53,7 +53,7 @@ export const HUB_SHOTS_FINE = scaleVoice("Real hub pages with example placements
 
 export const EARLY_RATE_BADGE = "Starter rate";
 /** Audit #5 (Randy, Nov 20 2026): footer under every block with a "Modelled" chip. */
-export const MODELLED_FOOTER = "Based on signed partnership contracts, not a delivery promise. Reporting is aggregate only.";
+export const MODELLED_FOOTER = "Modelled estimates from listed partners, not a delivery promise. Reporting is aggregate only.";
 /** Audit #4 (Randy, Nov 20 2026): the one urgency line. Once per block, above the button, never next to numbers. */
 export const URGENCY_LINE = "Prepaid credit keeps today's rate for its term. Rates step up only after reporting shows a placement performs.";
 export const EARLY_RATE_FINE = "New placements open at starter rates. They only move up once your reporting proves they work. Seats are shared: a category can include more than one brand.";

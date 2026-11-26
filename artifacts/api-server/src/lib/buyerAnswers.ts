@@ -7,7 +7,7 @@
  * other channels). FAQ blocks carry FAQPage schema. Every third-party number is cited and already on the site.
  *
  * Copy rules: no guarantees, never say a hub is open, no zero counts, no ownership talk, no client names,
- * network figures only as "based on signed partnership contracts", Scale never gig / on-demand, no promo codes.
+ * network figures only as "modelled estimates from listed partners", Scale never gig / on-demand, no promo codes.
  */
 import { AI_NETWORK_LINE } from "./aiDiscovery";
 import { EXCLUSIVE_RESERVE } from "./exclusiveReserveTerms";
@@ -28,7 +28,7 @@ const SRC = {
 
 const R = EXCLUSIVE_RESERVE;
 /** The reserve, in the terms' own words (lib/exclusiveReserveTerms.ts). */
-const RESERVE_ANSWER = `A $1,900 exclusive display reserve, paid by card (CAD in Canada, USD elsewhere). It locks one ${R.packageRange} exclusive display package in your category at ${R.discountPct}% below the regular rate, and all $1,900 counts toward that package. Nothing runs until you sign an insertion order naming the hub, placement and dates. Refundable until 14 days before the IO launch date, and refunded in full if your category is committed to another brand before your IO is signed.`;
+const RESERVE_ANSWER = `A $1,900 exclusive display reserve, paid by card (CAD in Canada, USD elsewhere). It holds one ${R.packageRange} exclusive display package in your category pending your insertion order, and all $1,900 counts toward that package. If another brand commits to the category first, you are refunded in full. Nothing runs until you sign an insertion order naming the hub, placement and dates. Refundable until 14 days before the IO launch date, and refunded in full if your category is committed to another brand before your IO is signed.`;
 const NETWORK_ANSWER = `${AI_NETWORK_LINE}. Audience volumes on a specific hub are modelled until an insertion order names it. No impression guarantee; reporting is aggregate only.`;
 const PRIVACY_ANSWER = "No. Placements are chosen by hub and category, never by anyone's health data. You get aggregate views, clicks, UTM visits and promo redemptions per hub and surface. Nobody's identity or condition is shared.";
 
@@ -156,7 +156,7 @@ export const CATEGORY_PAGES: AdvertiserGuide[] = AD_CATEGORIES.map((c) => ({
   h1: `Advertise your ${c.name.toLowerCase()} brand in Scale Health Network hubs`,
   description: `Exclusive display for ${c.name.toLowerCase()} brands inside Scale Health Network hubs: who sees it, what fits, and how the $1,900 category reserve works.`,
   lede: c.who,
-  answer: `${c.status === "now" ? `${c.name} is the first Scale Health category in market.` : `${c.name} is queued after Recovery.`} One brand gets the exclusive display package for the category. Reserve it with $1,900, counted in full toward a ${R.packageRange} package at ${R.discountPct}% below the regular rate.`,
+  answer: `${c.status === "now" ? `${c.name} is the first Scale Health category in market.` : `${c.name} is queued after Recovery.`} One brand gets the exclusive display package for the category. Hold it with $1,900, counted in full toward a ${R.packageRange} package; the package rate is set on the IO, at or below the rate card.`,
   tiles: [{ k: "Who", v: c.who }, { k: "Fits", v: c.fits.slice(0, 2).join(" · ") }, { k: "Status", v: c.status === "now" ? "Reserving now" : "Queued: reserve ahead" }],
   sections: [
     { h2: "Brands that fit", bullets: c.fits },

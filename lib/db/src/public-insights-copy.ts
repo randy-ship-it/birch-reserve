@@ -629,7 +629,7 @@ If your category is on the list, the quickest way to judge this is to look at th
 
 We are also building more: a Street Team for on-site sampling, new hub categories, and a private clinic network. Nothing in this post is a promise of results.
 
-Examples on this page are illustrative. Prices are shown in USD with CAD in brackets. Reach figures, where shown on the site, are based on signed partnership contracts and are not a guarantee of views, clicks or results.
+Examples on this page are illustrative. Prices are shown in USD with CAD in brackets. Reach figures, where shown on the site, are modelled estimates from listed partners and are not a guarantee of views, clicks or results.
 `,
 } as const;
 

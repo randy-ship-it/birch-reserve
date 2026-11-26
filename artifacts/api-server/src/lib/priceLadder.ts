@@ -31,7 +31,7 @@ export function priceLadder(currency: ReserveCurrency): readonly LadderStep[] {
   return [
     { key: "hold-190", price: offerPriceLabel(look, currency), name: "7-day look", line: "See your placement for 7 days. Converts in full to the reserve, or refunded.", href: "/buy?plan=hold-190", cta: "Take a look" },
     { key: "reserve-490", price: offerPriceLabel(seat, currency), name: "Reserve your space", line: "A shared category seat. 100% media credit, refundable until 14 days before launch.", href: "/buy?plan=reserve-490", cta: "Reserve" },
-    { key: "exclusive", price: ex.label, name: "Exclusive reserve", line: `Locks a ${ex.packageLabel} exclusive display package in your category, ${EXCLUSIVE_RESERVE.discountPct}% below the regular rate. All $1,900 counts toward it.`, href: "/exclusive", cta: "Lock your category" },
+    { key: "exclusive", price: ex.label, name: "Exclusive reserve", line: `Holds a ${ex.packageLabel} exclusive display package in your category pending your IO. All $1,900 counts toward it.`, href: "/exclusive", cta: "Hold your category" },
   ];
 }
 

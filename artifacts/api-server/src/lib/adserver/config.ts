@@ -107,11 +107,10 @@ export function regularRateSummary(): { cpmLow: number; cpmHigh: number; cpcLow:
   const cpc = RATE_SURFACES.map((s) => s.cpcStarter[0]);
   const f = (n: number) => (Number.isInteger(n) ? `$${n}` : `$${n.toFixed(2)}`);
   const cpmLow = Math.min(...cpm), cpmHigh = Math.max(...cpm), cpcLow = Math.min(...cpc), cpcHigh = Math.max(...cpc);
-  const off = Math.round((1 - EXCLUSIVE_RATE_BPS / 10_000) * 100);
   return {
     cpmLow, cpmHigh, cpcLow, cpcHigh,
     line: `Promo credit runs at regular rate-card rates (current pricing: ${f(cpmLow)}–${f(cpmHigh)} CPM or ${f(cpcLow)}–${f(cpcHigh)} CPC depending on the placement).`,
-    compare: `Exclusive display packages run ${off}% below regular; $190 looks, $490 reserves and sponsor packs run at the card rate.`,
+    compare: `Exclusive display packages are priced on the IO, at or below the card rate; $190 looks, $490 reserves and sponsor packs run at the card rate.`,
   };
 }
 

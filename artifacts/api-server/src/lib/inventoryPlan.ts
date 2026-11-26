@@ -53,12 +53,12 @@ export const PACING_ROWS: readonly PacingRow[] = [
   row("pack-3000", "Partner sponsor ($3,300 credit)", 3300, null, "USD"),
   row("pack-6000", "Network sponsor ($6,900 credit)", 6900, null, "USD"),
   row("agency-test", "Agency client test", 1000, 5000, "USD"),
-  row("exclusive-1900", "Exclusive display locked by the $1,900 CAD reserve", 5000, 50000, "CAD", "25% below the regular rate, set on the IO"),
+  row("exclusive-1900", "Exclusive display held by the $1,900 CAD reserve", 5000, 50000, "CAD", "Rate set on the IO, at or below the rate card"),
 ];
 
-/** The exclusive package locked by the $1,900 reserve, paced in the visitor's currency. */
+/** The exclusive package held by the $1,900 reserve, paced in the visitor's currency. */
 export function exclusivePacing(currency: "usd" | "cad"): PacingRow {
-  return row("exclusive-1900", `Exclusive display locked by the $1,900 ${currency.toUpperCase()} reserve`, 5000, 50000, currency === "usd" ? "USD" : "CAD", "25% below the regular rate, set on the IO");
+  return row("exclusive-1900", `Exclusive display held by the $1,900 ${currency.toUpperCase()} reserve`, 5000, 50000, currency === "usd" ? "USD" : "CAD", "Rate set on the IO, at or below the rate card");
 }
 
 /* ------------------------------------------------------------------ 2027 */
@@ -74,25 +74,11 @@ function tamCase(key: "low" | "base", label: string, hubs: number): Tam2027Case 
   return { key, label, hubs, viewsYear, usdYear: (viewsYear / 1000) * BLENDED_STARTER_CPM };
 }
 
-/**
- * Randy t422u (Nov 21 2026), explicit override of the no-forecast rule for THIS figure only: 2027 inventory is pegged at an
- * expected $50MM+. It is an expectation, always labelled as an estimate. Today's contract-based range is "available to spend now".
- */
-export const EXPECTED_2027 = {
-  headline: "$50MM+",
-  headlineUsd: "$50MM+ USD",
-  label: "Expected 2027 ad inventory",
-  note: "Estimate, not a guarantee.",
-  conservative: "Conservative: new hubs are launching that aren't counted yet.",
-  pipeline: "Retail hubs could reach 500+ locations. Street teams reach homes door to door and sample on site.",
-  availableNow: "Available to spend now",
-} as const;
-
 export const TAM_2027 = {
-  label: "Based on signed partnership contracts, not a commitment",
+  label: "Modelled estimates from listed partners, not a commitment",
   cases: [tamCase("low", "Low case: 120 hubs", 120), tamCase("base", "Base case: 300 hubs", 300)] as const,
   basis: [
-    `~${(HUB_VIEWS_MONTHLY / 1_000_000).toFixed(2)}MM hub-placement views a month across ${TAM.listedPartners} listed partners (TAM feed, part of ~128MM total modelled views). This pricing inventory is separate from the audience channels (700MM+ captive page views activating).`,
+    `~${(HUB_VIEWS_MONTHLY / 1_000_000).toFixed(2)}MM hub-placement views a month across ${TAM.listedPartners} listed partners (TAM feed). That is the slice sold here, out of about 128MM total modelled page views a month (estimate).`,
     `≈ ${VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} modelled views per hub a month.`,
     `× 12 months × hubs × $${BLENDED_STARTER_CPM.toFixed(2)} blended starter CPM (rate card).`,
     `${ladderLine()} Queued categories: Longevity, Sleep, Food & Nutrition, Medi/Spa, Pets.`,
@@ -102,6 +88,25 @@ export const TAM_2027 = {
 
 const money = (n: number) => (n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(1)}M` : `$${Math.round(n / 1000)}K`);
 const views = (n: number) => `${Math.round(n / 1_000_000)}MM`;
+
+/**
+ * 2027 hub display inventory: ONE modelled estimate that matches the printed math (Randy, Nov 26 2026: the old "$50MM+"
+ * headline exceeded the math and is removed). Range = TAM_2027 low and base cases. Always labelled an estimate.
+ */
+export const EXPECTED_2027 = {
+  get headline(): string {
+    const [lo, base] = TAM_2027.cases;
+    return `${money(lo.usdYear)}–${money(base.usdYear)}`;
+  },
+  get headlineUsd(): string {
+    return `${this.headline} USD`;
+  },
+  label: "Estimated 2027 hub display inventory",
+  note: "Modelled estimate, not a guarantee.",
+  conservative: "Hubs launching later are not counted.",
+  pipeline: "Retail hubs could reach 500+ locations. Street teams reach homes door to door and sample on site.",
+  availableNow: "Modelled scenarios",
+} as const;
 
 export function tam2027Headline(): string {
   const [lo, base] = TAM_2027.cases;
@@ -117,8 +122,7 @@ export function tam2027Views(): string {
 export function tam2027Text(): string {
   const [lo, base] = TAM_2027.cases;
   return [
-    `${EXPECTED_2027.label}: expected ${EXPECTED_2027.headlineUsd} a year in hub display. ${EXPECTED_2027.note} ${EXPECTED_2027.pipeline} It is an expectation, not a promise.`,
-    `${EXPECTED_2027.availableNow}: ${tam2027Headline()} a year (${tam2027Views()}). ${TAM_2027.label}. ${EXPECTED_2027.conservative}`,
+    `${EXPECTED_2027.label}: ${tam2027Headline()} a year (${tam2027Views()}). ${EXPECTED_2027.note} ${TAM_2027.label}. It assumes ${lo.hubs} to ${base.hubs} hubs, which are modelling assumptions. ${EXPECTED_2027.conservative} ${EXPECTED_2027.pipeline}`,
     `- ${lo.label}: ${lo.hubs} hubs × ${VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} views/hub/mo × 12 × $${BLENDED_STARTER_CPM.toFixed(2)} CPM = ${money(lo.usdYear)}.`,
     `- ${base.label}: ${base.hubs} hubs × same = ${money(base.usdYear)}.`,
     ...TAM_2027.basis.map((b) => `- ${b}`),

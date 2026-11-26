@@ -119,10 +119,10 @@ export default function BrIntakeReel() {
           <Ctas dark where="band" />
         </div>
         <div className="mt-6 divide-y divide-foreground/10 rounded-2xl border border-[#D3D7DE] bg-white px-5 py-2 text-sm">
-          <details className="py-2.5"><summary className="cursor-pointer font-semibold">What the $1,900 exclusive reserve is</summary><p className="mt-1.5 text-foreground/75">An exclusive display reserve: one brand per category. It locks an exclusive package at a discount, all of it counts toward that package, and an insertion order is signed before anything runs. Shown in your currency.</p></details>
+          <details className="py-2.5"><summary className="cursor-pointer font-semibold">What the $1,900 exclusive reserve is</summary><p className="mt-1.5 text-foreground/75">An exclusive display reserve: one brand per category. It holds an exclusive package pending your insertion order, all of it counts toward that package, and it is refunded if another brand commits first. Nothing runs until the IO is signed. Shown in your currency.</p></details>
           <details className="py-2.5" data-testid="reel-transcript"><summary className="cursor-pointer font-semibold">Transcript</summary><p className="mt-1.5 text-foreground/75">{transcript}</p></details>
         </div>
-        <p className="mt-5 max-w-3xl text-[13px] text-foreground/60">Northline Recovery, its hub and all dashboard figures in the video are examples, labelled EXAMPLE, not results. The hub placement shown is an example of how an ad could look, and runs only with the hub owner's approval. Upcoming categories are queued, with no launch dates. Channel figures are based on signed partnership contracts, not a delivery promise. No guarantee of views, clicks, sales or results. Prices in the video are in USD.</p>
+        <p className="mt-5 max-w-3xl text-[13px] text-foreground/60">Northline Recovery, its hub and all dashboard figures in the video are examples, labelled EXAMPLE, not results. The hub placement shown is an example of how an ad could look, and runs only with the hub owner's approval. Upcoming categories are queued, with no launch dates. Channel figures are modelled estimates from listed partners, not a delivery promise. No guarantee of views, clicks, sales or results. Prices in the video are in USD.</p>
       </section>
     </div>
   );
