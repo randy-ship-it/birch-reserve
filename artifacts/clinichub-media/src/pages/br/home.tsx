@@ -9,7 +9,6 @@ import { WatchHowItWorks } from "@/components/br/reel-button";
 import { Tam2027 } from "@/components/br/inventory-plan";
 import { HubAlerts } from "@/components/br/hub-alerts";
 import { MODELLED_FOOTER } from "../../../../api-server/src/lib/overhaul/pilotPath";
-import { BLOCK_BAND_LINE } from "../../../../api-server/src/lib/overhaul/mediaKit";
 import { useEffect, type ReactNode } from "react";
 import { ArrowRight, BookOpen, Building2, ChevronDown, FileText, Handshake, LayoutGrid, Package, Sparkles, Store, Users } from "lucide-react";
 import { DoorRoute } from "@/components/br/door-route";
@@ -255,7 +254,8 @@ export default function BrHome() {
               </div>
               <div className="rounded-xl p-4 text-white" style={{ background: NAVY }}>
                 <p className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Premium slots · the main event</p>
-                <p className="mt-1 font-display text-2xl" data-currency-fixed>{BLOCK_BAND_LINE}</p>
+                <p className="mt-1 font-display text-2xl" data-currency-fixed>Blocks from $25,000 to $1.5M USD</p>
+                <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Inquire only</p>
                 <p className="mt-2 text-sm text-white/75">Exclusivity, a larger display share and priority placement. No card purchase: we write the insertion order.</p>
                 <a href="/media-kit#premium" data-testid="home-cta-premium" className="mt-4 inline-flex h-11 items-center gap-1.5 rounded-full bg-lime-300 px-5 text-sm font-bold text-[#0b1f3a] hover:bg-white">Inquire about premium <ArrowRight className="size-4" aria-hidden /></a>
               </div>

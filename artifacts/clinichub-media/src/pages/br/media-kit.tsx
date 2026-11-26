@@ -39,7 +39,6 @@ import {
   AGENCY_CASH_PCT,
   MEDIA_KIT_CPM,
   MEDIA_KIT_EXAMPLES,
-  BLOCK_BAND_LINE,
   MEDIA_KIT_OFFERS,
   UPGRADE_PATH_LINE,
   agencyCash,
@@ -349,7 +348,8 @@ export default function BrMediaKit() {
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-background/60">Premium slots · the main event</p>
             </div>
-            <h3 className="mt-1 font-display text-2xl">{BLOCK_BAND_LINE}</h3>
+            <h3 className="mt-1 font-display text-2xl">Blocks from $25,000 to $1.5M USD</h3>
+            <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.2em] text-lime-300">Inquire only</p>
             <p className="mt-3 text-sm text-background/80">Exclusivity, a larger display share and priority placement. No card purchase — we reply with an insertion order. Term is set on the IO.</p>
             <ul className="mt-4 space-y-2 text-sm text-background/85">
               <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />Exclusivity for the term on the IO</li>
@@ -450,7 +450,7 @@ export default function BrMediaKit() {
           </div>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Cta href={RESERVE_HREF} variant="lime" testId="mk-reserve-foot" className="w-full sm:w-auto">Reserve your space — {price.seat}</Cta>
-            <Cta href="#premium" variant="lineDark" testId="mk-premium-foot" className="w-full sm:w-auto">Inquire · {BLOCK_BAND_LINE}</Cta>
+            <Cta href="#premium" variant="lineDark" testId="mk-premium-foot" className="w-full sm:w-auto">Inquire · Blocks from $25,000 to $1.5M USD</Cta>
           </div>
           <p className="mt-8 border-t border-background/20 pt-4 text-xs text-background/65" data-testid="mk-footnote">
             Estimates are modelled; terms on IO. Volumes come from partner-provided data and stated assumptions, not audited delivery.
