@@ -11,7 +11,7 @@ const FAQ = [
   { q: "How is it reported?", a: "Aggregate only: views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. No patient data and no clinical pixels." },
 ];
 
-const META_DESC = "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. 700MM+ captive page views activating, based on signed partnership contracts.";
+const META_DESC = "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category reserve, self-serve. Modelled estimates from listed partners: about 128MM page views a month (estimate).";
 
 export default function BrAdvertiseBrands() {
   usePageMeta("Advertise to brands | Birch Reserve", META_DESC);

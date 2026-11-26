@@ -88,7 +88,7 @@ export const ladderMarkdown = (): string =>
     `- ${LABEL_LIVE}: ${liveHubs().map((h) => h.name).join("; ")}`,
     `- ${LABEL_ACTIVATING}: ${activatingHubs().map((h) => h.name).join("; ")}`,
     `- ${LABEL_COMING}: ${MORE_LAUNCHING}`,
-    "- Hub audiences and any view figures are modelled estimates from signed partnership contracts, not delivered impressions, and not a guarantee.",
+    "- Hub audiences and any view figures are modelled estimates from listed partners, not delivered impressions, and not a guarantee.",
   ].join("\n");
 
 /** Real hub pages for the Live hubs, per skin. Scale pages stay on scalehealth.ca. */

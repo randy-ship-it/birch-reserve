@@ -4,7 +4,7 @@ import { skinText } from "@/lib/siteSkin";
 /** Randy's two differentiators (Nov 22 2026 9:48 AM ET), shown short and visual on the hub sections. Brand name goes through skinText (Scale voice). */
 export const HUB_DIFFERENTIATORS = [
   { key: "clinic", title: "A clinic layer built into the network", body: "Clinics are vertically integrated with the retail network, so your members can go from a product to care and back again." },
-  { key: "performance", title: "Brands that pay on results", body: "Performance-based partnerships: brands pay when offers drive clicks and orders, based on signed partnership contracts. Estimates here, not guarantees." },
+  { key: "performance", title: "Brands that pay on results", body: "Performance-based partnerships: brands pay when offers drive clicks and orders. Estimates here, not guarantees." },
 ] as const;
 
 export function HubDifferentiators({ dark = false }: { dark?: boolean }) {

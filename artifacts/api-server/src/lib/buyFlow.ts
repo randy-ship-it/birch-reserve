@@ -11,8 +11,8 @@
  *                bytes, not the name. Held for human approval before anything runs.
  *   3. Slot      where it shows + plan. $190 / $490 go to the SAME Stripe Checkout path as /buycalc
  *                (POST /v1/checkout: Stripe verifies the card, Radar scores it, 3DS when the bank asks).
- *                Exclusive: the $1,900 exclusive reserve by card (POST /v1/exclusive/reserve), which locks a $5K–$50K
- *                exclusive package on an insertion order. All prices in the visitor's currency (lib/priceLadder.ts).
+ *                Exclusive: the $1,900 exclusive reserve by card (POST /v1/exclusive/reserve), which holds a $5K–$50K
+ *                exclusive package pending an insertion order. All prices in the visitor's currency (lib/priceLadder.ts).
  *
  * Store: production (VERCEL_ENV=production) writes buy_creatives / buy_orders in Postgres (created on first use,
  * additive). Every other environment keeps them in this instance's memory, so preview QA never writes prod data.

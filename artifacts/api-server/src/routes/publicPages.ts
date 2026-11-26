@@ -149,7 +149,7 @@ const TERMS_HTML = documentPage(
 <p>Birch Reserve is operated by Silver Birch Growth Inc. Public prices are $190 USD / $270 CAD (<strong>hold-190</strong>, a 7-day category look that does not lock a category), $490 USD / $690 CAD (<strong>reserve-490</strong>, a shared self-serve category reserve; it does not lock the category) and $1,900 USD or CAD (the exclusive display reserve, below). Prices show in CAD for visitors in Canada and USD everywhere else, and you can switch on the page. Sponsorship packs are priced and charged in USD. The currency you see at checkout is the currency you are charged.</p>
 <p>hold-190 is a 100% credit if the buyer converts within 7 days. Otherwise it is a cash refund. It does not lock a category. reserve-490 is 100% display credit, fully refundable until 14 days before the launch date written in your insertion order. To cancel, reply to your confirmation email. We refund the full amount to the original card. After that date the credit is not refundable but stays usable for 12 months after payment. A cash refund is also available if no approved surface is named within 60 days of payment.</p>
 <p>Payment is a reservation credit, not a live flight and not an impression guarantee. Nothing runs until an insertion order names the surface. After that order, cancellation and makegood follow IAB. The public sample is <a href="/sample-io">/sample-io</a>.</p>
-<p>8 brand categories across hubs, not eight websites. reserve-490 is a shared self-serve category reserve; it does not lock the category. More than one brand can reserve in a category. Only exclusive display locks one brand per category for its term: a premium slot ($25,000 to $50,000 USD, set on an insertion order) or a $5,000 to $50,000 package secured by the $1,900 exclusive display reserve (below). Reporting is aggregate only. No PHI. No clinical pixels.</p>
+<p>8 brand categories across hubs, not eight websites. reserve-490 is a shared self-serve category reserve; it does not lock the category. More than one brand can reserve in a category. Only exclusive display gives one brand a category for its IO term: a premium slot ($25,000 to $50,000 USD, set on an insertion order) or a $5,000 to $50,000 package secured by the $1,900 exclusive display reserve (below). Reporting is aggregate only. No PHI. No clinical pixels.</p>
 <h2 id="sponsorship-packs">Sponsorship packs</h2>
 <ul>${SPONSOR_PACK_TERMS.map((t) => `<li>${escapeHtml(t)}</li>`).join("")}</ul>
 <p id="carry-over"><strong>Carry-over.</strong> ${escapeHtml(CARRY_OVER_CLAUSE)}</p>
@@ -163,17 +163,17 @@ const TERMS_HTML = documentPage(
 
 const PRIVACY_HTML = documentPage(
   "Privacy — Birch Reserve",
-  "Draft privacy note for Birch Reserve reservations. Not in force until counsel stamps this page.",
+  "Draft privacy note for Birch Reserve reservations. Final terms for any purchase are in your insertion order.",
   `<h1>Privacy</h1>
 <p class="fine">${escapeHtml(SELLER)}</p>
-<p>This draft describes what Birch Reserve collects to sell the public $190 USD and $490 USD reservations. This page is not in force until counsel stamps it.</p>
-<p>Reservation checkout collects the brand legal name, work email, optional website, format preference, and an idempotency key so a repeated request does not open a second hold. Stripe hosts the card form. Silver Birch Growth Inc. receives payment status from Stripe and does not store full card numbers on Birch Reserve servers.</p>
+<p>Draft. This page describes what Birch Reserve collects to sell the public $190 USD and $490 USD reservations and the $1,900 exclusive display reserve. Final terms for any purchase are in your insertion order.</p>
+<p>Reservation checkout collects the brand legal name, work email, optional website, format preference, and an idempotency key so a repeated request does not open a second hold. Stripe hosts the card form. Silver Birch Growth Inc. receives payment status from Stripe and does not store full card numbers on its servers.</p>
 <p>Birch Reserve does not collect protected health information, clinical pixels, or patient-level reporting. Birch Guide does not collect patient or PHI data. Placement reporting, when an insertion order later authorizes a flight, is aggregate only.</p>
 <h2 id="ads">Ad delivery, the conversion pixel and storage on your device</h2>
 <p>When a Birch Reserve placement shows inside a hub, our ad script counts a viewable impression (half the ad on screen for one second) and a click through our link. To cap how often one browser sees the same ad, the script keeps a random id in that hub site's own browser storage (localStorage, not a cookie). We hash it on our side with a salt that changes every day and never store the raw id. We do not collect names, emails, IP addresses or health information through the ad script, and we do not use cross-site cookies.</p>
 <p>A brand can add our conversion pixel to its own order confirmation page. The pixel sends only the click id our ad link added to the landing URL, the order value and currency, and an order reference that we hash and use only to drop duplicates. Brands receive aggregate counts only (viewable impressions, clicks, conversions, spend), never visitor-level data. The pixel is never placed on clinical or patient pages.</p>
 <p>If your browser sends Do Not Track or Global Privacy Control, the ad script creates no id and keeps no view history, and the pixel sends nothing. You can also clear the hub site's storage at any time. The ad dashboard at /account and the admin console use a sign-in cookie that is strictly necessary for signing in.</p>
-<p>The Stripe descriptor should read SCALE HEALTH*BIRCH or BIRCH RESERVE. Contact <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a> to ask for a copy of reservation details or to correct a brand name or email on an unpaid hold.</p>
+<p>Card statements show BIRCHRSV* followed by a short label (for example BIRCHRSV* RESERVE). The seller is Silver Birch Growth Inc. Contact <a href="mailto:randy@scalehealth.ca">randy@scalehealth.ca</a> to ask for a copy of reservation details or to correct a brand name or email on an unpaid hold.</p>
 <p><a href="/terms">Terms of sale</a></p>`,
   "/privacy",
 );
@@ -181,18 +181,18 @@ const PRIVACY_HTML = documentPage(
 const SAMPLE_IO_HTML = documentPage(
   "Sample insertion order — Birch Reserve",
   "Blank sample insertion order. Nothing runs until an approved insertion order names the surface.",
-  `<p class="fine">Draft sample — not an approved insertion order</p>
+  `<p class="fine">Draft sample. Final terms are in your insertion order.</p>
 <h1>Sample insertion order</h1>
 <p>Nothing runs until an approved insertion order names the surface. This page is a blank sample, not a flight and not a receipt.</p>
 <dl>
 <div><dt><strong>Advertiser</strong></dt><dd>[Brand legal name]</dd></div>
-<div><dt><strong>SKU</strong></dt><dd>reserve-490 · $490 USD shared category reserve (more than one brand can reserve; it does not lock the category), or hold-190 · $190 USD 7-day look</dd></div>
+<div><dt><strong>SKU</strong></dt><dd>reserve-490 · $490 USD shared category reserve (more than one brand can reserve; it does not lock the category), or hold-190 · $190 USD 7-day look, or the $1,900 exclusive display reserve (holds one exclusive package pending the IO; refunded if another brand commits first)</dd></div>
 <div><dt><strong>Named surface</strong></dt><dd>[Hub URL, for example a listed Scale Health hub]</dd></div>
 <div><dt><strong>Format</strong></dt><dd>post-checkout, recovery plan, booking confirmation, native hub module, or motion :15</dd></div>
 <div><dt><strong>Category</strong></dt><dd>One of eight: pain relief / topicals, recovery hardware, nutrition, sleep, meal prep, women’s health, men’s health, diagnostics / services</dd></div>
 <div><dt><strong>Credit</strong></dt><dd>100% display credit. Fully refundable until 14 days before the launch date. Credit expires 12 months. Cash refund if no approved surface can be named within 60 days.</dd></div>
 </dl>
-<p class="fine">Draft until counsel stamps.</p>
+<p class="fine">Draft sample. Final terms are in your insertion order.</p>
 <p><a href="/terms">Terms of sale</a></p>`,
   "/sample-io",
 );

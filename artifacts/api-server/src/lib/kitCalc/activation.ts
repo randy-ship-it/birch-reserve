@@ -71,7 +71,7 @@ export function readExposure(x: unknown): FridayExposure | null {
  */
 export const MOCK_SHARES = { min_share: 0.01, max_share: 0.05, placeholder: true } as const;
 const FIG = [
-  { key: "hubs", unit: "page views / month", now: 700_000_000, later: 5_000_000_000, figure_now: "700MM+ captive page views activating", figure_later: "700MM+ captive page views activating" },
+  { key: "hubs", unit: "page views / month", now: 128_000_000, later: 5_000_000_000, figure_now: "~128MM modelled page views a month (estimate)", figure_later: "~128MM modelled page views a month (estimate)" },
   { key: "street_team", unit: "homes", now: 500_000, later: 3_000_000, figure_now: "1MM+ consumers now, 3MM+ est. in 2027", figure_later: "1MM+ consumers now, 3MM+ est. in 2027" },
   { key: "retail", unit: "recovery customers", now: 1_000_000, later: 1_000_000, figure_now: "200+ locations, 500+ soon · 1MM+ captive recovery consumers · Canada + USA", figure_later: "200+ locations, 500+ soon · 1MM+ captive recovery consumers · Canada + USA" },
   { key: "calm_joints", unit: "", now: 0, later: 0, figure_now: null, figure_later: null, needs_figure: true },

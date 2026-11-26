@@ -70,7 +70,7 @@ export function sharesOf(ex: FridayExposure) {
 }
 /** Channel rows for one tier: base figure (= channel now.min ÷ min share) × the tier's share band. */
 /** Street Team row note: text reach, never a homes figure (Randy, Nov 19 2026 2:27 PM ET). */
-export const STREET_ROW_NOTE = "1MM+ consumers now, 3MM+ est. in 2027, based on signed partnership contracts";
+export const STREET_ROW_NOTE = "1MM+ consumers now, 3MM+ est. in 2027, modelled estimates from listed partners";
 
 export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
   const s = sharesOf(ex);
@@ -90,7 +90,7 @@ export function channelRows(ex: FridayExposure, tier: Tier): ChannelRow[] {
     const baseLater = c?.later ? c.later.min / s.min : null;
     const range = base && base > 0 ? llh(base * lo, base * hi) : null;
     const later = baseLater && base && baseLater > base ? llh(baseLater * lo, baseLater * hi) : null;
-    const note = c?.needs_figure ? "1MM+ consumers now, 3MM+ est. in 2027, based on signed partnership contracts" : !c?.eligible_now ? (c?.reason ?? "Not in your markets yet") : null;
+    const note = c?.needs_figure ? "1MM+ consumers now, 3MM+ est. in 2027, modelled estimates from listed partners" : !c?.eligible_now ? (c?.reason ?? "Not in your markets yet") : null;
     return { key, name: n.name, unit: n.unit, monthly: n.monthly, geo: c?.geo_label ?? "", range, later, note };
   });
 }

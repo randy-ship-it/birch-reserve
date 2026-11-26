@@ -61,7 +61,7 @@ test("buyer-answer + category pages: answer box, FAQPage schema, reserve CTA, Ma
     const html = renderGuide(g);
     assert.match(html, /class="answer"/);
     assert.match(html, /"@type":"FAQPage"/);
-    assert.match(html, /based on signed partnership contracts/i);
+    assert.match(html, /modelled estimates from listed partners/i);
     assert.match(html, /data-cta="reserve"/);
     assert.match(html, /\$1,900/);
     assert.match(html, /rel="alternate" type="text\/markdown"/);
