@@ -74,9 +74,9 @@ export function SeeYourAd({ testId = "see-your-ad", initial = "drho" }: { testId
         )}
       </form>
       <p className="mt-1.5 text-[12px] text-foreground/60" role={err ? "alert" : undefined}>{err || "Stays in your browser. Nothing is uploaded."}</p>
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-        <span className="rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2.5 py-1 text-[11px] font-bold text-[#8A5A00]" data-testid="mock-badge">{mockBadge(hub)}</span>
-        <div className="flex max-w-full items-center gap-1.5 overflow-x-auto text-[11px] font-bold uppercase tracking-wider [scrollbar-width:none]" role="group" aria-label="Live hub">
+      <div className="mt-3 flex flex-col gap-2">
+        <span className="w-fit rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2.5 py-1 text-[11px] font-bold text-[#8A5A00]" data-testid="mock-badge">{mockBadge(hub)}</span>
+        <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider" role="group" aria-label="Live hub">
           {HUB_KEYS.map((h) => (
             <button key={h} type="button" aria-pressed={hub === h} onClick={() => { setAuto(false); setHub(h); trackAttn("preview.hub", { once: true }); }} className={`inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-3.5 py-1 ${hub === h ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/70 ring-1 ring-foreground/15"}`} data-testid={`mock-hub-${h}`}>
               {HUB_MOCKS[h].tab}
