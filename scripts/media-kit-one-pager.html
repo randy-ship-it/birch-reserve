@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Birch Reserve media kit</title>
+  <title>{{BRAND}} media kit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
   <style>
@@ -14,14 +14,16 @@
       --lime: #C8F55A;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    @page { size: letter; margin: 0; }
     html, body { background: white; color: var(--ink); }
     body {
       font-family: "IBM Plex Sans", sans-serif;
-      font-size: 8.6pt;
+      font-size: 8pt;
       line-height: 1.35;
       width: 8.5in;
-      height: 11in;
-      padding: 0.42in 0.48in 0.38in;
+      min-height: 10.6in;
+      height: auto;
+      padding: 0.30in 0.42in 0.22in;
     }
     h1, h2, .display { font-family: Fraunces, serif; font-weight: 500; letter-spacing: -0.02em; }
     header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1.5px solid var(--ink); padding-bottom: 8px; }
@@ -29,18 +31,18 @@
     .brand img { width: 26px; height: 26px; }
     .brand-name { font-family: Fraunces, serif; font-size: 16pt; font-style: italic; line-height: 1; }
     .kicker { font-size: 7.5pt; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
-    h1 { font-size: 18pt; line-height: 1.08; margin: 10px 0 6px; }
+    h1 { font-size: 16.5pt; line-height: 1.08; margin: 8px 0 4px; }
     .lede { font-size: 9.2pt; max-width: 6.9in; }
     .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px; margin-top: 8px; }
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .card { border: 1px solid var(--line); padding: 7px 8px; }
+    .card { border: 1px solid var(--line); padding: 6px 7px; }
     .card.ink { border: 1.5px solid var(--ink); }
     .card h3 { font-size: 9pt; margin: 1px 0 3px; }
     .tag { display: inline-block; font-size: 6.5pt; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid var(--ink); padding: 1px 4px; }
     .tag.lime { background: var(--lime); border-color: var(--ink); }
     .price { font-family: Fraunces, serif; font-size: 16pt; line-height: 1; margin: 2px 0; }
-    section { margin-top: 11px; }
+    section { margin-top: 6px; }
     section h2 { font-size: 11.5pt; margin-bottom: 5px; }
     ol.steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; list-style: none; }
     ol.steps li { border: 1px solid var(--line); padding: 6px 7px; }
@@ -49,28 +51,39 @@
     th, td { text-align: left; padding: 3px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
     th { font-size: 6.8pt; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
     .muted { color: var(--muted); }
-    footer { margin-top: 10px; border-top: 1.5px solid var(--ink); padding-top: 7px; display: flex; justify-content: space-between; gap: 16px; font-size: 8pt; }
+    footer { margin-top: 6px; border-top: 1.5px solid var(--ink); padding-top: 5px; page-break-inside: avoid; break-inside: avoid; display: flex; justify-content: space-between; gap: 16px; font-size: 8pt; }
     .fine { font-size: 7.2pt; color: var(--muted); margin-top: 4px; }
   </style>
 </head>
 <body>
   <header>
     <div class="brand">
-      <img src="mark.svg" alt="" />
+      <img src="{{LOGO}}" alt="" style="width:auto;max-height:26px;height:26px" />
       <div>
-        <div class="brand-name">Birch Reserve</div>
+        <div class="brand-name">{{BRAND}}</div>
         <div class="kicker" style="margin-top:3px">Media kit · one page · November 2026</div>
       </div>
     </div>
     <div style="text-align:right; font-size:8.5pt">
-      <div>birchreserve.net</div>
+      <div>{{SITE}}</div>
       <div style="margin-top:3px">randy@scalehealth.ca</div>
     </div>
   </header>
 
-  <h1>Start with a seat. Then lock the category.</h1>
-  <p class="lede">Birch Reserve sells prepaid media credit inside a private, non-public member experience on Scale Health hubs. Every brand is hand-picked. The small-business package is the easy way to start, by card. Premium slots — from $25K, $25K–$50K, inquire only — are the main event: category exclusivity, a larger display share and priority placement. Nothing runs until an insertion order names the hub and surface.</p>
+  <h1>Buy small. Offer mid. Inquire big.</h1>
+  <p class="lede">{{BRAND}} sells prepaid media credit inside a private, non-public member experience on Scale Health hubs. Buy a small slot by card, make an offer on mid-size inventory, or inquire for bigger slots. Four ways in: supply, your own hub, display / CPC, or ads only. Nothing runs until an insertion order names the hub and surface.</p>
 
+
+  <section>
+    <div class="kicker">Four ways in · pick some or all</div>
+    <div class="grid-4" style="margin-top:6px">
+      <div class="card ink"><span class="tag lime">Pay on results</span><h3>Supply</h3><p>Products or services in hub micro-stores, 200+ brick-and-mortar locations, or street-team door-to-door sampling.</p></div>
+      <div class="card"><span class="tag">Pending approval</span><h3>Your own hub</h3><p>Performance-based. You earn from your hub. Needed for max CPC exposure.</p></div>
+      <div class="card"><span class="tag">Buy now</span><h3>Display / CPC</h3><p>Performance placements for brands without a hub. Buy a small slot now, or request CPC.</p></div>
+      <div class="card"><span class="tag">Buy now</span><h3>Ads only</h3><p>Exposure only. No supply needed. Buy a small slot now.</p></div>
+    </div>
+    <p class="fine" style="margin-top:6px"><strong>Categories:</strong> Recovery · Longevity · Sleep · Fitness · Nutrition. Most hubs are recovery-focused today. More categories are coming.</p>
+  </section>
   <section>
     <div class="kicker">Four placements in every hub</div>
     <div class="grid-4">
@@ -96,17 +109,22 @@
   </section>
 
   <section>
-    <div class="kicker">Two packages</div>
-    <div class="grid-2" style="margin-top:6px">
-      <div class="card">
-        <div class="kicker">Small business package · the easy way to start</div>
-        <div class="price" style="font-size:14pt">$190 look · $490 seat</div>
-        <p>Self-serve, paid by card. $190 USD is a 7-day look: 100% credit if you take the $490 seat within 7 days; otherwise a cash refund. The $490 USD category seat is 100% media credit, open to more than one brand. Credit spends down over 6 months. Does not lock category exclusivity.</p>
+    <div class="kicker">The buyer journey</div>
+    <div class="grid-3" style="margin-top:6px">
+      <div class="card" style="background:#ecfccb">
+        <span class="tag lime">1 · Small slots · buy now</span>
+        <div class="price" style="font-size:14pt;margin-top:4px">$190 look · $490 reserve</div>
+        <p>Self-serve, paid by card. $190 USD is a 7-day look: 100% credit if you take the $490 reserve within 7 days; otherwise a cash refund. The $490 USD category reserve is 100% media credit. Does not lock category exclusivity.</p>
+      </div>
+      <div class="card ink">
+        <span class="tag">2 · Mid-size · make an offer</span>
+        <div class="price" style="font-size:14pt;margin-top:4px">Name your budget</div>
+        <p>Make an offer on mid-size inventory. No card needed. We reply by email with options and an insertion order draft. Nothing runs until you approve it.</p>
       </div>
       <div class="card ink" style="background:var(--ink); color:white; border-color:var(--ink)">
-        <div class="kicker" style="color:#C8F55A">Premium slots · the main event · inquire only</div>
-        <div class="price" style="color:white">From $25K, $25K–$50K</div>
-        <p>Category exclusivity, a larger display share and priority placement. No card purchase — we reply with an insertion order. Term is set on the IO. Start with a seat, then lock the category.</p>
+        <span class="tag lime">3 · Bigger slots · inquire</span>
+        <div class="price" style="color:white;margin-top:4px">From $25K USD</div>
+        <p>Premium slots, $25K–$50K, inquire only: category exclusivity, a larger display share and priority placement. We write the insertion order.</p>
       </div>
     </div>
   </section>
@@ -115,25 +133,17 @@
     <div class="grid-2">
       <div>
         <div class="kicker">How it works</div>
-        <ol class="steps" style="margin-top:6px; grid-template-columns: 1fr;">
-          <li style="border:0; padding:0">
-            <table>
-              <tr><th style="width:18px">1</th><td><strong>Choose a placement</strong> — four surfaces; post-purchase is inquire-only.</td></tr>
-              <tr><th>2</th><td><strong>Start with $190 or $490, then inquire</strong> to lock a premium slot from $25K–$50K.</td></tr>
-              <tr><th>3</th><td><strong>An insertion order names the hub</strong> before anything runs.</td></tr>
-              <tr><th>4</th><td><strong>Credit spends down over 6 months</strong> on live hubs after your deposit lands.</td></tr>
-              <tr><th>5</th><td><strong>We report what ran</strong>, per hub and surface.</td></tr>
-            </table>
-          </li>
-        </ol>
+        <table style="margin-top:6px">
+          <tr><th style="width:18px">1</th><td><strong>Buy a small slot, make an offer, or inquire.</strong> An insertion order names the hub before anything runs.</td></tr>
+          <tr><th>2</th><td><strong>Credit spends down over 6 months</strong> on live hubs after your deposit lands. We report what ran, per hub and surface.</td></tr>
+        </table>
       </div>
       <div>
         <div class="kicker">What you get</div>
         <table style="margin-top:6px">
-          <tr><td>A placement inside a private, co-branded member hub. Hand-picked curation.</td></tr>
-          <tr><td>Media credit toward display or CPC.</td></tr>
-          <tr><td>Aggregate reporting: views, clicks, UTM-tagged visits and promo-code redemptions, per hub and surface. Reports go out on a regular schedule, confirmed on your insertion order.</td></tr>
-          <tr><td>If you are the agency of record: <strong>a standard written 10% discount off the published rate card</strong>. You set your own resale price and handle your own client disclosure. Direct buyers pay the card. We do not undercut agency clients.</td></tr>
+          <tr><td>A placement inside a private, co-branded member hub. Hand-picked curation. Media credit toward display or CPC.</td></tr>
+          <tr><td>Aggregate reporting: views, clicks, UTM-tagged visits and promo-code redemptions, per hub and surface.</td></tr>
+          <tr><td>If you are the agency of record: <strong>a standard written 10% discount off the published rate card</strong>. You set your own resale price. Direct buyers pay the card.</td></tr>
         </table>
       </div>
     </div>
@@ -143,13 +153,13 @@
     <div class="grid-2">
       <div class="card">
         <div class="kicker">Refundable 6-month spend-down</div>
-        <p style="margin-top:4px">Credit spends down over 6 months on live hubs after your deposit lands. Unused credit can be refunded or extended month by month. The $490 seat is also fully refundable until 14 days before the launch date on your insertion order; after that date the credit stays usable for 12 months. A cash refund is also available if no approved surface is named within 60 days of payment. Draft terms until counsel stamps the terms page. See birchreserve.net/terms.</p>
+        <p style="margin-top:4px">Credit spends down over 6 months on live hubs after your deposit lands. Unused credit can be refunded or extended month by month. The $490 seat is also fully refundable until 14 days before the launch date on your insertion order; after that date the credit stays usable for 12 months. A cash refund is also available if no approved surface is named within 60 days of payment. Draft terms until counsel stamps the terms page. See the terms page on {{FINE_SITE}}.</p>
       </div>
       <div class="card">
         <div class="kicker">Privacy-first</div>
         <p style="margin-top:4px">Reporting is aggregate only. No personal data is shared with brands. No names, contact details or health information. No PHI. No clinical pixels.</p>
         <div class="kicker" style="margin-top:8px">Measured proof we can show today</div>
-        <p style="margin-top:4px">8 launch brands feeding the audience <span class="tag">Measured</span>. 4 racquet-sport pages live on Calm Joints <span class="tag">Measured</span>. Early hub sessions: 49% Quebec, 43% Ontario (30 days to Nov 2, 2026) <span class="tag">Measured</span>. Audience: 700MM+ captive page views activating on branded ScaleHealth.ca hubs; 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers; 1MM+ consumers now through our provider network and Street Team Ambassadors, expanding to an estimated 3MM+ in 2027 <span class="tag">Estimate</span>. Street Team: Canada for now. Reach and audience, not delivered impressions <span class="tag">Plan</span>.</p>
+        <p style="margin-top:4px">8 launch brands <span class="tag">Measured</span>. 4 racquet-sport pages live on Calm Joints <span class="tag">Measured</span>. Early hub sessions: 49% Quebec, 43% Ontario (30 days to Nov 2, 2026) <span class="tag">Measured</span>. Audience: 700MM+ captive page views activating; 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers; 1MM+ consumers now through our provider network and Street Team, expanding to an estimated 3MM+ in 2027 <span class="tag">Estimate</span>. Reach and audience, not delivered impressions. Street Team: Canada for now <span class="tag">Plan</span>.</p>
       </div>
     </div>
   </section>
@@ -161,11 +171,11 @@
         randy@scalehealth.ca · We reply within 1 business day.
       </div>
       <div style="text-align:right">
-        Birch Reserve is operated by Silver Birch Growth Inc., Toronto, Ontario.<br />
-        birchreserve.net/media-kit · birchreserve.net/terms · birchreserve.net/sample-io
+        {{OPERATOR}}<br />
+        {{FOOTER_LINKS}}
       </div>
     </div>
-    <div class="fine">Use only the figures labelled above. No impression, click or sales guarantee. This one-pager uses terms already published on birchreserve.net.</div>
+    <div class="fine">Use only the figures labelled above. No impression, click or sales guarantee. This one-pager uses terms already published on {{FINE_SITE}}.</div>
   </footer>
 </body>
 </html>

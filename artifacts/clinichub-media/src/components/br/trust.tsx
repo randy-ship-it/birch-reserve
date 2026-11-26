@@ -9,6 +9,8 @@ import { AUDIENCE_SNAPSHOT, REGION_MIX } from "../../../../api-server/src/lib/ov
 import {
   MEDIA_KIT_ONE_PAGER_HREF,
   MEDIA_KIT_ONE_PAGER_NAME,
+  SCALE_MEDIA_KIT_ONE_PAGER_HREF,
+  SCALE_MEDIA_KIT_ONE_PAGER_NAME,
   OPERATOR_CITY,
   OPERATOR_LINE,
   SALES_CONTACT_NAME,
@@ -16,6 +18,8 @@ import {
   SALES_EMAIL_HREF,
   SALES_REPLY_LINE,
 } from "@/lib/seller-identity";
+import { isScaleSkin } from "@/lib/siteSkin";
+import { birchHref } from "@/lib/shareTrack";
 import { Eyebrow, Faq, H2, Section } from "./ui";
 
 export const TRUST_FAQ: Array<{ q: string; a: string }> = [
@@ -118,10 +122,12 @@ export function MediaKitPdfLink({
         : variant === "lineDark"
           ? "border border-background/45 text-background hover:border-background hover:bg-background hover:text-foreground"
           : "border border-foreground/25 text-foreground hover:border-foreground hover:bg-foreground hover:text-background";
+  const href = isScaleSkin() ? SCALE_MEDIA_KIT_ONE_PAGER_HREF : MEDIA_KIT_ONE_PAGER_HREF;
+  const name = isScaleSkin() ? SCALE_MEDIA_KIT_ONE_PAGER_NAME : MEDIA_KIT_ONE_PAGER_NAME;
   return (
     <a
-      href={MEDIA_KIT_ONE_PAGER_HREF}
-      download={MEDIA_KIT_ONE_PAGER_NAME}
+      href={birchHref(href)}
+      download={name}
       className={`inline-flex h-12 items-center justify-center gap-2 px-6 text-sm font-semibold transition-colors ${v} ${className}`}
       data-testid={testId}
     >

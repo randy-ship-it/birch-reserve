@@ -19,6 +19,7 @@ import { kitCover, kitSideA, kitSideB, kitPdfBlob, kitPngBlob, saveBlob, imageTo
 import { kitSummary } from "@/lib/kitSummary";
 import { loadPrefill } from "@/lib/intakePrefill";
 import { KIT_CALC_CONFIG, kitCalc } from "../../../../api-server/src/lib/kitCalc";
+import { BuyJourney, FourPaths } from "@/components/br/journey";
 
 const REPEAT_LABEL = (n: number) => KIT_CALC_CONFIG.repeatBands.find((b) => n >= b.lo && n <= b.hi)?.label ?? String(n);
 
@@ -75,6 +76,8 @@ export default function BrKitReport() {
       <div className="container mx-auto px-4 py-8 md:py-12">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Private link · not indexed</p>
         <h1 className="font-display text-4xl md:text-6xl">Your report and Monetization Kit</h1>
+        <FourPaths testId="kit-report-paths" className="mt-6" />
+        <BuyJourney where="kit_report" className="mt-6" testId="kit-report-journey" />
         {/* Sharing from a private report shares the public intake, never this report's token link. */}
         <div className="mt-4"><ShareBar testId="share-bar-report" href="intake" text="Get your own free Monetization Kit: hub earnings and supplier exposure, estimated and reviewed by a person." /></div>
         {state === "loading" ? <p className="mt-6 flex items-center gap-2"><Loader2 className="size-4 animate-spin" />Loading your report…</p> : null}

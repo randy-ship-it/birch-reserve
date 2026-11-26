@@ -64,6 +64,9 @@ test("operator line, founder contact, and one-page media kit are present", () =>
   assert.match(mediaKit, /testId="mk-pdf-hero"/);
   const pdf = resolve(root, "clinichub-media/public/birch-reserve-one-pager.pdf");
   assert.ok(existsSync(pdf), "one-pager PDF is in public/");
+  assert.match(identity, /SCALE_MEDIA_KIT_ONE_PAGER_HREF = "\/scale-health-one-pager\.pdf"/);
+  const scalePdf = resolve(root, "clinichub-media/public/scale-health-one-pager.pdf");
+  assert.ok(existsSync(scalePdf), "Scale one-pager PDF is in public/");
 });
 
 test("copy rules: 20mm+ allowed, no 8.7mm, no gross profit, no street address on public surfaces", () => {
@@ -82,6 +85,11 @@ test("copy rules: 20mm+ allowed, no 8.7mm, no gross profit, no street address on
   assert.doesNotMatch(pdfText, /8\.7\s*mm/i);
   assert.doesNotMatch(pdfText, /777-2255/);
   assert.doesNotMatch(pdfText, /Queen St/);
+  const html = read("../../scripts/media-kit-one-pager.html");
+  assert.match(html, /Buy small\. Offer mid\. Inquire big\./);
+  assert.match(html, /Four ways in/);
+  assert.match(read("../clinichub-media/src/pages/br/kit-report.tsx"), /<FourPaths /);
+  assert.match(read("../clinichub-media/src/pages/br/kit-report.tsx"), /<BuyJourney /);
 });
 
 test("two-tier offers: SMB $190/$490 to start, premium $25K–$50K is the main event", () => {
