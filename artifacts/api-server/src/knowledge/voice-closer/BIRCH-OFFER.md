@@ -3,7 +3,7 @@
 CURRENT OFFER (Randy HARD 2026-11-13; overrides anything below that conflicts):
 - The BIRCH RESERVE CANONICAL OFFER FACTS (brands/birch-reserve/CANONICAL-FACTS.md, generated from the birch-reserve repo lib/birchFacts.ts) are the only source for prices, seats, categories, terms and routing.
 - Self-serve under $10,000 ($190 7-day look, $490 category seat): walk them through checkout at https://birchreserve.net/buycalc, or the request form at https://birchreserve.net/buycalc#request if they are not ready. Self-serve reserves are shared, with more than one brand per category. Placements are curated hub by hub; we don't publish counts.
-- $10,000+ (premium slots, $25,000 to $50,000, inquire only; a premium slot locks one brand per category for its IO term), partnerships and serious prospects: collect name, company, phone, email and best time, submit the call-back, and give (647) 931-6278. You may say or type the phone number.
+- $10,000+ (premium slots, $25,000 to $1.5M USD, inquire only; a premium slot locks one brand per category for its IO term), partnerships and serious prospects: collect name, company, phone, email and best time, submit the call-back, and give (647) 931-6278. You may say or type the phone number.
 - Never call the $490 seat exclusive. Never promise impressions, reach, clicks or CTR. Modelled numbers are always called modelled. Audience (say as reach, never as impressions): branded ScaleHealth.ca hubs modelled page views a month (estimate, no figure quoted in chat); private retail network of fitness & recovery retailers 200+ locations, 500+ soon, 1MM+ captive recovery consumers; Calm Joints + provider network + Street Team Ambassadors 1MM+ consumers now, expanding to an estimated 3MM+ in 2027 (always say estimate; Street Team is Canada for now). Never 8.7MM.
 - Canada only for now.
 
@@ -23,7 +23,7 @@ CURRENT OFFER (Randy HARD 2026-11-13; overrides anything below that conflicts):
 |-----|-------|------------|
 | `hold-190` | **$190 USD** | 7-day look at your category placement. Converts 100% to the seat within 7 days, otherwise a cash refund. Does not take a seat or lock a category. |
 | `reserve-490` | **$490 USD** | Category reserve: a shared self-serve category reserve, used by more than one brand per category (not exclusive). 100% media credit until the IO. Refundable until 14 days before launch; then usable for 12 months. |
-| Premium slot | **$25,000 to $50,000 USD** | Inquire only, set on an IO. Category exclusivity (one brand per category for the term), larger display share, priority placement. Team call-back. |
+| Premium slot | **$25,000 to $1.5M USD** | Inquire only, set on an IO. Category exclusivity (one brand per category for the term), larger display share, priority placement. Team call-back. |
 | Book a call | Custom | Multi-hub / on-prem Align / custom package. Take intake (name, company, role, phone, email, need, size, timing) for a team callback. Cal only if they insist on a set time. |
 
 ## Enterprise (Coming soon — Randy HARD 2026-09-24 ~10:15pm ET)
@@ -32,7 +32,7 @@ CURRENT OFFER (Randy HARD 2026-11-13; overrides anything below that conflicts):
 |------|---------|------|
 | **$100K–$250K+** | **Coming soon / Inquire within** | Program / annual spend. **Not** Stripe self-serve. CTA: Book a call / randy@scalehealth.ca. Do **not** invent CPM, impression guarantees, or seat math for this tier. |
 
-Self-serve ladder: `hold-190` $190 look · `reserve-490` $490 seat · Premium $25K to $50K (inquire only) · Book a call (custom). No invented enterprise rate card beyond the $100K–$250K+ band.
+Self-serve ladder: `hold-190` $190 look · `reserve-490` $490 seat · Premium $25,000 to $1.5M USD (inquire only) · Book a call (custom). No invented enterprise rate card beyond the published $25,000–$1.5M USD block band.
 
 ## Unpublished / legacy only
 
@@ -123,7 +123,7 @@ On-prem clinic/studio surfaces via Align / Scale clinic hubs = separate IO line,
 |---|---|
 | Exploring, unsure of category, wants a look | The $190 7-day look at https://birchreserve.net/buycalc, or the request form at https://birchreserve.net/buycalc#request |
 | Clear category, ready to commit | The $490 category seat at https://birchreserve.net/buycalc |
-| $10K+, premium, exclusivity, partnership | Premium slot ($25K to $50K, inquire only): collect name, company, phone, email, best time; submit the call-back; give (647) 931-6278 |
+| $10K+, premium, exclusivity, partnership | Premium slot ($25,000 to $1.5M USD, inquire only): collect name, company, phone, email, best time; submit the call-back; give (647) 931-6278 |
 | Multi-hub, on-prem Align screens, custom, big account, or wants a human | Qualify, then the calendar (after qualifying only) |
 | Asks for impressions or guaranteed reach | Do not invent numbers. Say all numbers are modelled and spend is media credit until the IO; offer a call for a custom IO |
 | Ready to buy (checkout live, Randy 2026-09-24 6:22pm ET) | Capture name, company, email, phone; send them to https://birchreserve.net/buycalc to lock the $490 seat or take the $190 look (phone: text or read out the link). Never say a payment went through unless they confirm they paid |
@@ -142,11 +142,11 @@ Never tell a Birch buyer their seat equals any view count. Partner range to name
 
 | They say | You say / do |
 |---|---|
-| Options | $190 7-day look (converts to the seat or refunded). $490 category seat = 100% media credit until the IO. Premium $25K to $50K, inquire only. |
-| "Is it exclusive?" / holding a category | The $490 seat is not exclusive: a shared category reserve, used by more than one brand per category. Category exclusivity is a premium slot ($25K to $50K, inquire only, on an IO). |
+| Options | $190 7-day look (converts to the seat or refunded). $490 category seat = 100% media credit until the IO. Premium $25,000 to $1.5M USD, inquire only. |
+| "Is it exclusive?" / holding a category | The $490 seat is not exclusive: a shared category reserve, used by more than one brand per category. Category exclusivity is a premium slot ($25,000 to $1.5M USD, inquire only, on an IO). |
 | Proof / mock | Primary: live DR-HO hub https://physio.drhonow.com/dr-ho/portal ("illustrative, not your receipt"). Secondary placement example (not hero, no reach): https://weprize.net. Kit: https://birchreserve.net/kit. |
 | Impressions / CTR / guarantees | Refuse invented numbers. Platform scale story only (50MM+ uniques in 4 months, on track for 100MM+ by year end). Pivot to the checkout and booking moments the seat sits in. |
-| Premium / enterprise / big annual | Premium slots $25K to $50K, inquire only; larger annual programs, inquire. Intake + team call-back. No invented CPM. |
+| Premium / enterprise / big annual | Premium slots $25,000 to $1.5M USD, inquire only; larger annual programs, inquire. Intake + team call-back. No invented CPM. |
 | Person / calendar | Qualify first. Callback default. Cal https://cal.com/randy-gilling/30min only post-qualify if they insist on a set time. |
 | Franchise / complex / multi-location | Jon at jon@scalehealth.ca. Capture details. |
 

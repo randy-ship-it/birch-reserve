@@ -129,7 +129,7 @@ export function PrimeHero() {
           <a href={`mailto:${SALES_EMAIL}?subject=Birch%20Reserve%20seat`} className="inline-flex items-center gap-1.5 underline-offset-4 hover:underline" data-testid="prime-email"><Mail className="size-3.5" aria-hidden />{SALES_EMAIL}</a>
         </p>
         <p className="mt-4 max-w-3xl text-xs leading-relaxed text-background/60">
-          {p.seat} reserves your share of display space across the network: 100% media credit until the insertion order (IO), fully refundable until 14 days before launch. The {p.look} look gives you 7 days to see your placement and converts in full to the reserve, or is refunded. Premium slots ($25K–$50K, inquire only) add a larger share, priority placement and exclusivity. No impression guarantees. Aggregate reporting only.
+          {p.seat} reserves your share of display space across the network: 100% media credit until the insertion order (IO), fully refundable until 14 days before launch. The {p.look} look gives you 7 days to see your placement and converts in full to the reserve, or is refunded. Premium slots ($25,000–$1.5M, inquire only) add a larger share, priority placement and exclusivity. No impression guarantees. Aggregate reporting only.
         </p>
       </div>
     </section>

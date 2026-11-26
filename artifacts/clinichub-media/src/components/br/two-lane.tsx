@@ -379,7 +379,7 @@ function BlockLane() {
             <div className="mt-3"><Chips dark items={["Draft IO PDF now", "Nothing runs until the IO names the hub", "Aggregate reporting"]} /></div>
             <Details dark testId="lane-block-terms" label="Details">
               <p>{PAYMENT_METHODS_LINE} {REMIT_LINE} The IO sets the hubs, placements, flight and invoice terms.</p>
-              <p>The $25K–$50K Category Lock is the premium slot: one brand per category for its term, set on an insertion order.</p>
+              <p>The $25,000–$1.5M Category Lock is the premium slot: one brand per category for its term, set on an insertion order.</p>
               <p>{LIVE_TERMS.io} Views are modelled estimates. <a className="underline" href="/sample-io">Sample IO</a> · <a className="underline" href="/media-kit">Media kit</a></p>
             </Details>
           </div>

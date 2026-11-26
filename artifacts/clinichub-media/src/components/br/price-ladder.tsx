@@ -1,7 +1,7 @@
 /**
  * The one pricing component (BR-15 move 4, Randy, Nov 21 2026 3:34 PM ET: "it is based on where you are coming from").
  * Same steps and copy as the server pages (api-server/src/lib/priceLadder.ts), in the visitor's currency:
- * $190 look → $490 reserve → $1,900 exclusive reserve that locks a $5K–$50K package; $25K–$50K premium is inquire-only.
+ * $190 look → $490 reserve → $1,900 exclusive reserve that locks a $5K–$50K package; $25,000–$1.5M premium is inquire-only.
  */
 import { siteUrl } from "@/lib/siteSkin";
 import { ArrowRight } from "lucide-react";

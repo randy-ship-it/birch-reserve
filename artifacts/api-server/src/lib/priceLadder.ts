@@ -5,7 +5,7 @@
  * The same three steps everywhere, in the visitor's currency:
  *   $190 7-day look → $490 shared reserve → $1,900 exclusive reserve that locks a $5K–$50K exclusive package.
  * Look and reserve use the existing CAD table ($270 / $690 CAD, reserveOffers.ts). The $1,900 reserve has no
- * CAD/USD table, so it is the same number in both. $25K–$50K premium slots stay inquire-only at the top.
+ * CAD/USD table, so it is the same number in both. $25,000–$1.5M premium slots stay inquire-only at the top.
  *
  * Pure module: safe for the API and the browser bundle (no Node or Express imports).
  */
@@ -24,7 +24,7 @@ export type LadderStep = {
 const look = PUBLIC_RESERVE_OFFERS.find((o) => o.sku === "hold-190")!;
 const seat = PUBLIC_RESERVE_OFFERS.find((o) => o.sku === "reserve-490")!;
 
-export const PREMIUM_RANGE = "$25K–$50K" as const;
+export const PREMIUM_RANGE = "$25,000–$1.5M USD" as const;
 
 export function priceLadder(currency: ReserveCurrency): readonly LadderStep[] {
   const ex = exclusiveReserveFor(currency);

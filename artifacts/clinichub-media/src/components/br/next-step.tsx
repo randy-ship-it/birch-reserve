@@ -8,7 +8,7 @@
  *                live sponsorship credit tiers ($1.5K / $3K / $6K with +5/+10/+15% bonus credit, /sponsor).
  *
  * Only tiers that already exist: hold-190 / reserve-490 (card, /buy), STARTER_BLOCK (pricing.ts), AGENCY_TEST (twoLane.ts),
- * DEPOSIT_TIERS (sponsorKit.ts), premium $25K–$50K inquire-only. No new prices, no new Stripe prices, nothing charged here.
+ * DEPOSIT_TIERS (sponsorKit.ts), premium $25,000–$1.5M inquire-only. No new prices, no new Stripe prices, nothing charged here.
  * Refund wording is the live /terms line for the $490 reserve; everything else says the IO sets the terms.
  * Copy rules: no counts, never "open/available/unclaimed", no impression/CTR/ROAS guarantees, modelled figures labelled.
  */
@@ -270,7 +270,7 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
         <p data-testid="mid-tier-agency-terms">{MID_TIER_LINE} One IO per client. {AGENCY_REPORTING_LINE}.</p>
         <p data-testid="mid-tier-refund">{MID_TIER_REFUND}</p>
         <p>View block: from {fmtUsd(STARTER_BLOCK.startingUsd)} {C} for 100K modelled views. <a href={withUtm("/?inquire=pack&block=100000&surfaces=landing#quick-buy", where, "block")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-block-cta">Request a block</a></p>
-        <p>Premium, one brand per category: hold a {X.packageLabel} package pending your IO with the <a href={withUtm(siteUrl("/exclusive"), where, "exclusive-1900")} className="font-semibold text-lime-300 underline underline-offset-2">{X.label} reserve</a>, or ask about a $25K–$50K premium slot by invoice. <a href={withUtm("/buy?plan=exclusive", where, "exclusive")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-exclusive">Reserve on /buy</a></p>
+        <p>Premium, one brand per category: hold a {X.packageLabel} package pending your IO with the <a href={withUtm(siteUrl("/exclusive"), where, "exclusive-1900")} className="font-semibold text-lime-300 underline underline-offset-2">{X.label} reserve</a>, or ask about a $25,000–$1.5M premium slot by invoice. <a href={withUtm("/buy?plan=exclusive", where, "exclusive")} className="font-semibold text-lime-300 underline underline-offset-2" data-testid="mid-tier-exclusive">Reserve on /buy</a></p>
         <TwoSurfaceExample dark />
       </Details>
     </section>

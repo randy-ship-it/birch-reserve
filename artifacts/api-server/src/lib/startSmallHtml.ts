@@ -20,7 +20,7 @@ export function startSmallHtml(): string {
     ["Refund terms", "Every deposit is 100% media credit. Ask by email and the full amount goes back to your card any time before activation, which today means up to 14 days before the launch date on your insertion order (IO). The $190 look converts in full to the $490 seat within 7 days, or is refunded. After launch, unused credit can be extended or refunded under your IO."],
     ["What you get", "A share of display space across a growing network of private health and wellness hubs, curated as hubs launch. The IO names the hub and placement before anything runs. Views are modelled estimates at the starter rate, not a guarantee. Aggregate reporting only. No PHI, no clinical pixels."],
     ["Agencies", "Prepay a $1,000–$5,000 USD client test. Each client gets its own IO and reporting. Agencies earn the standard 15% agency commission off the gross rate card. You set your own resale price and handle your own client disclosure."],
-    ["Bigger budgets", "Premium slots ($25K–$50K) are by inquiry. Start small now and move up any time; your credit carries over."],
+    ["Bigger budgets", "Premium slots ($25,000–$1.5M) are by inquiry. Start small now and move up any time; your credit carries over."],
   ];
   return `<section class="band" id="start-small" data-testid="start-small"><div class="wrap"><p class="kicker">Start small</p><h2>Start small from $190. Fully refundable deposit.</h2><p class="fine" style="margin:8px 0 0">Pick a size. Nothing runs until you approve the IO.</p>
 <div class="ss-tiers">${[
