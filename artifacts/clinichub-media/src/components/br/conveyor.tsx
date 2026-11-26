@@ -70,9 +70,16 @@ export function ConveyorHero({ className = "", captionless = false }: { classNam
           ))}
         </div>
       </div>
+      <div className="mt-3 flex flex-wrap items-center gap-2 border border-dashed border-foreground/25 bg-white px-3 py-2" data-testid="conveyor-screens">
+        <span className="font-display text-sm">In-hub screens</span>
+        <span className="text-[12px] text-muted-foreground">Screens inside partner locations.</span>
+        <span className="rounded-full border border-foreground/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">Rolling out</span>
+        <span className="rounded-full border border-foreground/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">Reserve by inquiry</span>
+        <a href="/intake#inquire" className="text-[12px] font-bold underline underline-offset-2">Inquire</a>
+      </div>
       {captionless ? null : (
         <p className="mt-3 text-xs leading-relaxed text-muted-foreground" data-testid="conveyor-caption">
-          Each live hub adds display and CPC slots on four placements: post-purchase, hub home, product and services pages, and the member dashboard behind login. Illustrative.
+          Each live hub adds display and CPC slots on four placements: post-purchase, hub home, product and services pages, and the member dashboard behind login. Illustrative. In-hub screens are rolling out; reserve by inquiry.
         </p>
       )}
     </div>

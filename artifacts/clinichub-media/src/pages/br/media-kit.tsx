@@ -305,7 +305,18 @@ export default function BrMediaKit() {
             </article>
           ))}
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">Example placements, drawn on hub pages. Exact position and creative are set in your IO.</p>
+        <article className="mt-3 flex flex-col gap-2 border border-dashed border-foreground/30 bg-white p-4 md:flex-row md:items-center md:justify-between md:p-5" data-testid="mk-screens">
+          <div>
+            <h3 className="font-display text-lg leading-snug md:text-xl">In-hub screens</h3>
+            <p className="mt-1 text-[13px] leading-snug text-muted-foreground">Screens inside partner locations.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-foreground/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">Rolling out</span>
+            <span className="rounded-full border border-foreground/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">Reserve by inquiry</span>
+            <a href="/intake#inquire" className="text-[13px] font-bold underline underline-offset-2">Inquire</a>
+          </div>
+        </article>
+        <p className="mt-3 text-xs text-muted-foreground">Example placements, drawn on hub pages. Exact position and creative are set in your IO. In-hub screens are rolling out; reserve by inquiry.</p>
       </Block>
 
       {/* Two tiers */}
