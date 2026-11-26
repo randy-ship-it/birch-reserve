@@ -253,7 +253,7 @@ export function CategoryRequestForm({ path = "/", defaultCategory = "", intent =
       </div>
       {intent === "offer" ? (
         <label className="mt-3 block text-sm">
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-foreground/70">Your offer (USD, optional)</span>
+          <span data-currency-fixed className="mb-1 block text-xs font-semibold uppercase tracking-wider text-foreground/70">Your offer (USD, optional)</span>
           <input name="offer" inputMode="numeric" maxLength={40} placeholder="e.g. 5,000" value={offer} onChange={(e) => setOffer(e.target.value)} className={input} data-testid="cr-offer" />
         </label>
       ) : null}
