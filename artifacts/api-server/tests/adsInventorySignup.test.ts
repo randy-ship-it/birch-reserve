@@ -13,6 +13,8 @@ import {
   type FridayFetch,
 } from "../src/lib/fridayPush";
 import { isGuardedPost } from "../src/lib/publicGuards";
+import { setSalesAlertDepsForTests } from "../src/lib/salesAlert";
+import type { SiteMail } from "../src/lib/siteMail";
 
 let baseUrl = "";
 let closeServer: (() => Promise<void>) | undefined;
@@ -162,4 +164,23 @@ test("is_test identity: stored and marked test", async () => {
   assert.equal(res.status, 201);
   const j = (await res.json()) as { leadId: string };
   assert.equal(leadStore.rows.get(j.leadId)!.isTest, true);
+});
+
+test("team email: a signup sends the internal sales alert (test identities are tagged [TEST])", async () => {
+  const sent: SiteMail[] = [];
+  setSalesAlertDepsForTests({ send: async (m) => (sent.push(m), { id: "m1" }), ready: () => true });
+  try {
+    const res = await post(GOOD);
+    assert.equal(res.status, 201);
+    assert.equal(sent.length, 1);
+    assert.match(sent[0]!.subject, /^\[BIRCH SUPPLIER\] Inventory host signup: Example Clinic Group/);
+    assert.ok(sent[0]!.to.includes("randy@scalehealth.ca"));
+    assert.match(sent[0]!.text, /Email: ops@exampleclinic\.com/);
+    assert.equal(sent[0]!.replyTo, "ops@exampleclinic.com");
+    const t = await post({ ...GOOD, idempotencyKey: "qa-test-key-0001", name: "QA Test Audit" });
+    assert.equal(t.status, 201);
+    assert.match(sent[1]!.subject, /^\[TEST\] \[BIRCH SUPPLIER\]/);
+  } finally {
+    setSalesAlertDepsForTests({ send: null, ready: null });
+  }
 });
