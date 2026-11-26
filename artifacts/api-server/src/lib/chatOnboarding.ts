@@ -134,7 +134,7 @@ export function buildOnboardingModule(opts: { payLive?: boolean } = {}): string 
     `- Reserve $${seat.spendUsd} USD / ${cur(cadSeat, "CAD")}: shared category reserve, not exclusive, 100% media credit until the IO, usable for 12 months.`,
     `- Sponsorship packs: ${packs.join("; ")}. Bonus credit is media credit only (no cash value, not refunded). Carry-over: ${CARRY_OVER_CLAUSE}`,
     `- Exclusive reserve $1,900 (CAD for Canada, USD everywhere else, same number): holds one exclusive display package in the category pending the IO, sized $5K to $50K on the IO; the package rate is set on the IO, at or below the rate card (no percentage discount is quoted). The full $1,900 counts toward the package. If the category is committed to another brand before the IO is signed, the $1,900 is refunded in full. Page ${U("/exclusive")}.`,
-    "- Premium slots $25K to $50K: inquire only (request form), never a card purchase.",
+    "- Premium slots $25,000 to $1.5M USD: inquire only (request form), never a card purchase.",
     "",
     "CURRENCY RULES",
     "- Visitors in Canada see and pay CAD; everyone else pays USD. There is a currency toggle on the checkout page, and the currency shown at checkout is the currency charged (no conversion at the card). Look and reserve: CAD $270 and $690. Packs: CAD $2,100, $4,200 and $8,400. If you do not know where they are, quote USD and add the CAD equivalent in brackets only if they say they are Canadian or ask. Only quote CAD amounts from this module; never convert any other figure. Area lock and partnership prices are USD.",

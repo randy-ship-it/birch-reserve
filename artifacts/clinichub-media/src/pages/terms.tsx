@@ -37,7 +37,7 @@ export default function Terms() {
           public sample is <Link href="/sample-io" className="text-foreground underline">/sample-io</Link>.
         </p>
         <p>
-          8 brand categories across hubs, not eight websites. reserve-490 is a shared self-serve category reserve; it does not lock the category. More than one brand can reserve in a category. Only exclusive display gives one brand a category for its IO term: a premium slot ($25,000 to $50,000 USD, set on an insertion order) or a package secured by the $1,900 CAD exclusive display reserve (below). Reporting is aggregate only. No PHI. No clinical pixels.
+          8 brand categories across hubs, not eight websites. reserve-490 is a shared self-serve category reserve; it does not lock the category. More than one brand can reserve in a category. Only exclusive display gives one brand a category for its IO term: a premium slot ($25,000 to $1.5M USD, set on an insertion order) or a package secured by the $1,900 CAD exclusive display reserve (below). Reporting is aggregate only. No PHI. No clinical pixels.
         </p>
         <h2 id="sponsorship-packs" className="pt-4 font-display text-2xl text-foreground">Sponsorship packs</h2>
         <ul className="list-disc space-y-2 pl-5" data-testid="terms-sponsor-packs">

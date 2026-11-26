@@ -169,7 +169,7 @@ export const QUALIFY_QUESTIONS: ReadonlyArray<{ key: QualifyKey; prompt: string 
   {
     key: "timing",
     prompt:
-      "Last one: what's your timing, and a rough budget range? (For reference, reserving is $490 and a 7-day look is $190; premium slots are $25K to $50K, inquire only.)",
+      "Last one: what's your timing, and a rough budget range? (For reference, reserving is $490 and a 7-day look is $190; premium slots are $25,000 to $1.5M USD, inquire only.)",
   },
 ] as const;
 

@@ -64,10 +64,10 @@ test("refund lines are the live /terms wording, unchanged", () => {
 });
 
 test("Lane B: bands, lead payload on the existing /v1/leads kinds, draft IO says cheque/wire/EFT and no bank details", () => {
-  assert.deepEqual(BLOCK_BANDS.map((b) => b.label), ["$10K", "$25K–$50K", "$100K+"]);
-  assert.equal(bandAmountLabel("category_lock"), "$25,000–$50,000 USD");
+  assert.deepEqual(BLOCK_BANDS.map((b) => b.label), ["$10K", "$25,000–$1.5M", "$100K+"]);
+  assert.equal(bandAmountLabel("category_lock"), "$25,000–$1.5M USD");
   assert.equal(bandAmountLabel("network_100k"), "$100,000+ USD");
-  assert.equal(agencyCashLabel("category_lock"), "$3,750–$7,500 USD");
+  assert.equal(agencyCashLabel("category_lock"), "$3,750–$225,000 USD");
   assert.equal(agencyCashLabel("test_10k"), "$1,500 USD");
   const p = blockLeadPayload({ band: "test_10k", flightStart: "2027-01-05", flightEnd: "2027-02-05", client: "Acme", agency: "Ad Co", email: "x@y.co" }, "BR-IO-1");
   assert.equal(p.kind, "premium_inquiry");

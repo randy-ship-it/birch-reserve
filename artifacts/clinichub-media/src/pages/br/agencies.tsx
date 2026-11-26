@@ -199,7 +199,7 @@ export default function BrAgencies() {
             fields={[
               { name: "email", label: "Work email", type: "email", required: true },
               { name: "company", label: "Agency", required: true },
-              { name: "test_budget", label: "What are you after?", type: "select", options: ["Starter block ($1K–$5K USD)", "Upfront block ($25K–$50K USD)", "Partner access", "Not sure yet"] },
+              { name: "test_budget", label: "What are you after?", type: "select", options: ["Starter block ($1K–$5K USD)", "Upfront block ($25,000–$1.5M USD)", "Partner access", "Not sure yet"] },
             ]}
           />
         </div>

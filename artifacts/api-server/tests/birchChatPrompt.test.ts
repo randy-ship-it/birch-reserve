@@ -16,7 +16,7 @@ test("prompt carries the site offer in USD with CAD for Canadian visitors", () =
   const p = buildBirchChatSystemPrompt({ checkout: live });
   assert.match(p, /\$190 USD/);
   assert.match(p, /\$490 USD/);
-  assert.match(p, /\$25,000 to \$50,000 USD/);
+  assert.match(p, /\$25,000 to \$1.5M USD/);
   assert.match(p, /USD base prices; Canadian visitors pay CAD/);
   assert.match(p, /\$270 CAD/);
   assert.match(p, /\$690 CAD/);

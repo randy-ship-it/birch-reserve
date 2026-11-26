@@ -43,7 +43,7 @@ const SMALL_PRINT = [
   { q: "Refund terms", a: "Every deposit is 100% media credit. Ask by email and the full amount goes back to your card any time before activation, which today means up to 14 days before the launch date on your insertion order (IO). The $190 look converts in full to the $490 seat within 7 days, or is refunded. After launch, unused credit can be extended or refunded under your IO." },
   { q: "What you get", a: "A share of display space across a growing network of private health and wellness hubs, curated as hubs launch. The IO names the hub and placement before anything runs. Views are modelled estimates at the starter rate, not a guarantee. Reporting is aggregate: views, clicks, UTM visits and promo-code redemptions. No PHI, no clinical pixels." },
   { q: "Agencies", a: "Prepay a $1,000–$5,000 USD client test. Each client gets its own IO and reporting. Agencies earn the standard 15% agency commission off the gross rate card. You set your own resale price and handle your own client disclosure. Refundable on the same terms as every deposit." },
-  { q: "Bigger budgets", a: "Premium slots ($25K–$50K) and area locks are by inquiry. Start small now and move up any time; your credit carries over." },
+  { q: "Bigger budgets", a: "Premium slots ($25,000–$1.5M) and area locks are by inquiry. Start small now and move up any time; your credit carries over." },
 ];
 
 export function StartSmall({ page, highlight = "seat", id = "start-small", heading = true }: { page: string; highlight?: Tier["key"]; id?: string; heading?: boolean }) {

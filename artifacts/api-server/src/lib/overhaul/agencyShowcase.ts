@@ -10,7 +10,7 @@
  *   - sell assumption: Randy 7:33 PM ET, "20% of available display space". An ASSUMPTION.
  * No payout schedule is stated anywhere: timing reads "per the IO", never a date.
  */
-import { AGENCY_CASH_PCT, MEDIA_KIT_OFFERS, agencyCash } from "./mediaKit";
+import { AGENCY_CASH_PCT, BLOCK_BAND_LINE, MEDIA_KIT_OFFERS, agencyCash } from "./mediaKit";
 import { AGENCY, DEPOSIT_TIERS, SURFACES, TAM, INVENTORY } from "./model";
 import { RATE_SURFACES } from "./pricing";
 import { isPremiumPlacement } from "../premiumInquireOnly";
@@ -261,7 +261,7 @@ export const PARTNER_VALUE = {
 /**
  * Committing inventory blocks (Randy, Nov 25 2026 5:21 PM ET): small first commitment that scales, standard
  * cancellation window, makegoods for under-delivery, clear flight dates. Every figure is an existing Birch price:
- * the $1K–$5K USD client test (AGENCY_CLIENT_TEST) and the $25K–$50K USD premium band (MEDIA_KIT_OFFERS.premium).
+ * the $1K–$5K USD client test (AGENCY_CLIENT_TEST) and the $25,000–$1.5M USD premium band (MEDIA_KIT_OFFERS.premium).
  * Cancellation restates the 14-days-before-launch refund already on /terms; makegoods follow IAB (already on the spec).
  */
 export const BLOCK_LADDER = [
@@ -277,7 +277,7 @@ export const BLOCK_LADDER = [
     key: "upfront",
     step: "Scale",
     name: "Upfront block",
-    price: `$${MEDIA_KIT_OFFERS.premium.spendLo / 1000}K–$${MEDIA_KIT_OFFERS.premium.spendHi / 1000}K USD`,
+    price: BLOCK_BAND_LINE,
     line: "Book premium and exclusive placements ahead, across several clients and flights.",
     rate: `${AGENCY_CASH_PCT}% + a further ${PARTNER_VALUE_VS_AGENCY_PCT.lo}–${PARTNER_VALUE_VS_AGENCY_PCT.hi}% off net`,
   },

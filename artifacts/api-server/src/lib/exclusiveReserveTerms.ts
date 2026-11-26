@@ -46,7 +46,7 @@ export const EXCLUSIVE_RATE_LINE = "The package rate is set on your IO, at or be
 
 export const EXCLUSIVE_RESERVE_TERMS: readonly string[] = [
   "The exclusive display reserve is $1,900, charged by card in the currency shown when you pay: CAD for visitors in Canada, USD everywhere else. You can switch currency on the page before you pay; you are charged in the currency you saw.",
-  "It holds one exclusive display package in your category while we write your insertion order, sized $5,000 to $50,000 on the IO in the same currency as your reserve. The package rate is set on the IO, at or below the published rate card. The full $1,900 counts toward the package. Larger premium slots ($25K–$50K) are by inquiry.",
+  "It holds one exclusive display package in your category while we write your insertion order, sized $5,000 to $50,000 on the IO in the same currency as your reserve. The package rate is set on the IO, at or below the published rate card. The full $1,900 counts toward the package. Larger premium slots ($25,000–$1.5M) are by inquiry.",
   "The hold is pending your IO: the category becomes exclusive to you when you sign the IO, which names the hub, placement and dates. Nothing runs before then. If the category is committed to another brand before your IO is signed, we refund the $1,900 in full.",
   "Fully refundable until 14 days before the launch date in your IO. A cash refund is also available if no approved surface is named within 60 days of payment. To cancel, reply to your confirmation email and we refund the original card.",
   `${SPEND_DOWN_LINE}`,

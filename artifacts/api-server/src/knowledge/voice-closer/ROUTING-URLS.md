@@ -7,7 +7,7 @@ Only the URLs in this table are routable. Every row was verified in headless Chr
 
 | Visitor is… | Wants… | Send to | Status (2026-09-24) |
 |---|---|---|---|
-| Brand / advertiser | Category seats in Scale Health hubs | Birch: $490 seat or $190 look at https://birchreserve.net/buycalc (checkout live; invoice only if they ask); request form https://birchreserve.net/buycalc#request; premium $25K to $50K inquire only, team call-back; media kit https://birchreserve.net/media-kit | verified |
+| Brand / advertiser | Category seats in Scale Health hubs | Birch: $490 seat or $190 look at https://birchreserve.net/buycalc (checkout live; invoice only if they ask); request form https://birchreserve.net/buycalc#request; premium $25,000 to $1.5M USD inquire only, team call-back; media kit https://birchreserve.net/media-kit | verified |
 | Brand wanting its own hub / storefront | Branded Clinic Hub (turnkey, $0 build) | https://scalehealth.ca/clinichubs | verified ("For Studios & Gyms") |
 | Physio / clinic / independent provider (Canada) | Join the network, get bookable on rails | https://scalehealth.ca/providers | verified ("For Clinics & Physiotherapists") |
 | Local business (gym, pilates, yoga, recovery) | FIRST: Birch local ads (geo-targeted, location-based placements inside co-branded physio and clinical hubs in busy brands). SECOND, only if they raise it or say no to ads: free physio door / hub for members | https://birchreserve.net first, then https://scalehealth.ca/clinichubs | verified |

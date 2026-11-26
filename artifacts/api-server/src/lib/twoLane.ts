@@ -4,7 +4,7 @@
  * Lane B "Big block / agency (IO + cheque)": short form -> existing /v1/leads path + a draft IO / pro-forma PDF.
  *
  * Pure data + helpers shared by the page and its tests. No new prices and no new legal terms: refund lines are the
- * live /terms wording; budget bands come from the media kit (premium $25K–$50K inquire-only, mediaKit.ts).
+ * live /terms wording; budget bands come from the media kit (premium $25,000–$1.5M inquire-only, mediaKit.ts).
  * No bank details exist in the repo, so documents say "remit details on signed IO".
  */
 import { AGENCY_CASH_PCT } from "./overhaul/mediaKit";
@@ -70,10 +70,10 @@ export function quickReserveCheckoutBody(input: { sku: CardSku; email: string; b
 
 export const AGENCY_TEST = { lowUsd: 1_000, highUsd: 5_000, cashPct: AGENCY_CASH_PCT } as const;
 
-/** Lane B budget bands. Premium $25K–$50K is the live media-kit band that locks one brand per category (/terms). */
+/** Lane B budget bands. Premium $25,000–$1.5M is the live media-kit band that locks one brand per category (/terms). */
 export const BLOCK_BANDS = [
   { key: "test_10k", label: "$10K", sub: "Test block", lowUsd: 10_000, highUsd: 10_000 },
-  { key: "category_lock", label: "$25K–$50K", sub: "Category Lock (premium)", lowUsd: 25_000, highUsd: 50_000 },
+  { key: "category_lock", label: "$25,000–$1.5M", sub: "Category Lock (premium)", lowUsd: 25_000, highUsd: 1_500_000 },
   { key: "network_100k", label: "$100K+", sub: "Network block", lowUsd: 100_000, highUsd: null },
 ] as const;
 export type BlockBand = (typeof BLOCK_BANDS)[number]["key"];
@@ -92,9 +92,12 @@ export type BlockRequest = {
 };
 
 const fmt = (n: number) => `$${n.toLocaleString("en-US")}`;
+function fmtHi(n: number): string {
+  return n === 1_500_000 ? "$1.5M" : fmt(n);
+}
 export function bandAmountLabel(band: BlockBand): string {
   const b = BLOCK_BANDS.find((x) => x.key === band)!;
-  return b.highUsd === null ? `${fmt(b.lowUsd)}+ USD` : b.highUsd === b.lowUsd ? `${fmt(b.lowUsd)} USD` : `${fmt(b.lowUsd)}–${fmt(b.highUsd)} USD`;
+  return b.highUsd === null ? `${fmt(b.lowUsd)}+ USD` : b.highUsd === b.lowUsd ? `${fmt(b.lowUsd)} USD` : `${fmt(b.lowUsd)}–${fmtHi(b.highUsd)} USD`;
 }
 
 /** Standard 15% agency commission off list, on the band's low end (modelled; the IO sets the real figure). */
