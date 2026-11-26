@@ -162,8 +162,17 @@ export function RateCardV2() {
           </tbody>
         </table>
       </div>
+      <article className="mt-3 border border-dashed border-foreground/30 bg-white p-4" data-testid="rate-card-screens">
+        <h3 className="font-display text-xl">In-hub screens</h3>
+        <p className="mt-1 text-xs text-muted-foreground">Screens inside partner locations.</p>
+        <p className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+          <span className="rounded-full border border-foreground/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">Rolling out</span>
+          <span className="rounded-full border border-foreground/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">Reserve by inquiry</span>
+          <a href="/intake#inquire" className="font-semibold underline underline-offset-2">Inquire</a>
+        </p>
+      </article>
       <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
-        USD. <Estimate /> {ESTIMATE_NOTE} Starter rates apply while a placement is new; rates may step up only after campaign reporting shows the placement performs.
+        USD. <Estimate /> {ESTIMATE_NOTE} Starter rates apply while a placement is new; rates may step up only after campaign reporting shows the placement performs. In-hub screens have no published rate yet.
       </p>
       <PlacementDialog open={ex} onClose={() => setEx(null)} />
     </div>

@@ -96,6 +96,7 @@ export function WhatYoureBuying({ testId = "what-youre-buying" }: { testId?: str
             {PLACEMENTS.map((p) => (
               <li key={p} className="rounded-full bg-white/10 px-2.5 py-1 text-[12px] font-semibold text-white ring-1 ring-white/15">{p}</li>
             ))}
+            <li className="rounded-full bg-white/10 px-2.5 py-1 text-[12px] font-semibold text-white ring-1 ring-dashed ring-white/35">In-hub screens · Rolling out · Reserve by inquiry</li>
           </ul>
         </div>
         <div className="min-w-0 md:border-l md:border-white/10 md:pl-6">

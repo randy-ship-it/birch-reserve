@@ -17,6 +17,7 @@ const PLACEMENTS = [
   { t: "Member dashboard", d: "The logged-in home where members track orders and plans." },
   { t: "Hub home", d: "Banner and tiles on the co-branded hub home page." },
   { t: "Product & services pages", d: "Inside product, service and booking pages." },
+  { t: "In-hub screens", d: "Screens inside partner locations. Rolling out. Reserve by inquiry." },
 ];
 
 const AGENT_LINKS: Array<[string, string, string]> = [
