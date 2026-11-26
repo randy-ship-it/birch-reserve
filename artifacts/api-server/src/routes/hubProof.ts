@@ -12,6 +12,8 @@ import { adminEmails } from "../lib/adserver/config";
 import { verify } from "../lib/adserver/auth";
 import { siteOf } from "../lib/adserver/promoContext";
 import * as hp from "../lib/adserver/hubProof";
+import { sendSalesAlert } from "../lib/salesAlert";
+import { isTestIdentity } from "../lib/testTraffic";
 
 const router: IRouter = Router();
 const json = express.json({ limit: "5mb" });
@@ -63,7 +65,28 @@ router.post("/v1/hub-proof", json, (req, res) =>
       reach: Number(b.reach), note: str(b.note, 500), file, site: siteOf(req),
     });
     if (!r.ok) return void res.status(400).json(r);
-    void hp.mailReceived({ email: str(b.email, 254).toLowerCase(), hubName: str(b.hub_name, 160) });
+    const email = str(b.email, 254).toLowerCase();
+    // Form audit Nov 26 2026: awaited (no freeze before send) and the team now gets an internal alert too, not just the submitter.
+    await hp.mailReceived({ email, hubName: str(b.hub_name, 160) });
+    await sendSalesAlert({
+      event: "inquiry",
+      tag: "BIRCH HUB PROOF",
+      title: `Hub proof: ${str(b.hub_name, 160)}`,
+      rows: [
+        ["Form", "Activate your own hub (/hub-proof)"],
+        ["Hub", str(b.hub_name, 160)],
+        ["Hub URL", str(b.hub_url, 300)],
+        ["Name", str(b.name, 120)],
+        ["Email", email],
+        ["Channel", str(b.channel, 20)],
+        ["Reach", String(Number(b.reach) || "")],
+        ["Note", str(b.note, 500)],
+        ["Proof id", r.id],
+        ["Review", "Open /ads/admin to approve or reject"],
+      ],
+      replyTo: email,
+      isTest: isTestIdentity({ email, name: str(b.hub_name, 160) }),
+    });
     res.json({ ok: true, message: "Got it. We emailed you a confirmation. A person reviews every submission." });
   }),
 );

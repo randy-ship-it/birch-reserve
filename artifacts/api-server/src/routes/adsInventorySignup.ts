@@ -9,6 +9,7 @@ import { z } from "zod";
 import { captureInventorySignupLead } from "../lib/leadCapture";
 import { attributionFrom } from "../lib/publicGuards";
 import { hasValidQaHeader, isTestIdentity } from "../lib/testTraffic";
+import { sendSalesAlert } from "../lib/salesAlert";
 
 const InventoryType = z.enum(["site", "email", "sms", "waiting_room"]);
 
@@ -66,6 +67,29 @@ router.post("/launch/ads-inventory-signup", async (req, res): Promise<void> => {
     { leadId: lead.id, source: lead.source, pagePath: lead.pagePath },
     "Ads inventory signup accepted",
   );
+
+  // Form audit Nov 26 2026: this door only stored the lead + queued Friday, so the team never got an email.
+  // Same internal alert as every other form (randy@scalehealth.ca + randy@silverbirchgrowth.com). Awaited so the
+  // serverless function cannot freeze before it sends; sendSalesAlert never throws.
+  await sendSalesAlert({
+    event: "inquiry",
+    tag: "BIRCH SUPPLIER",
+    title: `Inventory host signup: ${data.company}`,
+    rows: [
+      ["Form", "Sell ads / inventory host (/sell-ads)"],
+      ["Company", data.company],
+      ["Name", data.name],
+      ["Email", data.email],
+      ["Phone", data.phone],
+      ["Audience", data.audienceEstimate],
+      ["Inventory", data.inventoryTypes.join(", ")],
+      ["Notes", data.notes],
+      ["Page", data.path ?? "/sell-ads"],
+      ["Lead id", lead.id],
+    ],
+    replyTo: data.email,
+    isTest: lead.isTest === true,
+  });
 
   res.status(201).json({ ok: true, leadId: lead.id });
 });
