@@ -49,7 +49,7 @@ export const TAM = {
 /** The four hub placements (Randy, Nov 12 1:10 PM), each sold as display or CPC. cpmUsd = starter (starting-at) rate from pricing.ts, an illustrative estimate. */
 export const SURFACES = [
   { key: "post_purchase", label: "Post-Purchase", cpmUsd: STARTER.post_purchase, monthly: TAM.monthly.postPurchase, blurb: "On the thank-you and booking-confirmation page, right after a paid order or booking." },
-  { key: "hub_home", label: "Clinic Layer Home Page", cpmUsd: STARTER.hub_home, monthly: TAM.monthly.hubHome, blurb: "Top-of-hub banner and native tiles on the co-branded clinic layer home." },
+  { key: "hub_home", label: "Clinic Layer Home Page", cpmUsd: STARTER.hub_home, monthly: TAM.monthly.hubHome, blurb: "Top-of-page banner and native tiles on the co-branded clinic layer home." },
   { key: "product_services", label: "Product / Services pages", cpmUsd: STARTER.product_services, monthly: TAM.monthly.productServices, blurb: "Inside product, service and booking pages while the visitor is browsing." },
   { key: "member_dashboard", label: "Member Dashboard (behind login)", cpmUsd: STARTER.member_dashboard, monthly: TAM.monthly.memberDashboard, blurb: "On the logged-in member dashboard, where members come back to track orders, plans and bookings." },
 ] as const;

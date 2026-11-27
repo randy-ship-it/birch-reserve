@@ -253,7 +253,7 @@ export function InventorySpec() {
           <Tag>Assumption</Tag> {SELL_ASSUMPTION_LINE} Post-Purchase, 100K+ view blocks and area placements are inquire-only.
         </p>
         <p className="md:col-span-2" data-testid="spec-screens">
-          <span className="font-medium text-foreground">In-hub screens</span> — Screens inside partner locations. Rolling out. Reserve by inquiry. No published rate yet. <a href="/intake#inquire" className="font-semibold underline underline-offset-2">Inquire</a>
+          <span className="font-medium text-foreground">Clinic layer screens</span> — Screens inside partner locations. Rolling out. Reserve by inquiry. No published rate yet. <a href="/intake#inquire" className="font-semibold underline underline-offset-2">Inquire</a>
         </p>
       </div>
     </div>

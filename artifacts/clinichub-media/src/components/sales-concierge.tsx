@@ -355,7 +355,7 @@ export function SalesConcierge({
         };
       case "book_a_call":
         return {
-          text: `Multi-hub and on-prem retail clinic layers are not a public checkout SKU. Send the request form or email.`,
+          text: `Programs across several clinic layers and on-prem retail clinic layers are not a public checkout SKU. Send the request form or email.`,
           options: [
             { label: "Buy ads now", href: "/buycalc?sku=reserve-490#reserve", primary: true },
           ],

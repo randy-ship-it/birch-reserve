@@ -480,7 +480,7 @@ export default function Home() {
               $100K–$250K+ · Inquire within
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Multi-hub or on-prem retail clinic layers. Credit, not a flight. Not a self-serve Stripe SKU — inquire within.
+              Several clinic layers or on-prem retail clinic layers. Credit, not a flight. Not a self-serve Stripe SKU — inquire within.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Button

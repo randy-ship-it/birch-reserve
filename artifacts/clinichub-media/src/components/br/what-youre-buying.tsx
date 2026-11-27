@@ -96,7 +96,7 @@ export function WhatYoureBuying({ testId = "what-youre-buying" }: { testId?: str
             {PLACEMENTS.map((p) => (
               <li key={p} className="border-b border-white/10 py-2">{p}</li>
             ))}
-            <li className="col-span-2 py-2 text-white/60">In-hub screens · rolling out, by inquiry</li>
+            <li className="col-span-2 py-2 text-white/60">Clinic layer screens · rolling out, by inquiry</li>
           </ul>
         </div>
         <div className="min-w-0 md:border-l md:border-white/10 md:pl-6">

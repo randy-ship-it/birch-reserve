@@ -155,7 +155,7 @@ export function buyerDiscoveryJsonLd(): Record<string, unknown>[] {
       name: "Birch Reserve",
       url: "https://birchreserve.net/",
       description:
-        "A private health and wellness media channel for brands and agencies: placements inside partner clinic layers, partner-website display, in-hub screens (rolling out), partner locations and a street team program from 2027, with an organic clinical service offering behind the clinic layers.",
+        "A private health and wellness media channel for brands and agencies: placements inside partner clinic layers, partner-website display, clinic layer screens (rolling out), partner locations and a street team program from 2027, with an organic clinical service offering behind the clinic layers.",
       areaServed: [
         { "@type": "Country", name: "Canada" },
         { "@type": "Country", name: "United States" },

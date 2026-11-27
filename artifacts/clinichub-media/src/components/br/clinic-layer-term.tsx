@@ -8,8 +8,8 @@ import { useRef, useState, type ReactNode } from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
 export const CLINIC_LAYER_EXAMPLES = [
-  { name: "Integrity Fitness", where: "Fitness · live", img: "/hub-gallery/thumbs/integrity.webp", pos: "50% 0%" },
-  { name: "Dima-lates", where: "Pilates · Ajax, ON", img: "/hub-gallery/dima-lates.webp", pos: "50% 25%" },
+  { name: "Integrity Fitness", where: "Fitness", img: "/hub-gallery/thumbs/integrity-layer.webp", pos: "50% 50%" },
+  { name: "Dima-lates", where: "Pilates · Ajax, ON", img: "/hub-gallery/thumbs/dima-lates-layer.webp", pos: "50% 50%" },
 ] as const;
 
 const INK = "#0b1f3a";
@@ -52,7 +52,7 @@ export function ClinicLayerTerm({ children = "clinic layer", testId = "clinic-la
           onMouseEnter={() => fine() && hover(true)}
           onMouseLeave={() => fine() && hover(false)}
           onClick={(e) => { e.stopPropagation(); }}
-          className={`inline cursor-help appearance-none border-0 bg-transparent p-0 text-inherit [font:inherit] [letter-spacing:inherit] underline decoration-dotted decoration-[1.5px] underline-offset-[0.22em] transition-colors hover:decoration-solid focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${className}`}
+          className={`inline cursor-help appearance-none border-0 bg-transparent p-0 text-inherit [font:inherit] [letter-spacing:inherit] underline decoration-dotted decoration-[1.5px] underline-offset-[0.22em] transition-colors hover:decoration-solid focus-visible:rounded-sm focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 ${className}`}
           style={{ textDecorationColor: "color-mix(in srgb, currentColor 45%, transparent)" }}
         >
           {children}
@@ -77,15 +77,10 @@ export function ClinicLayerTerm({ children = "clinic layer", testId = "clinic-la
   );
 }
 
-/** For labels that sit inside a button (role cards): a separate small trigger with the two thumbnails, outside the button. */
+/** For labels that sit inside a button (role cards): a separate quiet trigger under the card copy, outside the button. */
 export function ClinicLayerPeek({ testId = "clinic-layer-peek" }: { testId?: string }) {
   return (
-    <span className="mt-2.5 flex items-center gap-2 pl-8 text-[12px] text-foreground/60">
-      <span className="flex -space-x-1.5" aria-hidden>
-        {CLINIC_LAYER_EXAMPLES.map((x) => (
-          <img key={x.name} src={x.img} alt="" className="size-5 rounded-full object-cover ring-2 ring-white" style={{ objectPosition: x.pos }} loading="lazy" />
-        ))}
-      </span>
+    <span className="mt-2 block pl-8 text-[12.5px] text-foreground/60">
       <ClinicLayerTerm testId={testId}>What&rsquo;s a clinic layer?</ClinicLayerTerm>
     </span>
   );

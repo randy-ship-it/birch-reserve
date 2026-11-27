@@ -221,7 +221,7 @@ CURRENT OFFER (Randy HARD 2026-11-13; overrides anything below that conflicts):
 | `hold-190` | **$190 USD** | 7-day look at your category placement. Converts 100% to the seat within 7 days, otherwise a cash refund. Does not take a seat or lock a category. |
 | `reserve-490` | **$490 USD** | Category placement: a shared self-serve category placement, used by more than one brand per category. 100% media credit until the IO. Refundable until 14 days before launch; then usable for 12 months. |
 | Premium slot | **$25,000 to $1.5M USD** | Inquire only, set on an IO. Larger display share and priority placement. Team call-back. |
-| Book a call | Custom | Multi-hub / on-prem retail clinic layer screens / custom package. Take intake (name, company, role, phone, email, need, size, timing) for a team callback. Cal only if they insist on a set time. |
+| Book a call | Custom | Several clinic layers / on-prem retail clinic layer screens / custom package. Take intake (name, company, role, phone, email, need, size, timing) for a team callback. Cal only if they insist on a set time. |
 
 ## Enterprise (Coming soon — Randy HARD 2026-09-24 ~10:15pm ET)
 
@@ -323,7 +323,7 @@ On-prem clinic/studio surfaces via retail clinic layers / Scale clinic layers = 
 | Exploring, unsure of category, wants a look | The $190 7-day look at https://birchreserve.net/buycalc, or the request form at https://birchreserve.net/buycalc#request |
 | Clear category, ready to commit | The $490 category seat at https://birchreserve.net/buycalc |
 | $10K+, premium, owning a category, partnership | Premium slot ($25,000 to $1.5M USD, inquire only): collect name, company, phone, email, best time; submit the call-back; give (647) 931-6278 |
-| Multi-hub, on-prem retail clinic layer screens, custom, big account, or wants a human | Qualify, then the calendar (after qualifying only) |
+| Several clinic layers, on-prem retail clinic layer screens, custom, big account, or wants a human | Qualify, then the calendar (after qualifying only) |
 | Asks for impressions or guaranteed reach | Do not invent numbers. Say all numbers are modelled and spend is media credit until the IO; offer a call for a custom IO |
 | Ready to buy (checkout live, Randy 2026-09-24 6:22pm ET) | Capture name, company, email, phone; send them to https://birchreserve.net/buycalc to lock the $490 seat or take the $190 look (phone: text or read out the link). Never say a payment went through unless they confirm they paid |
 | Prefers to pay by invoice | Fallback: the team sends an insertion order (IO) and invoice. Not the default |

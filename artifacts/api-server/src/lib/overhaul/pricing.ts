@@ -25,7 +25,7 @@ export type RateSurface = {
 };
 
 export const RATE_SURFACES: readonly RateSurface[] = [
-  { key: "landing", label: "Clinic layer landing page (pre-login)", short: "Landing", where: "Top-of-hub banner and native tiles on the co-branded clinic layer home.", cpmStarter: [4, 8], cpcStarter: [0.4, 0.8] },
+  { key: "landing", label: "Clinic layer landing page (pre-login)", short: "Landing", where: "Top-of-page banner and native tiles on the co-branded clinic layer home.", cpmStarter: [4, 8], cpcStarter: [0.4, 0.8] },
   { key: "dashboard", label: "Member dashboard (post-login)", short: "Dashboard", where: "Logged-in members tracking orders, plans and bookings.", cpmStarter: [10, 18], cpcStarter: [0.8, 1.4] },
   { key: "products", label: "Product pages", short: "Products", where: "Inside product pages while members shop recovery gear.", cpmStarter: [12, 22], cpcStarter: [0.7, 1.4] },
   { key: "services", label: "Services & booking pages", short: "Services", where: "On service and booking pages, right before an appointment is made.", cpmStarter: [15, 25], cpcStarter: [0.9, 1.8] },

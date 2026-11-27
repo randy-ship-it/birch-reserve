@@ -68,7 +68,7 @@ export const SLOTS: Slot[] = [
   {
     key: "product_services",
     label: "Product / services page unit",
-    where: "In-hub product, service and booking pages",
+    where: "Product, service and booking pages inside the clinic layer",
     size: "Sponsored card 600×400 · 300×250",
     cpmUsd: STARTER.product_services,
     core: true,

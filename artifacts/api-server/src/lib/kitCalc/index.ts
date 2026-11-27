@@ -81,7 +81,7 @@ export function repeatRange(key: string): Range {
 
 const KIT_CALC_FORMULA_BASE = [
   "GP LTV per customer = average cart × margin band × purchases per year × 1–3 years (low with low, high with high).",
-  "Scale visits = spend ÷ blended hub CPM × 1,000 × the modelled engagement range for ‘Browsing the hub’ (Birch modelled figures).",
+  "Scale visits = spend ÷ blended clinic layer CPM × 1,000 × the modelled engagement range for ‘Browsing the clinic layer’ (Birch modelled figures).",
   "New customers = Scale visits × your conversion scenario.",
   "Revenue opportunity = new customers × average cart × purchases per year × 1–3 years.",
   "Gross-profit opportunity = new customers × GP LTV. Break-even = spend ÷ GP LTV.",

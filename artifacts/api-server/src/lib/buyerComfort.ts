@@ -42,14 +42,14 @@ export const DUAL_MOTION = {
   /** A1: /buycalc subhead under the H1. */
   heroSub: "Start yourself with a $190 USD look or $490 USD category placement. Or ask about a larger display share, priority placement, or a program across more than one clinic layer.",
   /** A2: secondary inquire link under the self-serve buttons. */
-  inquireLabel: "Ask about a premium slot or multi-hub program",
+  inquireLabel: "Ask about a premium slot or a program across several clinic layers",
   callBack: "to request a call back",
   /** B1: one line under the offer cards. */
   sampleIoLead: "Before you pay: read the",
   sampleIoLabel: "sample insertion order",
   sampleIoTail: "you'd approve before anything runs.",
   /** A3: /media-kit, under the tier cards. */
-  programsTitle: "Larger or multi-hub programs start with a call.",
+  programsTitle: "Larger programs across several clinic layers start with a call.",
   programsBody: "We'll walk through display share, priority placement and the sample insertion order, and the scope is set on your IO.",
   /** A4 (merged with the early-slots strap on /buycalc; short form under A3 on /media-kit). */
   sharedBuycalc: "Self-serve seats stay shared, open to more than one brand, while the network is curated clinic layer by clinic layer. Premium slots add a larger share.",
@@ -139,7 +139,7 @@ const SAMPLE_REPORT_BASE = {
   kicker: "Measurement",
   title: "What your report looks like.",
   body: "Aggregate totals per clinic layer and per surface, week by week. No names, no user-level rows, no health data.",
-  columns: ["Week", "Hub", "Surface", "Views", "Clicks", "UTM visits", "Promo redemptions"],
+  columns: ["Week", "Clinic layer", "Surface", "Views", "Clicks", "UTM visits", "Promo redemptions"],
   rows: [
     ["Week 1", "[Clinic layer on your IO]", "Clinic Layer Home", "x,xxx", "xx", "xx", "x"],
     ["Week 1", "[Clinic layer on your IO]", "Member Dashboard", "x,xxx", "xx", "xx", "x"],

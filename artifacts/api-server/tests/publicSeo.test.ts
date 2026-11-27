@@ -465,7 +465,7 @@ test("buycalc dual sales motion (Randy, Nov 17 2026 8:56 PM ET): additive copy, 
   assert.match(html, /No bidding\.<\/h1>\n<p class="hero-sub" data-testid="hero-sub">Start yourself with a \$190 USD look or \$490 USD category placement\. Or ask about a larger display share, priority placement, or a program across more than one hub\.<\/p>/);
   // Self-serve buttons unchanged; A2 inquire link is a secondary text link, not a third button.
   assert.match(html, /<div class="ctas"><a class="btn" href="\/buycalc\?sku=reserve-490#reserve" data-pick-sku="reserve-490">Category placement · \$490 USD<\/a><a class="btn line" href="\/buycalc\?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · \$190 USD<\/a><\/div>/);
-  assert.match(html, /<p class="hero-inquire" data-testid="hero-inquire"><a href="#request">Ask about a premium slot or multi-hub program →<\/a><\/p>/);
+  assert.match(html, /<p class="hero-inquire" data-testid="hero-inquire"><a href="#request">Ask about a premium slot or a program across several clinic layers →<\/a><\/p>/);
   assert.match(html, /Questions\? <a href="mailto:randy@scalehealth\.ca/);
   assert.doesNotMatch(html, /tel:\+16479316278/);
   // B1 sample IO next to the offer cards.

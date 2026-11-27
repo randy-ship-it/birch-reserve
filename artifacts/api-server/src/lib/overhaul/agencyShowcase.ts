@@ -80,7 +80,7 @@ const CPC_BY_SURFACE: Record<(typeof SURFACES)[number]["key"], number> = {
 
 const UNITS: Record<(typeof SURFACES)[number]["key"], string> = {
   post_purchase: "Post-checkout module",
-  hub_home: "Top-of-hub banner, native tiles",
+  hub_home: "Top-of-page banner, native tiles",
   product_services: "In-page display, booking confirmation",
   member_dashboard: "Native clinic layer module, logged-in",
 };

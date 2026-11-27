@@ -51,7 +51,7 @@ export const HUB_LADDER: readonly LadderHub[] = [
  * Never named, never located below province level, never shown with a real photo. Status is Activating.
  */
 export type RetailMicroHub = { key: string; name: string; label: string; surface: string; scene: "shelf" | "counter" | "wall"; hue: number; audience: string };
-export const RETAIL_MICRO_LABEL = "Retail micro-hub";
+export const RETAIL_MICRO_LABEL = "Retail micro clinic layer";
 export const RETAIL_MICRO_HUBS: readonly RetailMicroHub[] = [
   { key: "retail-1", name: "Retail micro clinic layer #1", label: "Physio & recovery clinic · Ontario", surface: "Recovery shelf card", scene: "shelf", hue: 0, audience: "Patients and walk-ins at the clinic's recovery shelf" },
   { key: "retail-2", name: "Retail micro clinic layer #2", label: "Physio & recovery clinic · Ontario", surface: "Clinic counter card", scene: "counter", hue: 40, audience: "Patients paying at the clinic counter" },

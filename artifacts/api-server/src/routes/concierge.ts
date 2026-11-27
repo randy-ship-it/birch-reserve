@@ -68,7 +68,7 @@ Publishers (studios, retailers): $500 CAD cash or $700+ CAD ad credit for activa
 If online checkout is not open, say: reserve by inquiry; we'll confirm within 1 business day.
 All audience and view numbers are modelled; say so. Partners are listed, never call them signed. Do not invent stats.
 Never collect or discuss patient / PHI data. Aggregate reporting only. No clinical pixels.
-Big accounts / multi-hub → Buy ads now at /buycalc or the media kit.
+Big accounts / several clinic layers → Buy ads now at /buycalc or the media kit.
 Seller: Silver Birch Growth Inc., Toronto.`;
 
 const APPROVED_SYSTEM_PROMPT = BIRCH_GUIDE_SYSTEM_PROMPT;
