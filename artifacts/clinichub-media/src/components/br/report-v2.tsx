@@ -163,7 +163,7 @@ export function ReportHero({ m, sample }: { m: ReportModel; sample?: boolean }) 
           <div className="flex items-center gap-3">
             <span className="flex size-10 items-center justify-center rounded-lg text-lg" style={{ background: monogramBg(m.domain || m.name), fontFamily: RT_SERIF }}>{m.name.slice(0, 1).toUpperCase()}</span>
             <div className="text-sm"><p className="font-semibold">{m.name}</p><p className="text-white/60">{[m.domain, m.updated ? `Updated ${new Date(m.updated).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : ""].filter(Boolean).join(" · ")}</p></div>
-            {sample ? <span className="ml-auto rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider" style={{ background: RT.mint, color: RT.forest }} data-testid="report-sample-pill">Sample · example values</span> : null}
+            {sample ? <span className="ml-auto inline-block shrink-0 whitespace-nowrap rounded-[3px] border border-current px-1.5 py-px text-[10px] font-semibold uppercase tracking-[0.14em] opacity-70" data-testid="report-sample-pill">Sample · example values</span> : null}
           </div>
           <p className={`${eyebrow} mt-6`} style={{ color: RT.mint }}>Where your customers convert best</p>
           <h2 className="mt-2 text-[34px] leading-[1.05] md:text-[52px]" style={{ fontFamily: RT_SERIF }}>

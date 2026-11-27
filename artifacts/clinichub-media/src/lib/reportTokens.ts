@@ -8,7 +8,8 @@ export const RT = {
   gold: "#8A5A00", goldBg: "#FFF4DB", goldLine: "#F1D58F",
   // red / redBg / redLine exist in Friday's system for its INTERNAL "excluded: competes" card only. Never used on Birch.
 } as const;
-export const RT_SERIF = "'Iowan Old Style', Charter, Georgia, 'Times New Roman', serif";
+// BR-83: lead with the site display face so report headings match the page. "Iowan Old Style" stays in the stack: the Scale skin keys its sans override on it.
+export const RT_SERIF = "'Fraunces', 'Iowan Old Style', Charter, Georgia, serif";
 export const RT_SANS = "-apple-system, 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif";
 export const RT_SHADOW = "0 1px 2px rgba(11,26,19,.05), 0 8px 24px rgba(11,26,19,.06)";
 export const fitLabelOf = (n: number) => (n >= 80 ? "Strong fit" : n >= 60 ? "Good fit" : n >= 40 ? "Possible fit" : "Early fit");

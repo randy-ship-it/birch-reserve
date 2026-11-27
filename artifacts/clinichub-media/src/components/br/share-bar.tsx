@@ -15,8 +15,9 @@ export function ShareBar({ title = "Get your free Monetization Kit", text = "See
   const [copied, setCopied] = useState(false);
   const canNative = typeof navigator !== "undefined" && typeof navigator.share === "function";
   const url = (c: ShareChannel) => shareUrl(c, sid, href === "intake" ? `${window.location.origin}/intake` : undefined);
-  const btn = tone === "dark" ? "bg-white/10 text-white hover:bg-white hover:text-[#0b1f3a]" : "bg-foreground/[0.06] text-foreground hover:bg-foreground hover:text-background";
-  const cls = `inline-flex h-10 items-center gap-1.5 rounded-full px-3.5 text-sm font-semibold transition ${btn}`;
+  // BR-83: quiet text links with small icons (was five filled pills). Same buttons, labels and tracking.
+  const btn = tone === "dark" ? "text-white/75 hover:text-white" : "text-foreground/60 hover:text-foreground";
+  const cls = `inline-flex h-10 items-center gap-1.5 px-1.5 text-[13px] font-medium underline-offset-4 transition hover:underline ${btn}`;
   const open = (c: ShareChannel, href: string) => () => {
     logShare(c, sid);
     if (href.startsWith("http")) window.open(href, "_blank", "noopener,noreferrer,width=640,height=640");
@@ -42,8 +43,8 @@ export function ShareBar({ title = "Get your free Monetization Kit", text = "See
   };
   const enc = encodeURIComponent;
   return (
-    <div data-testid={testId} className="flex flex-wrap items-center gap-2">
-      <span className={`mr-1 hidden text-[11px] font-bold uppercase sm:inline tracking-wider ${tone === "dark" ? "text-white/60" : "text-foreground/55"}`}>Share</span>
+    <div data-testid={testId} className="flex flex-wrap items-center gap-x-2 gap-y-0">
+      <span className={`mr-1 hidden text-[11px] font-semibold uppercase sm:inline tracking-[0.16em] ${tone === "dark" ? "text-white/60" : "text-foreground/55"}`}>Share</span>
       {canNative ? (
         <button type="button" onClick={native} data-testid={`${testId}-native`} className={`${cls} md:hidden`}><Share2 className="size-4" />Share…</button>
       ) : null}

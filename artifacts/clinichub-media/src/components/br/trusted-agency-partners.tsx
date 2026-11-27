@@ -55,14 +55,14 @@ export function TrustedAgencyPartners() {
             <div className="mt-6 grid grid-cols-2 border border-foreground">
               <div className="relative flex min-h-[200px] min-w-0 flex-col justify-between bg-foreground p-4 text-background md:min-h-[240px] md:p-6">
                 <span aria-hidden className="absolute right-3 top-3 hidden size-7 place-items-center bg-accent md:right-5 md:top-5 md:grid"><Check className="size-4 text-foreground" strokeWidth={3} /></span>
-                <span className="font-display text-5xl leading-none text-accent md:text-6xl">~50%</span>
+                <span className="font-display text-4xl leading-none text-accent sm:text-5xl md:text-6xl">~50%</span>
                 <span>
                   <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] md:text-xs">For partners</span>
                   <span className="mt-1.5 block text-[13px] leading-snug text-background/70 md:text-sm">Dedicated packages and newly activating hubs</span>
                 </span>
               </div>
               <div className="flex min-h-[200px] min-w-0 flex-col justify-between bg-[repeating-linear-gradient(135deg,transparent_0_11px,rgba(7,26,57,0.09)_11px_12px)] p-4 text-foreground md:min-h-[240px] md:p-6">
-                <span className="font-display text-5xl leading-none md:text-6xl">~50%</span>
+                <span className="font-display text-4xl leading-none sm:text-5xl md:text-6xl">~50%</span>
                 <span>
                   <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] md:text-xs">Open self-serve</span>
                   <span className="mt-1.5 block text-[13px] leading-snug text-foreground/70 md:text-sm">Direct buyers pay the rate card</span>
@@ -79,7 +79,7 @@ export function TrustedAgencyPartners() {
             <h3 className="mt-4 font-display text-2xl leading-tight sm:text-3xl md:text-4xl">What a partner <em className="italic">gets.</em></h3>
             <dl className="mt-6 border-t border-background/30">
               <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-4 border-b border-background/15 py-4">
-                <dt className="whitespace-nowrap font-display text-5xl leading-none tracking-tight sm:text-6xl text-accent">{PARTNER_VALUE_VS_AGENCY_PCT.lo}–{PARTNER_VALUE_VS_AGENCY_PCT.hi}%</dt>
+                <dt className="whitespace-nowrap font-display text-[2.1rem] leading-none tracking-tight text-accent sm:text-6xl">{PARTNER_VALUE_VS_AGENCY_PCT.lo}–{PARTNER_VALUE_VS_AGENCY_PCT.hi}%</dt>
                 <dd className="text-sm leading-snug text-background/70">
                   <span className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-accent">Better value</span>
                   Than regular agency pricing, by committing to inventory

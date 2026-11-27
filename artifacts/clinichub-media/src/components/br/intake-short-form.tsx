@@ -51,9 +51,9 @@ export function LocationsQuestion({ value: p, onChange, side }: { value: PhysFor
   const seg = (on: boolean) => `h-9 rounded-full px-4 text-sm font-bold transition ${on ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/75 ring-1 ring-foreground/15 hover:ring-foreground/40"}`;
   const reach = inLocationReach(physOf(p));
   return (
-    <div className="mt-4 rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-3" data-testid="intake-locations">
+    <div className="mt-4 border-t border-foreground/10 pt-4" data-testid="intake-locations">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="mr-1 text-sm font-bold text-[#0b1f3a]">Physical locations?</span>
+        <span className="mr-1 text-sm font-semibold text-[#0b1f3a]">Physical locations?</span>
         <button type="button" aria-pressed={p.has === true} onClick={() => { onChange({ ...p, has: true }); trackIntake(side, "field_start", "locations", { dedupe: true }); }} className={seg(p.has === true)} data-testid="locations-yes">Yes</button>
         <button type="button" aria-pressed={p.has === false} onClick={() => onChange({ ...p, has: false })} className={seg(p.has === false)} data-testid="locations-no">No</button>
       </div>
@@ -89,12 +89,12 @@ const EMPTY_SHARED: SharedAnswers = { brand: "", categories: [], skus: "", audie
 
 function RoleCard({ on, onClick, icon: Icon, title, sub, tag, testId, children }: { on: boolean; onClick: () => void; icon: typeof Store; title: string; sub: string; tag?: string; testId: string; children?: ReactNode }) {
   return (
-    <div data-testid={`${testId}-card`} className={`rounded-2xl border-2 p-4 transition md:flex md:flex-col md:justify-center ${on ? "border-[#0b1f3a] bg-[#0b1f3a] text-white shadow-lg" : "border-foreground/15 bg-white hover:border-foreground/40"}`}>
+    <div data-testid={`${testId}-card`} className={`rounded-xl border p-4 transition md:flex md:flex-col md:justify-center ${on ? "border-[#0b1f3a] bg-white text-[#0b1f3a] ring-1 ring-[#0b1f3a]" : "border-foreground/15 bg-white text-[#0b1f3a] hover:border-foreground/40"}`}>
       <button type="button" role="checkbox" aria-checked={on} onClick={onClick} data-testid={testId} className="flex w-full items-start gap-3 text-left">
-        <span className={`mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md border-2 ${on ? "border-lime-300 bg-lime-300 text-[#0b1f3a]" : "border-foreground/30"}`}>{on ? <Check className="size-4" /> : null}</span>
+        <span className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded border-2 ${on ? "border-[#0b1f3a] bg-[#0b1f3a] text-white" : "border-foreground/30"}`}>{on ? <Check className="size-3.5" strokeWidth={3} /> : null}</span>
         <span className="min-w-0">
-          <span className="flex flex-wrap items-center gap-2"><Icon className={`size-4 ${on ? "text-lime-300" : "text-foreground/50"}`} aria-hidden /><span className="text-base font-bold">{title}</span>{tag ? <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${on ? "bg-lime-300 text-[#0b1f3a]" : "bg-foreground/[0.07] text-foreground/70"}`}>{tag}</span> : null}</span>
-          <span className={`mt-1 block text-[13px] leading-snug ${on ? "text-white/80" : "text-foreground/65"}`}>{sub}</span>
+          <span className="flex flex-wrap items-baseline gap-x-2"><Icon className="size-4 self-center text-foreground/45" aria-hidden /><span className="text-base font-semibold">{title}</span>{tag ? <span className="text-[12px] font-medium text-foreground/55">{tag}</span> : null}</span>
+          <span className="mt-1 block text-[13px] leading-snug text-foreground/65">{sub}</span>
         </span>
       </button>
       {children}
@@ -105,27 +105,36 @@ function RoleCard({ on, onClick, icon: Icon, title, sub, tag, testId, children }
 /** Accelerate lives INSIDE the supplier card: the accelerated supplier option (premium display), never a separate "advertiser" role. */
 function AccelerateToggle({ on, onClick }: { on: boolean; onClick: () => void }) {
   return (
-    <button type="button" role="switch" aria-checked={on} onClick={onClick} data-testid="intake-accelerate" className={`mt-3 flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${on ? "bg-lime-300 text-[#0b1f3a]" : "bg-white/10 text-white hover:bg-white/15"}`}>
-      <Rocket className={`size-5 shrink-0 ${on ? "text-[#0b1f3a]" : "text-lime-300"}`} aria-hidden />
+    <button type="button" role="switch" aria-checked={on} onClick={onClick} data-testid="intake-accelerate" className="mt-3 flex w-full items-center gap-3 border-t border-foreground/10 pt-3 text-left text-[#0b1f3a] transition">
+      <Rocket className="size-4 shrink-0 text-foreground/45" aria-hidden />
       <span className="min-w-0 flex-1">
-        <span className="flex flex-wrap items-center gap-2 text-sm font-bold">Accelerate<span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${on ? "bg-[#0b1f3a] text-lime-300" : "bg-white/15 text-white/80"}`}>Optional</span></span>
-        <span className={`mt-0.5 block text-[12px] leading-snug ${on ? "text-[#0b1f3a]/80" : "text-white/75"}`}>Add premium display placements to speed up exposure.</span>
+        <span className="flex flex-wrap items-baseline gap-x-2 text-sm font-semibold">Accelerate<span className="text-[12px] font-medium text-foreground/55">Optional</span></span>
+        <span className="mt-0.5 block text-[12px] leading-snug text-foreground/60">Add premium display placements to speed up exposure.</span>
       </span>
-      <span aria-hidden data-static-toggle className={`inline-flex h-6 shrink-0 items-center rounded-full px-2.5 text-[10px] font-bold uppercase tracking-wider ${on ? "bg-[#0b1f3a] text-lime-300" : "bg-white/25 text-white/80"}`}>{on ? "On" : "Off"}</span>
+      <Switch on={on} />
     </button>
   );
 }
 
+/** BR-83: a quiet track-and-knob switch; the button keeps role="switch" + aria-checked. Text stays for screen-reader-free tests via data-static-toggle. */
+function Switch({ on }: { on: boolean }) {
+  return (
+    <span aria-hidden data-static-toggle data-state={on ? "on" : "off"} className={`relative inline-flex h-6 w-10 shrink-0 items-center rounded-full transition ${on ? "bg-[#0b1f3a]" : "bg-foreground/20"}`}>
+      <span className={`absolute left-0.5 size-5 rounded-full bg-white shadow transition-transform ${on ? "translate-x-4" : ""}`} />
+      <span className="sr-only">{on ? "On" : "Off"}</span>
+    </span>
+  );
+}
 
 /** Optional agency-partner intros: same On/Off pill as Accelerate, restyled for the light form surface (Randy, Nov 24 2026). */
 function AgencyPartnerToggle({ on, onClick }: { on: boolean; onClick: () => void }) {
   return (
-    <button type="button" role="switch" aria-checked={on} onClick={onClick} data-testid="intake-agency-partner" className={`mt-4 flex w-full items-center gap-3 rounded-xl p-3 text-left transition ${on ? "bg-lime-300 text-[#0b1f3a]" : "bg-foreground/[0.03] text-[#0b1f3a] hover:bg-foreground/[0.06]"}`}>
+    <button type="button" role="switch" aria-checked={on} onClick={onClick} data-testid="intake-agency-partner" className="mt-4 flex w-full items-center gap-3 border-t border-foreground/10 pt-4 text-left text-[#0b1f3a] transition">
       <span className="min-w-0 flex-1">
-        <span className="text-sm font-bold">Want intros to our agency partners?</span>
-        <span className={`mt-0.5 block text-[12px] leading-snug ${on ? "text-[#0b1f3a]/80" : "text-foreground/60"}`}>Creative, new distribution channels, full-service ad buying, and end-to-end campaign management.</span>
+        <span className="text-sm font-semibold">Want intros to our agency partners?</span>
+        <span className="mt-0.5 block text-[12px] leading-snug text-foreground/60">Creative, new distribution channels, full-service ad buying, and end-to-end campaign management.</span>
       </span>
-      <span aria-hidden data-static-toggle className={`inline-flex h-6 shrink-0 items-center rounded-full px-2.5 text-[10px] font-bold uppercase tracking-wider ${on ? "bg-[#0b1f3a] text-lime-300" : "bg-foreground/15 text-foreground/70"}`}>{on ? "On" : "Off"}</span>
+      <Switch on={on} />
     </button>
   );
 }
@@ -319,7 +328,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
     return (
       <>
       {sup ? <SupplierDone brand={quick.brand ?? ""} paths={paths} demand={demand} /> : null}
-      {sup && (paths.display || paths.ads) ? <div className="mb-4 rounded-3xl border border-foreground/10 bg-white p-5 shadow-xl md:p-6"><BuyJourney where="intake_supplier_done" title="Don't wait. Buy a small slot now." testId="supplier-done-journey" /></div> : null}
+      {sup && (paths.display || paths.ads) ? <div className="mb-4 rounded-xl border border-foreground/15 bg-white p-5 md:p-6"><BuyJourney where="intake_supplier_done" title="Don't wait. Buy a small slot now." testId="supplier-done-journey" /></div> : null}
       {sup && supHub ? <div className="mb-4" data-testid="intake-activation-step"><AdActivation role="supplier" email={quick.contact?.email ?? ""} company={quick.brand ?? ""} hubSlug={hubSlugOf(quick.brand ?? "")} fridayId={quick.ref?.id ?? ""} /></div> : null}
       <FastReport
         q={quick}
@@ -336,8 +345,8 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
     );
   if (done)
     return (
-      <div data-testid="intake-short-done" className="rounded-3xl border border-foreground/10 bg-white p-6 shadow-xl">
-        <p className="inline-flex items-center gap-2 rounded-full bg-lime-200 px-3 py-1 text-xs font-bold uppercase tracking-wider"><Check className="size-3.5" />Received · pending review</p>
+      <div data-testid="intake-short-done" className="rounded-xl border border-foreground/15 bg-white p-6 md:p-8">
+        <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-800"><Check className="size-3.5" />Received · pending review</p>
         <h2 className="mt-3 font-display text-3xl">{skinText("Thanks. A person at Birch Reserve reviews every request.")}</h2>
         <p className="mt-2 text-sm text-muted-foreground">Nothing is booked, charged or accepted automatically.</p>
         <LeadGatesStatus gates={done.gates} />
@@ -350,7 +359,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
 
   const supplierOnly = r.supplier && !r.hub;
   return (
-    <form onSubmit={submit} noValidate data-testid="intake-short-form" data-roles={roles.join(",")} className="rounded-3xl border border-foreground/10 bg-white p-5 shadow-xl md:p-6">
+    <form onSubmit={submit} noValidate data-testid="intake-short-form" data-roles={roles.join(",")} className="rounded-xl border border-foreground/15 bg-white p-5 md:p-8">
       <StepHeader step={1} total={2} title={sup ? "Pick your path" : "Your free kit"} hint={sup ? "Pick some or all, add your website and work email, then press the green button." : perfOnly ? "Add your website and work email, then press Get my free Monetization Kit." : "Both boxes are on (most brands are both). Add your website and work email, then press Get my free Monetization Kit."} testId="intake-steps" />
       <SavedNote show={localRestored && !resumed} onClear={startOver} />
       {sup ? (
@@ -363,19 +372,20 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
       ) : null}
       {sup ? null : (
         <fieldset className="mb-4" data-testid="intake-program">
-          <legend className="text-[11px] font-bold uppercase tracking-wider text-foreground/60">How do you want to work with us?</legend>
+          <legend className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/55">How do you want to work with us?</legend>
           <div className="mt-2 grid gap-2 md:grid-cols-2" role="radiogroup">
             {([[false, "Clinic hub program", "Your offers inside clinic hubs.", "intake-program-clinic"], [true, "Performance only (your own site)", "Our code on your own site. Not every brand is a fit for the clinic hub program.", "intake-program-perf"]] as const).map(([po, t, sub, id]) => (
-              <button key={id} type="button" role="radio" aria-checked={perfOnly === po} onClick={() => pickProgram(po)} data-testid={id} className={`rounded-2xl border-2 p-4 text-left transition ${perfOnly === po ? "border-[#0b1f3a] bg-[#0b1f3a] text-white shadow-lg" : "border-foreground/15 bg-white hover:border-foreground/40"}`}>
-                <span className="block text-base font-bold">{t}</span>
-                <span className={`mt-1 block text-[13px] leading-snug ${perfOnly === po ? "text-white/80" : "text-foreground/65"}`}>{sub}</span>
+              <button key={id} type="button" role="radio" aria-checked={perfOnly === po} onClick={() => pickProgram(po)} data-testid={id} className={`flex items-start gap-3 rounded-xl border p-4 text-left text-[#0b1f3a] transition ${perfOnly === po ? "border-[#0b1f3a] bg-white ring-1 ring-[#0b1f3a]" : "border-foreground/15 bg-white hover:border-foreground/40"}`}>
+                <span aria-hidden className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border-2 ${perfOnly === po ? "border-[#0b1f3a]" : "border-foreground/30"}`}>{perfOnly === po ? <span className="size-2.5 rounded-full bg-[#0b1f3a]" /> : null}</span>
+                <span className="min-w-0"><span className="block text-base font-semibold">{t}</span>
+                <span className="mt-1 block text-[13px] leading-snug text-foreground/65">{sub}</span></span>
               </button>
             ))}
           </div>
         </fieldset>
       )}
       {sup || perfOnly ? null : <fieldset>
-        <legend className="text-[11px] font-bold uppercase tracking-wider text-foreground/60">You are… <span className="font-semibold normal-case tracking-normal text-foreground/50">(most brands are both)</span></legend>
+        <legend className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/55">You are… <span className="font-semibold normal-case tracking-normal text-foreground/50">(most brands are both)</span></legend>
         <div className="mt-2 grid gap-2 md:grid-cols-2" data-testid="intake-roles">
           <RoleCard on={r.supplier} onClick={() => flip("supplier")} icon={Package} title="Supplier" tag="Performance-only" sub="Get into curated hubs. Pay on results." testId="intake-role-supplier">
             {r.supplier ? <AccelerateToggle on={r.accelerate} onClick={() => flip("accelerate")} /> : null}
@@ -406,11 +416,11 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
           <input data-testid="intake-email" aria-label="Work email" required type="email" value={email} onFocus={fieldStart(side, "email")} onBlur={() => email.trim() && setTouched((t) => ({ ...t, email: true }))} onChange={(e) => setEmail(e.target.value)} placeholder="you@yourbrand.com" autoComplete="email" inputMode="email" autoCapitalize="none" spellCheck={false} aria-invalid={touched.email && fieldErrs.email ? true : undefined} className={`${input} ${touched.email && fieldErrs.email ? "border-[#b42318]" : ""}`} />
           <FieldError msg={touched.email ? fieldErrs.email : ""} />
         </div>
-        <button type="submit" disabled={busy} data-testid="intake-submit" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 transition hover:bg-[#0b1f3a] hover:text-white">
+        <button type="submit" disabled={busy} data-testid="intake-submit" className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] transition hover:bg-[#0b1f3a] hover:text-white">
           {busy ? <Loader2 className="size-5 animate-spin" /> : null} {supHub ? "Create my hub" : sup && !anyPath(paths) ? "Ask about demand" : sup ? "Get started" : "Get my free Monetization Kit"} <ArrowRight className="size-5" />
         </button>
       </div>
-      <PromoBox />
+      <PromoBox quiet />
       <input tabIndex={-1} aria-hidden autoComplete="off" name="company_url" value={hp} onChange={(e) => setHp(e.target.value)} className="absolute -left-[9999px] h-0 w-0 opacity-0" />
       {err ? <p className="mt-2 text-sm font-semibold text-red-700" data-testid="intake-error">{err}</p> : null}
 
