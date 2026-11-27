@@ -173,7 +173,7 @@ export const ADVERTISER_GUIDES: AdvertiserGuide[] = [
       {
         h2: "Why recovery hubs fit",
         paras: [
-          "Placements sit on the pages recovery customers use: after they book or buy, in their member dashboard, and on hub and service pages. If you want your category to yourself, a premium slot adds exclusivity for the term on the insertion order.",
+          "Placements sit on the pages recovery customers use: after they book or buy, in their member dashboard, and on hub and service pages. For a dedicated package, start with the $1,900 Starter placement or ask about a larger block on the insertion order.",
           BIRCH_FIT,
           BIRCH_RULES,
         ],

@@ -177,7 +177,11 @@ export default function BrHome() {
           </span>
           <span className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 self-start rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white group-hover:bg-lime-300 group-hover:text-[#0b1f3a] sm:self-auto">See agency terms <ArrowRight className="size-4" aria-hidden /></span>
         </a>
-        <p className="mt-2 text-[12px] text-foreground/60">Prices in USD unless shown. Want a category to yourself? <a href="/starter?ref=home_strip" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-strip-exclusive">Dedicated placements from $1,900</a>.</p>
+        <a href="/starter?ref=home_strip" data-testid="home-strip-exclusive" onClick={() => trackAttn("strip.starter")} className="mt-3 flex flex-col gap-2 rounded-2xl border border-[#0b1f3a]/15 bg-white p-4 shadow-sm hover:border-[#0b1f3a] sm:flex-row sm:items-center sm:justify-between">
+          <span className="min-w-0"><span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Starter placement</span><span className="mt-0.5 block text-[13px] leading-snug text-foreground/75"><span className="font-display text-2xl text-[#0b1f3a]">$1,900</span> · a $5K–$50K dedicated package in your category, set on your IO. Nothing runs before you sign.</span></span>
+          <span className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 self-start rounded-full border border-[#0b1f3a]/30 px-5 text-sm font-bold text-[#0b1f3a] sm:self-auto">Starter placement · $1,900 <ArrowRight className="size-4" aria-hidden /></span>
+        </a>
+        <p className="mt-2 text-[12px] text-foreground/60">Prices in USD unless shown. Blocks run from $25,000 to $1.5M USD by inquiry or offer.</p>
       </section>
       {/* Light continuous category strip under the hero (Randy Nov 21 10:20 AM). */}
       <div className="container mx-auto max-w-6xl px-4 pb-5"><div className="hidden mb-3 min-h-[6.5rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div><CategoryStrip testId="home-category-strip" /></div>
