@@ -108,7 +108,7 @@ export function ownHubViews(): { on: number; all: number } {
 
 /* ------------------------------------------------------------------ primitives */
 const Pill = ({ children, tone = "model" }: { children: ReactNode; tone?: "model" | "mint" }) => (
-  <span className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={tone === "mint" ? { background: RT.mint, color: RT.forest } : { background: RT.track, color: RT.mute }}>{children}</span>
+  <span className="inline-block rounded-[3px] border border-current px-1.5 py-px text-[10px] font-semibold uppercase tracking-[0.14em] opacity-70">{children}</span>
 );
 function Headline({ value, unit, range, fmt, dark, testId }: { value: number; unit: string; range: LLH; fmt: (n: number) => string; dark?: boolean; testId: string }) {
   return (
@@ -333,7 +333,7 @@ export function HubView({ cta, split = false }: { m?: ReportModel; exposure?: Fr
       <div>
         <div className="flex items-center gap-2"><span className={eyebrow} style={{ color: GREEN }}>You could earn</span><span className="ml-auto"><Pill tone="mint">Estimate · {cad ? "CAD" : "USD"}</Pill></span></div>
         <div data-testid="hub-headline-month">
-          <p className="mt-2 text-[64px] font-bold leading-none tabular-nums md:text-[88px]" style={{ fontFamily: RT_SERIF, color: GREEN, textShadow: "0 0 32px rgba(74,222,128,.45)" }}>{has ? mny(month, cad) : "—"}</p>
+          <p className="mt-2 text-[64px] font-bold leading-none tabular-nums md:text-[88px]" style={{ fontFamily: RT_SERIF, color: GREEN }}>{has ? mny(month, cad) : "—"}</p>
           <p className="mt-1 text-[16px] font-semibold">a month</p>
         </div>
         {has ? (
@@ -344,10 +344,10 @@ export function HubView({ cta, split = false }: { m?: ReportModel; exposure?: Fr
               <li>Your hub could help drive about {mny(o.sales, cad)} a month in sales for brands.</li>
               <li>Brands pay for the space. You keep {o.sharePct}% of that media revenue.</li>
             </ul>
-            <div className="mt-5 grid grid-cols-2 gap-2 md:grid-cols-4" data-testid="hub-chain">
+            <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-5 border-t border-white/15 pt-5 md:grid-cols-4" data-testid="hub-chain">
               {chain.map(([t, v, sub], n) => (
-                <div key={t} className="rounded-xl p-3" style={{ background: "rgba(255,255,255,.08)" }} data-testid={`hub-chain-${n}`}>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-white/70">{t}</p>
+                <div key={t} className="min-w-0 border-l border-white/15 pl-3" data-testid={`hub-chain-${n}`}>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/60">{t}</p>
                   <p className="mt-1 text-[28px] leading-none tabular-nums" style={{ fontFamily: RT_SERIF }}>{v}</p>
                   <p className="mt-1 text-[11px] text-white/70">{sub}</p>
                 </div>

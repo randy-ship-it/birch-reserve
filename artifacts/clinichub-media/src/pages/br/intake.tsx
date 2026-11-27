@@ -18,7 +18,7 @@ import { ReportV2 } from "@/components/br/report-v2";
 import { ShareBar } from "@/components/br/share-bar";
 import { Details } from "@/components/br/details";
 import { sampleReport } from "@/lib/fridayMockReport";
-import { RT, RT_SANS, RT_SERIF } from "@/lib/reportTokens";
+import { RT_SANS } from "@/lib/reportTokens";
 import { TwoLane } from "@/components/br/two-lane";
 import { NextStep } from "@/components/br/next-step";
 import { GtmSetup } from "@/components/br/gtm-setup";
@@ -121,8 +121,9 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
         </div>
       ) : null}
       <div className="container mx-auto px-4 pb-12 pt-6" style={{ fontFamily: RT_SANS }} data-testid="sample-kit">
-        <span className="rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider" style={{ background: RT.mint, color: RT.forest }} data-testid="sample-label">Sample · example values only</span>
-        <h2 className="mt-3 text-3xl md:text-5xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you get.</h2>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/55" data-testid="sample-label">Sample · example values only</p>
+        {/* BR-83: the page display face (Fraunces on Birch, the Scale sans on the mirror), not the report serif. */}
+        <h2 className="mt-2 font-display text-3xl text-[#0b1f3a] md:text-5xl">What you get.</h2>
         <Details testId="sample-details"><p>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range, not a result or a guarantee.</p></Details>
         <div className="mt-4"><ReportV2 report={sample} sample compact exposure={SAMPLE_EXPOSURE} exposureSource="sample" /></div>
         {sup || scaleFacing ? null : <div className="mt-10" data-testid="intake-next-step"><NextStep where="intake" yieldToPostKit /></div>}

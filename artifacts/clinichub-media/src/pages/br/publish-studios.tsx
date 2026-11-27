@@ -43,13 +43,13 @@ export default function BrPublishStudios() {
           {/* BR-83: one ruled offer panel: the two payouts, then the three steps in a line each (was boxed chips). */}
           <div className="border-t-2 border-foreground" data-testid="publisher-offer">
             <div className="grid grid-cols-2 border-b border-foreground/15">
-              <div className="py-6 pr-6">
+              <div className="min-w-0 py-6 pr-4 sm:pr-6">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Cash</p>
-                <p className="mt-2 whitespace-nowrap font-display text-4xl leading-none">{$cash}</p>
+                <p className="mt-2 font-display text-[1.7rem] leading-none sm:text-4xl">{$cash}</p>
               </div>
-              <div className="border-l border-foreground/15 py-6 pl-6">
+              <div className="min-w-0 border-l border-foreground/15 py-6 pl-4 sm:pl-6">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Or ad credit</p>
-                <p className="mt-2 whitespace-nowrap font-display text-4xl leading-none">{$credit}</p>
+                <p className="mt-2 font-display text-[1.7rem] leading-none sm:text-4xl">{$credit}</p>
               </div>
             </div>
             <ol className="text-sm">

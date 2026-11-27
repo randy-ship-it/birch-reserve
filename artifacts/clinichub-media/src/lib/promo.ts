@@ -3,7 +3,7 @@ import { PROMO_BOX_JS } from "../../../api-server/src/lib/adserver/promoBoxJs";
 
 declare global {
   interface Window {
-    BRPromo?: { capture: () => void; mount: (el: HTMLElement, o?: { mode?: string; getEmail?: () => string }) => void };
+    BRPromo?: { capture: () => void; mount: (el: HTMLElement, o?: { mode?: string; quiet?: boolean; getEmail?: () => string }) => void };
   }
 }
 
