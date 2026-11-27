@@ -50,7 +50,7 @@ export function ioDraftSvg(r: BlockRequest, ref: string, opts: { issued?: Date; 
     ["Contact", [r.name, r.email].filter(Boolean).join(" · ")],
     ["Budget", `${bandAmountLabel(r.band)} · ${band.sub}`],
     ["Flight", `${longDate(r.flightStart)} – ${longDate(r.flightEnd)}`],
-    ["Placements", "Retail hubs named on the signed IO"],
+    ["Placements", "Retail clinic layers named on the signed IO"],
     ...(r.agency ? ([["Agency commission", `Standard ${AGENCY_TEST.cashPct}% agency commission off the gross rate card · est. ${agencyCashLabel(r.band)}`]] as Array<[string, string]>) : []),
   ];
   let y = 470;

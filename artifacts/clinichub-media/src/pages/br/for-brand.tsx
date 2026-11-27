@@ -107,7 +107,7 @@ function OverlapVenn({ fit }: { fit: BrandFit }) {
   const strong = fit.overlap.filter((o) => o.strength === "strong");
   const good = fit.overlap.filter((o) => o.strength === "good");
   const aria = [
-    `${fit.name}'s customer versus our hubs and rooms.`,
+    `${fit.name}'s customer versus our clinic layers and rooms.`,
     strong.length ? `Strong fit: ${strong.map((o) => o.title).join("; ")}.` : "",
     good.length ? `Good fit: ${good.map((o) => o.title).join("; ")}.` : "",
   ]
@@ -161,7 +161,7 @@ function OverlapVenn({ fit }: { fit: BrandFit }) {
           </ul>
         </div>
         <div className="for-venn-copy for-venn-right-copy">
-          <p className="for-venn-kicker">Our hubs and rooms</p>
+          <p className="for-venn-kicker">Our clinic layers and rooms</p>
           <ul>
             {good.map((o) => (
               <li key={o.title}>
@@ -272,7 +272,7 @@ function BrandFitPage({ fit }: { fit: BrandFit }) {
         <section className="border-b border-border/70 bg-background">
           <div className="container mx-auto max-w-6xl px-5 py-10 md:px-6 md:py-12">
             <Eyebrow>Where they already show up</Eyebrow>
-            <h2 className="mt-2 font-display text-[1.75rem] leading-tight tracking-tight md:text-4xl">Live hubs and racquet pages.</h2>
+            <h2 className="mt-2 font-display text-[1.75rem] leading-tight tracking-tight md:text-4xl">Live clinic layers and racquet pages.</h2>
             {liveTiles.length ? (
               <ul className="mt-6 grid gap-3 sm:grid-cols-2">
                 {liveTiles.map((t) => (
@@ -381,7 +381,7 @@ function BrandFitPage({ fit }: { fit: BrandFit }) {
           <Eyebrow dark>Start</Eyebrow>
           <h2 className="mt-2 font-display text-[1.75rem] leading-tight tracking-tight md:text-4xl">Look for $190 USD, or place in the category for $490 USD.</h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-background/75">
-            Pricing, live hubs and how category placements work are in the{" "}
+            Pricing, live clinic layers and how category placements work are in the{" "}
             <a href="/media-kit" className="underline underline-offset-4 hover:text-accent">
               Birch Reserve media kit
             </a>

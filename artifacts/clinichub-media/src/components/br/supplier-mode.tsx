@@ -31,8 +31,8 @@ export const SUPPLIER_FEES = {
   standUpUsd: 5000,
   waiver: "waived for brands live before 2027",
   lines: [
-    { k: "own", v: "10%", l: "on post-purchase activated sales through your own hub" },
-    { k: "network", v: "~35%", l: "on sales through partner clinics and other hubs" },
+    { k: "own", v: "10%", l: "on post-purchase activated sales through your own clinic layer" },
+    { k: "network", v: "~35%", l: "on sales through partner clinics and other clinic layers" },
   ],
 } as const;
 
@@ -47,9 +47,9 @@ export type Paths = Record<PathKey, boolean>;
 export const NO_PATHS: Paths = { supply: false, hub: false, display: false, ads: false };
 export const DEFAULT_PATHS: Paths = { supply: true, hub: false, display: false, ads: false };
 export const PATHS: Array<{ k: PathKey; icon: typeof Package; t: string; s: string; tag: string }> = [
-  { k: "supply", icon: Package, t: "Supply", s: "Your products or services in hub micro-stores, 200+ brick-and-mortar locations, or street-team door-to-door sampling.", tag: "Pay on results" },
-  { k: "hub", icon: Store, t: "Your own hub", s: "Performance-based. You earn from your hub. Needed for max CPC exposure.", tag: "Pending approval" },
-  { k: "display", icon: MousePointerClick, t: "Display / CPC", s: "Performance placements for brands without a hub.", tag: "Buy now" },
+  { k: "supply", icon: Package, t: "Supply", s: "Your products or services in clinic layer micro-stores, 200+ brick-and-mortar locations, or street-team door-to-door sampling.", tag: "Pay on results" },
+  { k: "hub", icon: Store, t: "Your own clinic layer", s: "Performance-based. You earn from your clinic layer. Needed for max CPC exposure.", tag: "Pending approval" },
+  { k: "display", icon: MousePointerClick, t: "Display / CPC", s: "Performance placements for brands without a clinic layer.", tag: "Buy now" },
   { k: "ads", icon: Megaphone, t: "Ads only", s: "Exposure only. No supply needed.", tag: "Buy now" },
 ];
 /** ?paths=supply,hub preselects (media kit links). Unknown keys are ignored; nothing valid → the supply default. */
@@ -75,7 +75,7 @@ export const VERTICALS = [
   { k: "nutrition", label: "Nutrition", cat: "sports_nutrition" },
 ] as const;
 export type VerticalKey = (typeof VERTICALS)[number]["k"];
-export const VERTICALS_NOTE = "Most hubs are recovery-focused today. More categories are coming.";
+export const VERTICALS_NOTE = "Most clinic layers are recovery-focused today. More categories are coming.";
 export const verticalCats = (v: VerticalKey[]) => VERTICALS.filter((x) => v.includes(x.k)).map((x) => x.cat);
 export const verticalLabels = (v: VerticalKey[]) => VERTICALS.filter((x) => v.includes(x.k)).map((x) => x.label);
 
@@ -114,7 +114,7 @@ export function PathBuyNow({ paths, look, seat, lookHref, reserveHref }: { paths
         <a href={lookHref} className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#0b1f3a] px-4 text-sm font-bold text-white hover:bg-lime-300 hover:text-[#0b1f3a]" data-testid="path-buy-look">Buy display now · {look}</a>
         <a href={reserveHref} className="inline-flex h-10 items-center rounded-full bg-white px-4 text-sm font-bold text-[#0b1f3a] ring-1 ring-[#0b1f3a]/20 hover:ring-[#0b1f3a]" data-testid="path-buy-reserve">Category placement · {seat}</a>
       </div>
-      {paths.display ? <p className="text-[12px] text-foreground/65 md:basis-full" data-testid="path-cpc-note">Request CPC: keep Display / CPC ticked and send. Max CPC exposure needs your own hub.</p> : null}
+      {paths.display ? <p className="text-[12px] text-foreground/65 md:basis-full" data-testid="path-cpc-note">Request CPC: keep Display / CPC ticked and send. Max CPC exposure needs your own clinic layer.</p> : null}
     </div>
   );
 }
@@ -160,7 +160,7 @@ export function SupplierFees({ testId = "supplier-fees" }: { testId?: string }) 
           {SUPPLIER_FEES.lines.map((f) => <li key={f.k}><strong className="text-foreground/80">{f.v}</strong> {f.l}</li>)}
           <li data-testid="supplier-standup-fee"><span className="text-foreground/80">Stand-up fee</span> <s className="text-foreground/45" data-testid="supplier-standup-struck">${SUPPLIER_FEES.standUpUsd.toLocaleString("en-US")} USD</s> · {SUPPLIER_FEES.waiver}</li>
         </ul>
-        <p>Supply and your own hub: fees apply only to sales, in USD. Display and CPC are priced on their own. You approve every placement before it runs.</p>
+        <p>Supply and your own clinic layer: fees apply only to sales, in USD. Display and CPC are priced on their own. You approve every placement before it runs.</p>
       </Details>
     </div>
   );
@@ -173,21 +173,21 @@ export function SupplierDone({ brand, paths, demand }: { brand: string; paths: P
   return (
     <div data-testid="supplier-pending" data-paths={PATHS.filter((x) => paths[x.k]).map((x) => x.k).join(",")} className="mb-4 rounded-3xl border border-foreground/10 bg-white p-5 shadow-xl md:p-6">
       <p className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-950 ring-1 ring-amber-300" data-testid="supplier-pending-chip"><Clock className="size-3.5" />{hub ? "Pending approval" : "Received · in review"}</p>
-      <h2 className="mt-3 font-display text-3xl leading-tight md:text-4xl" data-testid="supplier-pending-title">{hub ? "Your hub is created and goes live once our team approves it." : picked.length ? "You're in. We review it and reply by email." : "Got it. We'll show you the demand we see."}</h2>
+      <h2 className="mt-3 font-display text-3xl leading-tight md:text-4xl" data-testid="supplier-pending-title">{hub ? "Your clinic layer is created and goes live once our team approves it." : picked.length ? "You're in. We review it and reply by email." : "Got it. We'll show you the demand we see."}</h2>
       {picked.length ? <p className="mt-3 flex flex-wrap gap-1.5" data-testid="supplier-done-paths">{picked.map((t) => <span key={t} className="rounded-full bg-[#0b1f3a] px-3 py-1 text-xs font-bold text-white">{t}</span>)}{demand ? <span className="rounded-full bg-lime-200 px-3 py-1 text-xs font-bold text-[#0b1f3a]">Demand question</span> : null}</p> : null}
       {hub ? (
         <div className="mt-4 flex items-center gap-3 rounded-2xl bg-[#0b1f3a] p-4 text-white" data-testid="supplier-hub-card">
           <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-lime-300 text-lg font-black text-[#0b1f3a]">{(brand || "H").charAt(0).toUpperCase()}</span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-lg font-bold" data-testid="supplier-hub-name">{brand ? `${brand} hub` : "Your hub"}</p>
-            <p className="text-[12px] text-white/70">Own hub · performance-based</p>
+            <p className="truncate text-lg font-bold" data-testid="supplier-hub-name">{brand ? `${brand} clinic layer` : "Your clinic layer"}</p>
+            <p className="text-[12px] text-white/70">Own clinic layer · performance-based</p>
           </div>
           <span className="hidden shrink-0 rounded-full bg-white/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-200 sm:inline">Not live yet</span>
         </div>
       ) : null}
       {hub ? <HubDemandCard className="mt-4" /> : null}
       <Details testId="supplier-pending-details">
-        <p>{skinText("Birch Reserve")} reviews every request{hub ? " and every new hub before it goes live" : ""}. Nothing is published, booked or charged automatically, and you approve every placement.</p>
+        <p>{skinText("Birch Reserve")} reviews every request{hub ? " and every new clinic layer before it goes live" : ""}. Nothing is published, booked or charged automatically, and you approve every placement.</p>
       </Details>
     </div>
   );

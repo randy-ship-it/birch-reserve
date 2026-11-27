@@ -9,7 +9,7 @@ import { skinText } from "@/lib/siteSkin";
 import { ACT_ROLES, type ActRole } from "../../../../api-server/src/lib/overhaul/adActivation";
 
 export default function BrIntakeActivate() {
-  usePageMeta("Get your ads turned on | Birch Reserve", "Share a rough inventory estimate and which ads can run on your hubs. Every ad is reviewed and nothing runs without approval.");
+  usePageMeta("Get your ads turned on | Birch Reserve", "Share a rough inventory estimate and which ads can run on your clinic layers. Every ad is reviewed and nothing runs without approval.");
   const q = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search);
   const role = ACT_ROLES.find((r) => r.key === q.get("role"))?.key as ActRole | undefined;
   return (

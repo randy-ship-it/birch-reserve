@@ -16,7 +16,7 @@ export const SLOT_TO_PLACEMENT: Record<string, PlacementKey> = {
 };
 
 const COPY: Record<PlacementKey, { title: string; caption: string }> = {
-  landing: { title: "Hub landing banner and tiles", caption: "A banner under the hub header and native tiles on the co-branded hub home, before login." },
+  landing: { title: "Clinic layer landing banner and tiles", caption: "A banner under the clinic layer header and native tiles on the co-branded clinic layer home, before login." },
   dashboard: { title: "Member dashboard tile", caption: "A native tile next to a logged-in member's orders, plans and bookings." },
   products: { title: "Product page unit", caption: "A sponsored card in the product grid while members shop." },
   services: { title: "Services and booking unit", caption: "A native unit on a service or booking page, beside the time picker." },
@@ -46,7 +46,7 @@ function HubFrame({ children, tabs }: { children: ReactNode; tabs?: string }) {
   return (
     <div className="overflow-hidden rounded-md border border-foreground/15 bg-white text-left">
       <div className="flex items-center justify-between border-b border-foreground/10 px-3 py-2">
-        <span className="text-[10px] font-semibold text-foreground/70">Partner brand · member hub</span>
+        <span className="text-[10px] font-semibold text-foreground/70">Partner brand · member clinic layer</span>
         <span className="h-4 w-12 rounded-sm bg-foreground/10" />
       </div>
       {tabs ? <div className="flex gap-3 border-b border-foreground/10 px-3 py-1.5 text-[9px] text-foreground/55">{tabs.split("|").map((t, i) => <span key={t} className={i === 0 ? "font-semibold text-foreground" : ""}>{t}</span>)}</div> : null}
@@ -75,13 +75,13 @@ function LandingShot() {
   const H = HUB_MOCKS[hub];
   return (
     <div>
-      <div className="mb-1.5 flex max-w-full flex-wrap gap-1" role="group" aria-label="Example hub" data-testid="placement-hub-tabs">
+      <div className="mb-1.5 flex max-w-full flex-wrap gap-1" role="group" aria-label="Example clinic layer" data-testid="placement-hub-tabs">
         {HUB_KEYS.map((k) => (
           <button key={k} type="button" aria-pressed={hub === k} onClick={() => setHub(k)} className={`inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider ${hub === k ? "bg-foreground text-background" : "bg-white ring-1 ring-foreground/15 text-foreground/70"}`}>{HUB_MOCKS[k].tab}</button>
         ))}
       </div>
-      <Shot src={H.img} alt={`${H.name} hub home page, with an example banner and tile drawn on top`}>
-        <Unit className={`absolute left-[4%] right-[4%] ${LANDING_BANNER[hub] ?? "top-[12%]"} py-1`} label={showCalmExample(hub) ? `${EX} · hub banner` : "Your brand · hub banner"} />
+      <Shot src={H.img} alt={`${H.name} clinic layer home page, with an example banner and tile drawn on top`}>
+        <Unit className={`absolute left-[4%] right-[4%] ${LANDING_BANNER[hub] ?? "top-[12%]"} py-1`} label={showCalmExample(hub) ? `${EX} · clinic layer banner` : "Your brand · clinic layer banner"} />
         {showCalmExample(hub) ? (
           <div className={`absolute ${LANDING_TILE_EX[hub] ?? "right-[4%] top-[27%] w-[30%]"} rounded-md border-2 border-dashed border-emerald-600 bg-white/95 p-1 text-emerald-900 shadow`} data-testid="placement-example-tile">
             <Creative />
@@ -172,7 +172,7 @@ function Body({ k }: { k: PlacementKey }) {
   return (
     <div>
       <PlacementVisual k={k} />
-      <div className="mt-2 flex items-center gap-2"><Badge /><span className="text-[11px] text-muted-foreground">{shot ? "Drawn on a real hub screenshot" : "Mockup of a hub page"}</span></div>
+      <div className="mt-2 flex items-center gap-2"><Badge /><span className="text-[11px] text-muted-foreground">{shot ? "Drawn on a real clinic layer screenshot" : "Mockup of a clinic layer page"}</span></div>
       <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{c.caption} Illustration only: example creative from {EX}; your creative and exact position are set in your insertion order.</p>
     </div>
   );

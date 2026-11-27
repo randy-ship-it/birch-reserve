@@ -31,6 +31,7 @@ import { mockExposure } from "../../../../api-server/src/lib/kitCalc/activation"
 import { brandFromUrl, presetOf, type IntakePreset } from "@/components/br/supplier-mode";
 import { BuyJourney } from "@/components/br/journey";
 import { RETAIL_COPY, RETAIL_TAG } from "../../../../api-server/src/lib/overhaul/brandIntake";
+import { ClinicLayerTerm } from "@/components/br/clinic-layer-term";
 
 const SAMPLE_EXPOSURE = { ...mockExposure({ sells_in: ["CA", "US"], ships_to: ["CA", "US"], regions: ["ON"] }), basis: "Sample: network figures / targets × example activation shares (1%–5%)" };
 
@@ -61,7 +62,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
   }, []);
   // Scroll depth, first touch and time to first interaction for the intake (same code serves scalehealth.ca/intake via the mirror).
   useAttention({ ladder: "[data-testid=intake-next-step]" });
-  usePageMeta(sup ? "Supplier intake · Pick your path | Birch Reserve" : "Get your free Monetization Kit | Birch Reserve", sup ? "Pick some or all: supply (hub micro-stores, 200+ brick-and-mortar locations, street-team sampling), your own hub, display / CPC, or ads only. Buy small slots now, make an offer on mid-size inventory, or inquire for bigger slots." : scaleFacing ? HUB_DEFINITION : "One short form for suppliers and hubs. See your hub earnings and your supplier exposure on performance-only terms (pay on results), side by side. Estimates in USD, reviewed by a person.");
+  usePageMeta(sup ? "Supplier intake · Pick your path | Birch Reserve" : "Get your free Monetization Kit | Birch Reserve", sup ? "Pick some or all: supply (clinic layer micro-stores, 200+ brick-and-mortar locations, street-team sampling), your own clinic layer, display / CPC, or ads only. Buy small slots now, make an offer on mid-size inventory, or inquire for bigger slots." : scaleFacing ? HUB_DEFINITION : "One short form for suppliers and clinic layers. See your clinic layer earnings and your supplier exposure on performance-only terms (pay on results), side by side. Estimates in USD, reviewed by a person.");
   return (
     <div data-testid="intake-landing">
       <MockBanner />
@@ -71,7 +72,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
             <div data-testid="supplier-hero">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">{skinText("Birch Reserve · For suppliers")}</p>
               <h1 className="font-display text-4xl leading-[1.02] md:text-6xl" data-testid="supplier-h1">{brand ? `${brand}, pick your path.` : "Pick your path."}</h1>
-              <p className="mt-2 max-w-2xl text-base text-muted-foreground">Supply, your own hub, display or ads. Some or all. No setup fee.</p>
+              <p className="mt-2 max-w-2xl text-base text-muted-foreground">Supply, your own <ClinicLayerTerm testId="clinic-layer-term-intake" />, display or ads. Some or all. No setup fee.</p>
               <div className="mt-3"><WatchHowItWorks placement="hero_intake_supplier" testId="intake-watch-reel" /></div>
               <p className="mt-3 inline-flex items-start gap-2 rounded-2xl bg-white/80 px-3 py-1.5 text-[12px] font-semibold text-[#0b1f3a] ring-1 ring-foreground/10" data-testid="supplier-network"><span>{RETAIL_COPY} <span className="font-normal text-foreground/50">· {RETAIL_TAG}</span></span></p>
             </div>
@@ -101,7 +102,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
               {showLanes ? (
                 <TwoLane />
               ) : (
-                <button type="button" onClick={() => setShowLanes(true)} className="text-left text-[13px] text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-reserve-space-link">Buying ads on existing hubs? Buy space</button>
+                <button type="button" onClick={() => setShowLanes(true)} className="text-left text-[13px] text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-reserve-space-link">Buying ads on existing clinic layers? Buy space</button>
               )}
             </div>
           ) : null}
@@ -124,7 +125,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/55" data-testid="sample-label">Sample · example values only</p>
         {/* BR-83: the page display face (Fraunces on Birch, the Scale sans on the mirror), not the report serif. */}
         <h2 className="mt-2 font-display text-3xl text-[#0b1f3a] md:text-5xl">What you get.</h2>
-        <Details testId="sample-details"><p>Supplier exposure (performance-only, pay on results, and with Accelerate) and hub max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range, not a result or a guarantee.</p></Details>
+        <Details testId="sample-details"><p>Supplier exposure (performance-only, pay on results, and with Accelerate) and clinic layer max exposure + earnings, for a fictional example brand. Every figure is an estimate or modelled range, not a result or a guarantee.</p></Details>
         <div className="mt-4"><ReportV2 report={sample} sample compact exposure={SAMPLE_EXPOSURE} exposureSource="sample" /></div>
         {sup || scaleFacing ? null : <div className="mt-10" data-testid="intake-next-step"><NextStep where="intake" yieldToPostKit /></div>}
         {sup ? null : (

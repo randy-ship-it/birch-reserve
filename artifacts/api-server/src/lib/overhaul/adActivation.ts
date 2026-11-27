@@ -9,9 +9,9 @@
  */
 export const ACT_KIND = "ad_activation";
 export const ACT_ROLES = [
-  { key: "brand", label: "Brand with hubs" },
+  { key: "brand", label: "Brand with clinic layers" },
   { key: "supplier", label: "Supplier / brand" },
-  { key: "provider", label: "Provider / hub owner" },
+  { key: "provider", label: "Provider / clinic layer owner" },
 ] as const;
 export type ActRole = (typeof ACT_ROLES)[number]["key"];
 
@@ -23,7 +23,7 @@ export const VIEWS_RANGES: Range[] = [R("lt5k", "Under 5K", 2500), R("5-25k", "5
 export const LIST_RANGES: Range[] = [R("none", "No email or SMS list", 0), R("lt1k", "Under 1K", 500), R("1-10k", "1K–10K", 5000), R("10-50k", "10K–50K", 30000), R("50k+", "50K+", 75000), R("unsure", "Not sure", 0)];
 
 export const ACT_OPENNESS = [
-  { key: "curated", label: "Curated health & wellness only", hint: "Only recovery and health and wellness ads on your hubs." },
+  { key: "curated", label: "Curated health & wellness only", hint: "Only recovery and health and wellness ads on your clinic layers." },
   { key: "premium", label: "Open to other premium brands (non-wellness), with category exclusions", hint: "High-value advertisers outside wellness, minus the categories you exclude." },
   { key: "any", label: "Open to any approved ad", hint: "Any ad that passes our review, minus nothing unless you exclude it." },
 ] as const;
@@ -39,7 +39,7 @@ export const ACT_EXCLUSIONS = [
 export type ActExclusion = (typeof ACT_EXCLUSIONS)[number]["key"];
 
 /** Public copy: names no people. The internal rule (our ad system plus Randy or Jon permission) is unchanged and lives in the admin + docs. */
-export const ACT_REVIEW_NOTE = "Every ad is reviewed, and nothing runs on your hubs without explicit approval from our team.";
+export const ACT_REVIEW_NOTE = "Every ad is reviewed, and nothing runs on your clinic layers without explicit approval from our team.";
 export const ACT_OTHER_MAX = 300;
 /** Open to ads beyond curated health and wellness. */
 export const isNonCore = (o: string | undefined | null): boolean => o === "premium" || o === "any";
@@ -63,11 +63,11 @@ export function parseActivation(raw: unknown): { ok: true; v: ActivationClean } 
   const role = ACT_ROLES.find((r) => r.key === b["role"])?.key;
   if (!role) return { ok: false, error: "Pick who you are." };
   const pages = s(b["pages"], 20), views = s(b["views"], 20), list = s(b["list"], 20);
-  if (!PAGES_RANGES.some((r) => r.key === pages)) return { ok: false, error: "Pick a pages or hub screens range." };
+  if (!PAGES_RANGES.some((r) => r.key === pages)) return { ok: false, error: "Pick a pages or clinic layer screens range." };
   if (!VIEWS_RANGES.some((r) => r.key === views)) return { ok: false, error: "Pick a monthly views range." };
   if (!LIST_RANGES.some((r) => r.key === list)) return { ok: false, error: "Pick an email or SMS list range." };
   const openness = ACT_OPENNESS.find((o) => o.key === b["openness"])?.key;
-  if (!openness) return { ok: false, error: "Pick which ads can run on your hubs." };
+  if (!openness) return { ok: false, error: "Pick which ads can run on your clinic layers." };
   if (b["ack"] !== true) return { ok: false, error: "Please confirm you understand every ad is reviewed and nothing runs without approval." };
   const ex = Array.isArray(b["exclusions"]) ? (b["exclusions"] as unknown[]).map(String) : [];
   const keys = ACT_EXCLUSIONS.map((e) => e.key as string);

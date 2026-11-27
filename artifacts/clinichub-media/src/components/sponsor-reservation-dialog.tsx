@@ -89,7 +89,7 @@ const PLACEMENTS = [
   { value: "post_checkout", label: "Post-Checkout Confirmation" },
   { value: "recovery_plan", label: "Digital Recovery Plan" },
   { value: "booking_confirmation", label: "Booking Confirmation" },
-  { value: "member_hub", label: "Member Hub Dashboard" },
+  { value: "member_hub", label: "Member Clinic Layer Dashboard" },
   { value: "guidance_needed", label: "Not sure / Seeking guidance" }
 ];
 
@@ -550,7 +550,7 @@ export function SponsorReservationDialog({
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel className="text-xs font-medium text-foreground flex justify-between">
-                                  Desired Hub <span className="text-muted-foreground font-normal">(Optional)</span>
+                                  Desired Clinic layer <span className="text-muted-foreground font-normal">(Optional)</span>
                                 </FormLabel>
                                 <FormControl>
                                   <Input placeholder="Specific host name or network..." {...field} className="rounded-none border-border bg-card h-12 px-4 shadow-sm text-foreground focus-visible:ring-accent" data-testid="input-waitlist-hub" />

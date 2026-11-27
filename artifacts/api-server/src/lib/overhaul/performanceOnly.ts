@@ -8,12 +8,12 @@
  */
 export const PERF_ONLY_HREF = "/intake?program=performance-only";
 export const PERF_ONLY_URL = "https://birchreserve.net/intake?program=performance-only";
-export const PERF_ONLY_PROGRAM_NOTE = "Program: Performance only (own site, no clinic hub layer)";
-export const CLINIC_PROGRAM_NOTE = "Program: Clinic hub program";
+export const PERF_ONLY_PROGRAM_NOTE = "Program: Performance only (own site, no clinic layer layer)";
+export const CLINIC_PROGRAM_NOTE = "Program: Clinic layer program";
 
 export const PERFORMANCE_ONLY = {
   eyebrow: "Performance only · your own site",
-  title: "Not every brand is a fit for the clinic hub program. You can still activate.",
+  title: "Not every brand is a fit for the clinic layer program. You can still activate.",
   sub: "We place our drop-in code on key spots in your own online customer experience. No clinic layer needed.",
   spots: ["Post-purchase", "Order confirmation / thank-you", "Account pages", "Activation pages"],
   steps: [
@@ -22,14 +22,14 @@ export const PERFORMANCE_ONLY = {
     { n: "3", t: "Measure results", d: "See aggregate results. Performance-based terms are set at onboarding." },
   ],
   compare: [
-    { k: "Clinic hub program", v: "Your offers inside clinic hubs, with the clinic layer." },
+    { k: "Clinic layer program", v: "Your offers inside clinic layers, with the clinic layer." },
     { k: "Performance only", v: "Our code on your own site. No clinic layer." },
   ],
   ranges: "Typical ranges are on this page as estimates. Not a guarantee, not Birch results.",
   cta: "Ask about performance only",
   detailsLabel: "What's included and how it works",
   details: [
-    "Not every brand is a fit for the clinic hub program. Performance only is the other way to work with us.",
+    "Not every brand is a fit for the clinic layer program. Performance only is the other way to work with us.",
     "We give you a small snippet or tag. You place it, with our help, on the spots you pick: post-purchase, order confirmation or thank-you, account and activation pages.",
     "Performance-based terms are set at onboarding. Nothing is charged online and nothing runs until a person at Birch Reserve confirms the setup with you.",
     "Reporting is aggregate only. No guarantees of clicks, conversions or sales. Estimated ranges elsewhere on the page are estimates, not results.",
@@ -38,8 +38,8 @@ export const PERFORMANCE_ONLY = {
 
 /** One short paragraph for the chat prompt and llms.txt. */
 export const PERF_ONLY_FACT =
-  "Performance only (your own site): not every brand is a fit for the clinic hub program, and those brands can still work with us. We place our drop-in code (a small snippet or tag) on key spots in the brand's own online customer experience: post-purchase, order confirmation or thank-you, account and activation pages. They can activate offers and measure aggregate results without the clinic hub layer. Terms are performance-based and set at onboarding.";
+  "Performance only (your own site): not every brand is a fit for the clinic layer program, and those brands can still work with us. We place our drop-in code (a small snippet or tag) on key spots in the brand's own online customer experience: post-purchase, order confirmation or thank-you, account and activation pages. They can activate offers and measure aggregate results without the clinic layer layer. Terms are performance-based and set at onboarding.";
 
 /** Chat-only guardrail. */
 export const PERF_ONLY_CHAT_RULE =
-  "Say 'not every brand is a fit for the clinic hub program', never that anyone was rejected or declined. Do not quote rates, commissions or percentages for it: say performance-based terms are set at onboarding. No guarantees, and do not claim any live installs or results. If they want to start, send them to " + PERF_ONLY_URL + " (the brand intake with 'Performance only' picked).";
+  "Say 'not every brand is a fit for the clinic layer program', never that anyone was rejected or declined. Do not quote rates, commissions or percentages for it: say performance-based terms are set at onboarding. No guarantees, and do not claim any live installs or results. If they want to start, send them to " + PERF_ONLY_URL + " (the brand intake with 'Performance only' picked).";

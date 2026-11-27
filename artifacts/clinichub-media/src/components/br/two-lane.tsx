@@ -118,7 +118,7 @@ export function HubMock({ brand, logo, hub, category, pins = false, badge }: { b
       {/* 16:10 frame = the 1440x900 captures, nothing cropped. The ad card scales with the frame (container units) so it
           sits in the same place at every width; its spot is chosen per hub so it never cuts hub text (see hub-mocks.ts). */}
       <div className="relative aspect-[16/10] w-full">
-        <img src={H.img} alt={`${hubName} hub`} width={1440} height={900} loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover object-center" />
+        <img src={H.img} alt={`${hubName} clinic layer`} width={1440} height={900} loading="lazy" decoding="async" className="absolute inset-0 size-full object-cover object-center" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
         <div className={`absolute ${H.card.pos} ${example ? "w-[36cqw] p-[1.4cqw] max-md:w-[40cqw]" : "w-[42cqw] p-[2.2cqw] max-md:w-[60cqw]"} rounded-[1.6cqw] bg-white shadow-2xl ring-2 ring-lime-300`} style={H.card.scale ? { transform: `scale(${H.card.scale})`, transformOrigin: H.card.origin === "br" ? "bottom right" : "bottom left" } : undefined} data-testid="hub-mock-card">
           {pins ? <><span className={`${pinCls} -left-3 -top-3`} aria-hidden>1</span><span className={`${pinCls} -bottom-3 ${H.card.pin3 === "bl" ? "-left-3" : "-right-3"}`} aria-hidden>3</span></> : null}
@@ -145,7 +145,7 @@ export function HubMock({ brand, logo, hub, category, pins = false, badge }: { b
             </>
           )}
         </div>
-        {badge ? null : <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]">{H.status === "Live" ? "Mock · live hub" : "Example mockup"}</span>}
+        {badge ? null : <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#0b1f3a]">{H.status === "Live" ? "Mock · live clinic layer" : "Example mockup"}</span>}
         {pins ? <span className={pinCls} style={{ left: H.pin2.left, top: H.pin2.top }} aria-hidden>2</span> : null}
       </div>
     </figure>
@@ -209,7 +209,7 @@ function CardLane({ initialSku }: { initialSku: CardSku }) {
               </select>
             </label>
           </div>
-          <p className="mt-2 text-[12px] font-semibold text-foreground/60">Placements are curated hub by hub.</p>
+          <p className="mt-2 text-[12px] font-semibold text-foreground/60">Placements are curated clinic layer by clinic layer.</p>
           <button type="button" onClick={go} data-testid="lane-card-go" className="mt-3 inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-base font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30 transition hover:bg-[#0b1f3a] hover:text-white">
             <Lock className="size-4" aria-hidden /> Continue to secure checkout · {CARD_OFFERS[sku].label} <ArrowRight className="size-5" aria-hidden />
           </button>
@@ -232,8 +232,8 @@ function CardLane({ initialSku }: { initialSku: CardSku }) {
         </div>
         <div className="min-w-0">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-wide text-foreground/55">Your card, on a live hub</span>
-            <div className="flex max-w-full overflow-x-auto rounded-full bg-foreground/[0.05] p-0.5 [scrollbar-width:none]" role="radiogroup" aria-label="Live hub">
+            <span className="text-[11px] font-bold uppercase tracking-wide text-foreground/55">Your card, on a live clinic layer</span>
+            <div className="flex max-w-full overflow-x-auto rounded-full bg-foreground/[0.05] p-0.5 [scrollbar-width:none]" role="radiogroup" aria-label="Live clinic layer">
               {HUB_KEYS.map((h) => (
                 <button key={h} type="button" role="radio" aria-checked={hub === h} onClick={() => setHub(h)} data-testid={`lane-hub-${h}`} className={`inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-3.5 py-1 text-[11px] font-bold ${hub === h ? "bg-[#0b1f3a] text-white" : "text-foreground/60"}`}>{HUB_MOCKS[h].tab}</button>
               ))}
@@ -246,7 +246,7 @@ function CardLane({ initialSku }: { initialSku: CardSku }) {
           </label>
           <Details testId="lane-card-how" label="What happens next">
             <p>1. Pay by card on the secure checkout. All of it is media credit.</p>
-            <p>2. We send your insertion order (IO). It names the hub and placement.</p>
+            <p>2. We send your insertion order (IO). It names the clinic layer and placement.</p>
             <p>3. You approve the IO. Then it runs. Reporting is aggregate: views, clicks, UTM visits and promo codes (modelled until live).</p>
           </Details>
         </div>
@@ -376,9 +376,9 @@ function BlockLane() {
             <p className="mt-2 font-display text-4xl leading-none">{BLOCK_BANDS.find((b) => b.key === band)!.label}</p>
             <p className="text-sm text-white/75">{BLOCK_BANDS.find((b) => b.key === band)!.sub} · USD</p>
             {agency.trim() ? <p className="mt-3 text-sm"><b className="text-lime-300">{AGENCY_TEST.cashPct}% off the rate card</b> · discount est. {agencyCashLabel(band)}</p> : <p className="mt-3 text-sm text-white/75">Agencies buy at a written {AGENCY_TEST.cashPct}% discount off the published rate card.</p>}
-            <div className="mt-3"><Chips dark items={["Draft IO PDF now", "Nothing runs until the IO names the hub", "Aggregate reporting"]} /></div>
+            <div className="mt-3"><Chips dark items={["Draft IO PDF now", "Nothing runs until the IO names the clinic layer", "Aggregate reporting"]} /></div>
             <Details dark testId="lane-block-terms" label="Details">
-              <p>{PAYMENT_METHODS_LINE} {REMIT_LINE} The IO sets the hubs, placements, flight and invoice terms.</p>
+              <p>{PAYMENT_METHODS_LINE} {REMIT_LINE} The IO sets the clinic layers, placements, flight and invoice terms.</p>
               <p>The $25,000–$1.5M premium slot adds a larger display share and priority placement for its term, set on an insertion order.</p>
               <p>{LIVE_TERMS.io} Views are modelled estimates. <a className="underline" href="/sample-io">Sample IO</a> · <a className="underline" href="/media-kit">Media kit</a></p>
             </Details>

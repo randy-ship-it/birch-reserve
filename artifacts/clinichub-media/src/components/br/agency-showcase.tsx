@@ -105,7 +105,7 @@ export function GoalPlanner() {
           </article>
         ))}
       </div>
-      <p className="mt-4 text-xs text-muted-foreground">Starting rates are illustrative planning estimates, not a quote. Reporting is aggregate only. One IO can mix goals; it names each hub, surface and date before anything runs.</p>
+      <p className="mt-4 text-xs text-muted-foreground">Starting rates are illustrative planning estimates, not a quote. Reporting is aggregate only. One IO can mix goals; it names each clinic layer, surface and date before anything runs.</p>
     </div>
   );
 }
@@ -122,10 +122,10 @@ export function AgencyHero() {
               For agencies &amp; media buyers <span aria-hidden className="h-px w-6 bg-foreground/30" /> First-party health inventory
             </p>
             <h2 className="font-display text-[2.1rem] leading-[1.04] tracking-tight md:text-[3.5rem]">
-              Agencies: place a client inside the health hubs. <em className="not-italic text-foreground/55">A written {AGENCY_SHARE.pct}% off the rate card.</em>
+              Agencies: place a client inside the health clinic layers. <em className="not-italic text-foreground/55">A written {AGENCY_SHARE.pct}% off the rate card.</em>
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground" data-testid="agency-inventory-line">
-              {INVENTORY_LINE} Fixed starting rates, the surface named on the IO, and UTM and promo-code reporting per hub.
+              {INVENTORY_LINE} Fixed starting rates, the surface named on the IO, and UTM and promo-code reporting per clinic layer.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta href="/agencies#talk" testId="hero-agency" className="w-full sm:w-auto">Place a client</Cta>
@@ -139,7 +139,7 @@ export function AgencyHero() {
             </p>
             <dl className="mt-10 grid grid-cols-2 gap-px border border-foreground/15 bg-foreground/15 md:grid-cols-4" data-testid="agency-kpis">
               {[
-                { v: "4", l: "hub placements, display + CPC", t: "Spec" },
+                { v: "4", l: "clinic layer placements, display + CPC", t: "Spec" },
                 { v: `$${Math.min(...SPEC_ROWS.map((r) => r.cpmFloorUsd))}`, l: "CPM, starting at", t: "Estimate" },
                 { v: `${SELL_ASSUMPTION_PCT}%`, l: "of display space sold", t: "Assumption" },
               ].map((k) => (
@@ -291,17 +291,17 @@ export function InsiderGrid() {
       <Card k="01 · Audience & targeting" title="Members in a buying moment." testId="insider-audience">
         <Bullets
           items={[
-            <>Co-branded Recovery Brand hubs: {verticals}.</>,
+            <>Co-branded Recovery Brand clinic layers: {verticals}.</>,
             <>{POSITIONING.businessHubs}.</>,
-            <>Target by hub, by advertiser category, by placement, and by moment: after checkout, while browsing, or behind login.</>,
+            <>Target by clinic layer, by advertiser category, by placement, and by moment: after checkout, while browsing, or behind login.</>,
             <>Local reach: a 5 km area around a postal code, by inquiry.</>,
           ]}
         />
       </Card>
-      <Card k="02 · Measurement & reporting" title="Reported per hub and surface." testId="insider-measurement">
+      <Card k="02 · Measurement & reporting" title="Reported per clinic layer and surface." testId="insider-measurement">
         <Bullets
           items={[
-            <>Views, clicks, UTM-tagged visits and promo-code redemptions, per hub and per surface.</>,
+            <>Views, clicks, UTM-tagged visits and promo-code redemptions, per clinic layer and per surface.</>,
             <>Your UTM parameters on every placement; a promo code if you want one.</>,
             <>Pre-flight view estimates are modelled and labelled that way. Campaign results come from your UTMs and codes.</>,
             <>Aggregate reporting only.</>,
@@ -311,8 +311,8 @@ export function InsiderGrid() {
       <Card k="03 · Brand safety" title="Closed, co-branded environments." testId="insider-safety">
         <Bullets
           items={[
-            <>Ads run only inside co-branded hubs, not on an open exchange. Fixed price, no auction.</>,
-            <>The IO names the hub and surface before anything runs. Creative and exact position are set on the IO.</>,
+            <>Ads run only inside co-branded clinic layers, not on an open exchange. Fixed price, no auction.</>,
+            <>The IO names the clinic layer and surface before anything runs. Creative and exact position are set on the IO.</>,
             <>No patient or personal health data. No clinical pixels. Aggregate reporting only.</>,
             <>After the IO, cancellation and makegoods follow IAB.</>,
             <>No guarantees of reach, clicks or sales.</>,
@@ -325,10 +325,10 @@ export function InsiderGrid() {
 
 const IO_STEPS = [
   { t: "Brief", d: "Send the client and picks through the agency form or a quick-buy inquiry. Small tests can start self-serve on the $190 USD look or the $490 USD category placement." },
-  { t: "Draft IO", d: "We reply with hub fit and a draft insertion order naming the hub, surface, format, category and dates." },
+  { t: "Draft IO", d: "We reply with clinic layer fit and a draft insertion order naming the clinic layer, surface, format, category and dates." },
   { t: "Sign & prepay", d: "Seats pay by card. Post-Purchase and 100K+ view blocks go on the IO by inquiry." },
   { t: "Traffic", d: "Creative, UTMs and an optional promo code. Exact position is confirmed on the IO." },
-  { t: "Flight", d: `Credit spends down on live hubs over the ${SPEND_DOWN_MONTHS} months after the deposit lands.` },
+  { t: "Flight", d: `Credit spends down on live clinic layers over the ${SPEND_DOWN_MONTHS} months after the deposit lands.` },
   { t: "Report", d: "Per-hub, per-surface reporting. The $490 USD seat is fully refundable until 14 days before the launch date on the IO." },
 ];
 
@@ -511,11 +511,11 @@ export function BuyerValueCompare() {
 export function InventoryCanister({ compact = false }: { compact?: boolean }) {
   const n = AGENCY_TIERS.length;
   return (
-    <figure className={`w-full ${compact ? "max-w-none" : "mx-auto max-w-3xl"}`} data-testid="agency-canister" data-compact={compact || undefined} aria-label={skinText("One tank of hub inventory with three outlets: direct buyers, agencies and Trusted Agency Partners")}>
+    <figure className={`w-full ${compact ? "max-w-none" : "mx-auto max-w-3xl"}`} data-testid="agency-canister" data-compact={compact || undefined} aria-label={skinText("One tank of clinic layer inventory with three outlets: direct buyers, agencies and Trusted Agency Partners")}>
       <div className={`grid grid-cols-[4.25rem_1.25rem_minmax(0,1fr)] md:grid-cols-[8.5rem_3.5rem_minmax(0,1fr)]${compact ? " [&_.canister-card]:my-1 [&_.canister-card]:p-2.5" : ""}`}>
         {/* Lid + label */}
         <div className="col-start-1 flex flex-col items-center">
-          <span className="mb-1 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.14em] text-[#0b1f3a]/70 md:text-[11px]">{skinText("Hub inventory")}</span>
+          <span className="mb-1 text-center text-[10px] font-bold uppercase leading-tight tracking-[0.14em] text-[#0b1f3a]/70 md:text-[11px]">{skinText("Clinic layer inventory")}</span>
           <span className="block h-4 w-full rounded-[50%] border-2 border-[#0b1f3a] bg-white md:h-6" aria-hidden />
         </div>
         <span className="col-span-2" aria-hidden />

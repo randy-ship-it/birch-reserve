@@ -24,7 +24,7 @@ export function HubWalkthroughVideo({
       loop
       autoPlay
       preload="metadata"
-      aria-label="Live DR-HO'S hub walkthrough"
+      aria-label="Live DR-HO'S clinic layer walkthrough"
     />
   );
 }

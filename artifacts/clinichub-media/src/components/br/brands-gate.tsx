@@ -1,6 +1,6 @@
 /**
  * /advertise/brands public totals + access-code gate.
- * The named brand list and per-hub volumes are fetched from
+ * The named brand list and per-clinic-layer volumes are fetched from
  * POST/GET /v1/advertise/brands-access after the server checks the code.
  * This file loads detail rows only from the access API.
  */
@@ -54,7 +54,7 @@ function UnlockedHubs({ hubs }: { hubs: BrandsAccessHub[] }) {
   return (
     <div className="space-y-10" data-testid="brands-unlocked">
       <p className="inline-flex items-center gap-2 bg-accent px-4 py-2 text-sm font-semibold" data-testid="brands-unlocked-flag">
-        <Unlock className="size-4" /> Brand list and per-hub volumes
+        <Unlock className="size-4" /> Brand list and per-clinic-layer volumes
       </p>
       {brands.some((h) => h.logo) ? (
         <ul className="flex flex-wrap items-center justify-center gap-x-10 gap-y-5" data-testid="gated-logo-strip">
@@ -79,7 +79,7 @@ function UnlockedHubs({ hubs }: { hubs: BrandsAccessHub[] }) {
               </div>
               {h.banner ? (
                 <div className="relative aspect-[16/10] overflow-hidden">
-                  <img src={h.banner} alt={`${h.name} hub`} className="h-full w-full object-cover object-top" />
+                  <img src={h.banner} alt={`${h.name} clinic layer`} className="h-full w-full object-cover object-top" />
                 </div>
               ) : null}
             </div>
@@ -120,7 +120,7 @@ function UnlockedHubs({ hubs }: { hubs: BrandsAccessHub[] }) {
         <table className="w-full min-w-[760px] border-collapse text-left text-sm">
           <thead>
             <tr className="border-b-2 border-foreground">
-              <th className="py-3 pr-3 font-semibold">Hub</th>
+              <th className="py-3 pr-3 font-semibold">Clinic layer</th>
               {hubs[0]?.surfaces.map((s) => (
                 <th key={s.key} className="py-3 pr-3 font-semibold">
                   {s.label}
@@ -150,7 +150,7 @@ function UnlockedHubs({ hubs }: { hubs: BrandsAccessHub[] }) {
         </table>
       </div>
       <p className="text-[11px] leading-relaxed text-muted-foreground">
-        {CLAIM_LINE}. <Modelled /> {hubs[0]?.basis ? "Basis follows each hub row." : ""} Per-hub views and starting-at rates are illustrative estimates, not sold rates or a quote; your insertion order sets the final rate.
+        {CLAIM_LINE}. <Modelled /> {hubs[0]?.basis ? "Basis follows each clinic layer row." : ""} Per-hub views and starting-at rates are illustrative estimates, not sold rates or a quote; your insertion order sets the final rate.
       </p>
     </div>
   );
@@ -195,7 +195,7 @@ export function BrandsAccessGate() {
 
   return (
     <form onSubmit={onSubmit} className="grid gap-3 border border-foreground/15 bg-white p-5 sm:grid-cols-[1fr_auto] sm:items-end" data-testid="brands-access-gate">
-      <Field label="Access code" hint="The full brand list and per-hub volumes stay behind this code.">
+      <Field label="Access code" hint="The full brand list and per-clinic-layer volumes stay behind this code.">
         <input name="code" type="password" autoComplete="off" required className={inputClass} data-testid="brands-access-code" />
       </Field>
       <button disabled={busy} className="inline-flex h-12 items-center justify-center gap-2 bg-foreground px-5 text-sm font-semibold text-background hover:bg-accent hover:text-accent-foreground disabled:opacity-60" data-testid="brands-access-submit">

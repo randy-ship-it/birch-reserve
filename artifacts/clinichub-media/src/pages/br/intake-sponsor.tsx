@@ -27,7 +27,7 @@ export default function BrIntakeSponsor() {
         <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Accelerate: place in your category, or your area.</h1>
         <p className="mt-3 max-w-xl text-base text-muted-foreground">Premium placements that speed up exposure. Three published prices. Pay on the same secure Stripe page as always. Nothing runs before you approve an insertion order.</p>
         <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <KitCta placement="hero_role_sponsor" size="md" sub="One form for hub + supplier. Website + email to start." />
+          <KitCta placement="hero_role_sponsor" size="md" sub="One form for clinic layer + supplier. Website + email to start." />
           <ShareBar testId="share-bar-role" />
         </div>
       </header>
@@ -63,7 +63,7 @@ export default function BrIntakeSponsor() {
       </section>
       <section className="container mx-auto px-4 pb-10">
         <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-foreground/10 bg-white p-4 text-sm">
-          <EstimateTag /> Hub rates after launch: CPM ${HUB_RATE_RANGE.cpm[0]}–${HUB_RATE_RANGE.cpm[1]} · CPC ${HUB_RATE_RANGE.cpc[0].toFixed(2)}–${HUB_RATE_RANGE.cpc[1].toFixed(2)} USD
+          <EstimateTag /> Clinic layer rates after launch: CPM ${HUB_RATE_RANGE.cpm[0]}–${HUB_RATE_RANGE.cpm[1]} · CPC ${HUB_RATE_RANGE.cpc[0].toFixed(2)}–${HUB_RATE_RANGE.cpc[1].toFixed(2)} USD
           <span className="ml-auto"><InfoPop title="Terms in short" testId="sponsor-terms-pop">
             <p>The $190 USD look converts in full to the $490 USD category placement within 7 days, or is refunded. It does not lock in a slot.</p>
             <p>The $490 USD category placement is media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months.</p>

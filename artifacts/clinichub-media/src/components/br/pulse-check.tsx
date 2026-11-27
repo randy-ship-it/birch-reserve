@@ -9,8 +9,8 @@ import { skinText } from "@/lib/siteSkin";
  * goes back, no counts are shown. POST /v1/pulse-check: honeypot (company_url), render time (t), throttled server-side.
  */
 const CHANNELS = [
-  { Icon: LayoutGrid, t: "Branded hubs", d: "A co-branded storefront for the client." },
-  { Icon: Store, t: "Retail network micro-store hubs", d: "Small shop hubs inside partner retailers." },
+  { Icon: LayoutGrid, t: "Branded clinic layers", d: "A co-branded storefront for the client." },
+  { Icon: Store, t: "Retail network micro-store clinic layers", d: "Small shop clinic layers inside partner retailers." },
   { Icon: Footprints, t: "Street Team", d: "Samples, door-to-door and partner-retailer drop-offs." },
 ] as const;
 

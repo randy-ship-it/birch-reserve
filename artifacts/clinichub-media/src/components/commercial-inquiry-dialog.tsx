@@ -141,7 +141,7 @@ export function CommercialInquiryDialog({ open, onOpenChange, defaultInquiryType
                 </DialogTitle>
                 <DialogDescription className="text-sm text-muted-foreground mt-2 leading-relaxed">
                   {selectedType === "branded_hub"
-                    ? "Request private review for a branded clinic hub. No payment collected."
+                    ? "Request private review for a branded clinic layer. No payment collected."
                     : "Request details on fulfillment coordination. No payment collected."}
                 </DialogDescription>
               </DialogHeader>
@@ -169,7 +169,7 @@ export function CommercialInquiryDialog({ open, onOpenChange, defaultInquiryType
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent className="rounded-none shadow-lg border-border bg-card">
-                            <SelectItem value="branded_hub" className="text-sm">Branded Clinic Hub</SelectItem>
+                            <SelectItem value="branded_hub" className="text-sm">Branded Clinic layer</SelectItem>
                             <SelectItem value="fulfillment" className="text-sm">Fulfillment Coverage</SelectItem>
                           </SelectContent>
                         </Select>

@@ -8,7 +8,7 @@ import { BRAND_HUBS } from "../../../../api-server/src/lib/overhaul/model";
 
 const PLACEMENTS = [
   { key: "post", label: "Post-purchase", sub: "thank-you" },
-  { key: "home", label: "Hub home", sub: "banner" },
+  { key: "home", label: "Clinic layer home", sub: "banner" },
   { key: "products", label: "Products", sub: "product pages" },
   { key: "dash", label: "Dashboard", sub: "behind login" },
 ] as const;
@@ -30,11 +30,11 @@ export function ConveyorHero({ className = "", captionless = false }: { classNam
       <div
         data-testid="conveyor-hero"
         role="img"
-        aria-label="Every live hub adds display and CPC slots on four placements: post-purchase, hub home, product and services pages, and the member dashboard behind login."
+        aria-label="Every live clinic layer adds display and CPC slots on four placements: post-purchase, clinic layer home, product and services pages, and the member dashboard behind login."
       >
         <div className="flex items-baseline justify-between gap-3">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-foreground/60">
-            Every hub adds four placements
+            Every clinic layer adds four placements
           </p>
           <span className="shrink-0 text-[10px] font-medium uppercase tracking-wider text-foreground/40">Illustrative</span>
         </div>
@@ -71,7 +71,7 @@ export function ConveyorHero({ className = "", captionless = false }: { classNam
         </div>
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2 border border-dashed border-foreground/25 bg-white px-3 py-2" data-testid="conveyor-screens">
-        <span className="font-display text-sm">In-hub screens</span>
+        <span className="font-display text-sm">Clinic layer screens</span>
         <span className="text-[12px] text-muted-foreground">Screens inside partner locations.</span>
         <span className="rounded-full border border-foreground/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">Rolling out</span>
         <span className="rounded-full border border-foreground/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">Reserve by inquiry</span>
@@ -79,7 +79,7 @@ export function ConveyorHero({ className = "", captionless = false }: { classNam
       </div>
       {captionless ? null : (
         <p className="mt-3 text-xs leading-relaxed text-muted-foreground" data-testid="conveyor-caption">
-          Each live hub adds display and CPC slots on four placements: post-purchase, hub home, product and services pages, and the member dashboard behind login. Illustrative. In-hub screens are rolling out; reserve by inquiry.
+          Each live clinic layer adds display and CPC slots on four placements: post-purchase, clinic layer home, product and services pages, and the member dashboard behind login. Illustrative. Clinic layer screens are rolling out; reserve by inquiry.
         </p>
       )}
     </div>

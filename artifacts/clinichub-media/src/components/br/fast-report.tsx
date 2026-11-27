@@ -30,6 +30,7 @@ import { trackIntake } from "@/lib/intakeTrack";
 import type { Market } from "../../../../api-server/src/lib/kitCalc/channelGeo";
 import { FRIDAY_CATEGORIES } from "../../../../api-server/src/lib/kitCalc/fridayV12";
 import type { PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
+import { ClinicLayerTerm } from "@/components/br/clinic-layer-term";
 
 export type QuickResult = { side: IntakeSide; roles: string[]; host: string; autofill: Autofill | null; fallback: boolean; typedMarket: Market | null; held: boolean; ref?: IntakeRef; payload?: IntakePayload; contact?: { email: string; website: string }; shared?: SharedAnswers; brand?: string | null; category?: string | null; physical?: PhysicalAnswer | null };
 const DEFAULT_CAT = "recovery_devices";
@@ -123,7 +124,7 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
   const earnCta = supplierOnly && q.ref ? (
-    <button type="button" onClick={() => addRole("publisher", "add_hub")} disabled={!!adding} data-testid="report-add-hub" className="inline-flex h-11 items-center gap-1.5 rounded-full px-5 text-sm font-bold" style={{ background: RT.forest, color: "#fff" }}><Plus className="size-4" />{adding === "publisher" ? "Adding…" : "Add my hub to unlock max exposure"}</button>
+    <button type="button" onClick={() => addRole("publisher", "add_hub")} disabled={!!adding} data-testid="report-add-hub" className="inline-flex h-11 items-center gap-1.5 rounded-full px-5 text-sm font-bold" style={{ background: RT.forest, color: "#fff" }}><Plus className="size-4" />{adding === "publisher" ? "Adding…" : "Add my clinic layer to unlock max exposure"}</button>
   ) : undefined;
   const accCta = q.roles.includes("supplier") && !q.roles.includes("kit") && q.ref ? (
     <button type="button" onClick={() => addRole("kit", "accelerate")} disabled={!!adding} data-testid="report-add-accelerate" className="inline-flex h-11 items-center gap-1.5 rounded-full px-5 text-sm font-bold" style={{ background: RT.mint, color: RT.forest }}><Rocket className="size-4" />{adding === "kit" ? "Adding…" : "Add Accelerate to my request"}</button>
@@ -134,7 +135,7 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
     { k: "category", label: "Category", value: catLabel(cat), tag: f.category ? <FromSite /> : <Dflt /> },
     { k: "geo", label: "Sells / ships", value: geoText(q.typedMarket ? { sells: q.typedMarket.sells_in } : f.geo?.value) ?? "Canada + USA", tag: q.typedMarket ? null : f.geo ? <FromSite /> : <Dflt /> },
     ...(isPub
-      ? [{ k: "surfaces", label: "Surfaces", value: "Post-purchase, hub home, product pages, member dashboard, newsletter", tag: <Dflt /> }]
+      ? [{ k: "surfaces", label: "Surfaces", value: <>Post-purchase, <ClinicLayerTerm testId="clinic-layer-term-estimate-surfaces" /> home, product pages, member dashboard, newsletter</>, tag: <Dflt /> }]
       : [
           { k: "aov", label: "Average cart", value: `$${aov ?? QUICK_DEFAULTS.aov_usd} USD`, tag: aov != null ? <FromSite /> : <Dflt /> },
           { k: "orders", label: "Orders", value: `${QUICK_DEFAULTS.orders_per_month} a month`, tag: <Dflt /> },

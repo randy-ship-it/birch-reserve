@@ -45,7 +45,7 @@ async function safe(res: Response, fn: () => Promise<void>): Promise<void> {
   try {
     await fn();
   } catch (err) {
-    logger.warn({ err: err instanceof Error ? err.message : String(err) }, "hub proof route failed");
+    logger.warn({ err: err instanceof Error ? err.message : String(err) }, "clinic layer proof route failed");
     if (!res.headersSent) res.status(500).json({ ok: false, message: "Something went wrong. Try again, or email randy@scalehealth.ca." });
   }
 }
@@ -71,12 +71,12 @@ router.post("/v1/hub-proof", json, (req, res) =>
     await sendSalesAlert({
       via: alertSiteOf(req),
       event: "inquiry",
-      tag: "BIRCH HUB PROOF",
-      title: `Hub proof: ${str(b.hub_name, 160)}`,
+      tag: "BIRCH CLINIC LAYER PROOF",
+      title: `Clinic layer proof: ${str(b.hub_name, 160)}`,
       rows: [
-        ["Form", "Activate your own hub (/hub-proof)"],
+        ["Form", "Activate your own clinic layer (/hub-proof)"],
         ["Hub", str(b.hub_name, 160)],
-        ["Hub URL", str(b.hub_url, 300)],
+        ["Clinic Layer URL", str(b.hub_url, 300)],
         ["Name", str(b.name, 120)],
         ["Email", email],
         ["Channel", str(b.channel, 20)],
@@ -117,12 +117,12 @@ router.get(["/hub-proof", "/intake/hub-proof"], (req, res) => {
   const scale = siteOf(req) === "scale";
   const base = scale ? "/intake/_m" : "";
   const brand = scale ? "Scale Health" : "Birch Reserve";
-  res.set("Cache-Control", "no-store").type("html").send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Activate your hub, earn $100 | ${brand}</title><style>${PAGE_CSS}</style></head><body><main>
+  res.set("Cache-Control", "no-store").type("html").send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Activate your clinic layer, earn $100 | ${brand}</title><style>${PAGE_CSS}</style></head><body><main>
 <img src="${base}${scale ? "/brand/scale/favicon.svg" : "/favicon.svg"}" alt="${brand}" width="36" height="36" style="display:block;border-radius:8px;margin-bottom:10px">
-<p class="eyebrow">${brand} · Hub owners</p><h1>Activate your own hub. <span class="pill">Earn $100</span></h1>
-<p>Brands are already buying placements, so your hub can earn from ads from day one. Send your hub to 1,000 or more people, show us it went out, and we add a $100 ad credit to your account.</p>
-<form class="card" id="f" novalidate><label for="hn">Hub name</label><input id="hn" name="hub_name" required maxlength="160" autocomplete="organization">
-<label for="hu">Hub link</label><input id="hu" name="hub_url" maxlength="300" inputmode="url" placeholder="yourhub.com">
+<p class="eyebrow">${brand} · Clinic layer owners</p><h1>Activate your own clinic layer. <span class="pill">Earn $100</span></h1>
+<p>Brands are already buying placements, so your clinic layer can earn from ads from day one. Send your clinic layer to 1,000 or more people, show us it went out, and we add a $100 ad credit to your account.</p>
+<form class="card" id="f" novalidate><label for="hn">Clinic layer name</label><input id="hn" name="hub_name" required maxlength="160" autocomplete="organization">
+<label for="hu">Clinic layer link</label><input id="hu" name="hub_url" maxlength="300" inputmode="url" placeholder="yourhub.com">
 <label for="nm">Your name</label><input id="nm" name="name" maxlength="120" autocomplete="name"><label for="em">Email</label><input id="em" name="email" type="email" required autocomplete="email">
 <label for="ch">How did you send it?</label><select id="ch" name="channel"><option value="email">Email</option><option value="sms">Text message</option><option value="social">Social post</option><option value="other">Other</option></select>
 <label for="rc">People reached (1,000 or more)</label><input id="rc" name="reach" type="number" min="1000" step="1" inputmode="numeric" required>
@@ -132,7 +132,7 @@ router.get(["/hub-proof", "/intake/hub-proof"], (req, res) => {
 <label style="display:flex;gap:10px;align-items:flex-start;font-weight:500"><input id="tm" type="checkbox" style="width:22px;min-height:22px;margin-top:2px"><span>I agree to the terms below.</span></label>
 <button id="go" type="submit">Send my proof</button><p class="msg" id="m" role="status" aria-live="polite"></p>
 <details><summary>Terms</summary><ul>${hp.HUB_PROOF_TERMS.map((t) => `<li>${t}</li>`).join("")}</ul></details></form>
-<p class="fine">One credit per hub. Aggregate reporting only. Nothing here guarantees ad demand or earnings.</p></main>
+<p class="fine">One credit per clinic layer. Aggregate reporting only. Nothing here guarantees ad demand or earnings.</p></main>
 <script>(function(){var f=document.getElementById("f"),m=document.getElementById("m"),b=document.getElementById("go");
 f.addEventListener("submit",function(e){e.preventDefault();m.textContent="";if(!f.reportValidity())return;var fl=document.getElementById("fl").files[0];if(!fl){m.textContent="Add your proof screenshot.";return}if(fl.size>3*1024*1024){m.textContent="That file is over 3 MB.";return}if(!document.getElementById("tm").checked){m.textContent="Tick the box to accept the terms.";return}
 b.disabled=true;m.textContent="Sending…";var r=new FileReader();r.onload=function(){var d=String(r.result).split(",")[1]||"";var q=Object.fromEntries(new FormData(f));q.reach=Number(q.reach);q.terms=true;q.file={data:d};

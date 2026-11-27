@@ -45,9 +45,9 @@ export const SERVICES_SPLIT = {
   hubAssessment: 24.5,
   hubSession: 14.5,
   /** Scale-voice sentence (also the neutral one used in popovers). */
-  line: "Clinic services booked through your hub: you keep half of what Scale Health charges, $24.50 per $49 assessment and $14.50 per $29 session.",
+  line: "Clinic services booked through your clinic layer: you keep half of what Scale Health charges, $24.50 per $49 assessment and $14.50 per $29 session.",
   /** Birch-voice sentence. */
-  birchLine: "Scale Health clinic services booked through your hub: you keep half of what Scale Health charges, $24.50 per $49 assessment and $14.50 per $29 session.",
+  birchLine: "Scale Health clinic services booked through your clinic layer: you keep half of what Scale Health charges, $24.50 per $49 assessment and $14.50 per $29 session.",
 } as const;
 
 /** Hub onboarding fee framing (BR-39 follow-up, Randy Nov 22 2026 11:23 AM ET). Same $5,000 USD figure as the supplier "Stand-up fee" (SUPPLIER_FEES).
@@ -55,17 +55,17 @@ export const SERVICES_SPLIT = {
 export const HUB_ONBOARDING = {
   feeUsd: 5000,
   waiverFromViews: 1_000_000,
-  target: "Our target hubs are in the 50%+ payout range.",
-  smaller: "Smaller hubs are welcome. A $5,000 USD onboarding fee may apply, and it can be harder to waive.",
-  larger: "For larger hubs it's on us: the $5,000 USD onboarding fee is waived as a thank-you, so it's free to launch. The waiver is reserved for hubs at 1MM+ views a month.",
-  chipLarge: "onboarding fee waived: free to launch, our gift to larger hubs.",
-  chipSmall: "A $5,000 USD onboarding fee may apply to smaller hubs.",
+  target: "Our target clinic layers are in the 50%+ payout range.",
+  smaller: "Smaller clinic layers are welcome. A $5,000 USD onboarding fee may apply, and it can be harder to waive.",
+  larger: "For larger clinic layers it's on us: the $5,000 USD onboarding fee is waived as a thank-you, so it's free to launch. The waiver is reserved for clinic layers at 1MM+ views a month.",
+  chipLarge: "onboarding fee waived: free to launch, our gift to larger clinic layers.",
+  chipSmall: "A $5,000 USD onboarding fee may apply to smaller clinic layers.",
 } as const;
 export const onboardingWaived = (views: number) => views >= HUB_ONBOARDING.waiverFromViews;
 
 export const PAYOUT = {
   basePct: 70,
-  line: "Hubs earn 70% of media revenue, rising to 75% at 1MM views a month, 80% at 3MM and 85% at 5MM.",
+  line: "Clinic layers earn 70% of media revenue, rising to 75% at 1MM views a month, 80% at 3MM and 85% at 5MM.",
   tiers: SHARE_TIERS,
   tiersLabel: "Volume tiers",
 } as const;
@@ -95,12 +95,12 @@ export type PubSurface = {
 
 export const PUBLISHER_SURFACES: PubSurface[] = [
   { key: "post_purchase", label: "Post-purchase", where: rate("post_purchase").where, monthlyViews: MEDIAN.thank_you, cpm: rate("post_purchase").cpmStarter, cpc: rate("post_purchase").cpcStarter, ctr: ctr("Just bought"), source: "Rate card: post-purchase. CTR band: Just bought.", defaultOn: true },
-  { key: "home", label: "Hub home", where: rate("landing").where, monthlyViews: MEDIAN.hub_hero, cpm: rate("landing").cpmStarter, cpc: rate("landing").cpcStarter, ctr: ctr("Browsing the hub"), source: "Rate card: hub landing page. CTR band: Browsing the hub.", defaultOn: true },
-  { key: "product", label: "Product pages", where: rate("products").where, monthlyViews: Math.round(MEDIAN.product_services / 2), cpm: rate("products").cpmStarter, cpc: rate("products").cpcStarter, ctr: ctr("Browsing the hub"), source: "Rate card: product pages. Views: half of product / services (modelled split).", defaultOn: true },
-  { key: "services", label: "Services & booking", where: rate("services").where, monthlyViews: MEDIAN.product_services - Math.round(MEDIAN.product_services / 2), cpm: rate("services").cpmStarter, cpc: rate("services").cpcStarter, ctr: ctr("Browsing the hub"), source: "Rate card: services & booking pages. Views: half of product / services (modelled split).", defaultOn: true },
+  { key: "home", label: "Clinic layer home", where: rate("landing").where, monthlyViews: MEDIAN.hub_hero, cpm: rate("landing").cpmStarter, cpc: rate("landing").cpcStarter, ctr: ctr("Browsing the clinic layer"), source: "Rate card: clinic layer landing page. CTR band: Browsing the clinic layer.", defaultOn: true },
+  { key: "product", label: "Product pages", where: rate("products").where, monthlyViews: Math.round(MEDIAN.product_services / 2), cpm: rate("products").cpmStarter, cpc: rate("products").cpcStarter, ctr: ctr("Browsing the clinic layer"), source: "Rate card: product pages. Views: half of product / services (modelled split).", defaultOn: true },
+  { key: "services", label: "Services & booking", where: rate("services").where, monthlyViews: MEDIAN.product_services - Math.round(MEDIAN.product_services / 2), cpm: rate("services").cpmStarter, cpc: rate("services").cpcStarter, ctr: ctr("Browsing the clinic layer"), source: "Rate card: services & booking pages. Views: half of product / services (modelled split).", defaultOn: true },
   { key: "member_dashboard", label: "Member dashboard", where: rate("dashboard").where, monthlyViews: MEDIAN.member_dashboard, cpm: rate("dashboard").cpmStarter, cpc: rate("dashboard").cpcStarter, ctr: ctr("Coming back"), source: "Rate card: member dashboard. CTR band: Coming back.", defaultOn: true },
   { key: "newsletter", label: "Newsletter", where: EMAIL_SLOT.where, monthlyViews: MEDIAN.partner_email, cpm: [EMAIL_SLOT.cpmUsd, EMAIL_SLOT.cpmUsd], cpc: null, ctr: null, source: "Rate card: partner email module, $12 per 1,000 opens. No CPC or CTR on file.", defaultOn: false },
-  { key: "social", label: "Social", where: "Paid posts on the hub's own social accounts.", monthlyViews: null, cpm: null, cpc: null, ctr: null, source: "No Birch rate on file yet. Priced by IO.", defaultOn: false },
+  { key: "social", label: "Social", where: "Paid posts on the clinic layer's own social accounts.", monthlyViews: null, cpm: null, cpc: null, ctr: null, source: "No Birch rate on file yet. Priced by IO.", defaultOn: false },
 ];
 
 export type PricingMode = "cpm" | "cpc";
@@ -198,14 +198,14 @@ export function projectPublisher(input: PublisherInput) {
 }
 
 export const PUBLISHER_ASSUMPTIONS = [
-  `Views: the network median partner hub (modelled), scaled by your hub-size slider.`,
+  `Views: the network median partner clinic layer (modelled), scaled by your hub-size slider.`,
   `Sell-through: ${PUBLISHER_SELL_BAND[0]}% of views carry a paid offer in the low case, ${PUBLISHER_SELL_BAND[1]}% typical, ${PUBLISHER_SELL_BAND[2]}% high (the bottom of the 60-80% direct-sold target Google News Initiative cites). A planning assumption, not a delivery commitment.`,
   `Low = ${PUBLISHER_SELL_BAND[0]}% sold at the low end of each published starter price. Typical = ${PUBLISHER_SELL_BAND[1]}% sold at the midpoint. High = ${PUBLISHER_SELL_BAND[2]}% sold at the top. The newsletter is priced per 1,000 opens ($12), at a typical open rate. No later-rate numbers are published.`,
   `CPC mode uses the midpoint of each placement's modelled engagement range. Ranges, not promises.`,
-  `Your payout: ${PAYOUT.basePct}% of media revenue under 1MM views a month, ${SHARE_TIERS[1].pct}% at 1MM+, ${SHARE_TIERS[2].pct}% at 3MM+, ${SHARE_TIERS[3].pct}% at 5MM+, paid at the tier you reach (flat rate, like ad networks). Modelled; the hub agreement governs.`,
+  `Your payout: ${PAYOUT.basePct}% of media revenue under 1MM views a month, ${SHARE_TIERS[1].pct}% at 1MM+, ${SHARE_TIERS[2].pct}% at 3MM+, ${SHARE_TIERS[3].pct}% at 5MM+, paid at the tier you reach (flat rate, like ad networks). Modelled; the clinic layer agreement governs.`,
   `Transactions (bookings, products) use only the numbers you enter. Leave them at 0 to skip.`,
-  `${SERVICES_SPLIT.line} Modelled; the hub agreement governs.`,
-  `Estimates only. Not a guarantee of views, clicks, sales or payouts. Payouts follow the hub agreement.`,
+  `${SERVICES_SPLIT.line} Modelled; the clinic layer agreement governs.`,
+  `Estimates only. Not a guarantee of views, clicks, sales or payouts. Payouts follow the clinic layer agreement.`,
 ];
 
 /* ------------------------------------------------------------------ supplier */
@@ -229,8 +229,8 @@ export const FIRST_LOOK = {
 
 export const MAX_DISTRIBUTION = {
   label: "Max distribution",
-  line: "Show my offers on every eligible hub, newsletter and surface in the network.",
-  note: "Supplier-only reaches every hub that accepts your category. Add a hub of your own to unlock max exposure.",
+  line: "Show my offers on every eligible clinic layer, newsletter and surface in the network.",
+  note: "Supplier-only reaches every clinic layer that accepts your category. Add a clinic layer of your own to unlock max exposure.",
 } as const;
 
 export const INTEREST_FINE =
@@ -241,7 +241,7 @@ export const INTEREST_FINE =
 export const SPONSOR_OFFERS = [
   { key: "hold-190", name: "7-day category look", priceUsd: 190, priceLabel: "$190 USD", href: "/buycalc?sku=hold-190", line: "Hold your category for 7 days. Converts in full to the $490 USD category placement within 7 days, or refunded.", kind: "category" as const },
   { key: "reserve-490", name: "Category placement", priceUsd: 490, priceLabel: "$490 USD", href: "/buycalc?sku=reserve-490", line: "Media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months. Nothing runs before you approve an insertion order.", kind: "category" as const },
-  { key: "area-lock", name: "Area placement", priceUsd: AREA_LOCK.priceUsd, priceLabel: `$${AREA_LOCK.priceUsd.toLocaleString("en-US")} USD`, href: "/advertise/local", line: `Launch price through ${AREA_LOCK.launchRateUntil}. Up to ${AREA_LOCK.standardSharePct}% of hub display slots within ${AREA_LOCK.radiusKm} km, for the term on the IO.`, kind: "area" as const, launchPrice: true },
+  { key: "area-lock", name: "Area placement", priceUsd: AREA_LOCK.priceUsd, priceLabel: `$${AREA_LOCK.priceUsd.toLocaleString("en-US")} USD`, href: "/advertise/local", line: `Launch price through ${AREA_LOCK.launchRateUntil}. Up to ${AREA_LOCK.standardSharePct}% of clinic layer display slots within ${AREA_LOCK.radiusKm} km, for the term on the IO.`, kind: "area" as const, launchPrice: true },
 ] as const;
 
 /* ------------------------------------------------------------------ channel tiles */
@@ -253,7 +253,7 @@ export const RETAIL_COPY = "200+ locations, 500+ soon · 1MM+ captive recovery c
 export const RETAIL_TAG = "private network of digital and brick-and-mortar fitness & recovery retailers";
 /** Randy Nov 21 1:00 PM: one audience framing, three channels, sitewide (AUDIENCE_CHANNELS). Plan figures, not delivered impressions. */
 export const AUDIENCE_CHANNELS = [
-  { key: "scale-hubs", name: "Branded ScaleHealth.ca hubs", v: "~128MM", l: "modelled page views a month (estimate)", detail: "Private, members-only hubs on ScaleHealth.ca where recovery and wellness customers already shop and book care." },
+  { key: "scale-hubs", name: "Branded ScaleHealth.ca clinic layers", v: "~128MM", l: "modelled page views a month (estimate)", detail: "Private, members-only clinic layers on ScaleHealth.ca where recovery and wellness customers already shop and book care." },
   { key: "retail-network", name: "Private retail network", v: "200+", l: "locations · 500+ soon · 1MM+ captive recovery consumers", detail: "Our private network of digital and brick-and-mortar fitness & recovery retailers, in Canada and the USA." },
   { key: "calm-street", name: "Calm Joints + Street Team Ambassadors", v: "1MM+", l: "consumers now · 3MM+ est. in 2027", detail: "Our provider network activating, our owned digital clinic Calm Joints, and the Street Team Ambassadors doing on-site product sampling and door-to-door." },
 ] as const;
@@ -265,7 +265,7 @@ export const STREET_REACH_LINE = "reaching 1MM+ consumers now, expanding to an e
 export const STREET_REACH_SENTENCE = "Our provider network is activating and, with our Street Team Ambassadors, reaches 1MM+ consumers now, expanding to an estimated 3MM+ in 2027.";
 
 export const CHANNEL_TILES = [
-  { key: "scale-hubs", name: "Branded ScaleHealth.ca hubs", stats: [{ v: "~128MM", l: "modelled page views a month (estimate)" }], line: "Private health and wellness hubs: physio, recovery, longevity and food brands." },
+  { key: "scale-hubs", name: "Branded ScaleHealth.ca clinic layers", stats: [{ v: "~128MM", l: "modelled page views a month (estimate)" }], line: "Private health and wellness clinic layers: physio, recovery, longevity and food brands." },
   { key: "calm-joints", name: "Calm Joints", stats: [] as { v: string; l: string }[], line: "Our owned digital clinic. Its reach is counted with the Street Team: 1MM+ consumers now, 3MM+ est. in 2027." },
   { key: "street-team", name: "Calm Joints + Street Team", stats: [{ v: STREET_REACH_FIG.v, l: STREET_REACH_FIG.l }], line: "Street Team Ambassadors: on-site product sampling and door-to-door, targeted by neighbourhood. Area-level only.", image: "/street-team/door-route.webp", imageNote: "Day-1 route heat map (area-level). The network-wide census map is still needed." },
   { key: "retail-network", name: "Private retail network", stats: [{ v: "200+", l: "locations (500+ soon)" }, { v: "1MM+", l: "captive recovery consumers" }, { v: "CA + US", l: "Canada + USA" }], line: `${RETAIL_COPY} · ${RETAIL_TAG}` },
@@ -346,7 +346,7 @@ export const PROPOSED_ANCHOR_HUBS = [
   { key: "jack-health", name: "Jack Health", what: "Men's health and longevity", fits: ["longevity", "supplements", "fitness"], live: false },
   { key: "nutriprocan", name: "NutriProCan", what: "Nutrition and dietitian-guided eating", fits: ["supplements", "sports-nutrition", "longevity"], live: false },
   { key: "sole", name: "SOLE", what: "Foot pain, insoles and active footwear", fits: ["recovery", "fitness"], live: true },
-  { key: "effortless-admin", name: "Effortless Admin", what: "Benefits and wellness admin hub", fits: ["longevity", "supplements", "sleep"], live: false },
+  { key: "effortless-admin", name: "Effortless Admin", what: "Benefits and wellness admin clinic layer", fits: ["longevity", "supplements", "sleep"], live: false },
   { key: "bird-and-be", name: "Bird & Be", what: "Postpartum recovery and pelvic-floor care", fits: ["recovery", "physio", "longevity"], live: false },
   { key: "kalaya", name: "Kalaya", what: "Topical pain relief", fits: ["recovery", "physio", "sleep"], live: false },
 ] as const;
@@ -360,7 +360,7 @@ export const RATE_PLACEMENTS = allRates.map((r) => ({ key: r.key === "dashboard"
 export const HUB_RATE_RANGE = {
   cpm: [Math.min(...allRates.map((r) => r.cpmStarter[0])), Math.max(...allRates.map((r) => r.cpmStarter[1]))] as Range,
   cpc: [Math.min(...allRates.map((r) => r.cpcStarter[0])), Math.max(...allRates.map((r) => r.cpcStarter[1]))] as Range,
-  source: "Birch rate card starter ranges across the five hub surfaces (illustrative 2026 planning estimates).",
+  source: "Birch rate card starter ranges across the five clinic layer surfaces (illustrative 2026 planning estimates).",
 };
 
 export function hubFit(categoryKey: string) {
@@ -369,10 +369,10 @@ export function hubFit(categoryKey: string) {
 
 /** Side B channels. Rates only where the rate card / spec sheet has one; reach = network figures / targets. */
 export const EXPOSURE_CHANNELS = [
-  { key: "hubs", name: "Branded ScaleHealth.ca hubs", reach: "~128MM modelled page views a month (estimate)", cpm: HUB_RATE_RANGE.cpm, cpc: HUB_RATE_RANGE.cpc, rateNote: "Rate card starter range" },
+  { key: "hubs", name: "Branded ScaleHealth.ca clinic layers", reach: "~128MM modelled page views a month (estimate)", cpm: HUB_RATE_RANGE.cpm, cpc: HUB_RATE_RANGE.cpc, rateNote: "Rate card starter range" },
   { key: "calm-joints", name: "Calm Joints", reach: "Counted with the Street Team: 1MM+ consumers now, 3MM+ est. in 2027", cpm: null, cpc: null, rateNote: "Priced by IO" },
   { key: "street-team", name: "Calm Joints + Street Team", reach: "1MM+ consumers now, 3MM+ est. in 2027", cpm: null, cpc: null, rateNote: "Inquire: priced by route" },
   { key: "retail-network", name: "Private retail network", reach: RETAIL_COPY, cpm: null, cpc: null, rateNote: "Priced by IO" },
 ] as const;
 
-export const KIT_FIT_FINE = "Fit is a suggestion based on your category. Every placement is subject to human confirmation, hub approval and terms. Nothing is booked. Reach figures are network figures / targets, not guaranteed delivery.";
+export const KIT_FIT_FINE = "Fit is a suggestion based on your category. Every placement is subject to human confirmation, clinic layer approval and terms. Nothing is booked. Reach figures are network figures / targets, not guaranteed delivery.";

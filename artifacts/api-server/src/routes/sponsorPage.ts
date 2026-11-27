@@ -114,11 +114,11 @@ function shownStatus(hub: { key: string; status: string }): string {
 
 function statsStrip(): string {
   return `<div class="stats">
-<div class="stat"><b>Private hubs</b>members-only health and wellness hubs, with more launching</div>
-<div class="stat"><b>Media credit</b>until an insertion order (IO) names the hub and surface</div>
+<div class="stat"><b>Private clinic layers</b>members-only health and wellness clinic layers, with more launching</div>
+<div class="stat"><b>Media credit</b>until an insertion order (IO) names the clinic layer and surface</div>
 </div>
 ${hubLadderHtml("sponsor-hub-ladder")}
-<p class="fine">Aggregate reporting only. No impression guarantees. Any view figure is a modelled estimate, not a delivery promise. Nothing runs until an insertion order names the hub.</p>`;
+<p class="fine">Aggregate reporting only. No impression guarantees. Any view figure is a modelled estimate, not a delivery promise. Nothing runs until an insertion order names the clinic layer.</p>`;
 }
 
 function hubPackageTable(currency: Currency): string {
@@ -127,8 +127,8 @@ function hubPackageTable(currency: Currency): string {
     const imps = core.reduce((acc, s) => acc + sponsorImpressions(hub, s), 0);
     return `<tr><td><a href="${esc(hub.url)}">${esc(hub.name)}</a><div class="fine">${esc(hub.category)}</div></td><td>${esc(shownStatus(hub))}</td><td class="n"><span class="mc">Modelled</span>${fmt(imps)}</td><td class="n">${price(corePackageUsd(hub), currency)}</td></tr>`;
   }).join("");
-  return `<div class="tw"><table><thead><tr><th>Hub</th><th>Status</th><th class="n">Modelled impressions / mo</th><th class="n">Core package / mo</th></tr></thead><tbody>${rows}</tbody></table></div>
-<p class="fine">Core package = thank-you after buy or book, member dashboard tile and hub hero banner, as one of five rotating sponsors (20% share of voice) at 75% availability. Impressions are modelled. Full slot-by-slot pricing is in the <a href="/kit?currency=${currency}">marketing kit</a>.</p>
+  return `<div class="tw"><table><thead><tr><th>Clinic layer</th><th>Status</th><th class="n">Modelled impressions / mo</th><th class="n">Core package / mo</th></tr></thead><tbody>${rows}</tbody></table></div>
+<p class="fine">Core package = thank-you after buy or book, member dashboard tile and clinic layer hero banner, as one of five rotating sponsors (20% share of voice) at 75% availability. Impressions are modelled. Full slot-by-slot pricing is in the <a href="/kit?currency=${currency}">marketing kit</a>.</p>
 <p class="fine mf">${MODELLED_FOOTER}</p>`;
 }
 
@@ -180,25 +180,25 @@ ${(() => { const amt$ = money(amt(DEPOSIT_TIERS.find((t) => t.key === picked)!),
 <p id="msg" role="status" class="fine"></p>
 </form>
 <div class="stats pay" data-testid="payout-key-figures">
-<div class="stat"><span class="fine">Clinics and studios earn</span><b>${payoutAmount(SMB_LADDER[0]!.cashCad, payout)}</b>cash, or ${payoutAmount(SMB_LADDER[0]!.creditCad, payout, true)} in ad credit<br><a class="btn" href="https://scalehealth.ca/clinichubs">Open a Clinic Hub</a></div>
+<div class="stat"><span class="fine">Clinics and studios earn</span><b>${payoutAmount(SMB_LADDER[0]!.cashCad, payout)}</b>cash, or ${payoutAmount(SMB_LADDER[0]!.creditCad, payout, true)} in ad credit<br><a class="btn" href="https://scalehealth.ca/clinichubs">Open a Clinic layer</a></div>
 </div>
 <p class="fine" data-testid="packs-usd-note">Packs are charged in ${currency.toUpperCase()}, the currency shown. Bonus credit is added in the same currency.</p>
 ${priceLadderHtml(visitorCurrency, { title: "Or start smaller" })}
 <div class="boxes">
 <details><summary>How it works</summary><ol class="steps">
 <li><strong>Prepay</strong><br>Pick a pack. Stripe hosts the card payment.</li>
-<li><strong>Sign an insertion order</strong><br>It names each hub, placement and date. Nothing runs before it.</li>
+<li><strong>Sign an insertion order</strong><br>It names each clinic layer, placement and date. Nothing runs before it.</li>
 <li><strong>Your ad runs</strong><br>A person approves your ad. Clicks go to your site with your UTMs.</li>
 <li><strong>Draw down</strong><br>Credit comes off at the rate card as your ad runs. Reporting is aggregate.</li>
 </ol></details>
 <details><summary>Where your credit runs</summary>
-<p>Live partner brand hubs plus our clinic hub network: physio, mobility, gym and studio members who buy and book through their clinic's hub.</p>
+<p>Live partner brand clinic layers plus our clinic layer network: physio, mobility, gym and studio members who buy and book through their clinic's clinic layer.</p>
 ${hubPackageTable(currency)}
-<p class="fine">Aggregate reporting only. No impression guarantees. Any view figure is a modelled estimate, not a delivery promise. Nothing runs until an insertion order names the hub.</p></details>
+<p class="fine">Aggregate reporting only. No impression guarantees. Any view figure is a modelled estimate, not a delivery promise. Nothing runs until an insertion order names the clinic layer.</p></details>
 <details data-testid="payout-table-box"><summary>Clinic payout table</summary>
-<p>Open a Clinic Hub at <a href="https://scalehealth.ca/clinichubs">scalehealth.ca/clinichubs</a> and activate your audience: email, text, a link on your website, at checkout and on social media. When they buy or book through your hub, you earn a cash bonus, or a bigger bonus as Birch Reserve ad credit to promote your own business.</p>
+<p>Open a Clinic layer at <a href="https://scalehealth.ca/clinichubs">scalehealth.ca/clinichubs</a> and activate your audience: email, text, a link on your website, at checkout and on social media. When they buy or book through your clinic layer, you earn a cash bonus, or a bigger bonus as Birch Reserve ad credit to promote your own business.</p>
 <div class="tw"><table><thead><tr><th>Milestone (first 90 days live)</th><th class="n">Cash</th><th class="n">Or ad credit</th></tr></thead><tbody>${ladder}</tbody></table></div>
-<p class="fine">Proposal. An activated customer is a unique customer of your business who completes a paid order or booking through your Clinic Hub and does not refund or charge back. The 90-day clock starts once we see real traffic or transactions; bonuses are credited when it ends. Self-purchases (you, your staff or your own accounts) are excluded. One bonus per business per year, top milestone only. Refunded or charged-back orders are reversed. Ad credit has no cash value and expires 12 months after it lands.</p></details>
+<p class="fine">Proposal. An activated customer is a unique customer of your business who completes a paid order or booking through your Clinic layer and does not refund or charge back. The 90-day clock starts once we see real traffic or transactions; bonuses are credited when it ends. Self-purchases (you, your staff or your own accounts) are excluded. One bonus per business per year, top milestone only. Refunded or charged-back orders are reversed. Ad credit has no cash value and expires 12 months after it lands.</p></details>
 <details><summary>Paid in CAD</summary><p class="fine" data-testid="payout-currency-note">${payout === "us" ? esc(payoutUsNote()) : "Payouts are set and paid in CAD."}</p></details>
 <details id="terms-pack"><summary>Pack terms</summary>
 <p class="fine">${esc(CARRY_OVER_CLAUSE)}</p>
@@ -235,19 +235,19 @@ if(location.hash==='#prepay'){f.scrollIntoView({block:'start'})}
 function kitHtml(currency: Currency): string {
   const rows = HUBS.map((hub) => {
     const slotRows = SLOTS.map((s) => `<tr><td>${esc(s.label)}${s.core ? "" : ' <span class="fine">(partner approval per send)</span>'}</td><td class="n"><span class="mc">Modelled</span>${fmt(sponsorImpressions(hub, s))}</td><td class="n">${price(s.cpmUsd, currency)}</td><td class="n">${price(slotPriceUsd(hub, s), currency)}</td></tr>`).join("");
-    return `<tr class="hub"><td colspan="4"><a href="${esc(hub.url)}">${esc(hub.name)}</a> · ${esc(shownStatus(hub))} · ${esc(hub.category)} <span class="fine">· basis: ${esc(hub.basis)} · core package ${price(corePackageUsd(hub), currency)}/mo</span></td></tr>${slotRows}`;
+    return `<tr class="clinic layer"><td colspan="4"><a href="${esc(hub.url)}">${esc(hub.name)}</a> · ${esc(shownStatus(hub))} · ${esc(hub.category)} <span class="fine">· basis: ${esc(hub.basis)} · core package ${price(corePackageUsd(hub), currency)}/mo</span></td></tr>${slotRows}`;
   }).join("");
   const slotDefs = SLOTS.map((s) => `<tr><td>${esc(s.label)}</td><td>${esc(s.where)}</td><td>${esc(s.size)}</td><td class="n">${price(s.cpmUsd, currency)}</td><td class="fine">${esc(s.comp)}</td></tr>`).join("");
   return `<p class="draft">Every impression figure on this page is modelled, not measured.</p>
 <h1>Birch Reserve marketing kit</h1>
-<p>Display beside the product they already trust: thank-you pages after someone buys or books, member dashboards and hub home pages across launching partner brand hubs and our clinic hub network.</p>
+<p>Display beside the product they already trust: thank-you pages after someone buys or books, member dashboards and clinic layer home pages across launching partner brand clinic layers and our clinic layer network.</p>
 ${statsStrip()}
 <h2>Placement slots</h2>
 <div class="tw"><table><thead><tr><th>Slot</th><th>Where it runs</th><th>Size</th><th class="n">CPM</th><th>Market comp</th></tr></thead><tbody>${slotDefs}</tbody></table></div>
 <p class="fine">Comps: retail media onsite display $7–$22 CPM, median about $8.40–$12.50 (CMO Mag Retail Media CPM Benchmark 2026, cmomag.com; Benchmarketing 2026, benchmarketing.org). Post-purchase page revenue $0.25–$0.80 per order (Rokt Thanks, aftersell.com). Health and wellness newsletter sponsorship $40–$100 per 1,000 sends (sponsorships.ai, 2026). Health display $10–$25 CPM (ChannelROIHub).</p>
 <h2>Per-hub inventory and pricing</h2>
 <div class="tw"><table><thead><tr><th>Slot</th><th class="n">Modelled impressions / mo</th><th class="n">CPM</th><th class="n">Price / mo</th></tr></thead><tbody>${rows}</tbody></table></div>
-<p class="fine">Per sponsor: one of five rotating positions (20% share of voice) at 75% availability. Hubs without their own feed row use the network median partner until their feed lands. Core package floor is ${price(190, currency)}/mo. Prices draw down from your <a href="/sponsor?currency=${currency}">sponsorship credit</a>.</p>
+<p class="fine">Per sponsor: one of five rotating positions (20% share of voice) at 75% availability. Clinic layers without their own feed row use the network median partner until their feed lands. Core package floor is ${price(190, currency)}/mo. Prices draw down from your <a href="/sponsor?currency=${currency}">sponsorship credit</a>.</p>
 <p class="fine mf">${MODELLED_FOOTER}</p>
 <h2>Ways to buy</h2>
 <ul>
@@ -257,7 +257,7 @@ ${statsStrip()}
 </ul>
 <h2>What to send</h2>
 <ul><li>Square still (primary creative) and optional 15-second silent motion</li><li>Destination URL and one brand category</li><li>Contact email for creative and insertion-order follow-up</li></ul>
-<p class="fine">Mock placements are illustrative until an insertion order names the hub. Reporting is aggregate only. No patient data, no clinical pixels. <a href="/sample-io">Sample insertion order</a> · <a href="/terms">Terms</a></p>`;
+<p class="fine">Mock placements are illustrative until an insertion order names the clinic layer. Reporting is aggregate only. No patient data, no clinical pixels. <a href="/sample-io">Sample insertion order</a> · <a href="/terms">Terms</a></p>`;
 }
 
 router.get(["/sponsor", "/sponsor/"], (req: Request, res: Response) => {

@@ -44,18 +44,18 @@ import { UPGRADE_PATH_LINE } from "../../../../api-server/src/lib/overhaul/media
 const NAVY = "#0b1f3a";
 
 const FAQ = [
-  { q: "Where exactly do the ads run?", a: "In post-purchase moments and inside health and wellness member hubs: pages inside a brand, clinic or retailer where its own customers land right after they buy or book. Categories start with recovery, then longevity, sleep, nutrition and more. Private clinic network display, retail micro hubs and the Street Team are separate add-ons. Each hub has four placements: post-purchase, the hub home page, product and services pages, and the member dashboard behind login." },
-  { q: "Which hubs are live?", a: `${INVENTORY.line} More hubs launch over time.` },
+  { q: "Where exactly do the ads run?", a: "In post-purchase moments and inside health and wellness member clinic layers: pages inside a brand, clinic or retailer where its own customers land right after they buy or book. Categories start with recovery, then longevity, sleep, nutrition and more. Private clinic network display, retail micro clinic layers and the Street Team are separate add-ons. Each clinic layer has four placements: post-purchase, the clinic layer home page, product and services pages, and the member dashboard behind login." },
+  { q: "Which clinic layers are live?", a: `${INVENTORY.line} More clinic layers launch over time.` },
   { q: "Is this display or cost-per-click?", a: "Both. Every placement can be bought as display (priced per thousand views) or CPC (priced per click). Deposits and area placements draw down against either." },
-  { q: "Are the audience numbers measured?", a: "Not yet. Audience and view figures on this site are modelled estimates from listed partners, not measured delivery. We don't publish a measured network views figure (the 2027 inventory figure is a modelled estimate); your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
-  { q: "Can a local business or studio buy?", a: "Yes. Start with the same $190 USD 7-day look or $490 USD category placement. Locking your area (a share of hub display near your postal code) is a premium option, by inquiry." },
-  { q: "How does my business become a hub?", a: `Studios and retailers activate a hub on ScaleHealth.ca, the platform that hosts the hubs (scalehealth.ca/clinichubs), and earn cash or ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded hub.` },
-  { q: "Do agencies get anything?", a: `Yes. ${AGENCY_RATE_CARD.line} ${AGENCY_RATE_CARD.resale} ${AGENCY_RATE_CARD.disclosure} ${AGENCY_RATE_CARD.direct} ${AGENCY_RATE_CARD.noUndercut} Agencies can also prepay a client test budget and get UTM and promo-code reporting per hub and surface.` },
+  { q: "Are the audience numbers measured?", a: "Not yet. Audience and view figures on this site are modelled estimates from listed partners, not measured delivery. We don't publish a measured network views figure (the 2027 inventory figure is a modelled estimate); your insertion order sizes views against live clinic layer supply. Reporting on your campaign is measured with UTM links and promo codes." },
+  { q: "Can a local business or studio buy?", a: "Yes. Start with the same $190 USD 7-day look or $490 USD category placement. Locking your area (a share of clinic layer display near your postal code) is a premium option, by inquiry." },
+  { q: "How does my business become a clinic layer?", a: `Studios and retailers activate a clinic layer on ScaleHealth.ca, the platform that hosts the clinic layers (scalehealth.ca/clinichubs), and earn cash or ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded clinic layer.` },
+  { q: "Do agencies get anything?", a: `Yes. ${AGENCY_RATE_CARD.line} ${AGENCY_RATE_CARD.resale} ${AGENCY_RATE_CARD.disclosure} ${AGENCY_RATE_CARD.direct} ${AGENCY_RATE_CARD.noUndercut} Agencies can also prepay a client test budget and get UTM and promo-code reporting per clinic layer and surface.` },
 ];
 
 const TILES = [
-  { href: "/intake?ref=home_tile", icon: Sparkles, title: "Monetization Kit", line: "Exposure + hub earnings. Free.", tid: "tile-intake", hot: true },
-  { href: "/hubs", icon: Building2, title: "Hubs", line: "Where your brand shows up.", tid: "tile-hubs" },
+  { href: "/intake?ref=home_tile", icon: Sparkles, title: "Monetization Kit", line: "Exposure + clinic layer earnings. Free.", tid: "tile-intake", hot: true },
+  { href: "/hubs", icon: Building2, title: "Clinic layers", line: "Where your brand shows up.", tid: "tile-hubs" },
   { href: "/media-kit", icon: BookOpen, title: "Media kit", line: "Placements, rates, one page.", tid: "tile-media-kit" },
   { href: "/agencies", icon: Handshake, title: "Agencies", line: "Standard 15% agency commission.", tid: "tile-agencies" },
   { href: "/audiences", icon: Users, title: "Audiences", line: "Who you reach.", tid: "tile-audiences" },
@@ -84,7 +84,7 @@ function Expand({ title, sub, children, testId, open = false }: { title: string;
 
 export default function BrHome() {
   useAttention({ audience: "[data-testid=home-stats]", hubs: "#proof-live", ladder: "[data-testid=home-offer-stairs]", street: "[data-testid=home-street-team]", details: "#more", end: "[data-testid=home-close]" });
-  usePageMeta("Birch Reserve | Display space across private health & wellness hubs", "Put your brand in post-purchase moments and inside health and wellness member hubs: ~128MM modelled page views a month (estimate), 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 1MM+ consumers now through our provider network and Street Team, expanding to an estimated 3MM+ in 2027. Get a free Monetization Kit. Prices in USD; figures are modelled estimates from listed partners: reach and audience, not delivered impressions.");
+  usePageMeta("Birch Reserve | Display space across private health & wellness clinic layers", "Put your brand in post-purchase moments and inside health and wellness member clinic layers: ~128MM modelled page views a month (estimate), 200+ retail locations (500+ soon) with 1MM+ captive recovery consumers, and 1MM+ consumers now through our provider network and Street Team, expanding to an estimated 3MM+ in 2027. Get a free Monetization Kit. Prices in USD; figures are modelled estimates from listed partners: reach and audience, not delivered impressions.");
   const price = priceLabels(useAvailability());
   // Phones: the floating chat + voice buttons stay out of the hero preview until the visitor scrolls past it.
   useEffect(() => {
@@ -120,7 +120,7 @@ export default function BrHome() {
           logo: "https://birchreserve.net/logo.svg",
           parentOrganization: { "@type": "Organization", name: "Silver Birch Growth Inc." },
           email: "randy@scalehealth.ca",
-          description: "Ad space inside co-branded Recovery Brand hubs and health & wellness business hubs. Display and CPC on post-purchase, hub home, product and services, and member dashboard pages.",
+          description: "Ad space inside co-branded Recovery Brand clinic layers and health & wellness business clinic layers. Display and CPC on post-purchase, clinic layer home, product and services, and member dashboard pages.",
           address: { "@type": "PostalAddress", addressLocality: "Toronto", addressRegion: "ON", addressCountry: "CA" },
         }}
       />
@@ -132,8 +132,8 @@ export default function BrHome() {
         <div className="container mx-auto min-h-[5.25rem] max-w-6xl px-4 pt-3 md:hidden" data-testid="home-pulse-slim"><ActivityPulse mode="inline" slim /></div>
         <div className="container mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-x-8 gap-y-5 px-4 pb-8 pt-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:grid-rows-[auto_auto] md:content-center md:pb-16 md:pt-16">
           <div className="md:col-start-1 md:row-start-1 md:self-end">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground/50" data-testid="home-eyebrow">Private hub display network</p>
-          <h1 className="mt-4 font-display text-[2.6rem] leading-[1.02] tracking-[-0.01em] text-[#0b1f3a] md:text-[4.25rem]">See your brand inside a live wellness hub.</h1>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground/50" data-testid="home-eyebrow">Private clinic layer display network</p>
+          <h1 className="mt-4 font-display text-[2.6rem] leading-[1.02] tracking-[-0.01em] text-[#0b1f3a] md:text-[4.25rem]">See your brand inside a live wellness clinic layer.</h1>
           <p className="mt-5 max-w-[34rem] text-base leading-relaxed text-foreground/70 md:text-[1.0625rem]" data-testid="home-hub-definition">{hubDefinition()}</p>
           </div>
           <div className="order-3 md:order-none md:col-start-1 md:row-start-2 md:self-start">
@@ -200,7 +200,7 @@ export default function BrHome() {
 
       {/* 4. Live hubs as visual cards. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10" id="proof-live" data-testid="live-hub-thumbs">
-        <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Live now and activating hubs</h2>
+        <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">Live now and activating clinic layers</h2>
         <div className="mt-4"><LiveHubGrid /></div>
         <HubFunnel />
       </section>
@@ -222,7 +222,7 @@ export default function BrHome() {
             <div className="space-y-4"><FlightReportExample where="home" /><PerformanceRanges where="home" /></div>
           </Expand>
 
-          <Expand title="See the card in context" sub="Example mockups on live hubs, and the proof behind them" testId="home-own-moment">
+          <Expand title="See the card in context" sub="Example mockups on live clinic layers, and the proof behind them" testId="home-own-moment">
             <div className="space-y-6"><OwnTheMoment /><SeeTheProof /></div>
           </Expand>
 
@@ -272,7 +272,7 @@ export default function BrHome() {
             </div>
           </Expand>
 
-          <Expand title="Proof from the live hubs" sub="Measured figures only" testId="home-proof">
+          <Expand title="Proof from the live clinic layers" sub="Measured figures only" testId="home-proof">
             <div><ProofStrip /></div>
           </Expand>
 
@@ -285,13 +285,13 @@ export default function BrHome() {
             </div>
           </Expand>
 
-          <Expand title="Other ways to work with us" sub="Performance-only, your own hub, outreach setup, partnerships" testId="home-more-ways">
+          <Expand title="Other ways to work with us" sub="Performance-only, your own clinic layer, outreach setup, partnerships" testId="home-more-ways">
             <div className="space-y-4">
               <div data-testid="home-ways">
                 <div className="grid gap-3 sm:grid-cols-2">
           {[
-            { icon: Package, title: "Supplier", tag: "Performance-only", sub: "Get into curated hubs. Pay on results.", tid: "home-way-supplier", ref: "home_supplier" },
-            { icon: Store, title: "Hub", tag: "Max exposure", sub: "Your audience, shelf or screens. Earn a share.", tid: "home-way-hub", ref: "home_hub" },
+            { icon: Package, title: "Supplier", tag: "Performance-only", sub: "Get into curated clinic layers. Pay on results.", tid: "home-way-supplier", ref: "home_supplier" },
+            { icon: Store, title: "Clinic layer", tag: "Max exposure", sub: "Your audience, shelf or screens. Earn a share.", tid: "home-way-hub", ref: "home_hub" },
           ].map((w) => (
             <a key={w.tid} href={`/intake?ref=${w.ref}`} data-testid={w.tid} className="group flex items-center gap-4 rounded-2xl p-5 text-white shadow-md transition hover:-translate-y-0.5" style={{ background: NAVY }}>
               <span className="grid size-11 shrink-0 place-items-center rounded-full bg-lime-300 text-[#0b1f3a]"><w.icon className="size-5" aria-hidden /></span>
@@ -331,7 +331,7 @@ export default function BrHome() {
       {/* Ends on the payoff: one line, one CTA. */}
       <section className="bg-[#0b1f3a] py-12 text-white md:py-16" data-testid="home-close">
         <div className="container mx-auto flex max-w-5xl flex-col items-start justify-between gap-5 px-4 md:flex-row md:items-center">
-          <p className="font-display text-3xl leading-tight md:text-4xl">Your brand, on a live hub.</p>
+          <p className="font-display text-3xl leading-tight md:text-4xl">Your brand, on a live clinic layer.</p>
           <KitCta placement="close_home" size="lg" testId="home-close-kit" sub={null} onClick={() => trackAttn("hero_cta.kit")} />
         </div>
       </section>

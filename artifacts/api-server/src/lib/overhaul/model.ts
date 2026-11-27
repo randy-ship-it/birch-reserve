@@ -49,7 +49,7 @@ export const TAM = {
 /** The four hub placements (Randy, Nov 12 1:10 PM), each sold as display or CPC. cpmUsd = starter (starting-at) rate from pricing.ts, an illustrative estimate. */
 export const SURFACES = [
   { key: "post_purchase", label: "Post-Purchase", cpmUsd: STARTER.post_purchase, monthly: TAM.monthly.postPurchase, blurb: "On the thank-you and booking-confirmation page, right after a paid order or booking." },
-  { key: "hub_home", label: "Hub Home Page", cpmUsd: STARTER.hub_home, monthly: TAM.monthly.hubHome, blurb: "Top-of-hub banner and native tiles on the co-branded hub home." },
+  { key: "hub_home", label: "Clinic Layer Home Page", cpmUsd: STARTER.hub_home, monthly: TAM.monthly.hubHome, blurb: "Top-of-hub banner and native tiles on the co-branded clinic layer home." },
   { key: "product_services", label: "Product / Services pages", cpmUsd: STARTER.product_services, monthly: TAM.monthly.productServices, blurb: "Inside product, service and booking pages while the visitor is browsing." },
   { key: "member_dashboard", label: "Member Dashboard (behind login)", cpmUsd: STARTER.member_dashboard, monthly: TAM.monthly.memberDashboard, blurb: "On the logged-in member dashboard, where members come back to track orders, plans and bookings." },
 ] as const;
@@ -105,7 +105,7 @@ const BASE_BRAND_HUBS: BrandHub[] = [
     status: "Activating",
     url: "",
     category: "Workplace benefits and admin",
-    basis: "Network median partner (no hub feed yet)",
+    basis: "Network median partner (no clinic layer feed yet)",
     views: MEDIAN_VIEWS,
     logo: "/partner-logos/effortless-admin.png",
     banner: "/hub-banners/effortless-admin.webp",
@@ -130,7 +130,7 @@ export const BRAND_HUBS: BrandHub[] = (() => {
     const have = BASE_BRAND_HUBS.find((b) => b.key === l.key);
     if (have) return [have];
     if (!extra[l.key]) return [];
-    return [{ ...med, key: l.key, basis: "Network median partner (no hub feed yet)", audience: l.audience, ...extra[l.key], ...ladderStatus(l.key, "Live") } as BrandHub];
+    return [{ ...med, key: l.key, basis: "Network median partner (no clinic layer feed yet)", audience: l.audience, ...extra[l.key], ...ladderStatus(l.key, "Live") } as BrandHub];
   });
 })();
 /** Kept for the /hubs page import. */
@@ -141,8 +141,8 @@ export const INVENTORY = {
   liveSpendDownMonths: 6,
   queueMultiple: 3,
   queueBy: "year end 2026",
-  line: `${ladderLine()} Placements are curated as each hub launches.`,
-  queueLine: "Activating hubs are going live now; more hubs launch over time.",
+  line: `${ladderLine()} Placements are curated as each clinic layer launches.`,
+  queueLine: "Activating clinic layers are going live now; more clinic layers launch over time.",
 } as const;
 
 export const CLINIC_NETWORK = KIT_HUBS.find((h) => h.kind === "clinic")!;
@@ -155,7 +155,7 @@ export const POSITIONING = {
     { key: "food", label: "Food", inQueue: false },
     { key: "pets", label: "Pets", inQueue: true },
   ],
-  businessHubs: "Health & wellness business hubs: physio, mobility, gyms, studios and clinic hubs",
+  businessHubs: "Health & wellness business clinic layers: physio, mobility, gyms, studios and clinic layers",
 } as const;
 
 // ---------------------------------------------------------------- area placement

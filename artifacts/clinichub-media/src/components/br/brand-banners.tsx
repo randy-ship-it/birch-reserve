@@ -24,7 +24,7 @@ export function BrandBannerCard({ hub, locked = false }: { hub: BrandHub; locked
           <span className="ml-2 truncate text-[11px] text-foreground/45">{hub.name} × Scale</span>
         </div>
         <div className="relative aspect-[16/10] overflow-hidden">
-          <img src={hub.banner} alt={`${hub.name} co-branded hub`} className={`h-full w-full object-cover object-top ${locked ? "blur-[2px]" : ""}`} loading="lazy" />
+          <img src={hub.banner} alt={`${hub.name} co-branded clinic layer`} className={`h-full w-full object-cover object-top ${locked ? "blur-[2px]" : ""}`} loading="lazy" />
         </div>
         <div className="absolute left-1/2 top-9 flex h-12 -translate-x-1/2 items-center justify-center border border-foreground/10 bg-white px-4 shadow-md">
           <img src={hub.logo} alt={`${hub.name} logo`} className="max-h-8 w-auto max-w-[150px] object-contain" />
@@ -39,7 +39,7 @@ export function BrandBannerCard({ hub, locked = false }: { hub: BrandHub; locked
   );
 }
 
-export function BrandBanners({ title = "Co-branded brand hubs listed with Scale", hubs = BRAND_HUBS }: { title?: string; hubs?: BrandHub[] }) {
+export function BrandBanners({ title = "Co-branded brand clinic layers listed with Scale", hubs = BRAND_HUBS }: { title?: string; hubs?: BrandHub[] }) {
   const track = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(0);
   const scrollBy = (dir: 1 | -1) => {
@@ -68,7 +68,7 @@ export function BrandBanners({ title = "Co-branded brand hubs listed with Scale"
         ))}
       </div>
       <div className="mt-4 flex items-center justify-center gap-4">
-        <button type="button" onClick={() => scrollBy(-1)} aria-label="Previous hubs" className="flex size-10 items-center justify-center border border-foreground/25 hover:bg-foreground hover:text-background">
+        <button type="button" onClick={() => scrollBy(-1)} aria-label="Previous clinic layers" className="flex size-10 items-center justify-center border border-foreground/25 hover:bg-foreground hover:text-background">
           <ChevronLeft className="size-4" />
         </button>
         <div className="flex gap-1.5">
@@ -76,7 +76,7 @@ export function BrandBanners({ title = "Co-branded brand hubs listed with Scale"
             <span key={h.key} className={`h-1.5 transition-all ${i === page ? "w-6 bg-foreground" : "w-1.5 bg-foreground/25"}`} />
           ))}
         </div>
-        <button type="button" onClick={() => scrollBy(1)} aria-label="Next hubs" className="flex size-10 items-center justify-center border border-foreground/25 hover:bg-foreground hover:text-background">
+        <button type="button" onClick={() => scrollBy(1)} aria-label="Next clinic layers" className="flex size-10 items-center justify-center border border-foreground/25 hover:bg-foreground hover:text-background">
           <ChevronRight className="size-4" />
         </button>
       </div>

@@ -28,7 +28,7 @@ test("parse: ranges, openness and exclusions are validated; ack required; exclus
   assert.ok(c.ok && c.v.exclusions.length === 0);
   assert.deepEqual(ACT_OPENNESS.map((o) => o.label), ["Curated health & wellness only", "Open to other premium brands (non-wellness), with category exclusions", "Open to any approved ad"]);
   assert.ok(ACT_EXCLUSIONS.some((e) => e.key === "cannabis") && ACT_EXCLUSIONS.some((e) => e.key === "competitors"));
-  assert.equal(ACT_REVIEW_NOTE, "Every ad is reviewed, and nothing runs on your hubs without explicit approval from our team.");
+  assert.equal(ACT_REVIEW_NOTE, "Every ad is reviewed, and nothing runs on your clinic layers without explicit approval from our team.");
   assert.doesNotMatch(ACT_REVIEW_NOTE, /Randy|Jon\b/, "public note names no people");
   assert.equal(isNonCore("any"), true);
   assert.equal(isNonCore("curated"), false);
@@ -122,7 +122,7 @@ test("UI wiring: asked after intake submit (not at the start), standalone page, 
   assert.ok(after > 0 && form.indexOf("<AdActivation", after) > after, "activation step renders only in the post-submit state");
   assert.equal(form.slice(0, after).includes("<AdActivation"), false, "never at the start of intake");
   const comp = readFileSync(resolve(process.cwd(), "../clinichub-media/src/components/br/ad-activation.tsx"), "utf8");
-  for (const t of ["Your inventory estimate", "Which ads can run on your hubs?", "Other ad data (optional)", "Pages or hub screens", "Monthly views or visitors"]) assert.ok(comp.includes(t), t);
+  for (const t of ["Your inventory estimate", "Which ads can run on your clinic layers?", "Other ad data (optional)", "Pages or clinic layer screens", "Monthly views or visitors"]) assert.ok(comp.includes(t), t);
   const app = readFileSync(resolve(process.cwd(), "../clinichub-media/src/App.tsx"), "utf8");
   assert.match(app, /path="\/intake\/activate"/);
 });

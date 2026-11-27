@@ -24,64 +24,64 @@ const ORG = { "@type": "Organization", name: "Birch Reserve", url: "https://birc
 
 /** Share image for the intake (Nov 19 2026): 1200×630, on brand, no CRM or partner names. */
 export const INTAKE_OG_IMAGE = "https://birchreserve.net/og-monetization-kit.png";
-const INTAKE_DESC = "One short form for suppliers and hubs. See what your hub could earn and where your products get seen, side by side. Estimates in USD, reviewed by a person.";
+const INTAKE_DESC = "One short form for suppliers and clinic layers. See what your clinic layer could earn and where your products get seen, side by side. Estimates in USD, reviewed by a person.";
 
 export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   "/intake": { title: "Get your free Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
-  "/intake/publisher": { title: "Hub · max exposure + earnings · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
-  "/intake/supplier": { title: "Supplier intake · Your own hub | Birch Reserve", description: "Suppliers: get your own hub on Birch Reserve. No setup fee, no monthly fee, you approve every placement. Goes live once our team approves it.", image: INTAKE_OG_IMAGE },
+  "/intake/publisher": { title: "Clinic layer · max exposure + earnings · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
+  "/intake/supplier": { title: "Supplier intake · Your own clinic layer | Birch Reserve", description: "Suppliers: get your own clinic layer on Birch Reserve. No setup fee, no monthly fee, you approve every placement. Goes live once our team approves it.", image: INTAKE_OG_IMAGE },
   "/intake/gtm": { title: "B2B go-to-market | Silver Birch Growth Inc.", description: "B2B go-to-market, powered by Silver Birch Growth Inc. Rare strategic projects only; pointed at portfolio value creation right now.", image: INTAKE_OG_IMAGE },
   "/gtm-bot": { title: "B2B go-to-market | Silver Birch Growth Inc.", description: "B2B go-to-market, powered by Silver Birch Growth Inc. SBG takes on only rare strategic projects and is pointed at portfolio value creation right now.", image: INTAKE_OG_IMAGE },
-  "/intake/activate": { title: "Get your ads turned on | Birch Reserve", description: "Share a rough inventory estimate and which ads can run on your hubs. Every ad is reviewed and nothing runs without approval.", image: INTAKE_OG_IMAGE },
+  "/intake/activate": { title: "Get your ads turned on | Birch Reserve", description: "Share a rough inventory estimate and which ads can run on your clinic layers. Every ad is reviewed and nothing runs without approval.", image: INTAKE_OG_IMAGE },
   "/intake/street-team": { title: "Street team program inquiry (2027) | Birch Reserve", description: "Tell us your brand, tier and routes for the 2027 street team program. A minimum campaign size applies. Reviewed by a person; nothing is charged.", image: INTAKE_OG_IMAGE },
   "/partners": { title: "Partner with Birch Reserve | Service vendors and inventory partners", description: "Service vendors for ad buying, creative and distribution, and agencies, media houses and newspapers who want to offer our display inventory to their customers. Wholesale terms discussed directly.", image: INTAKE_OG_IMAGE },
   "/street-team": { title: "Street team program, coming 2027 | Birch Reserve", description: "Door-to-door by route: join a running campaign, run your own on specific routes, or door drop. The high-touch version runs today for Calm Joints only. Outside brands from 2027; minimum campaign size applies.", image: INTAKE_OG_IMAGE },
-  "/intake/reel": { title: "Watch: how the Scale Health ad system works | Birch Reserve", description: "A short walkthrough: start performance-only as a supplier, activate your own audience with a co-branded hub, then run targeted ads. Recovery is live, more categories are next.", image: "https://birchreserve.net/reel/og-reel.png" },
+  "/intake/reel": { title: "Watch: how the Scale Health ad system works | Birch Reserve", description: "A short walkthrough: start performance-only as a supplier, activate your own audience with a co-branded clinic layer, then run targeted ads. Recovery is live, more categories are next.", image: "https://birchreserve.net/reel/og-reel.png" },
   "/intake/sponsor": { title: "Supplier + Accelerate · Monetization Kit | Birch Reserve", description: INTAKE_DESC, image: INTAKE_OG_IMAGE },
   "/advertise/brands": {
     title: "Advertise to brands | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category placement, self-serve. Modelled estimates from listed partners: about 128MM page views a month (estimate).",
+    description: "Display space inside private health and wellness clinic layers. Start with a $190 USD 7-day category look or a $490 USD category placement, self-serve. Modelled estimates from listed partners: about 128MM page views a month (estimate).",
     jsonld: { "@context": "https://schema.org", "@graph": [...buyersOffersJsonLd(), ...buyerDiscoveryJsonLd()] },
   },
   "/advertise/local": {
     title: "Local businesses & studios | Birch Reserve",
-    description: "Reach hub members near you. Start with a $190 USD 7-day look or a $490 USD category placement; area placements are premium, by inquiry.",
+    description: "Reach clinic layer members near you. Start with a $190 USD 7-day look or a $490 USD category placement; area placements are premium, by inquiry.",
     jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
-  "/publish/brands": { title: "Publish · Brands | Birch Reserve", description: "Brands with a recovery audience can apply for a co-branded hub. Otherwise, inquire about display or CPC-only opportunities outside hubs." },
-  "/publish/studios": { title: "Publish · Studios & retail | Birch Reserve", description: `Activate your hub with pre-built monetizations and our marketplace. Earn $${PUBLISHER_INCENTIVE.cashCad} CAD cash or $${PUBLISHER_INCENTIVE.creditCad}+ CAD in ad credit.` },
+  "/publish/brands": { title: "Publish · Brands | Birch Reserve", description: "Brands with a recovery audience can apply for a co-branded clinic layer. Otherwise, inquire about display or CPC-only opportunities outside clinic layers." },
+  "/publish/studios": { title: "Publish · Studios & retail | Birch Reserve", description: `Activate your clinic layer with pre-built monetizations and our marketplace. Earn $${PUBLISHER_INCENTIVE.cashCad} CAD cash or $${PUBLISHER_INCENTIVE.creditCad}+ CAD in ad credit.` },
   "/match": { title: "Match your audience | Birch Reserve", description: "Enter your website and a short note. See how well your audience matches the Scale Activity launch audience profile, as a clean % with three reasons." },
-  "/hubs": { title: "Hubs | Birch Reserve", description: liveLine() + " More hubs are activating. Register your email to see audience, placements and modelled views." },
+  "/hubs": { title: "Clinic layers | Birch Reserve", description: liveLine() + " More clinic layers are activating. Register your email to see audience, placements and modelled views." },
   "/media-kit": {
     title: "Media kit | Birch Reserve",
     image: MEDIA_KIT_OG_IMAGE,
-    description: "Prepaid media credit across a growing network of private health and wellness hubs. Start with the small-business package ($190 USD look or $490 USD category placement, self-serve) or inquire about blocks from $25,000 to $1.5M USD. Modelled volumes, no guarantees.",
+    description: "Prepaid media credit across a growing network of private health and wellness clinic layers. Start with the small-business package ($190 USD look or $490 USD category placement, self-serve) or inquire about blocks from $25,000 to $1.5M USD. Modelled volumes, no guarantees.",
     jsonld: {
       "@context": "https://schema.org",
       "@type": "WebPage",
       name: "Birch Reserve media kit",
       url: "https://birchreserve.net/media-kit",
       publisher: ORG,
-      mainEntity: { "@type": "Service", name: "Birch Reserve hub network display space", provider: ORG, areaServed: ["CA", "US"], serviceType: "Prepaid media credit for display placements in private health and wellness hubs" },
+      mainEntity: { "@type": "Service", name: "Birch Reserve clinic layer network display space", provider: ORG, areaServed: ["CA", "US"], serviceType: "Prepaid media credit for display placements in private health and wellness clinic layers" },
     },
   },
   "/buyers": {
     title: "For media buyers & agencies | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category placement, paid by card on a Stripe-hosted page. " + liveLine(),
+    description: "Display space inside private health and wellness clinic layers. A $190 USD 7-day category look or a $490 USD category placement, paid by card on a Stripe-hosted page. " + liveLine(),
     jsonld: { "@context": "https://schema.org", "@graph": [...buyersOffersJsonLd(), ...buyerDiscoveryJsonLd()] },
   },
   "/ai-buyers": {
     title: "For media buyers & agencies | Birch Reserve",
-    description: "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category placement, paid by card on a Stripe-hosted page. " + liveLine(),
+    description: "Display space inside private health and wellness clinic layers. A $190 USD 7-day category look or a $490 USD category placement, paid by card on a Stripe-hosted page. " + liveLine(),
     jsonld: { "@context": "https://schema.org", "@graph": buyersOffersJsonLd() },
   },
   "/rates": {
     title: "Rates | Birch Reserve",
-    description: "Starting-at CPM and CPC rates for five hub surfaces, view-block packs, a 100k to 1B view scenario calculator, and rates that step up only once a placement proves out. Illustrative estimates.",
+    description: "Starting-at CPM and CPC rates for five clinic layer surfaces, view-block packs, a 100k to 1B view scenario calculator, and rates that step up only once a placement proves out. Illustrative estimates.",
   },
   "/audiences": {
     title: "Audience insights | Birch Reserve",
-    description: "What we know about the audiences behind the brand launches on Scale Health hubs and Calm Joints: recovery, longevity, sleep, physio patients, racquet players and MD-referral cohorts. Measured, modelled and estimated figures, labelled.",
+    description: "What we know about the audiences behind the brand launches on Scale Health clinic layers and Calm Joints: recovery, longevity, sleep, physio patients, racquet players and MD-referral cohorts. Measured, modelled and estimated figures, labelled.",
     jsonld: { "@context": "https://schema.org", "@type": "WebPage", name: "Birch Reserve audience insights", url: "https://birchreserve.net/audiences", publisher: ORG },
   },
   "/audiences/sample-profile": {
@@ -102,7 +102,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
   },
   "/media-buyers": {
     title: "For media buyers & performance marketers | Birch Reserve",
-    description: "Already running display, retargeting and paid social? Add one first-party health and wellness channel as its own line item: hand-placed placements inside private hubs, tracked with your UTM links and promo codes. Test from $190 USD.",
+    description: "Already running display, retargeting and paid social? Add one first-party health and wellness channel as its own line item: hand-placed placements inside private clinic layers, tracked with your UTM links and promo codes. Test from $190 USD.",
     jsonld: {
       "@context": "https://schema.org",
       "@graph": [
@@ -128,7 +128,7 @@ export const OVERHAUL_ROUTES: Record<string, RouteMeta> = {
 export function buyersOffersJsonLd(): Record<string, unknown>[] {
   return [
     { sku: "hold-190", name: "7-day category look", price: 190, description: "Hold your category for 7 days. Converts in full to the $490 USD category placement within 7 days, or refunded. Does not lock in a slot." },
-    { sku: "reserve-490", name: "Category placement", price: 490, description: "Reserve display space across the hub network. Media credit, fully refundable until 14 days before your launch date, usable for 12 months." },
+    { sku: "reserve-490", name: "Category placement", price: 490, description: "Reserve display space across the clinic layer network. Media credit, fully refundable until 14 days before your launch date, usable for 12 months." },
   ].map((o) => ({
     "@type": "Product",
     "@id": `https://birchreserve.net/buyers#${o.sku}`,
@@ -155,7 +155,7 @@ export function buyerDiscoveryJsonLd(): Record<string, unknown>[] {
       name: "Birch Reserve",
       url: "https://birchreserve.net/",
       description:
-        "A private health and wellness media channel for brands and agencies: placements inside partner hubs, partner-website display, in-hub screens (rolling out), partner locations and a street team program from 2027, with an organic clinical service offering behind the hubs.",
+        "A private health and wellness media channel for brands and agencies: placements inside partner clinic layers, partner-website display, in-hub screens (rolling out), partner locations and a street team program from 2027, with an organic clinical service offering behind the clinic layers.",
       areaServed: [
         { "@type": "Country", name: "Canada" },
         { "@type": "Country", name: "United States" },
@@ -192,7 +192,7 @@ export function slotProductsJsonLd(): Record<string, unknown>[] {
     name: `Birch Reserve ${o.name}`,
     sku: o.offer_key,
     category: "Health and wellness retail media / display and CPC",
-    description: `${o.note} Media credit $${o.media_credit.usd} USD; about ${o.modelled_hub_page_views.toLocaleString("en-US")} hub page views at rate card (modelled, not guaranteed).`,
+    description: `${o.note} Media credit $${o.media_credit.usd} USD; about ${o.modelled_hub_page_views.toLocaleString("en-US")} clinic layer page views at rate card (modelled, not guaranteed).`,
     brand: { "@type": "Brand", name: "Birch Reserve" },
     offers: [
       { "@type": "Offer", price: o.prices.usd, priceCurrency: "USD", availability: "https://schema.org/PreOrder", url: "https://birchreserve.net/advertise/brands", seller: ORG },
@@ -208,7 +208,7 @@ export function areaLockProductJsonLd(): Record<string, unknown> {
     name: "Birch Reserve area placement",
     sku: "area-lock",
     category: "Local health and wellness advertising",
-    description: `Up to ${o.display_share_pct.standard}% of hub display within ${o.radius_km} km for 1-6 months. ${o.guaranteed_hub_page_views_modelled.toLocaleString("en-US")} modelled hub page views. Draft terms.`,
+    description: `Up to ${o.display_share_pct.standard}% of clinic layer display within ${o.radius_km} km for 1-6 months. ${o.guaranteed_hub_page_views_modelled.toLocaleString("en-US")} modelled clinic layer page views. Draft terms.`,
     brand: { "@type": "Brand", name: "Birch Reserve" },
     offers: [
       { "@type": "Offer", price: o.prices.usd, priceCurrency: "USD", availability: "https://schema.org/PreOrder", url: "https://birchreserve.net/advertise/local", seller: ORG },
@@ -222,7 +222,7 @@ export function llmsTxt(): string {
     "",
     `> ${POSITIONING} ${POSITIONING_FOLLOW}`,
     "",
-    `Display space inside private health and wellness hubs, on four placements: ${PLACEMENT_LABELS.join(", ")}. Priced in USD for every buyer.`,
+    `Display space inside private health and wellness clinic layers, on four placements: ${PLACEMENT_LABELS.join(", ")}. Priced in USD for every buyer.`,
     "",
     "## Offers (same as the media kit)",
     "Prepay your category. Not an open auction.",
@@ -233,19 +233,19 @@ export function llmsTxt(): string {
     "- Premium slots (larger share, priority placement, area placements): inquire-only · https://birchreserve.net/media-kit#premium",
     `- Spend-down: ${SPEND_DOWN_LINE} Modelled pacing: ${PACING_ROWS.map((r) => `${r.label} ${r.perMonth}`).join("; ")}.`,
     "",
-    "## 2027 hub display inventory: modelled estimate (range below)",
+    "## 2027 clinic layer display inventory: modelled estimate (range below)",
     ...tam2027Text().split("\n").map((l, i) => (i === 0 ? `- ${l}` : `  ${l}`)),
     "",
-    "## Hubs (one status ladder)",
+    "## Clinic layers (one status ladder)",
     ladderMarkdown(),
-    "- Insertion order (IO): the short document that names your hub, the surface (post-purchase, dashboard tile, hub home), your category and your dates before anything runs. What you pay is media credit until the IO is signed and approved. Nothing runs without it.",
-    "- Proof: example flight-report layout (illustrative, aggregate only), estimated performance ranges (based on comparables, not Birch results), early measured hub session geography, and the GTM partnership bot example (internal testing, not ad results): https://birchreserve.net/media-kit#proof",
+    "- Insertion order (IO): the short document that names your clinic layer, the surface (post-purchase, dashboard tile, clinic layer home), your category and your dates before anything runs. What you pay is media credit until the IO is signed and approved. Nothing runs without it.",
+    "- Proof: example flight-report layout (illustrative, aggregate only), estimated performance ranges (based on comparables, not Birch results), early measured clinic layer session geography, and the GTM partnership bot example (internal testing, not ad results): https://birchreserve.net/media-kit#proof",
     "",
     "## Pages",
     "- Media kit: https://birchreserve.net/media-kit · PDF: https://birchreserve.net/birch-reserve-one-pager.pdf",
     "- For media buyers & agencies: https://birchreserve.net/buyers",
     "- Match your audience: https://birchreserve.net/match",
-    "- Hubs: https://birchreserve.net/hubs · Rates: https://birchreserve.net/rates",
+    "- Clinic layers: https://birchreserve.net/hubs · Rates: https://birchreserve.net/rates",
     `- Agencies: https://birchreserve.net/agencies · ${AGENCY.line}`,
     "- In plain terms (what Birch is, the moment, where figures come from, reporting, how to start): https://birchreserve.net/agencies#plain-terms",
     "- Media buyers & performance marketers (add Birch as its own line item next to programmatic, paid social and retail media; UTM + promo-code measurement): https://birchreserve.net/media-buyers",
@@ -273,9 +273,9 @@ export function llmsTxt(): string {
     ...searchDiscoverySection().split("\n"),
     "",
     "## For media buyers (answer-ready)",
-    "- Not programmatic: not an open auction, not sold through a DSP. Placements are curated by hand; nothing runs until the IO names the hub, surface, format and dates.",
+    "- Not programmatic: not an open auction, not sold through a DSP. Placements are curated by hand; nothing runs until the IO names the clinic layer, surface, format and dates.",
     "- Fits an existing mix as a separate line item, tagged with your UTM links and promo codes.",
-    "- Measurement: aggregate views and clicks per hub and surface, UTM visits and promo-code redemptions. No impression guarantees; no CTR or ROAS promises.",
+    "- Measurement: aggregate views and clicks per clinic layer and surface, UTM visits and promo-code redemptions. No impression guarantees; no CTR or ROAS promises.",
     "- Smallest test: hold-190 ($190 USD 7-day look). Then reserve-490 ($490 USD). Premium slots inquire-only.",
     "",
     "Rules: aggregate reporting only, no patient data, no clinical pixels. Modelled figures are labelled. No impression guarantees.",
@@ -290,7 +290,7 @@ export function llmsTxt(): string {
     "- [See prices and pay](https://birchreserve.net/buycalc.md)",
     "- [For media buyers and agencies](https://birchreserve.net/buyers.md)",
     "- [Agencies](https://birchreserve.net/agencies.md)",
-    "- [Hubs](https://birchreserve.net/hubs.md)",
+    "- [Clinic layers](https://birchreserve.net/hubs.md)",
     "- [Birch Reserve vs a typical Google Ads start](https://birchreserve.net/vs-google-ads.md)",
     "- [Full description](https://birchreserve.net/llms-full.txt)",
   ].join("\n");

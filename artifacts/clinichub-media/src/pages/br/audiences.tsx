@@ -55,7 +55,7 @@ function Bar({ pct, ink = false }: { pct: number; ink?: boolean }) {
 const FAQ = [
   {
     q: "Where do these numbers come from?",
-    a: "Three places, each labelled. Measured figures come from our own hub analytics and are shown as shares. Modelled figures are estimates from partner data and built from the customers of the brands launching on the network (the TAM feed at scalehealth.ca/tam). Estimates are benchmark ranges. None of it is audited delivery, and we say so on every number.",
+    a: "Three places, each labelled. Measured figures come from our own clinic layer analytics and are shown as shares. Modelled figures are estimates from partner data and built from the customers of the brands launching on the network (the TAM feed at scalehealth.ca/tam). Estimates are benchmark ranges. None of it is audited delivery, and we say so on every number.",
   },
   {
     q: "Do brands ever see customer or patient data?",
@@ -74,7 +74,7 @@ const FAQ = [
 export default function BrAudiences() {
   usePageMeta(
     "Audience insights | Birch Reserve",
-    "What we know about the audiences behind the brand launches on Scale Health hubs and Calm Joints: recovery, longevity, sleep, physio patients, racquet players and MD-referral cohorts. Measured, modelled and estimated figures, labelled.",
+    "What we know about the audiences behind the brand launches on Scale Health clinic layers and Calm Joints: recovery, longevity, sleep, physio patients, racquet players and MD-referral cohorts. Measured, modelled and estimated figures, labelled.",
   );
   const maxOrders = Math.max(...CATEGORY_DEMAND.map((c) => c.ordersYr));
   const maxBand = Math.max(...INTENT_LADDER.map((r) => r.hi));
@@ -98,7 +98,7 @@ export default function BrAudiences() {
             <Eyebrow>Audience insights</Eyebrow>
             <H1>Know the audience before you buy the seat.</H1>
             <Lede>
-              What we know about the people behind the brand launches going live on Scale Health hubs and Calm Joints, rolled up from their customers. Every number says where it comes from.
+              What we know about the people behind the brand launches going live on Scale Health clinic layers and Calm Joints, rolled up from their customers. Every number says where it comes from.
             </Lede>
             <div className="mt-6 flex flex-wrap items-center gap-2 text-xs text-muted-foreground" data-testid="basis-legend">
               <BasisTag basis="measured" /> <span className="mr-2">first-party analytics</span>
@@ -117,7 +117,7 @@ export default function BrAudiences() {
             <div className="grid grid-cols-2 gap-x-5 gap-y-7 [&>div]:min-w-0">
               <div>
                 <div className="font-display text-4xl md:text-5xl">Private</div>
-                <div className="mt-1 text-sm text-muted-foreground">members-only hubs, reached right after they buy or book</div>
+                <div className="mt-1 text-sm text-muted-foreground">members-only clinic layers, reached right after they buy or book</div>
               </div>
               <div>
                 <div className="font-display text-4xl md:text-5xl">{AUDIENCE_SNAPSHOT.launchBrands}</div>
@@ -146,7 +146,7 @@ export default function BrAudiences() {
             <H2>The brands feeding the audience.</H2>
           </div>
           <p className="max-w-md text-sm text-muted-foreground">
-            Each launch brings its own customers into a private, co-branded hub. We roll them up into segments. Brands never see each other's customers.
+            Each launch brings its own customers into a private, co-branded clinic layer. We roll them up into segments. Brands never see each other's customers.
           </p>
         </div>
         <div className="mt-10 grid grid-cols-2 gap-px border border-foreground/15 bg-foreground/15 sm:grid-cols-4" data-testid="launch-feeders">
@@ -285,9 +285,9 @@ export default function BrAudiences() {
       {/* Region + arrival (measured) */}
       <Section id="signals">
         <Eyebrow>Network signals</Eyebrow>
-        <H2>What the hubs are already telling us.</H2>
+        <H2>What the clinic layers are already telling us.</H2>
         <p className="mt-4 max-w-2xl text-muted-foreground">
-          Measured on our own hubs over the {AUDIENCE_SNAPSHOT.measuredWindow}. Shares only, aggregated and de-identified. These shift as launches go live.
+          Measured on our own clinic layers over the {AUDIENCE_SNAPSHOT.measuredWindow}. Shares only, aggregated and de-identified. These shift as launches go live.
         </p>
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           <div className="border border-foreground/15 bg-white p-6" data-testid="region-mix">
@@ -367,7 +367,7 @@ export default function BrAudiences() {
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-accent">Purchase intent</p>
             <h2 className="font-display text-3xl leading-tight tracking-tight text-background md:text-5xl">Reach them at the moment they act.</h2>
             <p className="mt-5 text-lg leading-relaxed text-background/75">
-              Hub placements sit right after a purchase or booking and inside the member dashboard, where attention is highest. Benchmark click-through bands by moment:
+              Clinic layer placements sit right after a purchase or booking and inside the member dashboard, where attention is highest. Benchmark click-through bands by moment:
             </p>
             <div className="mt-4">
               <BasisTag basis="estimated" tone="dark" />
@@ -417,7 +417,7 @@ export default function BrAudiences() {
           <div className="space-y-4 self-end">
             {[
               { icon: ShieldCheck, t: "Aggregated and de-identified", d: "Cohort-level results only. No names, contact details or health information ever reach a brand." },
-              { icon: Lock, t: "Private member experience", d: "Placements run inside non-public, co-branded hubs, not on the open web." },
+              { icon: Lock, t: "Private member experience", d: "Placements run inside non-public, co-branded clinic layers, not on the open web." },
               { icon: Sparkles, t: "Hand-picked curation", d: "Every brand is chosen to fit the audience it sits in front of." },
             ].map(({ icon: Icon, t, d }) => (
               <div key={t} className="flex gap-4 border border-foreground/15 bg-white p-5">

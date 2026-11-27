@@ -24,7 +24,7 @@ function Box({ title, children, id, testId }: { title: string; children: ReactNo
 }
 
 export default function BrPublishStudios() {
-  usePageMeta("Publish · Studios & retail | Birch Reserve", `Activate your hub with our pre-built monetizations and marketplace. Earn ${$cash} cash or ${$credit} in ad credit.`);
+  usePageMeta("Publish · Studios & retail | Birch Reserve", `Activate your clinic layer with our pre-built monetizations and marketplace. Earn ${$cash} cash or ${$credit} in ad credit.`);
   return (
     <div data-testid="br-publish-studios">
       <Section>
@@ -32,11 +32,11 @@ export default function BrPublishStudios() {
           <div>
             <Eyebrow>Studios &amp; retail</Eyebrow>
             <H1>
-              Activate your hub. Get <span className="bg-accent px-1">{$cash}</span>.
+              Activate your clinic layer. Get <span className="bg-accent px-1">{$cash}</span>.
             </H1>
             <p className="mt-3 text-lg">Or {$credit} in ad credit.</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Cta href={P.clinicHubsUrl} testId="cta-clinichubs">Activate your hub</Cta>
+              <Cta href={P.clinicHubsUrl} testId="cta-clinichubs">Activate your clinic layer</Cta>
             </div>
             <HubDemandCard className="mt-6 max-w-xl" />
           </div>
@@ -55,7 +55,7 @@ export default function BrPublishStudios() {
             <ol className="text-sm">
               {[
                 { t: "Set up", d: "Your logo, services and booking link." },
-                { t: "Activate", d: "Share your hub with your members." },
+                { t: "Activate", d: "Share your clinic layer with your members." },
                 { t: "Get paid", d: `${P.paidDaysAfterFirstTransaction} days after real traffic or transactions.` },
               ].map((s, i) => (
                 <li key={s.t} className="grid grid-cols-[2rem_minmax(0,1fr)] items-baseline border-b border-foreground/15 py-3.5">
@@ -72,9 +72,9 @@ export default function BrPublishStudios() {
           <Box title="How it works">
             <ol className="grid gap-4 md:grid-cols-3">
               {[
-                { t: "Set up your hub", d: "DIY onboarding at scalehealth.ca/clinichubs: your logo, your services, your booking link." },
-                { t: "Activate your audience", d: "Promote your hub by email, text, a link on your website, at checkout and on social media. Your members get care, member offers and the marketplace." },
-                { t: "Get paid", d: `Once we see real traffic or transactions from your audience, a ${P.paidDaysAfterFirstTransaction}-day clock starts. Then you get ${$cash} cash, or ${$credit} in ad credit to promote yourself on other hubs.` },
+                { t: "Set up your clinic layer", d: "DIY onboarding at scalehealth.ca/clinichubs: your logo, your services, your booking link." },
+                { t: "Activate your audience", d: "Promote your clinic layer by email, text, a link on your website, at checkout and on social media. Your members get care, member offers and the marketplace." },
+                { t: "Get paid", d: `Once we see real traffic or transactions from your audience, a ${P.paidDaysAfterFirstTransaction}-day clock starts. Then you get ${$cash} cash, or ${$credit} in ad credit to promote yourself on other clinic layers.` },
               ].map((s, i) => (
                 <li key={s.t} className="border border-foreground/15 bg-white p-4">
                   <span className="font-display text-3xl text-foreground/25">{i + 1}</span>
@@ -115,9 +115,9 @@ export default function BrPublishStudios() {
           <Box title="FAQ">
             <Faq
               items={[
-                { q: "Do I pay anything?", a: "No. Hub setup is free. You earn from member purchases through the marketplace and from the activation bonus." },
-                { q: "Cash or credit?", a: `Your choice: ${$cash} cash, or ${$credit} in ad credit you can use to advertise on other hubs, which goes further.` },
-                { q: "When is it paid?", a: `${P.paidDaysAfterFirstTransaction} days after the first unique transaction on your hub, once your customers are active on the hub monetizer.` },
+                { q: "Do I pay anything?", a: "No. Clinic layer setup is free. You earn from member purchases through the marketplace and from the activation bonus." },
+                { q: "Cash or credit?", a: `Your choice: ${$cash} cash, or ${$credit} in ad credit you can use to advertise on other clinic layers, which goes further.` },
+                { q: "When is it paid?", a: `${P.paidDaysAfterFirstTransaction} days after the first unique transaction on your clinic layer, once your customers are active on the clinic layer monetizer.` },
               ]}
             />
           </Box>

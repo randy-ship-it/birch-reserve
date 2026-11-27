@@ -17,7 +17,7 @@ import { isPremiumPlacement } from "../premiumInquireOnly";
 
 /** Randy, Nov 12 2026 7:33 PM ET: default sell assumption. Planning only, not a delivery commitment. */
 export const SELL_ASSUMPTION_PCT = 20;
-export const SELL_ASSUMPTION_LINE = `Planning assumption: we model selling ${SELL_ASSUMPTION_PCT}% of available display space on each placement. An assumption, not a delivery commitment; your IO sizes views against live hub supply.`;
+export const SELL_ASSUMPTION_LINE = `Planning assumption: we model selling ${SELL_ASSUMPTION_PCT}% of available display space on each placement. An assumption, not a delivery commitment; your IO sizes views against live clinic layer supply.`;
 
 /** Randy, Nov 24 2026: standard 15% agency commission off the gross rate card. */
 export const AGENCY_SHARE = {
@@ -82,12 +82,12 @@ const UNITS: Record<(typeof SURFACES)[number]["key"], string> = {
   post_purchase: "Post-checkout module",
   hub_home: "Top-of-hub banner, native tiles",
   product_services: "In-page display, booking confirmation",
-  member_dashboard: "Native hub module, logged-in",
+  member_dashboard: "Native clinic layer module, logged-in",
 };
 
 const MOMENT: Record<(typeof SURFACES)[number]["key"], string> = {
   post_purchase: "Right after a paid order or booking",
-  hub_home: "Arrival on the co-branded hub",
+  hub_home: "Arrival on the co-branded clinic layer",
   product_services: "Browsing products, services and booking",
   member_dashboard: "Return visits behind login",
 };
@@ -131,27 +131,27 @@ export const PLAIN_TERMS: Array<{ key: string; q: string; a: string }> = [
   {
     key: "what",
     q: "What is Birch Reserve?",
-    a: "Display and CPC ad space inside private health and wellness hubs: co-branded hubs from Recovery Brands, and health and wellness business hubs such as physio, gym, studio and clinic hubs. It is not an open auction or a public ad network. Placements run inside a private member experience, and every brand is hand-picked to fit the audience.",
+    a: "Display and CPC ad space inside private health and wellness clinic layers: co-branded clinic layers from Recovery Brands, and health and wellness business clinic layers such as physio, gym, studio and clinic layers. It is not an open auction or a public ad network. Placements run inside a private member experience, and every brand is hand-picked to fit the audience.",
   },
   {
     key: "moment",
     q: "Which moment does a placement reach?",
-    a: "Each hub has four placements: post-purchase, right after a paid order or booking (premium, by insertion order); the hub home page; product and services pages; and the member dashboard behind login. Each can be bought as display (priced per thousand views) or CPC (priced per click).",
+    a: "Each clinic layer has four placements: post-purchase, right after a paid order or booking (premium, by insertion order); the clinic layer home page; product and services pages; and the member dashboard behind login. Each can be bought as display (priced per thousand views) or CPC (priced per click).",
   },
   {
     key: "data",
     q: "Where do the audience figures come from?",
-    a: "Every figure is labelled. Measured figures come from our own hub analytics and are shown as shares. Modelled figures are built from the customers of the brands launching on the network. Market context is cited public research about the population, not our reach. None of it is audited delivery; your campaign itself is measured with UTM links and promo codes.",
+    a: "Every figure is labelled. Measured figures come from our own clinic layer analytics and are shown as shares. Modelled figures are built from the customers of the brands launching on the network. Market context is cited public research about the population, not our reach. None of it is audited delivery; your campaign itself is measured with UTM links and promo codes.",
   },
   {
     key: "report",
     q: "What does the client get back?",
-    a: "Aggregate reporting per hub and surface: views, clicks, UTM visits and promo-code redemptions. Never names, contact details or health information.",
+    a: "Aggregate reporting per clinic layer and surface: views, clicks, UTM visits and promo-code redemptions. Never names, contact details or health information.",
   },
   {
     key: "start",
     q: "How does a client start, and what is the risk?",
-    a: "Self-serve with the $190 USD 7-day look, which converts in full to the category placement within 7 days or is refunded, or the $490 USD category placement: 100% media credit, fully refundable until 14 days before the launch date on the insertion order. Premium slots are by inquiry. Nothing runs until the IO names the hub and surface.",
+    a: "Self-serve with the $190 USD 7-day look, which converts in full to the category placement within 7 days or is refunded, or the $490 USD category placement: 100% media credit, fully refundable until 14 days before the launch date on the insertion order. Premium slots are by inquiry. Nothing runs until the IO names the clinic layer and surface.",
   },
 ];
 
@@ -159,12 +159,12 @@ export const PLAIN_TERMS: Array<{ key: string; q: string; a: string }> = [
 export const AGENCY_FAQ: Array<{ q: string; a: string }> = [
   { q: "Can we prepay for several clients?", a: "Yes. One prepay can be split across clients; each client gets its own insertion order and reporting." },
   { q: "Is there an agency commission?", a: "Yes. Agencies, brokers and media resellers earn the standard 15% agency commission off the gross rate card. You set your own resale price and handle your own client disclosure. Direct buyers pay the rate card. We do not undercut an agency's client. Small tests can start self-serve on the $190 USD look or the $490 USD category placement." },
-  { q: "Which placement fits which goal?", a: "Awareness: the hub home page. Consideration: product, services and booking pages. Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Retention and loyalty: the member dashboard behind login. One IO can mix them." },
-  { q: "How is performance tracked?", a: "Every placement carries your UTM parameters and, if you want, a promo code. We report views and clicks per hub and surface. Aggregate only." },
-  { q: "What is partner inventory?", a: "A set of dedicated packages and newly activating hubs offered to a few agencies. Agencies that commit to an inventory block get a further 10–20% off the net agency rate, on top of the standard 15% agency commission. Block size and term set the tier. Partners also get first look as new hubs activate. Send a note on the agency form if that is useful." },
+  { q: "Which placement fits which goal?", a: "Awareness: the clinic layer home page. Consideration: product, services and booking pages. Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Retention and loyalty: the member dashboard behind login. One IO can mix them." },
+  { q: "How is performance tracked?", a: "Every placement carries your UTM parameters and, if you want, a promo code. We report views and clicks per clinic layer and surface. Aggregate only." },
+  { q: "What is partner inventory?", a: "A set of dedicated packages and newly activating clinic layers offered to a few agencies. Agencies that commit to an inventory block get a further 10–20% off the net agency rate, on top of the standard 15% agency commission. Block size and term set the tier. Partners also get first look as new clinic layers activate. Send a note on the agency form if that is useful." },
   { q: "Do brokers and media resellers qualify?", a: "Yes. When you are the agency of record on the insertion order, you earn the same standard 15% agency commission. You set your own resale price and handle your own client disclosure. List every brand you represent in one inquiry; each gets its own IO and reporting." },
-  { q: "Is it brand safe?", a: "Ads run in post-purchase moments and inside health and wellness member hubs: pages a brand, clinic or retailer runs for its own paying customers. No open web, no user-generated content, no programmatic resale. Nothing runs until you approve an insertion order naming the hub, placement and flight dates." },
-  { q: "What if a placement under-delivers?", a: "We run makegoods on equal or better placements, per IAB standard terms. Every IO states the flight dates for each hub and placement, and reporting shows views and clicks per hub and surface." },
+  { q: "Is it brand safe?", a: "Ads run in post-purchase moments and inside health and wellness member clinic layers: pages a brand, clinic or retailer runs for its own paying customers. No open web, no user-generated content, no programmatic resale. Nothing runs until you approve an insertion order naming the clinic layer, placement and flight dates." },
+  { q: "What if a placement under-delivers?", a: "We run makegoods on equal or better placements, per IAB standard terms. Every IO states the flight dates for each clinic layer and placement, and reporting shows views and clicks per clinic layer and surface." },
   { q: "Can we cancel?", a: "Yes. Cancel for a full refund up to 14 days before a flight starts. The $190 USD 7-day look converts in full to the category placement within 7 days or is refunded." },
   { q: "How does billing work?", a: "Small tests pay by card on a Stripe-hosted page. Blocks run on an insertion order: deposit collected at confirmation, then payment by cheque, wire or EFT to Silver Birch Growth Inc. Ask about terms for upfront blocks when you request the draft IO." },
   { q: "Why start with a test?", a: "A test shows how a placement performs before you scale it. Prepaid credit keeps its rate for its term, and the $490 USD category placement stays fully refundable until 14 days before the launch date on the IO." },
@@ -175,7 +175,7 @@ export function faqPageJsonLd(items: Array<{ q: string; a: string }>): Record<st
   return { "@type": "FAQPage", mainEntity: items.map((it) => ({ "@type": "Question", name: it.q, acceptedAnswer: { "@type": "Answer", text: it.a } })) };
 }
 
-export const INVENTORY_LINE = `First-party post-purchase and member-hub placements across private, co-branded health and wellness hubs.`;
+export const INVENTORY_LINE = `First-party post-purchase and member-hub placements across private, co-branded health and wellness clinic layers.`;
 export const SPEND_DOWN_MONTHS = INVENTORY.liveSpendDownMonths;
 
 /**
@@ -200,7 +200,7 @@ export const BUY_PATHS = {
   rows: [
     { k: "Best for", card: "One client, starting now", io: "Several clients or a bigger test" },
     { k: "Pay", card: "Card on a Stripe-hosted page, no login", io: "Deposit collected at confirmation" },
-    { k: "Before it runs", card: "You approve an IO naming the hub and placement", io: "Send the brief; we reply with hub fit and a draft IO" },
+    { k: "Before it runs", card: "You approve an IO naming the clinic layer and placement", io: "Send the brief; we reply with clinic layer fit and a draft IO" },
     { k: "Refunds", card: "$490 refundable until 14 days before launch; $190 converts or is refunded", io: "Same terms as every deposit" },
     { k: "Agency commission", card: `${AGENCY_CASH_PCT}% off the published rate card`, io: `${AGENCY_CASH_PCT}% off the published rate card` },
   ],
@@ -284,7 +284,7 @@ export const BLOCK_LADDER = [
 ] as const;
 
 export const BLOCK_TERMS = [
-  { k: "Flight dates", d: "Fixed start and end dates for every hub and placement, written on the insertion order." },
+  { k: "Flight dates", d: "Fixed start and end dates for every clinic layer and placement, written on the insertion order." },
   { k: "Cancellation", d: "Cancel for a full refund up to 14 days before a flight starts." },
   { k: "Makegoods", d: "If a placement under-delivers against the IO, we run makegoods on equal or better placements, per IAB standard terms." },
 ] as const;
@@ -318,7 +318,7 @@ export const AGENCY_TIERS: ReadonlyArray<{
   {
     key: "exclusive",
     name: "Trusted Agency Partners",
-    who: "Agencies with priority on dedicated packages and newly activating hubs.",
+    who: "Agencies with priority on dedicated packages and newly activating clinic layers.",
     pay: PARTNER_VALUE.pay,
     keep: "By committing to inventory",
     badge: "First look",
@@ -327,7 +327,7 @@ export const AGENCY_TIERS: ReadonlyArray<{
 
 /** Access perks for Trusted Agency Partners. The committed-spend tier is stated in PARTNER_VALUE. */
 export const EXCLUSIVE_PARTNER_PERKS = [
-  "First look at new dedicated packages and hubs before they open publicly.",
-  "Priority on dedicated packages and newly activating hubs.",
+  "First look at new dedicated packages and clinic layers before they open publicly.",
+  "Priority on dedicated packages and newly activating clinic layers.",
   "A named mention on the Birch Reserve site and in our sales materials.",
 ] as const;

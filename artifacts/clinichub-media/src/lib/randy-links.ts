@@ -31,11 +31,11 @@ const LINK_RE =
 const KNOWN_LABELS: ReadonlyArray<{ match: (u: URL) => boolean; label: string }> = [
   {
     match: (u) => u.hostname === "physio.drhonow.com" && u.pathname.replace(/\/+$/, "") === "/dr-ho/portal",
-    label: "the live DR-HO hub",
+    label: "the live DR-HO clinic layer",
   },
   {
     match: (u) => /(^|\.)scalehealth\.ca$/.test(u.hostname) && u.pathname.replace(/\/+$/, "") === "/clinichubs",
-    label: "Scale Health clinic hubs",
+    label: "Scale Health clinic layers",
   },
   {
     match: (u) => /(^|\.)scalehealth\.ca$/.test(u.hostname) && u.pathname.replace(/\/+$/, "") === "/providers",

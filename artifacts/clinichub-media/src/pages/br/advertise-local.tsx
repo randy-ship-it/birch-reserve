@@ -10,15 +10,15 @@ import { AREA_LOCK, PLACEMENT_LABELS, quoteAreaLock, type AreaQuote } from "../.
 const CATEGORIES = ["Physiotherapy / rehab", "Chiropractic", "Massage therapy", "Gym / fitness studio", "Yoga / pilates studio", "Nutrition / dietitian", "Health food / grocery", "Wellness clinic / naturopath", "Recovery studio (sauna, cold plunge)", "Footwear / orthotics retail", "Pet care / pet store", "Other health & wellness"];
 
 const FAQ = [
-  { q: "What does “up to 50%” mean?", a: `We hold up to ${AREA_LOCK.standardSharePct}% of the display slots shown to hub members within ${AREA_LOCK.radiusKm} km of your postal code for your category. In dense downtown cores (for example Toronto M5, downtown Montreal, Vancouver V6B/V6C/V6E and major US downtowns) the cap is ${AREA_LOCK.denseCoreSharePct}% because so many businesses share the same blocks.` },
+  { q: "What does “up to 50%” mean?", a: `We hold up to ${AREA_LOCK.standardSharePct}% of the display slots shown to clinic layer members within ${AREA_LOCK.radiusKm} km of your postal code for your category. In dense downtown cores (for example Toronto M5, downtown Montreal, Vancouver V6B/V6C/V6E and major US downtowns) the cap is ${AREA_LOCK.denseCoreSharePct}% because so many businesses share the same blocks.` },
   { q: "When does my term start?", a: "Your 1 to 6 month term starts the day your displays go live, not the day you pay." },
   { q: "What if traffic in my area grows?", a: "Your share grows with it. You keep the right to keep pace: more views in your area are offered to you first, at your locked discount, before anyone else can buy them." },
-  { q: "What does it cost?", a: "Self-serve starts at a $190 USD 7-day look or a $490 USD category placement, priced in USD for every buyer. An area placement is a premium slot, quoted by inquiry against the hubs near you." },
-  { q: "Which placements can I get?", a: `${PLACEMENT_LABELS.join(", ")}. Display or CPC, on the live hubs (DR-HO'S physio, SOLE, Integrity Fitness and Calm Joints today) plus hubs near you as they launch.` },
+  { q: "What does it cost?", a: "Self-serve starts at a $190 USD 7-day look or a $490 USD category placement, priced in USD for every buyer. An area placement is a premium slot, quoted by inquiry against the clinic layers near you." },
+  { q: "Which placements can I get?", a: `${PLACEMENT_LABELS.join(", ")}. Display or CPC, on the live clinic layers (DR-HO'S physio, SOLE, Integrity Fitness and Calm Joints today) plus clinic layers near you as they launch.` },
 ];
 
 export default function BrAdvertiseLocal() {
-  usePageMeta("Local businesses & studios | Birch Reserve", "Reach hub members near you. Start with a $190 USD 7-day look or a $490 USD category placement; area placements are premium, by inquiry.");
+  usePageMeta("Local businesses & studios | Birch Reserve", "Reach clinic layer members near you. Start with a $190 USD 7-day look or a $490 USD category placement; area placements are premium, by inquiry.");
   const params = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const [postal, setPostal] = useState(params.get("postal") ?? "");
   const [term, setTerm] = useState(3);
@@ -69,15 +69,15 @@ export default function BrAdvertiseLocal() {
         <div className="grid gap-12 lg:grid-cols-[1fr_1fr]">
           <div>
             <Eyebrow>Advertise · Local businesses &amp; studios</Eyebrow>
-            <H1>Reach hub members near you.</H1>
+            <H1>Reach clinic layer members near you.</H1>
             {areaInquireOnly ? <p className="mt-3"><InquireBadge /> <span className="text-sm text-muted-foreground">Premium slot: by inquiry, not card.</span></p> : null}
             <Lede>
-              Start self-serve for <strong>$190 USD</strong> (7-day look) or <strong>$490 USD</strong> (category placement): <a className="underline underline-offset-2" href="#slots">see the two offers</a>. Want your area to yourself? Put your postal code in to ask about an area placement: up to <strong>{AREA_LOCK.standardSharePct}%</strong> of hub display within <strong>{AREA_LOCK.radiusKm} km</strong> of you ({AREA_LOCK.denseCoreSharePct}% in busy city centres), for <strong>1 to 6 months</strong> from when your displays start.
+              Start self-serve for <strong>$190 USD</strong> (7-day look) or <strong>$490 USD</strong> (category placement): <a className="underline underline-offset-2" href="#slots">see the two offers</a>. Want your area to yourself? Put your postal code in to ask about an area placement: up to <strong>{AREA_LOCK.standardSharePct}%</strong> of clinic layer display within <strong>{AREA_LOCK.radiusKm} km</strong> of you ({AREA_LOCK.denseCoreSharePct}% in busy city centres), for <strong>1 to 6 months</strong> from when your displays start.
             </Lede>
             <ul className="mt-8 space-y-3 text-sm">
               {[
                 "Priority placement in your category within your radius for the term",
-                "Premium slot: priced by inquiry against the hubs near you, not by card",
+                "Premium slot: priced by inquiry against the clinic layers near you, not by card",
                 "Estimated local views shown below are modelled, not guaranteed",
                 "If traffic grows, you keep the right to keep pace",
               ].map((t) => (
@@ -174,7 +174,7 @@ export default function BrAdvertiseLocal() {
       </Section>
 
       <Section>
-        <Eyebrow>Why hubs beat the feed</Eyebrow>
+        <Eyebrow>Why clinic layers beat the feed</Eyebrow>
         <H2>Local members, inside a brand they trust.</H2>
         <div className="mt-10">
           <MetaComparison />

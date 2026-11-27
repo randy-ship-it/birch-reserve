@@ -142,7 +142,7 @@ export function CobrandedHubsBanner({
           id={titleId}
           className="mx-auto max-w-4xl font-display text-2xl tracking-tight text-foreground md:text-3xl lg:text-4xl"
         >
-          Co-Branded Hubs with Available Ad Slots
+          Co-Branded Clinic layers with Available Ad Slots
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-xs leading-relaxed text-muted-foreground md:text-sm">
           Clear names are live or launching. Blurred names are In Queue — logos, not reach.
@@ -151,7 +151,7 @@ export function CobrandedHubsBanner({
         <ul
           className="mt-8 flex w-full flex-wrap items-center justify-center gap-2.5 md:gap-3"
           data-testid="cobranded-hubs-clear"
-          aria-label="Live and launching co-branded hubs"
+          aria-label="Live and launching co-branded clinic layers"
         >
           {CLEAR_HUBS.map((hub) => (
             <HubChip key={hub.id} hub={hub} />
@@ -167,7 +167,7 @@ export function CobrandedHubsBanner({
         <ul
           className="mt-4 flex w-full flex-wrap items-center justify-center gap-2 md:gap-2.5"
           data-testid="cobranded-hubs-queue"
-          aria-label="In Queue hubs"
+          aria-label="In Queue clinic layers"
         >
           {IN_QUEUE_HUBS.map((hub) => (
             <HubChip key={hub.id} hub={hub} blurred />

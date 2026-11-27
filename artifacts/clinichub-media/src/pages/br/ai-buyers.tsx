@@ -15,14 +15,14 @@ import { buyersOffersJsonLd } from "../../../../api-server/src/lib/overhaul/seo"
 const PLACEMENTS = [
   { t: "Post-purchase", d: "The thank-you page right after an order or booking. Highest intent." },
   { t: "Member dashboard", d: "The logged-in home where members track orders and plans." },
-  { t: "Hub home", d: "Banner and tiles on the co-branded hub home page." },
+  { t: "Clinic layer home", d: "Banner and tiles on the co-branded clinic layer home page." },
   { t: "Product & services pages", d: "Inside product, service and booking pages." },
-  { t: "In-hub screens", d: "Screens inside partner locations. Rolling out. Reserve by inquiry." },
+  { t: "Clinic layer screens", d: "Screens inside partner locations. Rolling out. Reserve by inquiry." },
 ];
 
 const AGENT_LINKS: Array<[string, string, string]> = [
   ["llms.txt", "/llms.txt", "Plain-text map of the site and the two offers"],
-  ["Agent catalog", "/v1/agent/catalog.json", "Placements, live hubs and the two offers, in USD"],
+  ["Agent catalog", "/v1/agent/catalog.json", "Placements, live clinic layers and the two offers, in USD"],
   ["OpenAPI spec", "/v1/agent/openapi.json", "OpenAPI 3.1 for the catalog and quote endpoints"],
   ["Agent card", "/.well-known/agent.json", "Skills, endpoints and auth (none needed to read)"],
 ];
@@ -30,7 +30,7 @@ const AGENT_LINKS: Array<[string, string, string]> = [
 export default function BrAiBuyers() {
   usePageMeta(
     "For media buyers & agencies | Birch Reserve",
-    "Display space inside private health and wellness hubs. A $190 USD 7-day category look or a $490 USD category placement, paid by card on a Stripe-hosted page. Live today: DR-HO'S physio, SOLE, Integrity Fitness and Calm Joints.",
+    "Display space inside private health and wellness clinic layers. A $190 USD 7-day category look or a $490 USD category placement, paid by card on a Stripe-hosted page. Live today: DR-HO'S physio, SOLE, Integrity Fitness and Calm Joints.",
   );
   const price = priceLabels(useAvailability());
   const hubs = NETWORK_HUBS.join(" and ");
@@ -43,7 +43,7 @@ export default function BrAiBuyers() {
         <Eyebrow>For media buyers &amp; agencies</Eyebrow>
         <H1>Put your brand where people are already buying care.</H1>
         <Lede>
-          Birch Reserve sells display space inside private health and wellness hubs: the pages members use right after they buy or book, and when they log back in. Live today: {hubs}, with more hubs launching. Start self-serve for {price.look} or {price.seat}, priced in USD.
+          Birch Reserve sells display space inside private health and wellness clinic layers: the pages members use right after they buy or book, and when they log back in. Live today: {hubs}, with more clinic layers launching. Start self-serve for {price.look} or {price.seat}, priced in USD.
         </Lede>
         <div className="mt-6">
           <AvailabilityStrip />
@@ -71,19 +71,19 @@ export default function BrAiBuyers() {
           <article className="flex flex-col border-2 border-foreground bg-white p-6">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Category placement</p>
             <p className="mt-2 font-display text-5xl leading-none">{price.seat}</p>
-            <p className="mt-4 text-sm text-foreground/80">A category placement across the hub network. Your payment is media credit, fully refundable until 14 days before your launch date and usable for 12 months.</p>
+            <p className="mt-4 text-sm text-foreground/80">A category placement across the clinic layer network. Your payment is media credit, fully refundable until 14 days before your launch date and usable for 12 months.</p>
             <div className="mt-6 sm:mt-auto sm:pt-6">
               <Cta href={RESERVE_HREF} variant="lime" testId="buyers-reserve" className="w-full sm:w-auto">Category placement — {price.seat}</Cta>
             </div>
           </article>
         </div>
-        <p className="mt-4 text-sm text-muted-foreground">Pay by card on a Stripe-hosted page, no login. Nothing runs until you approve an insertion order naming the hub and placement. Premium slots are inquire-only; see the <a className="underline underline-offset-2" href="/media-kit#premium">media kit</a>.</p>
+        <p className="mt-4 text-sm text-muted-foreground">Pay by card on a Stripe-hosted page, no login. Nothing runs until you approve an insertion order naming the clinic layer and placement. Premium slots are inquire-only; see the <a className="underline underline-offset-2" href="/media-kit#premium">media kit</a>.</p>
       </Section>
 
       {/* Where it shows */}
       <Section>
         <Eyebrow>Where your ad shows</Eyebrow>
-        <H2>Four placements in every hub.</H2>
+        <H2>Four placements in every clinic layer.</H2>
         <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" data-testid="buyers-placements">
           {PLACEMENTS.map((p) => (
             <li key={p.t} className="border border-foreground/15 bg-white p-5">
@@ -92,7 +92,7 @@ export default function BrAiBuyers() {
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-sm">See the live hubs on the <a className="underline underline-offset-2" href="/hubs">hubs page</a>.</p>
+        <p className="mt-4 text-sm">See the live clinic layers on the <a className="underline underline-offset-2" href="/hubs">clinic layers page</a>.</p>
       </Section>
 
       {/* Match + agencies */}
@@ -101,7 +101,7 @@ export default function BrAiBuyers() {
           <div>
             <Eyebrow>Check the fit first</Eyebrow>
             <H2>Match your audience.</H2>
-            <p className="mt-4 text-foreground/80">Enter your website and a short note about your customer. You get a match score with three reasons, so you know whether the hubs fit before you spend.</p>
+            <p className="mt-4 text-foreground/80">Enter your website and a short note about your customer. You get a match score with three reasons, so you know whether the clinic layers fit before you spend.</p>
             <div className="mt-6"><Cta href="/match" variant="ink" testId="buyers-match-2" className="w-full sm:w-auto">Match your audience</Cta></div>
           </div>
           <div>
@@ -121,9 +121,9 @@ export default function BrAiBuyers() {
         <Faq
           items={[
             { q: "What currency do you charge in?", a: "USD for every buyer, including Canadian brands: $190 USD for the 7-day look and $490 USD for the category placement." },
-            { q: "Which hubs are live?", a: `${hubs}. More hubs launch over time, and placements are curated as each one goes live.` },
+            { q: "Which clinic layers are live?", a: `${hubs}. More clinic layers launch over time, and placements are curated as each one goes live.` },
             { q: "Are the view numbers real?", a: "Volumes in the media kit are modelled estimates, labelled as such. There are no impression, reach, click or sales guarantees." },
-            { q: "What happens after I pay?", a: "Your payment is media credit. We send an insertion order naming the hub and placement, and nothing runs until you approve it." },
+            { q: "What happens after I pay?", a: "Your payment is media credit. We send an insertion order naming the clinic layer and placement, and nothing runs until you approve it." },
           ]}
         />
       </Section>
@@ -133,7 +133,7 @@ export default function BrAiBuyers() {
         <div className="max-w-3xl" data-testid="buyers-ai-agents">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">For AI agents</p>
           <p className="mt-2 text-sm text-foreground/80">
-            Buying agents can read the same two offers ($190 USD look, $490 USD category placement) and the live hubs in machine-readable form. Agent checkout is on hold: a request sent to the checkout endpoint is recorded and answered by email, with no charge. To pay, send the buyer to the media kit and the Stripe-hosted page.
+            Buying agents can read the same two offers ($190 USD look, $490 USD category placement) and the live clinic layers in machine-readable form. Agent checkout is on hold: a request sent to the checkout endpoint is recorded and answered by email, with no charge. To pay, send the buyer to the media kit and the Stripe-hosted page.
           </p>
           <ul className="mt-3 flex flex-col gap-1 text-sm">
             {AGENT_LINKS.map(([label, href, d]) => (

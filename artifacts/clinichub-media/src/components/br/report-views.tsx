@@ -27,6 +27,7 @@ import { PERFORMANCE_RANGES } from "../../../../api-server/src/lib/overhaul/proo
 import { saveHubEstimate } from "@/lib/hubEstimateNote";
 import { CAD_PER_USD } from "../../../../api-server/src/lib/overhaul/model";
 import { IN_LOCATION, inLocationReach, type PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
+import { ClinicLayerTerm } from "@/components/br/clinic-layer-term";
 
 /** In-location display (Randy, Nov 19 2026 10:54 AM ET): the brand's own locations × monthly visitors. Estimate; no rate
  * is invented (priced by IO, the same per-door economics as Street Team). */
@@ -53,7 +54,7 @@ const scale = (r: LLH, f: number): LLH => ({ low: r.low * f, likely: r.likely * 
 
 /* ------------------------------------------------------------------ model */
 const NAMES: Record<string, { name: string; unit: string; monthly: boolean }> = {
-  hubs: { name: "Branded ScaleHealth.ca hubs", unit: "page views", monthly: true },
+  hubs: { name: "Branded ScaleHealth.ca clinic layers", unit: "page views", monthly: true },
   retail: { name: "Private retail network", unit: "your slice of the 1MM+ captive recovery consumers", monthly: false },
   street_team: { name: "Calm Joints + Street Team", unit: "homes", monthly: false },
   calm_joints: { name: "Calm Joints", unit: "", monthly: false },
@@ -211,7 +212,7 @@ export function SupplierExposureView({ m, exposure, source, cta, onAccelerate, p
                 </div>
               ) : null}
               <div className="grid grid-cols-[1fr_auto] items-baseline gap-2 px-3 py-2.5 text-[13px] md:grid-cols-[1.3fr_1fr_1fr]" style={{ borderTop: `1px solid ${RT.line}`, background: m.isPublisher ? "#F3FBF6" : undefined }} data-testid="supplier-channels-own-hub">
-                <span><span className="font-semibold" style={{ color: RT.ink }}>{m.isPublisher ? "Your own hub" : "Add your hub"}</span><span className="block text-[11px]" style={{ color: RT.mute }}>views / month on your own surfaces · typical hub, modelled</span></span>
+                <span><span className="font-semibold" style={{ color: RT.ink }}>{m.isPublisher ? "Your own clinic layer" : "Add your clinic layer"}</span><span className="block text-[11px]" style={{ color: RT.mute }}>views / month on your own surfaces · typical clinic layer, modelled</span></span>
                 <span className="text-right tabular-nums"><span className="text-[17px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{big(own.on)}</span><span className="block text-[11px]" style={{ color: RT.mute }}>up to {big(own.all)}</span></span>
                 <span className="col-span-2 text-[11px] md:col-span-1 md:text-right" style={{ color: RT.mute }}>{m.isPublisher ? "max exposure: on" : "unlocks max exposure"}</span>
               </div>
@@ -293,9 +294,9 @@ export function HubView({ cta, split = false }: { m?: ReportModel; exposure?: Fr
       <div className={`p-5 md:p-6 ${split ? "lg:rounded-3xl lg:border lg:bg-white lg:shadow-md" : ""}`} style={split ? { borderColor: RT.line, fontFamily: RT_SANS, color: RT.body } : undefined}>
         <div className="flex flex-wrap items-center gap-2">
           <Store className="size-4" style={{ color: RT.mintInk }} aria-hidden />
-          <span className={eyebrow} style={{ color: RT.mintInk }}>Your hub</span>
+          <span className={eyebrow} style={{ color: RT.mintInk }}>Your clinic layer</span>
         </div>
-        <h3 className="mt-2 text-[26px] leading-tight md:text-[32px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>See what your hub could earn</h3>
+        <h3 className="mt-2 text-[26px] leading-tight md:text-[32px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>See what your <ClinicLayerTerm testId="clinic-layer-term-estimate" /> could earn</h3>
         <p className="mt-1 text-[14px]">Four quick answers. The number updates as you type.</p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2" data-testid="hub-form">
           <label className="block text-[13px] font-bold" style={{ color: RT.ink }}>Orders or bookings a month
@@ -341,7 +342,7 @@ export function HubView({ cta, split = false }: { m?: ReportModel; exposure?: Fr
             <p className="mt-3 text-[28px] leading-none tabular-nums md:text-[36px]" style={{ fontFamily: RT_SERIF, color: GREEN }} data-testid="hub-headline-year">{mny(year, cad)} <span className="text-[16px] font-semibold text-white">a year</span></p>
             <ul className="mt-4 space-y-1.5 text-[15px] font-semibold" data-testid="hub-lines">
               <li>That's {mny(o.year, cad)} a year from space you already have.</li>
-              <li>Your hub could help drive about {mny(o.sales, cad)} a month in sales for brands.</li>
+              <li>Your clinic layer could help drive about {mny(o.sales, cad)} a month in sales for brands.</li>
               <li>Brands pay for the space. You keep {o.sharePct}% of that media revenue.</li>
             </ul>
             <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-5 border-t border-white/15 pt-5 md:grid-cols-4" data-testid="hub-chain">
@@ -367,9 +368,9 @@ export function HubView({ cta, split = false }: { m?: ReportModel; exposure?: Fr
         {has ? <HubOnboardingNote views={o.views} compact dark /> : null}
         {has ? <div className="mt-4"><HubDifferentiators dark /></div> : null}
         <Details dark label="How we estimate this" testId="hub-details">
-          <p><strong className="text-white">Views</strong> come from your answers: orders = thank-you and confirmation page views; visitors drive hub home, product and services pages; returning members follow orders; email views are opens = list × {SENDS_PER_MONTH} sends × a {Math.round((EMAIL.openRate.lo + EMAIL.openRate.hi) / 2)}% open rate (midpoint of public health and fitness benchmarks).</p>
+          <p><strong className="text-white">Views</strong> come from your answers: orders = thank-you and confirmation page views; visitors drive clinic layer home, product and services pages; returning members follow orders; email views are opens = list × {SENDS_PER_MONTH} sends × a {Math.round((EMAIL.openRate.lo + EMAIL.openRate.hi) / 2)}% open rate (midpoint of public health and fitness benchmarks).</p>
           <p><strong className="text-white">Earnings</strong> = views × the share of space sold ({SELL_BAND[0]}–{SELL_BAND[2]}%, midpoint {SELL_BAND[1]}%: from our {SELL_BAND[0]}% ramp assumption up to the bottom of the 60–80% direct sell-through target Google News Initiative cites) × the published starter price per 1,000 views × your {o.sharePct}% share (70% under 1MM views a month, 75% at 1MM+, 80% at 3MM+, 85% at 5MM+, a flat rate at the tier you reach). The range uses the low and high ends of both. Brand sales are value for brands and are not added to your earnings.</p>
-          <p><strong className="text-white">Clicks and orders</strong> apply only to the offers actually shown, so the click rate is on that share of views, not on all of them. Thank-you and confirmation pages average our post-purchase and thank-you ranges ({ctrB.lo}–{ctrB.hi}% and {PERFORMANCE_RANGES.rows[1]!.ctr.lo}–{PERFORMANCE_RANGES.rows[1]!.ctr.hi}% clicks, {cvB.lo}–{cvB.hi}% and {PERFORMANCE_RANGES.rows[1]!.conversion.lo}–{PERFORMANCE_RANGES.rows[1]!.conversion.hi}% conversion). Hub home, dashboard, product and services pages use the activation range ({PERFORMANCE_RANGES.rows[2]!.ctr.lo}–{PERFORMANCE_RANGES.rows[2]!.ctr.hi}% clicks, {PERFORMANCE_RANGES.rows[2]!.conversion.lo}–{PERFORMANCE_RANGES.rows[2]!.conversion.hi}% conversion). Email uses health and fitness benchmarks of {EMAIL.clickPerSend.lo}–{EMAIL.clickPerSend.hi}% clicks per send and {EMAIL.openRate.lo}–{EMAIL.openRate.hi}% opens, and assumes one sponsored slot gets {EMAIL.slotShare.lo}–{EMAIL.slotShare.hi}% of an email's clicks (our assumption). Sales = orders × your average order value.</p>
+          <p><strong className="text-white">Clicks and orders</strong> apply only to the offers actually shown, so the click rate is on that share of views, not on all of them. Thank-you and confirmation pages average our post-purchase and thank-you ranges ({ctrB.lo}–{ctrB.hi}% and {PERFORMANCE_RANGES.rows[1]!.ctr.lo}–{PERFORMANCE_RANGES.rows[1]!.ctr.hi}% clicks, {cvB.lo}–{cvB.hi}% and {PERFORMANCE_RANGES.rows[1]!.conversion.lo}–{PERFORMANCE_RANGES.rows[1]!.conversion.hi}% conversion). Clinic layer home, dashboard, product and services pages use the activation range ({PERFORMANCE_RANGES.rows[2]!.ctr.lo}–{PERFORMANCE_RANGES.rows[2]!.ctr.hi}% clicks, {PERFORMANCE_RANGES.rows[2]!.conversion.lo}–{PERFORMANCE_RANGES.rows[2]!.conversion.hi}% conversion). Email uses health and fitness benchmarks of {EMAIL.clickPerSend.lo}–{EMAIL.clickPerSend.hi}% clicks per send and {EMAIL.openRate.lo}–{EMAIL.openRate.hi}% opens, and assumes one sponsored slot gets {EMAIL.slotShare.lo}–{EMAIL.slotShare.hi}% of an email's clicks (our assumption). Sales = orders × your average order value.</p>
           <p data-testid="hub-compare"><strong className="text-white">Compared with typical publisher earnings:</strong> this works out to about ${(o.earn.likely / Math.max(1, o.views) * 1000).toFixed(2)} per 1,000 views ({o.surfaces[0] && o.surfaces[0].views > 0 ? `about $${(o.surfaces[0].earn / o.surfaces[0].views).toFixed(3)} per order on thank-you pages` : "thank-you pages need orders"}). Full-page programmatic ads on health and wellness sites typically pay $14–45 per 1,000 pageviews across every ad unit (Ezoic, Mediavine, Raptive; more cautious estimates start near $5–9), direct-sold display about $10–20 CPM at 60–80% sold, Rokt Thanks reports $0.20–0.60 per order to merchants, and wellness newsletters about $15 per 1,000 opens. Your Birch placements are extra, brand-priced units set so brands can earn back about 2.5× at typical performance, and your {o.sharePct}% share sits inside what networks pay publishers (Rokt Thanks 50%, AdSense about 68%, Mediavine and Raptive 75% and up), but Birch placements are priced for brand return rather than open-auction demand, so this still sits below ad-network averages. Estimates, not quotes.</p>
           <p className="text-[11px]">Sources: {[...EMAIL.sources, ...COMPARE_SOURCES].map((x, i) => <span key={x.url}>{i ? "; " : ""}<a href={x.url} target="_blank" rel="noopener noreferrer" className="underline">{x.label}</a></span>)}.</p>
           <p>Every figure is monthly; a year is 12 months at that run-rate. {cad ? "Shown in CAD, converted from our USD model at 1.4 CAD per USD." : "Shown in USD."} A planning estimate, not a quote, forecast or guarantee.</p>

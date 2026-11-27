@@ -55,7 +55,7 @@ import {
 const SURFACE_TILES: Array<{ k: PlacementKey; n: string; title: string; line: string; tag?: string }> = [
   { k: "post_purchase", n: "1", title: "Post-purchase", line: "Thank-you page right after an order or booking.", tag: "Highest intent" },
   { k: "dashboard", n: "2", title: "Member dashboard", line: "Logged-in home where members track orders and plans." },
-  { k: "landing", n: "3", title: "Hub home", line: "Banner and tiles on the co-branded hub home page." },
+  { k: "landing", n: "3", title: "Clinic layer home", line: "Banner and tiles on the co-branded clinic layer home page." },
   { k: "products", n: "4", title: "Product & services pages", line: "Inside product, service and booking pages." },
 ];
 
@@ -79,8 +79,8 @@ function ZoomFit({ children }: { children: ReactNode }) {
 }
 
 const RULES = [
-  "Media credit until IO. Your payment is media credit; nothing runs until an insertion order names the hub and surface.",
-  "A share of display space across the hub network, curated as hubs launch. Premium slots add a larger display share and priority placement.",
+  "Media credit until IO. Your payment is media credit; nothing runs until an insertion order names the clinic layer and surface.",
+  "A share of display space across the clinic layer network, curated as clinic layers launch. Premium slots add a larger display share and priority placement.",
   "The $490 USD category placement is fully refundable until 14 days before your launch date; credit is usable 12 months. The $190 USD look converts in full to the category placement within 7 days, or is refunded.",
   "Modelled volumes. Views and impressions are estimates, not measured delivery.",
   "Aggregate UTM reporting only. No personal data is shared.",
@@ -88,9 +88,9 @@ const RULES = [
 ];
 
 const HOW_TO_START = [
-  { n: "1", t: "Category placement", d: "Get a share of display space across our growing hub network. Placements are curated hub by hub." },
+  { n: "1", t: "Category placement", d: "Get a share of display space across our growing clinic layer network. Placements are curated clinic layer by clinic layer." },
   { n: "2", t: "Pay by card", d: "$490 USD category placements your space, or take a $190 USD 7-day look first. Stripe checkout, no login." },
-  { n: "3", t: "Approve the IO", d: "We send an insertion order naming the hub and surface. Nothing runs before you approve it." },
+  { n: "3", t: "Approve the IO", d: "We send an insertion order naming the clinic layer and surface. Nothing runs before you approve it." },
 ];
 
 /** 40,000 -> "40,000"; 2,083,333 -> "2.1M". Plain numbers read better than "0.04M". */
@@ -138,7 +138,7 @@ const HERO_BTN = "w-full sm:w-auto rounded-full whitespace-nowrap h-11! px-5!";
 export default function BrMediaKit() {
   usePageMeta(
     "Media kit | Birch Reserve",
-    "Display space across a growing network of private health and wellness hubs. $490 USD to reserve or a $190 USD 7-day look, self-serve; blocks from $25,000 to $1.5M USD, inquire only. Media credit until IO. Modelled volumes, no guarantees.",
+    "Display space across a growing network of private health and wellness clinic layers. $490 USD to reserve or a $190 USD 7-day look, self-serve; blocks from $25,000 to $1.5M USD, inquire only. Media credit until IO. Modelled volumes, no guarantees.",
   );
   const avail = useAvailability();
   const price = priceLabels(avail);
@@ -170,12 +170,12 @@ export default function BrMediaKit() {
           <div className="grid items-center gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
           <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Media kit · Nov 2026</p>
-          <h1 className="mt-3 font-display text-[2.15rem] leading-[1.05] tracking-tight md:text-6xl">Put your brand inside private health and wellness hubs.</h1>
+          <h1 className="mt-3 font-display text-[2.15rem] leading-[1.05] tracking-tight md:text-6xl">Put your brand inside private health and wellness clinic layers.</h1>
           <p className="mt-2 font-display text-xl text-foreground/70 md:text-2xl">A growing network. Curated placements.</p>
           <div data-testid="mk-what">
             <p className="mt-4 max-w-xl text-base leading-relaxed text-foreground/80 md:text-lg">Display space on the pages members use right after they buy or book, and when they log back in.</p>
             <Details label="How buying works" testId="mk-what-more" className="max-w-xl !text-sm">
-              <p>{siteName()} sells a share of display space across our growing network of private, members-only hubs (live today: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, with more launching). Placements are curated as each hub launches. Your payment is media credit until the insertion order. Start self-serve by reserving for {price.seat} or with a {price.look} 7-day look; premium slots are inquire-only.</p>
+              <p>{siteName()} sells a share of display space across our growing network of private, members-only clinic layers (live today: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, with more launching). Placements are curated as each clinic layer launches. Your payment is media credit until the insertion order. Start self-serve by reserving for {price.seat} or with a {price.look} 7-day look; premium slots are inquire-only.</p>
             </Details>
           </div>
           </div>
@@ -286,7 +286,7 @@ export default function BrMediaKit() {
       </Block>
 
       {/* Surfaces */}
-      <Block id="surfaces" eyebrow="Where your ad shows" title="Four surfaces in every hub" tone="soft">
+      <Block id="surfaces" eyebrow="Where your ad shows" title="Four surfaces in every clinic layer" tone="soft">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4" data-testid="mk-surfaces">
           {SURFACE_TILES.map((s) => (
             <article key={s.k} className={`flex flex-col border bg-white p-3 md:p-4 ${s.tag ? "border-2 border-foreground" : "border-foreground/15"}`}>
@@ -316,7 +316,7 @@ export default function BrMediaKit() {
             <a href="/intake#inquire" className="text-[13px] font-bold underline underline-offset-2">Inquire</a>
           </div>
         </article>
-        <p className="mt-3 text-xs text-muted-foreground">Example placements, drawn on hub pages. Exact position and creative are set in your IO. In-hub screens are rolling out; reserve by inquiry.</p>
+        <p className="mt-3 text-xs text-muted-foreground">Example placements, drawn on clinic layer pages. Exact position and creative are set in your IO. In-hub screens are rolling out; reserve by inquiry.</p>
       </Block>
 
       {/* Two tiers */}
@@ -325,7 +325,7 @@ export default function BrMediaKit() {
           <article className="flex flex-col border border-foreground/20 bg-white p-5 md:p-6" data-testid="mk-card-smb">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Small business package</p>
             <h3 className="mt-1 font-display text-2xl">The easy way to start</h3>
-            <p className="mt-3 text-sm text-foreground/80">Self-serve, paid by card. A share of display space across the hub network, curated as hubs launch. 100% media credit until the IO, usable 12 months.</p>
+            <p className="mt-3 text-sm text-foreground/80">Self-serve, paid by card. A share of display space across the clinic layer network, curated as clinic layers launch. 100% media credit until the IO, usable 12 months.</p>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-foreground/55">{MEDIA_KIT_OFFERS.look.name}</p>
@@ -391,9 +391,9 @@ export default function BrMediaKit() {
       </Block>
 
       {/* Categories */}
-      <Block id="categories" eyebrow="The network" title="A growing network of private hubs." tone="soft">
+      <Block id="categories" eyebrow="The network" title="A growing network of private clinic layers." tone="soft">
         <AvailabilityStrip />
-        <p className="mt-4 text-sm text-foreground/80">Your reserve buys a share of display space across the network. We curate placements as each hub launches, and your insertion order names where you show before anything runs. Want a premium slot or something custom? Ask below.</p>
+        <p className="mt-4 text-sm text-foreground/80">Your reserve buys a share of display space across the network. We curate placements as each clinic layer launches, and your insertion order names where you show before anything runs. Want a premium slot or something custom? Ask below.</p>
         <div id="request" className="mt-8 scroll-mt-20 max-w-2xl">
           <CategoryRequestForm path="/media-kit" />
         </div>

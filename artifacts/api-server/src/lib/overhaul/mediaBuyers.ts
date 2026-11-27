@@ -13,7 +13,7 @@ export const MIX_ROWS: Array<{ key: string; channel: string; youBuyItFor: string
     key: "programmatic",
     channel: "Programmatic display and retargeting",
     youBuyItFor: "Reach and frequency across the open web, bought through a DSP.",
-    birchAdds: "Hand-placed display inside private health and wellness hubs. Not an open auction and not sold through a DSP; the IO names the hub and placement.",
+    birchAdds: "Hand-placed display inside private health and wellness clinic layers. Not an open auction and not sold through a DSP; the IO names the clinic layer and placement.",
   },
   {
     key: "social",
@@ -31,7 +31,7 @@ export const MIX_ROWS: Array<{ key: string; channel: string; youBuyItFor: string
     key: "newsletters",
     channel: "Newsletter and creator sponsorships",
     youBuyItFor: "A trusted voice in front of a niche audience.",
-    birchAdds: "A fixed placement on a hub page for the term on the IO, tracked with your UTM links and promo codes.",
+    birchAdds: "A fixed placement on a clinic layer page for the term on the IO, tracked with your UTM links and promo codes.",
   },
 ];
 
@@ -54,9 +54,9 @@ export const MB_BUY_PATHS = {
     sub: "Larger share and priority placement",
   },
   rows: [
-    { k: "Best for", card: "A first test, starting now", io: "Several hubs or a bigger test" },
+    { k: "Best for", card: "A first test, starting now", io: "Several clinic layers or a bigger test" },
     { k: "Pay", card: "Card on a Stripe-hosted page, no login", io: "Rate, currency and term set on your IO" },
-    { k: "Before it runs", card: "You approve an IO naming the hub and placement", io: "Send the brief; we reply with hub fit and a draft IO" },
+    { k: "Before it runs", card: "You approve an IO naming the clinic layer and placement", io: "Send the brief; we reply with clinic layer fit and a draft IO" },
     { k: "Refunds", card: "$490 refundable until 14 days before launch; $190 converts or is refunded", io: "Set on your IO before anything runs" },
   ],
 } as const;
@@ -69,15 +69,15 @@ export const MB_BUY_PATHS = {
 export const MB_BUY_CHECKLIST: ReadonlyArray<{ label: string; answer: string }> = [
   {
     label: "Where it shows",
-    answer: "Four placements: post-purchase (premium, by IO), hub home page, product / services pages, member dashboard behind login. The IO names the hub, surface, format and dates.",
+    answer: "Four placements: post-purchase (premium, by IO), clinic layer home page, product / services pages, member dashboard behind login. The IO names the clinic layer, surface, format and dates.",
   },
   {
     label: "Controls",
-    answer: "Nothing runs until you approve an insertion order naming the hub, placement and flight dates. No open web, no user-generated content, no programmatic resale.",
+    answer: "Nothing runs until you approve an insertion order naming the clinic layer, placement and flight dates. No open web, no user-generated content, no programmatic resale.",
   },
   {
     label: "Cost",
-    answer: "From {look} for a 7-day look, or the {reserve} category placement by card. Premium and several hubs by IO.",
+    answer: "From {look} for a 7-day look, or the {reserve} category placement by card. Premium and several clinic layers by IO.",
   },
   {
     label: "Refunds",
@@ -85,19 +85,19 @@ export const MB_BUY_CHECKLIST: ReadonlyArray<{ label: string; answer: string }> 
   },
   {
     label: "Tracking",
-    answer: "Your UTM links and promo codes. No clinical pixels and no patient data on hub pages.",
+    answer: "Your UTM links and promo codes. No clinical pixels and no patient data on clinic layer pages.",
   },
   {
     label: "Reporting",
-    answer: "Aggregate views and clicks per hub and surface, plus UTM visits and redemptions. Pre-launch figures are labelled Modelled. No impression guarantees.",
+    answer: "Aggregate views and clicks per clinic layer and surface, plus UTM visits and redemptions. Pre-launch figures are labelled Modelled. No impression guarantees.",
   },
 ];
 
 /** How a test is read. Aggregate only; matches /agencies plain terms and /terms. */
 export const MEASUREMENT_STEPS: Array<{ k: string; t: string; d: string }> = [
   { k: "1", t: "Your UTM links", d: "Every placement carries the UTM parameters you send, so Birch traffic shows up as its own line in the analytics you already use." },
-  { k: "2", t: "Your promo code", d: "Add a code per hub or per placement if you want redemptions you can count on your side." },
-  { k: "3", t: "Our report", d: "Views and clicks per hub and surface, plus UTM visits and promo-code redemptions. Aggregate only: never names, contact details or health information." },
+  { k: "2", t: "Your promo code", d: "Add a code per clinic layer or per placement if you want redemptions you can count on your side." },
+  { k: "3", t: "Our report", d: "Views and clicks per clinic layer and surface, plus UTM visits and promo-code redemptions. Aggregate only: never names, contact details or health information." },
   { k: "4", t: "Labelled figures", d: "Anything we estimate before launch is labelled Modelled. It is an estimate, not measured delivery and not a guarantee." },
 ];
 
@@ -114,18 +114,18 @@ export const HOW_WE_COUNT: ReadonlyArray<{ label: string; answer: string }> = [
   { label: "A click", answer: "Counted once per served ad, then sent to your page with your UTM tags." },
   { label: "Filtering", answer: "Known bots, crawlers, previews and headless browsers are never counted. Instant clicks are dropped. Repeats count once." },
   { label: "Frequency", answer: "Up to 6 viewable views per visitor per campaign per day by default." },
-  { label: "Attribution", answer: "Optional pixel or server postback: last click within 7 days, adjustable per campaign. On carts inside a hub, a view within 1 day can also count." },
+  { label: "Attribution", answer: "Optional pixel or server postback: last click within 7 days, adjustable per campaign. On carts inside a clinic layer, a view within 1 day can also count." },
   { label: "Identity", answer: "Aggregate counts only. No names, emails, IP addresses or cross-site cookies. Do Not Track and GPC are honoured." },
 ];
 
 /** Answer-ready FAQ for performance teams. Emitted once as FAQPage JSON-LD, server-side (seo.ts). */
 export const MEDIA_BUYER_FAQ: Array<{ q: string; a: string }> = [
-  { q: "What is Birch Reserve, for a media buyer?", a: "A first-party display channel inside private, co-branded health and wellness hubs. Four placements: post-purchase (right after a paid order or booking, premium by IO), the hub home page, product and services pages, and the member dashboard behind login. Bought as display (per thousand views) or CPC (per click)." },
-  { q: "Is this programmatic? Can we buy it through our DSP?", a: "No. It is not an open auction and is not sold through a DSP. Placements are curated by hand as each hub launches, and nothing runs until an insertion order names the hub, surface, format and dates." },
+  { q: "What is Birch Reserve, for a media buyer?", a: "A first-party display channel inside private, co-branded health and wellness clinic layers. Four placements: post-purchase (right after a paid order or booking, premium by IO), the clinic layer home page, product and services pages, and the member dashboard behind login. Bought as display (per thousand views) or CPC (per click)." },
+  { q: "Is this programmatic? Can we buy it through our DSP?", a: "No. It is not an open auction and is not sold through a DSP. Placements are curated by hand as each clinic layer launches, and nothing runs until an insertion order names the clinic layer, surface, format and dates." },
   { q: "How does it fit an existing display mix?", a: "Run it as its own line item next to your programmatic, paid social and retail media buys. Tag it with your UTM links and promo codes so it reads as a separate source in your own analytics." },
-  { q: "How is a test measured?", a: "Aggregate reporting per hub and surface: views, clicks, UTM visits and promo-code redemptions. Never names, contact details or health information. Any pre-launch view figure is labelled Modelled and is not a guarantee." },
+  { q: "How is a test measured?", a: "Aggregate reporting per clinic layer and surface: views, clicks, UTM visits and promo-code redemptions. Never names, contact details or health information. Any pre-launch view figure is labelled Modelled and is not a guarantee." },
   { q: "Do you guarantee impressions, CTR or ROAS?", a: "No. There are no impression guarantees and no promised click-through or return figures. Your campaign is measured with your UTM links and promo codes." },
   { q: "What does the smallest test cost?", a: "The $190 USD 7-day category look, which converts in full to the $490 USD category placement within 7 days or is refunded. The $490 USD category placement is 100% media credit, fully refundable until 14 days before the launch date on the IO and usable for 12 months. Premium slots are inquire-only." },
-  { q: "Which placement suits a performance goal?", a: "Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Consideration: product, services and booking pages. Retention: the member dashboard behind login. Awareness: the hub home page. One IO can mix them." },
-  { q: "Do you drop tracking pixels on hub pages?", a: "No clinical pixels and no patient data. Measurement runs on your UTM links, your promo codes and our aggregate hub analytics." },
+  { q: "Which placement suits a performance goal?", a: "Conversion: post-purchase, right after a paid order or booking (premium, by insertion order). Consideration: product, services and booking pages. Retention: the member dashboard behind login. Awareness: the clinic layer home page. One IO can mix them." },
+  { q: "Do you drop tracking pixels on clinic layer pages?", a: "No clinical pixels and no patient data. Measurement runs on your UTM links, your promo codes and our aggregate clinic layer analytics." },
 ];

@@ -19,7 +19,7 @@ export const numOrU = (s: string) => {
 export const HUB_TYPES = ["Clinic / physio", "Studio / gym", "Retail store", "Online community / app", "Brand with members", "Other"] as const;
 export const HUB_SURFACES = [
   { key: "post_purchase", label: "Post-purchase / booking pages" },
-  { key: "home", label: "Hub home" },
+  { key: "home", label: "Clinic layer home" },
   { key: "product", label: "Product pages" },
   { key: "services", label: "Services pages" },
   { key: "dashboard", label: "Member dashboard" },
@@ -28,7 +28,7 @@ export const HUB_SURFACES = [
 ] as const;
 /** The draft hub question list (also reported to Randy). */
 export const HUB_QUESTIONS_DRAFT = [
-  "Hub type",
+  "Clinic layer type",
   "Locations (count)",
   "Monthly in-person visits (foot traffic)",
   "Monthly website visitors",
@@ -96,9 +96,9 @@ export function IntakeDetails({ intake: intakeRef, payload, roles, shared, onSav
         ) : null}
         {isHub ? (
           <div className="rounded-2xl p-4" style={{ background: RT.paper }} data-testid="details-hub">
-            <p className="flex flex-wrap items-center gap-2 text-sm font-bold" style={{ color: RT.ink }}><Store className="size-4" />Your hub <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={{ background: RT.goldBg, color: RT.gold }} data-testid="hub-draft-tag">Draft questions</span></p>
+            <p className="flex flex-wrap items-center gap-2 text-sm font-bold" style={{ color: RT.ink }}><Store className="size-4" />Your clinic layer <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={{ background: RT.goldBg, color: RT.gold }} data-testid="hub-draft-tag">Draft questions</span></p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <label><span className={lab}>Hub type</span><select className={f} value={hub.type} onChange={(e) => setHub({ ...hub, type: e.target.value })} data-testid="hub-type"><option value="">Pick one</option>{HUB_TYPES.map((t) => <option key={t}>{t}</option>)}</select></label>
+              <label><span className={lab}>Clinic layer type</span><select className={f} value={hub.type} onChange={(e) => setHub({ ...hub, type: e.target.value })} data-testid="hub-type"><option value="">Pick one</option>{HUB_TYPES.map((t) => <option key={t}>{t}</option>)}</select></label>
               <label><span className={lab}>Locations</span><input className={f} inputMode="numeric" value={hub.locations} onChange={(e) => setHub({ ...hub, locations: e.target.value })} placeholder="e.g. 3" data-testid="hub-locations" /></label>
               <label><span className={lab}>In-person visits / month</span><input className={f} inputMode="numeric" value={hub.foot} onChange={(e) => setHub({ ...hub, foot: e.target.value })} placeholder="e.g. 4,000" data-testid="hub-foot" /></label>
               <label><span className={lab}>Website visitors / month</span><input className={f} inputMode="numeric" value={hub.visitors} onChange={(e) => setHub({ ...hub, visitors: e.target.value })} placeholder="e.g. 20,000" data-testid="hub-visitors" /></label>

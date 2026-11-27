@@ -13,7 +13,7 @@ export const HUNDRED_ROWS: readonly HundredRow[] = RATE_SURFACES.map((s) => ({
   views: Math.floor(((HUNDRED_USD / s.cpmStarter[0]) * 1000) / 100) * 100,
 }));
 export const HUNDRED_TITLE = "What $100 gets you today";
-export const HUNDRED_NOTE = "Modelled at today's starting-at rate card, USD. Views are estimates, not a guarantee. Aggregate reporting only. Nothing runs until your insertion order names the hub.";
+export const HUNDRED_NOTE = "Modelled at today's starting-at rate card, USD. Views are estimates, not a guarantee. Aggregate reporting only. Nothing runs until your insertion order names the clinic layer.";
 
 export function hundredHtml(): string {
   const rows = HUNDRED_ROWS.map((r) => `<li><span>${r.label}</span><b>about ${r.views.toLocaleString("en-US")} views</b><small>$${r.cpm} CPM</small></li>`).join("");

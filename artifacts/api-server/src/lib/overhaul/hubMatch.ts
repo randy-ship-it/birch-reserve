@@ -80,12 +80,12 @@ export function matchHubs(hubKeys: readonly string[], ctx: BrandCtx): HubDecisio
   const approved = new Set([...(ctx.approved ?? []), ...(HUB_MATCH_APPROVED[host(ctx.domain)] ?? []), ...(HUB_MATCH_APPROVED[fcat(ctx.category) ?? ""] ?? [])]);
   const out = hubKeys.map((key, i): HubDecision => {
     const h = HUB_PROFILES[key];
-    if (!h) return { key, kind: "product", score: 0.5, hidden: !approved.has(key), reason: "unknown hub profile", approved: approved.has(key), order: i };
+    if (!h) return { key, kind: "product", score: 0.5, hidden: !approved.has(key), reason: "unknown clinic layer profile", approved: approved.has(key), order: i };
     let score = 0;
     let reason: string | null = null;
     if (!b.confident || !b.kind) {
       // Not confident about the brand: service hubs only.
-      if (h.kind === "product") (score = 0.5), (reason = "brand not classified yet: service hubs only");
+      if (h.kind === "product") (score = 0.5), (reason = "brand not classified yet: service clinic layers only");
     } else if (b.kind === h.kind) {
       const same = b.kind === "product" ? b.skus.filter((s) => h.skus.includes(s)) : b.leads.filter((l) => h.leads.includes(l));
       const catOverlap = b.cats.some((c) => h.cats.includes(c));

@@ -11,8 +11,8 @@ test("clinic services: hub keeps half of what Scale Health charges ($49 assessme
     assert.match(l, /half of what Scale Health charges, \$24\.50 per \$49 assessment and \$14\.50 per \$29 session\./);
     assert.doesNotMatch(l, /guarantee|net|labou?r|gross|profit/i);
   }
-  assert.match(SERVICES_SPLIT.birchLine, /^Scale Health clinic services booked through your hub/);
-  assert.match(SERVICES_SPLIT.line, /^Clinic services booked through your hub/);
+  assert.match(SERVICES_SPLIT.birchLine, /^Scale Health clinic services booked through your clinic layer/);
+  assert.match(SERVICES_SPLIT.line, /^Clinic services booked through your clinic layer/);
   assert.ok(PUBLISHER_ASSUMPTIONS.some((a) => a.includes(SERVICES_SPLIT.line)));
 });
 

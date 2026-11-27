@@ -41,7 +41,7 @@ export const SLOTS: Slot[] = [
   {
     key: "thank_you",
     label: "Thank-you (after buy or book)",
-    where: "Order confirmation or booking confirmation on the hub",
+    where: "Order confirmation or booking confirmation on the clinic layer",
     size: "656×280 splash · 360×640 vertical",
     cpmUsd: STARTER.post_purchase,
     core: true,
@@ -50,7 +50,7 @@ export const SLOTS: Slot[] = [
   {
     key: "member_dashboard",
     label: "Member dashboard tile",
-    where: "Logged-in member home on the hub",
+    where: "Logged-in member home on the clinic layer",
     size: "Native tile 600×400",
     cpmUsd: STARTER.member_dashboard,
     core: true,
@@ -58,8 +58,8 @@ export const SLOTS: Slot[] = [
   },
   {
     key: "hub_hero",
-    label: "Hub hero banner",
-    where: "Top of the hub home page",
+    label: "Clinic layer hero banner",
+    where: "Top of the clinic layer home page",
     size: "1200×300 desktop · 640×320 phone",
     cpmUsd: STARTER.hub_home,
     core: true,
@@ -77,7 +77,7 @@ export const SLOTS: Slot[] = [
   {
     key: "partner_email",
     label: "Partner email module",
-    where: "Native module in the hub brand's own customer email",
+    where: "Native module in the clinic layer brand's own customer email",
     size: "600×200 native",
     cpmUsd: 12,
     core: false,
@@ -86,7 +86,7 @@ export const SLOTS: Slot[] = [
   {
     key: "partner_site",
     label: "Partner site display",
-    where: "Display unit on the hub brand's own website",
+    where: "Display unit on the clinic layer brand's own website",
     size: "300×250 · 728×90",
     cpmUsd: 8,
     core: false,
@@ -116,13 +116,13 @@ export type Hub = {
 
 export const HUBS: Hub[] = [
   { key: "dr-ho", name: "DR-HO’S", kind: "brand", status: "Live inventory", url: "https://physio.drhonow.com/dr-ho/portal", category: "Pain relief", basis: "Partner feed row (DR-HO’S)", views: DRHO },
-  { key: "jack-health", name: "Jack Health", kind: "brand", status: "In queue", url: "https://scalehealth.ca/jack-health", category: "Men’s health", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "jill-health", name: "Jill Health", kind: "brand", status: "In queue", url: "https://scalehealth.ca/jill-health", category: "Women’s health", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "bird-and-be", name: "Bird & Be", kind: "brand", status: "In queue", url: "https://scalehealth.ca/bird-and-be", category: "Women’s health (postpartum)", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "roll-recovery", name: "Roll Recovery", kind: "brand", status: "In queue", url: "https://scalehealth.ca/roll-recovery", category: "Recovery hardware", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "nutriprocan", name: "NutriProCan", kind: "brand", status: "In queue", url: "https://scalehealth.ca/nutriprocan", category: "Nutrition", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "sole", name: "SOLE", kind: "brand", status: "Live inventory", url: "https://www.scalehealth.ca/sole", category: "Footwear and insoles", basis: "Network median partner (no hub feed yet)", views: MEDIAN_PARTNER },
-  { key: "clinic-network", name: "Clinic hub network", kind: "clinic", status: "Onboarding", url: "https://scalehealth.ca/clinichubs", category: "Physio, mobility, gym and studio members", basis: "TAM feed provider-network row", views: CLINIC_NETWORK },
+  { key: "jack-health", name: "Jack Health", kind: "brand", status: "In queue", url: "https://scalehealth.ca/jack-health", category: "Men’s health", basis: "Network median partner (no clinic layer feed yet)", views: MEDIAN_PARTNER },
+  { key: "jill-health", name: "Jill Health", kind: "brand", status: "In queue", url: "https://scalehealth.ca/jill-health", category: "Women’s health", basis: "Network median partner (no clinic layer feed yet)", views: MEDIAN_PARTNER },
+  { key: "bird-and-be", name: "Bird & Be", kind: "brand", status: "In queue", url: "https://scalehealth.ca/bird-and-be", category: "Women’s health (postpartum)", basis: "Network median partner (no clinic layer feed yet)", views: MEDIAN_PARTNER },
+  { key: "roll-recovery", name: "Roll Recovery", kind: "brand", status: "In queue", url: "https://scalehealth.ca/roll-recovery", category: "Recovery hardware", basis: "Network median partner (no clinic layer feed yet)", views: MEDIAN_PARTNER },
+  { key: "nutriprocan", name: "NutriProCan", kind: "brand", status: "In queue", url: "https://scalehealth.ca/nutriprocan", category: "Nutrition", basis: "Network median partner (no clinic layer feed yet)", views: MEDIAN_PARTNER },
+  { key: "sole", name: "SOLE", kind: "brand", status: "Live inventory", url: "https://www.scalehealth.ca/sole", category: "Footwear and insoles", basis: "Network median partner (no clinic layer feed yet)", views: MEDIAN_PARTNER },
+  { key: "clinic-network", name: "Clinic layer network", kind: "clinic", status: "Onboarding", url: "https://scalehealth.ca/clinichubs", category: "Physio, mobility, gym and studio members", basis: "TAM feed provider-network row", views: CLINIC_NETWORK },
 ];
 
 /** A sponsor buys one of five rotating positions (20% share of voice) at the low end of availability (75%). */

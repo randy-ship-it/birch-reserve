@@ -32,7 +32,7 @@ export function isScaleFacing(search: string = typeof window === "undefined" ? "
 /** Plain definition of a Scale Hub, drawn from the Scale home and intake copy: a co-branded clinic storefront,
  *  audience books care and buys products, earn from day 1, costs nothing to host. No splits, margins or prices. */
 export const HUB_DEFINITION =
-  "A hub is your own co-branded Scale clinic storefront. Your audience books care and buys products through it, and you earn from day 1. It costs nothing to host.";
+  "A clinic layer is your own co-branded Scale clinic storefront. Your audience books care and buys products through it, and you earn from day 1. It costs nothing to host.";
 
 /** The brand name a visitor should see on this host. */
 /** Absolute URL of a Birch page. On the Scale skin it stays on scalehealth.ca (the same page served at /intake/_m/<path>, Scale skin);

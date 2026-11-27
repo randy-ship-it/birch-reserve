@@ -185,7 +185,7 @@ const num = (n: unknown) => (typeof n === "number" && Number.isFinite(n) && n >=
 export function oneFormFields(p: IntakePayload, body: Record<string, unknown>): void {
   const lines: string[] = [];
   const roles = new Set([p.role, ...(p.roles ?? [])]);
-  const intent = roles.has("supplier") && roles.has("publisher") ? "supplier + hub" : roles.has("supplier") ? "supplier only (performance-only terms: pay on results, no CPC/CPM)" : roles.has("publisher") ? "hub only" : null;
+  const intent = roles.has("supplier") && roles.has("publisher") ? "supplier + clinic layer" : roles.has("supplier") ? "supplier only (performance-only terms: pay on results, no CPC/CPM)" : roles.has("publisher") ? "clinic layer only" : null;
   if (intent) lines.push(`Intake choice: ${intent}${roles.has("kit") ? " + Accelerate (premium display placements)" : ""}.`);
   if (p.company_name) {
     body.company_name = p.company_name.slice(0, 120);
@@ -222,7 +222,7 @@ export function oneFormFields(p: IntakePayload, body: Record<string, unknown>): 
       h.cities ? `cities: ${h.cities.slice(0, 200)}` : null,
       h.decision_maker_role ? `decision maker role: ${h.decision_maker_role.slice(0, 80)}` : null,
     ].filter(Boolean);
-    if (hubBits.length) lines.push(`Hub (hub-reported): ${hubBits.join("; ")}.`);
+    if (hubBits.length) lines.push(`Clinic layer (self-reported): ${hubBits.join("; ")}.`);
   }
   if (Object.keys(audience).length) profile.audience = { ...((profile.audience as Record<string, unknown>) ?? {}), ...audience };
   if (Object.keys(metrics).length) profile.reach = { metrics };

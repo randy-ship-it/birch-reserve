@@ -88,20 +88,20 @@ export function renderKitEmail(i: KitEmailInput): { subject: string; html: strin
   const k = kitSkin(i.site === "scale" ? "scale" : "birch");
   const whoText = i.brand?.trim() || "your brand";
   const who = esc(whoText);
-  const stats = [i.headline?.exposureMonth ? [i.headline.exposureMonth, "page-view exposures a month, likely"] : null, i.headline?.earningsMonth ? [i.headline.earningsMonth, "hub earnings a month, likely"] : null].filter(Boolean) as string[][];
+  const stats = [i.headline?.exposureMonth ? [i.headline.exposureMonth, "page-view exposures a month, likely"] : null, i.headline?.earningsMonth ? [i.headline.earningsMonth, "clinic layer earnings a month, likely"] : null].filter(Boolean) as string[][];
   // BR-83: figures as a ruled row (hairline above, figure, small label), not tinted tiles.
   const statHtml = stats.length
     ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0 4px;border-collapse:collapse"><tr>${stats.map(([v, l], n) => `<td valign="top" style="border-top:1px solid ${k.line};padding:12px ${n ? "0" : "16px"} 0 ${n ? "16px" : "0"};width:50%"><div style="${k.fig};line-height:1.1;color:${k.ink}">${esc(v)}</div><div style="margin-top:4px;font-family:${k.sans};font-size:12px;line-height:1.4;color:${k.muted}">${esc(l)}</div></td>`).join("")}</tr></table>`
     : "";
   const next = i.activateUrl
-    ? `<p style="margin:18px 0 0;padding-top:16px;border-top:1px solid ${k.line};font-family:${k.sans};font-size:14px;line-height:1.55;color:${k.muted}"><b style="color:${k.ink}">Next step: getting your ads turned on.</b> Two quick questions about your inventory and which ads can run on your hubs. Ranges are fine.<br><a href="${esc(i.activateUrl)}" style="display:inline-block;margin-top:6px;font-weight:700;color:${k.accent};text-decoration:underline">Answer the two questions&nbsp;&rarr;</a></p>`
+    ? `<p style="margin:18px 0 0;padding-top:16px;border-top:1px solid ${k.line};font-family:${k.sans};font-size:14px;line-height:1.55;color:${k.muted}"><b style="color:${k.ink}">Next step: getting your ads turned on.</b> Two quick questions about your inventory and which ads can run on your clinic layers. Ranges are fine.<br><a href="${esc(i.activateUrl)}" style="display:inline-block;margin-top:6px;font-weight:700;color:${k.accent};text-decoration:underline">Answer the two questions&nbsp;&rarr;</a></p>`
     : "";
   const inner = `<h1 style="${k.h1};margin:0 0 10px;color:${k.ink}">Your Monetization Kit is ready.</h1>
-<p style="font-family:${k.sans};font-size:15px;line-height:1.55;margin:0;color:${k.muted}">Here is what ${who} could reach and earn across health and wellness hubs. A person reviews every kit.</p>
+<p style="font-family:${k.sans};font-size:15px;line-height:1.55;margin:0;color:${k.muted}">Here is what ${who} could reach and earn across health and wellness clinic layers. A person reviews every kit.</p>
 ${statHtml}<div>${emailButton(i.reportUrl, "Open my Monetization Kit", k.site)}</div>
 ${i.hasPdf ? `<p style="font-family:${k.sans};font-size:13px;color:${k.muted};margin:-8px 0 0">Your kit is attached as a PDF.</p>` : ""}${next}`;
   const foot = `Modelled estimates from listed partners, not guarantees. A person at ${k.name} reviews every request; nothing is booked or charged automatically.<br>${k.name} · ${k.domain} · Reply to this email to reach the team.`;
-  const text = `Your Monetization Kit is ready.\n\nHere is what ${whoText} could reach and earn across health and wellness hubs. A person reviews every kit.\n${stats.map(([v, l]) => `- ${v} ${l}`).join("\n")}\n\nOpen your Monetization Kit: ${i.reportUrl}\n${i.hasPdf ? "Your kit is attached as a PDF.\n" : ""}${i.activateUrl ? `\nNext step, getting your ads turned on (two quick questions): ${i.activateUrl}\n` : ""}\nModelled estimates from listed partners, not guarantees. ${k.name} · ${k.domain}`;
+  const text = `Your Monetization Kit is ready.\n\nHere is what ${whoText} could reach and earn across health and wellness clinic layers. A person reviews every kit.\n${stats.map(([v, l]) => `- ${v} ${l}`).join("\n")}\n\nOpen your Monetization Kit: ${i.reportUrl}\n${i.hasPdf ? "Your kit is attached as a PDF.\n" : ""}${i.activateUrl ? `\nNext step, getting your ads turned on (two quick questions): ${i.activateUrl}\n` : ""}\nModelled estimates from listed partners, not guarantees. ${k.name} · ${k.domain}`;
   const html = emailLayout({ title: "Your Monetization Kit", preheader: "Your exposure and earnings estimate, plus the PDF.", eyebrow: `${k.name} · Monetization Kit`, body: inner, footer: foot, brand: k.site });
   return { subject: `Your free Monetization Kit from ${k.name}`, html, text };
 }

@@ -3,9 +3,9 @@ import { LocalPrice } from "@/components/local-price";
 import { ArrowRight, Building2, MapPinned, Network } from 'lucide-react';
 import birchReserveMark from '@assets/brand/birch-reserve-mark-v2.svg';
 
-const pageTitle = 'About Birch Reserve | Clinic Hubs Advertising';
+const pageTitle = 'About Birch Reserve | Clinic layers Advertising';
 const pageDescription =
-  'Learn how Birch Reserve, a Silver Birch Growth portfolio project, connects Scale Health brand partners, Clinic Member Hubs, and trusted retail partners.';
+  'Learn how Birch Reserve, a Silver Birch Growth portfolio project, connects Scale Health brand partners, Clinic Member Clinic layers, and trusted retail partners.';
 
 const pillars = [
   {
@@ -18,9 +18,9 @@ const pillars = [
   {
     icon: Network,
     eyebrow: 'Connected audiences',
-    title: 'Built around Clinic Member Hubs',
+    title: 'Built around Clinic Member Clinic layers',
     description:
-      'Through Clinic Member Hubs, Birch Reserve is designed to connect audiences from participating Scale Health brand partners with a network of trusted retail partners.',
+      'Through Clinic Member Clinic layers, Birch Reserve is designed to connect audiences from participating Scale Health brand partners with a network of trusted retail partners.',
   },
   {
     icon: MapPinned,
@@ -73,10 +73,10 @@ export default function About() {
               Birch Reserve is a portfolio project within RDGDH, built by
               Silver Birch Growth (SBG) to accelerate Scale Health brand
               partners and help create thoughtful connections across Clinic
-              Member Hubs and trusted retail networks.
+              Member Clinic layers and trusted retail networks.
             </p>
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground" data-testid="about-offer-body">
-              <LocalPrice>The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.</LocalPrice>
+              <LocalPrice>The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the clinic layer before anything runs.</LocalPrice>
             </p>
           </div>
         </div>

@@ -38,7 +38,7 @@ export const HUB_LADDER: readonly LadderHub[] = [
   { key: "sole", name: "SOLE", tier: "live", audience: "Foot-pain and active-footwear buyers, right after they buy", href: "https://www.scalehealth.ca/sole", thumb: "/hub-gallery/thumbs/sole.webp" },
   { key: "integrity-fitness", name: "Integrity Fitness", tier: "live", audience: "Gym members, with recovery and physio built into the membership", href: "https://www.scalehealth.ca/integrity", thumb: "/hub-gallery/thumbs/integrity.webp" },
   { key: "calm-joints", name: "Calm Joints", tier: "live", audience: "Members of our own digital physio clinic", href: "https://www.scalehealth.ca/calmjoints", thumb: "/hub-gallery/thumbs/calmjoints.webp" },
-  { key: "effortless-admin", name: "Effortless Admin", tier: "activating", audience: "Employees reaching care through their benefits", banner: "/hub-banners/effortless-admin.webp", surface: "Hub home card" },
+  { key: "effortless-admin", name: "Effortless Admin", tier: "activating", audience: "Employees reaching care through their benefits", banner: "/hub-banners/effortless-admin.webp", surface: "Clinic layer home card" },
   { key: "nutriprocan", name: "NutriProCan", tier: "activating", audience: "Nutrition and dietitian-guided eating", banner: "/hub-banners/nutriprocan.webp", surface: "Post-booking card" },
   { key: "jack-health", name: "Jack Health", tier: "activating", audience: "Men's health and longevity members", banner: "/hub-banners/jack-health.webp", surface: "Post-booking card" },
   { key: "jill-health", name: "Jill Health", tier: "activating", audience: "Women's health, midlife and menopause members", banner: "/hub-banners/jill-health.webp", surface: "Post-booking card" },
@@ -53,11 +53,11 @@ export const HUB_LADDER: readonly LadderHub[] = [
 export type RetailMicroHub = { key: string; name: string; label: string; surface: string; scene: "shelf" | "counter" | "wall"; hue: number; audience: string };
 export const RETAIL_MICRO_LABEL = "Retail micro-hub";
 export const RETAIL_MICRO_HUBS: readonly RetailMicroHub[] = [
-  { key: "retail-1", name: "Retail micro hub #1", label: "Physio & recovery clinic · Ontario", surface: "Recovery shelf card", scene: "shelf", hue: 0, audience: "Patients and walk-ins at the clinic's recovery shelf" },
-  { key: "retail-2", name: "Retail micro hub #2", label: "Physio & recovery clinic · Ontario", surface: "Clinic counter card", scene: "counter", hue: 40, audience: "Patients paying at the clinic counter" },
-  { key: "retail-3", name: "Retail micro hub #3", label: "Physio & recovery clinic · Ontario", surface: "Wall display card", scene: "wall", hue: 80, audience: "Patients waiting for an appointment" },
-  { key: "retail-4", name: "Retail micro hub #4", label: "Physio & recovery clinic · Ontario", surface: "Recovery shelf card", scene: "shelf", hue: 150, audience: "Patients picking up recovery products after a visit" },
-  { key: "retail-5", name: "Retail micro hub #5", label: "Physio & recovery clinic · Ontario", surface: "Clinic counter card", scene: "counter", hue: 210, audience: "Patients and walk-ins buying at the counter" },
+  { key: "retail-1", name: "Retail micro clinic layer #1", label: "Physio & recovery clinic · Ontario", surface: "Recovery shelf card", scene: "shelf", hue: 0, audience: "Patients and walk-ins at the clinic's recovery shelf" },
+  { key: "retail-2", name: "Retail micro clinic layer #2", label: "Physio & recovery clinic · Ontario", surface: "Clinic counter card", scene: "counter", hue: 40, audience: "Patients paying at the clinic counter" },
+  { key: "retail-3", name: "Retail micro clinic layer #3", label: "Physio & recovery clinic · Ontario", surface: "Wall display card", scene: "wall", hue: 80, audience: "Patients waiting for an appointment" },
+  { key: "retail-4", name: "Retail micro clinic layer #4", label: "Physio & recovery clinic · Ontario", surface: "Recovery shelf card", scene: "shelf", hue: 150, audience: "Patients picking up recovery products after a visit" },
+  { key: "retail-5", name: "Retail micro clinic layer #5", label: "Physio & recovery clinic · Ontario", surface: "Clinic counter card", scene: "counter", hue: 210, audience: "Patients and walk-ins buying at the counter" },
 ] as const;
 export const retailSceneSrc = (h: RetailMicroHub): string => `/hub-gallery/retail-${h.scene}.svg`;
 export const MOCK_LABEL = "Example mockup";
@@ -88,7 +88,7 @@ export const ladderMarkdown = (): string =>
     `- ${LABEL_LIVE}: ${liveHubs().map((h) => h.name).join("; ")}`,
     `- ${LABEL_ACTIVATING}: ${activatingHubs().map((h) => h.name).join("; ")}`,
     `- ${LABEL_COMING}: ${MORE_LAUNCHING}`,
-    "- Hub audiences and any view figures are modelled estimates from listed partners, not delivered impressions, and not a guarantee.",
+    "- Clinic layer audiences and any view figures are modelled estimates from listed partners, not delivered impressions, and not a guarantee.",
   ].join("\n");
 
 /** Real hub pages for the Live hubs, per skin. Scale pages stay on scalehealth.ca. */

@@ -3,23 +3,23 @@ import { BrandBanners } from "@/components/br/brand-banners";
 import { Eyebrow, H1, H2, Lede, Section, usePageMeta } from "@/components/br/ui";
 
 export default function BrPublishBrands() {
-  usePageMeta("Publish · Brands | Birch Reserve", "Brands with a recovery audience can apply for a co-branded hub. Otherwise, inquire about display or CPC-only opportunities outside hubs.");
+  usePageMeta("Publish · Brands | Birch Reserve", "Brands with a recovery audience can apply for a co-branded clinic layer. Otherwise, inquire about display or CPC-only opportunities outside clinic layers.");
   return (
     <div data-testid="br-publish-brands">
       <Section>
         <Eyebrow>Publish · Brands</Eyebrow>
-        <H1>Turn your customers into a co-branded hub.</H1>
-        <Lede>Co-branded hubs are open to brands with a Recovery audience: recovery, longevity and food today, pets in queue. We pick partners by fit and audience, so it starts with a short inquiry.</Lede>
+        <H1>Turn your customers into a co-branded clinic layer.</H1>
+        <Lede>Co-branded clinic layers are open to brands with a Recovery audience: recovery, longevity and food today, pets in queue. We pick partners by fit and audience, so it starts with a short inquiry.</Lede>
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           <div className="border-2 border-foreground bg-white p-6">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Option A</p>
-            <h3 className="mt-2 font-display text-2xl">Co-branded hub</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Your brand and Scale on one hub for your customers, with care, member offers and our marketplace plugged in. Ad slots on your hub earn for you. Selected by fit.</p>
+            <h3 className="mt-2 font-display text-2xl">Co-branded clinic layer</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Your brand and Scale on one clinic layer for your customers, with care, member offers and our marketplace plugged in. Ad slots on your clinic layer earn for you. Selected by fit.</p>
           </div>
           <div className="border border-foreground/20 bg-white p-6">
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Option B</p>
-            <h3 className="mt-2 font-display text-2xl">Display / CPC only, outside hubs</h3>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Not a recovery audience? Tell us about your site, app or email list. If there's a fit for display or CPC outside hubs, we'll contact you.</p>
+            <h3 className="mt-2 font-display text-2xl">Display / CPC only, outside clinic layers</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Not a recovery audience? Tell us about your site, app or email list. If there's a fit for display or CPC outside clinic layers, we'll contact you.</p>
           </div>
         </div>
       </Section>
@@ -27,13 +27,13 @@ export default function BrPublishBrands() {
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <Eyebrow>Option A</Eyebrow>
-            <H2>Co-branded hub inquiry</H2>
+            <H2>Co-branded clinic layer inquiry</H2>
             <p className="mt-4 text-sm text-muted-foreground">We reply by email.</p>
           </div>
           <LeadForm
             kind="cobranded_hub_inquiry"
             testId="form-cobranded"
-            submitLabel="Send hub inquiry"
+            submitLabel="Send clinic layer inquiry"
             done={<p>Thanks. We'll review your audience and reply by email.</p>}
             fields={[
               { name: "company", label: "Brand", required: true },
@@ -54,7 +54,7 @@ export default function BrPublishBrands() {
           <div>
             <Eyebrow>Option B</Eyebrow>
             <H2>Display / CPC-only inquiry</H2>
-            <p className="mt-4 text-sm text-muted-foreground">Outside hubs. We'll contact you if there's a fit.</p>
+            <p className="mt-4 text-sm text-muted-foreground">Outside clinic layers. We'll contact you if there's a fit.</p>
           </div>
           <LeadForm
             kind="display_cpc_inquiry"

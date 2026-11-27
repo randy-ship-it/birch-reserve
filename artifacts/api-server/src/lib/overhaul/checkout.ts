@@ -63,7 +63,7 @@ export function buildAreaLockSession(body: AreaCheckoutRequest, origin: string):
             unit_amount: amountCents,
             product_data: {
               name: `Birch Reserve area placement · ${q.area.area} · ${category}`,
-              description: `Priority ${category} placement for up to ${q.sharePct}% of hub display within ${q.radiusKm} km of ${q.area.code} for ${q.termMonths} month${q.termMonths === 1 ? "" : "s"} from display start. Includes media credit at ${q.discountPct}% off rate card and ${q.guaranteedViews.toLocaleString("en-US")} modelled hub page views. Launch rate until ${AREA_LOCK.launchRateUntil}; ${AREA_LOCK.followOnDiscountPct}% off follow-on spend up to $${AREA_LOCK.followOnCapUsd.toLocaleString("en-US")} USD. Unused credit: refund or extend at the same discount.`,
+              description: `Priority ${category} placement for up to ${q.sharePct}% of clinic layer display within ${q.radiusKm} km of ${q.area.code} for ${q.termMonths} month${q.termMonths === 1 ? "" : "s"} from display start. Includes media credit at ${q.discountPct}% off rate card and ${q.guaranteedViews.toLocaleString("en-US")} modelled clinic layer page views. Launch rate until ${AREA_LOCK.launchRateUntil}; ${AREA_LOCK.followOnDiscountPct}% off follow-on spend up to $${AREA_LOCK.followOnCapUsd.toLocaleString("en-US")} USD. Unused credit: refund or extend at the same discount.`,
             },
           },
         },

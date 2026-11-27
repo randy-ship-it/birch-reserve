@@ -221,7 +221,7 @@ export default function Success() {
           </a>
           <Link href="/">
             <Button variant="outline" className="rounded-none border-border text-foreground hover:bg-secondary px-8 h-12">
-              Return to Hub
+              Return to Clinic layer
             </Button>
           </Link>
         </div>

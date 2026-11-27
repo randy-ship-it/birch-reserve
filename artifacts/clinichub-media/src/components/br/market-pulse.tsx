@@ -59,14 +59,14 @@ const packs = DEPOSIT_TIERS.map((t) => `${fmtUsd(t.usd)} (${fmtUsd(Math.round(t.
 
 /** Evergreen FAQ, answered against the live terms. Not presented as recent or specific brands' questions. */
 export const BRAND_QUESTIONS = [
-  { q: "Can we see our card on a live hub before paying?", a: "Yes. The illustrative mock on this page shows the card format on the live DR-HO’S physio, SOLE, Integrity Fitness and Calm Joints hubs, and on Activating hubs as example mockups. The free Monetization Kit and the $190 USD 7-day look show your own card before you commit to a reserve or pack." },
+  { q: "Can we see our card on a live clinic layer before paying?", a: "Yes. The illustrative mock on this page shows the card format on the live DR-HO’S physio, SOLE, Integrity Fitness and Calm Joints clinic layers, and on Activating clinic layers as example mockups. The free Monetization Kit and the $190 USD 7-day look show your own card before you commit to a reserve or pack." },
   { q: "Does the $190 look or $490 category placement count toward a bigger pack?", a: "Yes. A paid $190 look or $490 category placement counts in full toward any sponsorship pack bought within 30 days of that payment. The $190 look also converts in full to the $490 category placement within 7 days; otherwise it is refunded." },
   { q: "What are the sponsorship packs?", a: `${packs} USD. Bonus is media credit only, no cash value. Packs are refundable until 14 days before the IO launch date.` },
-  { q: "How does reporting work with our UTM links?", a: "You send UTM-tagged links and an optional promo code. Reports show views, clicks, UTM-tagged visits and promo-code redemptions, per hub and surface. Aggregate only: never who saw your card. Reports go out on the schedule your IO sets." },
+  { q: "How does reporting work with our UTM links?", a: "You send UTM-tagged links and an optional promo code. Reports show views, clicks, UTM-tagged visits and promo-code redemptions, per clinic layer and surface. Aggregate only: never who saw your card. Reports go out on the schedule your IO sets." },
   { q: "Category placement or Starter placement?", a: "The $490 category placement is a shared category seat: more than one brand can sit in a category. The Starter placement ($1,900) puts a $5K–$50K dedicated package in your category, set on your IO. Blocks run from $25,000 to $1.5M USD by inquiry or offer." },
   { q: "Can an agency prepay a client test?", a: `Yes. ${fmtUsd(AGENCY_TEST.lowUsd)}–${fmtUsd(AGENCY_TEST.highUsd)} USD per client on a pre-filled IO request, no card. A written ${AGENCY_TEST.cashPct}% discount off the published rate card. One IO per client.` },
-  { q: "How is a view block priced?", a: `At each surface’s starter CPM (hub landing page from $${landing.cpmStarter[0]}), less a bundle discount when you add surfaces. 100K modelled views on the landing page start at ${fmtUsd(STARTER_BLOCK.startingUsd)} USD. Your IO sets the final rate.` },
-  { q: "Do you guarantee impressions or results?", a: "No. Reach and view figures are modelled planning estimates, not delivery promises. Nothing runs until you sign the insertion order, which names the hub, surface and dates." },
+  { q: "How is a view block priced?", a: `At each surface’s starter CPM (clinic layer landing page from $${landing.cpmStarter[0]}), less a bundle discount when you add surfaces. 100K modelled views on the landing page start at ${fmtUsd(STARTER_BLOCK.startingUsd)} USD. Your IO sets the final rate.` },
+  { q: "Do you guarantee impressions or results?", a: "No. Reach and view figures are modelled planning estimates, not delivery promises. Nothing runs until you sign the insertion order, which names the clinic layer, surface and dates." },
 ] as const;
 
 /** FAQ answers in the visitor's currency ($190/$490 via the CAD table; the $1,900 starter placement and its package keep the number). */
@@ -134,9 +134,9 @@ export function CategoryStrip({ className = "", testId = "category-strip" }: { c
  * Common questions, not dated or attributed inquiries.
  */
 export const BRAND_QUESTIONS_COMPACT = [
-  { q: "Can we get a mock on the live DR-HO’S hub before paying the $190?", a: "Yes. The illustrative mock is free, and after your free kit it shows your own card on the hub before you pay anything." },
+  { q: "Can we get a mock on the live DR-HO’S clinic layer before paying the $190?", a: "Yes. The illustrative mock is free, and after your free kit it shows your own card on the clinic layer before you pay anything." },
   { q: `Does the $490 credit carry into a ${packRange} pack?`, a: "Yes. A paid $190 look or $490 category placement counts in full toward any sponsorship pack bought within 30 days." },
-  { q: "How does UTM reporting work if it’s aggregate only?", a: "Views, clicks, UTM visits and promo-code redemptions are counted per hub and surface, never who saw your card." },
+  { q: "How does UTM reporting work if it’s aggregate only?", a: "Views, clicks, UTM visits and promo-code redemptions are counted per clinic layer and surface, never who saw your card." },
   { q: "Category placement or Starter placement?", a: "The $490 category placement is a shared category seat. The Starter placement ($1,900) is a $5K–$50K dedicated package, set on your IO. Blocks run from $25,000 to $1.5M USD by inquiry or offer." },
   { q: `Can an agency prepay a client test at the written ${AGENCY_TEST.cashPct}% discount?`, a: `Yes. ${fmtUsd(AGENCY_TEST.lowUsd).replace(/,000$/, "K")}–${fmtUsd(AGENCY_TEST.highUsd).replace(/,000$/, "K")} USD per client on a pre-filled IO, no card, at a written ${AGENCY_TEST.cashPct}% discount off the published rate card.` },
   { q: "What if we change our mind?", a: "The $490 category placement and packs are fully refundable until 14 days before the IO launch date; an unconverted $190 look is refunded." },
@@ -429,7 +429,7 @@ export function ActivityPulse({ mode = "fixed", desktopOnly = false, desktopInli
         <p className={`min-w-0 ${slim ? "line-clamp-2" : "whitespace-normal"} text-left text-[13px] font-normal normal-case tracking-normal opacity-90 transition-opacity ease-out [hyphens:none] [text-align-last:auto] [word-spacing:normal] motion-reduce:transition-none ${fading ? "opacity-0" : ""}`} style={{ color: NAVY, lineHeight: 1.35, transitionDuration: `${FADE_MS}ms` }}>
           {e.kind === "launch" ? (
             <>
-              <span className="mr-1 inline-block rounded-full bg-lime-400/80 px-1.5 align-[1px] text-[9px] font-semibold uppercase leading-[1.5] tracking-normal text-[#0b1f3a]" data-testid="activity-pulse-badge">New hub</span>
+              <span className="mr-1 inline-block rounded-full bg-lime-400/80 px-1.5 align-[1px] text-[9px] font-semibold uppercase leading-[1.5] tracking-normal text-[#0b1f3a]" data-testid="activity-pulse-badge">New clinic layer</span>
               <span className="font-medium" data-testid="activity-pulse-who">{e.who}{e.region ? `, ${e.region}` : ""}</span>
               {" "}
               <span data-testid="activity-pulse-line">{e.action}</span>

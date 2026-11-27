@@ -36,7 +36,7 @@ import { AGENCY_TEST, agencyPrepayLeadPayload, clampAgencyBudget, draftRef } fro
 export const MID_TIER_LINE = `Prepay a client test or sponsorship credit. 100% media credit. A written ${AGENCY_TEST.cashPct}% discount off the published rate card.`;
 /** Straight cut of the live /terms reserve-490 line, plus "the IO sets the terms" for everything else. */
 export const MID_TIER_REFUND = "Nothing runs until you sign the IO, and the IO sets the refund terms. The $490 card reserve is fully refundable until 14 days before the launch date in your IO.";
-export const AGENCY_REPORTING_LINE = "UTM and promo-code reporting per hub and surface";
+export const AGENCY_REPORTING_LINE = "UTM and promo-code reporting per clinic layer and surface";
 
 const NAVY = "#0b1f3a";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -60,13 +60,13 @@ export function twoSurfaceExample(creditUsd: number) {
   return (["landing", "dashboard"] as const).map((k) => {
     const s = surface(k);
     const half = creditUsd / 2;
-    return { key: k, label: k === "landing" ? "Hub home" : "Member dashboard", cpm: s.cpmStarter, lo: (half / s.cpmStarter[1]) * 1000, hi: (half / s.cpmStarter[0]) * 1000, spend: half };
+    return { key: k, label: k === "landing" ? "Clinic layer home" : "Member dashboard", cpm: s.cpmStarter, lo: (half / s.cpmStarter[1]) * 1000, hi: (half / s.cpmStarter[0]) * 1000, spend: half };
   });
 }
 
 /** Live-hub mock with numbered pins (DR-HO'S physio or SOLE, the two live hubs). Legend lives in an expander. */
 /** Audit #3 (Randy, Nov 20 2026): always-visible badge + pin legend + DR-HO'S/SOLE toggle. */
-export const MOCK_PINS = ["Your ad card, approved by a person", "Live member hub", "Clicks to your site, UTM-tagged"] as const;
+export const MOCK_PINS = ["Your ad card, approved by a person", "Live member clinic layer", "Clicks to your site, UTM-tagged"] as const;
 export function mockBadge(hub: HubKey): string {
   return mockBadgeFor(hub);
 }
@@ -76,7 +76,7 @@ export function AnnotatedHubMock({ brand = "", testId = "annotated-hub-mock", in
     <div className="min-w-0" data-testid={testId}>
       <div className="mb-2 flex flex-col gap-2">
         <span className="w-fit rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2.5 py-1 text-[11px] font-bold text-[#8A5A00]" data-testid="mock-badge">{mockBadge(hub)}</span>
-        <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider" role="group" aria-label="Live hub">
+        <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider" role="group" aria-label="Live clinic layer">
           {HUB_KEYS.map((h) => (
             <button key={h} type="button" aria-pressed={hub === h} onClick={() => setHub(h)} className={`inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-3.5 py-1 ${hub === h ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/70 ring-1 ring-foreground/15"}`} data-testid={`mock-hub-${h}`}>
               {HUB_MOCKS[h].tab}
@@ -85,7 +85,7 @@ export function AnnotatedHubMock({ brand = "", testId = "annotated-hub-mock", in
         </div>
       </div>
       <HubMock brand={brand} logo={null} hub={hub} category="Your category" pins badge={mockBadge(hub)} />
-      <p className="mt-1.5 text-[11px] text-foreground/55" data-testid="mock-coming-soon">Coming soon: Food &amp; Nutrition hub</p>
+      <p className="mt-1.5 text-[11px] text-foreground/55" data-testid="mock-coming-soon">Coming soon: Food &amp; Nutrition clinic layer</p>
       <ol className="mt-2 grid gap-1 text-[12px] text-foreground/75 sm:grid-cols-3" data-testid="annotated-hub-legend">
         {MOCK_PINS.map((p, i) => (
           <li key={p} className="flex items-start gap-1.5">
@@ -165,7 +165,7 @@ function TwoSurfaceExample({ dark = false }: { dark?: boolean }) {
   return (
     <div className="mt-2 overflow-x-auto" data-testid="two-surface-example">
       <table className={`w-full min-w-[420px] text-left text-[12px] ${dark ? "text-white/85" : "text-foreground/80"}`}>
-        <thead><tr className="opacity-70"><th className="py-1 pr-3 font-semibold">Credit</th><th className="py-1 pr-3 font-semibold">Hub home (${surface("landing").cpmStarter.join("–$")} CPM)</th><th className="py-1 font-semibold">Member dashboard (${surface("dashboard").cpmStarter.join("–$")} CPM)</th></tr></thead>
+        <thead><tr className="opacity-70"><th className="py-1 pr-3 font-semibold">Credit</th><th className="py-1 pr-3 font-semibold">Clinic layer home (${surface("landing").cpmStarter.join("–$")} CPM)</th><th className="py-1 font-semibold">Member dashboard (${surface("dashboard").cpmStarter.join("–$")} CPM)</th></tr></thead>
         <tbody>
           {rows.map(({ c, parts }) => (
             <tr key={c} className={`border-t ${dark ? "border-white/15" : "border-foreground/10"}`}>
@@ -204,7 +204,7 @@ export function DepositMock({ hub = "sole" }: { hub?: HubKey }) {
     <figure className="w-full max-w-[300px] shrink-0" data-testid="deposit-mock">
       <span className="mb-1.5 inline-block rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A5A00]">Illustrative mock</span>
       <HubMock brand="" logo={null} hub={hub} category="Your category" pins badge="Illustrative mock" />
-      <figcaption className="mt-1.5 text-[11px] leading-snug text-white/70">Sample card on the live {HUB_MOCKS[hub].name} hub: <b className="text-lime-300">1</b> your card, approved by a person · <b className="text-lime-300">2</b> member hub · <b className="text-lime-300">3</b> UTM-tagged click to your site.</figcaption>
+      <figcaption className="mt-1.5 text-[11px] leading-snug text-white/70">Sample card on the live {HUB_MOCKS[hub].name} clinic layer: <b className="text-lime-300">1</b> your card, approved by a person · <b className="text-lime-300">2</b> member clinic layer · <b className="text-lime-300">3</b> UTM-tagged click to your site.</figcaption>
     </figure>
   );
 }
@@ -228,7 +228,7 @@ export function MidTier({ where, kit, showMock = true }: { where: string; compac
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Next step after your kit or $190 look</p>
           <h3 className="mt-1 font-display text-2xl leading-tight md:text-3xl" data-testid="mid-tier-line">Bigger test? Prepay a sponsorship pack.</h3>
-          <p className="mt-1 text-[13px] text-white/75">Card now. Your insertion order names the hub and dates before anything runs.</p>
+          <p className="mt-1 text-[13px] text-white/75">Card now. Your insertion order names the clinic layer and dates before anything runs.</p>
           <p className="mt-2 inline-flex rounded-full bg-lime-300/15 px-3 py-1 text-[12px] font-semibold text-lime-200 ring-1 ring-lime-300/40" data-testid="mid-tier-carry-over">Credit carries over: {CARRY_OVER_CLAUSE.replace(/^A paid/, "a paid")}</p>
           <p className="mt-2 text-[13px] font-semibold text-lime-300" data-testid="early-rate-line">{URGENCY_LINE}</p>
         </div>
@@ -316,7 +316,7 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
   if (hidden) return null;
   return (
     <section id={anchor ? "next-step" : undefined} className="scroll-mt-20" data-testid="next-step" data-where={where}>
-      <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">{showMock ? "See it on a live hub first." : "Start with a 7-day look."}</h2>
+      <h2 className="font-display text-3xl leading-tight text-[#0b1f3a] md:text-4xl">{showMock ? "See it on a live clinic layer first." : "Start with a 7-day look."}</h2>
       <div className={`mt-4 grid grid-cols-[minmax(0,1fr)] items-center gap-5 ${showMock ? "md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:items-stretch lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]" : "md:grid-cols-2 md:items-stretch md:gap-8"}`}>
         {showMock ? <AnnotatedHubMock brand={brand} initial="drho" /> : null}
         <div className={showMock ? "md:flex md:flex-col md:justify-center md:rounded-3xl md:border md:border-foreground/10 md:bg-white md:p-6 md:shadow-sm" : "md:flex md:flex-col md:justify-center"} data-testid="next-step-pay">

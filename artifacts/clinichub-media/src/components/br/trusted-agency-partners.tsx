@@ -58,7 +58,7 @@ export function TrustedAgencyPartners() {
                 <span className="font-display text-4xl leading-none text-accent sm:text-5xl md:text-6xl">~50%</span>
                 <span>
                   <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] md:text-xs">For partners</span>
-                  <span className="mt-1.5 block text-[13px] leading-snug text-background/70 md:text-sm">Dedicated packages and newly activating hubs</span>
+                  <span className="mt-1.5 block text-[13px] leading-snug text-background/70 md:text-sm">Dedicated packages and newly activating clinic layers</span>
                 </span>
               </div>
               <div className="flex min-h-[200px] min-w-0 flex-col justify-between bg-[repeating-linear-gradient(135deg,transparent_0_11px,rgba(7,26,57,0.09)_11px_12px)] p-4 text-foreground md:min-h-[240px] md:p-6">

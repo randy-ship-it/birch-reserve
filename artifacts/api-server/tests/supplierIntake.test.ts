@@ -101,8 +101,8 @@ test("supplier preset copy: hard rules; /intake/supplier is the shared intake, n
   for (const bad of [/\bAlign\b/i, /clairvoyant/i, /alset/i, /80 locations/i, /medvibe/i, /friday/i, /integrity/i, /\bsigned partners\b/i, /\bpublisher\b(?!")/i, /\badvertiser\b(?!")/i, /\bCAD\b/, /guarantee/i, /\bROAS\b/, /\bCTR\b/, /\bdeposit\b/i, /not taken/i, /\b0 (sold|signed|holds?)\b/i]) {
     assert.ok(!bad.test(visible.replace(/fridayIntake|fridayBrandIntake|fridayV12|FRIDAY_CATEGORIES|"advertiser"|"publisher"/g, "")), `found ${bad}`);
   }
-  assert.match(visible, /Your hub is created and goes live once our team approves it\./);
-  for (const t of ["Supply", "Your own hub", "Display / CPC", "Ads only", "200+ brick-and-mortar locations", "Needed for max CPC exposure"]) assert.ok(visible.includes(t), t);
+  assert.match(visible, /Your clinic layer is created and goes live once our team approves it\./);
+  for (const t of ["Supply", "Your own clinic layer", "Display / CPC", "Ads only", "200+ brick-and-mortar locations", "Needed for max CPC exposure"]) assert.ok(visible.includes(t), t);
   assert.ok(!/Start performance-only/.test(readFileSync(resolve(process.cwd(), "../clinichub-media/src/pages/br/intake.tsx"), "utf8")), "no forced 'say you are a supplier' step");
 });
 

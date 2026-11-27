@@ -33,7 +33,7 @@ export function SampleKit({ publisherFirst = false, costExtra }: { publisherFirs
         </InfoPop>
       </div>
       <h2 className="mt-3 text-3xl md:text-5xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you get: your report and a two-sided kit.</h2>
-      <p className="mt-1 max-w-2xl text-sm" style={{ color: RT.mute }}>Where your customers fit, what it costs to reach them, and what a hub could earn. Every figure is an estimate.</p>
+      <p className="mt-1 max-w-2xl text-sm" style={{ color: RT.mute }}>Where your customers fit, what it costs to reach them, and what a clinic layer could earn. Every figure is an estimate.</p>
       <div className="mt-4"><ReportV2 report={report} sample compact costExtra={costExtra} /></div>
       <div className="mt-6 p-3 md:p-6" style={{ background: RT.paper, borderRadius: 24 }} data-testid="sample-kit-sides">
         <h3 className="text-[24px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Build your free Monetization Kit</h3>

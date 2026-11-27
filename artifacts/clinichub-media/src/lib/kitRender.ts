@@ -143,13 +143,13 @@ export function kitSideB(d: KitData): string {
   <rect width="100%" height="100%" fill="#FAF8F3"/><rect width="100%" height="100%" fill="url(#glowB)"/>
   ${header("B", "Your exposure opportunity", d, false)}
   ${pill(232, 268, "Network figures / targets", "#e0f2fe", "#0c4a6e")}
-  <text x="72" y="384" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing="2" fill="${NAVY}">1 · ANCHOR HUBS (UNCONFIRMED)</text>
+  <text x="72" y="384" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing="2" fill="${NAVY}">1 · ANCHOR CLINIC LAYERS (UNCONFIRMED)</text>
   <text x="1128" y="384" text-anchor="end" font-family="${SANS}" font-size="16" fill="${NAVY}" opacity=".6">${esc(d.fitHeader)}</text>
   ${hubCards}
   <rect x="72" y="${bannerY}" width="1056" height="110" rx="24" fill="${NAVY}"/>
-  <text x="104" y="${bannerY + 46}" font-family="${SANS}" font-size="18" font-weight="700" letter-spacing="2" fill="${LIME}">HUB RATES · ESTIMATE</text>
+  <text x="104" y="${bannerY + 46}" font-family="${SANS}" font-size="18" font-weight="700" letter-spacing="2" fill="${LIME}">CLINIC LAYER RATES · ESTIMATE</text>
   <text x="104" y="${bannerY + 82}" font-family="${SANS}" font-size="28" font-weight="700" fill="#fff">CPM $${d.hubRates.cpm[0]}–$${d.hubRates.cpm[1]} · CPC $${d.hubRates.cpc[0].toFixed(2)}–$${d.hubRates.cpc[1].toFixed(2)} USD</text>
-  <text x="1096" y="${bannerY + 82}" text-anchor="end" font-family="${SANS}" font-size="20" fill="${LIME}">${esc(d.hubRates.fitLabel ? `Hubs: ${d.hubRates.fitLabel}` : "~128MM modelled page views/mo (est.)")}</text>
+  <text x="1096" y="${bannerY + 82}" text-anchor="end" font-family="${SANS}" font-size="20" fill="${LIME}">${esc(d.hubRates.fitLabel ? `Clinic layers: ${d.hubRates.fitLabel}` : "~128MM modelled page views/mo (est.)")}</text>
   <text x="72" y="${h2Y}" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing="2" fill="${NAVY}">2 · CALM JOINTS + STREET TEAM</text>
   <text x="72" y="${h3Y}" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing="2" fill="${NAVY}">3 · RETAIL NETWORK</text>
   ${chCards}

@@ -28,7 +28,7 @@ test("shell script is only added for US", () => {
 });
 
 test("hub label no longer says pooled", () => {
-  assert.ok(HUBS.some((h) => h.name === "Clinic hub network"));
+  assert.ok(HUBS.some((h) => h.name === "Clinic layer network"));
   assert.ok(!HUBS.some((h) => /pooled/i.test(h.name)));
 });
 

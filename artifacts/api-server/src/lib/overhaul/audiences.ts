@@ -24,7 +24,7 @@ export const BASIS_LABEL: Record<Basis, string> = {
 };
 
 export const BASIS_NOTE: Record<Basis, string> = {
-  measured: "First-party hub analytics, aggregated and de-identified. Shares only.",
+  measured: "First-party clinic layer analytics, aggregated and de-identified. Shares only.",
   modelled: "Modelled estimates from listed partners: launch-partner order volumes and typical channel rates (TAM feed, read 2026-11-13). Not audited, not measured delivery.",
   estimated: "Benchmark range or editorial estimate. Not measured delivery.",
 };
@@ -70,7 +70,7 @@ export const ARRIVAL_MIX: Array<{ label: string; pct: number }> = [
 export const INTENT_LADDER: Array<{ moment: string; where: string; lo: number; hi: number }> = [
   { moment: "Just bought", where: "Post-purchase and booking confirmation", lo: 0.015, hi: 0.04 },
   { moment: "Coming back", where: "Member dashboard, behind login", lo: 0.003, hi: 0.008 },
-  { moment: "Browsing the hub", where: "Hub home, product and services pages", lo: 0.0025, hi: 0.006 },
+  { moment: "Browsing the clinic layer", where: "Clinic layer home, product and services pages", lo: 0.0025, hi: 0.006 },
   { moment: "Open web, for contrast", where: "Standard display on brand sites", lo: 0.0008, hi: 0.002 },
 ];
 
@@ -124,7 +124,7 @@ export const SEGMENTS: Segment[] = [
     isNew: true,
     who: "Recovery and wellness buyers who already list sleep as a goal. Scale Sleep is being curated now.",
     buys: "Sleep tech, bedding, wind-down and self-care products.",
-    feeders: ["Recovery and fitness hubs (sleep is a stated intent)"],
+    feeders: ["Recovery and fitness clinic layers (sleep is a stated intent)"],
     profile: "Core 25-54 · 55% women · ~1MM orders a year in personal care & sleep",
     profileBasis: "modelled",
     intent: "Building",
@@ -136,7 +136,7 @@ export const SEGMENTS: Segment[] = [
     name: "Physio patients",
     who: "People in active physio care, booking visits and following home plans.",
     buys: "Clinician-recommended recovery products and follow-up care.",
-    feeders: ["Calm Joints", "Clinic hubs"],
+    feeders: ["Calm Joints", "Clinic layers"],
     profile: "Core 25-64 · 55% women · physio, mobility, gym and studio members",
     profileBasis: "modelled",
     intent: "Very high",
@@ -336,8 +336,8 @@ export const MARKET_CONTEXT: Array<{ key: string; pillar: string; stat: string; 
 ];
 
 export const SOURCES: Array<{ basis: Basis; source: string; what: string }> = [
-  { basis: "measured", source: "Scale hub analytics", what: "Sessions by region and how members arrive, 30-day window. Shown as shares." },
-  { basis: "measured", source: "Live hub inventory", what: "The launch brands and Calm Joints racquet pages listed on this page." },
+  { basis: "measured", source: "Scale clinic layer analytics", what: "Sessions by region and how members arrive, 30-day window. Shown as shares." },
+  { basis: "measured", source: "Live clinic layer inventory", what: "The launch brands and Calm Joints racquet pages listed on this page." },
   { basis: "modelled", source: "TAM feed (scalehealth.ca/tam)", what: "Orders a year, age band, gender skew, mobile share and stated intents by category, modelled from launch-partner customers." },
   { basis: "estimated", source: "Channel benchmarks", what: "Click-through bands by moment. Ranges, not promises." },
   { basis: "estimated", source: "Public research (Health Canada, Statistics Canada, PHAC, CRN, AAFC, APPA, ISPA, AmSpa, Pickleball Canada)", what: "Population-level market context per pillar, linked to each source. Not Birch audience sizes or delivery." },

@@ -37,8 +37,8 @@ export function OwnTheMoment({ testId = "own-the-moment" }: { testId?: string })
           </figure>
         ))}
       </div>
-      <p className="mt-1 text-[13px] font-semibold"><a href={siteUrl("/hubs")} data-mirror-keep className="text-[#0b1f3a] underline underline-offset-2" data-testid="see-all-hubs">See all {HUB_KEYS.length + RETAIL_MICRO_HUBS.length} hubs</a> <span className="font-normal text-foreground/60">· {MORE_LAUNCHING}</span></p>
-      <p className="mt-2 text-[12px] text-foreground/60">Illustrative mockups, not live ads. Your insertion order names the hub and surface before anything runs.</p>
+      <p className="mt-1 text-[13px] font-semibold"><a href={siteUrl("/hubs")} data-mirror-keep className="text-[#0b1f3a] underline underline-offset-2" data-testid="see-all-hubs">See all {HUB_KEYS.length + RETAIL_MICRO_HUBS.length} clinic layers</a> <span className="font-normal text-foreground/60">· {MORE_LAUNCHING}</span></p>
+      <p className="mt-2 text-[12px] text-foreground/60">Illustrative mockups, not live ads. Your insertion order names the clinic layer and surface before anything runs.</p>
     </div>
   );
 }
@@ -46,8 +46,8 @@ export function OwnTheMoment({ testId = "own-the-moment" }: { testId?: string })
 export function FourSteps({ look, seat, testId = "four-steps" }: { look: string; seat: string; testId?: string }) {
   const steps = [
     { n: "1", title: `${look} look or ${seat} category placement`, line: "Media credit, not a fee. The look converts to a category placement or is refunded.", href: LOOK_HREF },
-    { n: "2", title: "See the mock on a live hub", line: "Your card on any hub, shown as an example mockup.", href: RESERVE_HREF },
-    { n: "3", title: "Sign the insertion order (IO)", line: "It names the hub, surface, category and dates. Nothing runs until the IO is signed and approved.", href: undefined },
+    { n: "2", title: "See the mock on a live clinic layer", line: "Your card on any clinic layer, shown as an example mockup.", href: RESERVE_HREF },
+    { n: "3", title: "Sign the insertion order (IO)", line: "It names the clinic layer, surface, category and dates. Nothing runs until the IO is signed and approved.", href: undefined },
     { n: "4", title: "The flight runs, you get the report", line: "Aggregate report only. Clicks arrive UTM-tagged, so you can check them in your own analytics. First measured reports coming soon.", href: undefined },
   ];
   return (
@@ -89,8 +89,8 @@ export function SeeTheProof({ testId = "see-the-proof", id = "see-the-proof" }: 
   const cards: { tag: Tag; title: string; line: string; href: string; cta: string }[] = [
     { tag: "Illustrative, not results", title: "Example flight report", line: "The layout you get after a flight. Round example numbers, aggregate only. First measured reports coming soon.", href: "/media-kit#flight-report", cta: "See the layout" },
     { tag: "Estimate", title: "Estimated performance ranges", line: "Based on comparables, not our results. Not a guarantee.", href: "/media-kit#performance-ranges", cta: "See the ranges" },
-    { tag: "Measured", title: "Hub session geography", line: `${geo} of located hub sessions, ${AUDIENCE_SNAPSHOT.measuredWindow}. Shares only.`, href: "/audiences#signals", cta: "See the shares" },
-    { tag: "Measured", title: "Launch brands feeding the audience", line: "Brand launches on the hubs, shown with the audiences they bring.", href: "/audiences#signals", cta: "See the audiences" },
+    { tag: "Measured", title: "Clinic layer session geography", line: `${geo} of located clinic layer sessions, ${AUDIENCE_SNAPSHOT.measuredWindow}. Shares only.`, href: "/audiences#signals", cta: "See the shares" },
+    { tag: "Measured", title: "Launch brands feeding the audience", line: "Brand launches on the clinic layers, shown with the audiences they bring.", href: "/audiences#signals", cta: "See the audiences" },
     { tag: "Internal testing, not ad results", title: "B2B go-to-market · Silver Birch Growth Inc.", line: "Pointed at portfolio value creation right now, so it is not something you can buy. Separate from ad placements.", href: "/gtm-bot", cta: "Read the note" },
   ];
   return (
@@ -106,7 +106,7 @@ export function SeeTheProof({ testId = "see-the-proof", id = "see-the-proof" }: 
           </a>
         ))}
       </div>
-      <p className="mt-2 text-[12px] text-foreground/60">Measured means counted on our own hubs. Estimates, ranges and example layouts are labelled and are not results or guarantees.</p>
+      <p className="mt-2 text-[12px] text-foreground/60">Measured means counted on our own clinic layers. Estimates, ranges and example layouts are labelled and are not results or guarantees.</p>
     </div>
   );
 }
