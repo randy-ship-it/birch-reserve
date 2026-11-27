@@ -2431,7 +2431,7 @@ ${heroSubHtml(price(look), price(seat))}
 ${heroInquireHtml()}</div>${heroMockHtml("buycalc-hero-mock")}</div></section>
 
 <section class="band" id="buy"><div class="wrap"><div class="buy">
-<form id="reserve" novalidate><p class="kicker">Reserve without a login</p><h2 style="margin-bottom:6px">Lock it in.</h2>
+<form id="reserve" novalidate><p class="kicker">Buy without a login</p><h2 style="margin-bottom:6px">Start here.</h2>
 <p class="fine" style="margin:0 0 6px" data-testid="buy-tagline">${CHECKOUT_TAGLINE} Want to upload your ad too? <a href="/buy">Use the 3-step buy</a>.</p>
 <label for="f-sku">Offer</label><select id="f-sku" name="sku">${PUBLIC_RESERVE_OFFERS.map((offer) => `<option value="${offer.sku}"${offer.sku === selected.sku ? " selected" : ""}>${price(offer)} · ${offer.sku === "reserve-490" ? "Category placement" : "7-day look"}</option>`).join("")}</select>
 ${category ? `<input type="hidden" name="category" value="${category}">` : ""}

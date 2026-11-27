@@ -317,7 +317,7 @@ export function renderBuyPage(opts: { checkoutLive: boolean; plan?: unknown; pre
     (f, i) => `<label class="pick" data-premium="${f.premium ? 1 : 0}"><input type="radio" name="format" value="${f.key}"${i === 0 ? " checked" : ""}>${MOCK[f.key] ?? ""}<strong>${esc(f.label)}</strong><small>${esc(f.hint)}</small>${f.premium ? `<span class="lock">Pick Starter placement above to use this spot</span>` : ""}</label>`,
   ).join("");
   const plans = PLANS_NOW.map(
-    (p) => `<label class="pick" data-pay="${p.pay}"><input type="radio" name="plan" value="${p.key}"${p.key === pre ? " checked" : ""}><span class="price">${esc(p.price)}</span><strong>${esc(p.name)}</strong><small>${esc(p.line)}</small><span class="tag">${p.pay === "card" ? "Card" : "Card · locks category"}</span></label>`,
+    (p) => `<label class="pick" data-pay="${p.pay}"><input type="radio" name="plan" value="${p.key}"${p.key === pre ? " checked" : ""}><span class="price">${esc(p.price)}</span><strong>${esc(p.name)}</strong><small>${esc(p.line)}</small><span class="tag">${p.pay === "card" ? "Card" : "Card · then IO"}</span></label>`,
   ).join("");
   const planMeta = Object.fromEntries(PLANS_NOW.map((p) => [p.key, { name: p.name, price: p.price, pay: p.pay }]));
   const formatMeta = Object.fromEntries(BUY_FORMATS.map((f) => [f.key, f.label]));
