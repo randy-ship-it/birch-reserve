@@ -183,7 +183,8 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
         {/* BR-81: brands get ONE next step, the $190 look in the post-kit block below; no competing buttons up here. */}
         {!oneForm ? null : hasKit ? <div className="mt-3"><PrimaryCta side={q.side} where="done" /></div> : <LaneCtas />}
       </div>
-      {oneForm && q.ref && q.payload ? <IntakeDetails key={q.roles.join(",")} intake={q.ref} payload={{ ...q.payload, roles: q.roles as IntakePayload["roles"] }} roles={q.roles} shared={q.shared ?? { brand: "", categories: [], skus: "", audience: "" }} /> : null}
+      {/* BR-81: the optional follow-up questions sit behind one tap so the $190 look below stays the single next step. */}
+      {oneForm && q.ref && q.payload ? <Details label="Sharpen your numbers (optional, 2 minutes)" testId="fast-intake-details" className="mt-4 text-sm"><IntakeDetails key={q.roles.join(",")} intake={q.ref} payload={{ ...q.payload, roles: q.roles as IntakePayload["roles"] }} roles={q.roles} shared={q.shared ?? { brand: "", categories: [], skus: "", audience: "" }} /></Details> : null}
       <ReportV2 report={report} exposure={exposure} exposureSource="mock" earnCta={earnCta} supplierCta={supplierOnly ? earnCta : undefined} onAccelerate={accCta} physical={q.physical} afterHero={<PostKitNext kit={{ brand: name ?? q.brand ?? null, label: name || q.host || null, email: q.contact?.email ?? null, website: q.contact?.website ?? q.host ?? null }} />} />
       {hasKit || !oneForm ? upgrade("bottom") : null}
     </section>
