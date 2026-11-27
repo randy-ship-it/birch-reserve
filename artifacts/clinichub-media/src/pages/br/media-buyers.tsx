@@ -2,7 +2,7 @@ import { KitEntry } from "@/components/br/pilot-path";
 import { CheckCircle2, ChevronDown } from "lucide-react";
 import { LeadForm } from "@/components/br/lead-form";
 import { BuyPaths, InventorySpec, IoProcess } from "@/components/br/agency-showcase";
-import { MB_BUY_CHECKLIST, MB_BUY_PATHS, MEASUREMENT_STEPS, MEDIA_BUYER_FAQ, MIX_ROWS } from "../../../../api-server/src/lib/overhaul/mediaBuyers";
+import { HOW_WE_COUNT, HOW_WE_COUNT_DOCS_HREF, MB_BUY_CHECKLIST, MB_BUY_PATHS, MEASUREMENT_STEPS, MEDIA_BUYER_FAQ, MIX_ROWS } from "../../../../api-server/src/lib/overhaul/mediaBuyers";
 import { LOOK_HREF, RESERVE_HREF, lookHref} from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, Lede, Modelled, Section, usePageMeta } from "@/components/br/ui";
 import { priceLabel, useCurrency } from "@/lib/currency";
@@ -99,6 +99,26 @@ export default function BrMediaBuyers() {
             ))}
           </ol>
         </div>
+        <details data-testid="mb-how-we-count" className="group mt-10 border-y border-[#0b1f3a]/15">
+          <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-4 [&::-webkit-details-marker]:hidden">
+            <span className="min-w-0">
+              <span className="block font-display text-xl leading-tight text-[#0b1f3a] md:text-2xl">How we count</span>
+              <span className="mt-0.5 block text-[13px] text-foreground/60">Seven rules, the same for every buyer</span>
+            </span>
+            <ChevronDown className="size-5 shrink-0 text-[#0b1f3a] transition group-open:rotate-180" aria-hidden />
+          </summary>
+          <dl className="divide-y divide-border border-t border-[#0b1f3a]/15 text-sm">
+            {HOW_WE_COUNT.map((row) => (
+              <div key={row.label} className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-[9.5rem_minmax(0,1fr)] sm:items-baseline sm:gap-4">
+                <dt className="text-foreground/60">{skinText(row.label)}</dt>
+                <dd className="min-w-0 font-medium leading-relaxed">{skinText(row.answer)}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="border-t border-[#0b1f3a]/15 py-3 text-xs text-muted-foreground">
+            Full method in the <a className="underline underline-offset-2" href={HOW_WE_COUNT_DOCS_HREF}>developer docs</a>. No impression guarantees.
+          </p>
+        </details>
       </Section>
 
       <Section tone="soft">
