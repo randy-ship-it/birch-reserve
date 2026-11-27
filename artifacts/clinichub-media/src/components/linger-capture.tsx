@@ -24,12 +24,20 @@ import { HoneypotField, withFormGuards } from "@/lib/form-guards";
 import { track } from "@/lib/analytics";
 import { CHAT_STATE_EVENT, isChatOpen, setLingerOpen } from "@/lib/overlay-bus";
 import { OPEN_RANDY_CHAT_EVENT } from "@/lib/book-call";
+import { isScaleSkin } from "@/lib/siteSkin";
+import { useCurrency } from "@/lib/currency";
 
 const SEEN_KEY = "birch_linger_seen_v1";
 const SEEN_TTL_MS = 30 * 24 * 60 * 60_000;
 const DESKTOP_MIN_DWELL_MS = 4_000;
-const MEDIA_KIT_PDF = "/birch-reserve-one-pager.pdf";
-const MEDIA_KIT_PAGE = "/kit";
+const MEDIA_KIT_PAGE_PATH = "/kit";
+/** BR-81 v2: Scale mirror downloads the Scale-branded one-pager from its own /intake/_m path; CAD visitors get the CAD copy. */
+function kitFiles(cad: boolean): { pdf: string; page: string; name: string } {
+  const scale = isScaleSkin();
+  const name = `${scale ? "scale-health" : "birch-reserve"}-one-pager${cad ? "-cad" : ""}.pdf`;
+  const base = scale ? "/intake/_m" : "";
+  return { pdf: `${base}/${name}`, page: `${base}${MEDIA_KIT_PAGE_PATH}`, name };
+}
 const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[A-Za-z]{2,24}$/;
 const HIDDEN_PREFIXES = ["/media-kit", "/kit", "/marketplace", "/sales", "/editorial", "/success", "/splash", "/sign-in", "/sign-up"];
 
@@ -72,6 +80,10 @@ export function LingerCapture() {
   const [email, setEmail] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
+  const cad = useCurrency().currency === "cad";
+  const files = kitFiles(cad);
+  const MEDIA_KIT_PDF = files.pdf;
+  const MEDIA_KIT_PAGE = files.page;
   const [kitHref, setKitHref] = useState<string>(MEDIA_KIT_PDF);
   const [desktop, setDesktop] = useState(() => (typeof window !== "undefined" ? isDesktop() : true));
   const reduced = useReducedMotion();
@@ -112,7 +124,7 @@ export function LingerCapture() {
     return () => {
       alive = false;
     };
-  }, [state]);
+  }, [state, MEDIA_KIT_PDF, MEDIA_KIT_PAGE]);
 
   // Tell the chat widget (launcher hides while we're up).
   useEffect(() => {
@@ -319,7 +331,7 @@ export function LingerCapture() {
                   <p id={descId} className="sr-only">Download it below.</p>
                   <a
                     href={kitHref}
-                    {...(kitHref === MEDIA_KIT_PDF ? { download: "birch-reserve-one-pager.pdf" } : {})}
+                    {...(kitHref === MEDIA_KIT_PDF ? { download: files.name } : {})}
                     onClick={() => track("media_kit_download", { via: kitHref === MEDIA_KIT_PDF ? "pdf" : "kit_page" })}
                     className="mt-1 inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-slate-900 px-5 text-[15px] font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
                     data-testid="linger-download"

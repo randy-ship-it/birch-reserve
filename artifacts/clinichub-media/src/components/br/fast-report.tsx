@@ -179,8 +179,9 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
           <p>We sent your request to Birch Reserve. A person reviews it before the full report is released{q.held ? " (brand ownership check, usually within one business day)" : ""}. Values tagged "default" are placeholders until you add detail.</p>
         </Details>
         <IntakeWarnings testId="fast-warnings" />
-        {hasKit || !oneForm ? <div className="mt-4">{upgrade("top")}</div> : null}
-        {hasKit || !oneForm ? <div className="mt-3"><PrimaryCta side={q.side} where="done" /></div> : <LaneCtas />}
+        {hasKit && oneForm ? <div className="mt-4">{upgrade("top")}</div> : null}
+        {/* BR-81: brands get ONE next step, the $190 look in the post-kit block below; no competing buttons up here. */}
+        {!oneForm ? null : hasKit ? <div className="mt-3"><PrimaryCta side={q.side} where="done" /></div> : <LaneCtas />}
       </div>
       {oneForm && q.ref && q.payload ? <IntakeDetails key={q.roles.join(",")} intake={q.ref} payload={{ ...q.payload, roles: q.roles as IntakePayload["roles"] }} roles={q.roles} shared={q.shared ?? { brand: "", categories: [], skus: "", audience: "" }} /> : null}
       <ReportV2 report={report} exposure={exposure} exposureSource="mock" earnCta={earnCta} supplierCta={supplierOnly ? earnCta : undefined} onAccelerate={accCta} physical={q.physical} afterHero={<PostKitNext kit={{ brand: name ?? q.brand ?? null, label: name || q.host || null, email: q.contact?.email ?? null, website: q.contact?.website ?? q.host ?? null }} />} />

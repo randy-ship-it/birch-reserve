@@ -320,7 +320,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
       <>
       {sup ? <SupplierDone brand={quick.brand ?? ""} paths={paths} demand={demand} /> : null}
       {sup && (paths.display || paths.ads) ? <div className="mb-4 rounded-3xl border border-foreground/10 bg-white p-5 shadow-xl md:p-6"><BuyJourney where="intake_supplier_done" title="Don't wait. Buy a small slot now." testId="supplier-done-journey" /></div> : null}
-      {sup && !supHub ? null : <div className="mb-4" data-testid="intake-activation-step"><AdActivation role={sup ? "supplier" : "brand"} email={quick.contact?.email ?? ""} company={quick.brand ?? ""} hubSlug={supHub ? hubSlugOf(quick.brand ?? "") : ""} fridayId={quick.ref?.id ?? ""} /></div>}
+      {sup && supHub ? <div className="mb-4" data-testid="intake-activation-step"><AdActivation role="supplier" email={quick.contact?.email ?? ""} company={quick.brand ?? ""} hubSlug={hubSlugOf(quick.brand ?? "")} fridayId={quick.ref?.id ?? ""} /></div> : null}
       <FastReport
         q={quick}
         onAddDetail={() => {
@@ -330,6 +330,8 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
           else window.location.assign(birchHref("/brand-kit#my-kit"));
         }}
       />
+      {/* BR-81 (Randy, Nov 27 2026): brands see one next step first; the hub ad-activation form is one tap away, below the report. */}
+      {sup ? null : <div className="mt-4" data-testid="intake-activation-step"><Details label="Have your own site or hub? Turn on ads there too" testId="intake-activation-more"><AdActivation role="brand" email={quick.contact?.email ?? ""} company={quick.brand ?? ""} fridayId={quick.ref?.id ?? ""} /></Details></div>}
       </>
     );
   if (done)
