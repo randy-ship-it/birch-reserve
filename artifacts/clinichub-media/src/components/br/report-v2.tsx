@@ -243,7 +243,38 @@ export function HubCards({ m }: { m: ReportModel }) {
           </article>
         ))}
       </div>
+      <SelfLaunchedHub />
     </section>
+  );
+}
+
+/**
+ * Hub a location switched on itself (Randy, Nov 27 2026: show a hub added organically, next to Integrity).
+ * Source: Scale Activity doc (Dima-lates signed, page live at scalehealth.ca/dima-lates-ajax-review) and Jon's
+ * Oct 27 Slack note that the owner activated it unprompted. One verified hub only, no counts.
+ */
+const SELF_LAUNCHED = { name: "Dima-lates", where: "Pilates studio · Ajax, ON", url: "https://www.scalehealth.ca/dima-lates-ajax-review", img: "/hub-gallery/dima-lates.webp" } as const;
+
+export function SelfLaunchedHub() {
+  const h = SELF_LAUNCHED;
+  return (
+    <a href={h.url} target="_blank" rel="noopener" data-testid="self-launched-hub" className="group mt-4 grid overflow-hidden md:grid-cols-[1.15fr_1fr]" style={{ ...card, borderRadius: 20, textDecoration: "none", color: "inherit" }}>
+      <div className="relative aspect-[16/10] overflow-hidden md:aspect-auto md:min-h-[260px]" style={{ background: RT.paper }}>
+        <img src={h.img} alt={`A class at ${h.name}`} className="absolute inset-0 size-full object-cover object-[50%_25%] transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" />
+        <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold" style={{ background: "rgba(255,255,255,.92)", color: RT.ink }}>
+          <span className="size-1.5 rounded-full" style={{ background: "#16a34a" }} aria-hidden />Live
+        </span>
+      </div>
+      <div className="flex flex-col justify-center gap-2 p-5 md:p-7">
+        <span className={`${eyebrow} inline-flex items-center gap-2`} style={{ color: RT.mintInk }}>
+          <span className="size-1.5 rounded-full" style={{ background: RT.mintInk }} aria-hidden />Added by a member studio
+        </span>
+        <p className="text-[26px] leading-tight md:text-[30px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{h.name}</p>
+        <p className="text-[14px]" style={{ color: RT.mute }}>{h.where}</p>
+        <p className="text-[15px]">Switched on its own members' club.</p>
+        <span className="mt-1 text-[14px] font-semibold underline-offset-4 group-hover:underline" style={{ color: RT.forest }}>Open the live hub →</span>
+      </div>
+    </a>
   );
 }
 
