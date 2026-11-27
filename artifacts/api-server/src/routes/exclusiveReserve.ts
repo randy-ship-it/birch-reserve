@@ -60,7 +60,7 @@ button{background:#071A39;color:#fff;border:0;border-radius:6px;min-height:44px;
 details{border-top:1px solid #ccd2d8;padding:12px 0}summary{cursor:pointer;font-weight:600}ul{padding-left:1.1em}${TOKENS_CSS}${BUYER_HEADER_CSS}${PRICE_LADDER_CSS}</style></head><body>
 ${buyerHeaderHtml("exclusive", currencyToggleHtml(currency, (c) => currencyHref(path, query, c)))}
 <main>${banner}<div data-promo-box="success"></div>
-<p class="fine">STARTER PLACEMENT · CARD · NOTHING RUNS BEFORE A SIGNED IO</p>
+<p class="fine">STARTER PLACEMENT · PAY BY CARD</p>
 <h1>Starter placement · ${X.label}</h1>
 <p>Dedicated placements from $1,900. Your $1,900 counts in full toward a ${X.packageLabel} package in your category while we write your insertion order (IO). The IO names the hub, placement and dates. If another brand commits to the category first, we refund the $1,900 in full.</p>
 <p><a class="cta" href="#f">Start: pay ${X.label} &darr;</a></p>
