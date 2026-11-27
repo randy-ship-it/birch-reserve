@@ -386,7 +386,9 @@ function homeOffer(html: string): { price: string; priceCurrency: string } {
   const block = blocks.find((b) => b.includes("reserve-490"));
   assert.ok(block, "home JSON-LD with the reserve-490 offer");
   const data = JSON.parse(block!);
-  return data.itemListElement[0].item.offers;
+  const svc = data["@graph"].find((n: { "@type": string }) => n["@type"] === "Service");
+  const o = svc.hasOfferCatalog.itemListElement.find((i: { sku?: string }) => i.sku === "reserve-490");
+  return { price: o.price, priceCurrency: o.priceCurrency };
 }
 
 test("GET / serves the Offer JSON-LD in USD for every visitor while CAD is paused (Canada, CAD cookie and ?currency=cad too)", async () => {

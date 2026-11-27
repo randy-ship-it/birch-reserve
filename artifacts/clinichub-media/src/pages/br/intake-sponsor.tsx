@@ -13,7 +13,7 @@ import { SPONSOR_OFFERS, SUPPLIER_CATEGORIES, HUB_RATE_RANGE } from "../../../..
 const ICON = { "hold-190": Timer, "reserve-490": Lock, "area-lock": MapPin } as const;
 
 export default function BrIntakeSponsor() {
-  usePageMeta("Supplier + Accelerate: lock a category or an area | Birch Reserve", "Start with the $190 USD 7-day look, the $490 USD category placement or the $3,500 USD area lock launch price.");
+  usePageMeta("Supplier + Accelerate: a category placement or an area | Birch Reserve", "Start with the $190 USD 7-day look, the $490 USD category placement or the $3,500 USD area lock launch price.");
   const [cat, setCat] = useState(SUPPLIER_CATEGORIES[0]!.key);
   const [ref, setRef] = useState<IntakeRef | null>(null);
   const [market, setMarket] = useState<Market>(DEFAULT_MARKET);
@@ -24,7 +24,7 @@ export default function BrIntakeSponsor() {
       <RoleTabs active="sponsor" />
       <header className="container mx-auto px-4 pb-4 pt-8 md:pt-12">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For suppliers · Accelerate</p>
-        <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Accelerate: lock your category, or your area.</h1>
+        <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Accelerate: place in your category, or your area.</h1>
         <p className="mt-3 max-w-xl text-base text-muted-foreground">Premium placements that speed up exposure. Three published prices. Pay on the same secure Stripe page as always. Nothing runs before you approve an insertion order.</p>
         <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <KitCta placement="hero_role_sponsor" size="md" sub="One form for hub + supplier. Website + email to start." />

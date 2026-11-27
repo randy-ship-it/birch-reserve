@@ -44,7 +44,10 @@ function page(open: boolean, status: Status, currency: ReserveCurrency = "cad", 
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Starter placement · ${X.label} — Birch Reserve</title>
 <meta name="description" content="Dedicated placements from $1,900. ${X.label} holds a $5K–$50K dedicated package in your category pending your insertion order. Refunded if another brand commits first. Nothing runs before the IO.">
-<link rel="canonical" href="https://birchreserve.net/starter"><link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
+<link rel="canonical" href="https://birchreserve.net/starter">
+<meta property="og:type" content="website"><meta property="og:url" content="https://birchreserve.net/starter"><meta property="og:title" content="Starter placement · ${X.label} — Birch Reserve"><meta property="og:description" content="Dedicated placements from $1,900 inside private health and wellness hubs. Nothing runs before a signed insertion order."><meta property="og:image" content="https://birchreserve.net/og-birch-reserve.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Starter placement · ${X.label} — Birch Reserve"><meta name="twitter:description" content="Dedicated placements from $1,900 inside private health and wellness hubs. Nothing runs before a signed insertion order."><meta name="twitter:image" content="https://birchreserve.net/og-birch-reserve.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>*{box-sizing:border-box}body{margin:0;background:#F9F8F6;color:#071A39;font:16px/1.6 "IBM Plex Sans",sans-serif}
 header,main,footer{max-width:880px;margin:auto;padding:18px 22px}header{display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-bottom:1px solid #ccd2d8;flex-wrap:wrap}

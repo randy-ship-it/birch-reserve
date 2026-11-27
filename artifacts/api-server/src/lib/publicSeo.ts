@@ -214,11 +214,14 @@ export function escapeXml(value: string): string {
     .replaceAll("'", "&apos;");
 }
 
+/** Date the public pages were last materially edited. Bump when site copy ships; insights carry their own. */
+export const SITE_LASTMOD = "2026-11-26";
+
 export function sitemapXml(paths: readonly string[], lastmodByPath: ReadonlyMap<string, string> = new Map()): string {
   const body = paths
     .map((path) => {
       const loc = escapeXml(publicCanonical(path));
-      const lastmod = lastmodByPath.get(path);
+      const lastmod = lastmodByPath.get(path) ?? SITE_LASTMOD;
       return `<url><loc>${loc}</loc>${lastmod ? `<lastmod>${escapeXml(lastmod)}</lastmod>` : ""}</url>`;
     })
     .join("");
@@ -314,27 +317,41 @@ export function readSpaIndexHtml(): string {
  */
 export function homeOfferJsonLd(currency: ReserveCurrency): string {
   const offer = PUBLIC_RESERVE_OFFERS.find((o) => o.sku === "reserve-490");
-  if (!offer) throw new Error("reserve-490 offer is missing.");
+  const look = PUBLIC_RESERVE_OFFERS.find((o) => o.sku === "hold-190");
+  if (!offer || !look) throw new Error("hold-190 / reserve-490 offers are missing.");
+  const cur = currency.toUpperCase();
+  const seller = { "@id": `${PUBLIC_SITE_ORIGIN}/#org` };
   const data = {
     "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: "Birch Reserve starter slot",
-    itemListElement: [
+    "@graph": [
       {
-        "@type": "ListItem",
-        position: 1,
-        item: {
-          "@type": "Product",
-          name: "Birch Reserve starter slot",
-          sku: offer.sku,
-          category: "Health and wellness retail media / display and CPC",
-          offers: {
-            "@type": "Offer",
-            price: String(offerAmountCents(offer, currency) / 100),
-            priceCurrency: currency.toUpperCase(),
-            availability: "https://schema.org/LimitedAvailability",
-            url: `${PUBLIC_SITE_ORIGIN}/media-kit`,
-          },
+        "@type": "Organization",
+        "@id": `${PUBLIC_SITE_ORIGIN}/#org`,
+        name: "Birch Reserve",
+        url: `${PUBLIC_SITE_ORIGIN}/`,
+        logo: `${PUBLIC_SITE_ORIGIN}/logo.svg`,
+        email: "randy@scalehealth.ca",
+        parentOrganization: { "@type": "Organization", name: "Silver Birch Growth Inc." },
+        description: "Ad space inside co-branded Recovery Brand hubs and health and wellness business hubs.",
+      },
+      { "@type": "WebSite", "@id": `${PUBLIC_SITE_ORIGIN}/#website`, name: "Birch Reserve", url: `${PUBLIC_SITE_ORIGIN}/`, publisher: seller, inLanguage: "en" },
+      {
+        "@type": "Service",
+        "@id": `${PUBLIC_SITE_ORIGIN}/#service`,
+        name: "Birch Reserve hub display placements",
+        serviceType: "Display advertising inside private health and wellness hubs",
+        provider: seller,
+        areaServed: ["CA", "US"],
+        category: "Health and wellness retail media / display",
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "Birch Reserve placements",
+          itemListElement: [
+            { "@type": "Offer", name: "7-day category look", sku: look.sku, price: String(offerAmountCents(look, currency) / 100), priceCurrency: cur, url: `${PUBLIC_SITE_ORIGIN}/buycalc?sku=${look.sku}` },
+            { "@type": "Offer", name: "Category placement", sku: offer.sku, price: String(offerAmountCents(offer, currency) / 100), priceCurrency: cur, url: `${PUBLIC_SITE_ORIGIN}/buycalc?sku=${offer.sku}` },
+            { "@type": "Offer", name: "Starter placement", sku: `exclusive-reserve-1900-${currency}`, price: "1900", priceCurrency: cur, url: `${PUBLIC_SITE_ORIGIN}/starter` },
+            { "@type": "AggregateOffer", name: "Blocks by inquiry or offer", lowPrice: "25000", highPrice: "1500000", priceCurrency: "USD", url: `${PUBLIC_SITE_ORIGIN}/media-buyers` },
+          ],
         },
       },
     ],

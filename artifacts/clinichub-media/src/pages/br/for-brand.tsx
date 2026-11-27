@@ -379,7 +379,7 @@ function BrandFitPage({ fit }: { fit: BrandFit }) {
       <section className="border-b border-border/70 bg-foreground text-background">
         <div className="container mx-auto max-w-6xl px-5 py-10 md:px-6 md:py-14">
           <Eyebrow dark>Start</Eyebrow>
-          <h2 className="mt-2 font-display text-[1.75rem] leading-tight tracking-tight md:text-4xl">Look for $190 USD, or lock the category for $490 USD.</h2>
+          <h2 className="mt-2 font-display text-[1.75rem] leading-tight tracking-tight md:text-4xl">Look for $190 USD, or place in the category for $490 USD.</h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-background/75">
             Pricing, live hubs and how category locks work are in the{" "}
             <a href="/media-kit" className="underline underline-offset-4 hover:text-accent">
