@@ -63,8 +63,8 @@ test("Nov 24 PM: /agencies is the published rate-card model (standard 15% agency
   assert.match(faq, /standard 15% agency commission off the gross rate card/);
   assert.match(faq, /We do not undercut an agency's client/);
   assert.match(faq, /a further 10–20% off the net agency rate, on top of the standard 15% agency commission/);
-  assert.match(AGENCY_FAQ.find((f) => /reserved partner inventory/i.test(f.q))!.a, /further 10–20% off the net agency rate/);
-  assert.doesNotMatch(AGENCY_FAQ.find((f) => /reserved partner inventory/i.test(f.q))!.a, /same (written )?10%/);
+  assert.match(AGENCY_FAQ.find((f) => /partner inventory/i.test(f.q))!.a, /further 10–20% off the net agency rate/);
+  assert.doesNotMatch(AGENCY_FAQ.find((f) => /partner inventory/i.test(f.q))!.a, /same (written )?10%/);
   assert.doesNotMatch(faq, /10–25%|go-to-market sales motions|GTM bot/);
 });
 
@@ -331,7 +331,7 @@ test("Nov 25 (Randy t570u, reworded 5:21 PM): committed blocks get a further 10�
   const page = read("../clinichub-media/src/pages/br/agencies.tsx");
   const ui = read("../clinichub-media/src/components/br/agency-showcase.tsx");
   const tap = read("../clinichub-media/src/components/br/trusted-agency-partners.tsx");
-  const partnerFaq = AGENCY_FAQ.find((f) => /reserved partner inventory/i.test(f.q))!.a;
+  const partnerFaq = AGENCY_FAQ.find((f) => /partner inventory/i.test(f.q))!.a;
   const partnerSurfaces = page + tap + JSON.stringify({ AGENCY_TIERS, PARTNER_VALUE, BUYER_VALUE_EXAMPLE }) + partnerFaq;
   assert.doesNotMatch(partnerSurfaces, /same 10%|same written 10%/);
   assert.doesNotMatch(JSON.stringify({ AGENCY_TIERS, PARTNER_VALUE, BUYER_VALUE_EXAMPLE }) + partnerFaq, /guarantee/i);

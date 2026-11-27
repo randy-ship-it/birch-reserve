@@ -136,11 +136,11 @@ test("mirror pages: /intake/activate is served in Scale mode like the other inta
 });
 
 test("scaleMeta: metas, link titles and JSON-LD names speak as Scale Health; URLs and the visible disclosure stay", () => {
-  const html = `<head><meta name="description" content="Buy Scale Health ads through Birch Reserve. Hubs."><meta property="og:description" content="Birch Reserve x"><link title="Birch Reserve machine catalog" href="/c.json"><script type="application/ld+json">{"name":"Birch Reserve starter slot","url":"https://birchreserve.net/"}</script></head><body><span>ad partner Birch Reserve</span></body>`;
+  const html = `<head><meta name="description" content="Buy Scale Health ads through Birch Reserve. Hubs."><meta property="og:description" content="Birch Reserve x"><link title="Birch Reserve machine catalog" href="/c.json"><script type="application/ld+json">{"name":"Birch Reserve placements","url":"https://birchreserve.net/"}</script></head><body><span>ad partner Birch Reserve</span></body>`;
   const out = scaleMeta(html);
   assert.ok(!/<head>[\s\S]*<\/head>/.exec(out)![0].includes("Birch Reserve"));
   assert.match(out, /content="Buy Scale Health ads\. Hubs\."/);
-  assert.match(out, /"name":"Scale Health starter slot","url":"https:\/\/birchreserve\.net\/"/);
+  assert.match(out, /"name":"Scale Health placements","url":"https:\/\/birchreserve\.net\/"/);
   assert.match(out, /<span>ad partner Birch Reserve<\/span>/);
 });
 
