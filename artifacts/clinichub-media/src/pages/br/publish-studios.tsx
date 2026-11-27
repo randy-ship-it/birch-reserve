@@ -40,21 +40,29 @@ export default function BrPublishStudios() {
             </div>
             <HubDemandCard className="mt-6 max-w-xl" />
           </div>
-          <div className="border-2 border-foreground bg-white p-6" data-testid="publisher-offer">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-secondary/60 p-4">
-                <p className="font-display text-4xl">{$cash}</p>
-                <p className="mt-1 text-sm">cash</p>
+          {/* BR-83: one ruled offer panel: the two payouts, then the three steps in a line each (was boxed chips). */}
+          <div className="border-t-2 border-foreground" data-testid="publisher-offer">
+            <div className="grid grid-cols-2 border-b border-foreground/15">
+              <div className="py-6 pr-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Cash</p>
+                <p className="mt-2 whitespace-nowrap font-display text-4xl leading-none">{$cash}</p>
               </div>
-              <div className="bg-accent/50 p-4">
-                <p className="font-display text-4xl">{$credit}</p>
-                <p className="mt-1 text-sm">ad credit</p>
+              <div className="border-l border-foreground/15 py-6 pl-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Or ad credit</p>
+                <p className="mt-2 whitespace-nowrap font-display text-4xl leading-none">{$credit}</p>
               </div>
             </div>
-            <ol className="mt-5 grid grid-cols-3 gap-2 text-center text-sm font-semibold">
-              <li className="border border-foreground/15 p-2">1 Set up</li>
-              <li className="border border-foreground/15 p-2">2 Activate</li>
-              <li className="border border-foreground/15 p-2">3 Get paid</li>
+            <ol className="text-sm">
+              {[
+                { t: "Set up", d: "Your logo, services and booking link." },
+                { t: "Activate", d: "Share your hub with your members." },
+                { t: "Get paid", d: `${P.paidDaysAfterFirstTransaction} days after real traffic or transactions.` },
+              ].map((s, i) => (
+                <li key={s.t} className="grid grid-cols-[2rem_minmax(0,1fr)] items-baseline border-b border-foreground/15 py-3.5">
+                  <span className="font-display text-base tabular-nums text-muted-foreground">{i + 1}</span>
+                  <span><b className="font-semibold">{s.t}</b> <span className="text-muted-foreground">· {s.d}</span></span>
+                </li>
+              ))}
             </ol>
           </div>
         </div>

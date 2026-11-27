@@ -50,34 +50,37 @@ function page(open: boolean, status: Status, currency: ReserveCurrency = "cad", 
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>*{box-sizing:border-box}body{margin:0;background:#F9F8F6;color:#071A39;font:16px/1.6 "IBM Plex Sans",sans-serif}
-header,main,footer{max-width:880px;margin:auto;padding:18px 22px}header{display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-bottom:1px solid #ccd2d8;flex-wrap:wrap}
+header,main,footer{max-width:1080px;margin:auto;padding:18px 22px}header{display:flex;justify-content:space-between;gap:12px;align-items:baseline;border-bottom:1px solid #ccd2d8;flex-wrap:wrap}
 h1,h2{font-family:Fraunces,serif;font-weight:400;line-height:1.15}h1{font-size:clamp(2rem,5vw,3rem);margin:.3em 0}h2{font-size:1.5rem;margin:1.4em 0 .4em}a{color:#071A39}
 .fine{color:#4d5b6a;font-size:.88rem}.ok{background:#BFF3D6;color:#0B6B43;padding:10px 14px;border-radius:8px;margin:12px 0}.note{background:#fff;border:1px solid #ccd2d8;padding:10px 14px;border-radius:8px;margin:12px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}.stat{border:1px solid #ccd2d8;border-radius:12px;padding:14px;background:#fff}.stat b{display:block;font:600 1.6rem Fraunces,serif}
+.sp-hero{display:grid;gap:28px;margin-top:8px}@media(min-width:900px){.sp-hero{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:56px;align-items:start}.sp-side{position:sticky;top:20px}.jump{display:none!important}}.eb{font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#4d5b6a;margin:28px 0 0}.lede{font-size:1.02rem;color:#33425a;max-width:36rem}.facts{margin:26px 0 0;border-top:1px solid #071A39}.facts>div{display:grid;grid-template-columns:9.5rem minmax(0,1fr);gap:14px;padding:14px 0;border-bottom:1px solid #d9dde2}.facts dt{font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#4d5b6a;padding-top:.35rem}.facts dd{margin:0;color:#33425a;font-size:.95rem}.facts dd b{display:block;font:400 1.55rem/1.15 Fraunces,serif;color:#071A39}@media(max-width:520px){.facts>div{grid-template-columns:1fr;gap:2px}}
 .mc{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;background:#FFF4DB;border:1px solid #F1D58F;color:#8A5A00;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;vertical-align:middle}
-.cta{display:inline-block;background:#071A39;color:#fff;border-radius:6px;padding:12px 18px;min-height:44px;box-sizing:border-box;font:600 1rem "IBM Plex Sans";text-decoration:none}.steps{list-style:none;margin:16px 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.steps li{border:1px solid #ccd2d8;border-radius:10px;padding:10px 12px;background:#fff;font-size:.9rem;color:#4d5b6a}.steps b{display:block;color:#071A39}form{display:grid;gap:10px;border:1px solid #ccd2d8;border-radius:14px;padding:18px;background:#fff}input,select{width:100%;padding:10px;border:1px solid #b9c1c9;border-radius:8px;font:inherit}
+.cta{display:inline-block;background:#071A39;color:#fff;border-radius:6px;padding:12px 18px;min-height:44px;box-sizing:border-box;font:600 1rem "IBM Plex Sans";text-decoration:none}.steps{list-style:none;margin:22px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 16px;counter-reset:s}.steps li{font-size:.85rem;color:#4d5b6a;line-height:1.4;border-top:2px solid #071A39;padding-top:8px}.steps b{display:block;color:#071A39}@media(max-width:520px){.steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px}}form{display:grid;gap:12px;border:1px solid #071A39;border-radius:4px;padding:22px;background:#fff}form .ft{font:400 1.35rem/1.2 Fraunces,serif;margin:0 0 4px}input,select{width:100%;padding:10px;border:1px solid #b9c1c9;border-radius:8px;font:inherit}
 button{background:#071A39;color:#fff;border:0;border-radius:6px;min-height:44px;padding:12px 18px;justify-self:start;font:600 1rem "IBM Plex Sans";cursor:pointer}button:disabled{opacity:.6}
 details{border-top:1px solid #ccd2d8;padding:12px 0}summary{cursor:pointer;font-weight:600}ul{padding-left:1.1em}${TOKENS_CSS}${BUYER_HEADER_CSS}${PRICE_LADDER_CSS}</style></head><body>
 ${buyerHeaderHtml("exclusive", currencyToggleHtml(currency, (c) => currencyHref(path, query, c)))}
 <main>${banner}<div data-promo-box="success"></div>
-<p class="fine">STARTER PLACEMENT · PAY BY CARD</p>
+<div class="sp-hero"><div class="sp-main">
+<p class="eb">Starter placement · Pay by card</p>
 <h1>Starter placement · ${X.label}</h1>
-<p>Dedicated placements from $1,900. Your $1,900 counts in full toward a ${X.packageLabel} package in your category while we write your insertion order (IO). The IO names the hub, placement and dates. If you are bumped by another advertiser before you have finalized payment, we refund the $1,900 in full.</p>
-<p><a class="cta" href="#f">Start: pay ${X.label} &darr;</a></p>
-<div class="grid">
-<div class="stat"><b>${X.label}</b>today, by card, counted in full</div>
-<div class="stat"><b>${EXCLUSIVE_RESERVE.packageRange}</b>dedicated package, ${C}</div>
-<div class="stat"><b>Pending your IO</b>refunded if you are bumped by another advertiser before you have finalized payment</div>
-<div class="stat"><span class="mc">Modelled</span><b>${esc(pace.perMonth)}</b>over up to 6 months (${esc(pace.viewsPerMonth)})</div>
-</div>
+<p class="lede">Dedicated placements from $1,900. Your $1,900 counts in full toward a ${X.packageLabel} package in your category while we write your insertion order (IO). The IO names the hub, placement and dates. If you are bumped by another advertiser before you have finalized payment, we refund the $1,900 in full.</p>
+<p><a class="cta jump" href="#f">Start: pay ${X.label} &darr;</a></p>
+<dl class="facts">
+<div><dt>Today</dt><dd><b>${X.label}</b>by card, counted in full</dd></div>
+<div><dt>Package</dt><dd><b>${EXCLUSIVE_RESERVE.packageRange}</b>dedicated package, ${C}</dd></div>
+<div><dt>Refund</dt><dd><b>Pending your IO</b>refunded if you are bumped by another advertiser before you have finalized payment</dd></div>
+<div><dt>Pacing <span class="mc">Modelled</span></dt><dd><b>${esc(pace.perMonth)}</b>over up to 6 months (${esc(pace.viewsPerMonth)})</dd></div>
+</dl>
 <ol class="steps"><li><b>1 Pay</b>by card, 4 fields</li><li><b>2 IO</b>we email it within 1 business day</li><li><b>3 Sign</b>and send creative</li><li><b>4 Runs</b>on the dates in the IO</li></ol>
-${open ? `<form id="f"><label>Brand<input name="brand" required maxlength="160" autocomplete="organization"></label>
+</div><div class="sp-side">
+${open ? `<form id="f"><p class="ft">Start your placement</p><label>Brand<input name="brand" required maxlength="160" autocomplete="organization"></label>
 <label>Work email<input name="email" type="email" required maxlength="200" autocomplete="email"></label>
 <label>Category<select name="category" required><option value="">Choose a category</option>${cats}</select></label>
 <label class="fine"><input type="checkbox" name="agree" style="width:auto"> I agree to the <a href="/terms#exclusive">placement terms</a>. Nothing runs until I sign an insertion order.</label>
 <div data-promo-box></div><input type="hidden" name="currency" value="${currency}"><button id="b" type="submit">Pay ${X.label}</button><p id="m" class="fine" role="status"></p></form>`
     : `<form id="f"><p><b>Card checkout is paused right now.</b> Leave your details and we'll send the insertion order and a payment link within 1 business day.</p><label>Brand<input name="brand" required></label><label>Work email<input name="email" type="email" required></label><label>Category<select name="category"><option value="">Choose a category</option>${cats}</select></label><input type="hidden" name="agree" value="on"><input type="hidden" name="currency" value="${currency}"><button id="b" type="submit">Request this placement</button><p id="m" class="fine" role="status"></p></form>`}
 <p class="fine">Card checkout by Stripe, charged in ${C}, the currency shown on this page. Statement shows BIRCHRSV* RESERVE.</p>
+</div></div>
 ${priceLadderHtml(currency, { title: "Where this sits", current: "exclusive" })}
 <details><summary>Placement terms</summary><ul>${EXCLUSIVE_RESERVE_TERMS.map((t) => `<li>${esc(t)}</li>`).join("")}</ul></details>
 <details><summary>How the 6-month spend-down works</summary><p><span class="mc">Modelled</span>A ${esc(pace.credit)} package paced over 6 months is ${esc(pace.perMonth)}, about ${esc(pace.viewsPerMonth)} at today's blended starter CPM. Spend faster if you like. No impression guarantee; reporting is aggregate only.</p></details>
