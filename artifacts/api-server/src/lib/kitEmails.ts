@@ -4,14 +4,18 @@
  *   KIT_EMAIL_ENABLED=on   sends the kit email after a final submit
  *   KIT_NUDGE_ENABLED=on   lets the nudge sweep send
  * In production each flag must be exactly "on". On previews, sends are further limited to test+…@silverbirchgrowth.com.
- * Sender: KIT_EMAIL_FROM (default "Birch Reserve <kit@birchreserve.net>", must be a verified Resend sender).
+ * Sender: KIT_EMAIL_FROM (default "Birch Reserve <kit@birchreserve.net>") and, for Scale mirror sign-ups, KIT_EMAIL_FROM_SCALE
+ * (default "Scale Health <kit@scalehealth.ca>"). Each must be on a domain verified in the Resend account.
  * Reply-To: BIRCH_REPLY_TO (siteMail). Tokens: KIT_EMAIL_SECRET (HMAC). Never mentions Friday.
  */
-import { EMAIL_TOKENS, emailButton, emailLayout } from "./emailLayout";
+import { EMAIL_TOKENS, SCALE_EMAIL_TOKENS, emailButton, emailLayout, type EmailBrand } from "./emailLayout";
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 type Env = NodeJS.ProcessEnv;
 export const DEFAULT_KIT_FROM = "Birch Reserve <kit@birchreserve.net>";
+/** Mirror sign-ups: scalehealth.ca is the verified Resend domain (DKIM resend._domainkey + send.scalehealth.ca). */
+export const DEFAULT_KIT_FROM_SCALE = "Scale Health <kit@scalehealth.ca>";
+export const SCALE_KIT_BASE = "https://www.scalehealth.ca/intake/_m";
 export const SITE = "https://birchreserve.net";
 export const TEST_RECIPIENT_RE = /^test\+[a-z0-9._-]{1,40}@silverbirchgrowth\.com$/i;
 const EMAIL_RE = /^[^\s@<>]{1,64}@[^\s@<>]{1,255}\.[^\s@<>]{2,}$/;
@@ -25,9 +29,9 @@ export function recipientAllowed(email: string, flag: boolean, env: Env = proces
   if (!flag || !EMAIL_RE.test(email)) return false;
   return env.VERCEL_ENV === "production" ? true : TEST_RECIPIENT_RE.test(email);
 }
-export function kitFrom(env: Env = process.env): string {
-  const v = env.KIT_EMAIL_FROM?.trim();
-  return v && /@/.test(v) && !/friday/i.test(v) ? v : DEFAULT_KIT_FROM;
+export function kitFrom(env: Env = process.env, site: EmailBrand = "birch"): string {
+  const v = (site === "scale" ? env.KIT_EMAIL_FROM_SCALE : env.KIT_EMAIL_FROM)?.trim();
+  return v && /@/.test(v) && !/friday/i.test(v) ? v : site === "scale" ? DEFAULT_KIT_FROM_SCALE : DEFAULT_KIT_FROM;
 }
 
 /* ------------------------------------------------------------------ signed tokens (resume / unsubscribe) */
@@ -59,20 +63,47 @@ function shell(title: string, pre: string, inner: string, foot: string): string 
 }
 const button = (href: string, label: string) => emailButton(href, label);
 
-export type KitEmailInput = { brand?: string | null; reportUrl: string; headline?: { exposureMonth?: string; earningsMonth?: string } | null; hasPdf: boolean; /** Prefilled /intake/activate link: the "ads turned on" step. */ activateUrl?: string };
+export type KitEmailInput = {
+  brand?: string | null;
+  reportUrl: string;
+  headline?: { exposureMonth?: string; earningsMonth?: string } | null;
+  hasPdf: boolean;
+  /** Prefilled /intake/activate link: the "ads turned on" step. */
+  activateUrl?: string;
+  /** Which site the visitor signed up on. "scale" = the scalehealth.ca/intake mirror (ScaleHealth logo, colours, type). */
+  site?: EmailBrand;
+};
+/** Per-site copy and tokens. Same structure for both, so the two kit emails can't drift. */
+function kitSkin(site: EmailBrand) {
+  if (site === "scale") {
+    const S = SCALE_EMAIL_TOKENS;
+    return { site, name: "Scale Health", domain: "scalehealth.ca", ink: S.ink, muted: S.muted, line: S.line, sans: S.sans, accent: S.green,
+      h1: `font-family:${S.sans};font-weight:700;font-size:26px;line-height:1.2;letter-spacing:-0.4px`, fig: `font-family:${S.sans};font-weight:700;font-size:26px;letter-spacing:-0.4px` };
+  }
+  const T = EMAIL_TOKENS;
+  return { site, name: "Birch Reserve", domain: "birchreserve.net", ink: T.ink, muted: T.muted, line: T.line, sans: T.sans, accent: T.ink,
+    h1: `font-family:${T.serif};font-weight:400;font-size:28px;line-height:1.18`, fig: `font-family:${T.serif};font-weight:400;font-size:28px` };
+}
 export function renderKitEmail(i: KitEmailInput): { subject: string; html: string; text: string } {
-  const who = i.brand?.trim() ? esc(i.brand.trim()) : "your brand";
+  const k = kitSkin(i.site === "scale" ? "scale" : "birch");
+  const whoText = i.brand?.trim() || "your brand";
+  const who = esc(whoText);
   const stats = [i.headline?.exposureMonth ? [i.headline.exposureMonth, "page-view exposures a month, likely"] : null, i.headline?.earningsMonth ? [i.headline.earningsMonth, "hub earnings a month, likely"] : null].filter(Boolean) as string[][];
+  // BR-83: figures as a ruled row (hairline above, figure, small label), not tinted tiles.
   const statHtml = stats.length
-    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px -8px;border-collapse:separate;border-spacing:8px 0;width:calc(100% + 16px)"><tr>${stats.map(([v, l]) => `<td style="background:${MINT};border-radius:14px;padding:14px 16px;width:50%"><div style="font-family:${EMAIL_TOKENS.serif};font-size:28px;color:${FOREST}">${esc(v)}</div><div style="font-size:12px;color:${FOREST}">${esc(l)}</div></td>`).join('')}</tr></table>`
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0 4px;border-collapse:collapse"><tr>${stats.map(([v, l], n) => `<td valign="top" style="border-top:1px solid ${k.line};padding:12px ${n ? "0" : "16px"} 0 ${n ? "16px" : "0"};width:50%"><div style="${k.fig};line-height:1.1;color:${k.ink}">${esc(v)}</div><div style="margin-top:4px;font-family:${k.sans};font-size:12px;line-height:1.4;color:${k.muted}">${esc(l)}</div></td>`).join("")}</tr></table>`
     : "";
-  const inner = `<h1 style="font-family:${EMAIL_TOKENS.serif};font-weight:400;font-size:28px;line-height:1.18;margin:0 0 10px;color:${EMAIL_TOKENS.ink}">Your Monetization Kit is ready.</h1>
-<p style="font-size:15px;line-height:1.55;margin:0;color:${MUTE}">Here is what ${who} could reach and earn across health and wellness hubs. Estimates, reviewed by a person.</p>
-${statHtml}<div>${button(i.reportUrl, "Open my Monetization Kit")}</div>
-${i.hasPdf ? `<p style="font-size:13px;color:${MUTE};margin:0 0 14px">Your kit is attached as a PDF.</p>` : ""}${i.activateUrl ? `<p style="font-size:14px;line-height:1.5;margin:14px 0 8px;color:${MUTE}"><b style="color:${FOREST}">Next step: getting your ads turned on.</b> Two quick questions about your inventory and which ads can run on your hubs. Ranges are fine.</p><div>${button(i.activateUrl, "Answer the two questions")}</div>` : ""}`;
-  const foot = `Estimates in USD, not guarantees. A person at Birch Reserve reviews every request; nothing is booked or charged automatically.<br>Birch Reserve · birchreserve.net · Reply to this email to reach the team.`;
-  const text = `Your Monetization Kit is ready.\n\nHere is what ${i.brand?.trim() || "your brand"} could reach and earn across health and wellness hubs. Estimates, reviewed by a person.\n${stats.map(([v, l]) => `- ${v} ${l}`).join("\n")}\n\nOpen your Monetization Kit: ${i.reportUrl}\n${i.hasPdf ? "Your kit is attached as a PDF.\n" : ""}${i.activateUrl ? `\nNext step, getting your ads turned on (two quick questions): ${i.activateUrl}\n` : ""}\nEstimates in USD, not guarantees. Birch Reserve · birchreserve.net`;
-  return { subject: "Your free Monetization Kit from Birch Reserve", html: shell("Your Monetization Kit", "Your exposure and earnings estimate, plus the PDF.", inner, foot), text };
+  const next = i.activateUrl
+    ? `<p style="margin:18px 0 0;padding-top:16px;border-top:1px solid ${k.line};font-family:${k.sans};font-size:14px;line-height:1.55;color:${k.muted}"><b style="color:${k.ink}">Next step: getting your ads turned on.</b> Two quick questions about your inventory and which ads can run on your hubs. Ranges are fine.<br><a href="${esc(i.activateUrl)}" style="display:inline-block;margin-top:6px;font-weight:700;color:${k.accent};text-decoration:underline">Answer the two questions&nbsp;&rarr;</a></p>`
+    : "";
+  const inner = `<h1 style="${k.h1};margin:0 0 10px;color:${k.ink}">Your Monetization Kit is ready.</h1>
+<p style="font-family:${k.sans};font-size:15px;line-height:1.55;margin:0;color:${k.muted}">Here is what ${who} could reach and earn across health and wellness hubs. A person reviews every kit.</p>
+${statHtml}<div>${emailButton(i.reportUrl, "Open my Monetization Kit", k.site)}</div>
+${i.hasPdf ? `<p style="font-family:${k.sans};font-size:13px;color:${k.muted};margin:-8px 0 0">Your kit is attached as a PDF.</p>` : ""}${next}`;
+  const foot = `Modelled estimates from listed partners, not guarantees. A person at ${k.name} reviews every request; nothing is booked or charged automatically.<br>${k.name} · ${k.domain} · Reply to this email to reach the team.`;
+  const text = `Your Monetization Kit is ready.\n\nHere is what ${whoText} could reach and earn across health and wellness hubs. A person reviews every kit.\n${stats.map(([v, l]) => `- ${v} ${l}`).join("\n")}\n\nOpen your Monetization Kit: ${i.reportUrl}\n${i.hasPdf ? "Your kit is attached as a PDF.\n" : ""}${i.activateUrl ? `\nNext step, getting your ads turned on (two quick questions): ${i.activateUrl}\n` : ""}\nModelled estimates from listed partners, not guarantees. ${k.name} · ${k.domain}`;
+  const html = emailLayout({ title: "Your Monetization Kit", preheader: "Your exposure and earnings estimate, plus the PDF.", eyebrow: `${k.name} · Monetization Kit`, body: inner, footer: foot, brand: k.site });
+  return { subject: `Your free Monetization Kit from ${k.name}`, html, text };
 }
 
 export type NudgeInput = { resumeUrl: string; unsubscribeUrl: string; website?: string | null };
