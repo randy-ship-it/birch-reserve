@@ -2,13 +2,13 @@
  * Street 100 additions (Randy, Nov 21 2026): "What $100 gets you today", the measured sample report, and the premium spend-down example.
  * All numbers come from the live rate card / ad-event store / pricing modules. Modelled where labelled. No guarantees.
  */
-import { skinChat } from "@/lib/siteSkin";
+import { isScaleSkin, skinChat } from "@/lib/siteSkin";
 import { useEffect, useState } from "react";
 import { Check, Mail, Phone } from "lucide-react";
 import { HUNDRED_NOTE, HUNDRED_ROWS, HUNDRED_TITLE } from "../../../../api-server/src/lib/overhaul/hundred";
 import { SPEND_DOWN_MAX_MONTHS } from "../../../../api-server/src/lib/inventoryPlan";
 import { MEDIA_KIT_CPM, MEDIA_KIT_OFFERS, kitExample, usd } from "../../../../api-server/src/lib/overhaul/mediaKit";
-import { HUB_DEMAND_LINE, HUB_DEMAND_SUB, HUB_EARN_LINE, HUB_EARN_TITLE, HUB_PROOF_PATH, HUB_PROOF_TERMS } from "../../../../api-server/src/lib/overhaul/hubEarn";
+import { HUB_DEMAND_LINE, HUB_DEMAND_SUB, HUB_DEMAND_SUB_BIRCH, HUB_EARN_LINE, HUB_EARN_TITLE, HUB_PROOF_PATH, HUB_PROOF_TERMS } from "../../../../api-server/src/lib/overhaul/hubEarn";
 
 export function WhatHundredGets() {
   return (
@@ -107,7 +107,7 @@ export function HubDemandCard({ className = "" }: { className?: string }) {
   return (
     <div className={`rounded-2xl border border-foreground/15 bg-white p-4 ${className}`} data-testid="hub-demand">
       <p className="font-display text-xl leading-snug">{HUB_DEMAND_LINE}</p>
-      <p className="mt-1 text-sm text-foreground/75">{HUB_DEMAND_SUB}</p>
+      <p className="mt-1 text-sm text-foreground/75">{isScaleSkin() ? HUB_DEMAND_SUB : HUB_DEMAND_SUB_BIRCH}</p>
       <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl bg-accent/70 px-3 py-2.5">
         <span className="text-sm font-bold">{HUB_EARN_TITLE}</span>
         <a href={HUB_PROOF_PATH} data-testid="hub-proof-cta" className="inline-flex h-10 items-center rounded-full bg-foreground px-4 text-sm font-semibold text-background">Send my proof</a>
