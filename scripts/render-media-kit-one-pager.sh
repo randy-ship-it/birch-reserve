@@ -7,7 +7,7 @@ MARK="$ROOT/attached_assets/brand/birch-reserve-mark-v2.svg"
 SCALE_LOGO="$ROOT/attached_assets/brand/scalehealth-logo-srgb-v2.png"
 PUB="$ROOT/artifacts/clinichub-media/public"
 render() {
-  local skin="$1" out="$2"
+  local skin="$1" out="$2" cur="${3:-usd}"
   local TMP; TMP="$(mktemp -d)"
   local html="$TMP/one-pager.html"
   cp "$SRC" "$html"
@@ -52,6 +52,18 @@ for k,v in repl.items():
 p.write_text(s)
 PY
   fi
+  if [ "$cur" = "cad" ]; then
+    # CAD copy (BR-81): same numbers the site shows Canadian visitors. Blocks stay in USD (site rule, #460).
+    python3 - "$html" << 'PY'
+import sys
+from pathlib import Path
+p = Path(sys.argv[1])
+s = p.read_text()
+for a, b in [("$190 USD", "$270 CAD"), ("$490 USD", "$690 CAD"), ("$1,900 USD", "$1,900 CAD"), ("$190", "$270"), ("$490", "$690")]:
+    s = s.replace(a, b)
+p.write_text(s)
+PY
+  fi
   google-chrome --headless=new --disable-gpu --no-pdf-header-footer \
     --print-to-pdf="$out" --no-sandbox --disable-dev-shm-usage \
     --virtual-time-budget=20000 "file://$html"
@@ -60,3 +72,5 @@ PY
 }
 render birch "$PUB/birch-reserve-one-pager.pdf"
 render scale "$PUB/scale-health-one-pager.pdf"
+render birch "$PUB/birch-reserve-one-pager-cad.pdf" cad
+render scale "$PUB/scale-health-one-pager-cad.pdf" cad

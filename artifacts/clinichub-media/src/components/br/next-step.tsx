@@ -326,7 +326,7 @@ export function NextStep({ where, brand = "", anchor = true, yieldToPostKit = fa
             Start the $190 look <ArrowRight className="size-5" />
           </a>
           <p className="mt-3 text-sm">
-            <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="next-step-reserve">or reserve $490 as media credit</a>
+            <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={() => trackCta("cta_reserve_490", { offer: "reserve-490" })} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="next-step-reserve">or a $490 category placement</a>
           </p>
           {showMock ? <NextStepTerms /> : null}
         </div>
@@ -395,21 +395,23 @@ export function PostKitNext({ kit, where = "post_kit" }: { kit: KitPrefill; wher
           <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={go("hold-190")} className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#0b1f3a] px-7 text-lg font-bold text-white hover:bg-[#13305a] md:w-auto" data-testid="post-kit-look">
             {busy === "hold-190" ? <Loader2 className="size-5 animate-spin" /> : null}Start the $190 look <ArrowRight className="size-5" />
           </a>
-          <p className="mt-3 text-sm">
-            <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={go("reserve-490")} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="post-kit-reserve">or reserve $490 as media credit</a>
-          </p>
           <p className="mt-3 text-[13px] text-foreground/70" data-testid="post-kit-prefill-line">
             {label ? `Prefilled for ${label}. ` : "Prefilled from your kit. "}100% credit toward $490 within 7 days, otherwise refunded.
           </p>
         </div>
       </div>
-      <div className="mt-6"><MidTier where={where} kit={kit} showMock={false} /></div>
-      {/* Mobile: one sticky bar for the two card offers, portalled to <body> so no transformed ancestor (Scale skin) breaks `fixed`. The chat/voice dock lifts above it (randy-chat.tsx --birch-dock-bottom). */}
+      {/* BR-81 (Randy, Nov 27 2026 "push this!"): one primary step ($190 look); everything else one tap away. */}
+      <Details label="More ways to buy" testId="post-kit-more">
+        <p className="text-sm">
+          <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={go("reserve-490")} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="post-kit-reserve">$490 category placement</a>
+          <span className="text-foreground/60"> · 100% media credit</span>
+        </p>
+        <div className="mt-3"><MidTier where={where} kit={kit} showMock={false} /></div>
+      </Details>
+      {/* Mobile: one sticky bar with the same single step, portalled to <body> so no transformed ancestor (Scale skin) breaks `fixed`. The chat/voice dock lifts above it (randy-chat.tsx --birch-dock-bottom). */}
       {mounted ? createPortal(
       <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-2 border-t border-foreground/10 bg-white/95 px-3 pb-[calc(env(safe-area-inset-bottom)+8px)] pt-2 shadow-[0_-8px_24px_-12px_rgba(7,26,57,0.35)] backdrop-blur md:hidden" data-testid="post-kit-sticky">
-        <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={go("hold-190")} className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-[#0b1f3a] text-sm font-bold text-white" data-testid="post-kit-sticky-look">$190 look</a>
-        <span aria-hidden className="text-foreground/40">·</span>
-        <a href={withUtm("/buy?plan=reserve-490", where, "reserve")} onClick={go("reserve-490")} className="inline-flex h-11 flex-1 items-center justify-center rounded-full border border-[#0b1f3a] text-sm font-bold text-[#0b1f3a]" data-testid="post-kit-sticky-reserve">$490 category placement</a>
+        <a href={withUtm("/buy?plan=hold-190", where, "look")} onClick={go("hold-190")} className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-[#0b1f3a] text-sm font-bold text-white" data-testid="post-kit-sticky-look">Start the $190 look</a>
       </div>,
         document.body,
       ) : null}

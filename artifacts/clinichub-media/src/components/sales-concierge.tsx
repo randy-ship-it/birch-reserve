@@ -88,7 +88,7 @@ export function SalesConcierge({
         {
           id: "init-1",
           role: "advisor",
-          text: "Birch Reserve places brands inside listed Scale Health customer hubs, beside products people already buy—not on the open web. I can help you inquire or reserve the right path.",
+          text: "Birch Reserve places brands inside listed Scale Health customer hubs, beside products people already buy—not on the open web. I can help you pick the right path.",
           isPrivacyNote: true
         },
         {
@@ -176,7 +176,7 @@ export function SalesConcierge({
       setIsTyping(true);
       window.setTimeout(() => {
         setIsTyping(false);
-        appendAdvisorMessage(localizeNow("Start on the Reserve List at https://birchreserve.net/inventory and claim a slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 category prepay is 100% media credit. Nothing runs until an insertion order names the surface."), [
+        appendAdvisorMessage(localizeNow("Start at https://birchreserve.net/inventory and pick your category. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 category prepay is 100% media credit. Nothing runs until an insertion order names the surface."), [
           { label: "Open Reservation Form", action: () => onHandoff(), primary: true },
           { label: "Compare advertising paths", action: () => handleChoosePath(true) }
         ]);
@@ -244,7 +244,7 @@ export function SalesConcierge({
       ]);
 
       appendAdvisorMessage("Would you like to claim a slot now?", [
-        { label: "Reserve first access", action: () => onHandoff(path), primary: true },
+        { label: "Get started", action: () => onHandoff(path), primary: true },
         { label: "See placement moments", action: showFormatPicker }
       ]);
     }, 800);
@@ -267,7 +267,7 @@ export function SalesConcierge({
     window.setTimeout(() => {
       setIsTyping(false);
       appendAdvisorMessage(selected.message, [
-        { label: "Reserve first access", action: () => onHandoff("display"), primary: true },
+        { label: "Get started", action: () => onHandoff("display"), primary: true },
         { label: "Show another context", action: showFormatPicker },
       ]);
     }, 380);
@@ -339,9 +339,9 @@ export function SalesConcierge({
       case "pricing_or_availability":
       case "self_serve_purchase":
         return {
-          text: localizeNow("Start on the Reserve List at https://birchreserve.net/inventory and claim a slot. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 category prepay is 100% media credit. Nothing runs until an insertion order names the surface."),
+          text: localizeNow("Start at https://birchreserve.net/inventory and pick your category. Categories stay open to more than one brand, and no brand gets more than 20%. The $490 category prepay is 100% media credit. Nothing runs until an insertion order names the surface."),
           options: [
-            { label: "Reserve first access", action: onHandoff, primary: true },
+            { label: "Get started", action: onHandoff, primary: true },
             { label: "Compare advertising paths", action: () => handleChoosePath(true) },
           ],
         };
@@ -362,17 +362,17 @@ export function SalesConcierge({
         };
       case "audience_or_metrics":
         return {
-          text: "We do not sell a guaranteed impression count. Reserve List brands are placed as each category activates. We name the surface on the insertion order.",
+          text: "We do not sell a guaranteed impression count. Brands are placed as each category activates. We name the surface on the insertion order.",
           options: [
-            { label: "Reserve first access", action: onHandoff, primary: true },
+            { label: "Get started", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },
           ],
         };
       case "media_kit":
         return {
-          text: localizeNow("The Reserve List: 8 advertiser categories inside listed Scale Health hubs, with curated placements. Not an open auction. Not a guaranteed impression buy. The $490 category prepay is media credit, not airfare."),
+          text: localizeNow("8 advertiser categories inside listed Scale Health hubs, with curated placements. Not an open auction. Not a guaranteed impression buy. The $490 category prepay is media credit, not airfare."),
           options: [
-            { label: "Reserve first access", action: onHandoff, primary: true },
+            { label: "Get started", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },
           ],
         };
@@ -439,7 +439,7 @@ export function SalesConcierge({
             response.handoffAllowed && response.recommendedInterest
               ? [
                   {
-                    label: `Reserve ${response.recommendedInterest} category`,
+                    label: `Start with ${response.recommendedInterest}`,
                     action: () => onHandoff(response.recommendedInterest!),
                     primary: true,
                   },
@@ -450,7 +450,7 @@ export function SalesConcierge({
                 ]
               : [
                   {
-                    label: "Reserve first access",
+                    label: "Get started",
                     action: onHandoff,
                     primary: true,
                   },
@@ -470,7 +470,7 @@ export function SalesConcierge({
           role: "advisor",
           text: "The live advisor is taking a pause, but you can still explore the paths or claim a slot directly.",
           options: [
-            { label: "Reserve first access", action: onHandoff, primary: true },
+            { label: "Get started", action: onHandoff, primary: true },
             { label: "Return to advertising paths", action: () => handleChoosePath(true) }
           ]
         }
