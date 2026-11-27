@@ -74,17 +74,18 @@ export function SeeYourAd({ testId = "see-your-ad", initial = "drho" }: { testId
         )}
       </form>
       <p className="mt-1.5 text-[12px] text-foreground/60" role={err ? "alert" : undefined}>{err || "Stays in your browser. Nothing is uploaded."}</p>
-      <div className="mt-3 flex flex-col gap-2">
-        <span className="w-fit rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2.5 py-1 text-[11px] font-bold text-[#8A5A00]" data-testid="mock-badge">{mockBadge(hub)}</span>
-        <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider" role="group" aria-label="Live hub">
+      {/* BR-83: hubs as one quiet tab row (was 2-3 rows of pills), the mock label as plain text. */}
+      <div className="mt-4 flex flex-col gap-1">
+        <span className="inline-flex w-fit items-center gap-1.5 text-[12px] font-semibold text-[#8A5A00]" data-testid="mock-badge"><span className="size-1.5 rounded-full bg-[#D9A21B]" aria-hidden />{mockBadge(hub)}</span>
+        <div className="-mx-1 flex items-center gap-0 overflow-x-auto border-b border-[#0b1f3a]/15 px-1 pr-8 text-[12px] font-semibold [mask-image:linear-gradient(90deg,#000_88%,transparent)] [scrollbar-width:none]" role="group" aria-label="Live hub">
           {HUB_KEYS.map((h) => (
-            <button key={h} type="button" aria-pressed={hub === h} onClick={() => { setAuto(false); setHub(h); trackAttn("preview.hub", { once: true }); }} className={`inline-flex min-h-10 shrink-0 items-center whitespace-nowrap rounded-full px-3.5 py-1 ${hub === h ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/70 ring-1 ring-foreground/15"}`} data-testid={`mock-hub-${h}`}>
+            <button key={h} type="button" aria-pressed={hub === h} onClick={() => { setAuto(false); setHub(h); trackAttn("preview.hub", { once: true }); }} className={`-mb-px inline-flex min-h-10 shrink-0 items-center whitespace-nowrap border-b-2 px-2.5 ${hub === h ? "border-[#0b1f3a] text-[#0b1f3a]" : "border-transparent text-foreground/55 hover:text-[#0b1f3a]"}`} data-testid={`mock-hub-${h}`}>
               {HUB_MOCKS[h].tab}
             </button>
           ))}
         </div>
       </div>
-      <div className="mt-2" onPointerDown={() => setAuto(false)}><HubMock brand={brand} logo={logo} hub={hub} category="Your category" badge={mockBadge(hub)} /></div>
+      <div className="mt-3" onPointerDown={() => setAuto(false)}><HubMock brand={brand} logo={logo} hub={hub} category="Your category" badge={mockBadge(hub)} /></div>
       <p className="mt-1.5 text-[12px] font-semibold"><a href={siteUrl("/hubs")} data-mirror-keep className="text-[#0b1f3a] underline underline-offset-2" data-testid={`${testId}-see-all`}>See all {HUB_KEYS.length + RETAIL_MICRO_HUBS.length} hubs</a> <span className="font-normal text-foreground/60">· {HUB_KEYS.length} shown here: Live now and Activating example mockups</span></p>
     </div>
   );

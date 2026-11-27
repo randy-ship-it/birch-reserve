@@ -113,11 +113,11 @@ export function CategoryStrip({ className = "", testId = "category-strip" }: { c
   const items = SERVED_CATEGORIES.map((c) => c.name);
   return (
     <section className={`overflow-hidden ${className}`} aria-label="Categories we place for" data-testid={testId}>
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Categories we place for</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/55">Categories we place for</p>
       <div className="relative mt-2 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_6%,#000_94%,transparent)] motion-reduce:[mask-image:none]">
-        <ul className="flex w-max animate-marquee gap-2 [animation-duration:45s] hover:[animation-play-state:paused] motion-reduce:w-auto motion-reduce:flex-wrap" aria-hidden={false}>
+        <ul className="flex w-max animate-marquee items-center gap-0 border-y border-[#0b1f3a]/10 py-2.5 [animation-duration:60s] hover:[animation-play-state:paused] motion-reduce:w-auto motion-reduce:flex-wrap" aria-hidden={false}>
           {[...items, ...items].map((n, i) => (
-            <li key={`${n}-${i}`} className={`whitespace-nowrap rounded-full bg-white px-3 py-1 text-[13px] font-semibold text-[#0b1f3a] ring-1 ring-foreground/10 ${i >= items.length ? "motion-reduce:hidden" : ""}`} aria-hidden={i >= items.length ? true : undefined} data-testid={i < items.length ? "category-strip-item" : undefined}>
+            <li key={`${n}-${i}`} className={`whitespace-nowrap font-display text-[17px] text-[#0b1f3a] before:mx-4 before:text-[#0b1f3a]/25 before:content-['·'] ${i >= items.length ? "motion-reduce:hidden" : ""}`} aria-hidden={i >= items.length ? true : undefined} data-testid={i < items.length ? "category-strip-item" : undefined}>
               {n}
             </li>
           ))}
