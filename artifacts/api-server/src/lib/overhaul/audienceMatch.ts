@@ -144,7 +144,7 @@ export function scoreMatch(s: SiteSignals, blurbRaw: string): MatchResult {
       : { title: "Best fit: the clinic hub network", detail: "Clinic, gym and studio member hubs give broad health-and-wellness reach while brand-specific hubs fill in." },
   );
   if (businessType === "local") {
-    reasons.push({ title: "You serve a local area", detail: "Hub members near you can be reached by postal code. Lock down your 5 km area so nearby members see you first." });
+    reasons.push({ title: "You serve a local area", detail: "Hub members near you can be reached by postal code. Take a placement in your 5 km area so nearby members see you first." });
   } else if (commerce) {
     reasons.push({ title: "Your customers buy online", detail: "Post-purchase placements reach people who just finished buying something, the moment an offer is most welcome." });
   } else {
@@ -153,11 +153,11 @@ export function scoreMatch(s: SiteSignals, blurbRaw: string): MatchResult {
 
   const recommended: MatchResult["recommended"] =
     businessType === "local"
-      ? { product: "area_lock", label: "Lock down my area", href: "/advertise/local", why: "Hold up to 50% of hub display within 5 km of you (25% in dense downtown cores)." }
+      ? { product: "area_lock", label: "Get my area placement", href: "/advertise/local", why: "Hold up to 50% of hub display within 5 km of you (25% in dense downtown cores)." }
       : score >= 70
         ? { product: "brand_deposit", label: "Brand spend commit", href: "/advertise/brands", why: "Prepay a test budget across the best-fit hubs and get bonus credit." }
         : score >= 55
-          ? { product: "starter_slot", label: "Starter slot", href: "/advertise/brands#slots", why: "Start small with a non-exclusive slot and see the response." }
+          ? { product: "starter_slot", label: "Starter slot", href: "/advertise/brands#slots", why: "Start small with a shared slot and see the response." }
           : { product: "display_cpc_inquiry", label: "Request display / CPC", href: "/publish/brands#display-cpc", why: "We'll suggest the hubs and formats where your offer fits." };
 
   return {

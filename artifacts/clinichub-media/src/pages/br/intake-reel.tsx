@@ -15,7 +15,7 @@ import { isScaleSkin } from "@/lib/siteSkin";
 
 const R = "/reel";
 /** The Scale skin plays its own render: same reel, but the last slide is Scale's three exclusive private channels (Randy, Nov 21 2026 5:38 PM). */
-const SCALE_END = "Three exclusive private channels: branded hubs, our digital and brick-and-mortar provider network across Canada and the USA, and Calm Joints, our recovery store, with Street Team ambassadors. Download your monetization kit for a free customized assessment for your business.";
+const SCALE_END = "Three private channels: branded hubs, our digital and brick-and-mortar provider network across Canada and the USA, and Calm Joints, our recovery store, with Street Team ambassadors. Download your monetization kit for a free customized assessment for your business.";
 const REEL_FILES = (scale: boolean) => scale
   ? { v: `${R}/scale-ad-system-9x16.mp4`, h: `${R}/scale-ad-system-16x9.mp4`, vtt: `${R}/captions-scale-en.vtt`, len: "One-minute walkthrough" }
   : { v: `${R}/birch-scale-ad-system-9x16.mp4`, h: `${R}/birch-scale-ad-system-16x9.mp4`, vtt: `${R}/captions-en.vtt`, len: "50-second walkthrough" };
@@ -119,7 +119,7 @@ export default function BrIntakeReel() {
           <Ctas dark where="band" />
         </div>
         <div className="mt-6 divide-y divide-foreground/10 rounded-2xl border border-[#D3D7DE] bg-white px-5 py-2 text-sm">
-          <details className="py-2.5"><summary className="cursor-pointer font-semibold">What the $1,900 starter placement is</summary><p className="mt-1.5 text-foreground/75">A starter placement: one brand per category. It holds a dedicated package pending your insertion order, all of it counts toward that package, and it is refunded if another brand commits first. Nothing runs until the IO is signed. Shown in your currency.</p></details>
+          <details className="py-2.5"><summary className="cursor-pointer font-semibold">What the $1,900 starter placement is</summary><p className="mt-1.5 text-foreground/75">A starter placement holds a dedicated package pending your insertion order, all of it counts toward that package, and it is refunded if you are bumped by another advertiser before you have finalized payment. Nothing runs until the IO is signed. Shown in your currency.</p></details>
           <details className="py-2.5" data-testid="reel-transcript"><summary className="cursor-pointer font-semibold">Transcript</summary><p className="mt-1.5 text-foreground/75">{transcript}</p></details>
         </div>
         <p className="mt-5 max-w-3xl text-[13px] text-foreground/60">Northline Recovery, its hub and all dashboard figures in the video are examples, labelled EXAMPLE, not results. The hub placement shown is an example of how an ad could look, and runs only with the hub owner's approval. Upcoming categories are queued, with no launch dates. Channel figures are modelled estimates from listed partners, not a delivery promise. No guarantee of views, clicks, sales or results. Prices in the video are in USD.</p>

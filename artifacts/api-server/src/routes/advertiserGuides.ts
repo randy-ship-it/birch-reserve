@@ -70,7 +70,7 @@ const reserveHref = (g?: AdvertiserGuide) => `/starter${g?.exclusiveCategory ? `
 const ctaHtml = (g?: AdvertiserGuide) => `<div class="cta"><a class="btn" data-cta="reserve" href="${reserveHref(g)}">Starter placement · $1,900</a><a class="btn line" href="/media-kit">See the media kit</a></div>`;
 const CTA = ctaHtml();
 const STEPS = `<div class="steps" aria-label="How buying works"><div class="step"><b>1</b>Pay $1,900 by card. All of it counts toward your package.</div><div class="step"><b>2</b>Sign the insertion order: hub, placement, dates.</div><div class="step"><b>3</b>Send your creative. It runs after a quick human review.</div></div>`;
-const stickyHtml = (g?: AdvertiserGuide) => `<div class="sticky"><span>One brand per category. Refundable until 14 days before launch.</span><a class="btn" data-cta="reserve" href="${reserveHref(g)}">Starter placement · $1,900</a></div>`;
+const stickyHtml = (g?: AdvertiserGuide) => `<div class="sticky"><span>Refundable until 14 days before launch.</span><a class="btn" data-cta="reserve" href="${reserveHref(g)}">Starter placement · $1,900</a></div>`;
 const CTA_TRACK = `<script>document.addEventListener("click",function(e){var a=e.target&&e.target.closest&&e.target.closest('a[data-cta="reserve"]');if(!a)return;try{navigator.sendBeacon&&navigator.sendBeacon("/v1/ui-events",new Blob([JSON.stringify({event:"cta_open_reserve",path:(location.pathname||"/").slice(0,200)})],{type:"application/json"}))}catch(x){}},true)</script>`;
 const MOCK = `<div class="mock" role="img" aria-label="Illustrative hub page with example placement areas"><div class="b">Hub banner</div><div class="g">Member dashboard</div><div class="p">Product page unit</div><div class="g">Recovery tools</div><div class="b">Thank-you card</div></div><p class="mockcap">Illustrative. Example placement areas on a hub page, no brand creative.</p>`;
 
@@ -123,7 +123,7 @@ ${sources}`;
     ] },
   ];
   if (g.faq?.length) graph.push({ "@type": "FAQPage", mainEntity: [...(g.answer ? [{ q: g.h1, a: g.answer }] : []), ...g.faq].map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) });
-  if (isNew) graph.push({ "@type": "Offer", name: "Starter placement", price: "1900", priceCurrency: "CAD", url: `${PUBLIC_SITE_ORIGIN}/starter`, description: "Holds a $5K–$50K dedicated package in your category pending your insertion order. The full $1,900 counts toward that package. Refunded if another brand commits first. Nothing runs until you sign an insertion order.", seller: { "@type": "Organization", name: "Silver Birch Growth Inc." } });
+  if (isNew) graph.push({ "@type": "Offer", name: "Starter placement", price: "1900", priceCurrency: "CAD", url: `${PUBLIC_SITE_ORIGIN}/starter`, description: "Holds a $5K–$50K dedicated package in your category pending your insertion order. The full $1,900 counts toward that package. Refunded if you are bumped by another advertiser before you have finalized payment. Nothing runs until you sign an insertion order.", seller: { "@type": "Organization", name: "Silver Birch Growth Inc." } });
   return shell(path, g.title, g.description, body, { "@context": "https://schema.org", "@graph": graph }, stickyHtml(g));
 }
 

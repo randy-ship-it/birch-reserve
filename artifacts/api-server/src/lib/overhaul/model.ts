@@ -158,7 +158,7 @@ export const POSITIONING = {
   businessHubs: "Health & wellness business hubs: physio, mobility, gyms, studios and clinic hubs",
 } as const;
 
-// ---------------------------------------------------------------- area lock
+// ---------------------------------------------------------------- area placement
 
 /** Configurable. Defaults flagged for Randy (see AREA-LOCK-PRICING.md). */
 export const AREA_LOCK = {
@@ -309,8 +309,8 @@ export function quoteAreaLock(postal: string, termMonths: number, currencyOverri
 
 /** Non-exclusive slots: smaller deposits that buy down the rate (bonus credit). */
 export const SLOT_LADDER = [
-  { key: "slot-490", label: "Starter slot", usd: 490, cad: 690, bonusPct: 0, note: "Non-exclusive. Rate card." },
-  ...DEPOSIT_TIERS.map((t) => ({ key: t.key, label: t.label, usd: t.usd, cad: t.cad, bonusPct: t.bonusPct, note: `Non-exclusive. +${t.bonusPct}% bonus credit (${(100 - 100 / (1 + t.bonusPct / 100)).toFixed(1)}% effective discount).` })),
+  { key: "slot-490", label: "Starter slot", usd: 490, cad: 690, bonusPct: 0, note: "Shared. Rate card." },
+  ...DEPOSIT_TIERS.map((t) => ({ key: t.key, label: t.label, usd: t.usd, cad: t.cad, bonusPct: t.bonusPct, note: `Shared. +${t.bonusPct}% bonus credit (${(100 - 100 / (1 + t.bonusPct / 100)).toFixed(1)}% effective discount).` })),
 ] as const;
 
 // ---------------------------------------------------------------- publishers

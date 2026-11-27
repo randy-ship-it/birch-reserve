@@ -1,6 +1,6 @@
 /**
  * $1,900 starter placement (Randy, Nov 26 2026: keep the price, drop reserve/exclusive/lock framing).
- * Holds a $5K–$50K dedicated package in one category pending the IO; refunded if another brand commits first.
+ * Holds a $5K–$50K dedicated package in one category pending the IO; refunded if you are bumped by another advertiser before you have finalized payment.
  * One source for /exclusive and /starter, /terms, llms.txt and the Stripe line item, so they never drift.
  * Geo currency since Nov 21 2026 3:34 PM ET: the same $1,900 in CAD (Canada) or USD (everyone else),
  * charged in the currency the page showed (body.currency).

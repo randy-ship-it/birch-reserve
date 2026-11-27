@@ -14,7 +14,7 @@ const STARTER_BY_SURFACE: Record<string, { cpm: number; cpc: number }> = {
 
 export const PATHS = [
   { group: "Advertise", who: "Brands", href: "/advertise/brands", Icon: Megaphone, line: "Display inside private health and wellness hubs. Start at $190 USD or $490 USD.", cta: "Advertise as a brand" },
-  { group: "Advertise", who: "Local businesses & studios", href: "/advertise/local", Icon: Store, line: "Reach hub members near you. Start at $190 USD or $490 USD; area locks by inquiry.", cta: "Advertise locally" },
+  { group: "Advertise", who: "Local businesses & studios", href: "/advertise/local", Icon: Store, line: "Reach hub members near you. Start at $190 USD or $490 USD; area placements by inquiry.", cta: "Advertise locally" },
   { group: "Publish", who: "Brands", href: "/publish/brands", Icon: Building2, line: "Have a recovery audience? Apply for a co-branded hub. Or ask about display / CPC only.", cta: "Inquire to publish" },
   { group: "Publish", who: "Studios & retail", href: "/publish/studios", Icon: Users, line: "Activate your hub and earn $500 cash or $700+ in ad credit.", cta: "Activate my hub" },
 ] as const;

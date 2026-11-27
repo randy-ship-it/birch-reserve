@@ -186,7 +186,7 @@ const SAMPLE_IO_HTML = documentPage(
 <p>Nothing runs until an approved insertion order names the surface. This page is a blank sample, not a flight and not a receipt.</p>
 <dl>
 <div><dt><strong>Advertiser</strong></dt><dd>[Brand legal name]</dd></div>
-<div><dt><strong>SKU</strong></dt><dd>reserve-490 · $490 USD shared category placement (more than one brand can reserve; it does not lock the category), or hold-190 · $190 USD 7-day look, or the $1,900 starter placement (holds one dedicated package pending the IO; refunded if another brand commits first)</dd></div>
+<div><dt><strong>SKU</strong></dt><dd>reserve-490 · $490 USD shared category placement (more than one brand can reserve; it does not lock the category), or hold-190 · $190 USD 7-day look, or the $1,900 starter placement (holds one dedicated package pending the IO; refunded if you are bumped by another advertiser before you have finalized payment)</dd></div>
 <div><dt><strong>Named surface</strong></dt><dd>[Hub URL, for example a listed Scale Health hub]</dd></div>
 <div><dt><strong>Format</strong></dt><dd>post-checkout, recovery plan, booking confirmation, native hub module, or motion :15</dd></div>
 <div><dt><strong>Category</strong></dt><dd>One of eight: pain relief / topicals, recovery hardware, nutrition, sleep, meal prep, women’s health, men’s health, diagnostics / services</dd></div>

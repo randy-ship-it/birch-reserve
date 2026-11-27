@@ -47,7 +47,7 @@ const NAVY = "#0b1f3a";
 const FAQ = [
   { q: "Where exactly do the ads run?", a: "In post-purchase moments and inside health and wellness member hubs: pages inside a brand, clinic or retailer where its own customers land right after they buy or book. Categories start with recovery, then longevity, sleep, nutrition and more. Private clinic network display, retail micro hubs and the Street Team are separate add-ons. Each hub has four placements: post-purchase, the hub home page, product and services pages, and the member dashboard behind login." },
   { q: "Which hubs are live?", a: `${INVENTORY.line} More hubs launch over time.` },
-  { q: "Is this display or cost-per-click?", a: "Both. Every placement can be bought as display (priced per thousand views) or CPC (priced per click). Deposits and area locks draw down against either." },
+  { q: "Is this display or cost-per-click?", a: "Both. Every placement can be bought as display (priced per thousand views) or CPC (priced per click). Deposits and area placements draw down against either." },
   { q: "Are the audience numbers measured?", a: "Not yet. Audience and view figures on this site are modelled estimates from listed partners, not measured delivery. We don't publish a measured network views figure (the 2027 inventory figure is a modelled estimate); your insertion order sizes views against live hub supply. Reporting on your campaign is measured with UTM links and promo codes." },
   { q: "Can a local business or studio buy?", a: "Yes. Start with the same $190 USD 7-day look or $490 USD category placement. Locking your area (a share of hub display near your postal code) is a premium option, by inquiry." },
   { q: "How does my business become a hub?", a: `Studios and retailers activate a hub on ScaleHealth.ca, the platform that hosts the hubs (scalehealth.ca/clinichubs), and earn cash or ad credit once they activate their audience (email, text, a link on their site, at checkout, social). It is paid ${PUBLISHER_INCENTIVE.paidDaysAfterFirstTransaction} days after we see real traffic or transactions; self-purchases are excluded. Brands with a recovery audience can apply for a co-branded hub.` },
@@ -260,7 +260,7 @@ export default function BrHome() {
                 <p className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Premium slots · the main event</p>
                 <p className="mt-1 font-display text-2xl" data-currency-fixed>Blocks from $25,000 to $1.5M USD</p>
                 <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">Inquire only</p>
-                <p className="mt-2 text-sm text-white/75">Exclusivity, a larger display share and priority placement. No card purchase: we write the insertion order.</p>
+                <p className="mt-2 text-sm text-white/75">A larger display share and priority placement. No card purchase: we write the insertion order.</p>
                 <a href="/media-kit#premium" data-testid="home-cta-premium" className="mt-4 inline-flex h-11 items-center gap-1.5 rounded-full bg-lime-300 px-5 text-sm font-bold text-[#0b1f3a] hover:bg-white">Inquire about premium <ArrowRight className="size-4" aria-hidden /></a>
               </div>
             </div>

@@ -33,7 +33,7 @@ export function CategoriesWeServe({ dark = false }: { dark?: boolean }) {
     <section data-testid="categories-we-serve" aria-labelledby="cats-h">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <h2 id="cats-h" className={`font-display text-2xl leading-tight md:text-3xl ${dark ? "text-white" : "text-[#0b1f3a]"}`}>Categories we serve</h2>
-        <p className={`text-[12px] ${dark ? "text-white/60" : "text-foreground/55"}`}>Shared seats. A premium slot locks one brand per category.</p>
+        <p className={`text-[12px] ${dark ? "text-white/60" : "text-foreground/55"}`}>Shared seats. Premium slots add a larger share and priority placement.</p>
       </div>
       <ul className="mt-3 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 md:grid-cols-4">
         {SERVED_CATEGORIES.map((c) => (

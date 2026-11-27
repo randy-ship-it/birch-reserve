@@ -89,7 +89,7 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     const area = checkoutGate(process.env, "AREA_LOCK_ENABLED", "AREA_LOCK_LIVE");
     const deposits = checkoutGate(process.env, "SPONSOR_DEPOSITS_ENABLED", "SPONSOR_DEPOSITS_LIVE");
     res.set("Cache-Control", "no-store");
-    // Area lock is in PREMIUM_INQUIRE_ONLY: never advertise card checkout for it.
+    // Area placement is in PREMIUM_INQUIRE_ONLY: never advertise card checkout for it.
     res.json({ areaLockCheckout: area.open && !isPremiumOffer("area-lock"), areaLockInquireOnly: isPremiumOffer("area-lock"), depositCheckout: deposits.open, stripeMode: area.mode, friday: Boolean(process.env.FRIDAY_API_URL && process.env.FRIDAY_API_KEY) });
   });
 
@@ -161,12 +161,12 @@ export function createOverhaulRouter(deps: { createSession?: CreateSession; log?
     await sendSalesAlert({
       via: alertSiteOf(req),
       event: "seat_hold",
-      title: `Area lock: ${meta.business || str(body.email, 320) || "local business"}`,
+      title: `Area placement: ${meta.business || str(body.email, 320) || "local business"}`,
       rows: [["Business", meta.business], ["Email", str(body.email, 320)], ["Website", meta.website], ["Amount", `${built.amountCents / 100} ${String(built.currency).toUpperCase()}`], ["Checkout open", String(gate.open)], ["Page", "/advertise/local"]],
       replyTo: str(body.email, 320),
       isTest: isTestIdentity({ email: str(body.email, 320), name: meta.business }),
     });
-    // PREMIUM_INQUIRE_ONLY: an area lock is never paid by card. The intake above is the inquiry.
+    // PREMIUM_INQUIRE_ONLY: an area placement is never paid by card. The intake above is the inquiry.
     if (isPremiumOffer("area-lock")) {
       res.status(200).json({ held: true, inquire_only: true, message: `Inquiry sent. ${PREMIUM_INQUIRY_MESSAGE} We'll confirm your area within 1 business day. No charge was made.`, stored: friday.status });
       return;

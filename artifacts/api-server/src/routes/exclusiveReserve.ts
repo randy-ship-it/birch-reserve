@@ -43,7 +43,7 @@ function page(open: boolean, status: Status, currency: ReserveCurrency = "cad", 
         : "";
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Starter placement · ${X.label} — Birch Reserve</title>
-<meta name="description" content="Dedicated placements from $1,900. ${X.label} holds a $5K–$50K dedicated package in your category pending your insertion order. Refunded if another brand commits first. Nothing runs before the IO.">
+<meta name="description" content="Dedicated placements from $1,900. ${X.label} holds a $5K–$50K dedicated package in your category pending your insertion order. Refunded if you are bumped by another advertiser before you have finalized payment. Nothing runs before the IO.">
 <link rel="canonical" href="https://birchreserve.net/starter">
 <meta property="og:type" content="website"><meta property="og:url" content="https://birchreserve.net/starter"><meta property="og:title" content="Starter placement · ${X.label} — Birch Reserve"><meta property="og:description" content="Dedicated placements from $1,900 inside private health and wellness hubs. Nothing runs before a signed insertion order."><meta property="og:image" content="https://birchreserve.net/og-birch-reserve.png">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Starter placement · ${X.label} — Birch Reserve"><meta name="twitter:description" content="Dedicated placements from $1,900 inside private health and wellness hubs. Nothing runs before a signed insertion order."><meta name="twitter:image" content="https://birchreserve.net/og-birch-reserve.png">
@@ -62,12 +62,12 @@ ${buyerHeaderHtml("exclusive", currencyToggleHtml(currency, (c) => currencyHref(
 <main>${banner}<div data-promo-box="success"></div>
 <p class="fine">STARTER PLACEMENT · PAY BY CARD</p>
 <h1>Starter placement · ${X.label}</h1>
-<p>Dedicated placements from $1,900. Your $1,900 counts in full toward a ${X.packageLabel} package in your category while we write your insertion order (IO). The IO names the hub, placement and dates. If another brand commits to the category first, we refund the $1,900 in full.</p>
+<p>Dedicated placements from $1,900. Your $1,900 counts in full toward a ${X.packageLabel} package in your category while we write your insertion order (IO). The IO names the hub, placement and dates. If you are bumped by another advertiser before you have finalized payment, we refund the $1,900 in full.</p>
 <p><a class="cta" href="#f">Start: pay ${X.label} &darr;</a></p>
 <div class="grid">
 <div class="stat"><b>${X.label}</b>today, by card, counted in full</div>
 <div class="stat"><b>${EXCLUSIVE_RESERVE.packageRange}</b>dedicated package, ${C}</div>
-<div class="stat"><b>Pending your IO</b>refunded if another brand commits first</div>
+<div class="stat"><b>Pending your IO</b>refunded if you are bumped by another advertiser before you have finalized payment</div>
 <div class="stat"><span class="mc">Modelled</span><b>${esc(pace.perMonth)}</b>over up to 6 months (${esc(pace.viewsPerMonth)})</div>
 </div>
 <ol class="steps"><li><b>1 Pay</b>by card, 4 fields</li><li><b>2 IO</b>we email it within 1 business day</li><li><b>3 Sign</b>and send creative</li><li><b>4 Runs</b>on the dates in the IO</li></ol>

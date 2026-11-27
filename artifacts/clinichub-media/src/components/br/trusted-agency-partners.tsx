@@ -58,7 +58,7 @@ export function TrustedAgencyPartners() {
                 <span className="font-display text-5xl leading-none text-accent md:text-6xl">~50%</span>
                 <span>
                   <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] md:text-xs">Reserved for partners</span>
-                  <span className="mt-1.5 block text-[13px] leading-snug text-background/70 md:text-sm">Exclusive packages and newly activating hubs</span>
+                  <span className="mt-1.5 block text-[13px] leading-snug text-background/70 md:text-sm">Dedicated packages and newly activating hubs</span>
                 </span>
               </div>
               <div className="flex min-h-[200px] min-w-0 flex-col justify-between bg-[repeating-linear-gradient(135deg,transparent_0_11px,rgba(7,26,57,0.09)_11px_12px)] p-4 text-foreground md:min-h-[240px] md:p-6">
@@ -70,7 +70,7 @@ export function TrustedAgencyPartners() {
               </div>
             </div>
             <p className="mt-4 text-[12px] leading-snug text-muted-foreground" data-testid="tap-allocation-note">
-              Of available exclusive and category inventory. Modelled split; inventory is still activating.
+              Of available dedicated and category inventory. Modelled split; inventory is still activating.
             </p>
           </div>
 

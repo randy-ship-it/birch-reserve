@@ -80,7 +80,7 @@ function ZoomFit({ children }: { children: ReactNode }) {
 
 const RULES = [
   "Media credit until IO. Your payment is media credit; nothing runs until an insertion order names the hub and surface.",
-  "A share of display space across the hub network, curated as hubs launch. Premium slots add exclusivity and priority placement.",
+  "A share of display space across the hub network, curated as hubs launch. Premium slots add a larger display share and priority placement.",
   "The $490 USD category placement is fully refundable until 14 days before your launch date; credit is usable 12 months. The $190 USD look converts in full to the category placement within 7 days, or is refunded.",
   "Modelled volumes. Views and impressions are estimates, not measured delivery.",
   "Aggregate UTM reporting only. No personal data is shared.",
@@ -350,9 +350,9 @@ export default function BrMediaKit() {
             </div>
             <h3 className="mt-1 font-display text-2xl">Blocks from $25,000 to $1.5M USD</h3>
             <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.2em] text-lime-300">Inquire only</p>
-            <p className="mt-3 text-sm text-background/80">Exclusivity, a larger display share and priority placement. No card purchase — we reply with an insertion order. Term is set on the IO.</p>
+            <p className="mt-3 text-sm text-background/80">A larger display share and priority placement. No card purchase — we reply with an insertion order. Term is set on the IO.</p>
             <ul className="mt-4 space-y-2 text-sm text-background/85">
-              <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />Exclusivity for the term on the IO</li>
+              <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />Priority placement for the term on the IO</li>
               <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden /><span><EstimateTag /> Modelled estimate, not a guarantee: about {impr(premLo.imprLo)}–{impr(premHi.imprHi)} impressions at {cpm}</span></li>
               <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />{UPGRADE_PATH_LINE}</li>
             </ul>
@@ -393,7 +393,7 @@ export default function BrMediaKit() {
       {/* Categories */}
       <Block id="categories" eyebrow="The network" title="A growing network of private hubs." tone="soft">
         <AvailabilityStrip />
-        <p className="mt-4 text-sm text-foreground/80">Your reserve buys a share of display space across the network. We curate placements as each hub launches, and your insertion order names where you show before anything runs. Want exclusivity, a premium slot, or something custom? Ask below.</p>
+        <p className="mt-4 text-sm text-foreground/80">Your reserve buys a share of display space across the network. We curate placements as each hub launches, and your insertion order names where you show before anything runs. Want a premium slot or something custom? Ask below.</p>
         <div id="request" className="mt-8 scroll-mt-20 max-w-2xl">
           <CategoryRequestForm path="/media-kit" />
         </div>

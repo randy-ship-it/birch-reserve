@@ -153,8 +153,8 @@ export function checkoutLockLines(state: SiteCheckoutState): string {
   }
   lines.push(
     state.areaLock
-      ? "- Area lock (https://birchreserve.net/advertise/local) can be paid online after the postal-code check."
-      : "- Area lock (https://birchreserve.net/advertise/local) is inquiry-only right now: no online payment. Point to the postal-code check and take intake for a team callback; never send a pay link for it.",
+      ? "- Area placement (https://birchreserve.net/advertise/local) can be paid online after the postal-code check."
+      : "- Area placement (https://birchreserve.net/advertise/local) is inquiry-only right now: no online payment. Point to the postal-code check and take intake for a team callback; never send a pay link for it.",
   );
   lines.push(
     state.deposits

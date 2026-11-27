@@ -14,7 +14,7 @@ export const PREMIUM_INQUIRE_ONLY = {
   placements: ["post_purchase"],
   /** Rate-card view blocks (views per surface). */
   viewBlocks: [100_000, 250_000, 1_000_000],
-  /** Offer / SKU keys that are a category or area lock, or a view block. */
+  /** Offer / SKU keys that are a category or area placement, or a view block. */
   offers: ["area-lock", "category-lock", "block-100k", "block-250k", "block-1m"],
 } as const;
 

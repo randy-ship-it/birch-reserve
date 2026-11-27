@@ -40,7 +40,7 @@ export function exclusiveReserveFor(currency: ReserveCur) {
 
 export const EXCLUSIVE_RESERVE_NAME = "Birch Reserve starter placement · $1,900 CAD";
 export const EXCLUSIVE_RESERVE_DESCRIPTION =
-  "Holds a $5K–$50K dedicated package in your category while we write your insertion order (IO). The full $1,900 counts toward that package. Nothing runs until you sign the IO. Refunded in full if another brand commits to the category first, and refundable until 14 days before the IO launch date.";
+  "Holds a $5K–$50K dedicated package in your category while we write your insertion order (IO). The full $1,900 counts toward that package. Nothing runs until you sign the IO. Refunded if you are bumped by another advertiser before you have finalized payment, and refundable until 14 days before the IO launch date.";
 
 /** One factual rate line for every surface (replaces the "25% below the regular rate" claim: no firm published reference price). */
 export const EXCLUSIVE_RATE_LINE = "The package rate is set on your IO, at or below the published rate card.";

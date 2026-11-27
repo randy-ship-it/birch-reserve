@@ -62,7 +62,7 @@ const SRC = {
 } as const;
 
 const BIRCH_FIT =
-  "Birch Reserve sells prepaid display credit inside co-branded Scale Health Network hubs, with category exclusivity available on a premium slot set on an insertion order. The surfaces are post-purchase pages, member dashboards, hub home pages and product and service pages, seen by recovery, physio and wellness customers, mostly in Ontario and Quebec plus the US. Audience volumes on our pages are modelled until an insertion order names a hub.";
+  "Birch Reserve sells prepaid display credit inside co-branded Scale Health Network hubs, with larger, priority placements available on a premium slot set on an insertion order. The surfaces are post-purchase pages, member dashboards, hub home pages and product and service pages, seen by recovery, physio and wellness customers, mostly in Ontario and Quebec plus the US. Audience volumes on our pages are modelled until an insertion order names a hub.";
 
 const BIRCH_RULES =
   "Every placement follows the rules that already apply to your brand: Health Canada, the Competition Act, the FTC and FDA. Birch does not run prescription-drug promotion, and nothing runs until an insertion order names the hub and the creative. We report aggregate results only. There are no guaranteed outcomes.";
