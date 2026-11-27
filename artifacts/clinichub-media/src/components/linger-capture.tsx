@@ -7,11 +7,13 @@
  * the chat is open, and the chat launcher hides while this is showing (overlay-bus).
  * Hook (Randy 7:03pm): "Get the media kit". After the email saves, the success
  * state offers the PDF (/birch-reserve-one-pager.pdf) plus a link to /kit; if the PDF
- * isn't deployed yet, the download button falls back to /kit. Email required, company
- * optional, honeypot. Saves via POST /api/launch/email-capture (source email_capture:
+ * isn't deployed yet, the download button falls back to /kit. Email only, honeypot. Saves via POST /api/launch/email-capture (source email_capture:
  * Birch DB leads row, Friday push, Randy + Jon email; skipped for QA traffic).
  * Copy rules: no raw URLs as text, no invented metrics, public SKUs only ($190 / $490).
  * QA / screenshots: add ?linger=show to force it open.
+ * BR-81 (Randy, Nov 27 2026 "we're confusing people a bit with that follow up nudge"): one ask, one button.
+ * No promised follow-up email (the site sends none), no Reserve List / seat wording, no optional
+ * company field, one download button on success, and it never pops for a visitor who already sent a form.
  */
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { LocalPrice } from "@/components/local-price";
@@ -68,7 +70,6 @@ export function LingerCapture() {
   const [location] = useLocation();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
-  const [company, setCompany] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
   const [kitHref, setKitHref] = useState<string>(MEDIA_KIT_PDF);
@@ -123,6 +124,18 @@ export function LingerCapture() {
   }, [open]);
 
   useEffect(() => () => setLingerOpen(false), []);
+
+  // Already engaged: a visitor who sent any other form on the site never gets this nudge afterwards.
+  useEffect(() => {
+    const onSubmit = (e: Event) => {
+      const form = e.target as HTMLElement | null;
+      if (form?.closest?.('[data-testid="linger-capture"]')) return;
+      shownRef.current = true;
+      markSeen();
+    };
+    document.addEventListener("submit", onSubmit, true);
+    return () => document.removeEventListener("submit", onSubmit, true);
+  }, []);
 
   // Triggers.
   useEffect(() => {
@@ -209,7 +222,6 @@ export function LingerCapture() {
       const body = withFormGuards(
         {
           email: v,
-          ...(company.trim() ? { company: company.trim().slice(0, 200) } : {}),
           pagePath: /^\/[A-Za-z0-9._~/?=&%-]{0,199}$/.test(window.location.pathname) ? window.location.pathname : "/",
         },
         honeypotRef,
@@ -304,9 +316,7 @@ export function LingerCapture() {
                   <h2 id={titleId} className="font-display text-2xl leading-tight">
                     Your media kit is ready.
                   </h2>
-                  <p id={descId} className="text-[14px] leading-relaxed text-slate-600">
-                    Thanks. We&apos;ll also send a short note with placement updates.
-                  </p>
+                  <p id={descId} className="sr-only">Download it below.</p>
                   <a
                     href={kitHref}
                     {...(kitHref === MEDIA_KIT_PDF ? { download: "birch-reserve-one-pager.pdf" } : {})}
@@ -315,25 +325,17 @@ export function LingerCapture() {
                     data-testid="linger-download"
                   >
                     <Download className="size-4" aria-hidden />
-                    Download media kit (PDF)
-                  </a>
-                  <a
-                    href={MEDIA_KIT_PAGE}
-                    className="self-center text-[14px] font-medium text-slate-700 underline underline-offset-4 hover:text-slate-900"
-                    data-testid="linger-kit-link"
-                  >
-                    View the media kit online
+                    {kitHref === MEDIA_KIT_PDF ? "Download the PDF" : "Open the media kit"}
                   </a>
                 </div>
               ) : (
                 <>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Free download</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Free PDF</p>
                   <h2 id={titleId} className="mt-2 pr-8 font-display text-[26px] leading-[1.1] tracking-tight">
                     Get the media kit.
                   </h2>
                   <p id={descId} className="mt-2 text-[14px] leading-relaxed text-slate-600">
-                    Placements, formats and how slots on the Reserve List work inside listed Scale Health hubs, in one PDF. Category
-                    placements are <LocalPrice>$490</LocalPrice>, all media credit.
+                    Placements and prices on one page. Category placement from <LocalPrice>$490</LocalPrice>.
                   </p>
                   <form onSubmit={submit} className="relative mt-4 flex flex-col gap-2.5" noValidate data-testid="linger-form">
                     <HoneypotField inputRef={honeypotRef} idSuffix="linger" />
@@ -359,20 +361,6 @@ export function LingerCapture() {
                       className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-[15px] placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:outline-none"
                       data-testid="linger-email"
                     />
-                    <label className="sr-only" htmlFor="linger-company">
-                      Company (optional)
-                    </label>
-                    <input
-                      id="linger-company"
-                      type="text"
-                      autoComplete="organization"
-                      maxLength={200}
-                      placeholder="Company (optional)"
-                      value={company}
-                      onChange={(e) => setCompany(e.target.value)}
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 text-[15px] placeholder:text-slate-400 focus:border-slate-900 focus:bg-white focus:outline-none"
-                      data-testid="linger-company"
-                    />
                     {state === "error" && error && (
                       <p id="linger-error" role="alert" className="text-[13px] text-red-600">
                         {error}
@@ -394,7 +382,7 @@ export function LingerCapture() {
                       )}
                     </button>
                     <p className="text-[12px] leading-snug text-slate-500">
-                      Plus occasional seat updates. Unsubscribe anytime.{" "}
+                      Occasional placement news. Unsubscribe anytime.{" "}
                       <a href="/privacy" className="underline underline-offset-2 hover:text-slate-900">
                         Privacy
                       </a>

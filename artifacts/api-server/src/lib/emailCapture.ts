@@ -30,7 +30,7 @@ export function renderEmailCaptureEmail(lead: Lead): RenderedEmail {
   const rows: Array<[string, string]> = [
     ["Email", lead.email ?? "(not given)"],
     ["Company", lead.company ?? "(not given)"],
-    ["Wants", hubAlert ? "Hub launch alerts" : "Birch Reserve media kit + seat updates"],
+    ["Wants", hubAlert ? "Hub launch alerts" : "Birch Reserve media kit + placement news"],
     ...(hubAlert ? ([["Categories", lead.meta?.category ?? "(none)"]] as Array<[string, string]>) : []),
     ["Page", lead.pagePath ?? "/"],
     ["UTM source / medium / campaign", [lead.utmSource, lead.utmMedium, lead.utmCampaign].map((x) => x ?? "-").join(" / ")],
