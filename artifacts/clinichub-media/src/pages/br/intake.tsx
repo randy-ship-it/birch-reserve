@@ -65,7 +65,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
   return (
     <div data-testid="intake-landing">
       <MockBanner />
-      <section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_55%)]">
+      <section>
         <div className="container mx-auto max-w-5xl px-4 pb-8 pt-8 md:pt-14">
           {sup ? (
             <div data-testid="supplier-hero">
@@ -82,7 +82,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
               {scaleFacing ? (
                 <p className="mt-3 max-w-2xl text-base text-foreground/80" data-testid="hub-definition">{HUB_DEFINITION}</p>
               ) : (
-                <p className="mt-2 max-w-2xl text-base text-muted-foreground">Reserve space now, book a big block, or get your free kit.</p>
+                <p className="mt-2 max-w-2xl text-base text-muted-foreground">Buy space now, book a big block, or get your free kit.</p>
               )}
               <div className="mt-3"><WatchHowItWorks placement="hero_intake" testId="intake-watch-reel" /></div>
               {scaleFacing ? null : (
@@ -101,7 +101,7 @@ export default function BrIntake({ preset: forced }: { preset?: IntakePreset } =
               {showLanes ? (
                 <TwoLane />
               ) : (
-                <button type="button" onClick={() => setShowLanes(true)} className="text-left text-[13px] text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-reserve-space-link">Buying ads on existing hubs? Reserve space</button>
+                <button type="button" onClick={() => setShowLanes(true)} className="text-left text-[13px] text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-reserve-space-link">Buying ads on existing hubs? Buy space</button>
               )}
             </div>
           ) : null}

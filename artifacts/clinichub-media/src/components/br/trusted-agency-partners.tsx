@@ -35,7 +35,7 @@ export function TrustedAgencyPartners() {
               {PARTNER.name.replace(/ partners$/i, "")} <em className="italic">Partners</em>
             </h2>
             <p className="mt-5 text-lg text-muted-foreground md:text-xl">
-              Reserved inventory for <span className="bg-accent px-1 text-foreground">a few agencies.</span>
+              Dedicated inventory for <span className="bg-accent px-1 text-foreground">a few agencies.</span>
             </p>
           </div>
           <div className="flex w-full max-w-[300px] items-center gap-4 bg-foreground p-4 md:max-w-[340px] md:p-5" data-testid="tap-badge" role="img" aria-label={`${siteName()} Trusted Agency Partner badge`}>
@@ -50,14 +50,14 @@ export function TrustedAgencyPartners() {
         <div className="mt-10 grid gap-px border border-foreground bg-foreground lg:grid-cols-[1.15fr_1fr]">
           <div className="min-w-0 bg-background p-6 md:p-10" data-testid="tap-allocation">
             <h3 className="font-display text-2xl leading-tight text-foreground sm:text-3xl md:text-4xl">
-              Half reserved. <em className="italic">Half open.</em>
+              Half for partners. <em className="italic">Half open.</em>
             </h3>
             <div className="mt-6 grid grid-cols-2 border border-foreground">
               <div className="relative flex min-h-[200px] min-w-0 flex-col justify-between bg-foreground p-4 text-background md:min-h-[240px] md:p-6">
                 <span aria-hidden className="absolute right-3 top-3 hidden size-7 place-items-center bg-accent md:right-5 md:top-5 md:grid"><Check className="size-4 text-foreground" strokeWidth={3} /></span>
                 <span className="font-display text-5xl leading-none text-accent md:text-6xl">~50%</span>
                 <span>
-                  <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] md:text-xs">Reserved for partners</span>
+                  <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] md:text-xs">For partners</span>
                   <span className="mt-1.5 block text-[13px] leading-snug text-background/70 md:text-sm">Dedicated packages and newly activating hubs</span>
                 </span>
               </div>

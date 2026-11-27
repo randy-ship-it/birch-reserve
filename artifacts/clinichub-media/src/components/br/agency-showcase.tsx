@@ -461,7 +461,7 @@ export const LIST_PRICE_HREF = "/media-kit#start-small";
 
 export function ListPriceLine({ className = "" }: { className?: string }) {
   const steps = priceLadder("usd");
-  const short: Record<string, string> = { "hold-190": "7-day look", "reserve-490": "reserve", exclusive: "starter placement" };
+  const short: Record<string, string> = { "hold-190": "7-day look", "reserve-490": "category placement", exclusive: "starter placement" };
   return (
     <div className={`flex flex-wrap items-center justify-center gap-1.5 text-[13px] text-foreground/70 ${className}`} data-testid="agency-list-price">
       <b className="mr-1 text-[#0b1f3a]">List price =</b>
@@ -634,12 +634,15 @@ export function AgencyRateCardModel() {
           <p className="mt-3 text-sm leading-relaxed text-[#0b1f3a]/70">{PARTNER_VALUE.line} {PARTNER_VALUE.fine}</p>
         </article>
       </div>
-      <ol className="mt-6 grid gap-px border border-foreground/15 bg-foreground/15 sm:grid-cols-2 lg:grid-cols-3" data-testid="agency-rate-rules">
+      {/* BR-83: a ruled list, not a filled 3-column grid (7 rules left an empty grey cell). */}
+      <ol className="mt-8 grid gap-x-12 border-t border-foreground/80 sm:grid-cols-2" data-testid="agency-rate-rules">
         {AGENCY_RATE_RULES.map((r, i) => (
-          <li key={r.k} className="bg-background p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{String(i + 1).padStart(2, "0")}</p>
-            <p className="mt-2 font-display text-xl leading-tight text-foreground">{r.k}</p>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{r.d}</p>
+          <li key={r.k} className="grid grid-cols-[2.25rem_minmax(0,1fr)] border-b border-foreground/15 py-5">
+            <p className="pt-1 font-display text-sm tabular-nums text-muted-foreground">{String(i + 1).padStart(2, "0")}</p>
+            <div className="min-w-0">
+              <p className="font-display text-xl leading-tight text-foreground">{r.k}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{r.d}</p>
+            </div>
           </li>
         ))}
       </ol>

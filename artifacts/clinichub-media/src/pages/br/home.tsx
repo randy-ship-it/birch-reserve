@@ -33,7 +33,6 @@ import { LiveHubGrid, HubFunnel } from "@/components/br/hub-funnel";
 import { OwnTheMoment, FourSteps, SeeTheProof } from "@/components/br/hub-story";
 import { MidTier } from "@/components/br/next-step";
 import { WhatYoureBuying, hubDefinition, hubHostLine } from "@/components/br/what-youre-buying";
-import { siteName } from "@/lib/siteSkin";
 import { SeeYourAd } from "@/components/br/see-your-ad";
 import { BuyJourney } from "@/components/br/journey";
 import { trackAttn, useAttention } from "@/lib/attention";
@@ -70,15 +69,15 @@ function Chip({ children, tone = "estimate" }: { children: ReactNode; tone?: "es
 
 function Expand({ title, sub, children, testId, open = false }: { title: string; sub?: string; children: ReactNode; testId: string; open?: boolean }) {
   return (
-    <details data-testid={testId} open={open || undefined} className="group overflow-hidden rounded-2xl border border-[#0b1f3a]/10 bg-white shadow-sm">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 md:px-6 [&::-webkit-details-marker]:hidden">
+    <details data-testid={testId} open={open || undefined} className="group border-b border-[#0b1f3a]/15">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 [&::-webkit-details-marker]:hidden">
         <span className="min-w-0">
-          <span className="block font-display text-xl leading-tight text-[#0b1f3a] md:text-2xl">{title}</span>
-          {sub ? <span className="mt-0.5 block text-[13px] text-foreground/60">{sub}</span> : null}
+          <span className="block font-display text-xl leading-tight text-[#0b1f3a] transition-colors group-hover:text-[#0b1f3a]/70 md:text-[1.6rem]">{title}</span>
+          {sub ? <span className="mt-1 block text-[13px] text-foreground/55">{sub}</span> : null}
         </span>
         <ChevronDown className="size-5 shrink-0 text-[#0b1f3a]/60 transition group-open:rotate-180" aria-hidden />
       </summary>
-      <div className="border-t border-[#0b1f3a]/10">{children}</div>
+      <div className="pb-6">{children}</div>
     </details>
   );
 }
@@ -128,60 +127,66 @@ export default function BrHome() {
 
       <style>{`@media (max-width: 767px){html.br-hero-in-view .birch-dock-squirrel{visibility:hidden!important;pointer-events:none!important}html.br-hero-in-view [data-testid=sticky-kit-cta]{display:none!important}}`}</style>
       {/* 1. Hero: one line + the kit CTA. */}
-      <section className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]" data-testid="home-hero">
+      <section className="border-b border-[#0b1f3a]/10" data-testid="home-hero">
         {/* Mobile first screen (Randy, Nov 21 2:26 PM): one slim line of real recent activity above the headline. In flow, never over the preview card. */}
         <div className="container mx-auto min-h-[5.25rem] max-w-6xl px-4 pt-3 md:hidden" data-testid="home-pulse-slim"><ActivityPulse mode="inline" slim /></div>
-        <div className="container mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-x-8 gap-y-5 px-4 pb-8 pt-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:grid-rows-[auto_auto] md:content-center md:pb-12 md:pt-14">
+        <div className="container mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-x-8 gap-y-5 px-4 pb-8 pt-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] md:grid-rows-[auto_auto] md:content-center md:pb-16 md:pt-16">
           <div className="md:col-start-1 md:row-start-1 md:self-end">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55" data-testid="home-eyebrow">{siteName()} · Private hub display network</p>
-          <h1 className="mt-2 font-display text-[2.6rem] leading-[1.02] text-[#0b1f3a] md:text-6xl">See your brand inside a live wellness hub.</h1>
-          <p className="mt-3 max-w-xl text-base text-muted-foreground md:text-lg" data-testid="home-hub-definition">{hubDefinition()}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-foreground/50" data-testid="home-eyebrow">Private hub display network</p>
+          <h1 className="mt-4 font-display text-[2.6rem] leading-[1.02] tracking-[-0.01em] text-[#0b1f3a] md:text-[4.25rem]">See your brand inside a live wellness hub.</h1>
+          <p className="mt-5 max-w-[34rem] text-base leading-relaxed text-foreground/70 md:text-[1.0625rem]" data-testid="home-hub-definition">{hubDefinition()}</p>
           </div>
           <div className="order-3 md:order-none md:col-start-1 md:row-start-2 md:self-start">
           <BuyCta placement="hero_home" className="mt-0" onClick={() => trackAttn("hero_cta.buy")} />
-          <p className="mt-3 text-[13px] text-foreground/60">
-            or <a href="/buy?plan=hold-190&ref=hero_home" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-look" onClick={() => trackAttn("hero_cta.look")}>start with a {price.look} 7-day look</a>
+          <p className="mt-4 text-[14px] text-foreground/65">
+            or <a href="/buy?plan=hold-190&ref=hero_home" className="font-semibold text-[#0b1f3a] underline decoration-[#0b1f3a]/30 underline-offset-4 hover:decoration-[#0b1f3a]" data-testid="home-cta-look" onClick={() => trackAttn("hero_cta.look")}>start with a {price.look} 7-day look</a>
           </p>
-          <p className="mt-2 text-[13px] text-foreground/60" data-testid="home-hero-agencies">
-            Buying for clients? <a href="/agencies?ref=hero_home" className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-agencies" onClick={() => trackAttn("hero_cta.agencies")}>For agencies: the standard 15% agency commission off the rate card</a>
+          <div className="mt-5"><WatchHowItWorks placement="hero_home" testId="home-watch-reel" /></div>
+          <p className="mt-6 flex flex-wrap gap-x-5 gap-y-1 border-t border-[#0b1f3a]/10 pt-4 text-[13px] text-foreground/60" data-testid="home-hero-agencies">
+            <a href="/agencies?ref=hero_home" className="hover:text-[#0b1f3a]" data-testid="home-cta-agencies" onClick={() => trackAttn("hero_cta.agencies")}>Agencies: 15% commission <span aria-hidden>→</span></a>
+            <a href={intakeHref("hero_home")} className="hover:text-[#0b1f3a]" data-testid="home-kit-cta" onClick={() => { logCtaClick("hero_home"); trackAttn("hero_cta.kit"); }}><span data-testid="home-cta-kit">Free Monetization Kit <span aria-hidden>→</span></span></a>
           </p>
-          <p className="mt-2 text-[13px] text-foreground/60" data-testid="home-kit-cta">
-            Not ready? <a href={intakeHref("hero_home")} className="font-semibold text-[#0b1f3a] underline underline-offset-4" data-testid="home-cta-kit" onClick={() => { logCtaClick("hero_home"); trackAttn("hero_cta.kit"); }}>Get my free Monetization Kit</a>
-          </p>
-          <div className="mt-4"><WatchHowItWorks placement="hero_home" testId="home-watch-reel" /></div>
           </div>
           <div className="order-2 md:order-none md:col-start-2 md:row-span-2 md:row-start-1 md:self-center"><SeeYourAd testId="home-hero-mock" /><p className="mt-1 text-[12px] leading-snug text-foreground/60" data-testid="home-hub-host">{hubHostLine()}</p></div>
         </div>
       </section>
-      {/* Front door (Randy, outside review Nov 23 2026 10:37 PM): the $190 look and $490 category placement, right under the hero. */}
-      <section className="container mx-auto max-w-6xl px-4 pb-6 pt-1" data-testid="home-plan-strip">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="flex flex-col rounded-2xl border border-[#0b1f3a]/15 bg-white p-4 shadow-sm" data-testid="home-strip-look">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">7-day look</p>
-            <p className="mt-0.5 font-display text-3xl leading-none text-[#0b1f3a]">{price.look}</p>
-            <p className="mt-2 flex-1 text-[13px] leading-snug text-foreground/75">See your placement for 7 days. It converts in full to a category placement, or it is refunded.</p>
-            <a href="/buy?plan=hold-190&ref=home_strip" data-testid="home-strip-look-cta" onClick={() => trackAttn("strip.look")} className="mt-3 inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-[#0b1f3a]/30 px-5 text-sm font-bold text-[#0b1f3a] hover:border-[#0b1f3a]">Start my look · {price.look} <ArrowRight className="size-4" aria-hidden /></a>
+      {/* Front door (Randy, outside review Nov 23 2026 10:37 PM): the $190 look and $490 category placement, right under the hero.
+          BR-83 (Nov 27): one ruled rate panel, not four differently styled boxes. Same prices, same words. */}
+      <section className="container mx-auto max-w-6xl px-4 pb-10 pt-10 md:pt-14" data-testid="home-plan-strip">
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="font-display text-2xl text-[#0b1f3a] md:text-3xl">Rates</h2>
+          <p className="text-[12px] text-foreground/55">Prices in USD unless shown.</p>
+        </div>
+        <div className="mt-4 grid border-y border-[#0b1f3a] md:grid-cols-3">
+          <div className="flex flex-col py-6 md:pr-8" data-testid="home-strip-look">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/55">7-day look</p>
+            <p className="mt-2 font-display text-4xl leading-none text-[#0b1f3a]">{price.look}</p>
+            <p className="mt-3 flex-1 text-[14px] leading-relaxed text-foreground/70">See your placement for 7 days. It converts in full to a category placement, or it is refunded.</p>
+            <a href="/buy?plan=hold-190&ref=home_strip" data-testid="home-strip-look-cta" onClick={() => trackAttn("strip.look")} className="mt-5 inline-flex h-11 items-center justify-center gap-1.5 self-start rounded-full border border-[#0b1f3a]/30 px-5 text-sm font-semibold text-[#0b1f3a] transition-colors hover:border-[#0b1f3a]">Start my look · {price.look} <ArrowRight className="size-4" aria-hidden /></a>
           </div>
-          <div className="flex flex-col rounded-2xl bg-lime-200 p-4 shadow-sm" data-testid="home-strip-reserve">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#0b1f3a]/70">Category placement</p>
-            <p className="mt-0.5 font-display text-3xl leading-none text-[#0b1f3a]">{price.seat}</p>
-            <p className="mt-2 flex-1 text-[13px] leading-snug text-[#0b1f3a]/80">A shared category placement. 100% media credit toward your insertion order, refundable until 14 days before launch.</p>
-            <a href="/buy?plan=reserve-490&ref=home_strip" data-testid="home-strip-reserve-cta" onClick={() => trackAttn("strip.reserve")} className="mt-3 inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-white hover:text-[#0b1f3a]">Category placement · {price.seat} <ArrowRight className="size-4" aria-hidden /></a>
+          <div className="relative flex flex-col border-t border-[#0b1f3a]/15 py-6 md:border-l md:border-t-0 md:px-8" data-testid="home-strip-reserve">
+            <span className="absolute inset-x-0 top-0 h-1 bg-lime-300 md:inset-x-8" aria-hidden />
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#0b1f3a]">Category placement</p>
+            <p className="mt-2 font-display text-4xl leading-none text-[#0b1f3a]">{price.seat}</p>
+            <p className="mt-3 flex-1 text-[14px] leading-relaxed text-foreground/70">A shared category placement. 100% media credit toward your insertion order, refundable until 14 days before launch.</p>
+            <a href="/buy?plan=reserve-490&ref=home_strip" data-testid="home-strip-reserve-cta" onClick={() => trackAttn("strip.reserve")} className="mt-5 inline-flex h-11 items-center justify-center gap-1.5 self-start rounded-full bg-[#0b1f3a] px-5 text-sm font-semibold text-white transition-colors hover:bg-lime-300 hover:text-[#0b1f3a]">Category placement · {price.seat} <ArrowRight className="size-4" aria-hidden /></a>
           </div>
+          <a href="/starter?ref=home_strip" data-testid="home-strip-exclusive" onClick={() => trackAttn("strip.starter")} className="group flex flex-col border-t border-[#0b1f3a]/15 py-6 md:border-l md:border-t-0 md:pl-8">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/55">Starter placement</p>
+            <p className="mt-2 font-display text-4xl leading-none text-[#0b1f3a]">$1,900</p>
+            <p className="mt-3 flex-1 text-[14px] leading-relaxed text-foreground/70">A $5K–$50K dedicated package in your category, set on your IO. Nothing runs before you sign.</p>
+            <span className="mt-5 inline-flex h-11 items-center justify-center gap-1.5 self-start rounded-full border border-[#0b1f3a]/30 px-5 text-sm font-semibold text-[#0b1f3a] transition-colors group-hover:border-[#0b1f3a]">Starter placement · $1,900 <ArrowRight className="size-4" aria-hidden /></span>
+          </a>
         </div>
         {/* Agencies get their own door (Randy, Nov 24 2026 12:57 PM ET, t543u): a clear secondary next to the two prices. */}
-        <a href="/agencies?ref=home_strip" data-testid="home-strip-agencies" onClick={() => trackAttn("strip.agencies")} className="group mt-3 flex flex-col gap-2 rounded-2xl border-2 border-[#0b1f3a] bg-white p-4 shadow-sm transition-colors hover:bg-[#0b1f3a] sm:flex-row sm:items-center sm:justify-between">
+        <a href="/agencies?ref=home_strip" data-testid="home-strip-agencies" onClick={() => trackAttn("strip.agencies")} className="group flex flex-col gap-3 border-b border-[#0b1f3a]/15 py-5 sm:flex-row sm:items-center sm:justify-between">
           <span className="min-w-0">
-            <span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55 group-hover:text-lime-300">For agencies &amp; brokers</span>
-            <span className="mt-0.5 block font-display text-xl leading-tight text-[#0b1f3a] group-hover:text-white md:text-2xl">A standard 15% agency commission off the gross rate card. You set the resale price. We do not undercut your clients.</span>
+            <span className="block text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/55">For agencies &amp; brokers</span>
+            <span className="mt-1 block max-w-3xl font-display text-lg leading-snug text-[#0b1f3a] md:text-xl">A standard 15% agency commission off the gross rate card. You set the resale price. We do not undercut your clients.</span>
           </span>
-          <span className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 self-start rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white group-hover:bg-lime-300 group-hover:text-[#0b1f3a] sm:self-auto">See agency terms <ArrowRight className="size-4" aria-hidden /></span>
+          <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-[#0b1f3a] underline decoration-[#0b1f3a]/30 underline-offset-4 group-hover:decoration-[#0b1f3a]">See agency terms <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden /></span>
         </a>
-        <a href="/starter?ref=home_strip" data-testid="home-strip-exclusive" onClick={() => trackAttn("strip.starter")} className="mt-3 flex flex-col gap-2 rounded-2xl border border-[#0b1f3a]/15 bg-white p-4 shadow-sm hover:border-[#0b1f3a] sm:flex-row sm:items-center sm:justify-between">
-          <span className="min-w-0"><span className="block text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Starter placement</span><span className="mt-0.5 block text-[13px] leading-snug text-foreground/75"><span className="font-display text-2xl text-[#0b1f3a]">$1,900</span> · a $5K–$50K dedicated package in your category, set on your IO. Nothing runs before you sign.</span></span>
-          <span className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 self-start rounded-full border border-[#0b1f3a]/30 px-5 text-sm font-bold text-[#0b1f3a] sm:self-auto">Starter placement · $1,900 <ArrowRight className="size-4" aria-hidden /></span>
-        </a>
-        <p className="mt-2 text-[12px] text-foreground/60">Prices in USD unless shown. Blocks run from $25,000 to $1.5M USD by inquiry or offer.</p>
+        <p className="mt-3 text-[12px] text-foreground/55">Blocks run from $25,000 to $1.5M USD by inquiry or offer.</p>
       </section>
       {/* Light continuous category strip under the hero (Randy Nov 21 10:20 AM). */}
       <div className="container mx-auto max-w-6xl px-4 pb-5"><div className="hidden mb-3 min-h-[6.5rem] md:block" data-testid="pulse-row"><ActivityPulse desktopInline /></div><CategoryStrip testId="home-category-strip" /></div>
@@ -189,7 +194,7 @@ export default function BrHome() {
       {/* 2. What you're buying (Randy, voice, Nov 23 2026 2:37 PM ET): the inventory, plain and visual, for a cold advertiser. */}
       <section className="container mx-auto max-w-5xl px-4 pb-10 pt-2" data-testid="home-stats">
         <WhatYoureBuying testId="home-what-youre-buying" />
-        <div className="mt-3 rounded-2xl border border-[#0b1f3a]/10 bg-white p-5 shadow-sm md:p-6"><Tam2027 compact testId="home-tam-2027" /><details className="group mt-3 rounded-xl border border-[#0b1f3a]/10" data-testid="home-alerts-expand"><summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-[#0b1f3a] [&::-webkit-details-marker]:hidden">Get launch alerts for your category<ChevronDown className="size-4 transition group-open:rotate-180" aria-hidden /></summary><div className="border-t border-[#0b1f3a]/10 p-3"><HubAlerts compact where="home" pagePath="/" /></div></details></div>
+        <div className="mt-12 border-t border-[#0b1f3a] pt-6"><Tam2027 compact testId="home-tam-2027" /><details className="group mt-3 rounded-xl border border-[#0b1f3a]/10" data-testid="home-alerts-expand"><summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-[#0b1f3a] [&::-webkit-details-marker]:hidden">Get launch alerts for your category<ChevronDown className="size-4 transition group-open:rotate-180" aria-hidden /></summary><div className="border-t border-[#0b1f3a]/10 p-3"><HubAlerts compact where="home" pagePath="/" /></div></details></div>
         <p className="mt-2 text-[12px] text-foreground/60" data-testid="home-stats-label">{MODELLED_FOOTER}</p>
       </section>
 
@@ -206,47 +211,48 @@ export default function BrHome() {
       {/* 2c. Categories + Questions brands ask moved up: strip under the hero, compact questions by the kit CTA (Nov 21). */}
 
       {/* 6. Everything long, collapsed. */}
-      <section className="border-t border-[#0b1f3a]/10 bg-white/60" id="more" data-testid="home-more">
-        <div className="container mx-auto max-w-5xl space-y-3 px-4 py-10 md:py-14">
-          <div className="flex flex-wrap items-end justify-between gap-3">
+      <section className="border-t border-[#0b1f3a]/10" id="more" data-testid="home-more">
+        <div className="container mx-auto max-w-5xl px-4 py-14 md:py-20">
+          <div className="flex flex-wrap items-end justify-between gap-3 border-b border-[#0b1f3a] pb-4">
             <h2 className="font-display text-3xl text-[#0b1f3a] md:text-4xl">The details</h2>
             <MediaKitPdfLink variant="line" testId="home-media-kit-pdf" />
           </div>
 
           <Expand title="Example report and expected ranges" sub="What a flight report shows. Estimates, not guarantees" testId="home-reports">
-            <div className="space-y-4 p-4 md:p-6"><FlightReportExample where="home" /><PerformanceRanges where="home" /></div>
+            <div className="space-y-4"><FlightReportExample where="home" /><PerformanceRanges where="home" /></div>
           </Expand>
 
           <Expand title="See the card in context" sub="Example mockups on live hubs, and the proof behind them" testId="home-own-moment">
-            <div className="space-y-6 p-4 md:p-6"><OwnTheMoment /><SeeTheProof /></div>
+            <div className="space-y-6"><OwnTheMoment /><SeeTheProof /></div>
           </Expand>
 
           <Expand title="Our track record" sub="How we got here" testId="home-track">
-            <div className="space-y-4 p-4 md:p-6"><HowWeGotHere where="home" /><TrackRecord where="home" /></div>
+            <div className="space-y-4"><HowWeGotHere where="home" /><TrackRecord where="home" /></div>
           </Expand>
 
-          <Expand title="Every step, from $190 to premium" sub="The ladder, and how a first order runs" testId="home-ladder">
-            <div className="space-y-6 p-4 md:p-6">
+          <Expand title="How it works, from $190 to premium" sub="The ladder, and how a first order runs" testId="home-ladder">
+            <div className="space-y-6">
               <div data-testid="home-offer-stairs"><BuyJourney where="home" testId="home-journey" /></div>
               <div data-testid="home-four-steps"><FourSteps look={price.look} seat={price.seat} /></div>
+              <div data-testid="home-how"><TrustBand /></div>
             </div>
           </Expand>
 
 
-          <Expand title="Street Team program" sub="Coming 2027. Door-to-door, by route" testId="home-street-team">
-            <div className="p-4 md:p-6"><StreetTeamProgram where="home" /></div>
-          </Expand>
-
-          <Expand title="Questions brands ask" sub="Six short answers" testId="home-questions-expand">
-            <div className="p-5 md:p-6"><QuestionsBrandsAskCompact testId="home-questions-compact" /></div>
+          <Expand title="Street Team" sub="Coming 2027. Door-to-door display, by neighbourhood" testId="home-street-team">
+            <div className="space-y-6"><StreetTeamProgram where="home" />
+              <div className="bg-foreground p-5 text-background md:p-8" data-testid="home-street">
+                <DoorRoute requestHref="/media-kit#doors" testId="home-doors" />
+              </div>
+            </div>
           </Expand>
 
           <Expand title="Bigger budgets" sub="Agency client tests and sponsorship credit" testId="home-mid-tier">
-            <div className="p-5 md:p-6"><MidTier where="home" compact /></div>
+            <div><MidTier where="home" compact /></div>
           </Expand>
 
           <Expand title="Pricing" sub={UPGRADE_PATH_LINE} testId="home-packages">
-            <div className="grid gap-3 p-5 md:grid-cols-2 md:p-6">
+            <div className="grid gap-3 md:grid-cols-2">
               <div className="rounded-xl border border-[#0b1f3a]/10 p-4">
                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Small business package</p>
                 <p className="mt-1 font-display text-2xl text-[#0b1f3a]">{price.look} look · {price.seat} category placement</p>
@@ -267,21 +273,12 @@ export default function BrHome() {
           </Expand>
 
           <Expand title="Proof from the live hubs" sub="Measured figures only" testId="home-proof">
-            <div className="p-5 md:p-6"><ProofStrip /></div>
-          </Expand>
-
-          <Expand title="How it works" sub="From a look to a live placement" testId="home-how">
-            <TrustBand />
-          </Expand>
-
-          <Expand title="Street Team routes" sub="Door-to-door display, by neighbourhood" testId="home-street">
-            <div className="bg-foreground p-5 text-background md:p-8">
-              <DoorRoute requestHref="/media-kit#doors" testId="home-doors" />
-            </div>
+            <div><ProofStrip /></div>
           </Expand>
 
           <Expand title="Questions" sub="Refunds, privacy, measurement, agencies" testId="home-faq">
-            <div className="space-y-6 p-5 md:p-6">
+            <div className="space-y-6" data-testid="home-questions-expand">
+              <QuestionsBrandsAskCompact testId="home-questions-compact" />
               {/* Nov 18 2026: one FAQPage for the page (was two: trust + home), so search engines read it cleanly. */}
               <TrustFaq schema={false} />
               <Faq items={FAQ} schema={false} />
@@ -289,7 +286,7 @@ export default function BrHome() {
           </Expand>
 
           <Expand title="Other ways to work with us" sub="Performance-only, your own hub, outreach setup, partnerships" testId="home-more-ways">
-            <div className="space-y-4 p-4 md:p-6">
+            <div className="space-y-4">
               <div data-testid="home-ways">
                 <div className="grid gap-3 sm:grid-cols-2">
           {[
@@ -318,14 +315,13 @@ export default function BrHome() {
           </Expand>
 
           <Expand title="Ask about a bid" sub="Email the desk · Silver Birch Growth Inc. · Toronto" testId="home-contact">
-            <div className="grid gap-4 p-5 md:grid-cols-2 md:p-6">
+            <div className="grid gap-4 md:grid-cols-2">
               <SalesContact />
               <FounderNote />
             </div>
           </Expand>
 
-          <div className="flex flex-wrap items-center gap-3 pt-4">
-            <KitCta placement="footer_home" size="md" testId="home-cta-kit-bottom" sub={null} />
+          <div className="flex flex-wrap items-center gap-3 pt-6">
             <a href="/terms" className="inline-flex items-center gap-1 text-sm text-foreground/60 underline underline-offset-4"><FileText className="size-4" aria-hidden />Terms</a>
           </div>
           <p className="text-[12px] text-foreground/50">Prices in USD. Audience and reach figures are modelled estimates from listed partners, not measured delivery.</p>

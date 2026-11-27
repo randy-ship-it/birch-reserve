@@ -118,7 +118,7 @@ const GOALS: Array<{ key: string; goal: string; brief: string; placement: (typeo
 
 export const GOAL_PLAN = GOALS.map((g) => {
   const row = SPEC_ROWS.find((r) => r.key === g.placement)!;
-  return { ...g, label: row.label, moment: row.moment, cpmFloorUsd: row.cpmFloorUsd, cpcFloorUsd: row.cpcFloorUsd, inquire: row.inquire, buy: row.inquire ? "Insertion order (inquire)" : "Card reserve or insertion order" };
+  return { ...g, label: row.label, moment: row.moment, cpmFloorUsd: row.cpmFloorUsd, cpcFloorUsd: row.cpcFloorUsd, inquire: row.inquire, buy: row.inquire ? "Insertion order (inquire)" : "Card or insertion order" };
 });
 
 /**
@@ -224,7 +224,7 @@ export const AGENCY_RATE_CARD = {
 } as const;
 
 export const AGENCY_RATE_RULES: ReadonlyArray<{ k: string; d: string }> = [
-  { k: "Published rate card", d: "The same list prices every buyer can see. The 7-day look, the reserve and the $1,900 starter placement are on the media kit." },
+  { k: "Published rate card", d: "The same list prices every buyer can see. The 7-day look, the category placement and the $1,900 starter placement are on the media kit." },
   { k: "Standard 15% agency commission", d: "Agencies, brokers and media resellers earn the standard 15% commission off the gross rate card, written into every insertion order." },
   { k: "You set the resale price", d: "What you charge your client is yours. We do not set a resale price for you." },
   { k: "You disclose to your client", d: "Client disclosure sits with you. We do not brief your client on what you paid." },
@@ -318,7 +318,7 @@ export const AGENCY_TIERS: ReadonlyArray<{
   {
     key: "exclusive",
     name: "Trusted Agency Partners",
-    who: "Agencies with reserved access to dedicated packages and newly activating hubs.",
+    who: "Agencies with priority on dedicated packages and newly activating hubs.",
     pay: PARTNER_VALUE.pay,
     keep: "By committing to inventory",
     badge: "First look",
@@ -328,6 +328,6 @@ export const AGENCY_TIERS: ReadonlyArray<{
 /** Access perks for Trusted Agency Partners. The committed-spend tier is stated in PARTNER_VALUE. */
 export const EXCLUSIVE_PARTNER_PERKS = [
   "First look at new dedicated packages and hubs before they open publicly.",
-  "Reserved access to dedicated packages and newly activating hubs.",
+  "Priority on dedicated packages and newly activating hubs.",
   "A named mention on the Birch Reserve site and in our sales materials.",
 ] as const;
