@@ -123,7 +123,7 @@ export function scaleHead(html: string): string {
 
 /** Scale logo for server-rendered pages (byte copy of attached_assets/brand/scalehealth-logo-srgb-v2.png). */
 export const SCALE_LOGO = "/brand/scale/scalehealth-logo.png";
-const SCALE_SERVER_CSS = `html[data-skin="scale"] body,html[data-skin="scale"] h1,html[data-skin="scale"] h2,html[data-skin="scale"] h3,html[data-skin="scale"] .step b,html[data-skin="scale"] .tile b{font-family:"Plus Jakarta Sans",system-ui,sans-serif!important}html[data-skin="scale"] .pill{background:#BFF3D6;color:#0B6B43}html[data-skin="scale"] .tile b{color:#7EE2B1}html[data-skin="scale"] .cmp tr.us td{background:#ECFBF3}.br-ad-partner{display:block;margin-top:8px;font-size:12px;opacity:.8}`;
+const SCALE_SERVER_CSS = `html[data-skin="scale"] body,html[data-skin="scale"] h1,html[data-skin="scale"] h2,html[data-skin="scale"] h3,html[data-skin="scale"] .step b,html[data-skin="scale"] .tile b,html[data-skin="scale"] .facts dd b,html[data-skin="scale"] form .ft{font-family:"Plus Jakarta Sans",system-ui,sans-serif!important}html[data-skin="scale"] .pill{background:#BFF3D6;color:#0B6B43}html[data-skin="scale"] .tile b{color:#7EE2B1}html[data-skin="scale"] .cmp tr.us td{background:#ECFBF3}.br-ad-partner{display:block;margin-top:8px;font-size:12px;opacity:.8}`;
 
 /**
  * Scale voice on every server-rendered page opened through the mirror (Randy, Nov 22 2026 5:31 PM ET: "ditto on
