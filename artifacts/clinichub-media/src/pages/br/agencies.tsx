@@ -77,7 +77,7 @@ export default function BrAgencies() {
   return (
     <div data-testid="br-agencies">
       <JsonLd data={{ "@context": "https://schema.org", "@type": "Service", name: "Birch Reserve agency placements", provider: { "@type": "Organization", name: "Birch Reserve" }, areaServed: ["CA", "US"], serviceType: "Retail media / post-purchase advertising", url: "https://birchreserve.net/agencies" }} />
-      <Section pad="hero" className="bg-[radial-gradient(ellipse_at_top_left,_#ecfccb_0%,_transparent_60%)]">
+      <Section pad="hero" className="border-b border-[#0b1f3a]/10">
         <div className="grid items-start gap-5 md:gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-x-16 lg:gap-y-12">
           <div className="max-w-3xl">
             <Eyebrow>For agencies &amp; media buyers</Eyebrow>
@@ -86,7 +86,7 @@ export default function BrAgencies() {
               Post-purchase and in-hub display.
             </p>
             <Lede className="hidden md:block">
-              Display in post-purchase moments and inside health and wellness member hubs: the post-purchase page, the hub home, product and booking pages, and the member dashboard. First-party, brand-safe, tracked on your UTMs. Agencies earn the standard 15% commission off a public rate card. We do not undercut an agency&apos;s client.
+              Post-purchase pages and member hubs, tracked on your UTMs. The standard 15% agency commission off a public rate card. We do not undercut an agency&apos;s client.
             </Lede>
             <HeroCtas className="mt-8 hidden flex-col items-start gap-3 sm:flex-row sm:items-center md:flex" />
           </div>

@@ -185,7 +185,7 @@ function CardLane({ initialSku }: { initialSku: CardSku }) {
   return (
     <LaneShell id="lane-card">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="font-display text-2xl text-[#0b1f3a] md:text-3xl">Reserve space by card</h3>
+        <h3 className="font-display text-2xl text-[#0b1f3a] md:text-3xl">Buy space by card</h3>
         <Steps step={step} labels={["Details", "Preview", "Checkout"]} />
       </div>
       <div className="mt-4 grid gap-5 lg:grid-cols-[1fr_1.05fr]">
@@ -414,7 +414,7 @@ export function TwoLane() {
       <div className="grid gap-2 sm:grid-cols-2" data-testid="two-lane-entry">
         <button type="button" onClick={() => open("card")} aria-expanded={lane === "card"} className={btn(lane === "card")} data-testid="lane-entry-card">
           <span className={`grid size-11 shrink-0 place-items-center rounded-xl ${lane === "card" ? "bg-lime-300 text-[#0b1f3a]" : "bg-lime-100"}`}><CreditCard className="size-5" /></span>
-          <span className="min-w-0"><span className="block text-base font-extrabold">Reserve space (card)</span><span className={`block text-[12px] ${lane === "card" ? "text-white/70" : "text-foreground/60"}`}>From $190 USD · refundable credit</span></span>
+          <span className="min-w-0"><span className="block text-base font-extrabold">Buy space (card)</span><span className={`block text-[12px] ${lane === "card" ? "text-white/70" : "text-foreground/60"}`}>From $190 USD · refundable credit</span></span>
           <ArrowRight className="ml-auto size-5 shrink-0 transition group-hover:translate-x-0.5" />
         </button>
         <button type="button" onClick={() => open("block")} aria-expanded={lane === "block"} className={btn(lane === "block")} data-testid="lane-entry-block">
@@ -438,7 +438,7 @@ export function LaneCtas({ testId = "report-lane-ctas" }: { testId?: string }) {
   if (!on) return null;
   return (
     <div className="mt-4 flex flex-col gap-2 sm:flex-row" data-testid={testId}>
-      <button type="button" onClick={() => openLane({ lane: "card", sku: "hold-190" })} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-sm font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30" data-testid={`${testId}-card`}><CreditCard className="size-4" aria-hidden />Reserve space (card) · from $190 USD</button>
+      <button type="button" onClick={() => openLane({ lane: "card", sku: "hold-190" })} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-sm font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30" data-testid={`${testId}-card`}><CreditCard className="size-4" aria-hidden />Buy space (card) · from $190 USD</button>
       <button type="button" onClick={() => openLane({ lane: "block" })} className="inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-bold text-[#0b1f3a] ring-1 ring-[#0b1f3a]/30" data-testid={`${testId}-block`}><Landmark className="size-4" aria-hidden />Big block / agency (IO + cheque)</button>
     </div>
   );

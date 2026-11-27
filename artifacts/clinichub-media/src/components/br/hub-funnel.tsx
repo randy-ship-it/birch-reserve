@@ -46,7 +46,7 @@ export function LiveHubGrid({ light = true }: { light?: boolean; dense?: boolean
             <>
               <span className="relative block">
                 <HubThumb h={h} />
-                <span className="absolute left-2 top-2 whitespace-nowrap rounded-full bg-lime-200 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#0b1f3a] shadow-sm" data-testid={`${h.tid}-live`}>{LABEL_LIVE}</span>
+                <span className="absolute left-2 top-2 inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#0b1f3a]" data-testid={`${h.tid}-live`}><span className="size-1.5 rounded-full bg-[#1f8a4c]" aria-hidden />{LABEL_LIVE}</span>
               </span>
               <span className="block px-3 py-2.5">
                 <span className="flex items-center justify-between gap-2 font-bold leading-tight text-[#0b1f3a]">
@@ -58,7 +58,7 @@ export function LiveHubGrid({ light = true }: { light?: boolean; dense?: boolean
               </span>
             </>
           );
-          const cls = `group block w-[250px] shrink-0 snap-start overflow-hidden sm:w-auto sm:shrink rounded-2xl border shadow-sm transition hover:shadow-lg ${light ? "border-[#0b1f3a]/10 bg-white" : "border-foreground/15 bg-white"}`;
+          const cls = `group block w-[250px] shrink-0 snap-start overflow-hidden sm:w-auto sm:shrink rounded-xl border transition hover:border-[#0b1f3a]/40 ${light ? "border-[#0b1f3a]/10 bg-white" : "border-foreground/15 bg-white"}`;
           return href ? (
             <a key={h.key} href={href} target="_blank" rel="noopener" data-testid={h.tid} data-mirror-keep className={cls} aria-label={`Visit the ${h.name} hub`}>{body}</a>
           ) : (
@@ -84,13 +84,11 @@ function AdCardMock({ surface }: { surface: string }) {
 
 function ExampleCard({ tid, img, imgClass = "object-top", style, name, chip, audience, surface, sub }: { tid: string; img: string; imgClass?: string; style?: React.CSSProperties; name: string; chip: string; audience: string; surface: string; sub?: string }) {
   return (
-    <li data-testid={tid} className="w-[240px] shrink-0 snap-start overflow-hidden rounded-2xl border border-dashed border-[#0b1f3a]/30 bg-white shadow-sm sm:w-auto sm:shrink">
+    <li data-testid={tid} className="w-[240px] shrink-0 snap-start overflow-hidden rounded-xl border border-dashed border-[#0b1f3a]/30 bg-white sm:w-auto sm:shrink">
       <span className="relative block aspect-[16/10] w-full overflow-hidden bg-[#e9e3d6]">
         <img src={img} alt={`${MOCK_LABEL}: ${name}`} width={960} height={600} loading="lazy" decoding="async" style={style} className={`absolute inset-0 size-full object-cover ${imgClass}`} />
-        <span className="absolute left-2 top-2 flex flex-col items-start gap-1">
-          <span className="whitespace-nowrap rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-900 shadow-sm">{chip}</span>
-          <span className="whitespace-nowrap rounded-full bg-[#0b1f3a]/80 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">{MOCK_LABEL}</span>
-        </span>
+        {/* BR-83: one label per card. The section heading already says "Activating"; the card says what it is. */}
+        <span className="absolute left-2 top-2 whitespace-nowrap rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#0b1f3a]/75" data-chip={chip}>{MOCK_LABEL}</span>
         <AdCardMock surface={surface} />
       </span>
       <span className="block px-3 py-2.5">

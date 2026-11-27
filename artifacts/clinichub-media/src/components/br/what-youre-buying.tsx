@@ -57,12 +57,12 @@ function AddOn({ icon: Icon, title, line, fig, figLabel, chip, href, testId, fig
   icon: typeof Store; title: string; line: string; fig?: string; figLabel?: string; chip: string; href: string; testId: string; figTestId?: string; children: ReactNode;
 }) {
   return (
-    <div className="flex flex-col rounded-2xl border border-[#0b1f3a]/10 bg-white p-4 shadow-sm md:p-5" data-testid={testId}>
+    <div className="flex flex-col border-t border-[#0b1f3a] pt-4" data-testid={testId}>
       <div className="flex items-start justify-between gap-2">
-        <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#ecfccb] text-[#0b1f3a]"><Icon className="size-5" aria-hidden /></span>
-        <span className="rounded-full border border-[#F1D58F] bg-[#FFF4DB] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A5A00]">{chip}</span>
+        <Icon className="size-5 shrink-0 text-[#0b1f3a]/70" aria-hidden />
+        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/55">{chip}</span>
       </div>
-      <p className="mt-3 text-lg font-bold leading-tight text-[#0b1f3a]">{title}</p>
+      <p className="mt-3 font-display text-xl leading-tight text-[#0b1f3a]">{title}</p>
       <p className="mt-1 text-[13px] leading-snug text-foreground/70">{line}</p>
       {fig ? (
         <p className="mt-3 font-display text-3xl leading-none tabular-nums text-[#0b1f3a]" data-testid={figTestId}>
@@ -87,16 +87,16 @@ export function WhatYoureBuying({ testId = "what-youre-buying" }: { testId?: str
       </div>
 
       {/* The main door: display inside the private hub network. */}
-      <div className="mt-4 grid gap-4 rounded-2xl p-5 text-white shadow-lg md:grid-cols-[1.2fr_1fr] md:p-7" style={{ background: NAVY }} data-testid="stat-hub-views">
+      <div className="mt-4 grid gap-6 rounded-xl p-6 text-white md:grid-cols-[1.2fr_1fr] md:p-9" style={{ background: NAVY }} data-testid="stat-hub-views">
         <div className="min-w-0">
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">The main buy · Private display network</p>
           <p className="mt-2 font-display text-2xl leading-tight md:text-3xl">Your ad inside brand hubs</p>
           <p className="mt-1.5 text-sm leading-snug text-white/75">Post-purchase pages and member hubs that brands, clinics and retailers give their own customers. Your card shows on four spots in each hub.</p>
-          <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Placements in each hub">
+          <ul className="mt-4 grid grid-cols-2 gap-x-6 border-t border-white/15 text-[13px] text-white/85" aria-label="Placements in each hub">
             {PLACEMENTS.map((p) => (
-              <li key={p} className="rounded-full bg-white/10 px-2.5 py-1 text-[12px] font-semibold text-white ring-1 ring-white/15">{p}</li>
+              <li key={p} className="border-b border-white/10 py-2">{p}</li>
             ))}
-            <li className="rounded-full bg-white/10 px-2.5 py-1 text-[12px] font-semibold text-white ring-1 ring-dashed ring-white/35">In-hub screens · Rolling out · Reserve by inquiry</li>
+            <li className="col-span-2 py-2 text-white/60">In-hub screens · rolling out, by inquiry</li>
           </ul>
         </div>
         <div className="min-w-0 md:border-l md:border-white/10 md:pl-6">
@@ -105,9 +105,9 @@ export function WhatYoureBuying({ testId = "what-youre-buying" }: { testId?: str
           <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">Hub categories</p>
           <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Hub categories" data-testid="hub-categories">
             {HUB_CATEGORIES.map((c) => (
-              <li key={c.name} className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-bold ${c.live ? "bg-lime-300 text-[#0b1f3a]" : "bg-white/10 text-white ring-1 ring-white/20"}`}>
+              <li key={c.name} className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold ${c.live ? "bg-lime-300 text-[#0b1f3a]" : "text-white/80 ring-1 ring-white/20"}`}>
                 {c.name}
-                <span className={`text-[9px] uppercase tracking-wider ${c.live ? "text-[#0b1f3a]/70" : "text-[#F1D58F]"}`}>{c.live ? "Live now" : "Rolling out"}</span>
+                <span className={`text-[9px] uppercase tracking-wider ${c.live ? "text-[#0b1f3a]/70" : "text-white/45"}`}>{c.live ? "Live now" : "Rolling out"}</span>
               </li>
             ))}
           </ul>
@@ -123,8 +123,8 @@ export function WhatYoureBuying({ testId = "what-youre-buying" }: { testId?: str
       </div>
 
       {/* Separate and incremental reach. */}
-      <p className="mt-5 text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/55">Also available · add-on reach, sold separately</p>
-      <div className="mt-2 grid gap-3 md:grid-cols-3" data-testid="home-retail-tile">
+      <p className="mt-10 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/55">Also available · add-on reach, sold separately</p>
+      <div className="mt-3 grid gap-8 md:grid-cols-3" data-testid="home-retail-tile">
         <AddOn icon={Stethoscope} title="Private clinic network" line="Display inside private digital and longevity clinics, where patients book and check in." chip="Onboarding" href="/hubs" testId="addon-clinic-network">
           <p>A separate network from the brand hubs, bought on its own. Clinics are onboarding now.</p>
         </AddOn>

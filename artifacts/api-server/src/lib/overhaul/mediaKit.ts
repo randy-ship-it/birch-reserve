@@ -34,7 +34,7 @@ export const MEDIA_KIT_OFFERS = {
 /** Public label for the inquire-only block band. */
 export const BLOCK_BAND_LINE = "Blocks from $25,000 to $1.5M USD";
 
-export const UPGRADE_PATH_LINE = "Start with a reserve, then go premium." as const;
+export const UPGRADE_PATH_LINE = "Start small, then go premium." as const;
 
 /** Modelled impression bands for the $490 seat and the premium spend band (no bonus assumed). */
 export const MEDIA_KIT_EXAMPLES: KitExample[] = [
