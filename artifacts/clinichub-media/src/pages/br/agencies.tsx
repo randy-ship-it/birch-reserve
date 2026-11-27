@@ -6,7 +6,7 @@ import { PulseCheckCard } from "@/components/br/pulse-check";
 import { KitEntry } from "@/components/br/pilot-path";
 import { SeeYourAd } from "@/components/br/see-your-ad";
 import { INVENTORY } from "../../../../api-server/src/lib/overhaul/model";
-import { AgencyDiscountExample, AgencyRateCardModel, BlockLadder, BuyPaths, ExclusivePerks, GoalPlanner, InventoryCanister, InventorySpec, IoProcess, PlainTerms } from "@/components/br/agency-showcase";
+import { AgencyDiscountExample, AgencyRateCardModel, BlockLadder, BuyerValueCompare, BuyPaths, ExclusivePerks, GoalPlanner, InventoryCanister, InventorySpec, IoProcess, ListPriceLine, PlainTerms } from "@/components/br/agency-showcase";
 import { AGENCY_FAQ } from "../../../../api-server/src/lib/overhaul/agencyShowcase";
 import { RESERVE_HREF, lookHref } from "@/components/br/pricing";
 import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@/components/br/ui";
@@ -90,12 +90,12 @@ export default function BrAgencies() {
             </Lede>
             <HeroCtas className="mt-8 hidden flex-col items-start gap-3 sm:flex-row sm:items-center md:flex" />
           </div>
-          {/* Mobile only: the inventory canister sits between the short subhead and the pulse-check card. Hidden from md up, so desktop is unchanged. */}
-          <div className="min-w-0 md:hidden" data-testid="agency-hero-canister">
+          {/* Hero visual at every width: the inventory canister, right of the headline on desktop and under the short subhead on mobile. */}
+          <div className="min-w-0 lg:col-start-2 lg:row-start-1" data-testid="agency-hero-canister">
             <InventoryCanister compact />
           </div>
-          {/* Rapid pulse check: right of the hero on desktop; on mobile, after the canister. */}
-          <PulseCheckCard className="min-w-0 lg:col-start-2 lg:row-span-2 lg:row-start-1" />
+          {/* Rapid pulse check: under the canister on the right at desktop; after the canister on mobile. */}
+          <PulseCheckCard className="min-w-0 lg:col-start-2 lg:row-start-2" />
           <HeroCtas className="flex flex-col items-start gap-3 md:hidden" />
           <ul className="border-t border-[#0b1f3a]/15 lg:col-start-1 lg:row-start-2 lg:mt-2" data-testid="agency-benefits" aria-label={skinText("Why agencies use Birch")}>
             {AGENCY_BENEFITS.map((b) => (
@@ -138,10 +138,9 @@ export default function BrAgencies() {
           <H2>One rate card. The standard 15% for&nbsp;agencies.</H2>
           <p className="mt-3 text-sm text-muted-foreground">One inventory. Direct buyers, agencies and partners each draw from the same tank.</p>
         </div>
-        <div className="mt-8 hidden md:block">
-          <InventoryCanister />
-        </div>
         <div className="mt-8 space-y-6">
+          <ListPriceLine />
+          <BuyerValueCompare />
           <AgencyRateCardModel />
           <ExclusivePerks />
         </div>
