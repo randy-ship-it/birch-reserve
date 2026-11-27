@@ -26,7 +26,7 @@ export const LIVE_HUB_LINKS: BuyerLink[] = [
 /** 6. Curated network strap (sits under the existing "Curated placements" strip). */
 export const EARLY_SLOTS = {
   label: "Curated network",
-  line: "We're curating the network hub by hub. Brands take shared category seats as each hub launches, at starter rates. Every seat is shared, not exclusive.",
+  line: "We're curating the network hub by hub. Brands take shared category seats as each hub launches, at starter rates. Every seat is shared by more than one brand.",
 } as const;
 
 /**
@@ -52,8 +52,8 @@ export const DUAL_MOTION = {
   programsTitle: "Larger or multi-hub programs start with a call.",
   programsBody: "We'll walk through display share, priority placement and the sample insertion order, and the scope is set on your IO.",
   /** A4 (merged with the early-slots strap on /buycalc; short form under A3 on /media-kit). */
-  sharedBuycalc: "Self-serve seats stay shared, open to more than one brand, while the network is curated hub by hub. Only a premium slot locks a category.",
-  sharedKit: "Self-serve seats stay shared, not exclusive, while the network is curated hub by hub. Exclusivity is a premium slot only.",
+  sharedBuycalc: "Self-serve seats stay shared, open to more than one brand, while the network is curated hub by hub. Premium slots add a larger share.",
+  sharedKit: "Self-serve seats stay shared by more than one brand while the network is curated hub by hub. Larger shares are a premium slot only.",
   /** B3: added to the live hub proof line on /buycalc. */
   liveHubLead: "Ready to bid, or have a question?",
 } as const;
@@ -87,7 +87,7 @@ const SEE_THE_UNIT_BASE = {
     "The creative brief and the sample insertion order, so you know what the next step asks for.",
     "Questions by email: randy@scalehealth.ca.",
   ],
-  decide: "Then decide: move to the $490 USD category placement within 7 days and all $190 USD carries over, otherwise it is refunded. The look does not lock a category; seats are shared, not exclusive.",
+  decide: "Then decide: move to the $490 USD category placement within 7 days and all $190 USD carries over, otherwise it is refunded. The look does not lock a category; seats are shared by more than one brand.",
   imageAlt: "Illustrative mock: an example brand card drawn beside the recovery path on the live DR-HO'S hub dashboard",
   caption: "Example of the mock Birch sends: an illustrative card drawn on a live hub page (DR-HO'S recovery path). Not a live ad and not a Birch result. Your IO names the hub and surface.",
 } as const;
@@ -106,7 +106,7 @@ export const BUYER_FAQ: Array<{ q: string; a: string; link?: BuyerLink; tail?: s
     a: "Your payment is media credit. An insertion order names the hub and surface before anything runs. The $490 USD category placement is fully refundable until 14 days before the launch date on your IO. The $190 USD look converts in full to the category placement within 7 days, otherwise it's refunded.",
   },
   {
-    q: "Is my category exclusive or shared?",
+    q: "Is my category mine alone, or shared?",
     a: "Shared. The $490 USD category placement is a shared category seat, open to more than one brand in the same category. It does not lock your category, and neither does the $190 USD look. Dedicated placements start with the $1,900 Starter placement, which holds a $5,000 to $50,000 package in your currency pending your IO, or a premium slot ($25,000 to $1.5M USD, inquire only). Both are set on an insertion order.",
   },
   {

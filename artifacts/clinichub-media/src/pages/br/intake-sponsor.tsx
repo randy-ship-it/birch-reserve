@@ -13,7 +13,7 @@ import { SPONSOR_OFFERS, SUPPLIER_CATEGORIES, HUB_RATE_RANGE } from "../../../..
 const ICON = { "hold-190": Timer, "reserve-490": Lock, "area-lock": MapPin } as const;
 
 export default function BrIntakeSponsor() {
-  usePageMeta("Supplier + Accelerate: a category placement or an area | Birch Reserve", "Start with the $190 USD 7-day look, the $490 USD category placement or the $3,500 USD area lock launch price.");
+  usePageMeta("Supplier + Accelerate: a category placement or an area | Birch Reserve", "Start with the $190 USD 7-day look, the $490 USD category placement or the $3,500 USD area placement launch price.");
   const [cat, setCat] = useState(SUPPLIER_CATEGORIES[0]!.key);
   const [ref, setRef] = useState<IntakeRef | null>(null);
   const [market, setMarket] = useState<Market>(DEFAULT_MARKET);
@@ -55,7 +55,7 @@ export default function BrIntakeSponsor() {
               <p className={`mt-4 font-display text-5xl ${hero ? "text-lime-200" : ""}`}>{o.priceLabel}</p>
               <p className={`mt-2 flex-1 text-sm ${hero ? "text-white/80" : "text-muted-foreground"}`}>{o.kind === "category" ? `${SUPPLIER_CATEGORIES.find((c) => c.key === cat)!.label}: ` : ""}{o.line}</p>
               <a href={o.href} data-testid={`sponsor-cta-${o.key}`} className={`mt-5 inline-flex h-12 items-center justify-center gap-2 rounded-full px-5 text-sm font-bold transition ${hero ? "bg-lime-300 text-[#0b1f3a] hover:bg-white" : "bg-foreground text-background hover:bg-accent hover:text-accent-foreground"}`}>
-                {o.key === "area-lock" ? "Lock an area" : o.key === "hold-190" ? "Start the 7-day look" : "Lock this category"} <ArrowRight className="size-4" aria-hidden />
+                {o.key === "area-lock" ? "Get an area placement" : o.key === "hold-190" ? "Start the 7-day look" : "Get this category placement"} <ArrowRight className="size-4" aria-hidden />
               </a>
             </article>
           );
@@ -67,7 +67,7 @@ export default function BrIntakeSponsor() {
           <span className="ml-auto"><InfoPop title="Terms in short" testId="sponsor-terms-pop">
             <p>The $190 USD look converts in full to the $490 USD category placement within 7 days, or is refunded. It does not lock in a slot.</p>
             <p>The $490 USD category placement is media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months.</p>
-            <p>The area lock is shown at its launch price. Full terms are on /advertise/local and /terms. Media is prepaid and runs only on an approved insertion order.</p>
+            <p>The area placement is shown at its launch price. Full terms are on /advertise/local and /terms. Media is prepaid and runs only on an approved insertion order.</p>
             <p>{HUB_RATE_RANGE.source}</p>
           </InfoPop></span>
         </div>

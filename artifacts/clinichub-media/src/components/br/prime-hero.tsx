@@ -165,7 +165,7 @@ export function FounderNote() {
     <div className="border border-foreground/15 bg-white p-5 md:p-6" data-testid="founder-note">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/55">Who's behind it</p>
       <p className="mt-2 text-sm leading-relaxed text-foreground/85">
-        {isScaleSkin() ? "Birch Reserve is Scale Health’s exclusive ad unit, run by Silver Birch Growth Inc. in Toronto." : "Birch Reserve is run by Silver Birch Growth Inc. in Toronto."} You deal with the founder, Randy Gilling, directly: no reseller and no ad network in between.
+        {isScaleSkin() ? "Birch Reserve is Scale Health’s ad unit, run by Silver Birch Growth Inc. in Toronto." : "Birch Reserve is run by Silver Birch Growth Inc. in Toronto."} You deal with the founder, Randy Gilling, directly: no reseller and no ad network in between.
       </p>
       {isScaleSkin() ? null : (
         <p className="mt-3 text-sm">
@@ -181,7 +181,7 @@ export type RequestIntent = "ask" | "offer" | "inquire";
 const INTENT_COPY: Record<RequestIntent, { title: string; hint: string; send: string; notes: string }> = {
   ask: { title: "Ask about a placement", hint: "Add your brand and work email, then press Send request. That's it.", send: "Send request", notes: "" },
   offer: { title: "Make an offer", hint: "Mid-size inventory. Name your budget, we reply by email.", send: "Send my offer", notes: "Offer on mid-size inventory" },
-  inquire: { title: "Inquire about bigger slots", hint: "Premium and exclusive slots. We write the insertion order.", send: "Send inquiry", notes: "Inquiry: bigger slots" },
+  inquire: { title: "Inquire about bigger slots", hint: "Premium slots. We write the insertion order.", send: "Send inquiry", notes: "Inquiry: bigger slots" },
 };
 export function CategoryRequestForm({ path = "/", defaultCategory = "", intent = "ask" }: { path?: string; defaultCategory?: string; intent?: RequestIntent }) {
   const ic = INTENT_COPY[intent];

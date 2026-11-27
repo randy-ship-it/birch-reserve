@@ -116,7 +116,7 @@ app.use(
     },
   }),
 );
-// Overhaul API (match tool, area lock, leads). Own JSON parser + limiter; checkout gated by env.
+// Overhaul API (match tool, area placement, leads). Own JSON parser + limiter; checkout gated by env.
 app.use(
   createOverhaulRouter({
     createSession: async (params) => {

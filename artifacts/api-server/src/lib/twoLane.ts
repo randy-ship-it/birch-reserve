@@ -73,7 +73,7 @@ export const AGENCY_TEST = { lowUsd: 1_000, highUsd: 5_000, cashPct: AGENCY_CASH
 /** Lane B budget bands. Premium $25,000–$1.5M is the live media-kit band that locks one brand per category (/terms). */
 export const BLOCK_BANDS = [
   { key: "test_10k", label: "$10K", sub: "Test block", lowUsd: 10_000, highUsd: 10_000 },
-  { key: "category_lock", label: "$25,000–$1.5M", sub: "Category Lock (premium)", lowUsd: 25_000, highUsd: 1_500_000 },
+  { key: "category_lock", label: "$25,000–$1.5M", sub: "Premium slot", lowUsd: 25_000, highUsd: 1_500_000 },
   { key: "network_100k", label: "$100K+", sub: "Network block", lowUsd: 100_000, highUsd: null },
 ] as const;
 export type BlockBand = (typeof BLOCK_BANDS)[number]["key"];

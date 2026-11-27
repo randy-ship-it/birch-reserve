@@ -77,7 +77,8 @@ test("supplier: categories from CATEGORY_DEMAND, first look on the top 3 at publ
   assert.deepEqual(SUPPLIER_CATEGORIES.filter((c) => c.firstLook).map((c) => c.key), ["recovery", "supplements", "fitness"]);
   assert.equal(FIRST_LOOK.cpmUsd, BLENDED.starterCpm);
   assert.equal(FIRST_LOOK.cpcUsd, CPC_FLOOR_USD);
-  assert.match(FIRST_LOOK.fine, /not exclusive/);
+  assert.match(FIRST_LOOK.fine, /not a lock/);
+  assert.doesNotMatch(FIRST_LOOK.fine, /exclusiv/i);
 });
 
 test("sponsor: existing SKUs and prices only, existing Stripe paths, area lock is a launch price", () => {

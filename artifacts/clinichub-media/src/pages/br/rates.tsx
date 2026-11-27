@@ -8,7 +8,7 @@ const FAQ = [
   { q: "Are these the prices I'll pay?", a: "They are starting-at planning estimates, not a quote. Your insertion order names the hubs, surfaces and final rate before anything runs." },
   { q: "Why do rates go up later?", a: "New placements open at starter rates. A placement's rate can step up only once campaign reporting (views, clicks, UTM visits, promo-code redemptions) shows it performs. Your locked deposit keeps its rate for its term." },
   { q: "What does the $490 USD category prepay do?", a: "It is a shared category placement (more than one brand can reserve in a category; it does not lock the category), and all $490 USD is media credit toward any pack. Fully refundable until 14 days before your launch date. The $190 USD 7-day look is 100% credit if you move to a category prepay within 7 days, else refunded." },
-  { q: "How big can a buy get?", a: "Self-serve packs run up to $25k at starter rates. Larger or category-exclusive buys go on an insertion order sized to live hub supply." },
+  { q: "How big can a buy get?", a: "Self-serve packs run up to $25k at starter rates. Larger buys go on an insertion order sized to live hub supply." },
 ];
 
 export default function BrRates() {

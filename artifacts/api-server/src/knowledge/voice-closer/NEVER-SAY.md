@@ -12,7 +12,7 @@ If a claim is not in this pack’s approved files → treat as **UNKNOWN**. Offe
 - Guaranteed impressions, CTR, fill rate, or “your ad will get X views.”
 - Lead fee, bounty, guaranteed patients, “we send you patients,” gold listing, cut of care, pay-for-referral.
 - Claiming a card was charged or a payment went through unless the buyer confirms they paid. (Birch checkout is LIVE as of Randy 2026-09-24 6:22pm ET; before that it was OFF pending Gordon.)
-- Telling a buyer their seat is "reserved pending invoice" or that checkout is paused as the default close. Default is: lock the $490 seat or take the $190 look online at https://birchreserve.net/buycalc; invoice only if they ask.
+- Telling a buyer their seat is "reserved pending invoice" or that checkout is paused as the default close. Default is: buy the $490 seat or take the $190 look online at https://birchreserve.net/buycalc; invoice only if they ask.
 - Hero-ing **$899** / `reserve-899` (legacy unpublished only).
 - Any **$300** price, SKU, or "three hundred" offer. Not a public SKU. Never invent mid-ladder prices between $190 and $490.
 - Third homepage ladder ($4,900 / $9,900) as current public SKUs.

@@ -2,7 +2,7 @@
  * ONE FORM intake, the default on /intake (Randy voice 8:30 AM + via Emma 9:34 AM ET, Nov 19 2026).
  * - Roles: Supplier (performance-only terms: pay on results, no CPC/CPM) + Hub, BOTH preselected (Randy 9:39 AM ET). Accelerate (premium
  *   display placements) is an option INSIDE the supplier card, never a separate "advertiser" role (sent as the kit role).
- *   Category / area locks keep their own page. Visitor copy never says advertiser / publisher / sponsor.
+ *   Category / area placements keep their own page. Visitor copy never says advertiser / publisher / sponsor.
  * - Positive framing: a hub unlocks maximum performance exposure (shelf space and eyeballs); supplier-only still works.
  * - Fast first: website + work email + one button. Shared answers (brand, location, categories, SKUs, audience) are
  *   optional here and asked ONCE for both sides. Role-specific detail comes after the submit (IntakeDetails), prefilled,
@@ -440,7 +440,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
       <AgencyPartnerToggle on={agencyPartner} onClick={() => setAgencyPartner((v) => !v)} />
 
       <div className="mt-4 border-t border-foreground/10 pt-3 text-[13px]" data-testid="intake-secondary">
-        <a href="/intake/sponsor" className="text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-sponsor-link">Want to own a category or an area? See category and area locks</a>
+        <a href="/intake/sponsor" className="text-foreground/60 underline-offset-2 hover:underline" data-testid="intake-sponsor-link">Want a bigger category or area placement? See the options</a>
       </div>
       {supHub ? <HubDemandCard className="mt-4" /> : null}
       {sup ? <SupplierFees /> : null}

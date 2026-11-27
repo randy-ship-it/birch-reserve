@@ -209,7 +209,7 @@ function BrandFitPage({ fit }: { fit: BrandFit }) {
                   $190 USD look
                 </Cta>
                 <Cta href={RESERVE_HREF} variant="lineDark" testId="for-brand-lock-hero" className="w-full sm:w-auto">
-                  $490 USD category lock
+                  $490 USD category placement
                 </Cta>
               </div>
             </div>
@@ -381,7 +381,7 @@ function BrandFitPage({ fit }: { fit: BrandFit }) {
           <Eyebrow dark>Start</Eyebrow>
           <h2 className="mt-2 font-display text-[1.75rem] leading-tight tracking-tight md:text-4xl">Look for $190 USD, or place in the category for $490 USD.</h2>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-background/75">
-            Pricing, live hubs and how category locks work are in the{" "}
+            Pricing, live hubs and how category placements work are in the{" "}
             <a href="/media-kit" className="underline underline-offset-4 hover:text-accent">
               Birch Reserve media kit
             </a>
@@ -392,7 +392,7 @@ function BrandFitPage({ fit }: { fit: BrandFit }) {
               $190 USD look
             </Cta>
             <Cta href={RESERVE_HREF} variant="lineDark" testId="for-brand-lock" className="w-full sm:w-auto">
-              $490 USD category lock
+              $490 USD category placement
             </Cta>
             <Cta href="/media-kit" variant="lineDark" testId="for-brand-kit" className="w-full sm:w-auto">
               Media kit

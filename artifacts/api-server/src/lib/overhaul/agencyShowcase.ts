@@ -45,7 +45,7 @@ export const AGENCY_CLIENT_TEST = { lo: 1_000, hi: 5_000 } as const;
 /**
  * The /agencies payout table in the visitor's currency (daily scan Nov 23 2026).
  * Bug fixed: CAD visitors saw "$690 CAD reserve vs $49 USD discount" because the page relabelled USD
- * text but kept the USD cash figure. Cash is now 10% of the seat price actually shown ($690 CAD -> $69 CAD).
+ * text but kept the USD cash figure. Cash is AGENCY_CASH_PCT (15%) of the seat price actually shown.
  * Other rows keep the same number in both currencies (the site rule when no CAD table exists).
  * No new prices: seat price comes from /api/currency (priceFor), bands are the ones already on /agencies.
  */
@@ -278,7 +278,7 @@ export const BLOCK_LADDER = [
     step: "Scale",
     name: "Upfront block",
     price: BLOCK_BAND_LINE,
-    line: "Book premium and exclusive placements ahead, across several clients and flights.",
+    line: "Book premium placements ahead, across several clients and flights.",
     rate: `${AGENCY_CASH_PCT}% + a further ${PARTNER_VALUE_VS_AGENCY_PCT.lo}–${PARTNER_VALUE_VS_AGENCY_PCT.hi}% off net`,
   },
 ] as const;
@@ -318,7 +318,7 @@ export const AGENCY_TIERS: ReadonlyArray<{
   {
     key: "exclusive",
     name: "Trusted Agency Partners",
-    who: "Agencies with reserved access to exclusive packages and newly activating hubs.",
+    who: "Agencies with reserved access to dedicated packages and newly activating hubs.",
     pay: PARTNER_VALUE.pay,
     keep: "By committing to inventory",
     badge: "First look",
@@ -327,7 +327,7 @@ export const AGENCY_TIERS: ReadonlyArray<{
 
 /** Access perks for Trusted Agency Partners. The committed-spend tier is stated in PARTNER_VALUE. */
 export const EXCLUSIVE_PARTNER_PERKS = [
-  "First look at new exclusive packages and hubs before they open publicly.",
-  "Reserved access to exclusive packages and newly activating hubs.",
+  "First look at new dedicated packages and hubs before they open publicly.",
+  "Reserved access to dedicated packages and newly activating hubs.",
   "A named mention on the Birch Reserve site and in our sales materials.",
 ] as const;

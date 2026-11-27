@@ -37,7 +37,7 @@ export function SignedHubHero({ reserveHref, lookHref, cardsLive = true, eyebrow
           <p className="text-4xl font-bold tracking-tight" data-testid="prepay-price">{t("$490 USD")}</p>
           <p className="mt-2 text-base font-semibold">Prepay once. All of it becomes display credit in your category.</p>
           <p className="mt-1 text-sm" data-testid="prepay-refund">Fully refundable until {PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
-          <p className="mt-3 text-sm" data-testid="prepay-why">Why it beats Meta: Meta sells you a cold click in an auction. Here you pay once, own the category, and your offer meets customers right after they have bought.</p>
+          <p className="mt-3 text-sm" data-testid="prepay-why">Why it beats Meta: Meta sells you a cold click in an auction. Here you pay once and your offer meets customers right after they have bought.</p>
           <a href={reserveHref} className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-md px-5 text-base font-semibold text-white" style={{ background: NAVY }} data-testid="cta-lock-category">{t("Prepay your category · $490 USD")}</a>
           <p className="mt-4 text-sm">
             Not ready? <a href={lookHref} className="font-semibold underline underline-offset-4" data-testid="cta-look">{t("Take a 7-day look for $190 USD")}</a>. It converts in full to the prepay, or it is refunded.
@@ -48,7 +48,7 @@ export function SignedHubHero({ reserveHref, lookHref, cardsLive = true, eyebrow
           Live hub: <a href={LIVE_HUB_URL} target="_blank" rel="noopener" className="font-semibold underline underline-offset-4" style={{ textDecorationColor: PURPLE }}>physio.drhonow.com</a>. A listed physio hub. Your module sits at the booking and the plan, in the category.
         </p>
         <p className="mt-3 text-xs text-white/65" data-testid="meta-benchmark">{skinChat("Public benchmark, not a Birch result")}: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p>
-        <p className="mt-3 text-xs text-white/65" data-testid="exclusions">One brand per category · No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only · Canada only</p>
+        <p className="mt-3 text-xs text-white/65" data-testid="exclusions">No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only · Canada only</p>
       </div>
     </section>
   );
@@ -69,7 +69,7 @@ export function SeatCalculator({ feed }: { feed: Feed | null }) {
           <select value={cat?.category || ""} onChange={(e) => setScope(e.target.value)} className="min-h-12 w-full rounded-md border border-[#0A1D56]/20 bg-white px-3">
             {cats.map((c) => <option key={c.category}>{c.category}</option>)}
           </select></label>
-        <p className="text-xs text-[#0A1D56]/70">One brand per category. The insertion order names the hub before anything runs.</p>
+        <p className="text-xs text-[#0A1D56]/70">The insertion order names the hub before anything runs.</p>
       </div>
       <div className="flex flex-col justify-center p-5 md:p-8" style={{ background: NAVY }} aria-live="polite">
         {r && cat ? (<>

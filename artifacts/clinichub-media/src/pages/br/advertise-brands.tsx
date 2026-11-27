@@ -7,7 +7,7 @@ import { siteName, siteUrl } from "@/lib/siteSkin";
 const FAQ = [
   { q: "What do I buy?", a: "Start with a $190 USD 7-day category look or a $490 USD category placement. Your payment is media credit. We send an insertion order naming the hub and placements, and nothing runs until you approve it." },
   { q: "Which hubs are live?", a: "Hubs are live now, and more are activating. Placements are curated as each one goes live. The named list and per-hub volumes are available with an access code on this page." },
-  { q: "Can I own a category?", a: "Premium slots add exclusivity and priority placement, by inquiry only. See the media kit or ask us and we'll quote it against the hubs you want." },
+  { q: "Can I get a bigger share of a category?", a: "Premium slots add a larger display share and priority placement, by inquiry only. See the media kit or ask us and we'll quote it against the hubs you want." },
   { q: "How is it reported?", a: "Aggregate only: views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. No patient data and no clinical pixels." },
 ];
 

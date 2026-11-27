@@ -5,7 +5,7 @@
 import scaleLogo from "@assets/brand/scalehealth-logo-srgb-v2.png";
 import birchReserveMark from "@assets/brand/birch-reserve-mark-v2.svg";
 
-export const SCALE_AD_UNIT_LINE = "Birch Reserve is Scale Health's exclusive ad unit, across Recovery and every Scale category.";
+export const SCALE_AD_UNIT_LINE = "Birch Reserve is Scale Health's ad unit, across Recovery and every Scale category.";
 
 export function ScaleAdUnitLockup({ className = "" }: { className?: string }) {
   return (

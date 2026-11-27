@@ -318,7 +318,7 @@ export default function Home() {
               </a>
             </div>
             <p className="mt-4 max-w-xl text-sm text-background/70">
-              Curated placements across 8 advertiser categories. Prepay your category's display space. One brand per category.
+              Curated placements across 8 advertiser categories. Prepay your category's display space.
             </p>
           </div>
 

@@ -51,7 +51,7 @@ export const MB_BUY_PATHS = {
     key: "io",
     kicker: "Premium · insertion order (IO)",
     price: "By inquiry",
-    sub: "Exclusivity and priority placement",
+    sub: "Larger share and priority placement",
   },
   rows: [
     { k: "Best for", card: "A first test, starting now", io: "Several hubs or a bigger test" },

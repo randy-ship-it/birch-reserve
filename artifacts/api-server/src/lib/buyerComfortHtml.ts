@@ -21,10 +21,10 @@ import {
  */
 export function buycalcWording(s: string): string {
   return s
-    .replaceAll("Is my category exclusive or shared?", "Is my category mine alone, or shared?")
+    .replaceAll("Is my category mine alone, or shared?", "Is my category mine alone, or shared?")
     .replaceAll("Shared, not exclusive.", "Shared, open to more than one brand.")
     .replaceAll("shared, not exclusive", "shared, open to more than one brand")
-    .replaceAll("Category exclusivity comes with exclusive display", "Locking a category to one brand comes with exclusive display");
+    .replaceAll("Category exclusivity comes with exclusive display", "Larger shares come with priority display");
 }
 
 const escRaw = (s: string) =>

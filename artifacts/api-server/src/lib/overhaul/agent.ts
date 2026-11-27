@@ -53,7 +53,7 @@ export function areaLockOffer() {
   const g = areaLockGuaranteedViews();
   return {
     offer_key: "area-lock",
-    name: "Lock down my area",
+    name: "Get my area placement",
     type: "area_exclusive_category_lock",
     buyer: "local business or studio",
     prices: { usd: AREA_LOCK.priceUsd, cad: AREA_LOCK.priceCad },
@@ -88,7 +88,7 @@ export function agentCatalog(_status?: unknown) {
       surfaces: SURFACES.map((s) => ({ key: s.key, label: s.label, description: s.blurb })),
     },
     offers: publicOffers(),
-    premium: { note: "Premium slots (exclusivity, priority placement) are inquire-only.", human_page: `${SITE}/media-kit#premium`, email: HANDOFF_EMAIL },
+    premium: { note: "Premium slots (larger share, priority placement) are inquire-only.", human_page: `${SITE}/media-kit#premium`, email: HANDOFF_EMAIL },
     checkout_status: {
       agent_checkout: "held",
       held_means: `Agent checkout is on hold. POST /v1/agent/checkout records the request and we reply by email from ${HANDOFF_EMAIL}; no charge is made. To pay now, send the buyer to the offer's human_checkout page (Stripe-hosted).`,

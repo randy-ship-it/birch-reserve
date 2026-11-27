@@ -96,7 +96,7 @@ export function MetaHook() {
         </div>
         <div className="mt-6 space-y-2 border-t border-background/15 pt-4 text-sm text-background/80">
           <p>Landing pages from <b className="text-background">${landing.cpmStarter[0]} CPM</b>. Post-purchase from <b className="text-background">${post.cpmStarter[0]} CPM</b>.</p>
-          <p>Reserve: fixed price, no auction, a share of display space across the hub network. Exclusive deals are by inquiry.</p>
+          <p>Reserve: fixed price, no auction, a share of display space across the hub network. Premium deals are by inquiry.</p>
         </div>
         <p className="mt-4 text-[11px] leading-relaxed text-background/50">
           <Estimate /> {ESTIMATE_NOTE}

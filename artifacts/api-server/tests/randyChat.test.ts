@@ -803,7 +803,7 @@ test("runtime checkout lock follows live flags: $190/$490 links when live, area 
   const live = checkoutLockLines({ reserve: true, areaLock: false, deposits: false });
   assert.match(live, /Checkout is LIVE/);
   assert.ok(live.includes(RESERVE_LINKS.hold190) && live.includes(RESERVE_LINKS.reserve490));
-  assert.match(live, /Area lock[^\n]*inquiry-only/);
+  assert.match(live, /Area placement[^\n]*inquiry-only/);
   assert.match(live, /Sponsor deposits[^\n]*inquiry-only/);
   assert.doesNotMatch(live, /Checkout is OFF/);
   const off = checkoutLockLines({ reserve: false, areaLock: false, deposits: false });

@@ -128,7 +128,7 @@ test("area lock is a launch price, never a deposit, everywhere the chat and phon
     throw new Error(`missing ${f}`);
   });
   for (const text of [facts, prompt, ...knowledge]) {
-    const areaLines = text.split("\n").filter((l) => /lock down my area|area lock/i.test(l) && /3,500/.test(l));
+    const areaLines = text.split("\n").filter((l) => /lock down my area|area lock|area placement/i.test(l) && /3,500/.test(l));
     assert.ok(areaLines.length > 0);
     for (const l of areaLines) {
       assert.match(l, /\$3,500 USD launch price/);

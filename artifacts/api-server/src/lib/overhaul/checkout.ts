@@ -1,4 +1,4 @@
-/** Pure Stripe Checkout param builders for the overhaul (area lock). Deposits reuse buildDepositSession. */
+/** Pure Stripe Checkout param builders for the overhaul (area placement). Deposits reuse buildDepositSession. */
 import { birchPaymentIntentBrand } from "../checkoutCopy";
 import { AREA_LOCK, quoteAreaLock, type Currency } from "./model";
 
@@ -62,14 +62,14 @@ export function buildAreaLockSession(body: AreaCheckoutRequest, origin: string):
             currency: q.currency,
             unit_amount: amountCents,
             product_data: {
-              name: `Birch Reserve area lock · ${q.area.area} · ${category}`,
-              description: `Exclusive ${category} rights to up to ${q.sharePct}% of hub display within ${q.radiusKm} km of ${q.area.code} for ${q.termMonths} month${q.termMonths === 1 ? "" : "s"} from display start. Includes media credit at ${q.discountPct}% off rate card and ${q.guaranteedViews.toLocaleString("en-US")} modelled hub page views. Launch rate until ${AREA_LOCK.launchRateUntil}; ${AREA_LOCK.followOnDiscountPct}% off follow-on spend up to $${AREA_LOCK.followOnCapUsd.toLocaleString("en-US")} USD. Unused credit: refund or extend at the same discount.`,
+              name: `Birch Reserve area placement · ${q.area.area} · ${category}`,
+              description: `Priority ${category} placement for up to ${q.sharePct}% of hub display within ${q.radiusKm} km of ${q.area.code} for ${q.termMonths} month${q.termMonths === 1 ? "" : "s"} from display start. Includes media credit at ${q.discountPct}% off rate card and ${q.guaranteedViews.toLocaleString("en-US")} modelled hub page views. Launch rate until ${AREA_LOCK.launchRateUntil}; ${AREA_LOCK.followOnDiscountPct}% off follow-on spend up to $${AREA_LOCK.followOnCapUsd.toLocaleString("en-US")} USD. Unused credit: refund or extend at the same discount.`,
             },
           },
         },
       ],
       metadata,
-      payment_intent_data: { ...birchPaymentIntentBrand(`Area lock · ${business} · ${q.area.area}`), metadata },
+      payment_intent_data: { ...birchPaymentIntentBrand(`Area placement · ${business} · ${q.area.area}`), metadata },
       success_url: `${origin}/advertise/local?lock=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/advertise/local?lock=cancelled&postal=${encodeURIComponent(q.area.code)}`,
     },

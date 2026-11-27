@@ -134,7 +134,7 @@ export function AgencyHero() {
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
               Brands: <a className="underline underline-offset-2" href="/match" data-testid="hero-match">match your audience</a> · Local:{" "}
-              <a className="underline underline-offset-2" href="/advertise/local" data-testid="hero-lock">Lock down my area · Inquire</a> ·{" "}
+              <a className="underline underline-offset-2" href="/advertise/local" data-testid="hero-lock">Get my area placement · Inquire</a> ·{" "}
               <a className="underline underline-offset-2" href="/sample-io">Sample IO</a>
             </p>
             <dl className="mt-10 grid grid-cols-2 gap-px border border-foreground/15 bg-foreground/15 md:grid-cols-4" data-testid="agency-kpis">
@@ -250,7 +250,7 @@ export function InventorySpec() {
           USD starting rates <Tag>Estimate</Tag> Illustrative planning estimates, not sold rates or measured delivery. Rates step up only once reporting shows a placement performs. Motion :15 is also available as a format on the IO.
         </p>
         <p data-testid="sell-assumption">
-          <Tag>Assumption</Tag> {SELL_ASSUMPTION_LINE} Post-Purchase, 100K+ view blocks and any exclusive category or area lock are inquire-only.
+          <Tag>Assumption</Tag> {SELL_ASSUMPTION_LINE} Post-Purchase, 100K+ view blocks and area placements are inquire-only.
         </p>
         <p className="md:col-span-2" data-testid="spec-screens">
           <span className="font-medium text-foreground">In-hub screens</span> — Screens inside partner locations. Rolling out. Reserve by inquiry. No published rate yet. <a href="/intake#inquire" className="font-semibold underline underline-offset-2">Inquire</a>
@@ -326,7 +326,7 @@ export function InsiderGrid() {
 const IO_STEPS = [
   { t: "Brief", d: "Send the client and picks through the agency form or a quick-buy inquiry. Small tests can start self-serve on the $190 USD look or the $490 USD category placement." },
   { t: "Draft IO", d: "We reply with hub fit and a draft insertion order naming the hub, surface, format, category and dates." },
-  { t: "Sign & prepay", d: "Seats pay by card. Post-Purchase, 100K+ view blocks and exclusive locks go on the IO by inquiry." },
+  { t: "Sign & prepay", d: "Seats pay by card. Post-Purchase and 100K+ view blocks go on the IO by inquiry." },
   { t: "Traffic", d: "Creative, UTMs and an optional promo code. Exact position is confirmed on the IO." },
   { t: "Flight", d: `Credit spends down on live hubs over the ${SPEND_DOWN_MONTHS} months after the deposit lands.` },
   { t: "Report", d: "Per-hub, per-surface reporting. The $490 USD seat is fully refundable until 14 days before the launch date on the IO." },

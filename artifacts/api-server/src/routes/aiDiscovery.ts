@@ -30,7 +30,7 @@ export function renderVsGoogle(): string {
 <h2>Being straight about the comparison</h2>
 <ul><li>A Birch Reserve purchase reserves your placement. It is not an ad that is already live.</li><li>Creatives get a quick human review before going live. We do not promise a fixed live time.</li><li>There are no impression guarantees and no click-through or return-on-ad-spend promises. Reporting is aggregate, and modelled figures are labelled as estimates.</li></ul>
 <h2>What it costs to start (USD)</h2>
-<ul><li>$190: 7-day category look, credited in full toward the $490 category placement if you convert within 7 days, otherwise refunded.</li><li>$490: category placement, media credit, fully refundable until 14 days before the launch date on the insertion order.</li><li>Premium exclusive display from $5K to $50K is set through intake and an insertion order. Agencies buy by insertion order and invoice.</li></ul>
+<ul><li>$190: 7-day category look, credited in full toward the $490 category placement if you convert within 7 days, otherwise refunded.</li><li>$490: category placement, media credit, fully refundable until 14 days before the launch date on the insertion order.</li><li>Premium display from $5K to $50K is set through intake and an insertion order. Agencies buy by insertion order and invoice.</li></ul>
 </article>
 <div class="cta"><p>Reserve your placement in minutes.<small>Pay online or start an intake.</small></p><div class="btns"><a class="btn" href="/buycalc">See prices and pay</a><a class="btn line" href="/intake">Start your intake</a><a class="btn line" href="/agencies">Agencies</a></div></div></div>`;
   return shell(VS_GOOGLE_PATH, title, description, body, jsonLdGraph(), "website").replace(
