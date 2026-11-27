@@ -81,13 +81,13 @@ export function CtaBand({ side, where, line }: { side: IntakeSide; where: Intake
  * Plain-language review state. Only "In review, pending BR approval", and only when Friday reports pending_review.
  * Friday's hub-partner match is internal only: no match badge is ever rendered here (withheld per Friday's contract).
  */
-export function LeadGatesStatus({ gates, testId = "lead-gates" }: { gates: LeadGates | undefined | null; testId?: string }) {
+export function LeadGatesStatus({ gates, testId = "lead-gates", details = true }: { gates: LeadGates | undefined | null; testId?: string; details?: boolean }) {
   if (gates?.review !== "pending_review") return null;
   return (
     <div data-testid={testId} className="mt-3 flex flex-wrap items-center gap-2">
       {gates.mock ? <span data-testid={`${testId}-mock`} className="inline-flex items-center gap-1 rounded-full bg-violet-700 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"><FlaskConical className="size-3" />Mock · preview state</span> : null}
-      <span data-testid={`${testId}-pending`} className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900"><Clock className="size-3.5" />In review, pending BR approval</span>
-      <Details className="basis-full !mt-0" testId={`${testId}-details`}><p>{skinText("A person at Birch Reserve approves before anything changes on a hub screen or page. Nothing is booked or charged until then.")}</p></Details>
+      <span data-testid={`${testId}-pending`} className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-amber-800"><Clock className="size-3.5" />In review, pending BR approval</span>
+      {details ? <Details className="basis-full !mt-0" testId={`${testId}-details`}><p>{skinText("A person at Birch Reserve approves before anything changes on a hub screen or page. Nothing is booked or charged until then.")}</p></Details> : null}
     </div>
   );
 }
