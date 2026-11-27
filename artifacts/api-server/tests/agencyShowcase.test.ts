@@ -259,9 +259,10 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.doesNotMatch(ui, /TRACK_RECORD|partner-launch|EXCLUSIVE_CASE_STUDY|digital-md-partner|fridayapp|See the live case study|Contract signed · Onboarding|names withheld/i);
   assert.ok(TRACK_RECORD_UNLINKED_CARDS.some((c) => c.key === "partner-launch"));
   assert.ok(!TRACK_RECORD.cards.some((c) => c.key === "partner-launch"));
-  for (const c of ["<InventoryCanister />", "<AgencyRateCardModel />", "<AgencyDiscountExample />", "<ExclusivePerks />"]) assert.ok(page.includes(c), c);
-  // Canister sits after the hero and before the rate card, so the tank explains the three buyer types.
-  assert.ok(page.indexOf("<InventoryCanister") > page.indexOf("<H1>"));
+  for (const c of ["<InventoryCanister compact />", "<ListPriceLine />", "<BuyerValueCompare />", "<AgencyRateCardModel />", "<AgencyDiscountExample />", "<ExclusivePerks />"]) assert.ok(page.includes(c), c);
+  // Canister is the hero visual, still before the rate card, so the tank explains the three buyer types at the top.
+  assert.ok(page.indexOf("agency-hero-canister") > page.indexOf("<H1>"));
+  assert.ok(page.indexOf('data-testid="agency-hero-canister"') < page.indexOf("<PulseCheckCard"));
   assert.ok(page.indexOf("<InventoryCanister") < page.indexOf("<AgencyRateCardModel"));
   assert.doesNotMatch(page, /<AgencyTierCards /);
   assert.match(ui, /aria-label=\{skinText\("One tank of hub inventory with three outlets: direct buyers, agencies and Trusted Agency Partners"\)\}/);
@@ -279,7 +280,8 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.equal((page.match(/<Cta href="#talk"/g) ?? []).length, 1);
   assert.match(page, /<InventoryCanister compact \/>/);
   assert.match(page, /data-testid="agency-hero-canister"/);
-  assert.match(page, /className="mt-8 hidden md:block">\s*<InventoryCanister \/>/s);
+  assert.doesNotMatch(page, /agency-hero-canister"[^>]*(md:hidden|hidden md:)/);
+  assert.doesNotMatch(page, /<InventoryCanister \/>/);
   // Exclusive partners ask for a bid on the existing form; never a phone call or a chat with Randy.
   assert.match(ui, /Send a bid or interest/);
   const all = page + ui + JSON.stringify({ AGENCY_TIERS, EXCLUSIVE_PARTNER_PERKS });
