@@ -51,7 +51,7 @@ export function AdActivation({ role: role0, email: email0 = "", company: company
     if (!role) return setErr("Pick who you are.");
     if (needEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setErr("Add the work email you used for intake.");
     if (!pages || !views || !list) return setErr("Pick one range in each row. \"Not sure\" is fine.");
-    if (!openness) return setErr("Pick which ads can run on your hubs.");
+    if (!openness) return setErr("Pick which ads can run on your clinic layers.");
     if (!ack) return setErr("Tick the box to confirm every ad is reviewed first.");
     setBusy(true);
     const r = await postJson<{ error?: string }>("/v1/activation", { email: email.trim(), company: company.trim(), role, pages, views, list, other: other.trim(), openness, exclusions: noncore ? excl : [], ack, hub_slug: hubSlug, friday_id: fridayId, path: typeof window === "undefined" ? "" : window.location.pathname.replace(/^\/intake\/_m/, ""), company_url: hp }).catch(() => null);
@@ -82,14 +82,14 @@ export function AdActivation({ role: role0, email: email0 = "", company: company
       {needEmail ? (
         <div className="mb-4 grid gap-2 sm:grid-cols-2">
           <input data-testid="act-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email" aria-label="Work email" autoComplete="email" className="h-11 min-w-0 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
-          <input data-testid="act-company" value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Brand or hub (optional)" aria-label="Brand or hub name" maxLength={160} className="h-11 min-w-0 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
+          <input data-testid="act-company" value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Brand or clinic layer (optional)" aria-label="Brand or clinic layer name" maxLength={160} className="h-11 min-w-0 rounded-full border border-foreground/20 bg-white px-4 text-sm" />
         </div>
       ) : null}
 
       <section aria-labelledby="act-h1" data-testid="act-inventory">
         <h3 id="act-h1" className="font-display text-xl leading-tight">Your inventory estimate</h3>
         <div className="mt-3 space-y-3">
-          <RangeChips legend="Pages or hub screens" name="pages" ranges={PAGES_RANGES} value={pages} onPick={setPages} />
+          <RangeChips legend="Pages or clinic layer screens" name="pages" ranges={PAGES_RANGES} value={pages} onPick={setPages} />
           <RangeChips legend="Monthly views or visitors" name="views" ranges={VIEWS_RANGES} value={views} onPick={setViews} />
           <RangeChips legend="Email or SMS list size (if you have one)" name="list" ranges={LIST_RANGES} value={list} onPick={setList} />
           <label className="block text-[12px] font-bold text-foreground/75">Other ad data (optional)
@@ -97,12 +97,12 @@ export function AdActivation({ role: role0, email: email0 = "", company: company
           </label>
         </div>
         <Details label="Why we ask" testId="act-inventory-help">
-          <p>Rough ranges are all we need. We use them to plan how much ad inventory your hubs could add. They stay internal, are never published, and don't change any public figure.</p>
+          <p>Rough ranges are all we need. We use them to plan how much ad inventory your clinic layers could add. They stay internal, are never published, and don't change any public figure.</p>
         </Details>
       </section>
 
       <section aria-labelledby="act-h2" className="mt-5 border-t border-foreground/10 pt-5" data-testid="act-openness">
-        <h3 id="act-h2" className="font-display text-xl leading-tight">Which ads can run on your hubs?</h3>
+        <h3 id="act-h2" className="font-display text-xl leading-tight">Which ads can run on your clinic layers?</h3>
         <div role="radiogroup" aria-labelledby="act-h2" className="mt-3 grid gap-2">
           {ACT_OPENNESS.map((o) => (
             <button key={o.key} type="button" role="radio" aria-checked={openness === o.key} onClick={() => setOpenness(o.key)} data-testid={`act-openness-${o.key}`} className={`flex min-w-0 items-start gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${openness === o.key ? "bg-[#0b1f3a] text-white" : "bg-white text-foreground/80 ring-1 ring-foreground/15 hover:ring-foreground/40"}`}>
@@ -125,7 +125,7 @@ export function AdActivation({ role: role0, email: email0 = "", company: company
           <span>I understand every ad is reviewed and nothing runs without approval.</span>
         </label>
         <Details label="How review works" testId="act-openness-help">
-          <p>Curated keeps your hubs strictly health and wellness. Open to other premium brands lets high-value advertisers outside wellness in, minus anything you exclude. Open to any approved ad adds everything that passes review. You can change your choice later.</p>
+          <p>Curated keeps your clinic layers strictly health and wellness. Open to other premium brands lets high-value advertisers outside wellness in, minus anything you exclude. Open to any approved ad adds everything that passes review. You can change your choice later.</p>
         </Details>
       </section>
 

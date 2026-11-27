@@ -76,7 +76,7 @@ export function AvailabilityStrip({ dark = false }: { a?: Availability | null; d
           <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#3b9b00] opacity-60" />
           <span className="relative inline-flex size-2.5 rounded-full bg-[#3b9b00]" />
         </span>
-        <span data-testid="avail-count"><strong className={dark ? "text-accent" : ""}>Curated placements</strong> · placed by hand, hub by hub</span>
+        <span data-testid="avail-count"><strong className={dark ? "text-accent" : ""}>Curated placements</strong> · placed by hand, clinic layer by clinic layer</span>
       </p>
       <ul className="mt-3 flex flex-wrap gap-2" data-testid="network-hubs">
         {NETWORK_HUBS.map((h) => (
@@ -100,17 +100,17 @@ export function PrimeHero() {
   return (
     <section className="border-b border-border/70 bg-foreground text-background" data-testid="prime-hero">
       <div className="container mx-auto px-5 pb-10 pt-8 md:px-6 md:pb-16 md:pt-14">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Birch Reserve · Display space across private health &amp; wellness hubs</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">Birch Reserve · Display space across private health &amp; wellness clinic layers</p>
         <h1 className="mt-3 max-w-4xl font-display text-[2.2rem] leading-[1.03] tracking-tight md:text-[4rem]" data-testid="prime-h1">
-          Put your brand inside private health and wellness hubs.
+          Put your brand inside private health and wellness clinic layers.
         </h1>
         <p className="mt-3 font-display text-xl text-accent md:text-3xl" data-testid="prime-positioning">Buy Scale Health ads through Birch Reserve. The faster way to buy ads.</p>
         <p className="mt-3 font-display text-xl text-background/80 md:text-3xl" data-testid="prime-scarcity">A growing network. Curated placements. No bidding.</p>
         <p className="mt-4 max-w-3xl text-base leading-relaxed text-background/80" data-testid="prime-what">
-          Reserve a share of display space across our growing network of private, members-only hubs: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, and more launching. Placements are curated as each hub launches.
+          Reserve a share of display space across our growing network of private, members-only clinic layers: {NETWORK_HUBS.join(", ").replace(/, ([^,]*)$/, " and $1")}, and more launching. Placements are curated as each clinic layer launches.
         </p>
         <div className="mt-6" data-testid="prime-kit-cta">
-          <KitCta placement="hero_home_network" size="lg" sub="Free · website + email · hub earnings and supplier exposure, estimated" />
+          <KitCta placement="hero_home_network" size="lg" sub="Free · website + email · clinic layer earnings and supplier exposure, estimated" />
         </div>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
           <a href={RESERVE_HREF} data-testid="prime-cta-seat" className="inline-flex h-14 items-center justify-center gap-2 bg-accent px-6 text-base font-semibold text-accent-foreground transition-colors hover:bg-background hover:text-foreground">
@@ -143,17 +143,17 @@ export function FaceBeforeFlight({ compact = false }: { compact?: boolean }) {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Proof</p>
         <h2 className="mt-1 font-display text-[1.75rem] leading-tight tracking-tight md:text-3xl">See the face before the flight.</h2>
         <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          Open a hub that is live and activating right now. This is the private, members-only experience your brand sits inside: placements curated hub by hub, next to the brand members already trust. No feed, no auction.
+          Open a clinic layer that is live and activating right now. This is the private, members-only experience your brand sits inside: placements curated clinic layer by clinic layer, next to the brand members already trust. No feed, no auction.
         </p>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <a href={isScaleSkin() ? "https://www.scalehealth.ca/dr-ho" : LIVE_HUB_URL} data-mirror-keep target="_blank" rel="noopener" data-testid="face-live-hub" className="inline-flex h-11 items-center justify-center gap-2 bg-foreground px-4 text-sm font-semibold text-background transition-colors hover:bg-accent hover:text-accent-foreground">
-            Open the DR-HO'S physio hub <ArrowRight className="size-4" aria-hidden />
+            Open the DR-HO'S physio clinic layer <ArrowRight className="size-4" aria-hidden />
           </a>
           <a href={SOLE_HUB_URL} data-mirror-keep target="_blank" rel="noopener" data-testid="face-live-hub-sole" className="inline-flex h-11 items-center justify-center gap-2 border border-foreground px-4 text-sm font-semibold text-foreground transition-colors hover:bg-foreground hover:text-background">
-            Open the SOLE hub <ArrowRight className="size-4" aria-hidden />
+            Open the SOLE clinic layer <ArrowRight className="size-4" aria-hidden />
           </a>
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">Hubs that are live and activating, shown as they are today. Your placement and hub are named on your IO before anything runs.</p>
+        <p className="mt-3 text-xs text-muted-foreground">Clinic layers that are live and activating, shown as they are today. Your placement and clinic layer are named on your IO before anything runs.</p>
       </div>
       <div data-testid="live-hub-thumbs"><LiveHubGrid dense={!compact} /><HubFunnel compact={!compact} /></div>
     </div>

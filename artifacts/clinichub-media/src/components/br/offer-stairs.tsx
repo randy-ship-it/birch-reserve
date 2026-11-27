@@ -15,9 +15,9 @@ export function OfferStairs({ look, seat, testId = "offer-stairs" }: { look: str
   const lo = DEPOSIT_TIERS[0]!.usd;
   const hi = DEPOSIT_TIERS[DEPOSIT_TIERS.length - 1]!.usd;
   const steps = [
-    { key: "look" as const, n: "1", price: look, name: "7-day look", line: "See it on a hub. Converts to a reserve or is refunded.", href: LOOK_HREF, h: "md:h-[150px]", tone: "bg-white text-[#0b1f3a] border border-[#0b1f3a]/15", cta: () => trackCta("cta_hold_190", { offer: "hold-190" }) },
+    { key: "look" as const, n: "1", price: look, name: "7-day look", line: "See it on a clinic layer. Converts to a reserve or is refunded.", href: LOOK_HREF, h: "md:h-[150px]", tone: "bg-white text-[#0b1f3a] border border-[#0b1f3a]/15", cta: () => trackCta("cta_hold_190", { offer: "hold-190" }) },
     { key: "reserve" as const, n: "2", price: seat, name: "Category placement", line: "Your slot, as media credit toward your insertion order.", href: RESERVE_HREF, h: "md:h-[190px]", tone: "bg-lime-200 text-[#0b1f3a]", cta: () => trackCta("cta_reserve_490", { offer: "reserve-490" }) },
-    { key: "sponsor" as const, n: "3", price: `${k(lo)}–${k(hi)}`, name: "Sponsor", line: "Prepaid credit with bonus credit, across more hubs.", href: "/sponsor", h: "md:h-[230px]", tone: "bg-[#0E3B2A] text-white", cta: () => undefined },
+    { key: "sponsor" as const, n: "3", price: `${k(lo)}–${k(hi)}`, name: "Sponsor", line: "Prepaid credit with bonus credit, across more clinic layers.", href: "/sponsor", h: "md:h-[230px]", tone: "bg-[#0E3B2A] text-white", cta: () => undefined },
     { key: "premium" as const, n: "4", price: "$25,000–$1.5M USD", name: "Blocks", line: "Larger share and priority placement. Inquire only. We write the IO.", href: "/media-kit#premium", h: "md:h-[270px]", tone: "bg-[#0b1f3a] text-white", cta: () => undefined },
   ];
   return (

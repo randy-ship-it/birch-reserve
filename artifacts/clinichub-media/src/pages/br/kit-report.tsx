@@ -79,7 +79,7 @@ export default function BrKitReport() {
         <FourPaths testId="kit-report-paths" className="mt-6" />
         <BuyJourney where="kit_report" className="mt-6" testId="kit-report-journey" />
         {/* Sharing from a private report shares the public intake, never this report's token link. */}
-        <div className="mt-4"><ShareBar testId="share-bar-report" href="intake" text="Get your own free Monetization Kit: hub earnings and supplier exposure, estimated and reviewed by a person." /></div>
+        <div className="mt-4"><ShareBar testId="share-bar-report" href="intake" text="Get your own free Monetization Kit: clinic layer earnings and supplier exposure, estimated and reviewed by a person." /></div>
         {state === "loading" ? <p className="mt-6 flex items-center gap-2"><Loader2 className="size-4 animate-spin" />Loading your report…</p> : null}
         {state === "draft" ? <p className="mt-6" data-testid="kit-report-draft">This Monetization Kit is still a draft. Finish it on <a href="/brand-kit" className="underline">your kit page</a>.</p> : null}
         {state === "missing" ? <p className="mt-6" data-testid="kit-report-missing">We couldn't find this kit. The link may have been rotated.</p> : null}

@@ -21,7 +21,7 @@ import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@
 const FORWARD_KIT = [
   { href: "/media-kit", t: "Media kit", d: "The published rate card, placements and terms." },
   { href: "/sample-io", t: "Sample IO", d: "What your client signs before anything runs." },
-  { href: "/audiences", t: "Audience insights", d: "Who the hubs reach. Measured, modelled and estimated figures, labelled." },
+  { href: "/audiences", t: "Audience insights", d: "Who the clinic layers reach. Measured, modelled and estimated figures, labelled." },
   { href: "/terms", t: "Terms", d: "Credit, refunds and cancellation in writing." },
   { href: "/media-buyers", t: "For media buyers", d: "How Birch fits next to programmatic, paid social and retail media." },
 ];
@@ -83,10 +83,10 @@ export default function BrAgencies() {
             <Eyebrow>For agencies &amp; media buyers</Eyebrow>
             <H1>Reach health and wellness customers right after they buy.</H1>
             <p className="mt-4 text-base leading-snug text-muted-foreground md:hidden" data-testid="agency-hero-sub">
-              Post-purchase and in-hub display.
+              Post-purchase and clinic layer display.
             </p>
             <Lede className="hidden md:block">
-              Post-purchase pages and member hubs, tracked on your UTMs. The standard 15% agency commission off a public rate card. We do not undercut an agency&apos;s client.
+              Post-purchase pages and member clinic layers, tracked on your UTMs. The standard 15% agency commission off a public rate card. We do not undercut an agency&apos;s client.
             </Lede>
             <HeroCtas className="mt-8 hidden flex-col items-start gap-3 sm:flex-row sm:items-center md:flex" />
           </div>
@@ -108,10 +108,10 @@ export default function BrAgencies() {
         </div>
         <dl className="mt-12 grid gap-px border border-[#0b1f3a]/15 bg-[#0b1f3a]/15 sm:grid-cols-2 lg:grid-cols-4" data-testid="agency-proof">
           {[
-            { k: "Where ads run", d: "Post-purchase, hub home, product and booking pages, member dashboard." },
-            { k: "Live hubs", d: INVENTORY.line },
-            { k: "Measurement", d: "Your UTM links and promo codes. Views and clicks per hub and surface, aggregate only." },
-            { k: "Brand safety", d: "Post-purchase pages and member hubs. No open web. Nothing runs before you approve the IO." },
+            { k: "Where ads run", d: "Post-purchase, clinic layer home, product and booking pages, member dashboard." },
+            { k: "Live clinic layers", d: INVENTORY.line },
+            { k: "Measurement", d: "Your UTM links and promo codes. Views and clicks per clinic layer and surface, aggregate only." },
+            { k: "Brand safety", d: "Post-purchase pages and member clinic layers. No open web. Nothing runs before you approve the IO." },
           ].map((p) => (
             <div key={p.k} className="bg-background p-5">
               <dt className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/55">{p.k}</dt>
@@ -124,8 +124,8 @@ export default function BrAgencies() {
       <Section id="see-it">
         <div className="max-w-3xl">
           <Eyebrow>Sample placement</Eyebrow>
-          <H2>See a client&apos;s ad on a live hub.</H2>
-          <p className="mt-3 text-sm text-muted-foreground">Type the client&apos;s brand or drop in a logo. Illustrative mock on a real hub page; nothing is uploaded.</p>
+          <H2>See a client&apos;s ad on a live clinic layer.</H2>
+          <p className="mt-3 text-sm text-muted-foreground">Type the client&apos;s brand or drop in a logo. Illustrative mock on a real clinic layer page; nothing is uploaded.</p>
         </div>
         <div className="mt-8">
           <SeeYourAd testId="agency-see-your-ad" />
@@ -144,7 +144,7 @@ export default function BrAgencies() {
           <AgencyRateCardModel />
           <ExclusivePerks />
         </div>
-        <p className="mt-6 text-xs text-muted-foreground">Nothing runs until the insertion order names the hub, placement and flight dates. Full terms on <a className="underline underline-offset-2" href="/terms">/terms</a>.</p>
+        <p className="mt-6 text-xs text-muted-foreground">Nothing runs until the insertion order names the clinic layer, placement and flight dates. Full terms on <a className="underline underline-offset-2" href="/terms">/terms</a>.</p>
       </Section>
 
       <Section id="blocks" className="scroll-mt-24">
@@ -206,13 +206,13 @@ export default function BrAgencies() {
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <H2>Book a starter block for a client.</H2>
-            <p className="mt-4 text-sm text-muted-foreground">Starter blocks, upfront blocks and partner access all come here. We reply in writing within one business day with hub fit, flight dates and a draft insertion order.</p>
+            <p className="mt-4 text-sm text-muted-foreground">Starter blocks, upfront blocks and partner access all come here. We reply in writing within one business day with clinic layer fit, flight dates and a draft insertion order.</p>
           </div>
           <LeadForm
             kind="agency_inquiry"
             testId="form-agency"
             submitLabel="Send"
-            done={<p>Thanks. We&apos;ll reply in writing with hub fit and a draft insertion order.</p>}
+            done={<p>Thanks. We&apos;ll reply in writing with clinic layer fit and a draft insertion order.</p>}
             fields={[
               { name: "email", label: "Work email", type: "email", required: true },
               { name: "company", label: "Agency", required: true },

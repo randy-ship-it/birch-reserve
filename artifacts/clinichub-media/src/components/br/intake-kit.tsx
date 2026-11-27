@@ -116,7 +116,7 @@ const ROLE_SIDES: Array<{ side: "advertiser" | "publisher"; label: string; roles
     { key: "supplier", label: "Performance-only", href: "/intake/supplier", icon: Target },
     { key: "sponsor", label: "Accelerate", href: "/intake/sponsor", icon: Megaphone },
   ] },
-  { side: "publisher", label: "Hub", roles: [{ key: "publisher", label: "Max exposure", href: "/intake/publisher", icon: Store }] },
+  { side: "publisher", label: "Clinic layer", roles: [{ key: "publisher", label: "Max exposure", href: "/intake/publisher", icon: Store }] },
 ];
 
 export function RoleTabs({ active }: { active?: IntakeRole }) {

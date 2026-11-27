@@ -121,7 +121,7 @@ export default function SellAdsPage() {
         category placement checkout.
       </p>
       <p className="mt-3 text-sm text-muted-foreground">
-        Want ads plus product transactions in a free hub? That path is{" "}
+        Want ads plus product transactions in a free clinic layer? That path is{" "}
         <a
           className="underline underline-offset-2"
           href="https://scalehealth.ca/clinichubs"

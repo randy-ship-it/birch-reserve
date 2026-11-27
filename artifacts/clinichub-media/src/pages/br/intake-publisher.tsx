@@ -25,7 +25,7 @@ export default function BrIntakePublisher() {
   const k = cad ? CAD_PER_USD : 1;
   const usd = (n: number, d = 0) => usdFmt(n * k, d);
   const cur = cad ? "CAD" : "USD";
-  usePageMeta("Hub · max exposure + earnings | Birch Reserve", "Put curated products in front of your audience for max exposure, and see what your hub could earn. Estimates in USD.");
+  usePageMeta("Clinic layer · max exposure + earnings | Birch Reserve", "Put curated products in front of your audience for max exposure, and see what your clinic layer could earn. Estimates in USD.");
   const [on, setOn] = useState<Partial<Record<PubSurfaceKey, boolean>>>({});
   const [mode, setMode] = useState<PricingMode>("cpm");
   const [sizeX, setSizeX] = useState(1);
@@ -52,11 +52,11 @@ export default function BrIntakePublisher() {
       <MockBanner />
       <RoleTabs active="publisher" />
       <header className="container mx-auto px-4 pb-4 pt-8 md:pt-12">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For hubs · Max exposure</p>
-        <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Max exposure for your hub, plus a share.</h1>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">For clinic layers · Max exposure</p>
+        <h1 className="font-display text-4xl leading-[1.02] md:text-6xl">Max exposure for your clinic layer, plus a share.</h1>
         <p className="mt-3 max-w-xl text-base text-muted-foreground">Switch surfaces on. Watch the estimate move. You keep {PAYOUT.basePct}% of media revenue, rising to {PAYOUT.tiers[3].pct}% as your views grow.</p>
         <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <KitCta placement="hero_role_publisher" size="md" sub="One form for hub + supplier. Website + email to start." />
+          <KitCta placement="hero_role_publisher" size="md" sub="One form for clinic layer + supplier. Website + email to start." />
           <ShareBar testId="share-bar-role" />
         </div>
       </header>
@@ -126,9 +126,9 @@ export default function BrIntakePublisher() {
         <div className="mb-3 flex flex-wrap items-center gap-3">
           <h2 className="font-display text-2xl md:text-3xl">Your surfaces</h2>
           <label className="ml-auto flex max-w-full flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            <span className="text-xs font-semibold uppercase tracking-wider text-foreground/60">Hub size</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-foreground/60">Clinic layer size</span>
             <input data-testid="size-slider" type="range" min={0.25} max={20} step={0.25} value={sizeX} onChange={(e) => touch(setSizeX)(Number(e.target.value))} className="w-36 accent-[#0b1f3a] sm:w-48" />
-            <span className="w-28 text-xs tabular-nums">{sizeX}× median hub</span>
+            <span className="w-28 text-xs tabular-nums">{sizeX}× median clinic layer</span>
           </label>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -169,7 +169,7 @@ export default function BrIntakePublisher() {
                   </p>
                   <InfoPop title={s.label} testId={`surface-pop-${s.key}`}>
                     <p>{skinText(s.source)}</p>
-                    <p>Modelled {s.key === "newsletter" ? "sends" : "views"} at a median hub: {s.monthlyViews == null ? "none on file" : `${s.monthlyViews.toLocaleString("en-US")}/mo`}.{s.key === "newsletter" && s.monthlyViews != null ? ` Priced per 1,000 opens: about ${Math.round((s.monthlyViews * EMAIL_OPEN_PCT_MID) / 100).toLocaleString("en-US")} opens at a typical open rate.` : ""}</p>
+                    <p>Modelled {s.key === "newsletter" ? "sends" : "views"} at a median clinic layer: {s.monthlyViews == null ? "none on file" : `${s.monthlyViews.toLocaleString("en-US")}/mo`}.{s.key === "newsletter" && s.monthlyViews != null ? ` Priced per 1,000 opens: about ${Math.round((s.monthlyViews * EMAIL_OPEN_PCT_MID) / 100).toLocaleString("en-US")} opens at a typical open rate.` : ""}</p>
                     <p>Starter rates are illustrative 2026 planning estimates, not sold rates.</p>
                   </InfoPop>
                 </div>
@@ -209,7 +209,7 @@ export default function BrIntakePublisher() {
           <div className="flex items-center gap-2">
             <h2 className="font-semibold">Payout share</h2>
             <span className="rounded-full bg-foreground/[0.06] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">{PAYOUT.tiersLabel}</span>
-            <span className="ml-auto"><InfoPop title="Payout tiers" testId="tiers-pop"><p>{PAYOUT.line}</p><p>Tiers are on your total monthly views and paid as a flat rate at the tier you reach, the way ad networks tier their shares (Mediavine: 75% to 90%). Your estimate above uses the tier for the views it models. Modelled; the hub agreement governs.</p></InfoPop></span>
+            <span className="ml-auto"><InfoPop title="Payout tiers" testId="tiers-pop"><p>{PAYOUT.line}</p><p>Tiers are on your total monthly views and paid as a flat rate at the tier you reach, the way ad networks tier their shares (Mediavine: 75% to 90%). Your estimate above uses the tier for the views it models. Modelled; the clinic layer agreement governs.</p></InfoPop></span>
           </div>
           <ol className="mt-4 flex items-end gap-2">
             {PAYOUT.tiers.map((t, i) => (

@@ -27,7 +27,7 @@ export function HubThumb({ h, className = "" }: { h: LadderHub; className?: stri
       {failed || !h.thumb ? (
         <span className="absolute inset-0 grid place-items-center px-3 text-center font-display text-lg font-bold text-white">{h.name}</span>
       ) : (
-        <img src={h.thumb} alt={`${h.name} members-only hub`} width={1000} height={625} loading="eager" decoding="async" onError={() => setFailed(true)} className="absolute inset-0 size-full object-cover object-top" />
+        <img src={h.thumb} alt={`${h.name} members-only clinic layer`} width={1000} height={625} loading="eager" decoding="async" onError={() => setFailed(true)} className="absolute inset-0 size-full object-cover object-top" />
       )}
     </div>
   );
@@ -60,7 +60,7 @@ export function LiveHubGrid({ light = true }: { light?: boolean; dense?: boolean
           );
           const cls = `group block w-[250px] shrink-0 snap-start overflow-hidden sm:w-auto sm:shrink rounded-xl border transition hover:border-[#0b1f3a]/40 ${light ? "border-[#0b1f3a]/10 bg-white" : "border-foreground/15 bg-white"}`;
           return href ? (
-            <a key={h.key} href={href} target="_blank" rel="noopener" data-testid={h.tid} data-mirror-keep className={cls} aria-label={`Visit the ${h.name} hub`}>{body}</a>
+            <a key={h.key} href={href} target="_blank" rel="noopener" data-testid={h.tid} data-mirror-keep className={cls} aria-label={`Visit the ${h.name} clinic layer`}>{body}</a>
           ) : (
             <div key={h.key} data-testid={h.tid} className={cls}>{body}</div>
           );
@@ -105,11 +105,11 @@ export function HubFunnel({ compact = false }: { compact?: boolean }) {
   const list = activatingHubs();
   const strip = "-mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2 sm:mx-0 sm:grid sm:overflow-visible sm:px-0 sm:pb-0";
   return (
-    <div className={compact ? "mt-4" : "mt-6"} data-testid="hub-funnel" data-hub-tier="activating" aria-label={`${LABEL_ACTIVATING} hubs, ${MORE_LAUNCHING}`}>
-      <p className="mb-2 flex flex-wrap items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#0b1f3a]/65">{LABEL_ACTIVATING}<span className="font-semibold normal-case tracking-normal text-foreground/55">Example mockups of the ad card on each hub's page. Not live placements.</span></p>
+    <div className={compact ? "mt-4" : "mt-6"} data-testid="hub-funnel" data-hub-tier="activating" aria-label={`${LABEL_ACTIVATING} clinic layers, ${MORE_LAUNCHING}`}>
+      <p className="mb-2 flex flex-wrap items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.18em] text-[#0b1f3a]/65">{LABEL_ACTIVATING}<span className="font-semibold normal-case tracking-normal text-foreground/55">Example mockups of the ad card on each clinic layer's page. Not live placements.</span></p>
       <ul className={`${strip} ${compact ? "sm:grid-cols-3" : "sm:grid-cols-2 lg:grid-cols-3"}`} data-testid="hub-funnel-soon">
         {list.map((h) => (
-          <ExampleCard key={h.key} tid={`activating-${h.key}`} img={h.banner ?? ""} name={h.name} chip={LABEL_ACTIVATING} audience={h.audience} surface={h.surface ?? "Hub card"} />
+          <ExampleCard key={h.key} tid={`activating-${h.key}`} img={h.banner ?? ""} name={h.name} chip={LABEL_ACTIVATING} audience={h.audience} surface={h.surface ?? "Clinic layer card"} />
         ))}
       </ul>
       {(

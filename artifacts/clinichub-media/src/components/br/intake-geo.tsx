@@ -33,7 +33,7 @@ export function MarketPicker({ value, onChange, side = "advertiser", compact = f
   );
   return (
     <div data-testid="market-picker" className={compact ? "" : "flex h-full flex-col justify-center rounded-2xl border border-foreground/10 bg-white/70 p-3"}>
-      <span className="block text-[11px] font-bold uppercase tracking-wider text-foreground/60">{side === "publisher" ? "Where is your hub's audience?" : "Where do you sell and ship?"}</span>
+      <span className="block text-[11px] font-bold uppercase tracking-wider text-foreground/60">{side === "publisher" ? "Where is your clinic layer's audience?" : "Where do you sell and ship?"}</span>
       <div className="mt-1">{chips(value.sells_in, (c) => onChange({ ...value, sells_in: c, ships_to: shipsSame ? c : value.ships_to }), "market-sells")}</div>
       {side === "advertiser" ? (
         <label className="mt-2 flex items-center gap-2 text-xs text-foreground/70">
@@ -95,7 +95,7 @@ export function ActivationRange({ kind, block, source, testId }: { kind: "advert
   const hi = Math.max(block.later.max, lo + 1);
   const pct = (n: number) => `${Math.min(100, Math.max(0, ((n - lo) / (hi - lo)) * 100))}%`;
   const per = block.period === "month" ? " / month" : block.period === "test" ? " per test" : "";
-  const title = kind === "publisher" ? "Hub earnings" : "Supplier exposure value";
+  const title = kind === "publisher" ? "Clinic layer earnings" : "Supplier exposure value";
   const srcLabel = source === "friday" ? "From your report" : source === "sample" ? "Sample · example values" : "Preview · modelled estimate";
   return (
     <section data-currency-fixed data-testid={testId ?? `activation-${kind}`} data-source={source === "friday" ? "report" : source} className="rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm">
@@ -146,7 +146,7 @@ export function pickActivation(friday: unknown, modelled: ActivationBlock): { bl
 export { COUNTRY_LABEL };
 
 /* ------------------------- Exposure value (Friday v1.1 `exposure`) ------------------------- */
-const CH_NAME: Record<string, string> = { hubs: "Branded ScaleHealth.ca hubs", calm_joints: "Calm Joints", street_team: "Calm Joints + Street Team", retail: "Private retail network" };
+const CH_NAME: Record<string, string> = { hubs: "Branded ScaleHealth.ca clinic layers", calm_joints: "Calm Joints", street_team: "Calm Joints + Street Team", retail: "Private retail network" };
 const fmt = (n: number) => (n >= 1e9 ? `${+(n / 1e9).toFixed(1)}B` : n >= 1e6 ? `${+(n / 1e6).toFixed(1)}MM` : n >= 1e3 ? `${Math.round(n / 1e3)}K` : String(Math.round(n)));
 export type Horizon = "now" | "later";
 export type Expo = "min" | "max";

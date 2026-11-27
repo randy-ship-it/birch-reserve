@@ -15,12 +15,12 @@ import { isScaleSkin } from "@/lib/siteSkin";
 
 const R = "/reel";
 /** The Scale skin plays its own render: same reel, but the last slide is Scale's three exclusive private channels (Randy, Nov 21 2026 5:38 PM). */
-const SCALE_END = "Three private channels: branded hubs, our digital and brick-and-mortar provider network across Canada and the USA, and Calm Joints, our recovery store, with Street Team ambassadors. Download your monetization kit for a free customized assessment for your business.";
+const SCALE_END = "Three private channels: branded clinic layers, our digital and brick-and-mortar provider network across Canada and the USA, and Calm Joints, our recovery store, with Street Team ambassadors. Download your monetization kit for a free customized assessment for your business.";
 const REEL_FILES = (scale: boolean) => scale
   ? { v: `${R}/scale-ad-system-9x16.mp4`, h: `${R}/scale-ad-system-16x9.mp4`, vtt: `${R}/captions-scale-en.vtt`, len: "One-minute walkthrough" }
   : { v: `${R}/birch-scale-ad-system-9x16.mp4`, h: `${R}/birch-scale-ad-system-16x9.mp4`, vtt: `${R}/captions-en.vtt`, len: "50-second walkthrough" };
 const TRANSCRIPT =
-  "Hey guys, here's the Scale Health ad system. One distribution network, for brands and for hubs. Starting as a supplier only? Stay performance-only, and earn when your products sell across our distribution channels. Maximize that exposure by activating your own audience, with a co-branded hub. Your dashboard shows your audience. Then tap our targeted audiences with open inventory, and crush it with yours. Ready for ads? Go deep where you know you'll convert, in front of the right audiences for your brand. Upload your ad, check out through Birch Reserve, and watch views, clicks and claims in your own cockpit. Recovery is live now. Longevity, sleep, fitness, food and nutrition, medi-spa, mental health and pets are coming next. One distribution system. Birch Reserve, plus Scale Health.";
+  "Hey guys, here's the Scale Health ad system. One distribution network, for brands and for clinic layers. Starting as a supplier only? Stay performance-only, and earn when your products sell across our distribution channels. Maximize that exposure by activating your own audience, with a co-branded clinic layer. Your dashboard shows your audience. Then tap our targeted audiences with open inventory, and crush it with yours. Ready for ads? Go deep where you know you'll convert, in front of the right audiences for your brand. Upload your ad, check out through Birch Reserve, and watch views, clicks and claims in your own cockpit. Recovery is live now. Longevity, sleep, fitness, food and nutrition, medi-spa, mental health and pets are coming next. One distribution system. Birch Reserve, plus Scale Health.";
 
 const I = {
   box: <><path d="M3 7l9-4 9 4-9 4-9-4z" /><path d="M3 7v10l9 4 9-4V7" /><path d="M12 11v10" /></>,
@@ -30,8 +30,8 @@ const I = {
 };
 
 const TILES: { k: string; h: string; p: React.ReactNode; d: string; ds?: string; icon: keyof typeof I }[] = [
-  { k: "01 · Supplier", h: "Start performance-only", p: "Earn when your products sell across our channels. Pay on results.", d: "No CPC or CPM on performance-only. Channels include branded ScaleHealth.ca hubs, a private digital and brick-and-mortar retail network, and the Ontario Street Team. You approve every placement.", icon: "box" },
-  { k: "02 · Co-branded hub", h: "Activate your audience", p: "Your own hub and dashboard. Add our targeted audiences on top.", d: "The dashboard shows your audience and campaigns. Tap network audiences with open inventory. Ads appear on your hub only if you approve them; the hub ad in the video is a labelled example placement.", icon: "home" },
+  { k: "01 · Supplier", h: "Start performance-only", p: "Earn when your products sell across our channels. Pay on results.", d: "No CPC or CPM on performance-only. Channels include branded ScaleHealth.ca clinic layers, a private digital and brick-and-mortar retail network, and the Ontario Street Team. You approve every placement.", icon: "box" },
+  { k: "02 · Co-branded clinic layer", h: "Activate your audience", p: "Your own clinic layer and dashboard. Add our targeted audiences on top.", d: "The dashboard shows your audience and campaigns. Tap network audiences with open inventory. Ads appear on your clinic layer only if you approve them; the clinic layer ad in the video is a labelled example placement.", icon: "home" },
   { k: "03 · Ads", h: "Go deep where you convert", p: "Pick the right audiences, check out, and watch your own cockpit.", d: "Ads run on ScaleHealth.ca and Birch Reserve pages. Upload your ad, check out, a person reviews it, then it runs. Views, clicks and claims update in your dashboard. No guaranteed reach or results.", icon: "target" },
   {
     k: "04 · Categories", h: "Recovery first, more next", icon: "grid", ds: "Which categories",
@@ -63,7 +63,7 @@ export default function BrIntakeReel() {
   const transcript = scale ? TRANSCRIPT.replace("One distribution system. Birch Reserve, plus Scale Health.", SCALE_END) : TRANSCRIPT;
   const { currency } = useCurrency();
   const C = currency.toUpperCase();
-  usePageMeta("Watch: how the Scale Health ad system works | Birch Reserve", `A ${scale ? "one-minute" : "50-second"} walkthrough: start performance-only as a supplier, activate your own audience with a co-branded hub, then run targeted ads. Recovery is live, more categories are next.`);
+  usePageMeta("Watch: how the Scale Health ad system works | Birch Reserve", `A ${scale ? "one-minute" : "50-second"} walkthrough: start performance-only as a supplier, activate your own audience with a co-branded clinic layer, then run targeted ads. Recovery is live, more categories are next.`);
   // On the Scale skin every link stays under /intake, so the visit and any checkout stay on scalehealth.ca (Scale direct).
   const kit = `/intake?utm_source=reel&utm_medium=${scale ? "scale_reel" : "reel"}`;
   const exclusive = `${scale ? "/intake/_m" : ""}/starter?currency=${currency}&utm_source=reel&utm_medium=${scale ? "scale_reel" : "reel"}`;
@@ -91,7 +91,7 @@ export default function BrIntakeReel() {
       <style>{`.reel-pl{max-width:min(420px,calc((100vh - 300px) * 9 / 16 + 18px));max-width:min(420px,calc((100dvh - 300px) * 9 / 16 + 18px))}@media (min-width:768px){.reel-pl{max-width:calc((100vh - 250px) * 16 / 9 + 18px);max-width:calc((100dvh - 250px) * 16 / 9 + 18px)}}.reel-s .reel-pl{max-width:min(420px,calc((100dvh - 380px) * 9 / 16 + 18px))}@media (min-width:768px){.reel-s .reel-pl{max-width:calc((100dvh - 300px) * 16 / 9 + 18px)}}`}</style>
       <section className="container mx-auto max-w-5xl px-4 pt-5 md:pt-8">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-foreground/55">{F.len}<span className="hidden sm:inline"> · {scale ? "Scale Health + Birch Reserve" : "Birch Reserve + Scale Health"}</span></p>
-        <h1 className="mt-1.5 font-display text-[2rem] leading-[1.05] md:text-5xl">One distribution system, for brands and hubs.</h1>
+        <h1 className="mt-1.5 font-display text-[2rem] leading-[1.05] md:text-5xl">One distribution system, for brands and clinic layers.</h1>
         {scale ? <ScaleAdUnitLockup className="mt-3" /> : null}
         <div className="reel-pl mx-auto mt-4 rounded-[18px] border border-[#D3D7DE] bg-white p-2 shadow-[0_14px_34px_-18px_rgba(7,26,57,.25)]" data-testid="reel-player">
           <video key={F.h} ref={h} className="hidden aspect-video w-full rounded-xl bg-[#0B1B38] md:block" controls playsInline preload="metadata" poster={`${R}/poster-16x9.jpg`} aria-label="How the Scale Health ad system works, 16:9">
@@ -114,7 +114,7 @@ export default function BrIntakeReel() {
         <div className="mt-7 grid items-center gap-4 rounded-[20px] bg-[#071A39] p-5 text-white md:grid-cols-[1fr_auto] md:p-6" data-testid="reel-band">
           <div>
             <h2 className="font-display text-2xl leading-tight md:text-3xl">See what it means for your brand.</h2>
-            <p className="mt-1.5 text-sm text-white/75">Free kit: your supplier exposure and hub earnings, estimated and reviewed by a person.</p>
+            <p className="mt-1.5 text-sm text-white/75">Free kit: your supplier exposure and clinic layer earnings, estimated and reviewed by a person.</p>
           </div>
           <Ctas dark where="band" />
         </div>
@@ -122,7 +122,7 @@ export default function BrIntakeReel() {
           <details className="py-2.5"><summary className="cursor-pointer font-semibold">What the $1,900 starter placement is</summary><p className="mt-1.5 text-foreground/75">A starter placement holds a dedicated package pending your insertion order, all of it counts toward that package, and it is refunded if you are bumped by another advertiser before you have finalized payment. Nothing runs until the IO is signed. Shown in your currency.</p></details>
           <details className="py-2.5" data-testid="reel-transcript"><summary className="cursor-pointer font-semibold">Transcript</summary><p className="mt-1.5 text-foreground/75">{transcript}</p></details>
         </div>
-        <p className="mt-5 max-w-3xl text-[13px] text-foreground/60">Northline Recovery, its hub and all dashboard figures in the video are examples, labelled EXAMPLE, not results. The hub placement shown is an example of how an ad could look, and runs only with the hub owner's approval. Upcoming categories are queued, with no launch dates. Channel figures are modelled estimates from listed partners, not a delivery promise. No guarantee of views, clicks, sales or results. Prices in the video are in USD.</p>
+        <p className="mt-5 max-w-3xl text-[13px] text-foreground/60">Northline Recovery, its clinic layer and all dashboard figures in the video are examples, labelled EXAMPLE, not results. The clinic layer placement shown is an example of how an ad could look, and runs only with the clinic layer owner's approval. Upcoming categories are queued, with no launch dates. Channel figures are modelled estimates from listed partners, not a delivery promise. No guarantee of views, clicks, sales or results. Prices in the video are in USD.</p>
       </section>
     </div>
   );

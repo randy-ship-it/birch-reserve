@@ -21,7 +21,7 @@ export const EXAMPLE_EXCLUSIVE_PROPERTIES: ReadonlyArray<ExampleExclusivePropert
     id: "weprize",
     name: "WePrize",
     blurb:
-      "Live SBG / Birch Reserve display placement example (placement example only — not a Scale hub seat; no reach claim).",
+      "Live SBG / Birch Reserve display placement example (placement example only — not a Scale clinic layer seat; no reach claim).",
     href: "https://weprize.net",
     kind: "Display · example",
   },

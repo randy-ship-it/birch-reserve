@@ -73,8 +73,8 @@ const INVENTORY_FORMATS = [
   },
   {
     id: "member-hub",
-    tag: "Member Hub",
-    title: "Native Hub Module",
+    tag: "Member Clinic layer",
+    title: "Native Clinic Layer Module",
     desc: "A sponsored module inside an approved member, customer, or wellness dashboard.",
     Preview: HubMockup,
     bg: "bg-background"
@@ -269,7 +269,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="text-4xl md:text-5xl lg:text-6xl font-display text-background leading-[0.98] tracking-tight mb-6"
             >
-              Placements inside listed Scale Health hubs.
+              Placements inside listed Scale Health clinic layers.
             </motion.h2>
 
             <motion.p
@@ -298,7 +298,7 @@ export default function Home() {
               </Button>
             </motion.div>
             <p className="mt-3 text-sm text-background/80">
-              <a className="underline underline-offset-4" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" data-testid="link-hero-live-hub">See a live hub</a>
+              <a className="underline underline-offset-4" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" data-testid="link-hero-live-hub">See a live clinic layer</a>
             </p>
             <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
               <a
@@ -347,7 +347,7 @@ export default function Home() {
                 Reserve this placement <ArrowRight className="size-3.5" />
               </span>
               <span className="mt-3 block text-[10px] leading-relaxed text-background/50">
-                Illustrative unit. Your creative is placed beside live catalog products on a listed hub. Nothing runs until an insertion order names the surface.
+                Illustrative unit. Your creative is placed beside live catalog products on a listed clinic layer. Nothing runs until an insertion order names the surface.
               </span>
             </button>
           </motion.div>
@@ -368,7 +368,7 @@ export default function Home() {
             {(
               [
                 ["1", "Prepay your category on the Reserve List. All of it becomes display credit, refundable until 14 days before your launch date."],
-                ["2", "Insertion order names the hub."],
+                ["2", "Insertion order names the clinic layer."],
                 ["3", "Unit sits after checkout, on a plan, or at a booking."],
               ] as const
             ).map(([step, copy], index) => (
@@ -398,7 +398,7 @@ export default function Home() {
                 Slots across 8 advertiser categories.
               </h2>
               <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-                Every dollar is a 100% media credit. Delivery starts when the insertion order names the hub. Hubs are the rooms. Prepay your category and the credit is yours to use for 12 months.
+                Every dollar is a 100% media credit. Delivery starts when the insertion order names the clinic layer. Clinic layers are the rooms. Prepay your category and the credit is yours to use for 12 months.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 lg:w-[620px]">
@@ -433,7 +433,7 @@ export default function Home() {
               </p>
               <p className="mt-4 font-display text-4xl text-accent">Curated placements</p>
               <p className="mt-4 flex-1 text-sm leading-relaxed text-background/75">
-                Log the placements you want and claim a slot. No commitment. Canada only for now. {t("The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.")}
+                Log the placements you want and claim a slot. No commitment. Canada only for now. {t("The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the clinic layer before anything runs.")}
               </p>
               <p className="mt-5 border-t border-background/15 pt-4 text-xs text-background/60">
                 Use an insider code, or request one on the list.
@@ -480,7 +480,7 @@ export default function Home() {
               $100K–$250K+ · Inquire within
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Multi-hub or on-prem retail hubs. Credit, not a flight. Not a self-serve Stripe SKU — inquire within.
+              Several clinic layers or on-prem retail clinic layers. Credit, not a flight. Not a self-serve Stripe SKU — inquire within.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Button
@@ -561,7 +561,7 @@ export default function Home() {
               <MonitorUp className="mb-7 size-6 text-foreground" />
               <h3 className="mb-3 font-display text-3xl text-foreground">Digital inventory</h3>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Sponsored placements, offers, content and category visibility inside closed customer and partner hubs.
+                Sponsored placements, offers, content and category visibility inside closed customer and partner clinic layers.
               </p>
               <p className="mt-4 text-xs leading-relaxed text-muted-foreground/80" data-testid="home-also-weprize">
                 Also on request: display example at{" "}
@@ -574,14 +574,14 @@ export default function Home() {
                   {WEPRIZE.name}
                 </a>
                 {" "}
-                — placement example only; not a Scale hub category.
+                — placement example only; not a Scale clinic layer category.
               </p>
             </article>
             <article className="border border-border bg-foreground p-7 text-background md:p-9">
               <MapPin className="mb-7 size-6 text-accent" />
               <h3 className="mb-3 font-display text-3xl">On-prem, on request</h3>
               <p className="text-sm leading-relaxed text-background/70 mb-4">
-                On-prem surfaces in retail hubs and in Scale hubs are a separate insertion-order line. They are not sold as digital reach.
+                On-prem surfaces in retail clinic layers and in Scale clinic layers are a separate insertion-order line. They are not sold as digital reach.
               </p>
               <div className="flex flex-wrap gap-2">
                 <a
@@ -726,7 +726,7 @@ export default function Home() {
                 Your ad runs next to products people already buy—not random inventory.
               </h2>
               <p className="mt-7 max-w-3xl text-base leading-relaxed text-background/75 md:text-lg">
-                Scale Health hubs sell and recommend a private supplier catalog. Birch placements sit in that same shelf: recovery equipment, topicals, nutrition, sleep, and meal prep. You are not dropped next to unknown brands.
+                Scale Health clinic layers sell and recommend a private supplier catalog. Birch placements sit in that same shelf: recovery equipment, topicals, nutrition, sleep, and meal prep. You are not dropped next to unknown brands.
               </p>
             </div>
             <a
@@ -749,7 +749,7 @@ export default function Home() {
             ))}
           </div>
           <p className="mt-5 max-w-4xl text-xs leading-relaxed text-background/55">
-            These are products and hubs on the Scale Health layer. Birch buys the display unit beside them. This is not a sold impression count.
+            These are products and clinic layers on the Scale Health layer. Birch buys the display unit beside them. This is not a sold impression count.
           </p>
         </div>
       </section>
@@ -759,15 +759,15 @@ export default function Home() {
         <div className="absolute top-0 right-0 w-1/3 h-full bg-secondary/10 pointer-events-none" />
         <div className="container mx-auto px-6 relative z-10">
           <div className="mb-12 mx-auto max-w-3xl text-center">
-            <h3 className="text-3xl md:text-5xl font-display tracking-tight text-foreground mb-4">Co-branded hubs. Real customer environments.</h3>
+            <h3 className="text-3xl md:text-5xl font-display tracking-tight text-foreground mb-4">Co-branded clinic layers. Real customer environments.</h3>
             <p className="text-muted-foreground leading-relaxed text-lg">
-              Birch inventory is contracted inside approved Scale Health brand environments. Launch timing varies by hub.
+              Birch inventory is contracted inside approved Scale Health brand environments. Launch timing varies by clinic layer.
             </p>
           </div>
           <div className="mb-8 border border-border bg-secondary/5 p-5 text-center md:p-6">
             <p className="text-[10px] font-bold uppercase tracking-widest text-accent">LIVE on DR-HO&apos;s</p>
             <p className="mt-2 text-sm font-medium">
-              <a className="underline underline-offset-4 hover:text-accent" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">Tour the DR-HO hub</a>
+              <a className="underline underline-offset-4 hover:text-accent" href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer">Tour the DR-HO clinic layer</a>
               <span className="text-muted-foreground"> · On-prem clinic and studio surfaces are a separate insertion order.</span>
             </p>
             <p className="mt-3 text-sm">
@@ -785,17 +785,17 @@ export default function Home() {
               <div className="p-6 md:p-8 border-b border-border bg-secondary/5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-accent mb-2 flex items-center gap-2">
                   <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span></span>
-                  Live customer hub
+                  Live customer clinic layer
                 </p>
-                <h4 className="font-display text-2xl text-foreground">DR-HO'S Insider Hub</h4>
+                <h4 className="font-display text-2xl text-foreground">DR-HO'S Insider Clinic layer</h4>
               </div>
               <div className="p-6 md:p-8 bg-background flex-1">
                 <div className="border border-border/50 shadow-sm overflow-hidden aspect-[4/3] bg-muted relative">
                   <HubWalkthroughVideo testId="video-hub-walkthrough" />
                 </div>
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Live DR-HO&apos;S hub walkthrough — illustrative of placement context.</p>
+                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Live DR-HO&apos;S clinic layer walkthrough — illustrative of placement context.</p>
                 <a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold">
-                  Open the live hub <ArrowUpRight className="size-4" />
+                  Open the live clinic layer <ArrowUpRight className="size-4" />
                 </a>
               </div>
             </div>
@@ -806,13 +806,13 @@ export default function Home() {
                   <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span></span>
                   Launching
                 </p>
-                <h4 className="font-display text-2xl text-foreground">Kalaya Booking Hub</h4>
+                <h4 className="font-display text-2xl text-foreground">Kalaya Booking Clinic layer</h4>
               </div>
               <div className="p-6 md:p-8 bg-background flex-1">
                 <div className="border border-border/50 shadow-sm overflow-hidden aspect-[4/3] bg-muted relative">
-                  <img src="/hub-proof/kalaya-booking-card.png" alt="Kalaya Booking Hub screenshot" className="w-full h-full object-cover object-top" loading="lazy" />
+                  <img src="/hub-proof/kalaya-booking-card.png" alt="Kalaya Booking Clinic layer screenshot" className="w-full h-full object-cover object-top" loading="lazy" />
                 </div>
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Co-branded Scale Health hub. Display inventory is contracted. Launch timing varies.</p>
+                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Co-branded Scale Health clinic layer. Display inventory is contracted. Launch timing varies.</p>
               </div>
             </div>
 
@@ -827,7 +827,7 @@ export default function Home() {
                 <div className="border border-border/50 shadow-sm overflow-hidden aspect-[4/3] bg-muted relative">
                   <img src="/hub-proof/roll-marketplace-grid.png" alt="ROLL Marketplace screenshot" className="w-full h-full object-cover object-top" loading="lazy" />
                 </div>
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Co-branded Scale Health hub. Display inventory is contracted. Launch timing varies.</p>
+                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Co-branded Scale Health clinic layer. Display inventory is contracted. Launch timing varies.</p>
               </div>
             </div>
           </div>
@@ -846,10 +846,10 @@ export default function Home() {
           <div className="max-w-3xl mb-16 md:mb-20">
             <h3 className="text-4xl md:text-6xl font-display tracking-tight mb-6 italic">Where the ad sits.</h3>
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-              Not on the open web. Birch units appear after a customer has already bought, booked, or started a plan inside a listed Scale Health hub.
+              Not on the open web. Birch units appear after a customer has already bought, booked, or started a plan inside a listed Scale Health clinic layer.
             </p>
             <a href="https://physio.drhonow.com/dr-ho/portal" target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-accent">
-              See the live DR-HO'S hub <ArrowUpRight className="size-4" />
+              See the live DR-HO'S clinic layer <ArrowUpRight className="size-4" />
             </a>
           </div>
 
@@ -859,9 +859,9 @@ export default function Home() {
                  <div className="inline-block border border-border bg-secondary/30 text-[10px] uppercase tracking-widest px-3 py-1 text-foreground w-max font-medium">
                    Featured Format
                  </div>
-                  <h4 className="text-3xl md:text-4xl font-display text-foreground tracking-wide">See a hub walk-through</h4>
+                  <h4 className="text-3xl md:text-4xl font-display text-foreground tracking-wide">See a clinic layer walk-through</h4>
                  <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
-                    Real walkthrough of the live DR-HO&apos;S hub — the page, the customer moment, and the neighboring catalog. No generated stand-in.
+                    Real walkthrough of the live DR-HO&apos;S clinic layer — the page, the customer moment, and the neighboring catalog. No generated stand-in.
                  </p>
                </div>
                  <div
@@ -873,7 +873,7 @@ export default function Home() {
                      className="h-full w-full object-cover object-top"
                    />
                    <p className="absolute bottom-0 left-0 right-0 bg-background/85 px-3 py-2 text-[10px] font-medium uppercase tracking-[0.16em] text-foreground/70 backdrop-blur-sm">
-                     Live DR-HO&apos;S hub walkthrough · illustrative
+                     Live DR-HO&apos;S clinic layer walkthrough · illustrative
                    </p>
                  </div>
              </div>
@@ -899,7 +899,7 @@ export default function Home() {
                     <h4 className="text-2xl font-display mb-2 text-foreground tracking-wide">{item.title}</h4>
                     <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
                     <p className="mt-3 text-xs font-medium text-foreground">
-                      This unit lives on listed hubs like {index === 0 ? (
+                      This unit lives on listed clinic layers like {index === 0 ? (
                         <span>DR-HO'S.</span>
                       ) : (
                         "DR-HO'S."
@@ -912,7 +912,7 @@ export default function Home() {
                     </p>
                     <Preview />
                     <p className="mt-3 text-[10px] leading-relaxed text-muted-foreground">
-                      Illustrative unit. Your creative is placed beside live catalog products on a listed hub. Nothing runs until an insertion order names the surface.
+                      Illustrative unit. Your creative is placed beside live catalog products on a listed clinic layer. Nothing runs until an insertion order names the surface.
                     </p>
                   </div>
                   <div className="mt-6 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-foreground transition-colors group-hover:text-accent">
@@ -967,7 +967,7 @@ export default function Home() {
           <div className="mb-10">
             <h3 className="text-2xl md:text-3xl font-display tracking-tight mb-3">Studios that already own a local audience</h3>
             <p className="text-muted-foreground text-sm max-w-xl leading-relaxed">
-               Studios that already own a local audience can add a Scale Clinic Hub (store + booking) and then a Birch unit on that hub. Care, commerce, and display stay three separate contracts.
+               Studios that already own a local audience can add a Scale Clinic layer (store + booking) and then a Birch unit on that clinic layer. Care, commerce, and display stay three separate contracts.
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-4 md:gap-6">
@@ -1006,7 +1006,7 @@ export default function Home() {
           <div className="max-w-2xl mx-auto flex flex-col items-center">
             <h2 className="text-4xl md:text-6xl font-display tracking-tight mb-5 italic">Reserve a slot at today's minimum.</h2>
             <p className="text-base md:text-lg text-background/70 mb-10 leading-relaxed max-w-xl">
-              {t("The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the hub before anything runs.")}
+              {t("The $190 look does not burn a seat. The $490 seat is the named category. The insertion order names the clinic layer before anything runs.")}
             </p>
             <div className="flex w-full max-w-xl flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
               <a

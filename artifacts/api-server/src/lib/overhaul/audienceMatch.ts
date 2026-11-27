@@ -35,7 +35,7 @@ export const PROFILE: Category[] = [
   { key: "fitness", label: "Fitness", hubs: ["Roll Recovery", "Jack Health"], weight: 1.1, terms: ["fitness", "gym", "workout", "workouts", "training", "trainer", "personal training", "strength", "pilates", "yoga", "barre", "spin", "cycling", "running", "run club", "athlete", "athletes", "crossfit", "hiit", "studio", "class", "classes", "membership", "boxing", "climbing", "squash", "tennis", "pickleball", "golf", "swim", "marathon", "sport", "sports"] },
   { key: "food", label: "Food & nutrition", hubs: ["NutriProCan"], weight: 1.1, terms: ["nutrition", "nutritionist", "dietitian", "diet", "protein", "meal", "meals", "meal prep", "recipe", "recipes", "organic", "snack", "snacks", "greens", "vitamin", "vitamins", "supplement", "supplements", "collagen", "electrolyte", "hydration", "probiotic", "gut health", "plant-based", "keto", "gluten-free", "food", "grocery", "kitchen", "coffee", "tea", "smoothie", "juice", "meal kit", "meal kits", "meal delivery", "ingredients", "chef", "dinner", "healthy eating", "whole foods", "macros"] },
   { key: "pets", label: "Pets (in queue)", hubs: [], weight: 0.8, terms: ["pet", "pets", "dog", "dogs", "puppy", "cat", "cats", "canine", "feline", "vet", "veterinary", "pet food", "treats", "hip and joint", "pet food", "dog food", "cat food", "pet supplies", "pet store", "kibble", "litter", "grooming"] },
-  { key: "services", label: "Wellness services", hubs: ["Clinic hub network", "Effortless Admin"], weight: 1.0, terms: ["clinic", "clinics", "wellness", "health", "healthcare", "therapy", "therapist", "naturopath", "acupuncture", "registered massage", "rmt", "dental", "dentist", "optometr", "dermatolog", "skin", "skincare", "spa", "medspa", "mental health", "counselling", "counseling", "book an appointment", "appointment", "benefits", "insurance", "employee benefits", "care"] },
+  { key: "services", label: "Wellness services", hubs: ["Clinic layer network", "Effortless Admin"], weight: 1.0, terms: ["clinic", "clinics", "wellness", "health", "healthcare", "therapy", "therapist", "naturopath", "acupuncture", "registered massage", "rmt", "dental", "dentist", "optometr", "dermatolog", "skin", "skincare", "spa", "medspa", "mental health", "counselling", "counseling", "book an appointment", "appointment", "benefits", "insurance", "employee benefits", "care"] },
 ];
 
 /** Words that also appear on unrelated sites: count only in title/meta/headings, at a third of the weight. */
@@ -135,16 +135,16 @@ export function scoreMatch(s: SiteSignals, blurbRaw: string): MatchResult {
   } else {
     reasons.push({
       title: "Adjacent to the wellness audience",
-      detail: "Your pages don't lean on recovery, fitness or food words yet, but hub members are health-minded adults who buy for themselves and their families. A short, practical offer usually travels well.",
+      detail: "Your pages don't lean on recovery, fitness or food words yet, but clinic layer members are health-minded adults who buy for themselves and their families. A short, practical offer usually travels well.",
     });
   }
   reasons.push(
     hubs.length
-      ? { title: `Best-fit hubs: ${hubs.join(", ")}`, detail: "Your ad would sit inside these co-branded hubs, on the home page, in product and service pages, and after checkout." }
-      : { title: "Best fit: the clinic hub network", detail: "Clinic, gym and studio member hubs give broad health-and-wellness reach while brand-specific hubs fill in." },
+      ? { title: `Best-fit clinic layers: ${hubs.join(", ")}`, detail: "Your ad would sit inside these co-branded clinic layers, on the home page, in product and service pages, and after checkout." }
+      : { title: "Best fit: the clinic layer network", detail: "Clinic, gym and studio member clinic layers give broad health-and-wellness reach while brand-specific clinic layers fill in." },
   );
   if (businessType === "local") {
-    reasons.push({ title: "You serve a local area", detail: "Hub members near you can be reached by postal code. Take a placement in your 5 km area so nearby members see you first." });
+    reasons.push({ title: "You serve a local area", detail: "Clinic layer members near you can be reached by postal code. Take a placement in your 5 km area so nearby members see you first." });
   } else if (commerce) {
     reasons.push({ title: "Your customers buy online", detail: "Post-purchase placements reach people who just finished buying something, the moment an offer is most welcome." });
   } else {
@@ -153,12 +153,12 @@ export function scoreMatch(s: SiteSignals, blurbRaw: string): MatchResult {
 
   const recommended: MatchResult["recommended"] =
     businessType === "local"
-      ? { product: "area_lock", label: "Get my area placement", href: "/advertise/local", why: "Hold up to 50% of hub display within 5 km of you (25% in dense downtown cores)." }
+      ? { product: "area_lock", label: "Get my area placement", href: "/advertise/local", why: "Hold up to 50% of clinic layer display within 5 km of you (25% in dense downtown cores)." }
       : score >= 70
-        ? { product: "brand_deposit", label: "Brand spend commit", href: "/advertise/brands", why: "Prepay a test budget across the best-fit hubs and get bonus credit." }
+        ? { product: "brand_deposit", label: "Brand spend commit", href: "/advertise/brands", why: "Prepay a test budget across the best-fit clinic layers and get bonus credit." }
         : score >= 55
           ? { product: "starter_slot", label: "Starter slot", href: "/advertise/brands#slots", why: "Start small with a shared slot and see the response." }
-          : { product: "display_cpc_inquiry", label: "Request display / CPC", href: "/publish/brands#display-cpc", why: "We'll suggest the hubs and formats where your offer fits." };
+          : { product: "display_cpc_inquiry", label: "Request display / CPC", href: "/publish/brands#display-cpc", why: "We'll suggest the clinic layers and formats where your offer fits." };
 
   return {
     score,

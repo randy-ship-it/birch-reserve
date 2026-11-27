@@ -74,7 +74,7 @@ export function MetaHook() {
           You&apos;re already paying Meta {fmtRange(META_CPM)} CPM for cold recovery audiences.
         </h2>
         <p className="mt-5 max-w-2xl text-lg leading-relaxed text-background/75">
-          Reach people already inside the recovery hub with a $490 USD category placement, at fixed starting-at rates instead of an auction.
+          Reach people already inside the recovery clinic layer with a $490 USD category placement, at fixed starting-at rates instead of an auction.
         </p>
         <SeatCtas tone="dark" className="mt-8" />
         <a href="#rates" className="mt-4 inline-block text-sm text-background/70 underline underline-offset-4 hover:text-background">
@@ -89,14 +89,14 @@ export function MetaHook() {
             <p className="text-xs text-background/55">CPM, cold audience, auction</p>
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Birch hubs, starting at</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-accent">Birch clinic layers, starting at</p>
             <p className="mt-1 font-display text-4xl text-accent md:text-5xl">~${BLENDED.starterCpm}</p>
-            <p className="text-xs text-background/55">blended CPM, members inside the hub</p>
+            <p className="text-xs text-background/55">blended CPM, members inside the clinic layer</p>
           </div>
         </div>
         <div className="mt-6 space-y-2 border-t border-background/15 pt-4 text-sm text-background/80">
           <p>Landing pages from <b className="text-background">${landing.cpmStarter[0]} CPM</b>. Post-purchase from <b className="text-background">${post.cpmStarter[0]} CPM</b>.</p>
-          <p>Reserve: fixed price, no auction, a share of display space across the hub network. Premium deals are by inquiry.</p>
+          <p>Reserve: fixed price, no auction, a share of display space across the clinic layer network. Premium deals are by inquiry.</p>
         </div>
         <p className="mt-4 text-[11px] leading-relaxed text-background/50">
           <Estimate /> {ESTIMATE_NOTE}
@@ -111,7 +111,7 @@ export function RateCardV2() {
   const [ex, setEx] = useState<PlacementKey | null>(null);
   return (
     <div data-testid="rate-card-v2">
-      <p className="mb-3 text-xs text-muted-foreground">Tap or hover a surface to see an example placement inside a hub.</p>
+      <p className="mb-3 text-xs text-muted-foreground">Tap or hover a surface to see an example placement inside a clinic layer.</p>
       {/* Mobile: one card per surface */}
       <div className="grid gap-3 md:hidden">
         {RATE_SURFACES.map((s) => (
@@ -163,7 +163,7 @@ export function RateCardV2() {
         </table>
       </div>
       <article className="mt-3 border border-dashed border-foreground/30 bg-white p-4" data-testid="rate-card-screens">
-        <h3 className="font-display text-xl">In-hub screens</h3>
+        <h3 className="font-display text-xl">Clinic layer screens</h3>
         <p className="mt-1 text-xs text-muted-foreground">Screens inside partner locations.</p>
         <p className="mt-2 flex flex-wrap items-center gap-2 text-sm">
           <span className="rounded-full border border-foreground/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">Rolling out</span>
@@ -172,7 +172,7 @@ export function RateCardV2() {
         </p>
       </article>
       <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
-        USD. <Estimate /> {ESTIMATE_NOTE} Starter rates apply while a placement is new; rates may step up only after campaign reporting shows the placement performs. In-hub screens have no published rate yet.
+        USD. <Estimate /> {ESTIMATE_NOTE} Starter rates apply while a placement is new; rates may step up only after campaign reporting shows the placement performs. Clinic layer screens have no published rate yet.
       </p>
       <PlacementDialog open={ex} onClose={() => setEx(null)} />
     </div>
@@ -327,7 +327,7 @@ export function ScenarioCalculator() {
         ))}
       </div>
       <p className="mt-5 text-[11px] leading-relaxed text-muted-foreground">
-        Straight-line illustration at ~${BLENDED.starterCpm} blended starter CPM and Meta at {fmtRange(META_CPM)}. <Estimate /> Not a forecast of available inventory or delivery; large volumes are sold on an IO against live hub supply.
+        Straight-line illustration at ~${BLENDED.starterCpm} blended starter CPM and Meta at {fmtRange(META_CPM)}. <Estimate /> Not a forecast of available inventory or delivery; large volumes are sold on an IO against live clinic layer supply.
       </p>
     </div>
   );
@@ -337,7 +337,7 @@ export function ScenarioCalculator() {
 export function ProveItLadder() {
   const steps = [
     { n: "1", t: "Start at starter rates", d: "Your first period runs at the starting-at rates above. Start with a $490 USD category placement, all of it media credit." },
-    { n: "2", t: "We report, you judge", d: "Views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. Aggregate only, no patient data." },
+    { n: "2", t: "We report, you judge", d: "Views, clicks, UTM-tagged visits and promo-code redemptions per clinic layer and surface. Aggregate only, no patient data." },
     { n: "3", t: "Rates rise only when it's proven", d: "A placement's rate can step up only after reporting shows it performs. Your deposit keeps its rate for its term." },
   ];
   return (
@@ -374,7 +374,7 @@ export function ChannelBenchmarks() {
             </tr>
           ))}
           <tr>
-            <td className="py-3 pr-4 font-semibold">Birch hubs (starting at)</td>
+            <td className="py-3 pr-4 font-semibold">Birch clinic layers (starting at)</td>
             <td className="py-3 pr-4 font-semibold">${RATE_SURFACES[0]!.cpmStarter[0]}–{RATE_SURFACES[4]!.cpmStarter[1]} by surface</td>
             <td className="py-3 font-semibold">${RATE_SURFACES[0]!.cpcStarter[0].toFixed(2)}–{RATE_SURFACES[4]!.cpcStarter[1].toFixed(2)}</td>
           </tr>

@@ -44,7 +44,7 @@ export function MeasuredReport() {
   return (
     <div className="mt-6 rounded-2xl border border-foreground/20 bg-white p-5" data-testid="measured-report">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Measured on a live hub</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">Measured on a live clinic layer</p>
         <span className="rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-bold text-accent-foreground">{fmtDay(r.from!)}{r.from !== r.to ? ` – ${fmtDay(r.to!)}` : ""}</span>
       </div>
       <p className="mt-2 font-display text-2xl">{r.totalViews!.toLocaleString("en-US")} views{r.totalClicks ? ` · ${r.totalClicks.toLocaleString("en-US")} clicks` : ""}</p>
@@ -56,7 +56,7 @@ export function MeasuredReport() {
           </div>
         ))}
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">{skinChat("Anonymized aggregate. Counted by the Birch ad server on live hubs;")} test and QA traffic excluded. Clicks land on the brand's site tagged by surface (utm_content). A sample of what your report looks like, not a forecast or a guarantee.</p>
+      <p className="mt-3 text-xs text-muted-foreground">{skinChat("Anonymized aggregate. Counted by the Birch ad server on live clinic layers;")} test and QA traffic excluded. Clicks land on the brand's site tagged by surface (utm_content). A sample of what your report looks like, not a forecast or a guarantee.</p>
     </div>
   );
 }
@@ -66,12 +66,12 @@ export function YourCardHere() {
   return (
     <div className="mt-6 grid gap-4 sm:grid-cols-2" data-testid="your-card-here">
       {[
-        { src: "/proof/drhos-card-here.jpg", alt: "DR-HO'S hub with a marked space labelled 'your card here'", cap: "DR-HO'S, the booking confirmation" },
-        { src: "/proof/sole-card-here.jpg", alt: "SOLE hub with a marked space labelled 'your card here'", cap: "SOLE, the member page" },
+        { src: "/proof/drhos-card-here.jpg", alt: "DR-HO'S clinic layer with a marked space labelled 'your card here'", cap: "DR-HO'S, the booking confirmation" },
+        { src: "/proof/sole-card-here.jpg", alt: "SOLE clinic layer with a marked space labelled 'your card here'", cap: "SOLE, the member page" },
       ].map((s) => (
         <figure key={s.src} className="overflow-hidden rounded-2xl border border-foreground/20 bg-white">
           <img src={s.src} alt={s.alt} loading="lazy" className="block h-auto w-full" />
-          <figcaption className="px-4 py-2 text-xs text-muted-foreground">{s.cap}. Real hub, marked to show where your card sits.</figcaption>
+          <figcaption className="px-4 py-2 text-xs text-muted-foreground">{s.cap}. Real clinic layer, marked to show where your card sits.</figcaption>
         </figure>
       ))}
     </div>
@@ -89,11 +89,11 @@ export function PremiumSpendDown() {
       <summary className="flex min-h-11 cursor-pointer list-none items-center font-semibold [&::-webkit-details-marker]:hidden">Example: how a {usd(spend)} slot spends down</summary>
       <ul className="space-y-2 pb-2 text-background/85">
         <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />You prepay {usd(spend)} USD. All of it is media credit.</li>
-        <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />Your IO names the hubs and sets the pacing: for example about {usd(perMonth)} a month over {SPEND_DOWN_MAX_MONTHS} months, or faster.</li>
+        <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />Your IO names the clinic layers and sets the pacing: for example about {usd(perMonth)} a month over {SPEND_DOWN_MAX_MONTHS} months, or faster.</li>
         <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />Modelled: about {k(ex.imprLo)}–{k(ex.imprHi)} impressions in total at ${MEDIA_KIT_CPM.lo}–${MEDIA_KIT_CPM.hi} CPM.</li>
         <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0" aria-hidden />Credit stays valid for 12 months from payment.</li>
       </ul>
-      <p className="pb-3 text-xs text-background/65">An example, not a quote or a guarantee. Inquire only: no card purchase, and nothing runs until the IO names the hub. Aggregate reporting only.</p>
+      <p className="pb-3 text-xs text-background/65">An example, not a quote or a guarantee. Inquire only: no card purchase, and nothing runs until the IO names the clinic layer. Aggregate reporting only.</p>
       <div className="flex flex-col gap-2 pb-4 sm:flex-row">
         <a href="mailto:randy@scalehealth.ca?subject=Premium%20slot%20inquiry" className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-background/45 px-5 text-sm font-semibold"><Mail className="size-4" aria-hidden /> Email sales</a>
         <a href="/buycalc?sku=reserve-490#reserve" className="inline-flex h-11 items-center justify-center rounded-full border border-background/45 px-5 text-sm font-semibold">Buy ads now</a>

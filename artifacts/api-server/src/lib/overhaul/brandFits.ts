@@ -131,8 +131,8 @@ const radRoller: BrandFit = {
   name: "RAD Roller",
   site: { title: "RAD Roller", href: "https://radroller.com/" },
   eyebrow: "Customer exposure fit · RAD Roller",
-  headline: "Your customer, inside our hubs.",
-  lede: "People who use self-myofascial release tools between physio or chiro visits, after sport, and at a desk — the same moments our live recovery hubs and Calm Joints racquet pages already serve.",
+  headline: "Your customer, inside our clinic layers.",
+  lede: "People who use self-myofascial release tools between physio or chiro visits, after sport, and at a desk — the same moments our live recovery clinic layers and Calm Joints racquet pages already serve.",
   logoSrc: "/for-brands/rad-roller/logo-white.png",
   logoAlt: "RAD",
   photoCredit: "Product photos from RAD Roller",
@@ -159,22 +159,22 @@ const radRoller: BrandFit = {
   ],
   hubTiles: [
     {
-      title: "DR-HO'S physio hub",
+      title: "DR-HO'S physio clinic layer",
       status: "live",
       imageSrc: "/hub-gallery/drho.webp",
-      imageAlt: "DR-HO'S physio hub, live",
+      imageAlt: "DR-HO'S physio clinic layer, live",
       logoSrc: "/partner-logos/dr-ho.png",
       href: "https://physio.drhonow.com",
-      hrefTitle: "DR-HO'S physio hub",
+      hrefTitle: "DR-HO'S physio clinic layer",
     },
     {
-      title: "SOLE hub",
+      title: "SOLE clinic layer",
       status: "live",
       imageSrc: "/hub-gallery/sole.webp",
-      imageAlt: "SOLE hub, live",
+      imageAlt: "SOLE clinic layer, live",
       logoSrc: "/partner-logos/sole.png",
       href: "https://www.scalehealth.ca/sole",
-      hrefTitle: "SOLE hub",
+      hrefTitle: "SOLE clinic layer",
     },
     {
       title: "Calm Joints squash",
@@ -238,11 +238,11 @@ const radRoller: BrandFit = {
   overlap: [
     {
       status: "live",
-      title: "Live recovery hubs",
-      line: "Hubs anyone can open today: the DR-HO'S physio hub, the SOLE hub, Integrity Fitness and Calm Joints. They are the hubs we call live.",
+      title: "Live recovery clinic layers",
+      line: "Clinic layers anyone can open today: the DR-HO'S physio clinic layer, the SOLE clinic layer, Integrity Fitness and Calm Joints. They are the clinic layers we call live.",
       links: [
-        { title: "DR-HO'S physio hub", href: "https://physio.drhonow.com" },
-        { title: "SOLE hub", href: "https://www.scalehealth.ca/sole" },
+        { title: "DR-HO'S physio clinic layer", href: "https://physio.drhonow.com" },
+        { title: "SOLE clinic layer", href: "https://www.scalehealth.ca/sole" },
         { title: "Calm Joints", href: "https://www.scalehealth.ca/calmjoints" },
       ],
       strength: "strong",
@@ -267,25 +267,25 @@ const radRoller: BrandFit = {
     },
     {
       status: "street-team",
-      title: "Street team, retail hub footprint",
-      line: "The street team follows the retail hub footprint in the Greater Toronto and Hamilton Area, in studios and recovery rooms.",
+      title: "Street team, retail clinic layer footprint",
+      line: "The street team follows the retail clinic layer footprint in the Greater Toronto and Hamilton Area, in studios and recovery rooms.",
       strength: "good",
     },
     {
       status: "activating",
-      title: "Hubs activating",
-      line: "More co-branded recovery and wellness hubs are launching. Placements are curated as each one goes live. We don't list those as live until they are.",
+      title: "Clinic layers activating",
+      line: "More co-branded recovery and wellness clinic layers are launching. Placements are curated as each one goes live. We don't list those as live until they are.",
       strength: "good",
     },
   ],
   bestFits: [
     {
-      title: "Post-purchase on live recovery hubs",
+      title: "Post-purchase on live recovery clinic layers",
       why: "The thank-you page after a care booking or recovery purchase is the moment people are sent home with a mobility tool.",
       icon: "purchase",
       links: [
-        { title: "DR-HO'S physio hub", href: "https://physio.drhonow.com" },
-        { title: "SOLE hub", href: "https://www.scalehealth.ca/sole" },
+        { title: "DR-HO'S physio clinic layer", href: "https://physio.drhonow.com" },
+        { title: "SOLE clinic layer", href: "https://www.scalehealth.ca/sole" },
       ],
     },
     {
@@ -319,22 +319,22 @@ const radRoller: BrandFit = {
     { name: "Bird & Be", logoSrc: "/partner-logos/bird-and-be.png" },
     { name: "Calm Joints", href: "https://calmjoints.org/pickleball", logoSrc: "/for-brands/hubs/calm-joints-mark.svg" },
   ],
-  launchingNote: "Cataloged brands already launching on Scale Health hubs and Calm Joints — the company RAD would sit with.",
+  launchingNote: "Cataloged brands already launching on Scale Health clinic layers and Calm Joints — the company RAD would sit with.",
   performanceOnlyLine: "Performance-only terms are also available (pay on results, no CPC/CPM).",
   heroVisuals: [
     {
       src: "/hub-gallery/drho.webp",
-      alt: "DR-HO'S physio hub, live",
-      caption: "DR-HO'S physio hub, live",
+      alt: "DR-HO'S physio clinic layer, live",
+      caption: "DR-HO'S physio clinic layer, live",
       href: "https://physio.drhonow.com",
-      hrefTitle: "DR-HO'S physio hub",
+      hrefTitle: "DR-HO'S physio clinic layer",
     },
     {
       src: "/hub-gallery/sole.webp",
-      alt: "SOLE hub, live",
-      caption: "SOLE hub, live",
+      alt: "SOLE clinic layer, live",
+      caption: "SOLE clinic layer, live",
       href: "https://www.scalehealth.ca/sole",
-      hrefTitle: "SOLE hub",
+      hrefTitle: "SOLE clinic layer",
     },
   ],
   sources: [
@@ -348,7 +348,7 @@ const radRoller: BrandFit = {
     },
     {
       label: "Birch snapshot",
-      text: "Live hubs named in the Birch media kit (DR-HO'S physio, SOLE, Integrity Fitness and Calm Joints). Cataloged launching brands and Calm Joints racquet pages from the audience snapshot fed by the TAM inventory read on Nov 13, 2026. Street team footprint follows the retail hubs in the GTHA.",
+      text: "Live clinic layers named in the Birch media kit (DR-HO'S physio, SOLE, Integrity Fitness and Calm Joints). Cataloged launching brands and Calm Joints racquet pages from the audience snapshot fed by the TAM inventory read on Nov 13, 2026. Street team footprint follows the retail clinic layers in the GTHA.",
     },
   ],
 };

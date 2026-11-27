@@ -19,7 +19,7 @@ export default function BrMediaBuyers() {
   const reserve = priceLabel("reserve-490", currency, prices);
   usePageMeta(
     "For media buyers & performance marketers | Birch Reserve",
-    "Already running display, retargeting and paid social? Add one first-party health and wellness channel as its own line item: hand-placed placements inside private hubs, tracked with your UTM links and promo codes. Test from $190 USD.",
+    "Already running display, retargeting and paid social? Add one first-party health and wellness channel as its own line item: hand-placed placements inside private clinic layers, tracked with your UTM links and promo codes. Test from $190 USD.",
   );
   return (
     <div data-testid="br-media-buyers">
@@ -30,7 +30,7 @@ export default function BrMediaBuyers() {
             <Eyebrow>For media buyers &amp; performance marketers</Eyebrow>
             <H1>Add one first-party health channel to the display mix you already run.</H1>
             <Lede>
-              Your programmatic, retargeting and paid social stay as they are. {siteName()} adds hand-placed display inside private health and wellness hubs, on the pages members use right after they buy or book, and when they log back in. It runs as its own line item, tagged with your UTM links and promo codes.
+              Your programmatic, retargeting and paid social stay as they are. {siteName()} adds hand-placed display inside private health and wellness clinic layers, on the pages members use right after they buy or book, and when they log back in. It runs as its own line item, tagged with your UTM links and promo codes.
             </Lede>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta href={lookHref("media_buyers_look")} variant="ink" testId="mb-cta-look">Start a test · $190 USD 7-day look</Cta>
@@ -46,10 +46,10 @@ export default function BrMediaBuyers() {
             <ul className="mt-3 space-y-3 text-sm">
               {[
                 "Incremental: a separate line item, not a replacement for your DSP or social buys",
-                "Four placements: post-purchase, hub home, product / services, member dashboard",
+                "Four placements: post-purchase, clinic layer home, product / services, member dashboard",
                 "Display (per thousand views) or CPC (per click); public starting rates",
-                "Measured with your UTM links and promo codes; aggregate reporting per hub and surface",
-                "Prepaid media credit; nothing runs until the insertion order names the hub and placement",
+                "Measured with your UTM links and promo codes; aggregate reporting per clinic layer and surface",
+                "Prepaid media credit; nothing runs until the insertion order names the clinic layer and placement",
               ].map((t) => (
                 <li key={t} className="flex gap-2">
                   <CheckCircle2 className="mt-0.5 size-4 shrink-0" /> {t}
@@ -83,7 +83,7 @@ export default function BrMediaBuyers() {
             <Eyebrow>How measurement works</Eyebrow>
             <H2>Read it in the analytics you already use.</H2>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              {skinText("No new dashboard to trust. Birch traffic arrives on your UTM links, and redemptions arrive on your promo codes. Our report adds views and clicks per hub and surface.")}
+              {skinText("No new dashboard to trust. Birch traffic arrives on your UTM links, and redemptions arrive on your promo codes. Our report adds views and clicks per clinic layer and surface.")}
             </p>
             <p className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground" data-testid="mb-modelled-note">
               <Modelled /> Pre-launch view figures are modelled estimates, not measured delivery or a guarantee. No impression guarantees.
@@ -124,7 +124,7 @@ export default function BrMediaBuyers() {
       <Section tone="soft">
         <Eyebrow>Spec sheet</Eyebrow>
         <H2>Four placements. Public starting rates.</H2>
-        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">The IO names the hub, surface, format and dates.</p>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">The IO names the clinic layer, surface, format and dates.</p>
         <div className="mt-8">
           <InventorySpec />
         </div>
@@ -133,7 +133,7 @@ export default function BrMediaBuyers() {
       <Section>
         <Eyebrow>Start a test</Eyebrow>
         <H2>Two ways to buy.</H2>
-        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">Card for a first test today. An insertion order (IO) for premium or several hubs.</p>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">Card for a first test today. An insertion order (IO) for premium or several clinic layers.</p>
         <div className="mt-8">
           <BuyPaths
             paths={MB_BUY_PATHS}
@@ -177,13 +177,13 @@ export default function BrMediaBuyers() {
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <H2>Send the brief.</H2>
-            <p className="mt-4 text-sm text-muted-foreground">Tell us what you already run and what you want to test. We reply with hub fit and a draft insertion order.</p>
+            <p className="mt-4 text-sm text-muted-foreground">Tell us what you already run and what you want to test. We reply with clinic layer fit and a draft insertion order.</p>
           </div>
           <LeadForm
             kind="display_cpc_inquiry"
             testId="form-media-buyer"
             submitLabel="Send"
-            done={<p>Thanks. We'll reply with hub fit and a draft insertion order.</p>}
+            done={<p>Thanks. We'll reply with clinic layer fit and a draft insertion order.</p>}
             fields={[
               { name: "source_page", label: "Source", type: "hidden", defaultValue: "media-buyers" },
               { name: "company", label: "Brand or team", required: true },

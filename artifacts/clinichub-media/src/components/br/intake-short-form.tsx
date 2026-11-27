@@ -40,6 +40,7 @@ import { DemandAsk, PathBuyNow, PathPicker, SupplierDone, SupplierFees, Vertical
 import { RESERVE_HREF, lookHref } from "@/components/br/pricing";
 import { BuyJourney } from "@/components/br/journey";
 import { priceLabels, useAvailability } from "@/components/br/prime-hero";
+import { ClinicLayerPeek } from "@/components/br/clinic-layer-term";
 
 /** "Do you have physical locations?" (Randy, Nov 19 2026 10:54 AM ET): yes/no; if yes, how many + monthly visitors. */
 export type PhysForm = { has: boolean | null; locations: string; visitors: string; basis: "per_location" | "total" };
@@ -237,7 +238,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
 
   // Supplier preset blurb lines (land in the lead blurb; Friday v1 has no fields for these).
   const supNotes = () => [
-    `Supplier intake (/intake/supplier) paths: ${pathLabels(paths).join(", ") || "none picked"}${paths.hub ? " (own hub pending approval)" : ""}.`,
+    `Supplier intake (/intake/supplier) paths: ${pathLabels(paths).join(", ") || "none picked"}${paths.hub ? " (own clinic layer pending approval)" : ""}.`,
     ...(verts.length ? [`Categories: ${verticalLabels(verts).join(", ")}.`] : []),
     ...(demand ? ["Demand inquiry: asked what demand / interest we see for their categories."] : []),
     ...(paths.display ? ["CPC requested (no published CPC price yet)."] : []),
@@ -340,7 +341,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
         }}
       />
       {/* BR-81 (Randy, Nov 27 2026): brands see one next step first; the hub ad-activation form is one tap away, below the report. */}
-      {sup ? null : <div className="mt-4" data-testid="intake-activation-step"><Details label="Have your own site or hub? Turn on ads there too" testId="intake-activation-more"><AdActivation role="brand" email={quick.contact?.email ?? ""} company={quick.brand ?? ""} fridayId={quick.ref?.id ?? ""} /></Details></div>}
+      {sup ? null : <div className="mt-4" data-testid="intake-activation-step"><Details label="Have your own site or clinic layer? Turn on ads there too" testId="intake-activation-more"><AdActivation role="brand" email={quick.contact?.email ?? ""} company={quick.brand ?? ""} fridayId={quick.ref?.id ?? ""} /></Details></div>}
       </>
     );
   if (done)
@@ -374,7 +375,7 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
         <fieldset className="mb-4" data-testid="intake-program">
           <legend className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/55">How do you want to work with us?</legend>
           <div className="mt-2 grid gap-2 md:grid-cols-2" role="radiogroup">
-            {([[false, "Clinic hub program", "Your offers inside clinic hubs.", "intake-program-clinic"], [true, "Performance only (your own site)", "Our code on your own site. Not every brand is a fit for the clinic hub program.", "intake-program-perf"]] as const).map(([po, t, sub, id]) => (
+            {([[false, "Clinic layer program", "Your offers inside clinic layers.", "intake-program-clinic"], [true, "Performance only (your own site)", "Our code on your own site. Not every brand is a fit for the clinic layer program.", "intake-program-perf"]] as const).map(([po, t, sub, id]) => (
               <button key={id} type="button" role="radio" aria-checked={perfOnly === po} onClick={() => pickProgram(po)} data-testid={id} className={`flex items-start gap-3 rounded-xl border p-4 text-left text-[#0b1f3a] transition ${perfOnly === po ? "border-[#0b1f3a] bg-white ring-1 ring-[#0b1f3a]" : "border-foreground/15 bg-white hover:border-foreground/40"}`}>
                 <span aria-hidden className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border-2 ${perfOnly === po ? "border-[#0b1f3a]" : "border-foreground/30"}`}>{perfOnly === po ? <span className="size-2.5 rounded-full bg-[#0b1f3a]" /> : null}</span>
                 <span className="min-w-0"><span className="block text-base font-semibold">{t}</span>
@@ -387,18 +388,18 @@ export function IntakeShortForm({ onExpand, preset }: { onExpand?: (side: Intake
       {sup || perfOnly ? null : <fieldset>
         <legend className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/55">You are… <span className="font-semibold normal-case tracking-normal text-foreground/50">(most brands are both)</span></legend>
         <div className="mt-2 grid gap-2 md:grid-cols-2" data-testid="intake-roles">
-          <RoleCard on={r.supplier} onClick={() => flip("supplier")} icon={Package} title="Supplier" tag="Performance-only" sub="Get into curated hubs. Pay on results." testId="intake-role-supplier">
+          <RoleCard on={r.supplier} onClick={() => flip("supplier")} icon={Package} title="Supplier" tag="Performance-only" sub="Get into curated clinic layers. Pay on results." testId="intake-role-supplier">
             {r.supplier ? <AccelerateToggle on={r.accelerate} onClick={() => flip("accelerate")} /> : null}
           </RoleCard>
-          <RoleCard on={r.hub} onClick={() => flip("hub")} icon={Store} title="Hub" tag="Max exposure" sub={isScaleFacing() ? "Your audience books care and buys products through it." : "Your audience, shelf or screens. Earn a share."} testId="intake-role-hub" />
+          <RoleCard on={r.hub} onClick={() => flip("hub")} icon={Store} title="Clinic layer" tag="Max exposure" sub={isScaleFacing() ? "Your audience books care and buys products through it." : "Your audience, shelf or screens. Earn a share."} testId="intake-role-hub"><ClinicLayerPeek /></RoleCard>
         </div>
         {supplierOnly ? (
           <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-lime-300 bg-lime-50 p-4 md:flex-row md:items-center md:justify-between" data-testid="supplier-only-note">
             <div>
-              <p className="text-sm font-bold text-[#0b1f3a]">Supplier-only works. Add your hub for max exposure.</p>
-              <Details testId="supplier-only-details" className="mt-1"><p>A hub puts your products on your own shelf and pages too. Network: {RETAIL_COPY} ({RETAIL_TAG}).</p></Details>
+              <p className="text-sm font-bold text-[#0b1f3a]">Supplier-only works. Add your clinic layer for max exposure.</p>
+              <Details testId="supplier-only-details" className="mt-1"><p>A clinic layer puts your products on your own shelf and pages too. Network: {RETAIL_COPY} ({RETAIL_TAG}).</p></Details>
             </div>
-            <button type="button" onClick={addHub} data-testid="supplier-only-add-hub" className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-lime-300 hover:text-[#0b1f3a]"><Plus className="size-4" />Add my hub</button>
+            <button type="button" onClick={addHub} data-testid="supplier-only-add-hub" className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-[#0b1f3a] px-5 text-sm font-bold text-white hover:bg-lime-300 hover:text-[#0b1f3a]"><Plus className="size-4" />Add my clinic layer</button>
           </div>
         ) : null}
       </fieldset>}

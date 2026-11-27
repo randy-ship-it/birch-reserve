@@ -13,13 +13,13 @@ export const HANDOFF_EMAIL = "randy@scalehealth.ca";
 export type AgentOfferKey = "hold-190" | "reserve-490";
 
 /** Live hubs anyone can open today (media kit, Nov 17 2026). */
-export const AGENT_LIVE_HUBS = liveHubs().map((h) => ({ name: h.name, type: h.key === "calm-joints" ? "digital physio layer" : "brand hub", status: "live" as const }));
+export const AGENT_LIVE_HUBS = liveHubs().map((h) => ({ name: h.name, type: h.key === "calm-joints" ? "digital physio layer" : "brand clinic layer", status: "live" as const }));
 
 /** The two public offers, same as the media kit. USD only. Humans pay on the Stripe-hosted /buycalc page. */
 export function publicOffers() {
   return [
     { offer_key: "hold-190", name: "7-day category look", price_usd: 190, currency: "USD", terms: "Hold your category for 7 days. Converts in full to the $490 USD category placement within 7 days, or refunded. Does not lock in a slot.", human_checkout: `${SITE}/buycalc?sku=hold-190` },
-    { offer_key: "reserve-490", name: "Category placement", price_usd: 490, currency: "USD", terms: "Reserve display space across the hub network. Media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months. Nothing runs before the buyer approves an insertion order.", human_checkout: `${SITE}/buycalc?sku=reserve-490` },
+    { offer_key: "reserve-490", name: "Category placement", price_usd: 490, currency: "USD", terms: "Reserve display space across the clinic layer network. Media credit, fully refundable until 14 days before the launch date on the IO, usable for 12 months. Nothing runs before the buyer approves an insertion order.", human_checkout: `${SITE}/buycalc?sku=reserve-490` },
   ];
 }
 
@@ -40,7 +40,7 @@ export function slotOffers() {
       bonus_credit_pct: t.bonusPct,
       media_credit: { usd: creditUsd, cad: Math.round(t.cad * (1 + t.bonusPct / 100)) },
       modelled_hub_page_views: modelledViewsForCreditUsd(creditUsd),
-      views_basis: `credit / blended hub rate-card CPM $${blendedHubCpmUsd().toFixed(2)} USD × 1000, rounded down to 100. Modelled, not guaranteed.`,
+      views_basis: `credit / blended clinic layer rate-card CPM $${blendedHubCpmUsd().toFixed(2)} USD × 1000, rounded down to 100. Modelled, not guaranteed.`,
       exclusive: false,
       note: t.note,
       checkout: { method: "POST", path: "/v1/agent/checkout", body: { offer: t.key, currency: "usd|cad", brand: "string", email: "string", agree: true } },
@@ -63,7 +63,7 @@ export function areaLockOffer() {
     radius_km: AREA_LOCK.radiusKm,
     display_share_pct: { standard: AREA_LOCK.standardSharePct, dense_core: AREA_LOCK.denseCoreSharePct },
     term_months: { min: AREA_LOCK.minTermMonths, max: AREA_LOCK.maxTermMonths, starts: "display start" },
-    keep_pace: "Right to keep pace: if hub traffic in your area grows, you may top up to hold your share.",
+    keep_pace: "Right to keep pace: if clinic layer traffic in your area grows, you may top up to hold your share.",
     launch_rate_until: AREA_LOCK.launchRateUntil,
     launch_rate_note: `The lock price is a launch rate, held until ${AREA_LOCK.launchRateUntil}.`,
     follow_on_spend: { discount_pct_vs_rate_card: AREA_LOCK.followOnDiscountPct, cap_usd: AREA_LOCK.followOnCapUsd, cap_cad_approx: AREA_LOCK.followOnCapCad, over: "the lock term, per locker" },
@@ -79,12 +79,12 @@ export function agentCatalog(_status?: unknown) {
   return {
     catalog_version: AGENT_CATALOG_VERSION,
     seller: { name: "Birch Reserve", legal_name: "Silver Birch Growth Inc.", url: SITE, email: HANDOFF_EMAIL, address: "Toronto, Ontario, Canada" },
-    what_you_buy: `Display space inside private health and wellness hubs, on four placements: ${PLACEMENT_LABELS.join(", ")}.`,
+    what_you_buy: `Display space inside private health and wellness clinic layers, on four placements: ${PLACEMENT_LABELS.join(", ")}.`,
     currencies: ["USD"],
     currency_rule: "USD for every buyer, including Canadian brands.",
     inventory: {
       live_hubs: AGENT_LIVE_HUBS,
-      note: "More hubs launch over time; placements are curated as each one goes live. Audience and view figures are modelled estimates, not measured delivery.",
+      note: "More clinic layers launch over time; placements are curated as each one goes live. Audience and view figures are modelled estimates, not measured delivery.",
       surfaces: SURFACES.map((s) => ({ key: s.key, label: s.label, description: s.blurb })),
     },
     offers: publicOffers(),
@@ -107,7 +107,7 @@ export function agentCatalog(_status?: unknown) {
     rules: [
       "Aggregate reporting only. No patient data, no clinical pixels, no open auction.",
       "Modelled figures are labelled modelled. No impression, reach, click or sales guarantees.",
-      "Payment is media credit, used under an insertion order that names the hub and placement.",
+      "Payment is media credit, used under an insertion order that names the clinic layer and placement.",
       "Agents must show the buyer the terms and price before sending agree:true.",
     ],
   };
@@ -126,7 +126,7 @@ export function agentCard() {
   return {
     schema_version: "agent-card/0.1",
     name: "Birch Reserve ad buying",
-    description: "Display space inside private health & wellness hubs: a $190 USD 7-day look or a $490 USD category placement. Machine-readable catalog and quotes; buyers pay on a Stripe-hosted page.",
+    description: "Display space inside private health & wellness clinic layers: a $190 USD 7-day look or a $490 USD category placement. Machine-readable catalog and quotes; buyers pay on a Stripe-hosted page.",
     url: SITE,
     provider: { organization: "Silver Birch Growth Inc.", url: SITE, email: HANDOFF_EMAIL },
     documentation: `${SITE}/buyers`,

@@ -275,7 +275,7 @@ export function KitBuilder({ id = "my-kit", showMockBanner = true }: { id?: stri
               <p className="text-[11px] text-muted-foreground">{EDIT_TOKEN_WARNING}</p>
             </div>
           ) : null}
-          <p className="mt-2 text-[11px] text-muted-foreground">PDF + PNG. Estimates only. Anchor hubs are proposed and unconfirmed. <InfoPop title="Fit and figures" label="Fine print" testId="kit-fine"><p>{KIT_FIT_FINE}</p><p>Channel fit is subject to human confirmation. No checkout here. Prices, refunds and the prepaid + IO rules are on /media-kit and /terms.</p></InfoPop></p>
+          <p className="mt-2 text-[11px] text-muted-foreground">PDF + PNG. Estimates only. Anchor clinic layers are proposed and unconfirmed. <InfoPop title="Fit and figures" label="Fine print" testId="kit-fine"><p>{KIT_FIT_FINE}</p><p>Channel fit is subject to human confirmation. No checkout here. Prices, refunds and the prepaid + IO rules are on /media-kit and /terms.</p></InfoPop></p>
         </div>
         <div className="self-start lg:col-start-2 lg:row-start-2 xl:sticky xl:top-20 xl:col-start-3 xl:row-start-1" data-testid="kit-preview">
           <div className="mb-3 inline-flex rounded-full bg-foreground/[0.06] p-1" role="tablist">

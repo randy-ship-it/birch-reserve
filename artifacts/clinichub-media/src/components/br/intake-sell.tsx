@@ -18,7 +18,7 @@ export const sideOf = (roles: readonly IntakeRole[] | IntakeRole): IntakeSide =>
 
 export const SIDES: Record<IntakeSide, { label: string; sub: string; icon: typeof Store }> = {
   advertiser: { label: "Supplier", sub: "Performance-only (pay on results, no CPC/CPM), plus optional Accelerate for premium placements", icon: Megaphone },
-  publisher: { label: "Hub", sub: "Max exposure: earn from your screens and pages", icon: Store },
+  publisher: { label: "Clinic layer", sub: "Max exposure: earn from your screens and pages", icon: Store },
 };
 
 export function SideSwitch({ side, onChange }: { side: IntakeSide; onChange: (s: IntakeSide) => void }) {
@@ -58,7 +58,7 @@ export function PrimaryCta({ side, where, tone = "light", secondary = true }: { 
         </>
       ) : (
         <a href={where === "done" ? "/intake/publisher" : "/intake/publisher#publisher-contact-submit"} data-testid="primary-cta-publisher" onClick={() => trackIntake(side, "cta_click", where === "done" ? "publisher_payout" : "send_for_review")} className={`${big} bg-lime-300 text-[#0b1f3a] shadow-lime-500/30 hover:bg-[#0b1f3a] hover:text-white`}>
-          {where === "done" ? "See my full hub payout estimate" : skinText("List my hub with Birch Reserve")} <ArrowRight className="size-5" />
+          {where === "done" ? "See my full clinic layer payout estimate" : skinText("List my clinic layer with Birch Reserve")} <ArrowRight className="size-5" />
         </a>
       )}
     </div>
@@ -70,7 +70,7 @@ export function CtaBand({ side, where, line }: { side: IntakeSide; where: Intake
   return (
     <section data-testid={`cta-band-${where}`} className="border-y border-border/70 bg-[#0b1f3a] text-white">
       <div className="container mx-auto flex flex-col gap-3 px-4 py-5 md:flex-row md:items-center md:justify-between">
-        <p className="max-w-xl text-sm text-white/85">{line ?? (side === "publisher" ? skinText("Your hub's screens and pages: max exposure for curated products, and a share for you. A person at Birch Reserve reviews every hub.") : "Accelerate on live hub screens, by category. Start with the $190 USD look; the reserve is $490 USD.")}</p>
+        <p className="max-w-xl text-sm text-white/85">{line ?? (side === "publisher" ? skinText("Your clinic layer's screens and pages: max exposure for curated products, and a share for you. A person at Birch Reserve reviews every clinic layer.") : "Accelerate on live clinic layer screens, by category. Start with the $190 USD look; the reserve is $490 USD.")}</p>
         <PrimaryCta side={side} where={where} tone="dark" />
       </div>
     </section>
@@ -87,7 +87,7 @@ export function LeadGatesStatus({ gates, testId = "lead-gates", details = true }
     <div data-testid={testId} className="mt-3 flex flex-wrap items-center gap-2">
       {gates.mock ? <span data-testid={`${testId}-mock`} className="inline-flex items-center gap-1 rounded-full bg-violet-700 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"><FlaskConical className="size-3" />Mock · preview state</span> : null}
       <span data-testid={`${testId}-pending`} className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-amber-800"><Clock className="size-3.5" />In review, pending BR approval</span>
-      {details ? <Details className="basis-full !mt-0" testId={`${testId}-details`}><p>{skinText("A person at Birch Reserve approves before anything changes on a hub screen or page. Nothing is booked or charged until then.")}</p></Details> : null}
+      {details ? <Details className="basis-full !mt-0" testId={`${testId}-details`}><p>{skinText("A person at Birch Reserve approves before anything changes on a clinic layer screen or page. Nothing is booked or charged until then.")}</p></Details> : null}
     </div>
   );
 }

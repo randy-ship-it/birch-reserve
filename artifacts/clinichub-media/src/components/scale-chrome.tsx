@@ -11,7 +11,7 @@ import { logCtaClick } from "@/lib/shareTrack";
 
 const NAV = [
   { href: `${SCALE_HOME}/brands`, label: "For Brands", testId: "scale-nav-brands" },
-  { href: `${SCALE_HOME}/hub-examples`, label: "Hub examples", testId: "scale-nav-hub-examples" },
+  { href: `${SCALE_HOME}/hub-examples`, label: "Clinic layer examples", testId: "scale-nav-hub-examples" },
   { href: `${SCALE_HOME}/clinichubs`, label: "For Studios", testId: "scale-nav-studios" },
   { href: `${SCALE_HOME}/providers`, label: "Providers", testId: "scale-nav-providers" },
 ] as const;
@@ -23,7 +23,7 @@ const FOOTER = [
   { href: `${SCALE_HOME}/blog`, label: "Field Notes" },
   { href: `${SCALE_HOME}/be-a-supplier`, label: "Suppliers" },
   { href: `${SCALE_HOME}/inquire`, label: "Contact" },
-  { href: `${SCALE_HOME}/clinichubs`, label: "Start your clinic hub" },
+  { href: `${SCALE_HOME}/clinichubs`, label: "Start your clinic layer" },
 ] as const;
 
 function Logo({ className }: { className: string }) {

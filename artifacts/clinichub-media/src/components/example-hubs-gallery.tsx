@@ -23,15 +23,15 @@ export const EXAMPLE_HUBS: ReadonlyArray<ExampleHub> = [
   {
     id: "drho",
     name: "DR-HO'S",
-    kind: "Product brand hub",
+    kind: "Product brand clinic layer",
     image: "/hub-gallery/drho.webp",
     href: "https://physio.drhonow.com/dr-ho/portal",
   },
-  { id: "sole", name: "SOLE", kind: "Product brand hub", image: "/hub-gallery/sole.webp", href: "https://www.scalehealth.ca/sole" },
-  { id: "kalaya", name: "Kalaya", kind: "Product brand hub", image: "/hub-gallery/kalaya.webp" },
-  { id: "jill-health", name: "Jill Health", kind: "Health brand hub", image: "/hub-gallery/jill-health.webp" },
-  { id: "jack-health", name: "Jack Health", kind: "Health brand hub", image: "/hub-gallery/jack-health.webp" },
-  { id: "effortless-admin", name: "Effortless Admin", kind: "Benefits hub", image: "/hub-gallery/effortless-admin.webp" },
+  { id: "sole", name: "SOLE", kind: "Product brand clinic layer", image: "/hub-gallery/sole.webp", href: "https://www.scalehealth.ca/sole" },
+  { id: "kalaya", name: "Kalaya", kind: "Product brand clinic layer", image: "/hub-gallery/kalaya.webp" },
+  { id: "jill-health", name: "Jill Health", kind: "Health brand clinic layer", image: "/hub-gallery/jill-health.webp" },
+  { id: "jack-health", name: "Jack Health", kind: "Health brand clinic layer", image: "/hub-gallery/jack-health.webp" },
+  { id: "effortless-admin", name: "Effortless Admin", kind: "Benefits clinic layer", image: "/hub-gallery/effortless-admin.webp" },
 ];
 
 function CardBody({ hub }: { hub: ExampleHub }) {
@@ -40,7 +40,7 @@ function CardBody({ hub }: { hub: ExampleHub }) {
       <div className="relative aspect-[16/10] overflow-hidden border-b border-border bg-muted">
         <img
           src={hub.image}
-          alt={`${hub.name} co-branded hub homepage screenshot`}
+          alt={`${hub.name} co-branded clinic layer homepage screenshot`}
           width={1440}
           height={900}
           loading="lazy"
@@ -56,7 +56,7 @@ function CardBody({ hub }: { hub: ExampleHub }) {
         </div>
         {hub.href ? (
           <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-foreground transition-colors group-hover:text-accent">
-            Tour the hub <ArrowUpRight className="size-3.5" aria-hidden />
+            Tour the clinic layer <ArrowUpRight className="size-3.5" aria-hidden />
           </span>
         ) : null}
       </div>
@@ -75,14 +75,14 @@ export function ExampleHubsGallery() {
         <div className="mb-8 flex flex-col gap-3 md:mb-10 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
             <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/50">
-              The co-branded hub network
+              The co-branded clinic layer network
             </p>
             <h3 id="example-hubs-title" className="font-display text-3xl tracking-tight text-foreground md:text-5xl">
-              Example hubs
+              Example clinic layers
             </h3>
           </div>
           <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
-            Live co-branded Scale Health hubs, shown as examples of the network. Featured brands are not Birch advertisers or seat holders.
+            Live co-branded Scale Health clinic layers, shown as examples of the network. Featured brands are not Birch advertisers or seat holders.
           </p>
         </div>
 
@@ -97,7 +97,7 @@ export function ExampleHubsGallery() {
                   href={hub.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`Tour the ${hub.name} hub (opens in a new tab)`}
+                  aria-label={`Tour the ${hub.name} clinic layer (opens in a new tab)`}
                   className="group block h-full border border-border bg-background transition-all duration-300 hover:-translate-y-0.5 hover:border-foreground/30 hover:shadow-[0_12px_32px_-16px_rgba(0,0,0,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent motion-reduce:hover:translate-y-0"
                   data-testid={`example-hub-${hub.id}`}
                 >
@@ -115,7 +115,7 @@ export function ExampleHubsGallery() {
           ))}
         </ul>
         <p className="mt-5 max-w-3xl text-xs leading-relaxed text-muted-foreground">
-          Homepage screenshots of the hubs as they appear today. Birch display runs only on a hub named in an approved insertion order.
+          Homepage screenshots of the clinic layers as they appear today. Birch display runs only on a clinic layer named in an approved insertion order.
         </p>
       </div>
     </section>

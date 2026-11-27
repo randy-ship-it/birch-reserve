@@ -43,7 +43,7 @@ export const TRACK_RECORD = {
       stat: "No build",
       outcome: "Post-purchase moments turned into a co-branded care layer, with no tech build for the brand.",
       detail:
-        "We wrap a brand's existing post-purchase, email, loyalty and in-pack surfaces in real care, so its name sits next to registered physiotherapists, not affiliate banners. Each hub has four ad surfaces: the post-purchase thank-you page, the member dashboard, the hub home and product or service pages.",
+        "We wrap a brand's existing post-purchase, email, loyalty and in-pack surfaces in real care, so its name sits next to registered physiotherapists, not affiliate banners. Each clinic layer has four ad surfaces: the post-purchase thank-you page, the member dashboard, the clinic layer home and product or service pages.",
       sources: ["https://silverbirchgrowth.com/work", "https://silverbirchgrowth.com/"],
     },
   ] as const satisfies readonly TrackRecordCard[],
@@ -68,7 +68,7 @@ export const TRACK_RECORD_UNLINKED_CARDS = [
     stat: "21 days",
     outcome: "A virtual care partner went from first email to signed pilot in 21 days — now in onboarding.",
     detail:
-      "Our field sales bot ran the thread: 12 emails, each one scored, with the prospect's tone rising from 55 on the first reply to 94 before signing (our read of the wording). Contract signed Nov 18; onboarding is under way across partner pages and hubs.",
+      "Our field sales bot ran the thread: 12 emails, each one scored, with the prospect's tone rising from 55 on the first reply to 94 before signing (our read of the wording). Contract signed Nov 18; onboarding is under way across partner pages and clinic layers.",
     sources: ["https://fridayapp.org/share/deal/digital-md-partner (Case study · names withheld, Oct 28 to Nov 24, 2026)"],
   },
 ] as const satisfies readonly TrackRecordCard[];

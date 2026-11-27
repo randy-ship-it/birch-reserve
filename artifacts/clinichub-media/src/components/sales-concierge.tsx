@@ -88,7 +88,7 @@ export function SalesConcierge({
         {
           id: "init-1",
           role: "advisor",
-          text: "Birch Reserve places brands inside listed Scale Health customer hubs, beside products people already buy—not on the open web. I can help you pick the right path.",
+          text: "Birch Reserve places brands inside listed Scale Health customer clinic layers, beside products people already buy—not on the open web. I can help you pick the right path.",
           isPrivacyNote: true
         },
         {
@@ -227,7 +227,7 @@ export function SalesConcierge({
       if (path === "performance") {
         responseText = "Performance is a strong fit when the focus is direct bookings and the clinic is set up to receive them.";
       } else if (path === "display") {
-        responseText = "Display reaches high-intent customers inside listed Scale Health brand hubs—after purchase, booking, or plan start—and beside products they already trust.";
+        responseText = "Display reaches high-intent customers inside listed Scale Health brand clinic layers—after purchase, booking, or plan start—and beside products they already trust.";
       } else if (path === "both") {
         responseText = "A side-by-side approach compares Performance and Display contexts to see what works best.";
       } else {
@@ -306,10 +306,10 @@ export function SalesConcierge({
         };
       case "build_a_hub":
         return {
-          text: "That is a Scale Health Clinic Hubs conversation, rather than an ad purchase.",
+          text: "That is a Scale Health Clinic layers conversation, rather than an ad purchase.",
           options: [
             {
-              label: "Open Scale Health clinic hubs",
+              label: "Open Scale Health clinic layers",
               href: SCALE_HEALTH_URLS.clinicHubs,
               primary: true,
             },
@@ -330,7 +330,7 @@ export function SalesConcierge({
         };
       case "performance_fit":
         return {
-          text: "If you are already in Clinic Hubs and can receive bookings, Performance is the advertising path here.",
+          text: "If you are already in Clinic layers and can receive bookings, Performance is the advertising path here.",
           options: [
             { label: "Explore Performance", action: () => handlePathSelection("performance"), primary: true },
             { label: "Open Scale Health for providers", href: SCALE_HEALTH_URLS.providers },
@@ -347,7 +347,7 @@ export function SalesConcierge({
         };
       case "align_on_request":
         return {
-          text: "On-prem clinic and studio surfaces are a separate insertion-order line, available on request. The public product is digital hubs.",
+          text: "On-prem clinic and studio surfaces are a separate insertion-order line, available on request. The public product is digital clinic layers.",
           options: [
             { label: "Buy ads now", href: "/buycalc?sku=reserve-490#reserve", primary: true },
             { label: localizeNow("Prepay your category — $490"), action: onHandoff },
@@ -355,7 +355,7 @@ export function SalesConcierge({
         };
       case "book_a_call":
         return {
-          text: `Multi-hub and on-prem retail hubs are not a public checkout SKU. Send the request form or email.`,
+          text: `Programs across several clinic layers and on-prem retail clinic layers are not a public checkout SKU. Send the request form or email.`,
           options: [
             { label: "Buy ads now", href: "/buycalc?sku=reserve-490#reserve", primary: true },
           ],
@@ -370,7 +370,7 @@ export function SalesConcierge({
         };
       case "media_kit":
         return {
-          text: localizeNow("8 advertiser categories inside listed Scale Health hubs, with curated placements. Not an open auction. Not a guaranteed impression buy. The $490 category prepay is media credit, not airfare."),
+          text: localizeNow("8 advertiser categories inside listed Scale Health clinic layers, with curated placements. Not an open auction. Not a guaranteed impression buy. The $490 category prepay is media credit, not airfare."),
           options: [
             { label: "Get started", action: onHandoff, primary: true },
             { label: "See placement moments", action: showFormatPicker },
@@ -378,7 +378,7 @@ export function SalesConcierge({
         };
       case "auction_comparison":
         return {
-          text: "This is a curated network, not an open auction. Digital units sit inside listed Scale Health customer hubs beside recognized recovery and wellness products. Physical activations are planned for participating locations, with details TBA for Fall 2026.",
+          text: "This is a curated network, not an open auction. Digital units sit inside listed Scale Health customer clinic layers beside recognized recovery and wellness products. Physical activations are planned for participating locations, with details TBA for Fall 2026.",
           options: [
             { label: "Explore Display", action: () => handlePathSelection("display"), primary: true },
             { label: "Compare advertising paths", action: () => handleChoosePath(true) },

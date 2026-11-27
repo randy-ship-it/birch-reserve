@@ -17,15 +17,15 @@ test("markdown [label](url) renders the label, keeps the href, opens in a new ta
 
 test("bare URLs never show as raw text: known label or bare host", () => {
   const v = visible("Here’s a live hub: https://physio.drhonow.com/dr-ho/portal That’s it.");
-  assert.equal(v, "Here’s a live hub: the live DR-HO hub That’s it.");
+  assert.equal(v, "Here’s a live hub: the live DR-HO clinic layer That’s it.");
   assert.doesNotMatch(v, /https?:|drhonow\.com\/dr-ho/);
   assert.equal(visible("Try https://www.example.org/a/b?c=1."), "Try example.org.");
-  assert.equal(visible("Go to scalehealth.ca/clinichubs"), "Go to Scale Health clinic hubs");
+  assert.equal(visible("Go to scalehealth.ca/clinichubs"), "Go to Scale Health clinic layers");
   assert.equal(visible("(https://example.com/x)"), "(example.com)");
 });
 
 test("markdown whose label is itself a URL gets a short label", () => {
-  assert.equal(visible("[https://physio.drhonow.com/dr-ho/portal](https://physio.drhonow.com/dr-ho/portal)"), "the live DR-HO hub");
+  assert.equal(visible("[https://physio.drhonow.com/dr-ho/portal](https://physio.drhonow.com/dr-ho/portal)"), "the live DR-HO clinic layer");
 });
 
 test("only http/https/tel/mailto are linkable; unsafe schemes are dropped to text", () => {

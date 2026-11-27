@@ -45,7 +45,7 @@ export function SignedHubHero({ reserveHref, lookHref, cardsLive = true, eyebrow
         </div>
         {!cardsLive && <p className="mt-3 text-sm text-white/80">Card checkout is not live yet. Reserve by email and we invoice in USD.</p>}
         <p className="mt-6 text-sm text-white/85">
-          Live hub: <a href={LIVE_HUB_URL} target="_blank" rel="noopener" className="font-semibold underline underline-offset-4" style={{ textDecorationColor: PURPLE }}>physio.drhonow.com</a>. A listed physio hub. Your module sits at the booking and the plan, in the category.
+          Live clinic layer: <a href={LIVE_HUB_URL} target="_blank" rel="noopener" className="font-semibold underline underline-offset-4" style={{ textDecorationColor: PURPLE }}>physio.drhonow.com</a>. A listed physio clinic layer. Your module sits at the booking and the plan, in the category.
         </p>
         <p className="mt-3 text-xs text-white/65" data-testid="meta-benchmark">{skinChat("Public benchmark, not a Birch result")}: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p>
         <p className="mt-3 text-xs text-white/65" data-testid="exclusions">No PHI · No clinical pixels · No impression guarantee · Aggregate reporting only · Canada only</p>
@@ -69,18 +69,18 @@ export function SeatCalculator({ feed }: { feed: Feed | null }) {
           <select value={cat?.category || ""} onChange={(e) => setScope(e.target.value)} className="min-h-12 w-full rounded-md border border-[#0A1D56]/20 bg-white px-3">
             {cats.map((c) => <option key={c.category}>{c.category}</option>)}
           </select></label>
-        <p className="text-xs text-[#0A1D56]/70">The insertion order names the hub before anything runs.</p>
+        <p className="text-xs text-[#0A1D56]/70">The insertion order names the clinic layer before anything runs.</p>
       </div>
       <div className="flex flex-col justify-center p-5 md:p-8" style={{ background: NAVY }} aria-live="polite">
         {r && cat ? (<>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/70">Your category surface</p>
           <div className="mt-1 text-6xl font-bold leading-none md:text-7xl" style={{ color: GREEN }} data-testid="seat-number">1 seat</div>
           <p className="mt-2 text-lg font-semibold text-white">{cat.category}. One brand in the category.</p>
-          <p className="mt-5 text-base text-white/80" data-testid="seat-reach">Your insertion order sizes views against live hub supply in this category before anything runs.</p>
+          <p className="mt-5 text-base text-white/80" data-testid="seat-reach">Your insertion order sizes views against live clinic layer supply in this category before anything runs.</p>
         </>) : <p className="text-sm text-white/70">Loading the modelled feed…</p>}
       </div>
       <p className="border-t border-[#0A1D56]/10 p-5 text-xs leading-relaxed text-[#0A1D56]/65 lg:col-span-2">
-        No public reach figure: views are sized on your insertion order against live hub supply. Not a delivery or impression guarantee, and not a performance or click forecast.
+        No public reach figure: views are sized on your insertion order against live clinic layer supply. Not a delivery or impression guarantee, and not a performance or click forecast.
       </p>
     </div>
   );
@@ -93,10 +93,10 @@ export function HowCalculated({ feed, showAudience = false }: { feed: Feed | nul
       <summary className="cursor-pointer text-base font-semibold">How this is calculated <span className="ml-2 text-xs font-normal opacity-70">Modelled estimate, not a guarantee, not Scale measured performance.</span></summary>
       <ul className="mt-4 list-disc space-y-2 pl-5 text-sm">
         {showAudience ? (<>
-          <li>Audience: members of private health and wellness hubs, reached right after they buy or book.</li>
+          <li>Audience: members of private health and wellness clinic layers, reached right after they buy or book.</li>
         </>) : null}
         <li>Pick a category to see the seat. The $490 category placement is shared; it does not lock the category.</li>
-        <li>Views are sized on your insertion order against live hub supply. No click, conversion or order forecast.</li>
+        <li>Views are sized on your insertion order against live clinic layer supply. No click, conversion or order forecast.</li>
       </ul>
     </details>
   );

@@ -26,7 +26,7 @@ export function RateCard({ currency }: { currency: Currency }) {
   return (
     // Hub totals are modelled from USD CPMs (no CAD table), so they stay labelled in the currency they were built in.
     <div data-testid="rate-card" data-currency-fixed>
-      <p className="mb-3 text-xs text-muted-foreground">Tap or hover a placement to see an example inside a hub.{currency === "usd" ? " Modelled from USD CPMs, shown in USD." : ""}</p>
+      <p className="mb-3 text-xs text-muted-foreground">Tap or hover a placement to see an example inside a clinic layer.{currency === "usd" ? " Modelled from USD CPMs, shown in USD." : ""}</p>
       {/* Mobile: one card per hub (no sideways scroll) */}
       <div className="grid gap-3 md:hidden" data-testid="rate-card-mobile">
         {hubs.map((h) => (
@@ -58,7 +58,7 @@ export function RateCard({ currency }: { currency: Currency }) {
       <table className="w-full min-w-[760px] border-collapse text-left text-sm">
         <thead>
           <tr className="border-b-2 border-foreground">
-            <th className="py-3 pr-3 font-semibold">Hub</th>
+            <th className="py-3 pr-3 font-semibold">Clinic layer</th>
             {core.map((s) => (
               <th key={s.key} className="py-3 pr-3 font-semibold">
                 {label(s)}
@@ -91,7 +91,7 @@ export function RateCard({ currency }: { currency: Currency }) {
       </table>
       </div>
       <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-        Prices are starting-at (starter) rates from the <a href="/rates" className="underline underline-offset-2">rate card</a> <Modelled>Illustrative estimate</Modelled>: not sold rates or a quote; your insertion order sets the final rate. Views per month per sponsor position <Modelled />: one of five rotating positions (20% share of voice) at 75% availability. Hubs without their own feed row use the network median partner until their feed lands. Core package floor $190 USD. Hub status follows the same ladder as the hubs page: Live now or Activating. Partner email and partner-site display are available on request.
+        Prices are starting-at (starter) rates from the <a href="/rates" className="underline underline-offset-2">rate card</a> <Modelled>Illustrative estimate</Modelled>: not sold rates or a quote; your insertion order sets the final rate. Views per month per sponsor position <Modelled />: one of five rotating positions (20% share of voice) at 75% availability. Clinic layers without their own feed row use the network median partner until their feed lands. Core package floor $190 USD. Clinic layer status follows the same ladder as the clinic layers page: Live now or Activating. Partner email and partner-site display are available on request.
       </p>
       <PlacementDialog open={ex} onClose={() => setEx(null)} />
     </div>

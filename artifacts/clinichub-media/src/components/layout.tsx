@@ -18,14 +18,14 @@ const NAV_GROUPS = [
     label: 'Advertise',
     items: [
       { href: '/advertise/brands', label: 'Brands', sub: 'Start at $190 or $490 USD' },
-      { href: '/advertise/local', label: 'Local businesses & studios', sub: 'Reach hub members near you' },
+      { href: '/advertise/local', label: 'Local businesses & studios', sub: 'Reach clinic layer members near you' },
       { href: '/audiences', label: 'Audience insights', sub: 'Who the launch brands bring' },
     ],
   },
   {
     label: 'Publish',
     items: [
-      { href: '/publish/brands', label: 'Brands', sub: 'Co-branded hub or display / CPC inquiry' },
+      { href: '/publish/brands', label: 'Brands', sub: 'Co-branded clinic layer or display / CPC inquiry' },
       { href: '/publish/studios', label: 'Studios & retail', sub: '$500 cash or $700+ ad credit to activate' },
     ],
   },
@@ -34,7 +34,7 @@ const NAV_GROUPS = [
 const NAV_LINKS = [
   { href: '/match', label: 'Match' },
   { href: '/rates', label: 'Rates' },
-  { href: '/hubs', label: 'Hubs' },
+  { href: '/hubs', label: 'Clinic layers' },
   { href: '/media-kit', label: 'Media kit' },
   { href: '/agencies', label: 'Agencies' },
   { href: '/buyers', label: 'Buyers' },
@@ -43,7 +43,7 @@ const NAV_LINKS = [
 const FOOTER_COLS = [
   { label: 'Advertise', items: [{ href: '/advertise/brands', label: 'Brands' }, { href: '/advertise/local', label: 'Local businesses & studios' }, { href: '/rates', label: 'Rates' }, { href: '/match', label: 'Match your audience' }, { href: '/audiences', label: 'Audience insights' }, { href: '/media-kit', label: 'Media kit' }, { href: MEDIA_KIT_ONE_PAGER_HREF, label: 'Media kit PDF' }] },
   { label: 'Publish', items: [{ href: '/publish/brands', label: 'Brands' }, { href: '/publish/studios', label: 'Studios & retail' }, { href: 'https://www.scalehealth.ca/clinichubs', label: 'scalehealth.ca/clinichubs' }] },
-  { label: 'More', items: [{ href: '/blog', label: 'Blog' }, { href: '/hubs', label: 'Hubs' }, { href: '/agencies', label: 'Agencies' }, { href: '/partners', label: 'Partnerships' }, { href: '/media-buyers', label: 'Media buyers' }, { href: '/buyers', label: 'Buyers' }, { href: '/llms.txt', label: 'llms.txt' }, { href: '/inventory', label: 'Partner inventory' }, { href: '/insights', label: 'Insights' }, { href: '/about', label: 'About' }, { href: '/terms', label: 'Terms' }, { href: '/privacy', label: 'Privacy' }] },
+  { label: 'More', items: [{ href: '/blog', label: 'Blog' }, { href: '/hubs', label: 'Clinic layers' }, { href: '/agencies', label: 'Agencies' }, { href: '/partners', label: 'Partnerships' }, { href: '/media-buyers', label: 'Media buyers' }, { href: '/buyers', label: 'Buyers' }, { href: '/llms.txt', label: 'llms.txt' }, { href: '/inventory', label: 'Partner inventory' }, { href: '/insights', label: 'Insights' }, { href: '/about', label: 'About' }, { href: '/terms', label: 'Terms' }, { href: '/privacy', label: 'Privacy' }] },
 ] as const;
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -204,7 +204,7 @@ export function Layout({ children }: { children: ReactNode }) {
               <span className="font-display text-2xl tracking-tight italic">Birch Reserve</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-              Display space across private health and wellness hubs. Your payment is media credit until an insertion order.
+              Display space across private health and wellness clinic layers. Your payment is media credit until an insertion order.
             </p>
             <div className="mb-4">
               <SalesContact />

@@ -65,7 +65,7 @@ export function SlotLadder({ currency, audience }: { currency: Currency; audienc
             {busy ? "Opening…" : status?.depositCheckout ? "Pay deposit" : "Reserve by inquiry"}
           </button>
           <label className="flex items-start gap-2 text-xs text-muted-foreground md:col-span-3">
-            <input type="checkbox" name="agree" required className="mt-0.5" /> I agree to the deposit terms: credit spends down on live hubs over 6 months from when my deposit lands, under an insertion order that names the hubs; unused credit can be refunded or extended month by month at the same rate.
+            <input type="checkbox" name="agree" required className="mt-0.5" /> I agree to the deposit terms: credit spends down on live clinic layers over 6 months from when my deposit lands, under an insertion order that names the clinic layers; unused credit can be refunded or extended month by month at the same rate.
           </label>
           {msg ? <p className="text-sm md:col-span-3" data-testid="slot-msg">{msg}</p> : null}
         </form>

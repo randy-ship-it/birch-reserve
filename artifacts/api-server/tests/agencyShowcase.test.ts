@@ -162,7 +162,7 @@ test("in plain terms (Nov 18 2026): five category answers, published terms only,
   // No counts, claims, guarantees, banned names or CAD.
   assert.doesNotMatch(text, /guarantee|lift|CTR|\b\d+MM\b|million|listed partners|\bsigned partners?\b|Align\b|Clairvoyant|Kalaya|80 locations|we sell them customers|\bCAD\b/i);
   // Only the four published placements.
-  for (const s of ["post-purchase", "hub home page", "product and services pages", "member dashboard"]) assert.match(text, new RegExp(s, "i"), s);
+  for (const s of ["post-purchase", "clinic layer home page", "product and services pages", "member dashboard"]) assert.match(text, new RegExp(s, "i"), s);
   const meta = OVERHAUL_ROUTES["/agencies"].jsonld as { "@graph": Array<Record<string, unknown>> };
   const faqs = meta["@graph"].filter((n) => n["@type"] === "FAQPage");
   assert.equal(faqs.length, 1);
@@ -265,7 +265,7 @@ test("Nov 24 PM (Randy t543u): /agencies is one canister, three tiers, Randy's e
   assert.ok(page.indexOf('data-testid="agency-hero-canister"') < page.indexOf("<PulseCheckCard"));
   assert.ok(page.indexOf("<InventoryCanister") < page.indexOf("<AgencyRateCardModel"));
   assert.doesNotMatch(page, /<AgencyTierCards /);
-  assert.match(ui, /aria-label=\{skinText\("One tank of hub inventory with three outlets: direct buyers, agencies and Trusted Agency Partners"\)\}/);
+  assert.match(ui, /aria-label=\{skinText\("One tank of clinic layer inventory with three outlets: direct buyers, agencies and Trusted Agency Partners"\)\}/);
   assert.match(ui, /skinText\(t\.name\)/);
   assert.match(ui, /<BuyerValueCompare \/>/);
   assert.match(ui, /data-testid="buyer-value-compare" data-currency-fixed/);

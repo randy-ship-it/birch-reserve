@@ -105,7 +105,7 @@ test("channel tiles: Randy's figures labelled network figures / targets; Calm Jo
 
 test("kit calculator config matches Birch modelled figures (no outside benchmarks)", () => {
   assert.equal(KIT_CALC_CONFIG.demand.blendedHubCpmUsd, Math.round(blendedHubCpmUsd() * 100) / 100);
-  const browse = INTENT_LADDER.find((x) => x.moment === "Browsing the hub")!;
+  const browse = INTENT_LADDER.find((x) => x.moment === "Browsing the clinic layer")!;
   assert.deepEqual([KIT_CALC_CONFIG.demand.ctrBand.lo, KIT_CALC_CONFIG.demand.ctrBand.hi], [browse.lo, browse.hi]);
   assert.deepEqual(KIT_CALC_CONFIG.spendLevels.map((s) => s.usd), [490, ...DEPOSIT_TIERS.map((d) => d.usd)]);
   assert.equal(KIT_CALC_CONFIG.currency, "USD");
@@ -227,7 +227,7 @@ test("hero path picks: existing terms word for word, no turnaround promise, no r
 test("Scale voice: publisher band copy and popovers go through skinText; publisher page converts CAD", async () => {
   const { readFileSync } = await import("node:fs");
   const sell = readFileSync("../clinichub-media/src/components/br/intake-sell.tsx", "utf8");
-  assert.match(sell, /skinText\("Your hub's screens and pages[^"]*A person at Birch Reserve reviews every hub\./);
+  assert.match(sell, /skinText\("Your clinic layer's screens and pages[^"]*A person at Birch Reserve reviews every clinic layer\./);
   const pub = readFileSync("../clinichub-media/src/pages/br/intake-publisher.tsx", "utf8");
   assert.match(pub, /skinText\(s\.source\)/);
   assert.match(pub, /CAD_PER_USD/);

@@ -10,9 +10,9 @@ export const SURFACE_ART = {
 } as const;
 
 export const SURFACES = [
-  { key: "hubs", kicker: "Brand hubs", h: "Co-branded hubs for partner brands", line: "Your audience gets added value from a clinic layer, and your brand gets exposure across hubs.", more: "For supplier partner brands that want maximum exposure across hubs. Each co-branded hub pairs the brand's audience with a clinic layer. Ads on a hub run only with the owner's approval. Illustration is an example." },
+  { key: "hubs", kicker: "Brand clinic layers", h: "Co-branded clinic layers for partner brands", line: "Your audience gets added value from clinic care, and your brand gets exposure across clinic layers.", more: "For supplier partner brands that want maximum exposure across clinic layers. Each co-branded clinic layer pairs the brand's audience with clinic care. Ads on a clinic layer run only with the owner's approval. Illustration is an example." },
   { key: "calm", kicker: "Calm Joints", h: "Scale's in-house consumer brand", line: "The consumer face of Scale Health, handling Recovery fulfillment, with Street Team ambassadors.", more: "Calm Joints fulfills Recovery orders and has full access to the Street Team ambassadors, who do on-site product sampling as well as door-to-door work." },
-  { key: "providers", kicker: "Provider network", h: "Private retail providers, Canada and USA", line: "Digital and brick-and-mortar retail providers activate their own templated hubs.", more: "Scale's private network of retail providers, both digital and brick-and-mortar in-person retail, across Canada and the USA. Each provider can activate a templated hub with its own products and services, plus display and CPC inventory." },
+  { key: "providers", kicker: "Provider network", h: "Private retail providers, Canada and USA", line: "Digital and brick-and-mortar retail providers activate their own templated clinic layers.", more: "Scale's private network of retail providers, both digital and brick-and-mortar in-person retail, across Canada and the USA. Each provider can activate a templated clinic layer with its own products and services, plus display and CPC inventory." },
 ] as const;
 
 export function SurfaceTypes({ className = "" }: { className?: string }) {

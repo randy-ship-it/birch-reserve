@@ -53,11 +53,11 @@ export function Tam2027({ compact = false, dark = false, testId = "tam-2027" }: 
         <span className={`text-[11px] font-bold uppercase tracking-[0.18em] ${dark ? "text-lime-300" : "text-[#0b1f3a]/70"}`}>{EXPECTED_2027.label}</span>
         <span className={`${chip} ${dark ? "bg-white/10 text-lime-200" : "border border-[#F1D58F] bg-[#FFF4DB] text-[#8A5A00]"}`}>Modelled · estimate</span>
       </div>
-      <p className={`mt-2 font-display leading-none tabular-nums ${compact ? "text-[2.2rem] md:text-[2.8rem]" : "text-4xl md:text-5xl"}`} data-testid={`${testId}-figure`}>{EXPECTED_2027.headline} <span className={`text-base font-semibold ${sub}`}>USD a year in hub display (estimate)</span></p>
+      <p className={`mt-2 font-display leading-none tabular-nums ${compact ? "text-[2.2rem] md:text-[2.8rem]" : "text-4xl md:text-5xl"}`} data-testid={`${testId}-figure`}>{EXPECTED_2027.headline} <span className={`text-base font-semibold ${sub}`}>USD a year in clinic layer display (estimate)</span></p>
       <div className={`mt-3 grid gap-2.5 sm:grid-cols-2 ${dark ? "" : ""}`}>
         <div className={`rounded-xl px-3.5 py-2.5 ${dark ? "bg-white/[0.08]" : "bg-[#0b1f3a]/[0.04]"}`} data-testid={`${testId}-now`}>
           <p className={`text-[11px] font-bold uppercase tracking-wider ${dark ? "text-lime-300" : "text-[#0b1f3a]/70"}`}>{EXPECTED_2027.availableNow}</p>
-          <p className="mt-0.5 font-display text-xl tabular-nums md:text-2xl">{lo.hubs} to {base.hubs} hubs <span className={`text-[12px] font-normal ${sub}`}>assumed (modelling scenarios)</span></p>
+          <p className="mt-0.5 font-display text-xl tabular-nums md:text-2xl">{lo.hubs} to {base.hubs} clinic layers <span className={`text-[12px] font-normal ${sub}`}>assumed (modelling scenarios)</span></p>
           <p className={`text-[12px] ${sub}`}>{TAM_2027.label}. {EXPECTED_2027.conservative}</p>
         </div>
         <div className={`rounded-xl px-3.5 py-2.5 ${dark ? "bg-white/[0.08]" : "bg-[#0b1f3a]/[0.04]"}`} data-testid={`${testId}-pipeline`}>
@@ -66,8 +66,8 @@ export function Tam2027({ compact = false, dark = false, testId = "tam-2027" }: 
         </div>
       </div>
       <Details dark={dark} label="Estimate, not a guarantee: how we get there" testId={`${testId}-math`}>
-        <p>{EXPECTED_2027.headline} USD a year is a modelled estimate for 2027, not a guarantee or a promise of delivery. It assumes {lo.hubs} to {base.hubs} hubs, which are modelling assumptions. Hubs launching later are not counted.</p>
-        <p>The math: <b>{lo.label}:</b> {lo.hubs} hubs × {VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} views/hub/mo × 12 × ${BLENDED_STARTER_CPM.toFixed(2)} CPM ÷ 1,000 = {money(lo.usdYear)}. <b>{base.label}:</b> {base.hubs} hubs × the same = {money(base.usdYear)}.</p>
+        <p>{EXPECTED_2027.headline} USD a year is a modelled estimate for 2027, not a guarantee or a promise of delivery. It assumes {lo.hubs} to {base.hubs} clinic layers, which are modelling assumptions. Clinic layers launching later are not counted.</p>
+        <p>The math: <b>{lo.label}:</b> {lo.hubs} clinic layers × {VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} views/hub/mo × 12 × ${BLENDED_STARTER_CPM.toFixed(2)} CPM ÷ 1,000 = {money(lo.usdYear)}. <b>{base.label}:</b> {base.hubs} clinic layers × the same = {money(base.usdYear)}.</p>
         <p>Range: {tam2027Views()} a year.</p>
         {TAM_2027.basis.map((b) => <p key={b}>{b}</p>)}
       </Details>

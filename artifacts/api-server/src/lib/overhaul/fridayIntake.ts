@@ -28,9 +28,9 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SOURCE: Record<IntakeKind, string> = {
   match_tool: "Birch match-your-audience tool",
   hub_access: "Birch brand-hub access (email gate)",
-  cobranded_hub_inquiry: "Birch publisher: co-branded hub inquiry",
+  cobranded_hub_inquiry: "Birch publisher: co-branded clinic layer inquiry",
   display_cpc_inquiry: "Birch publisher: display / CPC ex-hub inquiry",
-  publisher_studio: "Birch publisher: studio / retail clinic hub",
+  publisher_studio: "Birch publisher: studio / retail clinic layer",
   area_lock_interest: "Birch lock-down-my-area",
   agency_inquiry: "Birch agency inquiry",
   deposit_interest: "Birch deposit interest",

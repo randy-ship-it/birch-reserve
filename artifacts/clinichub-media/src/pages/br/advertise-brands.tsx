@@ -5,13 +5,13 @@ import { Cta, Eyebrow, Faq, H1, H2, JsonLd, Lede, Section, usePageMeta } from "@
 import { siteName, siteUrl } from "@/lib/siteSkin";
 
 const FAQ = [
-  { q: "What do I buy?", a: "Start with a $190 USD 7-day category look or a $490 USD category placement. Your payment is media credit. We send an insertion order naming the hub and placements, and nothing runs until you approve it." },
-  { q: "Which hubs are live?", a: "Hubs are live now, and more are activating. Placements are curated as each one goes live. The named list and per-hub volumes are available with an access code on this page." },
-  { q: "Can I get a bigger share of a category?", a: "Premium slots add a larger display share and priority placement, by inquiry only. See the media kit or ask us and we'll quote it against the hubs you want." },
-  { q: "How is it reported?", a: "Aggregate only: views, clicks, UTM-tagged visits and promo-code redemptions per hub and surface. No patient data and no clinical pixels." },
+  { q: "What do I buy?", a: "Start with a $190 USD 7-day category look or a $490 USD category placement. Your payment is media credit. We send an insertion order naming the clinic layer and placements, and nothing runs until you approve it." },
+  { q: "Which clinic layers are live?", a: "Clinic layers are live now, and more are activating. Placements are curated as each one goes live. The named list and per-clinic-layer volumes are available with an access code on this page." },
+  { q: "Can I get a bigger share of a category?", a: "Premium slots add a larger display share and priority placement, by inquiry only. See the media kit or ask us and we'll quote it against the clinic layers you want." },
+  { q: "How is it reported?", a: "Aggregate only: views, clicks, UTM-tagged visits and promo-code redemptions per clinic layer and surface. No patient data and no clinical pixels." },
 ];
 
-const META_DESC = "Display space inside private health and wellness hubs. Start with a $190 USD 7-day category look or a $490 USD category placement, self-serve. Modelled estimates from listed partners: about 128MM page views a month (estimate).";
+const META_DESC = "Display space inside private health and wellness clinic layers. Start with a $190 USD 7-day category look or a $490 USD category placement, self-serve. Modelled estimates from listed partners: about 128MM page views a month (estimate).";
 
 export default function BrAdvertiseBrands() {
   usePageMeta("Advertise to brands | Birch Reserve", META_DESC);
@@ -20,8 +20,8 @@ export default function BrAdvertiseBrands() {
       <JsonLd data={{ "@context": "https://schema.org", "@type": "OfferCatalog", name: `${siteName()} self-serve offers`, itemListElement: [{ "@type": "Offer", name: "7-day category look", sku: "hold-190", price: 190, priceCurrency: "USD", url: siteUrl("/buycalc?sku=hold-190") }, { "@type": "Offer", name: "Category placement", sku: "reserve-490", price: 490, priceCurrency: "USD", url: siteUrl("/buycalc?sku=reserve-490") }] }} />
       <Section>
         <Eyebrow>Advertise · Brands</Eyebrow>
-        <H1>Put your brand inside private health and wellness hubs.</H1>
-        <Lede>Your ad runs on the pages members use right after they buy or book, and when they log back in. Hubs are live now, with more activating. Start for $190 USD or $490 USD.</Lede>
+        <H1>Put your brand inside private health and wellness clinic layers.</H1>
+        <Lede>Your ad runs on the pages members use right after they buy or book, and when they log back in. Clinic layers are live now, with more activating. Start for $190 USD or $490 USD.</Lede>
         <div className="mt-8 flex flex-wrap gap-3">
           <Cta href="#slots">See the two offers</Cta>
           <Cta href="/match" variant="line">Match my audience</Cta>
@@ -33,8 +33,8 @@ export default function BrAdvertiseBrands() {
 
       <Section id="list">
         <Eyebrow>Brand list</Eyebrow>
-        <H2>Names and per-hub volumes, with an access code.</H2>
-        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">The public page shows combined totals only. Enter the access code to see the full brand list and modelled volumes per hub.</p>
+        <H2>Names and per-clinic-layer volumes, with an access code.</H2>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">The public page shows combined totals only. Enter the access code to see the full brand list and modelled volumes per clinic layer.</p>
         <div className="mt-8">
           <BrandsAccessGate />
         </div>

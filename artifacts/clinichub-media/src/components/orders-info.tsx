@@ -3,18 +3,18 @@ import { createPortal } from "react-dom";
 
 // Same sentence on birchreserve.net, /inventory and scalehealth.ca. Do not paraphrase.
 export const ORDERS_DEFINITION =
-  "Orders: completed customer purchases over 12 months, on a partner brand's own store or through a clinic's member hub, across the Reserve List audience. Figures marked est. are modeled.";
+  "Orders: completed customer purchases over 12 months, on a partner brand's own store or through a clinic's member clinic layer, across the Reserve List audience. Figures marked est. are modeled.";
 
 const VISUALS = [
   {
     src: "/orders-brand-hub.webp",
-    alt: "Jack Health brand hub on Scale Health, a brand's own page where a customer purchase counts as one order",
-    caption: "Brand hub: a customer buys on the brand's own store = 1 order",
+    alt: "Jack Health brand clinic layer on Scale Health, a brand's own page where a customer purchase counts as one order",
+    caption: "Brand clinic layer: a customer buys on the brand's own store = 1 order",
   },
   {
     src: "/orders-clinic-hub.webp",
-    alt: "Example clinic member hub from scalehealth.ca/clinichubs, where a patient purchase counts as one order",
-    caption: "Clinic hub: a patient buys through their clinic's member hub = 1 order",
+    alt: "Example clinic member clinic layer from scalehealth.ca/clinichubs, where a patient purchase counts as one order",
+    caption: "Clinic layer: a patient buys through their clinic's member clinic layer = 1 order",
   },
 ];
 

@@ -55,7 +55,7 @@ function HubDetail({ hub, unlocked }: { hub: BrandHub; unlocked: boolean }) {
           Per sponsor position <Modelled />. Basis: {hub.basis}.{hub.url ? " " : ""}
           {hub.url ? (
             <a href={hub.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
-              View the hub
+              View the clinic layer
             </a>
           ) : null}
         </p>
@@ -72,7 +72,7 @@ function HubDetail({ hub, unlocked }: { hub: BrandHub; unlocked: boolean }) {
 }
 
 export default function BrHubs() {
-  usePageMeta("Hubs | Birch Reserve", `${ladderLine()} Register your email to see audience, placements and modelled views.`);
+  usePageMeta("Clinic layers | Birch Reserve", `${ladderLine()} Register your email to see audience, placements and modelled views.`);
   const [unlocked, setUnlocked] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -106,9 +106,9 @@ export default function BrHubs() {
       <Section>
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div>
-            <Eyebrow>Hubs</Eyebrow>
-            <H1>See inside the hubs.</H1>
-            <Lede>{ladderLine()} Placements are curated as each hub launches. Register your email to see each hub's audience, placements and modelled views.</Lede>
+            <Eyebrow>Clinic layers</Eyebrow>
+            <H1>See inside the clinic layers.</H1>
+            <Lede>{ladderLine()} Placements are curated as each clinic layer launches. Register your email to see each clinic layer's audience, placements and modelled views.</Lede>
           </div>
           {unlocked ? (
             <p className="inline-flex items-center gap-2 bg-accent px-4 py-3 text-sm font-semibold" data-testid="hubs-unlocked">
@@ -133,7 +133,7 @@ export default function BrHubs() {
                 </Field>
               </div>
               <button disabled={busy} className="h-12 bg-foreground text-sm font-semibold text-background hover:bg-accent hover:text-accent-foreground disabled:opacity-60" data-testid="hubs-submit">
-                {busy ? "Unlocking…" : "Unlock hub details"}
+                {busy ? "Unlocking…" : "Unlock clinic layer details"}
               </button>
               {err ? <p className="text-sm text-destructive">{err}</p> : null}
             </form>
@@ -143,10 +143,10 @@ export default function BrHubs() {
       <Section>
         <LiveHubGrid />
         <HubFunnel />
-        <p className="mt-4 text-[13px] text-foreground/65">Your hub and surface are named on an insertion order (IO) before anything runs. Audiences are described, not guaranteed; view figures are modelled.</p>
+        <p className="mt-4 text-[13px] text-foreground/65">Your clinic layer and surface are named on an insertion order (IO) before anything runs. Audiences are described, not guaranteed; view figures are modelled.</p>
       </Section>
       <Section tone="soft">
-        <BrandBanners title="Brand hubs: live and activating" />
+        <BrandBanners title="Brand clinic layers: live and activating" />
       </Section>
       <Section>
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">

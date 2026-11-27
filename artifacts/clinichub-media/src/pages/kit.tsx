@@ -60,7 +60,7 @@ export default function Kit() {
           <p className="mt-6 text-base leading-relaxed text-muted-foreground md:text-lg">
             This page is the creative brief for a Birch Reserve category placement. It is not a
             media-kit demos dump. Captions and mock placements are illustrative until an insertion
-            order names the hub.
+            order names the clinic layer.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <a
@@ -115,7 +115,7 @@ export default function Kit() {
             <li>Contact email for creative and IO follow-up</li>
           </ul>
           <p className="mt-4 text-sm text-muted-foreground">
-            Caption: illustrative until an insertion order names the hub.
+            Caption: illustrative until an insertion order names the clinic layer.
           </p>
         </div>
       </section>

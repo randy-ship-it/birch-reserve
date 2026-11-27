@@ -513,7 +513,7 @@ export async function categoryStatuses(seatsOpen?: number): Promise<Array<{ slug
 export const PUBLIC_AVAILABILITY_NOTE = URGENCY_LINE;
 
 const PUBLIC_BRAND_DESCRIPTION =
-  "Reserve a share of display space across a growing network of private health and wellness hubs. Placements curated as hubs launch, no bidding. Fully refundable until 14 days before launch. Your payment is display credit.";
+  "Reserve a share of display space across a growing network of private health and wellness clinic layers. Placements curated as clinic layers launch, no bidding. Fully refundable until 14 days before launch. Your payment is display credit.";
 
 /** The eight site category slugs (same as Friday's seat feed and /kit). One brand per category. */
 export const BUYCALC_CATEGORIES = [
@@ -2295,7 +2295,7 @@ const BUYCALC_FORMAT_LABELS: Record<(typeof FORMATS)[number], string> = {
   post_checkout: "After checkout",
   recovery_plan: "Recovery plan",
   scheduled_service: "Scheduled service",
-  member_hub: "Member hub",
+  member_hub: "Member clinic layer",
   motion_15s: "Motion 15s",
 };
 
@@ -2393,13 +2393,13 @@ function renderBuycalcHtmlUsd(input: {
     : `Reserve my seat · no charge today`;
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Reserve display space — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | Display space across private health and wellness hubs"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | Display space across private health and wellness hubs"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">${publicSeoTags("/buycalc")}
+<title>Reserve display space — Birch Reserve</title><meta name="description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta property="og:title" content="Birch Reserve | Display space across private health and wellness clinic layers"><meta property="og:description" content="${PUBLIC_BRAND_DESCRIPTION}"><meta name="twitter:title" content="Birch Reserve | Display space across private health and wellness clinic layers"><meta name="twitter:description" content="${PUBLIC_BRAND_DESCRIPTION}">${publicSeoTags("/buycalc")}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=birch-reserve-3">
 <link rel="alternate" type="application/json" href="/v1/catalog.json" title="Birch Reserve machine catalog">
 <script type="application/ld+json">${JSON.stringify({
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: "Birch Reserve hub network display space",
+  name: "Birch Reserve clinic layer network display space",
   itemListElement: PUBLIC_RESERVE_OFFERS.map((offer, index) => ({
     "@type": "ListItem",
     position: index + 1,
@@ -2423,10 +2423,10 @@ function renderBuycalcHtmlUsd(input: {
 <style>${TOKENS_CSS}${BUYCALC_CSS}${BUYER_COMFORT_CSS}${START_SMALL_CSS}${HERO_MOCK_CSS}${BUYER_HEADER_CSS}${PRICE_LADDER_CSS}${BUYCALC_MORE_CSS}</style></head><body>
 ${buyerHeaderHtml("buycalc", `<a class="br-bh-tel" href="#request" data-testid="buycalc-ask">Ask about a placement</a>${currencyToggleHtml(currency, { sku: input.sku, format: input.format, category })}`)}
 <main>
-<section class="hero"><div class="wrap hero-grid"><div><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness hubs</p><h1>Put your brand inside private health and wellness hubs. No bidding.</h1>
+<section class="hero"><div class="wrap hero-grid"><div><p class="eyebrow">Birch Reserve · Display space across private health &amp; wellness clinic layers</p><h1>Put your brand inside private health and wellness clinic layers. No bidding.</h1>
 ${heroSubHtml(price(look), price(seat))}
-<p class="avail" data-testid="buycalc-avail"><span class="dot" aria-hidden="true"></span><span><strong>Curated placements</strong> · placed by hand, hub by hub</span></p>
-<p class="lede">Reserve a share of display space across our growing network of private, members-only health and wellness hubs (physio, fitness and recovery today), with more launching. Your brand shows right after a member books or buys. All of it is media credit until the insertion order (IO), fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
+<p class="avail" data-testid="buycalc-avail"><span class="dot" aria-hidden="true"></span><span><strong>Curated placements</strong> · placed by hand, clinic layer by clinic layer</span></p>
+<p class="lede">Reserve a share of display space across our growing network of private, members-only health and wellness clinic layers (physio, fitness and recovery today), with more launching. Your brand shows right after a member books or buys. All of it is media credit until the insertion order (IO), fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</p>
 <div class="ctas"><a class="btn" href="/buycalc?sku=reserve-490#reserve" data-pick-sku="reserve-490">Category placement · ${price(seat)}</a><a class="btn line" href="/buycalc?sku=hold-190#reserve" data-pick-sku="hold-190">Take a 7-day look · ${price(look)}</a></div>
 ${heroInquireHtml()}</div>${heroMockHtml("buycalc-hero-mock")}</div></section>
 
@@ -2447,12 +2447,12 @@ ${sampleIoCheckoutHtml()}
 <p id="message" role="status" aria-live="polite"></p>
 <noscript><p class="fine">This form needs JavaScript. To reserve without it, <a href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20seat">email randy@scalehealth.ca</a>.</p></noscript>
 </form>
-<aside class="talk"><h3>Rather read first?</h3><p>See the hubs, placements and the brief in the media kit.</p><a class="btn line" href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20seat">randy@scalehealth.ca</a><a class="btn line" href="/media-kit">See the media kit</a></aside>
+<aside class="talk"><h3>Rather read first?</h3><p>See the clinic layers, placements and the brief in the media kit.</p><a class="btn line" href="mailto:randy@scalehealth.ca?subject=Birch%20Reserve%20seat">randy@scalehealth.ca</a><a class="btn line" href="/media-kit">See the media kit</a></aside>
 </div></div></section>
 
 <section class="band" id="more"><div class="wrap"><details class="more" id="more-details"><summary>How it works, what you get, refunds and the network</summary>
 <section class="band" id="offers"><div class="wrap"><p class="kicker">Two ways in</p><h2>Pick your start.</h2>
-<div class="offers">${offerCard(look, { eyebrow: "7-day look", name: "See it before you commit", lines: ["See your placement for 7 days while you decide.", "Converts in full to the category placement within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Category placement", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the hub network. Credit lasts 12 months.`, "Placements are curated as hubs launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Category placement · ${price(seat)}` })}</div>
+<div class="offers">${offerCard(look, { eyebrow: "7-day look", name: "See it before you commit", lines: ["See your placement for 7 days while you decide.", "Converts in full to the category placement within 7 days, otherwise refunded."], cta: `Start the 7-day look · ${price(look)}` })}${offerCard(seat, { eyebrow: "Category placement", name: "Your share of the network", lines: [`All ${price(seat)} becomes display credit across the clinic layer network. Credit lasts 12 months.`, "Placements are curated as clinic layers launch. Premium slots (inquire only) add a larger share and priority placement."], cta: `Category placement · ${price(seat)}` })}</div>
 ${priceLadderHtml(currency, { title: "Every step, in " + currency.toUpperCase() })}
 ${offersSampleIoHtml()}
 ${hundredHtml()}
@@ -2462,14 +2462,14 @@ ${currency === "usd" ? startSmallHtml() : ""}
 ${seeTheUnitHtml(price(look), price(seat))}
 
 <section class="band" id="included"><div class="wrap"><p class="kicker">What you get</p><h2>Plain terms.</h2>
-<ul class="facts"><li>A share of display space across the hub network. No auction.</li><li>100% of what you pay is media credit.</li><li>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</li><li>The insertion order names the hub and placement before anything runs.</li><li>Aggregate reporting only. No PHI, no clinical pixels.</li><li>No impression guarantee, and no reach or click forecast.</li></ul>
-<div class="proof"><p><span class="tag">Live now</span>${liveLine().replace("Live now: ","")} Your card sits at the booking and the plan. Illustrative until your insertion order (IO) names the hub.${liveHubTalkHtml()}</p>
+<ul class="facts"><li>A share of display space across the clinic layer network. No auction.</li><li>100% of what you pay is media credit.</li><li>Fully refundable until ${PREPAY_REFUND_CUTOFF_DAYS} days before your launch date.</li><li>The insertion order names the clinic layer and placement before anything runs.</li><li>Aggregate reporting only. No PHI, no clinical pixels.</li><li>No impression guarantee, and no reach or click forecast.</li></ul>
+<div class="proof"><p><span class="tag">Live now</span>${liveLine().replace("Live now: ","")} Your card sits at the booking and the plan. Illustrative until your insertion order (IO) names the clinic layer.${liveHubTalkHtml()}</p>
 <p><span class="tag">Public benchmark</span>Not a Birch result: Meta health and wellness ads, median CPM $21.80 and median $40.53 per customer (Triple Whale, Meta Ads Benchmarks, Aug 17, 2026, USD).</p></div>
 </div></section>
 ${flightTimelineHtml(price(look), price(seat))}
 
-<section class="band" id="categories"><div class="wrap"><p class="kicker">The network</p><h2>A growing network of private hubs.</h2>
-<p class="open-count"><strong>Curated placements</strong> · Placed by hand, hub by hub. Want a premium slot or something custom? Ask below.</p>
+<section class="band" id="categories"><div class="wrap"><p class="kicker">The network</p><h2>A growing network of private clinic layers.</h2>
+<p class="open-count"><strong>Curated placements</strong> · Placed by hand, clinic layer by clinic layer. Want a premium slot or something custom? Ask below.</p>
 ${sharedSeatsHtml()}
 ${hubLadderHtml("network-hubs")}
 </div></section>

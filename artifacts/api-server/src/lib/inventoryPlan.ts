@@ -76,11 +76,11 @@ function tamCase(key: "low" | "base", label: string, hubs: number): Tam2027Case 
 
 export const TAM_2027 = {
   label: "Modelled estimates from listed partners, not a commitment",
-  cases: [tamCase("low", "Low case: 120 hubs", 120), tamCase("base", "Base case: 300 hubs", 300)] as const,
+  cases: [tamCase("low", "Low case: 120 clinic layers", 120), tamCase("base", "Base case: 300 clinic layers", 300)] as const,
   basis: [
     `~${(HUB_VIEWS_MONTHLY / 1_000_000).toFixed(2)}MM hub-placement views a month across ${TAM.listedPartners} listed partners (TAM feed). That is the slice sold here, out of about 128MM total modelled page views a month (estimate).`,
-    `≈ ${VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} modelled views per hub a month.`,
-    `× 12 months × hubs × $${BLENDED_STARTER_CPM.toFixed(2)} blended starter CPM (rate card).`,
+    `≈ ${VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} modelled views per clinic layer a month.`,
+    `× 12 months × clinic layers × $${BLENDED_STARTER_CPM.toFixed(2)} blended starter CPM (rate card).`,
     `${ladderLine()} Queued categories: Longevity, Sleep, Food & Nutrition, Medi/Spa, Pets.`,
     "Partner websites and email (the rest of the ~128MM) are not counted. Starter rates only; no impression guarantee.",
   ],
@@ -101,10 +101,10 @@ export const EXPECTED_2027 = {
   get headlineUsd(): string {
     return `${this.headline} USD`;
   },
-  label: "Estimated 2027 hub display inventory",
+  label: "Estimated 2027 clinic layer display inventory",
   note: "Modelled estimate, not a guarantee.",
-  conservative: "Hubs launching later are not counted.",
-  pipeline: "Retail hubs could reach 500+ locations. Street teams reach homes door to door and sample on site.",
+  conservative: "Clinic layers launching later are not counted.",
+  pipeline: "Retail clinic layers could reach 500+ locations. Street teams reach homes door to door and sample on site.",
   availableNow: "Modelled scenarios",
 } as const;
 
@@ -115,16 +115,16 @@ export function tam2027Headline(): string {
 
 export function tam2027Views(): string {
   const [lo, base] = TAM_2027.cases;
-  return `${views(lo.viewsYear)}–${views(base.viewsYear)} hub views`;
+  return `${views(lo.viewsYear)}–${views(base.viewsYear)} clinic layer views`;
 }
 
 /** One plain-text block for llms.txt and the chat. */
 export function tam2027Text(): string {
   const [lo, base] = TAM_2027.cases;
   return [
-    `${EXPECTED_2027.label}: ${tam2027Headline()} a year (${tam2027Views()}). ${EXPECTED_2027.note} ${TAM_2027.label}. It assumes ${lo.hubs} to ${base.hubs} hubs, which are modelling assumptions. ${EXPECTED_2027.conservative} ${EXPECTED_2027.pipeline}`,
-    `- ${lo.label}: ${lo.hubs} hubs × ${VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} views/hub/mo × 12 × $${BLENDED_STARTER_CPM.toFixed(2)} CPM = ${money(lo.usdYear)}.`,
-    `- ${base.label}: ${base.hubs} hubs × same = ${money(base.usdYear)}.`,
+    `${EXPECTED_2027.label}: ${tam2027Headline()} a year (${tam2027Views()}). ${EXPECTED_2027.note} ${TAM_2027.label}. It assumes ${lo.hubs} to ${base.hubs} clinic layers, which are modelling assumptions. ${EXPECTED_2027.conservative} ${EXPECTED_2027.pipeline}`,
+    `- ${lo.label}: ${lo.hubs} clinic layers × ${VIEWS_PER_HUB_MONTHLY.toLocaleString("en-US")} views/hub/mo × 12 × $${BLENDED_STARTER_CPM.toFixed(2)} CPM = ${money(lo.usdYear)}.`,
+    `- ${base.label}: ${base.hubs} clinic layers × same = ${money(base.usdYear)}.`,
     ...TAM_2027.basis.map((b) => `- ${b}`),
   ].join("\n");
 }

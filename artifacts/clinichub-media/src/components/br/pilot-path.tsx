@@ -26,7 +26,7 @@ export function PilotHero({ testId = "pilot-hero", headingLevel = 2 }: { testId?
               {PILOT_HERO.refunds.map((r) => <p key={r.k}><strong>{r.k}.</strong> {r.d}</p>)}
               <p className="mt-2">{PILOT_HERO.decide}</p>
             </InfoPop>
-            <span className="ml-2">Live hubs: {PILOT_HERO.liveHubs.map((h, i) => <span key={h.href}>{i ? " · " : ""}<a href={h.href} target="_blank" rel="noopener" className="underline underline-offset-2">{h.label}</a></span>)}</span>
+            <span className="ml-2">Live clinic layers: {PILOT_HERO.liveHubs.map((h, i) => <span key={h.href}>{i ? " · " : ""}<a href={h.href} target="_blank" rel="noopener" className="underline underline-offset-2">{h.label}</a></span>)}</span>
           </p>
           <AgentLine className="mt-4 text-white/80" />
         </div>
@@ -62,7 +62,7 @@ export function HubShots() {
   return (
     <section className="border-b border-border/70 bg-background" data-testid="hub-shots">
       <div className="container mx-auto px-4 py-10 md:py-14">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Real hub surfaces</p>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">Real clinic layer surfaces</p>
         <h2 className="font-display text-3xl md:text-5xl">Where your card would sit.</h2>
         <div className="mt-6 grid gap-6 md:grid-cols-2">{HUB_SURFACE_SHOTS.map((s) => <AnnotatedShot key={s.key} shot={s} />)}</div>
       </div>
@@ -83,7 +83,7 @@ export function CategoryCards() {
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-foreground/55">8 categories</p>
             <h2 className="font-display text-3xl md:text-5xl">Who your seat reaches.</h2>
           </div>
-          <p className="max-w-sm text-xs text-muted-foreground">No reach numbers here: your IO sizes views against live hub supply. <InfoPop title="Starter rate" label="Starter rate" testId="early-rate-pop"><p>{EARLY_RATE_FINE}</p></InfoPop></p>
+          <p className="max-w-sm text-xs text-muted-foreground">No reach numbers here: your IO sizes views against live clinic layer supply. <InfoPop title="Starter rate" label="Starter rate" testId="early-rate-pop"><p>{EARLY_RATE_FINE}</p></InfoPop></p>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {CATEGORY_AUDIENCES.map((c) => (

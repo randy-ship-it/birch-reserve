@@ -20,7 +20,7 @@ export const PUBLIC_BRAND_TOTALS = [
   { v: "1MM+", l: "captive recovery consumers" },
   { v: "1MM+", l: "consumers now, Street Team and provider network" },
   { v: "3MM+", l: "consumers in 2027", estimate: true },
-  { v: "4", l: "hub placements, display + CPC" },
+  { v: "4", l: "clinic layer placements, display + CPC" },
 ] as const;
 
 /** Live verticals only (Pets is in queue and is not listed here). */

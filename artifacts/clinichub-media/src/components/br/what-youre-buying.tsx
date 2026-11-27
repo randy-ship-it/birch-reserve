@@ -28,19 +28,19 @@ export const HUB_CATEGORIES: readonly { name: string; live: boolean }[] = [
 ];
 
 /** The four placements inside every hub (same list as the home FAQ). */
-const PLACEMENTS = ["After purchase", "Hub home", "Products & services", "Member dashboard"];
+const PLACEMENTS = ["After purchase", "Clinic layer home", "Products & services", "Member dashboard"];
 
 /** One plain definition of a hub, per skin. Used by the hero subhead and the explainer. */
 export const hubDefinition = (): string =>
   isScaleSkin()
-    ? "Scale Health hubs are pages inside a brand, clinic or retailer, where its own customers land right after they buy or book. Your ad shows in those post-purchase moments and inside the member hub."
-    : "A hub is a page inside a brand, clinic or retailer, where its own customers land right after they buy or book. Your ad shows in those post-purchase moments and inside the member hub.";
+    ? "Scale Health clinic layers are pages inside a brand, clinic or retailer, where its own customers land right after they buy or book. Your ad shows in those post-purchase moments and inside the member clinic layer."
+    : "A clinic layer is a page inside a brand, clinic or retailer, where its own customers land right after they buy or book. Your ad shows in those post-purchase moments and inside the member clinic layer.";
 
 /** Where the hubs live, said once in plain words (an outsider has never heard of ScaleHealth.ca). */
 export const hubHostLine = (): string =>
   isScaleSkin()
-    ? "These are Scale Health's hubs, hosted on ScaleHealth.ca. DR-HO'S, SOLE and the rest are real brand and clinic hubs."
-    : "The hubs are hosted on ScaleHealth.ca, the hub platform Birch Reserve sells display for. DR-HO'S, SOLE and the rest are real brand and clinic hubs.";
+    ? "These are Scale Health's clinic layers, hosted on ScaleHealth.ca. DR-HO'S, SOLE and the rest are real brand and clinic layers."
+    : "The clinic layers are hosted on ScaleHealth.ca, the clinic layer platform Birch Reserve sells display for. DR-HO'S, SOLE and the rest are real brand and clinic layers.";
 
 function More({ children, dark = false, testId }: { children: ReactNode; dark?: boolean; testId?: string }) {
   return (
@@ -90,20 +90,20 @@ export function WhatYoureBuying({ testId = "what-youre-buying" }: { testId?: str
       <div className="mt-4 grid gap-6 rounded-xl p-6 text-white md:grid-cols-[1.2fr_1fr] md:p-9" style={{ background: NAVY }} data-testid="stat-hub-views">
         <div className="min-w-0">
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-lime-300">The main buy · Private display network</p>
-          <p className="mt-2 font-display text-2xl leading-tight md:text-3xl">Your ad inside brand hubs</p>
-          <p className="mt-1.5 text-sm leading-snug text-white/75">Post-purchase pages and member hubs that brands, clinics and retailers give their own customers. Your card shows on four spots in each hub.</p>
-          <ul className="mt-4 grid grid-cols-2 gap-x-6 border-t border-white/15 text-[13px] text-white/85" aria-label="Placements in each hub">
+          <p className="mt-2 font-display text-2xl leading-tight md:text-3xl">Your ad inside brand clinic layers</p>
+          <p className="mt-1.5 text-sm leading-snug text-white/75">Post-purchase pages and member clinic layers that brands, clinics and retailers give their own customers. Your card shows on four spots in each clinic layer.</p>
+          <ul className="mt-4 grid grid-cols-2 gap-x-6 border-t border-white/15 text-[13px] text-white/85" aria-label="Placements in each clinic layer">
             {PLACEMENTS.map((p) => (
               <li key={p} className="border-b border-white/10 py-2">{p}</li>
             ))}
-            <li className="col-span-2 py-2 text-white/60">In-hub screens · rolling out, by inquiry</li>
+            <li className="col-span-2 py-2 text-white/60">Clinic layer screens · rolling out, by inquiry</li>
           </ul>
         </div>
         <div className="min-w-0 md:border-l md:border-white/10 md:pl-6">
           <p className="font-display text-[2.6rem] leading-none tabular-nums md:text-5xl">{HUB_FIG.v}</p>
           <p className="mt-1 text-sm text-white/75">{HUB_FIG.l}</p>
-          <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">Hub categories</p>
-          <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Hub categories" data-testid="hub-categories">
+          <p className="mt-4 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">Clinic layer categories</p>
+          <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Clinic layer categories" data-testid="hub-categories">
             {HUB_CATEGORIES.map((c) => (
               <li key={c.name} className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold ${c.live ? "bg-lime-300 text-[#0b1f3a]" : "text-white/80 ring-1 ring-white/20"}`}>
                 {c.name}
@@ -126,11 +126,11 @@ export function WhatYoureBuying({ testId = "what-youre-buying" }: { testId?: str
       <p className="mt-10 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/55">Also available · add-on reach, sold separately</p>
       <div className="mt-3 grid gap-8 md:grid-cols-3" data-testid="home-retail-tile">
         <AddOn icon={Stethoscope} title="Private clinic network" line="Display inside private digital and longevity clinics, where patients book and check in." chip="Onboarding" href="/hubs" testId="addon-clinic-network">
-          <p>A separate network from the brand hubs, bought on its own. Clinics are onboarding now.</p>
+          <p>A separate network from the brand clinic layers, bought on its own. Clinics are onboarding now.</p>
         </AddOn>
-        <AddOn icon={Store} title="Retail micro hubs" line="Hubs inside retail stores and clinics: shelf, counter and wall cards." fig={RETAIL_FIG.v} figLabel="locations · 500+ soon" chip="Activating" href="/hubs" testId="stat-retail-locations">
+        <AddOn icon={Store} title="Retail micro clinic layers" line="Clinic layers inside retail stores and clinics: shelf, counter and wall cards." fig={RETAIL_FIG.v} figLabel="locations · 500+ soon" chip="Activating" href="/hubs" testId="stat-retail-locations">
           <p>A private network of digital and brick-and-mortar fitness and recovery retailers in Canada and the USA, with 1MM+ captive recovery consumers.</p>
-          <p>{RETAIL_MICRO_HUBS.length} signed micro hubs are activating. They appear on this site as example illustrations.</p>
+          <p>{RETAIL_MICRO_HUBS.length} signed micro clinic layers are activating. They appear on this site as example illustrations.</p>
         </AddOn>
         <AddOn icon={Footprints} title="Street Team" line="Ambassadors doing on-site product sampling and door-to-door, by neighbourhood." fig={STREET_REACH_FIG.v} figLabel={STREET_REACH_FIG.l} chip="Canada for now" href="/street-team" testId="home-street-tile" figTestId="home-street-figure">
           <p>Reach comes from our provider network, which is activating, plus the Street Team Ambassadors. The 2027 figure is an estimate.</p>

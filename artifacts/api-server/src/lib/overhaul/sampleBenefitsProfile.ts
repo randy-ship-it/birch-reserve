@@ -10,7 +10,7 @@ export const SAMPLE_PROFILE_BADGE = "Sample profile, illustrative" as const;
 export const SAMPLE_PROFILE_TITLE = "Benefits partner (sample)" as const;
 export const SAMPLE_PROFILE_KIND = "Mid-market group insurance / workplace benefits" as const;
 export const SAMPLE_PROFILE_HOWTO =
-  "How buyers use it: campaigns on Birch can target hub activations by these segments, aggregated only. No customer-level data is ever shared with brands.";
+  "How buyers use it: campaigns on Birch can target clinic layer activations by these segments, aggregated only. No customer-level data is ever shared with brands.";
 
 export type SampleBand = { label: string; lo: number; hi: number; note?: string };
 export type SampleShare = { label: string; lo: number; hi: number };

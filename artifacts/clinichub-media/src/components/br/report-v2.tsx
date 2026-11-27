@@ -21,6 +21,7 @@ import { HubView, SupplierExposureView } from "@/components/br/report-views";
 import { Details } from "@/components/br/details";
 import { MODELLED_PLAN_LABEL, PlanChip } from "@/components/br/modelled";
 import type { PhysicalAnswer } from "../../../../api-server/src/lib/overhaul/inLocation";
+import { ClinicLayerTerm } from "@/components/br/clinic-layer-term";
 
 const FKEY: Record<string, string> = { hubs: "scale-hubs", calm_joints: "calm-joints", street_team: "street-team", retail: "retail-network" };
 type LoHi = { low: number; high: number };
@@ -223,7 +224,7 @@ export function HubCards({ m }: { m: ReportModel }) {
   return (
     <section data-testid="report-hubs" style={{ fontFamily: RT_SANS, color: RT.body }}>
       <h2 className="text-[24px] md:text-[28px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Partners, ranked</h2>
-      <Details testId="hubs-details"><p>Proposed hubs, subject to human confirmation.</p></Details>
+      <Details testId="hubs-details"><p>Proposed clinic layers, subject to human confirmation.</p></Details>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         {m.hubs.map((h, i) => (
           <article key={h.key ?? h.name} data-testid={`hub-card-${i + 1}`} className={`p-5 ${i === 0 ? "md:col-span-2" : ""}`} style={card}>
@@ -272,7 +273,7 @@ export function SelfLaunchedHub() {
         <p className="text-[26px] leading-tight md:text-[30px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{h.name}</p>
         <p className="text-[14px]" style={{ color: RT.mute }}>{h.where}</p>
         <p className="text-[15px]">Switched on its own members' club.</p>
-        <span className="mt-1 text-[14px] font-semibold underline-offset-4 group-hover:underline" style={{ color: RT.forest }}>Open the live hub →</span>
+        <span className="mt-1 text-[14px] font-semibold underline-offset-4 group-hover:underline" style={{ color: RT.forest }}>Open the live clinic layer →</span>
       </div>
     </a>
   );
@@ -290,7 +291,7 @@ export function CostSide({ m, extra }: { m: ReportModel; extra?: ReactNode }) {
           <h3 className="mt-1 text-[24px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What it costs to reach customers</h3>
         </div>
         <EstimatePop title="Estimate: what it costs" testId="estimate-cost">
-          <p style={{ color: RT.mute }}>Starter hub rate ranges (illustrative) and modelled monthly views per surface. USD. Planning ranges, not quotes or measured delivery.</p>
+          <p style={{ color: RT.mute }}>Starter clinic layer rate ranges (illustrative) and modelled monthly views per surface. USD. Planning ranges, not quotes or measured delivery.</p>
           {m.placements.length ? (
             <table className="w-full text-left text-[14px]"><thead><tr className="text-[11px] uppercase tracking-wider" style={{ color: RT.mute }}><th className="py-2">Placement</th><th>CPM</th><th>CPC</th></tr></thead>
               <tbody>{m.placements.map((p) => <tr key={p.key} style={{ borderTop: `1px solid ${RT.line}` }}><td className="py-2 pr-2">{p.label}</td><td className="pr-2">{p.cpm_usd ? money(p.cpm_usd) : "— (needs rate)"}</td><td>{p.cpc_usd ? money(p.cpc_usd, 2) : "— (needs rate)"}</td></tr>)}</tbody></table>
@@ -350,7 +351,7 @@ export function EarningsSide({ m, cta }: { m: ReportModel; cta?: ReactNode }) {
     <section data-report-half="publisher-earnings" data-testid="report-half-publisher" className="p-5 md:p-6" style={{ ...card, borderRadius: 24, fontFamily: RT_SANS, color: RT.body }}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className={eyebrow} style={{ color: RT.mintInk }}>Hub · max exposure</p>
+          <p className={eyebrow} style={{ color: RT.mintInk }}>Clinic layer · max exposure</p>
           <h3 className="mt-1 text-[24px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>What you could earn</h3>
         </div>
         <EstimatePop title="Estimate: what you could earn" testId="estimate-earn">
@@ -369,7 +370,7 @@ export function EarningsSide({ m, cta }: { m: ReportModel; cta?: ReactNode }) {
           {m.earnings.map((e) => e.pay ? <RangeBar key={e.surface} label={e.surface} range={e.pay} unit="/ mo" axisMax={axisMax} d={0} /> : <p key={e.surface} className="mt-3 flex justify-between text-sm"><span className="font-semibold" style={{ color: RT.ink }}>{e.surface}</span><span style={{ color: RT.mute }}>— (needs rate / needs monthly views)</span></p>)}
         </>
       ) : (
-        <p className="mt-4 text-[14px]" data-testid="earnings-empty">Add your hub to unlock max exposure. Hubs keep a share of media revenue from their own shelf space, screens and pages, and your products get the most eyeballs. Supplier-only works too.</p>
+        <p className="mt-4 text-[14px]" data-testid="earnings-empty">Add your clinic layer to unlock max exposure. Clinic layers keep a share of media revenue from their own shelf space, screens and pages, and your products get the most eyeballs. Supplier-only works too.</p>
       )}
       {cta ? <div className="mt-5">{cta}</div> : null}
     </section>
@@ -390,7 +391,7 @@ export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposur
     const sides = [m.isSupplier ? "supplier" : null, m.isPublisher ? "hub" : null].filter(Boolean) as string[];
     return (
       <section data-testid="report-two-sides" data-first={sides[0]} data-sides={sides.join(",")} data-accelerate={m.isAccelerate ? "true" : "false"} style={{ fontFamily: RT_SANS }}>
-        <h2 className="text-[26px] md:text-[34px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{m.isSupplier && m.isPublisher ? "Your exposure and your hub earnings" : m.isSupplier ? "Your supplier exposure" : "Your hub earnings"}</h2>
+        <h2 className="text-[26px] md:text-[34px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>{m.isSupplier && m.isPublisher ? <>Your exposure and your <ClinicLayerTerm testId="clinic-layer-term-report" /> earnings</> : m.isSupplier ? "Your supplier exposure" : <>Your <ClinicLayerTerm testId="clinic-layer-term-report" /> earnings</>}</h2>
         <p className="text-[13px]" style={{ color: RT.mute }} data-testid="two-sides-plan">Estimates, not guarantees. {MODELLED_PLAN_LABEL}.</p>
         <div className={`mt-4 grid items-stretch gap-4 ${sides.length > 1 ? "lg:grid-cols-2" : ""}`}>
           {m.isSupplier ? <div key="sup" className="min-w-0"><SupplierExposureView m={m} exposure={ex} source={src} cta={supplierCta} onAccelerate={onAccelerate} physical={physical} /></div> : null}
@@ -402,7 +403,7 @@ export function TwoSides({ m, costExtra, earnCta, supplierCta, exposure, exposur
   return (
     <section data-testid="report-two-sides" data-first={m.publisherFirst ? "hub" : "accelerate"} style={{ fontFamily: RT_SANS }}>
       <h2 className="text-[24px] md:text-[28px]" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Exposure + earnings, side by side</h2>
-      <p className="text-[13px]" style={{ color: RT.mute }}>Accelerate is optional paid display; your hub earns a share. Each side is labelled.</p>
+      <p className="text-[13px]" style={{ color: RT.mute }}>Accelerate is optional paid display; your clinic layer earns a share. Each side is labelled.</p>
       <div className="mt-4 grid items-start gap-4 md:grid-cols-2">{m.publisherFirst ? [earn, cost] : [cost, earn]}</div>
     </section>
   );

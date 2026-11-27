@@ -55,7 +55,7 @@ for (const skin of SKINS) {
     await page.waitForTimeout(4500); // the form rejects a submit faster than a human
     await page.getByTestId("intake-submit").click();
     await expect(page.getByTestId("ad-activation")).toBeVisible({ timeout: 20_000 });
-    await expect(page.getByTestId("act-openness")).toContainText("Which ads can run on your hubs?");
+    await expect(page.getByTestId("act-openness")).toContainText("Which ads can run on your clinic layers?");
     await expect(page.getByTestId("act-inventory")).toContainText("Your inventory estimate");
     if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}/supplier-after-submit-${skin}.png`, fullPage: true });
   });

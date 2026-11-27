@@ -72,7 +72,7 @@ export function HubAlerts({ compact = false, where = "media_kit", pagePath = "/m
     return (
       <div id={compact ? undefined : "hub-alerts"} className={`rounded-2xl p-4 ${shell}`} role="status" data-testid={`hub-alerts-done-${where}`}>
         <p className="flex items-center gap-2 font-semibold"><span className="flex size-6 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check className="size-4" aria-hidden /></span> You're on the list.</p>
-        <p className={`mt-1 text-sm ${sub}`}>We'll email you when hubs launch in {cats.length === 1 ? "that category" : "those categories"}. No spam.</p>
+        <p className={`mt-1 text-sm ${sub}`}>We'll email you when clinic layers launch in {cats.length === 1 ? "that category" : "those categories"}. No spam.</p>
       </div>
     );
   }
@@ -81,8 +81,8 @@ export function HubAlerts({ compact = false, where = "media_kit", pagePath = "/m
     <form onSubmit={submit} noValidate className={`relative rounded-2xl ${compact ? "p-3.5" : "p-4 md:p-5"} ${shell}`} id={compact ? undefined : "hub-alerts"} data-testid={`hub-alerts-${where}`} aria-labelledby={`${uid}-h`}>
       <HoneypotField inputRef={hp} idSuffix={`hub-alerts-${where}`} />
       <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-        <h3 id={`${uid}-h`} className={`font-display leading-tight ${compact ? "text-lg" : "text-xl md:text-2xl"}`}>Get hub launch alerts</h3>
-        <p className={`text-[12.5px] ${sub}`}>Hear when hubs launch in the categories your audience cares about.</p>
+        <h3 id={`${uid}-h`} className={`font-display leading-tight ${compact ? "text-lg" : "text-xl md:text-2xl"}`}>Get clinic layer launch alerts</h3>
+        <p className={`text-[12.5px] ${sub}`}>Hear when clinic layers launch in the categories your audience cares about.</p>
       </div>
       <fieldset className="mt-2.5">
         <legend className="sr-only">Categories</legend>
@@ -112,7 +112,7 @@ export function HubAlerts({ compact = false, where = "media_kit", pagePath = "/m
       </div>
       {state === "error" && error && <p role="alert" className="mt-1.5 text-[13px] text-red-500">{error}</p>}
       <p className={`mt-2 text-[12px] leading-snug ${dark ? "text-white/60" : "text-slate-500"}`}>
-        {skinText("By submitting, you agree we may email you about Birch Reserve hub launches. No spam.")} <a href="/privacy" className="underline underline-offset-2">Privacy</a>
+        {skinText("By submitting, you agree we may email you about Birch Reserve clinic layer launches. No spam.")} <a href="/privacy" className="underline underline-offset-2">Privacy</a>
       </p>
     </form>
   );

@@ -19,13 +19,13 @@ export function StarterOffers({ testId = "starter-offers" }: { testId?: string }
         <article className="flex flex-col border-2 border-foreground bg-white p-6">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/55">Category placement</p>
           <p className="mt-2 font-display text-5xl leading-none">{price.seat}</p>
-          <p className="mt-4 text-sm text-foreground/80">A category placement across the hub network. Your payment is media credit, fully refundable until 14 days before your launch date and usable for 12 months.</p>
+          <p className="mt-4 text-sm text-foreground/80">A category placement across the clinic layer network. Your payment is media credit, fully refundable until 14 days before your launch date and usable for 12 months.</p>
           <div className="mt-6 sm:mt-auto sm:pt-6">
             <Cta href={RESERVE_HREF} variant="lime" testId={`${testId}-reserve`} className="w-full sm:w-auto">Category placement — {price.seat}</Cta>
           </div>
         </article>
       </div>
-      <p className="mt-4 text-sm text-muted-foreground">Priced in USD for every buyer. Pay by card on a Stripe-hosted page, no login. Nothing runs until you approve an insertion order naming the hub and placement. Premium slots are inquire-only; see the <a className="underline underline-offset-2" href="/media-kit#premium">media kit</a>.</p>
+      <p className="mt-4 text-sm text-muted-foreground">Priced in USD for every buyer. Pay by card on a Stripe-hosted page, no login. Nothing runs until you approve an insertion order naming the clinic layer and placement. Premium slots are inquire-only; see the <a className="underline underline-offset-2" href="/media-kit#premium">media kit</a>.</p>
     </div>
   );
 }

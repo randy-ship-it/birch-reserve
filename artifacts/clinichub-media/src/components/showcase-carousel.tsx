@@ -14,7 +14,7 @@ const HUBS = [
     id: "dr-ho",
     name: "DR-HO'S",
     surface: "Care & product landing",
-    displayUrl: "DR-HO'S hub",
+    displayUrl: "DR-HO'S clinic layer",
     description: "Integrating virtual physiotherapy alongside established pain therapy product paths.",
     image: drHoHub,
     url: "https://physio.drhonow.com/dr-ho/portal"
@@ -23,7 +23,7 @@ const HUBS = [
     id: "jill-health",
     name: "Jill Health",
     surface: "Clinical services",
-    displayUrl: "jill-health / wellness hub",
+    displayUrl: "jill-health / wellness clinic layer",
     description: "Women's wellness support expanding into hormone, weight, and movement guidance.",
     image: jillHealthHub,
     url: "https://jill-health.replit.app/my-brand-landing/"
@@ -127,7 +127,7 @@ export function ShowcaseCarousel() {
     >
       <div className="flex flex-col md:flex-row gap-8 items-end justify-between">
         <div className="flex-1">
-          <h3 className="text-4xl md:text-5xl font-display mb-4 italic tracking-tight">Selected Hub Environments</h3>
+          <h3 className="text-4xl md:text-5xl font-display mb-4 italic tracking-tight">Selected Clinic Layer Environments</h3>
           <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
             A curated look at how wellness brands and clinics are building dedicated recovery experiences for their communities. These are live deployment examples, not performance guarantees.
           </p>
@@ -148,7 +148,7 @@ export function ShowcaseCarousel() {
                 selectHub((activeIndex - 1 + HUBS.length) % HUBS.length);
               }}
               className="size-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
-              aria-label="Previous hub"
+              aria-label="Previous clinic layer"
             >
               <ChevronLeft className="size-5" />
             </button>
@@ -160,7 +160,7 @@ export function ShowcaseCarousel() {
                 selectHub((activeIndex + 1) % HUBS.length);
               }}
               className="size-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
-              aria-label="Next hub"
+              aria-label="Next clinic layer"
             >
               <ChevronRight className="size-5" />
             </button>
@@ -189,7 +189,7 @@ export function ShowcaseCarousel() {
             <motion.img
               key={activeHub.id}
               src={activeHub.image}
-              alt={`Screenshot of ${activeHub.name} hub`}
+              alt={`Screenshot of ${activeHub.name} clinic layer`}
               data-testid="hub-showcase-image"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, scale: activeImageScale }}

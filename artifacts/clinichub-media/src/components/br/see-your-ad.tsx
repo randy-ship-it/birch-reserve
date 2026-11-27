@@ -50,7 +50,7 @@ export function SeeYourAd({ testId = "see-your-ad", initial = "drho" }: { testId
   };
   return (
     <div data-testid={testId}>
-      <form className="flex gap-2" onSubmit={(e) => e.preventDefault()} aria-label="Preview your brand on a live hub">
+      <form className="flex gap-2" onSubmit={(e) => e.preventDefault()} aria-label="Preview your brand on a live clinic layer">
         <label className="sr-only" htmlFor={`${testId}-name`}>Your brand name</label>
         <input
           id={`${testId}-name`}
@@ -77,7 +77,7 @@ export function SeeYourAd({ testId = "see-your-ad", initial = "drho" }: { testId
       {/* BR-83: hubs as one quiet tab row (was 2-3 rows of pills), the mock label as plain text. */}
       <div className="mt-4 flex flex-col gap-1">
         <span className="inline-flex w-fit items-center gap-1.5 text-[12px] font-semibold text-[#8A5A00]" data-testid="mock-badge"><span className="size-1.5 rounded-full bg-[#D9A21B]" aria-hidden />{mockBadge(hub)}</span>
-        <div className="-mx-1 flex items-center gap-0 overflow-x-auto border-b border-[#0b1f3a]/15 px-1 pr-8 text-[12px] font-semibold [mask-image:linear-gradient(90deg,#000_88%,transparent)] [scrollbar-width:none]" role="group" aria-label="Live hub">
+        <div className="-mx-1 flex items-center gap-0 overflow-x-auto border-b border-[#0b1f3a]/15 px-1 pr-8 text-[12px] font-semibold [mask-image:linear-gradient(90deg,#000_88%,transparent)] [scrollbar-width:none]" role="group" aria-label="Live clinic layer">
           {HUB_KEYS.map((h) => (
             <button key={h} type="button" aria-pressed={hub === h} onClick={() => { setAuto(false); setHub(h); trackAttn("preview.hub", { once: true }); }} className={`-mb-px inline-flex min-h-10 shrink-0 items-center whitespace-nowrap border-b-2 px-2.5 ${hub === h ? "border-[#0b1f3a] text-[#0b1f3a]" : "border-transparent text-foreground/55 hover:text-[#0b1f3a]"}`} data-testid={`mock-hub-${h}`}>
               {HUB_MOCKS[h].tab}
@@ -86,7 +86,7 @@ export function SeeYourAd({ testId = "see-your-ad", initial = "drho" }: { testId
         </div>
       </div>
       <div className="mt-3" onPointerDown={() => setAuto(false)}><HubMock brand={brand} logo={logo} hub={hub} category="Your category" badge={mockBadge(hub)} /></div>
-      <p className="mt-1.5 text-[12px] font-semibold"><a href={siteUrl("/hubs")} data-mirror-keep className="text-[#0b1f3a] underline underline-offset-2" data-testid={`${testId}-see-all`}>See all {HUB_KEYS.length + RETAIL_MICRO_HUBS.length} hubs</a> <span className="font-normal text-foreground/60">· {HUB_KEYS.length} shown here: Live now and Activating example mockups</span></p>
+      <p className="mt-1.5 text-[12px] font-semibold"><a href={siteUrl("/hubs")} data-mirror-keep className="text-[#0b1f3a] underline underline-offset-2" data-testid={`${testId}-see-all`}>See all {HUB_KEYS.length + RETAIL_MICRO_HUBS.length} clinic layers</a> <span className="font-normal text-foreground/60">· {HUB_KEYS.length} shown here: Live now and Activating example mockups</span></p>
     </div>
   );
 }

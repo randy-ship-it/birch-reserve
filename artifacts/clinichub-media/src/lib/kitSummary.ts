@@ -19,7 +19,7 @@ export function kitSummary(report: FridayReport, exposure: FridayExposure, physi
   const loc = inLocationReach(physical);
   const headline: KitCover["headline"] = [];
   if (m.isSupplier && hubs) headline.push({ value: big(hubs.likely), label: "page-view exposures a month, likely", sub: `${big(hubs.low)}–${big(hubs.high)} · ${m.isAccelerate ? "with Accelerate" : "performance-only"}` });
-  if (m.isPublisher && earn) headline.push({ value: usd(earn), label: "hub earnings a month, likely (USD)", sub: `${usd(earn * 12)} over 12 months` });
+  if (m.isPublisher && earn) headline.push({ value: usd(earn), label: "clinic layer earnings a month, likely (USD)", sub: `${usd(earn * 12)} over 12 months` });
   if (loc) headline.push({ value: big(loc.monthlyVisits), label: "in-person visits a month at your locations", sub: IN_LOCATION.source });
   const channels: KitCover["channels"] = rows
     .filter((r) => r.range || (r.key === "street_team" && r.note === STREET_NOTE))

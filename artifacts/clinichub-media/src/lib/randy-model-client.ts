@@ -135,7 +135,7 @@ async function stubRandyReply(
 
   if (/\b(who (are|r) (you|u)|who('s| is) this|your name|are (you|u) (a |an )?(ai|bot|human|real))\b/i.test(lastUser?.content ?? "")) {
     return {
-      text: "I'm the Birch Q&A Squirrel, the AI guide on Birch Reserve. I help brands reserve display space across our private health and wellness hubs. Want to buy? Reserve at https://birchreserve.net/buycalc. What are you working on?",
+      text: "I'm the Birch Q&A Squirrel, the AI guide on Birch Reserve. I help brands reserve display space across our private health and wellness clinic layers. Want to buy? Reserve at https://birchreserve.net/buycalc. What are you working on?",
       source: "stub",
     };
   }
@@ -150,7 +150,7 @@ async function stubRandyReply(
 
   if (chip === "how_seats") {
     return {
-      text: "You reserve a share of display space across our growing network of private health and wellness hubs, curated as hubs launch. A category placement is $490 USD (100% media credit until the IO), or take a 7-day look for $190 USD. Premium slots ($25,000 to $1.5M USD, inquire only) add a larger share and priority placement. Start at https://birchreserve.net/buycalc. What do you sell?",
+      text: "You reserve a share of display space across our growing network of private health and wellness clinic layers, curated as clinic layers launch. A category placement is $490 USD (100% media credit until the IO), or take a 7-day look for $190 USD. Premium slots ($25,000 to $1.5M USD, inquire only) add a larger share and priority placement. Start at https://birchreserve.net/buycalc. What do you sell?",
       source: "stub",
     };
   }
@@ -165,7 +165,7 @@ async function stubRandyReply(
   if (chip === "live_hub") {
     return {
       // Emma HARD: never spell raw hub URLs as visible prose — label / markdown href only.
-      text: `Tap See a live hub — or open [See a live hub](${LIVE_HUB_PROOF_URL}). That’s the kind of surface your brand shows up on. What would you want in front of those members?`,
+      text: `Tap See a live clinic layer — or open [See a live clinic layer](${LIVE_HUB_PROOF_URL}). That’s the kind of surface your brand shows up on. What would you want in front of those members?`,
       source: "stub",
     };
   }

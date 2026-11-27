@@ -13,10 +13,10 @@ const STARTER_BY_SURFACE: Record<string, { cpm: number; cpc: number }> = {
 };
 
 export const PATHS = [
-  { group: "Advertise", who: "Brands", href: "/advertise/brands", Icon: Megaphone, line: "Display inside private health and wellness hubs. Start at $190 USD or $490 USD.", cta: "Advertise as a brand" },
-  { group: "Advertise", who: "Local businesses & studios", href: "/advertise/local", Icon: Store, line: "Reach hub members near you. Start at $190 USD or $490 USD; area placements by inquiry.", cta: "Advertise locally" },
-  { group: "Publish", who: "Brands", href: "/publish/brands", Icon: Building2, line: "Have a recovery audience? Apply for a co-branded hub. Or ask about display / CPC only.", cta: "Inquire to publish" },
-  { group: "Publish", who: "Studios & retail", href: "/publish/studios", Icon: Users, line: "Activate your hub and earn $500 cash or $700+ in ad credit.", cta: "Activate my hub" },
+  { group: "Advertise", who: "Brands", href: "/advertise/brands", Icon: Megaphone, line: "Display inside private health and wellness clinic layers. Start at $190 USD or $490 USD.", cta: "Advertise as a brand" },
+  { group: "Advertise", who: "Local businesses & studios", href: "/advertise/local", Icon: Store, line: "Reach clinic layer members near you. Start at $190 USD or $490 USD; area placements by inquiry.", cta: "Advertise locally" },
+  { group: "Publish", who: "Brands", href: "/publish/brands", Icon: Building2, line: "Have a recovery audience? Apply for a co-branded clinic layer. Or ask about display / CPC only.", cta: "Inquire to publish" },
+  { group: "Publish", who: "Studios & retail", href: "/publish/studios", Icon: Users, line: "Activate your clinic layer and earn $500 cash or $700+ in ad credit.", cta: "Activate my clinic layer" },
 ] as const;
 
 export function FourPaths() {
@@ -42,11 +42,11 @@ export function PositioningBand() {
     <div className="grid gap-8 md:grid-cols-[1.1fr_1fr] md:items-center" data-testid="positioning">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Only two kinds of inventory</p>
-        <h2 className="mt-3 font-display text-3xl leading-tight md:text-5xl">We sell ad space in co-branded Recovery Brand hubs and health &amp; wellness business hubs. Nothing else.</h2>
+        <h2 className="mt-3 font-display text-3xl leading-tight md:text-5xl">We sell ad space in co-branded Recovery Brand clinic layers and health &amp; wellness business clinic layers. Nothing else.</h2>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="border border-background/25 p-5">
-          <p className="font-display text-xl">Co-branded Recovery Brand hubs</p>
+          <p className="font-display text-xl">Co-branded Recovery Brand clinic layers</p>
           <ul className="mt-3 flex flex-wrap gap-2">
             {POSITIONING.recoveryBrandVerticals.map((v) => (
               <li key={v.key} className={`border px-2.5 py-1 text-sm ${v.inQueue ? "border-background/30 text-background/60" : "border-accent text-accent"}`}>
@@ -57,8 +57,8 @@ export function PositioningBand() {
           </ul>
         </div>
         <div className="border border-background/25 p-5">
-          <p className="font-display text-xl">Health &amp; wellness business hubs</p>
-          <p className="mt-3 text-sm leading-relaxed text-background/75">Physio, mobility, gyms, studios and clinic hubs, each with our marketplace plugged in.</p>
+          <p className="font-display text-xl">Health &amp; wellness business clinic layers</p>
+          <p className="mt-3 text-sm leading-relaxed text-background/75">Physio, mobility, gyms, studios and clinic layers, each with our marketplace plugged in.</p>
         </div>
       </div>
     </div>
@@ -97,7 +97,7 @@ export function TamStrip({ tone = "light", compact = false }: { tone?: "light" |
   return (
     <div className={`grid grid-cols-2 gap-6 ${compact ? "" : "md:grid-cols-4"}`} data-testid="tam-strip">
       {[
-        { v: "4", l: "hub placements, display + CPC" },
+        { v: "4", l: "clinic layer placements, display + CPC" },
         { v: "IO", l: "media credit until the insertion order" },
       ].map((x) => (
         <div key={x.l}>
@@ -121,7 +121,7 @@ export function MetaComparison() {
             <tr className="border-b-2 border-foreground">
               <th className="py-3 pr-4 font-semibold"> </th>
               <th className="py-3 pr-4 font-semibold">Meta / public social</th>
-              <th className="py-3 font-semibold">{siteName()} hubs</th>
+              <th className="py-3 font-semibold">{siteName()} clinic layers</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -133,7 +133,7 @@ export function MetaComparison() {
             <tr>
               <td className="py-3 pr-4 font-medium">Where it shows</td>
               <td className="py-3 pr-4 text-muted-foreground">Between friends’ posts and other ads</td>
-              <td className="py-3">Inside the hub experience and right after checkout or booking</td>
+              <td className="py-3">Inside the clinic layer experience and right after checkout or booking</td>
             </tr>
             <tr>
               <td className="py-3 pr-4 font-medium">CPM, health &amp; wellness</td>
@@ -169,7 +169,7 @@ export function MetaComparison() {
             </a>
           </li>
         ))}
-        <li>Our CPMs are illustrative starting-at estimates, not sold rates, and any view figures are modelled estimates. Hub ads are expected to work better because of trust and timing; we will prove it with campaign reporting, not claim it.</li>
+        <li>Our CPMs are illustrative starting-at estimates, not sold rates, and any view figures are modelled estimates. Clinic layer ads are expected to work better because of trust and timing; we will prove it with campaign reporting, not claim it.</li>
       </ol>
     </div>
   );

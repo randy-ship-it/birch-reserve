@@ -25,7 +25,7 @@ import { Eyebrow, Faq, H2, Section } from "./ui";
 export const TRUST_FAQ: Array<{ q: string; a: string }> = [
   {
     q: "What are the refund terms?",
-    a: "The $190 USD 7-day look is a 100% credit if you buy the $490 USD category placement within 7 days; otherwise it is a cash refund. The $490 USD category placement is 100% media credit that spends down over 6 months on live hubs after your deposit lands. Unused credit can be refunded or extended month by month. The $490 USD category placement is also fully refundable until 14 days before the launch date on your insertion order; after that date the credit stays usable for 12 months. A cash refund is also available if no approved surface is named within 60 days of payment. These terms are draft until counsel stamps the terms page.",
+    a: "The $190 USD 7-day look is a 100% credit if you buy the $490 USD category placement within 7 days; otherwise it is a cash refund. The $490 USD category placement is 100% media credit that spends down over 6 months on live clinic layers after your deposit lands. Unused credit can be refunded or extended month by month. The $490 USD category placement is also fully refundable until 14 days before the launch date on your insertion order; after that date the credit stays usable for 12 months. A cash refund is also available if no approved surface is named within 60 days of payment. These terms are draft until counsel stamps the terms page.",
   },
   {
     q: "How is privacy handled?",
@@ -37,27 +37,27 @@ export const TRUST_FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "How often will we get reports?",
-    a: "Campaign results are reported per hub and surface from your UTM links and promo codes. Reports are sent on a regular schedule, confirmed on your insertion order.",
+    a: "Campaign results are reported per clinic layer and surface from your UTM links and promo codes. Reports are sent on a regular schedule, confirmed on your insertion order.",
   },
 ];
 
 const HOW_STEPS = [
-  { n: "1", t: "Choose a placement", d: "Four surfaces in every hub: post-purchase (inquire-only), the hub home page, product and services pages, and the member dashboard behind login. Display or CPC." },
+  { n: "1", t: "Choose a placement", d: "Four surfaces in every clinic layer: post-purchase (inquire-only), the clinic layer home page, product and services pages, and the member dashboard behind login. Display or CPC." },
   { n: "2", t: "Pick how to start", d: "A $190 USD 7-day look, a $490 USD category placement, or an inquiry for premium slots (including post-purchase and larger commitments)." },
-  { n: "3", t: "The insertion order names the hub", d: "Nothing runs until an insertion order names the hub and surface. Your payment is media credit, not a live flight and not an impression guarantee." },
-  { n: "4", t: "Credit spends down over 6 months", d: "Credit draws down on live hubs after your deposit lands. Unused credit can be refunded or extended month by month." },
-  { n: "5", t: "We report what ran", d: "Views, clicks, UTM-tagged visits and promo-code redemptions, per hub and surface. Aggregate only. Reports go out on the schedule your insertion order sets." },
+  { n: "3", t: "The insertion order names the clinic layer", d: "Nothing runs until an insertion order names the clinic layer and surface. Your payment is media credit, not a live flight and not an impression guarantee." },
+  { n: "4", t: "Credit spends down over 6 months", d: "Credit draws down on live clinic layers after your deposit lands. Unused credit can be refunded or extended month by month." },
+  { n: "5", t: "We report what ran", d: "Views, clicks, UTM-tagged visits and promo-code redemptions, per clinic layer and surface. Aggregate only. Reports go out on the schedule your insertion order sets." },
 ];
 
 const YOU_GET = [
-  { t: "A placement in a private member experience", d: "Ads run inside co-branded hubs, not on the open web. Every brand is hand-picked to fit the audience." },
+  { t: "A placement in a private member experience", d: "Ads run inside co-branded clinic layers, not on the open web. Every brand is hand-picked to fit the audience." },
   { t: "Media credit toward display or CPC", d: "The $190 USD look and the $490 USD seat are 100% media credit (the look credits over if you convert within 7 days)." },
-  { t: "Aggregate campaign reporting", d: "Your UTMs on every placement, an optional promo code, and results per hub and surface. Reports go out on the schedule your IO sets." },
+  { t: "Aggregate campaign reporting", d: "Your UTMs on every placement, an optional promo code, and results per clinic layer and surface. Reports go out on the schedule your IO sets." },
   { t: "Agency discount, if you place a client", d: "Agencies earn the standard 15% agency commission off the gross rate card. You set your own resale price." },
 ];
 
 const SAMPLE_ROWS = [
-  { surface: "Hub home", views: "12,400", clicks: "62", visits: "41", codes: "9" },
+  { surface: "Clinic layer home", views: "12,400", clicks: "62", visits: "41", codes: "9" },
   { surface: "Product & services", views: "8,100", clicks: "28", visits: "19", codes: "4" },
   { surface: "Member dashboard", views: "5,600", clicks: "22", visits: "15", codes: "3" },
 ] as const;
@@ -160,7 +160,7 @@ export function ProofStrip() {
           <p className="font-display text-4xl tabular-nums">
             {quebec}% / {ontario}%
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">hub sessions from Quebec / Ontario</p>
+          <p className="mt-1 text-sm text-muted-foreground">clinic layer sessions from Quebec / Ontario</p>
           <div className="mt-2">
             <BasisTag>Measured</BasisTag>
           </div>
@@ -174,7 +174,7 @@ export function ProofStrip() {
         ))}
       </ul>
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        Logos are the launch brands already listed on partner hubs. Session shares are first-party analytics, aggregated and de-identified, over the {AUDIENCE_SNAPSHOT.measuredWindow}.
+        Logos are the launch brands already listed on partner clinic layers. Session shares are first-party analytics, aggregated and de-identified, over the {AUDIENCE_SNAPSHOT.measuredWindow}.
       </p>
     </div>
   );
@@ -215,8 +215,8 @@ export function SampleReport() {
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border bg-secondary/50 px-4 py-3 md:px-5">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/55">Campaign report</p>
-          <p className="mt-1 font-display text-xl md:text-2xl">Example Brand · Sample hub</p>
-          <p className="mt-1 text-xs text-muted-foreground">Illustrative 30-day window · per hub and surface</p>
+          <p className="mt-1 font-display text-xl md:text-2xl">Example Brand · Sample clinic layer</p>
+          <p className="mt-1 text-xs text-muted-foreground">Illustrative 30-day window · per clinic layer and surface</p>
         </div>
         <span className="inline-flex items-center border-2 border-foreground bg-accent px-2.5 py-1 text-xs font-bold uppercase tracking-[0.18em] text-accent-foreground" data-testid="sample-report-badge">
           Sample
@@ -247,7 +247,7 @@ export function SampleReport() {
         </table>
       </div>
       <p className="border-t border-border px-4 py-3 text-xs leading-relaxed text-muted-foreground md:px-5">
-        Sample layout only. These figures are illustrative and are not a real campaign. Your report will show what actually delivered, per hub and surface, from your UTMs and promo codes. Aggregate reporting only; no personal data is shared with brands. Reports go out on the schedule your insertion order sets.
+        Sample layout only. These figures are illustrative and are not a real campaign. Your report will show what actually delivered, per clinic layer and surface, from your UTMs and promo codes. Aggregate reporting only; no personal data is shared with brands. Reports go out on the schedule your insertion order sets.
       </p>
     </div>
   );
@@ -259,7 +259,7 @@ export function TrustBand() {
       <Section id="how-it-works" tone="soft">
         <Eyebrow>How it works</Eyebrow>
         <H2>From a look to a live placement.</H2>
-        <p className="mt-4 max-w-2xl text-muted-foreground">Five steps, using the terms already on the site. Nothing runs until an insertion order names the hub.</p>
+        <p className="mt-4 max-w-2xl text-muted-foreground">Five steps, using the terms already on the site. Nothing runs until an insertion order names the clinic layer.</p>
         <div className="mt-8">
           <HowItWorks />
         </div>
@@ -274,7 +274,7 @@ export function TrustBand() {
             <Eyebrow>Reporting</Eyebrow>
             <H2>What a brand report looks like.</H2>
             <p className="mt-4 text-muted-foreground">
-              Views, clicks, UTM-tagged visits and promo-code redemptions, broken out by hub and surface. The layout below is a sample, not a live campaign.
+              Views, clicks, UTM-tagged visits and promo-code redemptions, broken out by clinic layer and surface. The layout below is a sample, not a live campaign.
             </p>
             <PrivacyNote className="mt-4 text-sm text-muted-foreground" />
           </div>

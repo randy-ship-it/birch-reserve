@@ -79,13 +79,13 @@ export type DiscoveryChipId =
 
 /** Live proof of a Scale Health hub surface (public). */
 export const LIVE_HUB_PROOF_URL = "https://physio.drhonow.com/dr-ho/portal" as const;
-export const LIVE_HUB_PROOF_DISPLAY = "the live DR-HO hub" as const;
+export const LIVE_HUB_PROOF_DISPLAY = "the live DR-HO clinic layer" as const;
 
 /** Quiet display placement example (not hero; no reach claim). */
 export const WEPRIZE_EXAMPLE_URL = "https://weprize.net" as const;
 
 export const SMART_OPENER =
-  "Hey! Birch Q&A Squirrel here. Want to see what a $490 category placement gets you across our hub network?" as const;
+  "Hey! Birch Q&A Squirrel here. Want to see what a $490 category placement gets you across our clinic layer network?" as const;
 
 /** Teaser bubble shown beside the full-body figure (closed state). */
 export const TEASER_TEXT = "Got a brand to place? Ask me." as const;
@@ -108,8 +108,8 @@ export const SUGGESTION_CHIPS: ReadonlyArray<{
   },
   {
     id: "live_hub",
-    label: "See a live hub",
-    message: "Can I see a live hub?",
+    label: "See a live clinic layer",
+    message: "Can I see a live clinic layer?",
   },
   {
     id: "asking_now",

@@ -178,7 +178,7 @@ export function QuickBuy() {
         </a>
         )}
         <p className="mt-3 text-[11px] leading-relaxed text-background/55">
-          {premium ? `${PREMIUM_INQUIRY_MESSAGE} ` : "Next: brand, work email, then Stripe. "} Views are modelled estimates, not a guarantee. Fully refundable until 14 days before your launch date; your insertion order names the hub before anything runs.
+          {premium ? `${PREMIUM_INQUIRY_MESSAGE} ` : "Next: brand, work email, then Stripe. "} Views are modelled estimates, not a guarantee. Fully refundable until 14 days before your launch date; your insertion order names the clinic layer before anything runs.
         </p>
       </div>
     </div>
