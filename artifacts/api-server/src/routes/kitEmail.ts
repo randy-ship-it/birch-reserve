@@ -10,7 +10,8 @@
 import express, { Router, type IRouter, type Request } from "express";
 import { cronAuthorized } from "../lib/cronAuth";
 import { activationUrl } from "../lib/overhaul/adActivation";
-import { kitFlags, kitFrom, readToken, recipientAllowed, renderKitEmail, sweepNudges, SITE, type Mailer, type NudgeStore } from "../lib/kitEmails";
+import { kitFlags, kitFrom, readToken, recipientAllowed, renderKitEmail, sweepNudges, SCALE_KIT_BASE, SITE, type Mailer, type NudgeStore } from "../lib/kitEmails";
+import { MIRROR_ORIGIN_HOSTS } from "../middlewares/mirrorHost";
 
 type Env = NodeJS.ProcessEnv;
 export type KitLeadLookup = (id: string) => Promise<{ email: string | null; stage: string | null } | null>;
@@ -27,6 +28,15 @@ function limited(key: string, now: number, max = 5, windowMs = 10 * 60_000): boo
   return xs.length > max;
 }
 const ipOf = (req: Request) => req.ip ?? "?";
+/** Sign-up came through the scalehealth.ca/intake mirror: the page says so (isScaleSkin) or the request Origin is Scale's. */
+export function kitSiteOf(req: Request, body: Record<string, unknown>): "scale" | "birch" {
+  if (body.site === "scale") return "scale";
+  try {
+    const o = String(req.headers.origin ?? "");
+    if (o && MIRROR_ORIGIN_HOSTS.has(new URL(o).hostname.toLowerCase())) return "scale";
+  } catch { /* bad origin */ }
+  return "birch";
+}
 
 async function defaultMail(m: Parameters<Mailer>[0] & { attachments?: Array<{ filename: string; content: string }> }) {
   const { resendSend, birchReplyTo } = await import("../lib/siteMail");
@@ -73,10 +83,13 @@ export function createKitEmailRouter(deps: KitEmailDeps = {}): IRouter {
     const brand = typeof b.brand === "string" ? b.brand.slice(0, 80) : null;
     const h = (b.headline ?? {}) as Record<string, unknown>;
     const s = (x: unknown) => (typeof x === "string" && /^[\w$.,–\- +%MKB/]{1,24}$/.test(x) ? x : undefined);
-    const m = renderKitEmail({ brand, reportUrl: `${SITE}${reportPath}`, headline: { exposureMonth: s(h.exposureMonth), earningsMonth: s(h.earningsMonth) }, hasPdf: !!pdf, activateUrl: activationUrl({ email, company: brand, role: "supplier" }, SITE) });
+    const site = kitSiteOf(req, b);
+    const scale = site === "scale";
+    const m = renderKitEmail({ site, brand, reportUrl: `${scale ? SCALE_KIT_BASE : SITE}${reportPath}`, headline: { exposureMonth: s(h.exposureMonth), earningsMonth: s(h.earningsMonth) }, hasPdf: !!pdf, activateUrl: activationUrl({ email, company: brand, role: "supplier" }, scale ? "https://www.scalehealth.ca" : SITE) });
     try {
-      await mail({ from: kitFrom(e), to: [email], subject: m.subject, html: m.html, text: m.text, ...(pdf ? { attachments: [{ filename: "birch-reserve-monetization-kit.pdf", content: pdf }] } : {}) });
-      res.json({ sent: true });
+      const out = await mail({ from: kitFrom(e, site), to: [email], subject: m.subject, html: m.html, text: m.text, ...(pdf ? { attachments: [{ filename: scale ? "scalehealth-monetization-kit.pdf" : "birch-reserve-monetization-kit.pdf", content: pdf }] } : {}) });
+      const id = out && typeof out === "object" && "id" in out ? (out as { id: unknown }).id : null;
+      res.json({ sent: true, site, ...(typeof id === "string" ? { id } : {}) });
     } catch {
       res.status(502).json({ sent: false, reason: "send_failed" });
     }

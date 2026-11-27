@@ -4,7 +4,7 @@
  * "from your site" tag; gaps (needs_input) become prompts in "Add detail to sharpen your numbers". Defaults are
  * labelled. Friday's full report is reviewed by a person first. Birch never fetches the brand's site itself.
  */
-import { siteUrl, skinText } from "@/lib/siteSkin";
+import { isScaleSkin, siteUrl, skinText } from "@/lib/siteSkin";
 import { LaneCtas } from "@/components/br/two-lane";
 import { PostKitNext } from "@/components/br/next-step";
 import { ArrowRight, Download, Loader2, Mail, Plus, Rocket, Sparkles } from "lucide-react";
@@ -113,7 +113,7 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
       try {
         const blob = await buildPdf();
         const b64 = await new Promise<string>((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(",")[1] ?? ""); fr.onerror = rej; fr.readAsDataURL(blob); });
-        const r = await fetch("/v1/kit-email", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, intake_id: q.ref!.id, report_path: reportPath(token), brand: name ?? null, headline: summary.email, pdf_b64: b64.length <= 3_400_000 ? b64 : undefined }) });
+        const r = await fetch("/v1/kit-email", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, site: isScaleSkin() ? "scale" : "birch", intake_id: q.ref!.id, report_path: reportPath(token), brand: name ?? null, headline: summary.email, pdf_b64: b64.length <= 3_400_000 ? b64 : undefined }) });
         const j = (await r.json().catch(() => ({}))) as { sent?: boolean };
         if (j.sent) { setMailed(email); trackIntake(q.side, "step_complete", "kit_email"); }
       } catch {

@@ -154,3 +154,38 @@ test("in-location display: their numbers only, per location or total, labelled b
   assert.doesNotMatch(b, /\$/);
   assert.equal(physicalBlurb(cleanPhysical({ has: false })), "Physical locations: no.");
 });
+
+test("templates: Scale mirror kit email is ScaleHealth-branded, no Birch, modelled-estimate label, own sender", () => {
+  const k = renderKitEmail({ site: "scale", brand: "Acme", reportUrl: "https://www.scalehealth.ca/intake/_m/kit/r/tok", headline: { exposureMonth: "1.2MM", earningsMonth: "$1,240" }, hasPdf: true, activateUrl: "https://www.scalehealth.ca/intake/activate?role=supplier" });
+  assert.match(k.subject, /from Scale Health$/);
+  assert.match(k.html, /cid:scale-logo/);
+  assert.doesNotMatch(k.html, /cid:br-mark/);
+  assert.match(k.html, /#1D875C/);
+  for (const s of [k.html, k.text]) {
+    assert.doesNotMatch(s, /Birch|birchreserve/i);
+    assert.doesNotMatch(s, /exclusive|\breserv|\block|25%|promo|coupon/i);
+    assert.doesNotMatch(s, BANNED);
+    assert.match(s, /Modelled estimates from listed partners/);
+  }
+  const b = renderKitEmail({ brand: "Acme", reportUrl: "https://birchreserve.net/kit/r/tok", hasPdf: false });
+  assert.match(b.subject, /from Birch Reserve$/);
+  assert.match(b.html, /cid:br-mark/);
+  assert.doesNotMatch(b.html, /cid:scale-logo/);
+  assert.equal(kitFrom({} as NodeJS.ProcessEnv, "scale"), "Scale Health <kit@scalehealth.ca>");
+  assert.equal(kitFrom({ KIT_EMAIL_FROM_SCALE: "Scale Health <care@scalehealth.ca>" } as NodeJS.ProcessEnv, "scale"), "Scale Health <care@scalehealth.ca>");
+  assert.equal(kitFrom({} as NodeJS.ProcessEnv), "Birch Reserve <kit@birchreserve.net>");
+});
+
+test("POST /v1/kit-email: a Scale mirror sign-up (Origin www.scalehealth.ca or site=scale) gets the ScaleHealth email and sender", async () => {
+  const sent: Array<{ from: string; subject: string; html: string; attachments?: Array<{ filename: string }> }> = [];
+  const s = await serve({ env: PROD, mail: async (m) => { sent.push(m as never); return { id: "re_test" }; }, lead: async () => ({ email: "scale-owner@brand.com", stage: "submitted" }) });
+  const post = (b: Record<string, unknown>, h: Record<string, string> = {}) => fetch(`${s.url}/v1/kit-email`, { method: "POST", headers: { "content-type": "application/json", ...h }, body: JSON.stringify({ report_path: "/kit/r/abcdefgh123", email: "scale-owner@brand.com", intake_id: "rec1", pdf_b64: PDF_B64, ...b }) }).then((r) => r.json());
+  assert.deepEqual(await post({}, { origin: "https://www.scalehealth.ca" }), { sent: true, site: "scale", id: "re_test" });
+  assert.equal(sent[0]!.from, "Scale Health <kit@scalehealth.ca>");
+  assert.match(sent[0]!.subject, /Scale Health/);
+  assert.match(sent[0]!.html, /https:\/\/www\.scalehealth\.ca\/intake\/_m\/kit\/r\/abcdefgh123/);
+  assert.equal(sent[0]!.attachments![0]!.filename, "scalehealth-monetization-kit.pdf");
+  assert.equal((await post({ site: "birch" }, { "x-forwarded-for": "10.0.0.2" })).site, "birch");
+  assert.equal(sent[1]!.from, "Birch Reserve <kit@birchreserve.net>");
+  s.close();
+});
