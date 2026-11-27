@@ -2,8 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { MB_BUY_CHECKLIST, MB_BUY_PATHS, MEASUREMENT_STEPS, MEDIA_BUYER_FAQ, MIX_ROWS } from "../src/lib/overhaul/mediaBuyers";
+import { HOW_WE_COUNT, HOW_WE_COUNT_DOCS_HREF, MB_BUY_CHECKLIST, MB_BUY_PATHS, MEASUREMENT_STEPS, MEDIA_BUYER_FAQ, MIX_ROWS } from "../src/lib/overhaul/mediaBuyers";
 import { OVERHAUL_ROUTES, llmsTxt } from "../src/lib/overhaul/seo";
+import { AD_DEFAULTS, VIEWABILITY } from "../src/lib/adserver/config";
 import { PUBLIC_SITEMAP_PATHS, SPA_SHELL_PATHS } from "../src/lib/publicSeo";
 
 const read = (f: string) => readFileSync(resolve(process.cwd(), f), "utf8");
@@ -16,6 +17,7 @@ function allCopy(): string {
     JSON.stringify(MIX_ROWS),
     JSON.stringify(MB_BUY_PATHS),
     JSON.stringify(MB_BUY_CHECKLIST),
+    JSON.stringify(HOW_WE_COUNT),
     JSON.stringify(MEASUREMENT_STEPS),
     JSON.stringify(MEDIA_BUYER_FAQ),
     JSON.stringify(OVERHAUL_ROUTES["/media-buyers"]),
@@ -113,4 +115,25 @@ test("/media-buyers: 'What to check before you buy' is six published answers und
   assert.match(page, /priceLabel\("reserve-490", currency, prices\)/);
   assert.match(page, /replaceAll\("\{look\}", look\)/);
   assert.match(page, /replaceAll\("\{reserve\}", reserve\)/);
+});
+
+test("/media-buyers How we count (Nov 27 2026): seven rows, synced with the ad server config and /ads/docs, no claims", () => {
+  assert.deepEqual(HOW_WE_COUNT.map((r) => r.label), ["Cost model", "A view", "A click", "Filtering", "Frequency", "Attribution", "Identity"]);
+  const byLabel = Object.fromEntries(HOW_WE_COUNT.map((r) => [r.label, r.answer]));
+  assert.equal(VIEWABILITY.ratio, 0.5);
+  assert.equal(VIEWABILITY.ms, 1000);
+  assert.match(byLabel["A view"], /Half the ad on screen for one continuous second/);
+  assert.match(byLabel["Frequency"], new RegExp(`Up to ${AD_DEFAULTS.freqCapPerDay} viewable views`));
+  assert.match(byLabel["Attribution"], new RegExp(`last click within ${AD_DEFAULTS.clickWindowDays} days`));
+  assert.match(byLabel["Attribution"], new RegExp(`a view within ${AD_DEFAULTS.viewWindowDays} day`));
+  assert.equal(HOW_WE_COUNT_DOCS_HREF, "/ads/docs");
+  const docs = read("src/lib/adserver/docsPage.ts");
+  assert.match(docs, /IAB\/MRC display standard/);
+  assert.match(docs, /headless browsers are never counted/);
+  const page = read(PAGE);
+  assert.match(page, /data-testid="mb-how-we-count"/);
+  assert.match(page, /No impression guarantees/);
+  const joined = JSON.stringify(HOW_WE_COUNT);
+  assert.doesNotMatch(joined, /\$\d/, "no prices in the counting rules");
+  assert.doesNotMatch(joined, /guarantee|signed partner|Align|Clairvoyant|80 locations|CTR|ROAS|Birch/i);
 });

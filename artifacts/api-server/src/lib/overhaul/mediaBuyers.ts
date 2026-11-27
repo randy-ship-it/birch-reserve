@@ -101,6 +101,23 @@ export const MEASUREMENT_STEPS: Array<{ k: string; t: string; d: string }> = [
   { k: "4", t: "Labelled figures", d: "Anything we estimate before launch is labelled Modelled. It is an estimate, not measured delivery and not a guarantee." },
 ];
 
+/**
+ * "How we count" (Nov 27 2026): one compact disclosure of the counting rules, in the order commerce-media buyers
+ * compare networks (cost model, what a view is, clicks, filtering, frequency, attribution, identity). Every row
+ * restates the public developer docs (/ads/docs, lib/adserver/docsPage.ts) and lib/adserver/config.ts values
+ * (VIEWABILITY 50% / 1 s, freqCapPerDay 6, clickWindowDays 7, viewWindowDays 1). A test keeps them in sync.
+ */
+export const HOW_WE_COUNT_DOCS_HREF = "/ads/docs";
+export const HOW_WE_COUNT: ReadonlyArray<{ label: string; answer: string }> = [
+  { label: "Cost model", answer: "Display is billed per thousand viewable views (CPM). CPC is billed per click. No auction." },
+  { label: "A view", answer: "Half the ad on screen for one continuous second, with the tab visible (IAB/MRC display standard)." },
+  { label: "A click", answer: "Counted once per served ad, then sent to your page with your UTM tags." },
+  { label: "Filtering", answer: "Known bots, crawlers, previews and headless browsers are never counted. Instant clicks are dropped. Repeats count once." },
+  { label: "Frequency", answer: "Up to 6 viewable views per visitor per campaign per day by default." },
+  { label: "Attribution", answer: "Optional pixel or server postback: last click within 7 days, adjustable per campaign. On carts inside a hub, a view within 1 day can also count." },
+  { label: "Identity", answer: "Aggregate counts only. No names, emails, IP addresses or cross-site cookies. Do Not Track and GPC are honoured." },
+];
+
 /** Answer-ready FAQ for performance teams. Emitted once as FAQPage JSON-LD, server-side (seo.ts). */
 export const MEDIA_BUYER_FAQ: Array<{ q: string; a: string }> = [
   { q: "What is Birch Reserve, for a media buyer?", a: "A first-party display channel inside private, co-branded health and wellness hubs. Four placements: post-purchase (right after a paid order or booking, premium by IO), the hub home page, product and services pages, and the member dashboard behind login. Bought as display (per thousand views) or CPC (per click)." },
