@@ -438,7 +438,7 @@ export function LaneCtas({ testId = "report-lane-ctas" }: { testId?: string }) {
   if (!on) return null;
   return (
     <div className="mt-4 flex flex-col gap-2 sm:flex-row" data-testid={testId}>
-      <button type="button" onClick={() => openLane({ lane: "card", sku: "hold-190" })} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-sm font-bold text-[#0b1f3a] shadow-lg shadow-lime-500/30" data-testid={`${testId}-card`}><CreditCard className="size-4" aria-hidden />Buy space (card) · from $190 USD</button>
+      <button type="button" onClick={() => openLane({ lane: "card", sku: "hold-190" })} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-lime-300 px-6 text-sm font-bold text-[#0b1f3a]" data-testid={`${testId}-card`}><CreditCard className="size-4" aria-hidden />Buy space (card) · from $190 USD</button>
       <button type="button" onClick={() => openLane({ lane: "block" })} className="inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-bold text-[#0b1f3a] ring-1 ring-[#0b1f3a]/30" data-testid={`${testId}-block`}><Landmark className="size-4" aria-hidden />Big block / agency (IO + cheque)</button>
     </div>
   );

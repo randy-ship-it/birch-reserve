@@ -4,7 +4,7 @@
  * "from your site" tag; gaps (needs_input) become prompts in "Add detail to sharpen your numbers". Defaults are
  * labelled. Friday's full report is reviewed by a person first. Birch never fetches the brand's site itself.
  */
-import { siteUrl } from "@/lib/siteSkin";
+import { siteUrl, skinText } from "@/lib/siteSkin";
 import { LaneCtas } from "@/components/br/two-lane";
 import { PostKitNext } from "@/components/br/next-step";
 import { ArrowRight, Download, Loader2, Mail, Plus, Rocket, Sparkles } from "lucide-react";
@@ -52,8 +52,9 @@ export function needPrompt(key: string, notes: string[] = []): string {
   )[key] ?? key.replace(/_/g, " ");
 }
 
-const FromSite = () => <span className="ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={{ background: RT.mint, color: RT.mintInk }} data-testid="from-site-tag">from your site</span>;
-const Dflt = () => <span className="ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider" style={{ background: RT.track, color: RT.mute }}>default</span>;
+// BR-83: provenance as quiet trailing text, not chips.
+const FromSite = () => <span className="text-[12px]" style={{ color: RT.mintInk }} data-testid="from-site-tag">· from your site</span>;
+const Dflt = () => <span className="text-[12px] italic" style={{ color: RT.mute }} data-testid="default-tag">· default</span>;
 
 export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail: () => void }) {
   // "Add my hub" after a supplier-only submit adds the hub role to the SAME record (PATCH), never a second form.
@@ -142,7 +143,7 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
   ];
   const upgrade = (where: string) => (
     <div className="rounded-2xl p-4" style={{ background: RT.forest, color: "#fff" }} data-testid={`fast-upgrade-${where}`}>
-      <button type="button" onClick={onAddDetail} data-testid="fast-add-detail" className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-base font-bold shadow-lg" style={{ background: RT.mint, color: RT.forest }}>
+      <button type="button" onClick={onAddDetail} data-testid="fast-add-detail" className="inline-flex h-12 items-center gap-2 rounded-full px-6 text-base font-bold" style={{ background: RT.mint, color: RT.forest }}>
         <Sparkles className="size-5" />Add detail to sharpen your numbers<ArrowRight className="size-5" />
       </button>
       {needs.length ? (
@@ -155,10 +156,10 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
   );
   return (
     <section data-testid="fast-report" className="space-y-4" style={{ fontFamily: RT_SANS }}>
-      <div className="rounded-3xl bg-white p-5 shadow-xl md:p-6" style={{ border: `1px solid ${RT.line}` }}>
-        <span className="rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider" style={{ background: RT.goldBg, color: RT.gold, border: `1px solid ${RT.goldLine}` }} data-testid="fast-label">Quick estimate from your website + defaults</span>
-        <h2 className="mt-3 text-3xl [overflow-wrap:anywhere] md:text-4xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Here's your quick estimate for {name ?? q.host}.</h2>
-        <dl className="mt-3 grid gap-x-6 gap-y-1 text-[13px] md:grid-cols-2" data-testid="fast-values">
+      <div className="rounded-xl bg-white p-5 md:p-8" style={{ border: `1px solid ${RT.line}` }}>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: RT.mute }} data-testid="fast-label">Quick estimate from your website + defaults</p>
+        <h2 className="mt-2 text-3xl [overflow-wrap:anywhere] md:text-4xl" style={{ fontFamily: RT_SERIF, color: RT.ink }}>Here's your quick estimate for {name ?? q.host}.</h2>
+        <dl className="mt-4 grid gap-x-8 gap-y-1.5 text-[13px] md:grid-cols-2" data-testid="fast-values">
           {rows.map((r) => (
             <div key={r.k} className="flex flex-wrap items-baseline gap-1" style={{ color: RT.mute }}>
               <dt>{r.label}:</dt><dd className="font-semibold" style={{ color: RT.ink }}>{r.value}</dd>{r.tag}
@@ -169,14 +170,14 @@ export function FastReport({ q: q0, onAddDetail }: { q: QuickResult; onAddDetail
           <button type="button" onClick={downloadPdf} disabled={pdfBusy} data-testid="fast-download-pdf" className="inline-flex h-11 items-center gap-2 rounded-full px-5 text-sm font-bold" style={{ background: RT.forest, color: "#fff" }}>{pdfBusy ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}Download my kit (PDF)</button>
           {mailed ? <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold" style={{ color: RT.mintInk }} data-testid="fast-kit-emailed"><Mail className="size-4" />Sent to {mailed}</span> : null}
         </div>
-        <div className="mt-3 rounded-2xl p-3 text-sm" style={{ background: RT.paper, color: RT.body }} data-testid="fast-in-review">
+        <div className="mt-5 border-t pt-4 text-sm" style={{ borderColor: RT.line, color: RT.body }} data-testid="fast-in-review">
           <strong>Your full report is in review.</strong> A person reviews it first{q.held ? ", after we confirm brand ownership" : ""}.
         </div>
-        <LeadGatesStatus gates={{ review: "pending_review" }} testId="fast-lead-gates" />
+        <LeadGatesStatus gates={{ review: "pending_review" }} testId="fast-lead-gates" details={false} />
         <Details testId="fast-details">
           {q.autofill?.mock ? <p data-testid="fast-autofill-mock">Preview · mock data: we don't read your site on this preview, so every value is a default.</p> : null}
           {q.fallback ? <p data-testid="fast-fallback">Site auto-fill is not switched on yet, so these are defaults.</p> : null}
-          <p>We sent your request to Birch Reserve. A person reviews it before the full report is released{q.held ? " (brand ownership check, usually within one business day)" : ""}. Values tagged "default" are placeholders until you add detail.</p>
+          <p>{skinText("We sent your request to Birch Reserve. A person reviews it before the full report is released")}{q.held ? " (brand ownership check, usually within one business day)" : ""}. Nothing is booked or charged until then. Values marked "default" are placeholders until you add detail.</p>
         </Details>
         <IntakeWarnings testId="fast-warnings" />
         {hasKit && oneForm ? <div className="mt-4">{upgrade("top")}</div> : null}
