@@ -55,20 +55,22 @@ h1,h2{font-family:Fraunces,serif;font-weight:400;line-height:1.15}h1{font-size:c
 .fine{color:#4d5b6a;font-size:.88rem}.ok{background:#BFF3D6;color:#0B6B43;padding:10px 14px;border-radius:8px;margin:12px 0}.note{background:#fff;border:1px solid #ccd2d8;padding:10px 14px;border-radius:8px;margin:12px 0}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}.stat{border:1px solid #ccd2d8;border-radius:12px;padding:14px;background:#fff}.stat b{display:block;font:600 1.6rem Fraunces,serif}
 .mc{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:999px;background:#FFF4DB;border:1px solid #F1D58F;color:#8A5A00;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;vertical-align:middle}
-form{display:grid;gap:10px;border:1px solid #ccd2d8;border-radius:14px;padding:18px;background:#fff}input,select{width:100%;padding:10px;border:1px solid #b9c1c9;border-radius:8px;font:inherit}
+.cta{display:inline-block;background:#071A39;color:#fff;border-radius:6px;padding:12px 18px;min-height:44px;box-sizing:border-box;font:600 1rem "IBM Plex Sans";text-decoration:none}.steps{list-style:none;margin:16px 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}.steps li{border:1px solid #ccd2d8;border-radius:10px;padding:10px 12px;background:#fff;font-size:.9rem;color:#4d5b6a}.steps b{display:block;color:#071A39}form{display:grid;gap:10px;border:1px solid #ccd2d8;border-radius:14px;padding:18px;background:#fff}input,select{width:100%;padding:10px;border:1px solid #b9c1c9;border-radius:8px;font:inherit}
 button{background:#071A39;color:#fff;border:0;border-radius:6px;min-height:44px;padding:12px 18px;justify-self:start;font:600 1rem "IBM Plex Sans";cursor:pointer}button:disabled{opacity:.6}
 details{border-top:1px solid #ccd2d8;padding:12px 0}summary{cursor:pointer;font-weight:600}ul{padding-left:1.1em}${TOKENS_CSS}${BUYER_HEADER_CSS}${PRICE_LADDER_CSS}</style></head><body>
 ${buyerHeaderHtml("exclusive", currencyToggleHtml(currency, (c) => currencyHref(path, query, c)))}
 <main>${banner}<div data-promo-box="success"></div>
-<p class="fine">DEDICATED PLACEMENT · ONE BRAND PER CATEGORY</p>
+<p class="fine">STARTER PLACEMENT · CARD · NOTHING RUNS BEFORE A SIGNED IO</p>
 <h1>Starter placement · ${X.label}</h1>
-<p>Dedicated placements from $1,900. Your $1,900 holds a ${X.packageLabel} dedicated package in your category while we write your insertion order. All $1,900 counts toward the package. The category is yours when you sign the IO, which names the hub, placement and dates. If another brand commits to the category first, we refund the $1,900 in full.</p>
+<p>Dedicated placements from $1,900. Your $1,900 counts in full toward a ${X.packageLabel} package in your category while we write your insertion order (IO). The IO names the hub, placement and dates. If another brand commits to the category first, we refund the $1,900 in full.</p>
+<p><a class="cta" href="#f">Start: pay ${X.label} &darr;</a></p>
 <div class="grid">
 <div class="stat"><b>${X.label}</b>today, by card, counted in full</div>
 <div class="stat"><b>${EXCLUSIVE_RESERVE.packageRange}</b>dedicated package, ${C}</div>
 <div class="stat"><b>Pending your IO</b>refunded if another brand commits first</div>
 <div class="stat"><span class="mc">Modelled</span><b>${esc(pace.perMonth)}</b>over up to 6 months (${esc(pace.viewsPerMonth)})</div>
 </div>
+<ol class="steps"><li><b>1 Pay</b>by card, 4 fields</li><li><b>2 IO</b>we email it within 1 business day</li><li><b>3 Sign</b>and send creative</li><li><b>4 Runs</b>on the dates in the IO</li></ol>
 ${open ? `<form id="f"><label>Brand<input name="brand" required maxlength="160" autocomplete="organization"></label>
 <label>Work email<input name="email" type="email" required maxlength="200" autocomplete="email"></label>
 <label>Category<select name="category" required><option value="">Choose a category</option>${cats}</select></label>
