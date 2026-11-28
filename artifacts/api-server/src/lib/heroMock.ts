@@ -8,7 +8,6 @@ const HUBS = {
   sole: { name: "SOLE", host: "scalehealth.ca/sole", img: "/hub-gallery/sole.webp", surface: "Clinic layer home", card: "right:2.5%;bottom:3%", pin3: "right:-12px", pin2: "left:3%;top:27%" },
   effortless: { name: "Effortless Admin", host: "scalehealth.ca/effortlessadmin", img: "/hub-gallery/effortless.webp", surface: "Clinic layer home", card: "right:1.2%;top:27%", pin3: "left:-12px", pin2: "left:1.5%;top:74%" },
   calmjoints: { name: "Calm Joints", host: "scalehealth.ca/calmjoints", img: "/hub-gallery/calmjoints.webp", surface: "Clinic layer home", card: "left:5%;bottom:4%;transform:scale(.64);transform-origin:bottom left", pin3: "right:-12px", pin2: "left:3%;top:22%" },
-  integrity: { name: "Integrity Fitness", host: "scalehealth.ca/integrity", img: "/hub-gallery/integrity.webp", surface: "Clinic layer home", card: "right:2.5%;bottom:3%", pin3: "right:-12px", pin2: "left:3%;top:27%" },
   nutriprocan: { name: "NutriProCan", host: "scalehealth.ca/nutriprocan", img: "/hub-banners/nutriprocan.webp", surface: "Post-booking card", card: "right:2.5%;bottom:3%", pin3: "right:-12px", pin2: "left:3%;top:27%" },
   jack: { name: "Jack Health", host: "scalehealth.ca/jack-health", img: "/hub-gallery/jack-health.webp", surface: "Post-booking card", card: "right:2.5%;bottom:3%", pin3: "right:-12px", pin2: "left:3%;top:27%" },
   jill: { name: "Jill Health", host: "scalehealth.ca/jill-health", img: "/hub-gallery/jill-health.webp", surface: "Post-booking card", card: "right:2.5%;bottom:3%", pin3: "right:-12px", pin2: "left:3%;top:27%" },
@@ -17,7 +16,7 @@ const HUBS = {
 } as const;
 /** Ladder order (Live now first). Mirrors clinichub-media/src/lib/hub-mocks.ts. */
 const ORDER: { k: keyof typeof HUBS; tab: string; live: boolean }[] = [
-  { k: "drho", tab: "DR-HO'S", live: true }, { k: "sole", tab: "SOLE", live: true }, { k: "integrity", tab: "Integrity", live: true }, { k: "calmjoints", tab: "Calm Joints", live: true },
+  { k: "drho", tab: "DR-HO'S", live: true }, { k: "sole", tab: "SOLE", live: true }, { k: "calmjoints", tab: "Calm Joints", live: true },
   { k: "effortless", tab: "Effortless", live: false }, { k: "nutriprocan", tab: "NutriProCan", live: false }, { k: "jack", tab: "Jack Health", live: false }, { k: "jill", tab: "Jill Health", live: false }, { k: "roll", tab: "Roll Recovery", live: false }, { k: "bird", tab: "Bird & Be", live: false },
 ];
 export function mockBadge(hub: keyof typeof HUBS): string {

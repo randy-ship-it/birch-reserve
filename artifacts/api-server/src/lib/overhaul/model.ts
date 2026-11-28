@@ -117,13 +117,13 @@ const BASE_BRAND_HUBS: BrandHub[] = [
 
 /**
  * Every hub on the ladder, in ladder order (Live now first), for every hub list on the site (carousel, media kit tiles,
- * /hubs detail cards, rate card, trust strip). Integrity Fitness and Calm Joints have no hub feed row, so they use the
+ * /hubs detail cards, rate card, trust strip). Dima-lates and Calm Joints have no hub feed row, so they use the
  * network-median basis like SOLE and a wordmark logo. Display only; ad serving still reads sponsorKit status.
  */
 export const BRAND_HUBS: BrandHub[] = (() => {
   const med = BASE_BRAND_HUBS.find((h) => h.key === "jack-health")!;
   const extra: Record<string, Partial<BrandHub>> = {
-    "integrity-fitness": { name: "Integrity Fitness", url: "https://www.scalehealth.ca/integrity", category: "Gym and recovery membership", logo: "/partner-logos/integrity-fitness.svg", banner: "/hub-gallery/integrity.webp", recovery: "Recovery" },
+    "dima-lates": { name: "Dima-lates", url: "https://www.scalehealth.ca/dima-lates-ajax-review", category: "Pilates studio", logo: "/partner-logos/dima-lates.svg", banner: "/hub-gallery/dima-lates.webp", recovery: "Recovery" },
     "calm-joints": { name: "Calm Joints", url: "https://www.scalehealth.ca/calmjoints", category: "Digital physio clinic", logo: "/partner-logos/calm-joints.svg", banner: "/hub-gallery/calmjoints.webp", recovery: "Recovery" },
   };
   return publicHubs().flatMap((l) => {

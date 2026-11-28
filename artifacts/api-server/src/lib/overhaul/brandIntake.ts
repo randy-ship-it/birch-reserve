@@ -339,7 +339,6 @@ export const ANCHOR_HUBS_STATUS = "Proposed, pending Randy's confirmation" as co
  */
 export const PROPOSED_ANCHOR_HUBS = [
   { key: "dr-ho", name: "DR-HO’S", what: "Pain relief and physio", fits: ["recovery", "physio", "sleep"], live: true },
-  { key: "integrity-fitness", name: "Integrity Fitness", what: "Gym members, with recovery and physio built into the membership", fits: ["recovery", "fitness", "physio", "sports-nutrition"], live: true },
   { key: "calm-joints", name: "Calm Joints", what: "Members of our own digital physio clinic", fits: ["recovery", "physio", "sleep"], live: true },
   { key: "roll-recovery", name: "Roll Recovery", what: "Recovery tools and a member marketplace", fits: ["recovery", "fitness", "physio", "sports-nutrition"], live: false },
   { key: "jill-health", name: "Jill Health", what: "Women's health, midlife and menopause", fits: ["longevity", "sleep", "supplements"], live: false },

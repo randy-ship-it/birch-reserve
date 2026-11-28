@@ -14,7 +14,7 @@ const FAQ = [
   { q: "When does my term start?", a: "Your 1 to 6 month term starts the day your displays go live, not the day you pay." },
   { q: "What if traffic in my area grows?", a: "Your share grows with it. You keep the right to keep pace: more views in your area are offered to you first, at your locked discount, before anyone else can buy them." },
   { q: "What does it cost?", a: "Self-serve starts at a $190 USD 7-day look or a $490 USD category placement, priced in USD for every buyer. An area placement is a premium slot, quoted by inquiry against the clinic layers near you." },
-  { q: "Which placements can I get?", a: `${PLACEMENT_LABELS.join(", ")}. Display or CPC, on the live clinic layers (DR-HO'S physio, SOLE, Integrity Fitness and Calm Joints today) plus clinic layers near you as they launch.` },
+  { q: "Which placements can I get?", a: `${PLACEMENT_LABELS.join(", ")}. Display or CPC, on the live clinic layers (DR-HO'S physio, SOLE, Calm Joints and Dima-lates today) plus clinic layers near you as they launch.` },
 ];
 
 export default function BrAdvertiseLocal() {

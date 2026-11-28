@@ -6,7 +6,8 @@
  *   Activating  -> going live
  *   Coming      -> "and more launching"
  *
- * Integrity Fitness: named Live by Randy (Nov 23 2026 8:16 AM ET), listed Live on the Scale site, real page at scalehealth.ca/integrity.
+ * Dima-lates (Nov 27 2026): a Pilates studio that switched on its own clinic layer, page live at scalehealth.ca/dima-lates-ajax-review.
+ * Not an Align Network clinic. The former gym example was removed from every public surface (Randy, Nov 27 2026 7:14 PM ET).
  * Rules: audience lines use only facts already on the site (model.ts hub audiences). A hub is linked only when it has a
  * real page. `public: false` keeps a hub out of every public surface until Randy confirms it (no hub is listed that has no
  * page and no approved public line). Visible reach or price figures are not stored here.
@@ -36,7 +37,7 @@ export type LadderHub = {
 export const HUB_LADDER: readonly LadderHub[] = [
   { key: "dr-ho", name: "DR-HO'S physio", tier: "live", audience: "Physio patients, right after they book or buy", href: "https://physio.drhonow.com", scaleHref: "https://www.scalehealth.ca/dr-ho", thumb: "/hub-gallery/thumbs/drho.webp" },
   { key: "sole", name: "SOLE", tier: "live", audience: "Foot-pain and active-footwear buyers, right after they buy", href: "https://www.scalehealth.ca/sole", thumb: "/hub-gallery/thumbs/sole.webp" },
-  { key: "integrity-fitness", name: "Integrity Fitness", tier: "live", audience: "Gym members, with recovery and physio built into the membership", href: "https://www.scalehealth.ca/integrity", thumb: "/hub-gallery/thumbs/integrity.webp" },
+  { key: "dima-lates", name: "Dima-lates", tier: "live", audience: "Pilates studio members in Ajax, ON", href: "https://www.scalehealth.ca/dima-lates-ajax-review", thumb: "/hub-gallery/thumbs/dima-lates-layer.webp" },
   { key: "calm-joints", name: "Calm Joints", tier: "live", audience: "Members of our own digital physio clinic", href: "https://www.scalehealth.ca/calmjoints", thumb: "/hub-gallery/thumbs/calmjoints.webp" },
   { key: "effortless-admin", name: "Effortless Admin", tier: "activating", audience: "Employees reaching care through their benefits", banner: "/hub-banners/effortless-admin.webp", surface: "Clinic layer home card" },
   { key: "nutriprocan", name: "NutriProCan", tier: "activating", audience: "Nutrition and dietitian-guided eating", banner: "/hub-banners/nutriprocan.webp", surface: "Post-booking card" },

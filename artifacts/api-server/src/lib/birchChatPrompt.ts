@@ -100,7 +100,7 @@ export const BRAND_QUESTIONS_ASKED = [
 const CHIP_NOTES: Record<string, string> = {
   how_seats: `The visitor tapped "How it works". Explain the three steps (reserve, pay by card, approve the IO) in plain words, then ask what they sell.`,
   hold_190: `The visitor tapped "Reserve space". Walk them to checkout (the $490 USD category placement, or the $190 USD 7-day look as a smaller first step) and ask what they sell so you can point them to the right category.`,
-  live_hub: `The visitor tapped "See a live clinic layer". Share ${BIRCH_LINKS.drhoHub} (DR-HO'S), ${BIRCH_LINKS.soleHub} (SOLE), https://www.scalehealth.ca/integrity (Integrity Fitness) or https://www.scalehealth.ca/calmjoints (Calm Joints) and ask what they would want to put in front of those members.`,
+  live_hub: `The visitor tapped "See a live clinic layer". Share ${BIRCH_LINKS.drhoHub} (DR-HO'S), ${BIRCH_LINKS.soleHub} (SOLE), https://www.scalehealth.ca/calmjoints (Calm Joints) or https://www.scalehealth.ca/dima-lates-ajax-review (Dima-lates) and ask what they would want to put in front of those members.`,
   asking_now: `The visitor tapped "What are brands asking?". Answer from the WHAT PEOPLE ARE ASKING section: name 3-4 themes in plain words, answer one or two briefly from the facts above, then ask which one matters most to them.`,
   talk_human: `The visitor tapped "Buy ads now". Walk them to https://birchreserve.net/buycalc to reserve or place a bid. Never offer a call.`,
 };
@@ -174,7 +174,7 @@ function buildBirchPromptText(opts: BirchChatPromptOptions, brand: ChatBrand): s
     "- Not a social feed and not an open auction. No bidding. Placements are curated clinic layer by clinic layer as each clinic layer launches. Don't describe how ads are selected or matched beyond that.",
     "- Four placements in every clinic layer: 1) Post-purchase, the thank-you page right after an order or booking (highest intent); 2) Member dashboard, the logged-in home where members track orders and plans; 3) Clinic layer home, banner and tiles on the co-branded clinic layer home page; 4) Product and services pages, inside product, service and booking pages. Exact position and creative are set in the insertion order (IO).",
     "- Clinic layer verticals: Recovery, Longevity and Food.",
-    `- Clinic layer status ladder (one list): ${ladderLine()} Open now: DR-HO'S ${BIRCH_LINKS.drhoHub}, SOLE ${BIRCH_LINKS.soleHub}, Integrity Fitness https://www.scalehealth.ca/integrity, Calm Joints https://www.scalehealth.ca/calmjoints. Never describe an Activating clinic layer as live. Detailed clinic layer audiences are shown on the clinic layers page after the visitor registers their email.`,
+    `- Clinic layer status ladder (one list): ${ladderLine()} Open now: DR-HO'S ${BIRCH_LINKS.drhoHub}, SOLE ${BIRCH_LINKS.soleHub}, Dima-lates https://www.scalehealth.ca/dima-lates-ajax-review, Calm Joints https://www.scalehealth.ca/calmjoints. Never describe an Activating clinic layer as live. Detailed clinic layer audiences are shown on the clinic layers page after the visitor registers their email.`,
     "- Who they reach: members of these clinic layers, people actively buying or booking recovery, physio, fitness and wellness products and services. Do not give audience sizes, order counts, view counts or demographics beyond that and the homepage network line (see THE PRIVATE DISPLAY NETWORK).",
     "- Run by Silver Birch Growth Inc., Toronto, Ontario. Founder: Randy Gilling.",
     "",
