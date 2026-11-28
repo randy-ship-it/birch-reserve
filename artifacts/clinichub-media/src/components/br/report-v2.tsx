@@ -250,7 +250,7 @@ export function HubCards({ m }: { m: ReportModel }) {
 }
 
 /**
- * Hub a location switched on itself (Randy, Nov 27 2026: show a hub added organically, next to Integrity).
+ * Hub a location switched on itself (Randy, Nov 27 2026: show a hub a member studio added itself).
  * Source: Scale Activity doc (Dima-lates signed, page live at scalehealth.ca/dima-lates-ajax-review) and Jon's
  * Oct 27 Slack note that the owner activated it unprompted. One verified hub only, no counts.
  */

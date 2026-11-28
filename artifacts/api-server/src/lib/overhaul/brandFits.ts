@@ -239,7 +239,7 @@ const radRoller: BrandFit = {
     {
       status: "live",
       title: "Live recovery clinic layers",
-      line: "Clinic layers anyone can open today: the DR-HO'S physio clinic layer, the SOLE clinic layer, Integrity Fitness and Calm Joints. They are the clinic layers we call live.",
+      line: "Clinic layers anyone can open today: the DR-HO'S physio clinic layer, the SOLE clinic layer, Calm Joints and Dima-lates. They are the clinic layers we call live.",
       links: [
         { title: "DR-HO'S physio clinic layer", href: "https://physio.drhonow.com" },
         { title: "SOLE clinic layer", href: "https://www.scalehealth.ca/sole" },
@@ -348,7 +348,7 @@ const radRoller: BrandFit = {
     },
     {
       label: "Birch snapshot",
-      text: "Live clinic layers named in the Birch media kit (DR-HO'S physio, SOLE, Integrity Fitness and Calm Joints). Cataloged launching brands and Calm Joints racquet pages from the audience snapshot fed by the TAM inventory read on Nov 13, 2026. Street team footprint follows the retail clinic layers in the GTHA.",
+      text: "Live clinic layers named in the Birch media kit (DR-HO'S physio, SOLE, Calm Joints and Dima-lates). Cataloged launching brands and Calm Joints racquet pages from the audience snapshot fed by the TAM inventory read on Nov 13, 2026. Street team footprint follows the retail clinic layers in the GTHA.",
     },
   ],
 };

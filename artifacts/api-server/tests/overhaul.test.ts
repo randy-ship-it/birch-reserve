@@ -134,7 +134,7 @@ test("Friday payload: org birchreserve, tags, and skipped without env", async ()
 });
 
 test("copy rules: every ladder brand hub (4 Live, 6 Activating), no do-not-pitch brands", () => {
-  assert.deepEqual(BRAND_HUBS.map((h) => h.key).sort(), ["bird-and-be", "calm-joints", "dr-ho", "effortless-admin", "integrity-fitness", "jack-health", "jill-health", "nutriprocan", "roll-recovery", "sole"]);
+  assert.deepEqual(BRAND_HUBS.map((h) => h.key).sort(), ["bird-and-be", "calm-joints", "dima-lates", "dr-ho", "effortless-admin", "jack-health", "jill-health", "nutriprocan", "roll-recovery", "sole"]);
   const all = JSON.stringify(BRAND_HUBS);
   assert.doesNotMatch(all, /kalaya|align|clairvoyant|80 locations|pier39|ankita/i);
 });
@@ -150,7 +150,7 @@ test("agent catalog: the two media-kit offers in USD, only live hubs, agent chec
   assert.deepEqual(c.offers.map((o) => [o.offer_key, o.price_usd]), [["hold-190", 190], ["reserve-490", 490]]);
   assert.deepEqual(c.currencies, ["USD"]);
   assert.equal(c.inventory.surfaces.length, 4);
-  assert.deepEqual(c.inventory.live_hubs.map((h) => h.name), ["DR-HO'S physio", "SOLE", "Integrity Fitness", "Calm Joints"]);
+  assert.deepEqual(c.inventory.live_hubs.map((h) => h.name), ["DR-HO'S physio", "SOLE", "Dima-lates", "Calm Joints"]);
   assert.equal(c.agency.discount_pct_off_rate_card, 10);
   assert.equal(c.agency.resale_price, "set_by_agency");
   assert.equal(c.agency.undercut_agency_clients, false);

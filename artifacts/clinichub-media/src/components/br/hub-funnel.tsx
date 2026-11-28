@@ -12,7 +12,7 @@ const TINT: Record<string, string> = {
   "dr-ho": "from-[#2b2d8f] to-[#4a4cc0]",
   sole: "from-[#e5532a] to-[#f08a5d]",
   "calm-joints": "from-[#2f3e5c] to-[#5b6f94]",
-  "integrity-fitness": "from-[#7a1f3d] to-[#c0507a]",
+  "dima-lates": "from-[#5b2a4a] to-[#c27aa0]",
 };
 const hostOf = (u?: string) => (u ? u.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "") : "");
 

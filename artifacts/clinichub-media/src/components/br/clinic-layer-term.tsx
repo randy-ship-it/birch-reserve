@@ -1,28 +1,43 @@
 /**
  * "Clinic layer" term with a quick visual reference (Randy, Nov 27 2026 call: rename user-facing "hub" to
- * "clinic layer" and show example hubs on hover so visitors get it at a glance).
- * Hover or focus opens it on desktop, tap opens it on touch. Only real, live examples: Integrity Fitness and
- * Dima-lates (both verified live on scalehealth.ca). No brackets around names: the thumbnails carry the names.
+ * "clinic layer" and show example clinic layers on hover so visitors get it at a glance).
+ * Hover or focus opens it on desktop, tap opens it on touch. No brackets around names: the thumbnails carry the names.
+ *
+ * Pool (Randy, Nov 27 2026 7:14 PM ET): real, live clinic layers on scalehealth.ca that are not Align Network clinics,
+ * shown two at a time and rotated per page view so it is never the same pair. Crops come from the live public pages
+ * and were checked for "exclusive" text, Align branding and zero counts. Never add Kalaya or an Align Network clinic.
  */
 import { useRef, useState, type ReactNode } from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 
-export const CLINIC_LAYER_EXAMPLES = [
-  { name: "Integrity Fitness", where: "Fitness", img: "/hub-gallery/thumbs/integrity-layer.webp", pos: "50% 50%" },
-  { name: "Dima-lates", where: "Pilates · Ajax, ON", img: "/hub-gallery/thumbs/dima-lates-layer.webp", pos: "50% 50%" },
-] as const;
+export type ClinicLayerExample = { key: string; name: string; where: string; img: string; pos: string };
+export const CLINIC_LAYER_POOL: ReadonlyArray<ClinicLayerExample> = [
+  { key: "dima-lates", name: "Dima-lates", where: "Pilates · Ajax, ON", img: "/hub-gallery/thumbs/dima-lates-layer.webp", pos: "50% 50%" },
+  { key: "sole", name: "SOLE", where: "Footwear brand", img: "/hub-gallery/thumbs/sole-layer.webp", pos: "0% 50%" },
+  { key: "dr-ho", name: "DR-HO\u2019S", where: "Pain relief brand", img: "/hub-gallery/thumbs/drho-layer.webp", pos: "0% 0%" },
+];
+
+/** Two examples, rotated: a random pair per page view (stable while the page is open). */
+export function pickClinicLayerExamples(n = 2, rand: () => number = Math.random): ClinicLayerExample[] {
+  const pool = [...CLINIC_LAYER_POOL];
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [pool[i], pool[j]] = [pool[j]!, pool[i]!]; }
+  return pool.slice(0, n);
+}
+let pageExamples: ClinicLayerExample[] | null = null;
+const examplesForPage = () => (pageExamples ??= pickClinicLayerExamples());
 
 const INK = "#0b1f3a";
 
 export function ClinicLayerCard() {
+  const [examples] = useState(examplesForPage);
   return (
     <div data-testid="clinic-layer-card" style={{ color: INK }}>
       <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: "rgba(11,31,58,.5)" }}>What&rsquo;s a clinic layer?</p>
       <p className="mt-1.5 text-[14px] leading-snug">A co-branded members&rsquo; storefront on Scale Health. Its audience books care and buys products there. Two live ones:</p>
       <div className="mt-3 grid grid-cols-2 gap-2.5">
-        {CLINIC_LAYER_EXAMPLES.map((x) => (
-          <figure key={x.name} className="m-0">
-            <div className="aspect-[4/3] overflow-hidden rounded-lg" style={{ background: "#eef1f4", boxShadow: "inset 0 0 0 1px rgba(11,31,58,.08)" }}>
+        {examples.map((x) => (
+          <figure key={x.key} className="m-0">
+            <div className="aspect-[4/3] overflow-hidden rounded-lg" style={{ background: "#eef1f4", border: "1px solid rgba(11,31,58,.12)" }}>
               <img src={x.img} alt={`${x.name} clinic layer`} loading="lazy" decoding="async" className="size-full object-cover" style={{ objectPosition: x.pos }} />
             </div>
             <figcaption className="mt-1.5">

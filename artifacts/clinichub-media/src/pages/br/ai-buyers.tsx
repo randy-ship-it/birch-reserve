@@ -30,7 +30,7 @@ const AGENT_LINKS: Array<[string, string, string]> = [
 export default function BrAiBuyers() {
   usePageMeta(
     "For media buyers & agencies | Birch Reserve",
-    "Display space inside private health and wellness clinic layers. A $190 USD 7-day category look or a $490 USD category placement, paid by card on a Stripe-hosted page. Live today: DR-HO'S physio, SOLE, Integrity Fitness and Calm Joints.",
+    "Display space inside private health and wellness clinic layers. A $190 USD 7-day category look or a $490 USD category placement, paid by card on a Stripe-hosted page. Live today: DR-HO'S physio, SOLE, Calm Joints and Dima-lates.",
   );
   const price = priceLabels(useAvailability());
   const hubs = NETWORK_HUBS.join(" and ");
