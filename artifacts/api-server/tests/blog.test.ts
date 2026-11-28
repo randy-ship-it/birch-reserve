@@ -6,9 +6,9 @@ import router, { postPath, renderBlogIndex, renderPost } from "../src/routes/blo
 import { BLOG_INDEX_PATH, BLOG_PATHS, BLOG_POSTS } from "../src/lib/blogPosts";
 import { PUBLIC_SITEMAP_PATHS } from "../src/lib/publicSeo";
 
-// Copy rules (Randy, Nov 2026). Kalaya is allowed.
+// Copy rules (Randy, Nov 2026). Kalaya is never mentioned to visitors (Nov 27 2026).
 const BANNED = [
-  /\bFriday\b/, /\bAlign\b/, /Clairvoyant/i, /Alset/i, /80 locations/i, /MedVibe/i, /\bsigned partners\b/i,
+  /\bFriday\b/, /\bAlign\b/, /Clairvoyant/i, /Alset/i, /80 locations/i, /MedVibe/i, /Kalaya/i, /\bsigned partners\b/i,
   /\bPublisher\b/, /\bCAD\b|C\$/, /guarantee(d)? (results|reach|impressions|roi|leads|views)/i, /\bROAS\b/, /\bCTR\b/,
   /\b(not taken|is open|still open|0 (hubs|brands|spots))\b/i, /—/,
 ];

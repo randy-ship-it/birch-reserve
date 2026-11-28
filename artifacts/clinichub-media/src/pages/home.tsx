@@ -98,7 +98,6 @@ const RESERVE_LIST_HREF = "/inventory";
 
 const SUPPLIER_ADJACENCY = [
   "DR-HO recovery equipment",
-  "Kalaya topical pain relief",
   "Magnum Supps",
   "Fresh Prep",
   "LyfeFuel",
@@ -804,15 +803,18 @@ export default function Home() {
               <div className="p-6 md:p-8 border-b border-border bg-secondary/5">
                 <p className="text-[10px] font-bold uppercase tracking-widest text-accent mb-2 flex items-center gap-2">
                   <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-accent"></span></span>
-                  Launching
+                  Live studio clinic layer
                 </p>
-                <h4 className="font-display text-2xl text-foreground">Kalaya Booking Clinic layer</h4>
+                <h4 className="font-display text-2xl text-foreground">Dima-lates Members&apos; Clinic layer</h4>
               </div>
               <div className="p-6 md:p-8 bg-background flex-1">
                 <div className="border border-border/50 shadow-sm overflow-hidden aspect-[4/3] bg-muted relative">
-                  <img src="/hub-proof/kalaya-booking-card.png" alt="Kalaya Booking Clinic layer screenshot" className="w-full h-full object-cover object-top" loading="lazy" />
+                  <img src="/hub-gallery/dima-lates.webp" alt="Dima-lates Pilates studio clinic layer" className="w-full h-full object-cover" style={{ objectPosition: "50% 40%" }} loading="lazy" />
                 </div>
-                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Co-branded Scale Health clinic layer. Display inventory is contracted. Launch timing varies.</p>
+                <p className="mt-4 text-xs leading-relaxed text-muted-foreground">An Ajax, ON Pilates studio that switched on its own members&apos; clinic layer.</p>
+                <a href="https://www.scalehealth.ca/dima-lates-ajax-review" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-2 text-sm font-semibold">
+                  Open the live clinic layer <ArrowUpRight className="size-4" />
+                </a>
               </div>
             </div>
 

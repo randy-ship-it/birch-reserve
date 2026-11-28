@@ -4,7 +4,7 @@
  * Real desktop homepage screenshots (1440×900, captured 2026-09-24) of live,
  * public co-branded Scale Health hubs. Examples of the hub network only —
  * these brands are NOT Birch advertisers or seat holders. Brand labels only,
- * no URLs as visible text. Only the DR-HO card links out (new tab).
+ * no URLs as visible text. Only live clinic layers link out (new tab). Never a never-mention name.
  * Only add a hub here after verifying its homepage is live, public (HTTP 200,
  * real content, no login wall) — never a mockup or an unlaunched hub.
  */
@@ -15,8 +15,10 @@ export type ExampleHub = {
   name: string;
   kind: string;
   image: string;
-  /** Only live hubs link out (DR-HO'S, SOLE). */
+  /** Only live clinic layers link out (DR-HO'S, SOLE, Dima-lates). */
   href?: string;
+  /** object-position for non-1440x900 images. */
+  pos?: string;
 };
 
 export const EXAMPLE_HUBS: ReadonlyArray<ExampleHub> = [
@@ -28,7 +30,14 @@ export const EXAMPLE_HUBS: ReadonlyArray<ExampleHub> = [
     href: "https://physio.drhonow.com/dr-ho/portal",
   },
   { id: "sole", name: "SOLE", kind: "Product brand clinic layer", image: "/hub-gallery/sole.webp", href: "https://www.scalehealth.ca/sole" },
-  { id: "kalaya", name: "Kalaya", kind: "Product brand clinic layer", image: "/hub-gallery/kalaya.webp" },
+  {
+    id: "dima-lates",
+    name: "Dima-lates",
+    kind: "Studio clinic layer",
+    image: "/hub-gallery/dima-lates.webp",
+    pos: "50% 40%",
+    href: "https://www.scalehealth.ca/dima-lates-ajax-review",
+  },
   { id: "jill-health", name: "Jill Health", kind: "Health brand clinic layer", image: "/hub-gallery/jill-health.webp" },
   { id: "jack-health", name: "Jack Health", kind: "Health brand clinic layer", image: "/hub-gallery/jack-health.webp" },
   { id: "effortless-admin", name: "Effortless Admin", kind: "Benefits clinic layer", image: "/hub-gallery/effortless-admin.webp" },
@@ -45,6 +54,7 @@ function CardBody({ hub }: { hub: ExampleHub }) {
           height={900}
           loading="lazy"
           decoding="async"
+          style={hub.pos ? { objectPosition: hub.pos } : undefined}
           className="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-foreground/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />

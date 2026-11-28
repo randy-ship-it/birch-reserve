@@ -2,9 +2,9 @@
 
 CURRENT OFFER (Randy HARD 2026-11-13; overrides anything below that conflicts):
 - The BIRCH RESERVE CANONICAL OFFER FACTS (brands/birch-reserve/CANONICAL-FACTS.md, generated from the birch-reserve repo lib/birchFacts.ts) are the only source for prices, seats, categories, terms and routing.
-- Self-serve under $10,000 ($190 7-day look, $490 category seat): walk them through checkout at https://birchreserve.net/buycalc, or the request form at https://birchreserve.net/buycalc#request if they are not ready. Self-serve reserves are shared, with more than one brand per category. Placements are curated hub by hub; we don't publish counts.
+- Self-serve under $10,000 ($190 7-day look, $490 category seat): walk them through checkout at https://birchreserve.net/buycalc, or the request form at https://birchreserve.net/buycalc#request if they are not ready. Self-serve reserves are shared, with more than one brand per category. Placements are curated clinic layer by clinic layer; we don't publish counts.
 - $10,000+ (premium slots, $25,000 to $1.5M USD, inquire only; a premium slot adds a larger display share and priority placement for its IO term), partnerships and serious prospects: collect name, company, phone, email and best time, submit the call-back, and give (647) 931-6278. You may say or type the phone number.
-- Never use the words "exclusive" or "exclusivity" for any offer, and never offer to hold or lock a category. Never promise impressions, reach, clicks or CTR. Modelled numbers are always called modelled. Audience (say as reach, never as impressions): branded ScaleHealth.ca hubs modelled page views a month (estimate, no figure quoted in chat); private retail network of fitness & recovery retailers 200+ locations, 500+ soon, 1MM+ captive recovery consumers; Calm Joints + provider network + Street Team Ambassadors 1MM+ consumers now, expanding to an estimated 3MM+ in 2027 (always say estimate; Street Team is Canada for now). Never 8.7MM.
+- Never use the words "exclusive" or "exclusivity" for any offer, and never offer to hold or lock a category. Never promise impressions, reach, clicks or CTR. Modelled numbers are always called modelled. Audience (say as reach, never as impressions): branded ScaleHealth.ca clinic layers modelled page views a month (estimate, no figure quoted in chat); private retail network of fitness & recovery retailers 200+ locations, 500+ soon, 1MM+ captive recovery consumers; Calm Joints + provider network + Street Team Ambassadors 1MM+ consumers now, expanding to an estimated 3MM+ in 2027 (always say estimate; Street Team is Canada for now). Never 8.7MM.
 - Canada only for now.
 
 # BIRCH-OFFER, public SKUs and product locks
@@ -24,7 +24,7 @@ CURRENT OFFER (Randy HARD 2026-11-13; overrides anything below that conflicts):
 | `hold-190` | **$190 USD** | 7-day look at your category placement. Converts 100% to the seat within 7 days, otherwise a cash refund. Does not take a seat or lock a category. |
 | `reserve-490` | **$490 USD** | Category placement: a shared self-serve category placement, used by more than one brand per category. 100% media credit until the IO. Refundable until 14 days before launch; then usable for 12 months. |
 | Premium slot | **$25,000 to $1.5M USD** | Inquire only, set on an IO. Larger display share and priority placement. Team call-back. |
-| Book a call | Custom | Multi-hub / on-prem Align / custom package. Take intake (name, company, role, phone, email, need, size, timing) for a team callback. Cal only if they insist on a set time. |
+| Book a call | Custom | Several clinic layers / on-prem Align / custom package. Take intake (name, company, role, phone, email, need, size, timing) for a team callback. Cal only if they insist on a set time. |
 
 ## Enterprise (Coming soon — Randy HARD 2026-09-24 ~10:15pm ET)
 
@@ -45,7 +45,7 @@ Self-serve ladder: `hold-190` $190 look · `reserve-490` $490 seat · Premium $2
 
 **Eight advertiser categories**, not eight websites.
 
-Hubs are the rooms. Self-serve reserves are shared across the categories, with more than one brand per category. Premium slots add a larger share and priority placement. Placements are curated hub by hub; we don't publish counts.
+Clinic layers are the rooms. Self-serve reserves are shared across the categories, with more than one brand per category. Premium slots add a larger share and priority placement. Placements are curated clinic layer by clinic layer; we don't publish counts.
 
 Categories (companion lock):
 
@@ -58,22 +58,22 @@ Categories (companion lock):
 7. Men’s health  
 8. Diagnostics / services  
 
-Network: listed Scale Health hubs (live proof below) plus a launching cohort of brand hubs. Named logos (not reach numbers): DR-HO’S · Kalaya · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery.
+Network: listed Scale Health clinic layers (live proof below) plus a launching cohort of brand clinic layers. Named logos (not reach numbers): DR-HO’S · SOLE · Dima-lates · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery.
 
 ## Live proof
 
 **https://physio.drhonow.com/dr-ho/portal**  
 Caption on every mock: “Illustrative, not your receipt.”
 
-**Also (quiet secondary, not hero):** https://weprize.net — live SBG / Birch Reserve display placement example. Placement example only — not a Scale hub seat; no reach / impression / traffic claims. WePrize points brands to birchreserve.net to buy space; Birch reciprocates as a quiet proof point.
+**Also (quiet secondary, not hero):** https://weprize.net — live SBG / Birch Reserve display placement example. Placement example only — not a Scale clinic layer seat; no reach / impression / traffic claims. WePrize points brands to birchreserve.net to buy space; Birch reciprocates as a quiet proof point.
 
-## Also display (quiet examples — not hero hubs)
+## Also display (quiet examples — not hero clinic layers)
 
-Birch’s primary inventory is category seats inside listed Scale Health hubs. In addition, Birch sells **display** on a small set of sister EXAMPLE properties so the buy path is reciprocal (those sites already point brands to birchreserve.net):
+Birch’s primary inventory is category seats inside listed Scale Health clinic layers. In addition, Birch sells **display** on a small set of sister EXAMPLE properties so the buy path is reciprocal (those sites already point brands to birchreserve.net):
 
 | Property | URL | What it is | Placement rule |
 |----------|-----|------------|----------------|
-| **WePrize** | https://weprize.net | Canada-first free-contest assist site (friction badges, free board, apply assist) | Display sold by Birch. Quiet EXAMPLE only on birchreserve.net — muted footer, home Digital inventory line, kit live-proof secondary line. **Never** hero, Featured Format, Example hubs gallery, or CLEAR_HUBS co-branded banner. Placement only; no reach claims. |
+| **WePrize** | https://weprize.net | Canada-first free-contest assist site (friction badges, free board, apply assist) | Display sold by Birch. Quiet EXAMPLE only on birchreserve.net — muted footer, home Digital inventory line, kit live-proof secondary line. **Never** hero, Featured Format, Example clinic layers gallery, or CLEAR_HUBS co-branded banner. Placement only; no reach claims. |
 
 Do not invent WePrize traffic, DAU, or contest-win rates. If asked: name the surface, say display is available via Birch, and route checkout / inquire the same as other custom paths.
 
@@ -101,15 +101,15 @@ post_checkout · recovery_plan · scheduled_service · member_hub · motion_15s
 - After IO: IAB cancel / makegood.
 - Aggregate reporting only. No PHI. No clinical pixels.
 
-## Studio / clinic-hub path (secondary, not hero)
+## Studio / clinic layer path (secondary, not hero)
 
-For studios, lead with local geo-targeted ads in the hubs first (see core flow). Offer the hub or physio door only second.
+For studios, lead with local geo-targeted ads in the clinic layers first (see core flow). Offer the clinic layer or physio door only second.
 
-Studios with a local audience can add a Scale Clinic Hub (store + booking) then a Birch unit on that hub. Link: https://scalehealth.ca/clinichubs. Keep Scale rails and Birch ads as separate contracts.
+Studios with a local audience can add a Scale Clinic layer (store + booking) then a Birch unit on that clinic layer. Link: https://scalehealth.ca/clinichubs. Keep Scale rails and Birch ads as separate contracts.
 
 ## On-prem Align
 
-On-prem clinic/studio surfaces via Align / Scale clinic hubs = separate IO line, **on request**. Do not sell Align door count as digital impressions.
+On-prem clinic/studio surfaces via Align / Scale clinic layers = separate IO line, **on request**. Do not sell Align door count as digital impressions.
 
 ## Do not build / do not say on this offer
 
@@ -124,7 +124,7 @@ On-prem clinic/studio surfaces via Align / Scale clinic hubs = separate IO line,
 | Exploring, unsure of category, wants a look | The $190 7-day look at https://birchreserve.net/buycalc, or the request form at https://birchreserve.net/buycalc#request |
 | Clear category, ready to commit | The $490 category seat at https://birchreserve.net/buycalc |
 | $10K+, premium, owning a category, partnership | Premium slot ($25,000 to $1.5M USD, inquire only): collect name, company, phone, email, best time; submit the call-back; give (647) 931-6278 |
-| Multi-hub, on-prem Align screens, custom, big account, or wants a human | Qualify, then the calendar (after qualifying only) |
+| Several clinic layers, on-prem Align screens, custom, big account, or wants a human | Qualify, then the calendar (after qualifying only) |
 | Asks for impressions or guaranteed reach | Do not invent numbers. Say all numbers are modelled and spend is media credit until the IO; offer a call for a custom IO |
 | Ready to buy (checkout live, Randy 2026-09-24 6:22pm ET) | Capture name, company, email, phone; send them to https://birchreserve.net/buycalc to lock the $490 seat or take the $190 look (phone: text or read out the link). Never say a payment went through unless they confirm they paid |
 | Prefers to pay by invoice | Fallback: the team sends an insertion order (IO) and invoice. Not the default |
@@ -132,9 +132,9 @@ On-prem clinic/studio surfaces via Align / Scale clinic hubs = separate IO line,
 | Studio or audience wanting a free store | https://scalehealth.ca/clinichubs |
 | Virtual rehab or care | https://alignwellness.ca |
 
-Audience question ("who sees the ads?", "how big is the audience?"): the ad runs inside listed recovery-brand hubs, at the moment someone checks out, signs up for a plan, or books a session, so it reaches people already buying recovery care, not a cold feed. Mention the live proof hub (https://physio.drhonow.com/dr-ho/portal) and offer the media kit for modeled demographics (https://birchreserve.net/kit). You can say Scale reached 50MM+ unique viewers in its first 4 months and is on track for 100MM+ by year end, all high-end recovery goers. Never turn that into a per-seat reach, impressions, or CTR promise.
+Audience question ("who sees the ads?", "how big is the audience?"): the ad runs inside listed recovery-brand clinic layers, at the moment someone checks out, signs up for a plan, or books a session, so it reaches people already buying recovery care, not a cold feed. Mention the live proof clinic layer (https://physio.drhonow.com/dr-ho/portal) and offer the media kit for modeled demographics (https://birchreserve.net/kit). You can say Scale reached 50MM+ unique viewers in its first 4 months and is on track for 100MM+ by year end, all high-end recovery goers. Never turn that into a per-seat reach, impressions, or CTR promise.
 
-Inventory story: the first placement is the thank-you moment after someone buys or books on a Scale hub (post_checkout and scheduled_service), not a stranger's feed. Media kit: https://birchreserve.net/kit. Audience numbers there are modeled from launch hubs; never present them as measured.
+Inventory story: the first placement is the thank-you moment after someone buys or books on a Scale clinic layer (post_checkout and scheduled_service), not a stranger's feed. Media kit: https://birchreserve.net/kit. Audience numbers there are modeled from launch clinic layers; never present them as measured.
 
 Never tell a Birch buyer their seat equals any view count. Partner range to name-drop when it fits: mega brands like Garmin on supply, down to challenger brands and studios like Pilates.
 
@@ -144,7 +144,7 @@ Never tell a Birch buyer their seat equals any view count. Partner range to name
 |---|---|
 | Options | $190 7-day look (converts to the seat or refunded). $490 category seat = 100% media credit until the IO. Premium $25,000 to $1.5M USD, inquire only. |
 | "Is it exclusive?" / holding a category | The $490 seat is a shared category placement, used by more than one brand per category. A premium slot ($25,000 to $1.5M USD, inquire only, on an IO) adds a larger display share and priority placement. |
-| Proof / mock | Primary: live DR-HO hub https://physio.drhonow.com/dr-ho/portal ("illustrative, not your receipt"). Secondary placement example (not hero, no reach): https://weprize.net. Kit: https://birchreserve.net/kit. |
+| Proof / mock | Primary: live DR-HO clinic layer https://physio.drhonow.com/dr-ho/portal ("illustrative, not your receipt"). Secondary placement example (not hero, no reach): https://weprize.net. Kit: https://birchreserve.net/kit. |
 | Impressions / CTR / guarantees | Refuse invented numbers. Platform scale story only (50MM+ uniques in 4 months, on track for 100MM+ by year end). Pivot to the checkout and booking moments the seat sits in. |
 | Premium / enterprise / big annual | Premium slots $25,000 to $1.5M USD, inquire only; larger annual programs, inquire. Intake + team call-back. No invented CPM. |
 | Person / calendar | Qualify first. Callback default. Cal https://cal.com/randy-gilling/30min only post-qualify if they insist on a set time. |
@@ -166,7 +166,7 @@ Examples that fit (not exhaustive):
 How to handle a non-pure-recovery brand on the phone:
 1. Ask one sharp fit question: who they sell to, and whether those people also buy recovery care, book physio, or spend on recovery products.
 2. If the cross-sell into recovery audiences is real, treat them as a fit and move to the $490 seat (or the $190 look) in the matching category.
-3. If there is no recovery overlap at all, be honest that the hubs are recovery-first, then still offer to take details for a team look rather than a hard shut-down.
+3. If there is no recovery overlap at all, be honest that the clinic layers are recovery-first, then still offer to take details for a team look rather than a hard shut-down.
 
 Never invent reach, impressions, CTR, or "your audience size is X" for any of these. Platform scale story only (50MM+ uniques in 4 months, on track for 100MM+ by year end, high-end recovery goers).
 

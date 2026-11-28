@@ -2,6 +2,9 @@
  * Randy (Nov 27 2026 7:14 PM ET): the Integrity Fitness example is gone from birchreserve.net and the Scale mirror
  * everywhere. This fails if "Integrity" shows up in user-facing copy, example data, asset names or chat knowledge.
  * Allowed: the never-mention guard in pulseIngest.ts and the unrelated db "marketplace integrity" check (not scanned).
+ *
+ * Randy (Nov 27 2026 7:34 PM ET): Kalaya is on the HARD never-mention-to-visitors list too, so the same scan fails
+ * on "kalaya". Allowed: the never-mention guards (agentSearch.ts, hubNameFilter.ts) that exist to block the name.
  */
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -10,11 +13,15 @@ import { join, resolve } from "node:path";
 import { HUB_LADDER, liveHubs } from "../src/lib/hubLadder";
 import { BRAND_HUBS } from "../src/lib/overhaul/model";
 import { PROPOSED_ANCHOR_HUBS } from "../src/lib/overhaul/brandIntake";
+import { NEVER_HUB_NAME } from "../src/lib/overhaul/hubNameFilter";
+import { EXAMPLE_HUBS } from "../../clinichub-media/src/components/example-hubs-gallery";
+import { CLEAR_HUBS, QUEUE_PIPE_HUBS } from "../../clinichub-media/src/components/cobranded-hubs-banner";
 import { CLINIC_LAYER_POOL, pickClinicLayerExamples } from "../../clinichub-media/src/components/br/clinic-layer-term";
 
 const ROOT = resolve(process.cwd(), "..");
 const TEXT = /\.(tsx?|jsx?|mjs|cjs|json|md|txt|html|css|svg|xml)$/i;
 const ALLOW = new Set([resolve(ROOT, "api-server/src/lib/pulseIngest.ts")]);
+const KALAYA_ALLOW = new Set(["api-server/src/lib/agentSearch.ts", "api-server/src/lib/overhaul/hubNameFilter.ts"].map((f) => resolve(ROOT, f)));
 const walk = (dir: string, out: string[] = []): string[] => {
   for (const n of readdirSync(dir)) {
     if (n === "node_modules" || n === "dist" || n.startsWith(".")) continue;
@@ -36,11 +43,23 @@ test("no 'Integrity' in user-facing copy, chat knowledge or example data", () =>
   assert.deepEqual(hits, []);
 });
 
+test("no 'Kalaya' in visitor-facing source, assets, chat or phone knowledge", () => {
+  const hits: string[] = [];
+  for (const f of files) {
+    if (/kalaya/i.test(f.slice(ROOT.length))) hits.push(`file name: ${f.slice(ROOT.length)}`);
+    if (KALAYA_ALLOW.has(f) || !TEXT.test(f)) continue;
+    readFileSync(f, "utf8").split("\n").forEach((line, i) => { if (/kalaya/i.test(line)) hits.push(`${f.slice(ROOT.length)}:${i + 1}`); });
+  }
+  assert.deepEqual(hits, []);
+});
+
 test("hub lists and the clinic layer pop-up carry no Integrity, Kalaya or Align example", () => {
   const names = [...HUB_LADDER, ...liveHubs(), ...BRAND_HUBS, ...PROPOSED_ANCHOR_HUBS, ...CLINIC_LAYER_POOL].map((h) => `${h.key} ${h.name}`);
-  for (const n of names) assert.doesNotMatch(n, /integrity/i, n);
+  for (const n of names) assert.doesNotMatch(n, /integrity|kalaya/i, n);
   for (const x of CLINIC_LAYER_POOL) assert.doesNotMatch(`${x.key} ${x.name} ${x.img}`, /integrity|kalaya|\balign\b/i);
   assert.ok(CLINIC_LAYER_POOL.some((x) => x.key === "dima-lates"), "Dima-lates stays in the pool");
+  for (const h of [...EXAMPLE_HUBS, ...CLEAR_HUBS, ...QUEUE_PIPE_HUBS]) assert.doesNotMatch(`${h.id} ${h.name}`, /integrity|kalaya/i, h.name);
+  assert.ok(NEVER_HUB_NAME.test("Kalaya"), "report hub names from the intake engine drop Kalaya");
 });
 
 test("pop-up rotates: two examples, different pairs across page views", () => {

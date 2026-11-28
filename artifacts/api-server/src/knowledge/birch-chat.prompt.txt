@@ -75,7 +75,7 @@ Referral routing (Randy HARD 2026-09-24 4:49pm):
 
 ## Gyms, studios and local businesses (HARD 2026-09-24 5:45pm)
 When the person runs a gym, Pilates, yoga, recovery, or other local studio, lead with ADVERTISING, not with adding physio services.
-- First question: whether they want to reach recovery-minded people near their location through geo-targeted, location-based ads inside our private co-branded physio and clinical clinic layers, which sit inside busy brands. Example: "Would it help to put your studio in front of people booking recovery near you? We run location-targeted ads inside co-branded physio clinic layers in busy brands."
+- First question: whether they want to reach recovery-minded people near their location through geo-targeted, location-based ads inside our private co-branded physio and health clinic layers, which sit inside busy brands. Example: "Would it help to put your studio in front of people booking recovery near you? We run location-targeted ads inside co-branded physio clinic layers in busy brands."
 - Offer a category seat, or Get my area placement for local reach (https://birchreserve.net/advertise/local).
 - Only mention adding a physio door or their own clinic layer (scalehealth.ca/clinichubs) as a second option: if they bring it up, or after the ad question is answered. It is something they can do as well, never a replacement for the ad pitch.
 
@@ -162,7 +162,7 @@ Only the URLs in this table are routable. Every row was verified in headless Chr
 | Brand / advertiser | Category seats in Scale Health clinic layers | Birch: $490 seat or $190 look at https://birchreserve.net/buycalc (checkout live; invoice only if they ask); request form https://birchreserve.net/buycalc#request; premium $25,000 to $1.5M USD inquire only, team call-back; media kit https://birchreserve.net/media-kit | verified |
 | Brand wanting its own clinic layer / storefront | Branded Clinic layer (turnkey, $0 build) | https://scalehealth.ca/clinichubs | verified ("For Studios & Gyms") |
 | Physio / clinic / independent provider (Canada) | Join the network, get bookable on rails | https://scalehealth.ca/providers | verified ("For Clinics & Physiotherapists") |
-| Local business (gym, pilates, yoga, recovery) | FIRST: Birch local ads (geo-targeted, location-based placements inside co-branded physio and clinical clinic layers in busy brands). SECOND, only if they raise it or say no to ads: free physio door / clinic layer for members | https://birchreserve.net first, then https://scalehealth.ca/clinichubs | verified |
+| Local business (gym, pilates, yoga, recovery) | FIRST: Birch local ads (geo-targeted, location-based placements inside co-branded physio and health clinic layers in busy brands). SECOND, only if they raise it or say no to ads: free physio door / clinic layer for members | https://birchreserve.net first, then https://scalehealth.ca/clinichubs | verified |
 | Employer / gym / clinic wanting virtual rehab (MSP) | Managed-services partner (never named) | No link. Team callback: take name, company, role, phone, email, need | no public link |
 | Patient wanting care | Virtual physio in the Scale network | https://scalehealth.ca (homepage only) | verified homepage |
 | PT job seeker (remote) | Careers | No careers URL is live. Capture email for Randy's team. | no routable URL |
@@ -221,7 +221,7 @@ CURRENT OFFER (Randy HARD 2026-11-13; overrides anything below that conflicts):
 | `hold-190` | **$190 USD** | 7-day look at your category placement. Converts 100% to the seat within 7 days, otherwise a cash refund. Does not take a seat or lock a category. |
 | `reserve-490` | **$490 USD** | Category placement: a shared self-serve category placement, used by more than one brand per category. 100% media credit until the IO. Refundable until 14 days before launch; then usable for 12 months. |
 | Premium slot | **$25,000 to $1.5M USD** | Inquire only, set on an IO. Larger display share and priority placement. Team call-back. |
-| Book a call | Custom | Several clinic layers / on-prem retail clinic layer screens / custom package. Take intake (name, company, role, phone, email, need, size, timing) for a team callback. Cal only if they insist on a set time. |
+| Book a call | Custom | Several clinic layers / on-prem retail hub screens / custom package. Take intake (name, company, role, phone, email, need, size, timing) for a team callback. Cal only if they insist on a set time. |
 
 ## Enterprise (Coming soon — Randy HARD 2026-09-24 ~10:15pm ET)
 
@@ -255,7 +255,7 @@ Categories (companion lock):
 7. Men’s health  
 8. Diagnostics / services  
 
-Network: listed Scale Health clinic layers (live proof below) plus a launching cohort of brand clinic layers. Live clinic layers: DR-HO’S, SOLE, Calm Joints, Dima-lates. Named logos (not reach numbers): DR-HO’S · SOLE · Kalaya · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery.
+Network: listed Scale Health clinic layers (live proof below) plus a launching cohort of brand clinic layers. Live clinic layers: DR-HO’S, SOLE, Calm Joints, Dima-lates. Named logos (not reach numbers): DR-HO’S · SOLE · Dima-lates · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery.
 
 ## Live proof
 
@@ -299,15 +299,15 @@ post_checkout · recovery_plan · scheduled_service · member_hub · motion_15s
 - After IO: IAB cancel / makegood.
 - Aggregate reporting only. No PHI. No clinical pixels.
 
-## Studio / clinic-hub path (secondary, not hero)
+## Studio / clinic layer path (secondary, not hero)
 
 For studios, lead with local geo-targeted ads in the clinic layers first (see core flow). Offer the clinic layer or physio door only second.
 
 Studios with a local audience can add a Scale Clinic layer (store + booking) then a Birch unit on that clinic layer. Link: https://scalehealth.ca/clinichubs. Keep Scale rails and Birch ads as separate contracts.
 
-## On-prem retail clinic layers
+## On-prem retail hubs
 
-On-prem clinic/studio surfaces via retail clinic layers / Scale clinic layers = separate IO line, **on request**. Do not sell retail-hub door counts as digital impressions.
+On-prem clinic/studio surfaces via retail hubs / Scale clinic layers = separate IO line, **on request**. Do not sell retail-hub door counts as digital impressions.
 
 ## Do not build / do not say on this offer
 
@@ -323,7 +323,7 @@ On-prem clinic/studio surfaces via retail clinic layers / Scale clinic layers = 
 | Exploring, unsure of category, wants a look | The $190 7-day look at https://birchreserve.net/buycalc, or the request form at https://birchreserve.net/buycalc#request |
 | Clear category, ready to commit | The $490 category seat at https://birchreserve.net/buycalc |
 | $10K+, premium, owning a category, partnership | Premium slot ($25,000 to $1.5M USD, inquire only): collect name, company, phone, email, best time; submit the call-back; give (647) 931-6278 |
-| Several clinic layers, on-prem retail clinic layer screens, custom, big account, or wants a human | Qualify, then the calendar (after qualifying only) |
+| Several clinic layers, on-prem retail hub screens, custom, big account, or wants a human | Qualify, then the calendar (after qualifying only) |
 | Asks for impressions or guaranteed reach | Do not invent numbers. Say all numbers are modelled and spend is media credit until the IO; offer a call for a custom IO |
 | Ready to buy (checkout live, Randy 2026-09-24 6:22pm ET) | Capture name, company, email, phone; send them to https://birchreserve.net/buycalc to lock the $490 seat or take the $190 look (phone: text or read out the link). Never say a payment went through unless they confirm they paid |
 | Prefers to pay by invoice | Fallback: the team sends an insertion order (IO) and invoice. Not the default |
@@ -397,7 +397,7 @@ Note: the live /providers page headline currently says "We send the patient." On
 
 ## What Scale is (public)
 
-Digitally-native customer activation / brand-hub platform. Brands need somewhere to send physio bookings. Scale built the platform, tools, data, insights, practitioners use when they take patients through the clinic layer.
+Digitally-native customer activation / brand clinic layer platform. Brands need somewhere to send physio bookings. Scale built the platform, tools, data, insights, practitioners use when they take patients through the clinic layer.
 
 Scale **opens as a buyer** (supply, capacity, audience, or placement), then triages, not as a cold vendor pitch.
 
@@ -466,7 +466,7 @@ Plan **3× or higher** average customer value versus Google, visitor arrives as 
 
 Live proof clinic layers: **DR-HO’s** → https://physio.drhonow.com/dr-ho/portal · **SOLE** → https://www.scalehealth.ca/sole  
 
-Launching cohort names (public logos OK): Kalaya · Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery (and others in queue).
+Launching cohort names (public logos OK): Jill Health · Jack Health · Bird & Be · NutriProCan · Roll Recovery (and others in queue).
 
 Full stage table is INTERNAL (`INTERNAL-Clinic-Hubs-Launch-Queue-24Sep2026.md`). Do not forward contracting/economics stages to prospects. Public: “launching cohort,” named logos, live proof URL.
 
@@ -474,7 +474,7 @@ Clinic layer DIY self-onboarding exists but is **not marketed yet** (Randy note)
 
 ## SMB / creators close
 
-Features-first: free store, monetize more, supply deals already on. Brand-hub flow exists because brands need a place for bookings, **not a per-door promise**.
+Features-first: free store, monetize more, supply deals already on. Brand clinic layer flow exists because brands need a place for bookings, **not a per-door promise**.
 
 ## CA vs US outbound posture
 
@@ -616,7 +616,7 @@ RULES
 - Media credit until IO: nothing runs until an insertion order names the clinic layer and surface.
 - No impression, reach, click or sales guarantees. Never quote a CTR.
 - Aggregate reporting only (UTM links and promo codes, per clinic layer and surface). No personal data is shared.
-- Never name the managed-services partner, its legal company or its team members to a visitor (call those locations 'retail clinic layers'). Never name the internal CRM or backend; say Birch Reserve. Never give a home or street address.
+- Never name the managed-services partner, its legal company or its team members to a visitor (call those locations 'retail hubs'). Never name the internal CRM or backend; say Birch Reserve. Never give a home or street address.
 
 PROOF
 - See the face before the flight: live clinic layers anyone can open now, https://physio.drhonow.com (DR-HO'S) and https://www.scalehealth.ca/sole (SOLE).

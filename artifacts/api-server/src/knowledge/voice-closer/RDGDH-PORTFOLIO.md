@@ -14,7 +14,7 @@ No invented metrics. If a number is only on an investor CIM or diligence pack, d
 | **AlignWellness** | https://alignwellness.ca | Allied health / rehab partner-location network under RDG operational control; public site cites scaled from 19 to over 80 active locations (tracking 90+ by YE 2026). |
 | **Scale Health** | https://scalehealth.ca | Digitally-native customer activation platform launching across the Align partner-location network in 2026. |
 | **Silver Birch Growth (SBG)** | https://silverbirchgrowth.com | RDGDH value-creation engine / operator bench; builds Scale Health and Birch Reserve; advertising revenue flows to Scale Health (per RDGDH schema). |
-| **Birch Reserve** | https://birchreserve.net | Automated ad-buying / recovery-economy media channel, category seats on Scale hubs (this closer’s primary product). |
+| **Birch Reserve** | https://birchreserve.net | Automated ad-buying / recovery-economy media channel, category seats on Scale clinic layers (this closer’s primary product). |
 | **AIforHealth Alliance** | https://rdgdh.com/portfolio/aiforhealth | Members-only alliance of North American health & wellness operators; SBG bench; holdco funnel. |
 | **Reforged** | https://getreforged.org | Indigenous-led brick-and-mortar opportunity platform; public launch sequenced after Scale Health in Fall 2026 per schema (timing = site claim; do not invent progress). |
 
@@ -26,7 +26,7 @@ No invented metrics. If a number is only on an investor CIM or diligence pack, d
 
 | Product | URL / note | Factual blurb from files |
 |---------|------------|--------------------------|
-| **WePrize** | https://weprize.net (also weprize.ca) | Canada-first free-contest assist site: friction badges before click, free board, apply assist. Tagline: “Don’t gamble with your time. We apply to free contests for you.” Former name WeContest retired. **Birch Reserve sells display on WePrize** (quiet EXAMPLE property on birchreserve.net — not a featured Scale hub). WePrize Advertise soft-links brands to https://birchreserve.net so the inventory is reciprocal, not random. Do not invent DAU/ARR. |
+| **WePrize** | https://weprize.net (also weprize.ca) | Canada-first free-contest assist site: friction badges before click, free board, apply assist. Tagline: “Don’t gamble with your time. We apply to free contests for you.” Former name WeContest retired. **Birch Reserve sells display on WePrize** (quiet EXAMPLE property on birchreserve.net — not a featured Scale clinic layer). WePrize Advertise soft-links brands to https://birchreserve.net so the inventory is reciprocal, not random. Do not invent DAU/ARR. |
 | **WeFlush** | https://weflush.org (also poopmap.org redirect family) | Bathroom / flush map PWA, “Get the inside flush.” Community map product; WeFlush Bot owns. |
 | **ParKings / GetParkings** | https://getparkings.com | Toronto-first: parking-ticket screening letter (you file on toronto.ca/aps; first eligible letter free; not a law firm) + user-drop street parking map. No promised outcome. |
 

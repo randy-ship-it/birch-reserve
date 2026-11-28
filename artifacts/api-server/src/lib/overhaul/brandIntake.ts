@@ -333,8 +333,8 @@ export const agencyPartnerBlurb = (yes: boolean) => `Agency partner interest: ${
  */
 export const ANCHOR_HUBS_STATUS = "Proposed, pending Randy's confirmation" as const;
 /**
- * Anchor set (Randy, Nov 18 2026 11:34–11:35 PM ET): named publicly on birchreserve.net and in brand kits, Kalaya
- * included. Status follows the hub list: DR-HO'S and SOLE are live today; the rest are in queue. Proposed, not confirmed.
+ * Anchor set (Randy, Nov 18 2026 11:34–11:35 PM ET): named publicly on birchreserve.net and in brand kits.
+ * Never-mention names stay out (Randy, Nov 27 2026); Dima-lates is the live studio example. Status follows the hub list: DR-HO'S and SOLE are live today; the rest are in queue. Proposed, not confirmed.
  * Retail locations are referred to only as "retail hubs" (Retail Network tile), never by an operator name.
  */
 export const PROPOSED_ANCHOR_HUBS = [
@@ -347,7 +347,7 @@ export const PROPOSED_ANCHOR_HUBS = [
   { key: "sole", name: "SOLE", what: "Foot pain, insoles and active footwear", fits: ["recovery", "fitness"], live: true },
   { key: "effortless-admin", name: "Effortless Admin", what: "Benefits and wellness admin clinic layer", fits: ["longevity", "supplements", "sleep"], live: false },
   { key: "bird-and-be", name: "Bird & Be", what: "Postpartum recovery and pelvic-floor care", fits: ["recovery", "physio", "longevity"], live: false },
-  { key: "kalaya", name: "Kalaya", what: "Topical pain relief", fits: ["recovery", "physio", "sleep"], live: false },
+  { key: "dima-lates", name: "Dima-lates", what: "Pilates studio members in Ajax, ON", fits: ["fitness", "recovery", "longevity"], live: true },
 ] as const;
 
 export const anchorName = (key: string | undefined, name: string) => PROPOSED_ANCHOR_HUBS.find((h) => h.key === key)?.name ?? name;

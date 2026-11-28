@@ -23,7 +23,7 @@ If a claim is not in this pack’s approved files → treat as **UNKNOWN**. Offe
 
 ## Birch brand / display calls, never as sold Birch traffic
 
-- Any view, impression, CTR, or patient guarantee tied to a single seat, hub, or listing. (The Scale platform story, 50MM+ unique viewers in 4 months and on track for 100MM+ by year end, IS allowed as network scale; see core identity. Randy HARD 2026-09-24 4:46pm supersedes the earlier 50MM ban.)
+- Any view, impression, CTR, or patient guarantee tied to a single seat, clinic layer, or listing. (The Scale platform story, 50MM+ unique viewers in 4 months and on track for 100MM+ by year end, IS allowed as network scale; see core identity. Randy HARD 2026-09-24 4:46pm supersedes the earlier 50MM ban.)
 - **1MM uniques** as Birch traffic.
 - **100MM** stated as current traffic. It is a year-end target: always "on track for 100MM+ by year end".
 - **1MM patients** as Birch uniques.
@@ -77,6 +77,6 @@ Never push Randy's calendar link. Don't put it in greetings, closes, option list
 ## WePrize placement example (Randy HARD 2026-09-25 ~4:12pm ET)
 
 - Never invent WePrize traffic, reach, CTR, impressions, seat-as-views, or user counts.
-- WePrize is a **placement example only** (quiet display inventory Birch/SBG sells). Not a Scale hub seat. Not hero / Featured Format.
-- Do not claim WePrize is part of the category placements or the Example hubs gallery.
+- WePrize is a **placement example only** (quiet display inventory Birch/SBG sells). Not a Scale clinic layer seat. Not hero / Featured Format.
+- Do not claim WePrize is part of the category placements or the Example clinic layers gallery.
 
