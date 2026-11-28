@@ -5,7 +5,7 @@
  * Used by /kit/r/:token (Friday data) and the /intake sample (labelled sample). Birch's site chrome stays Birch's.
  *
  * Never rendered: Friday's internal "excluded: competes" data (stripped server-side too), match results, private
- * partners. Hub names are checked against Birch's never-mention list (Kalaya is allowed; known anchors show by name).
+ * partners. Hub names are checked against Birch's never-mention list (known anchors show by name).
  */
 import { useEffect, useState, type ReactNode } from "react";
 import { X } from "lucide-react";

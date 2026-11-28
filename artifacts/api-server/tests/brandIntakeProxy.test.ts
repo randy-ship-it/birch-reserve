@@ -212,7 +212,7 @@ test("excluded competing hubs never reach the browser: keys, flagged items and n
   const out = publicGates(JSON.stringify(raw));
   assert.doesNotMatch(out, /exclu|compet|Rival|Clairvoyant/i);
   const o = JSON.parse(out);
-  assert.deepEqual(o.report.hubs.map((h: { key: string }) => h.key), ["a", "kalaya"]); // Kalaya may be named (Randy 11:34 PM)
+  assert.deepEqual(o.report.hubs.map((h: { key: string }) => h.key), ["a"]); // Kalaya is never-mention (Randy, Nov 27 2026)
   assert.equal(o.report.demand_fit.anchor_hubs.length, 1);
 });
 

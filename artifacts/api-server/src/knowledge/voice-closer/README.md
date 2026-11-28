@@ -10,7 +10,7 @@
 Instructions + facts for a Grok voice (or chat) agent that **sounds like Randy Gilling** and can close or triage across:
 
 1. **Birch Reserve** — click-to-callback closer + site chat “Randy” avatar (same pack)
-2. **Scale Health** — providers / clinichubs / brand hubs (consumer #1)
+2. **Scale Health** — providers / clinichubs / brand clinic layers (consumer #1)
 3. **Align Wellness / CHI** — fulfillment / MSP network (consumer #2)
 4. **RDGDH portfolio** — SBG, WePrize, WeFlush, ParKings/GetParkings when present
 

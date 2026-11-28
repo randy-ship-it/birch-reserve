@@ -24,7 +24,7 @@ export const HUB_PROFILES: Record<string, HubProfile> = {
   "dr-ho": { kind: "product", skus: ["tens_device", "massage_device", "pain_relief_device", "compression"], leads: [], cats: ["recovery_devices", "pain_relief_topicals"] },
   "roll-recovery": { kind: "product", skus: ["massage_gun", "foam_roller", "recovery_tools", "compression"], leads: [], cats: ["recovery_devices", "strength_home_fitness"] },
   sole: { kind: "product", skus: ["insoles", "footwear"], leads: [], cats: ["footwear_insoles_compression"] },
-  kalaya: { kind: "product", skus: ["topical_pain_relief"], leads: [], cats: ["pain_relief_topicals"] },
+  "dima-lates": { kind: "service", skus: [], leads: ["pilates", "fitness_classes"], cats: ["strength_home_fitness"] },
   "jill-health": { kind: "service", skus: [], leads: ["hormonal", "menopause", "glp1", "womens_health"], cats: ["digital_health_telehealth", "health_testing_longevity"] },
   "jack-health": { kind: "service", skus: [], leads: ["hormonal", "trt", "glp1", "mens_health"], cats: ["digital_health_telehealth", "health_testing_longevity"] },
   nutriprocan: { kind: "service", skus: [], leads: ["dietitian", "nutrition_coaching", "glp1"], cats: ["sports_nutrition"] },

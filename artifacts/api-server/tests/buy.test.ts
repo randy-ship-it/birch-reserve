@@ -13,9 +13,9 @@ import { PUBLIC_RESERVE_OFFERS, reserveCheckoutLineItem } from "../src/lib/reser
 import { PUBLIC_SITEMAP_PATHS } from "../src/lib/publicSeo";
 import { buildAreaLockSession } from "../src/lib/overhaul/checkout";
 
-// Copy rules (Randy, Nov 2026). Kalaya is allowed.
+// Copy rules (Randy, Nov 2026). Kalaya is never mentioned to visitors (Nov 27 2026).
 const BANNED = [
-  /\bFriday\b/, /\bAlign\b/, /Clairvoyant/i, /Alset/i, /80 locations/i, /MedVibe/i, /\bsigned partners\b/i, /Integrity Fitness/i,
+  /\bFriday\b/, /\bAlign\b/, /Clairvoyant/i, /Alset/i, /80 locations/i, /MedVibe/i, /\bsigned partners\b/i, /Integrity Fitness/i, /Kalaya/i,
   // CAD is allowed since Nov 21 2026 3:34 PM ET (geo currency + toggle); C$ shorthand stays out.
   /\bPublisher\b/, /C\$/, /guarantee(d)? (results|reach|impressions|roi|leads|views)/i, /\bROAS\b/, /\bCTR\b/,
   /\b(not taken|unclaimed|is open|are open|still open|open now|0 (hubs|brands|spots|seats))\b/i, /\bseats? left\b/i, /—/,

@@ -138,9 +138,9 @@ test("kit calculator module stays framework-light (reusable by scalehealth.ca/cl
 
 test("Side B anchor hubs: proposed, pending Randy, public-OK names only", () => {
   assert.equal(ANCHOR_HUBS_STATUS, "Proposed, pending Randy's confirmation");
-  const publicNames = new Set([...BRAND_HUBS.map((h) => h.name), "Kalaya"]); // Kalaya public per Randy 11:34 PM
+  const publicNames = new Set(BRAND_HUBS.map((h) => h.name)); // never-mention names stay out (Randy, Nov 27 2026)
   for (const h of PROPOSED_ANCHOR_HUBS) assert.ok(publicNames.has(h.name), h.name);
-  assert.deepEqual(PROPOSED_ANCHOR_HUBS.map((h) => h.key), ["dr-ho", "calm-joints", "roll-recovery", "jill-health", "jack-health", "nutriprocan", "sole", "effortless-admin", "bird-and-be", "kalaya"]);
+  assert.deepEqual(PROPOSED_ANCHOR_HUBS.map((h) => h.key), ["dr-ho", "calm-joints", "roll-recovery", "jill-health", "jack-health", "nutriprocan", "sole", "effortless-admin", "bird-and-be", "dima-lates"]);
   assert.deepEqual(EXPOSURE_CHANNELS[0]!.cpm, HUB_RATE_RANGE.cpm);
   assert.deepEqual(HUB_RATE_RANGE.cpm, [4, 45]);
   assert.ok(EXPOSURE_CHANNELS.slice(1).every((c) => c.cpm === null), "no rate card for other channels: priced by IO");

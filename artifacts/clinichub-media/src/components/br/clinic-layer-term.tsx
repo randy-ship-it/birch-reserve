@@ -5,7 +5,7 @@
  *
  * Pool (Randy, Nov 27 2026 7:14 PM ET): real, live clinic layers on scalehealth.ca that are not Align Network clinics,
  * shown two at a time and rotated per page view so it is never the same pair. Crops come from the live public pages
- * and were checked for "exclusive" text, Align branding and zero counts. Never add Kalaya or an Align Network clinic.
+ * and were checked for "exclusive" text, Align branding and zero counts. Never add a never-mention name or an Align Network clinic.
  */
 import { useRef, useState, type ReactNode } from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";

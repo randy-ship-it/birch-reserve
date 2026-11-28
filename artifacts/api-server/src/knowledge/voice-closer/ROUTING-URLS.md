@@ -7,16 +7,16 @@ Only the URLs in this table are routable. Every row was verified in headless Chr
 
 | Visitor is… | Wants… | Send to | Status (2026-09-24) |
 |---|---|---|---|
-| Brand / advertiser | Category seats in Scale Health hubs | Birch: $490 seat or $190 look at https://birchreserve.net/buycalc (checkout live; invoice only if they ask); request form https://birchreserve.net/buycalc#request; premium $25,000 to $1.5M USD inquire only, team call-back; media kit https://birchreserve.net/media-kit | verified |
-| Brand wanting its own hub / storefront | Branded Clinic Hub (turnkey, $0 build) | https://scalehealth.ca/clinichubs | verified ("For Studios & Gyms") |
+| Brand / advertiser | Category seats in Scale Health clinic layers | Birch: $490 seat or $190 look at https://birchreserve.net/buycalc (checkout live; invoice only if they ask); request form https://birchreserve.net/buycalc#request; premium $25,000 to $1.5M USD inquire only, team call-back; media kit https://birchreserve.net/media-kit | verified |
+| Brand wanting its own clinic layer / storefront | Branded Clinic layer (turnkey, $0 build) | https://scalehealth.ca/clinichubs | verified ("For Studios & Gyms") |
 | Physio / clinic / independent provider (Canada) | Join the network, get bookable on rails | https://scalehealth.ca/providers | verified ("For Clinics & Physiotherapists") |
-| Local business (gym, pilates, yoga, recovery) | FIRST: Birch local ads (geo-targeted, location-based placements inside co-branded physio and clinical hubs in busy brands). SECOND, only if they raise it or say no to ads: free physio door / hub for members | https://birchreserve.net first, then https://scalehealth.ca/clinichubs | verified |
+| Local business (gym, pilates, yoga, recovery) | FIRST: Birch local ads (geo-targeted, location-based placements inside co-branded physio and health clinic layers in busy brands). SECOND, only if they raise it or say no to ads: free physio door / clinic layer for members | https://birchreserve.net first, then https://scalehealth.ca/clinichubs | verified |
 | Employer / gym / clinic wanting virtual rehab (MSP) | Align Wellness care | https://alignwellness.ca | verified homepage |
 | Patient wanting care | Virtual physio | https://alignwellness.ca (homepage only; there is no live booking sub-page) | verified homepage |
 | PT job seeker (remote) | Careers | No careers URL is live. Capture email for Randy's team. | no routable URL |
 | Brand partnership / other Scale | General Scale | https://scalehealth.ca (homepage only) | verified homepage |
 | Investor / buyer | RDGDH portfolio | https://rdgdh.com/portfolio | verified |
-| Wants to see proof | Live hub | https://physio.drhonow.com/dr-ho/portal | verified |
+| Wants to see proof | Live clinic layer | https://physio.drhonow.com/dr-ho/portal | verified |
 | Wants a human | Team callback: take name, company, role, phone, email, need, size, timing | (no link; intake is captured and emailed to the team) | verified |
 | Explicitly insists on a set booking time | Randy's calendar | https://cal.com/randy-gilling/30min (last resort only, never offered proactively) | verified |
 

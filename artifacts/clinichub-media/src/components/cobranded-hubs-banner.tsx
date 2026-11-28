@@ -16,7 +16,7 @@ export type HubBannerChip = {
 /** LIVE + listed/launching — clear (unblurred). */
 export const CLEAR_HUBS: ReadonlyArray<HubBannerChip> = [
   { id: "dr-ho", name: "DR-HO's", live: true },
-  { id: "kalaya", name: "Kalaya" },
+  { id: "dima-lates", name: "Dima-lates", live: true },
   { id: "jill-health", name: "Jill Health" },
   { id: "jack-health", name: "Jack Health" },
   { id: "bird-and-be", name: "Bird & Be" },
